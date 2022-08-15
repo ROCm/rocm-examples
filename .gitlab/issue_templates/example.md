@@ -1,0 +1,22 @@
+# Example checklist
+
+- Elaboration
+	- [ ] Example concept is described and agreed on
+- Implementation
+	- [ ] Example is implemented
+	- CMake support is added
+		- [ ] Linux
+		- [ ] Windows
+	- [ ] GNU Make support is added (Linux)
+	- [ ] Visual Studio project is added (Windows)
+		- [ ] Project is added to the root solution
+	- [ ] Inline code documentation is added
+	- [ ] README is added according to template
+		- [ ] Related READMEs, ToC are updated
+	- [ ] Internal CI passes
+- Internal review
+	- [ ] Internal code review is done
+- External review
+	- [ ] Upstreaming PR is opened, external code review is done
+- Done
+	- [ ] Example merged to upstream

@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32630.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{052412EF-7CEB-4E32-96F9-AADBC70945D7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocRAND", "rocRAND", "{B8AE36C3-BE07-48B0-B375-5BAAE9355A45}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_distributions_cpp_vs2019", "Libraries\rocRAND\simple_distributions_cpp\simple_distributions_cpp_vs2019.vcxproj", "{13BB009A-0679-49C0-A763-3F0A388EA78F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "exampleLibraryTemplate", "exampleLibraryTemplate", "{D3D306DE-0AB5-4B05-A089-F9E5E7100611}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "example_template_vs2019", "Libraries\exampleLibraryTemplate\example_template\example_template_vs2019.vcxproj", "{B885EF49-EDAA-4474-8D31-E0EF71D2BB3D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13BB009A-0679-49C0-A763-3F0A388EA78F}.Debug|x64.ActiveCfg = Debug|x64
+		{13BB009A-0679-49C0-A763-3F0A388EA78F}.Debug|x64.Build.0 = Debug|x64
+		{13BB009A-0679-49C0-A763-3F0A388EA78F}.Release|x64.ActiveCfg = Release|x64
+		{13BB009A-0679-49C0-A763-3F0A388EA78F}.Release|x64.Build.0 = Release|x64
+		{B885EF49-EDAA-4474-8D31-E0EF71D2BB3D}.Debug|x64.ActiveCfg = Debug|x64
+		{B885EF49-EDAA-4474-8D31-E0EF71D2BB3D}.Debug|x64.Build.0 = Debug|x64
+		{B885EF49-EDAA-4474-8D31-E0EF71D2BB3D}.Release|x64.ActiveCfg = Release|x64
+		{B885EF49-EDAA-4474-8D31-E0EF71D2BB3D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{B8AE36C3-BE07-48B0-B375-5BAAE9355A45} = {052412EF-7CEB-4E32-96F9-AADBC70945D7}
+		{13BB009A-0679-49C0-A763-3F0A388EA78F} = {B8AE36C3-BE07-48B0-B375-5BAAE9355A45}
+		{D3D306DE-0AB5-4B05-A089-F9E5E7100611} = {052412EF-7CEB-4E32-96F9-AADBC70945D7}
+		{B885EF49-EDAA-4474-8D31-E0EF71D2BB3D} = {D3D306DE-0AB5-4B05-A089-F9E5E7100611}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
+	EndGlobalSection
+EndGlobal
