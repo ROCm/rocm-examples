@@ -1,0 +1,216 @@
+# MIT License
+#
+# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+include:
+  - project: 'amd/ci-templates'
+    ref: main
+    file:
+      - /defaults.yaml
+      - /gpus-rocm.yaml
+      - /gpus-nvcc.yaml
+      - /rules.yaml
+
+stages:
+  - lint
+  - build
+  - test
+
+clang-format:
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  stage: lint
+  needs: []
+  tags:
+    - rocm-build
+  variables:
+    CLANG_FORMAT: "/opt/rocm/llvm/bin/clang-format"
+    GIT_CLANG_FORMAT: "/opt/rocm/llvm/bin/git-clang-format"
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - cd $CI_PROJECT_DIR
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+    - scripts/code-format/check-format.sh $CI_MERGE_REQUEST_DIFF_BASE_SHA --binary "$CLANG_FORMAT"
+
+.build:dockerfiles:
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  stage: build
+  needs: []
+  tags:
+    - rocm-build
+  script:
+    - mkdir -p /kaniko/.docker
+    - echo "${DOCKER_AUTH_CONFIG}" > /kaniko/.docker/config.json
+    - if [ "$CI_COMMIT_BRANCH" != "$CI_DEFAULT_BRANCH" ]; then NO_PUSH="--no-push"; fi;
+    - >-
+      /kaniko/executor
+      --context "${CI_PROJECT_DIR}/Dockerfiles"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfiles/hip-libraries-${TAG}.Dockerfile"
+      --destination "docker.io/${DOCKER_TAG_PREFIX}:${TAG}"
+      ${NO_PUSH}
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+      changes:
+        - Dockerfiles/hip-libraries-${TAG}.Dockerfile
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      changes:
+        - Dockerfiles/hip-libraries-${TAG}.Dockerfile
+
+build:rocm-ubuntu-dockerfile:
+  extends:
+    - .build:dockerfiles
+  variables:
+    TAG: rocm-ubuntu
+
+build:cuda-ubuntu-dockerfile:
+  extends:
+    - .build:dockerfiles
+  variables:
+    TAG: cuda-ubuntu
+
+build:make-rocm:
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  stage: build
+  extends:
+    - .rules:build
+  tags:
+    - rocm-build
+  needs: []
+  script:
+    - cd $CI_PROJECT_DIR && make -j $(nproc)
+
+build:make-cuda:
+  image: $DOCKER_TAG_PREFIX:cuda-ubuntu
+  stage: build
+  extends:
+    - .rules:build
+  tags:
+    - nvcc-build
+  needs: []
+  script:
+    - cd $CI_PROJECT_DIR && make GPU_RUNTIME=CUDA -j $(nproc)
+
+.build:cmake:
+  stage: build
+  extends:
+    - .rules:build
+  needs: []
+  artifacts:
+    paths:
+      - $CI_PROJECT_DIR/build
+
+build:cmake-rocm:
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  extends:
+    - .build:cmake
+    - .gpus:rocm-gpus
+  tags:
+    - rocm-build
+  script:
+    - cmake
+      -S $CI_PROJECT_DIR
+      -B $CI_PROJECT_DIR/build
+      -D CMAKE_HIP_ARCHITECTURES="$GPU_TARGETS"
+    - cmake --build $CI_PROJECT_DIR/build
+
+build:cmake-cuda:
+  image: $DOCKER_TAG_PREFIX:cuda-ubuntu
+  extends:
+    - .build:cmake
+  tags:
+    - nvcc-build
+  script:
+    - cmake
+      -S $CI_PROJECT_DIR
+      -B $CI_PROJECT_DIR/build
+      -D GPU_RUNTIME=CUDA
+    - cmake --build $CI_PROJECT_DIR/build
+
+.test:
+  stage: test
+  extends:
+    - .rules:test
+  script:
+    - cd $CI_PROJECT_DIR/build && ctest --output-on-failure
+
+test:rocm:
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  extends:
+    - .test
+    - .gpus:rocm
+  needs:
+    - build:cmake-rocm
+
+test:cuda:
+  image: $DOCKER_TAG_PREFIX:cuda-ubuntu
+  extends:
+    - .test
+    - .gpus:nvcc
+  needs:
+    - build:cmake-cuda
+
+.test:windows:
+  extends:
+    - .rules:test
+  stage: test
+  tags:
+    - windows
+    - shell
+    - rx6900
+  needs: []
+  parallel:
+    matrix:
+      - BUILD_TYPE: [Debug, Release]
+
+test:rocm-windows-vs2019:
+  extends:
+    - .test:windows
+  script:
+    - >
+      & "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe"
+      /maxCpuCount
+      "/p:Configuration=$BUILD_TYPE"
+      "$CI_PROJECT_DIR"
+    - |-
+      Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
+      ForEach-Object {
+        echo "--" $_.Name
+        & "$_"
+        if (!$?) {
+          throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
+        }
+      }
+
+test:rocm-windows-cmake:
+  extends:
+    - .test:windows
+  script:
+    - cmake
+      -S "$CI_PROJECT_DIR"
+      -B "$CI_PROJECT_DIR/build"
+      -G Ninja
+      -D CMAKE_BUILD_TYPE="$CONFIG"
+      -D CMAKE_HIP_ARCHITECTURES=gfx1030
+      -D CMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe"
+    - cmake --build "$CI_PROJECT_DIR/build"
+    - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure
