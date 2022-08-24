@@ -20,7 +20,7 @@ This example showcases launching kernels and printing from device programs.
     - `threadIdx` is the 3D coordinate of the active work item in the block of threads. 
     - `blockIdx` is the 3D coordinate of the active work item in the grid of blocks.
 
-## Used API surface
+## Demonstrated API Calls
 ### HIP Runtime
 - `hipLaunchKernelGGL`
 - `hipDeviceSynchronize`
