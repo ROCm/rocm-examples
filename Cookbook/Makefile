@@ -20,9 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(ROCMm-SDK-Examples)
-enable_testing()
+EXAMPLES := \
+	hello_world
 
-add_subdirectory(Cookbook)
-add_subdirectory(Libraries)
+all: $(EXAMPLES)
+
+clean: TARGET=clean
+clean: all
+
+$(EXAMPLES):
+	$(MAKE) -C $@ $(TARGET)
+
+.PHONY: all clean $(EXAMPLES)

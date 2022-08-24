@@ -21,8 +21,6 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(ROCMm-SDK-Examples)
-enable_testing()
+project(Cookbook)
 
-add_subdirectory(Cookbook)
-add_subdirectory(Libraries)
+add_subdirectory(hello_world)

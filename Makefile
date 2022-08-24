@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 SUB_PROJECTS := \
+	Cookbook \
 	Libraries
 
 all: $(SUB_PROJECTS)

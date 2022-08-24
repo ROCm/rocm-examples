@@ -2,6 +2,8 @@
 
 ## Repository Contents
 - [Common](/Common/) contains common utility functionality shared between the examples.
+- [Cookbook](/Cookbook/) hosts self-contained recipes showcasing HIP runtime functionality.
+    -  [hello_world](/Cookbook/hello_world): Simple program that showcases launching kernels and printing from the device.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
 - [docs](/docs/)
     - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
