@@ -30,7 +30,7 @@ A PRNG engine typically generates uniformly distributed integral numbers over th
 
 For the full list of implemented distributions, refer to the documentation.
 
-## Used API surface
+## Demonstrated API Calls
 
 ### rocRAND
 - `rocrand_cpp::default_random_engine`

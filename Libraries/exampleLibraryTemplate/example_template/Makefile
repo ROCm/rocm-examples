@@ -45,7 +45,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
 	CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
 else ifeq ($(GPU_RUNTIME), HIP)
 else
-$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
