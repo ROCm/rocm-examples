@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
+	device_query \
 	hello_world
 
 all: $(EXAMPLES)
