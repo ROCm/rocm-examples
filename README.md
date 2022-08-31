@@ -3,9 +3,18 @@
 ## Repository Contents
 - [Common](/Common/) contains common utility functionality shared between the examples.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
+- [docs](/docs/)
+    - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
 - [Libraries](/Libraries/)
     - [rocRAND](/Libraries/rocRAND/)
         - [simple_distributions_cpp](/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
+    - [rocThrust](/Libraries/rocThrust/)
+        - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
+        - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
+        - [reduce_sum](/Libraries/rocThrust/reduce_sum/): An example that computes the sum of a `thrust::device_vector` integer vector using the `thrust::reduce()` generalized summation and the `thrust::plus` operator.
+        - [remove_points](/Libraries/rocThrust/remove_points/): Simple program that demonstrates the usage of the `thrust` random number generation, host vector, generation, tuple, zip iterator, and conditional removal templates. It generates a number of random points in a unit square and then removes all of them outside the unit circle.
+        - [saxpy](/Libraries/rocThrust/saxpy/): Simple program that implements the SAXPY operation (`Y[i] = a * X[i] + Y[i]`) using rocThrust and showcases the usage of the vector and functor templates and of `thrust::fill` and `thrust::transform` operations.
+        - [vectors](/Libraries/rocThrust/vectors/): Simple program that showcases the `host_vector` and the `device_vector` of rocThrust.
 
 ## Prerequisites
 ### Linux

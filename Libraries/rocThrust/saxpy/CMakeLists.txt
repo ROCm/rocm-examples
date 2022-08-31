@@ -20,15 +20,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	Libraries
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocthrust_saxpy LANGUAGES CXX HIP)
 
-all: $(SUB_PROJECTS)
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
-clean: TARGET=clean
-clean: all
+if(NOT CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "/opt/rocm")
+endif()
 
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(SUB_PROJECTS)
+find_package(rocthrust REQUIRED CONFIG)
+add_executable(rocthrust_saxpy main.hip)
+target_link_libraries(rocthrust_saxpy PRIVATE roc::rocthrust)
+add_test(rocthrust_saxpy rocthrust_saxpy)
+target_include_directories(rocthrust_saxpy PRIVATE "../../../Common")

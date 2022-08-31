@@ -20,15 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	Libraries
+EXAMPLES := \
+	device_ptr \
+	norm \
+	reduce_sum \
+	remove_points \
+	saxpy \
+	vectors
 
-all: $(SUB_PROJECTS)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(SUB_PROJECTS):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(SUB_PROJECTS)
+.PHONY: all clean $(EXAMPLES)

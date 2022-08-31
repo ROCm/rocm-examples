@@ -20,15 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	Libraries
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocThrust_examples)
 
-all: $(SUB_PROJECTS)
+if(GPU_RUNTIME STREQUAL "CUDA")
+    message(STATUS "rocThrust examples do not support the CUDA runtime")
+    return()
+endif()
 
-clean: TARGET=clean
-clean: all
-
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(SUB_PROJECTS)
+add_subdirectory(device_ptr)
+add_subdirectory(norm)
+add_subdirectory(reduce_sum)
+add_subdirectory(saxpy)
+add_subdirectory(remove_points)
+add_subdirectory(vectors)

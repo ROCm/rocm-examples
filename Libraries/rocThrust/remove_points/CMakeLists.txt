@@ -20,15 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	Libraries
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocthrust_remove_points LANGUAGES CXX HIP)
 
-all: $(SUB_PROJECTS)
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
-clean: TARGET=clean
-clean: all
+if(NOT CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "/opt/rocm")
+endif()
 
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
+find_package(rocthrust REQUIRED CONFIG)
 
-.PHONY: all clean $(SUB_PROJECTS)
+add_executable(rocthrust_remove_points main.hip)
+target_link_libraries(rocthrust_remove_points PRIVATE roc::rocthrust)
+target_include_directories(rocthrust_remove_points PRIVATE "../../../Common")
+
+add_test(rocthrust_remove_points rocthrust_remove_points)

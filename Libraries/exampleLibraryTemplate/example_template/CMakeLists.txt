@@ -46,10 +46,12 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
+set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "/opt/rocm")
+    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 endif()
 
+# DELETE ME: Remove if no required libraries (such as HIP examples without dependencies).
 # List required packages
 find_package(${library_name} REQUIRED CONFIG)
 
@@ -57,10 +59,20 @@ add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(${example_name} ${example_name})
 
+# DELETE ME: Update path depending on directory nesting.
+set(include_dirs "../../../Common")
+# DELETE ME: Adding the HIP header directory is only required for examples that directly 
+#            depend on HIP without linking to a HIP-based library
+# For examples targeting NVIDIA, include the HIP header directory.
+if(GPU_RUNTIME STREQUAL "CUDA")
+    list(APPEND include_dirs "${ROCM_ROOT}/include")
+endif()
+
+# DELETE ME: remove if no libraries to be linked
 # Link to example library
 target_link_libraries(${example_name}
     PRIVATE
     ${library_target_name}
 )
-target_include_directories(${example_name} PRIVATE "../../../Common")
+target_include_directories(${example_name} PRIVATE ${include_dirs})
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})

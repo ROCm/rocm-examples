@@ -20,15 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	Libraries
+ROCM_INSTALL_DIR = /opt/rocm
+HIPCXX = $(ROCM_INSTALL_DIR)/bin/hipcc
+CXX_STD = c++17
+COMMON_INCLUDE_DIR = ../../../Common
 
-all: $(SUB_PROJECTS)
+rocthrust_device_ptr: main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $< -std=$(CXX_STD) -I $(COMMON_INCLUDE_DIR) -o $@
 
-clean: TARGET=clean
-clean: all
+clean:
+	rm -f rocthrust_device_ptr
 
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(SUB_PROJECTS)
+.PHONY: clean

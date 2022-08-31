@@ -12,7 +12,7 @@
 ## Key APIs and Concepts
 *List and explain the APIs used in the example and the library's high-level concepts behind these APIs. Give an overview of the structure of the library and how the showcased APIs can interact with other facilities of the library.*
 
-## Used API surface
+## Demonstrated API Calls
 
 ### `example-library-name`
 *List the library's API functions presented in this example.*

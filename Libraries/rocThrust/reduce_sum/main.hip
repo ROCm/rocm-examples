@@ -20,21 +20,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// DELETE ME: the file-extension should be ".hip" when device code is compiled or ".cpp" when not
-// DELETE ME: use lower_snake_case style for names (i.e. foo_bar)
-// DELETE ME: use CUDA-style variables for kernel dimensions i.e. blockIdx.x, blockDim.x and threadIdx.x etc
+#include <cstddef>
+#include <iostream>
 
-// DELETE ME: order includes from most to least specific (i.e. "local" headers first) to make sure, that headers are self-contained
+#include <thrust/device_vector.h>
+#include <thrust/host_vector.h>
+#include <thrust/reduce.h>
 
-// DELETE ME: e.g.:
-// #include "local_include.hpp"
+#include "example_utils.hpp"
 
-// #include "example_utils.hpp"
+int main()
+{
+    // create a host vector with 4 elements
+    thrust::host_vector<int> host_vector(4);
+    host_vector[0] = 33;
+    host_vector[1] = -1;
+    host_vector[2] = 0;
+    host_vector[3] = 10;
 
-// #include <some_library/header.hpp>
+    // print the elements of the vector
+    std::cout << "host_vector after setting elements: "
+              << format_range(host_vector.begin(), host_vector.end()) << std::endl;
 
-// #include <hip/hip_runtime.h>
+    // transfer to device and compute sum
+    const thrust::device_vector<int> device_vector = host_vector;
 
-// #include <iostream>
+    // initial value used in the summation
+    constexpr int initial_value = 500;
 
-int main(/*(DELETE ME: command line arguments are optional)const int argc, const char** argv*/) {}
+    // compute sum
+    const int sum = thrust::reduce(device_vector.begin(),
+                                   device_vector.end(),
+                                   initial_value,
+                                   thrust::plus<int>{});
+
+    // print the sum
+    std::cout << "The sum is: " << sum << std::endl;
+}

@@ -24,7 +24,8 @@ LIBRARIES := \
 	exampleLibraryTemplate \
 	rocRAND
 ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES +=
+LIBRARIES += \
+	rocThrust
 endif
 
 all: $(LIBRARIES)
