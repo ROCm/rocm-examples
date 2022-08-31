@@ -20,21 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	exampleLibraryTemplate \
-	hipCUB \
-	rocRAND
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocThrust
-endif
+EXAMPLES := \
+	device_radix_sort \
+	device_sum
 
-all: $(LIBRARIES)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(LIBRARIES):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(LIBRARIES)
+.PHONY: all clean $(EXAMPLES)

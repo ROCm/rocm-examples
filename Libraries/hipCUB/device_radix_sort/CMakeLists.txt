@@ -20,21 +20,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	exampleLibraryTemplate \
-	hipCUB \
-	rocRAND
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocThrust
-endif
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(hipcub_device_radix_sort LANGUAGES CXX)
 
-all: $(LIBRARIES)
+set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
+set(GPU_RUNTIMES "HIP" "CUDA")
+set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
 
-clean: TARGET=clean
-clean: all
+if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
+    message(FATAL_ERROR "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}")
+endif()
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+enable_language(${GPU_RUNTIME})
+set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
+set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
+set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-.PHONY: all clean $(LIBRARIES)
+if(NOT CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "/opt/rocm")
+endif()
+
+find_package(hipcub REQUIRED CONFIG)
+
+add_executable(hipcub_device_radix_sort main.hip)
+add_test(hipcub_device_radix_sort hipcub_device_radix_sort)
+
+target_link_libraries(hipcub_device_radix_sort
+    PRIVATE
+    hip::hipcub
+)
+target_include_directories(hipcub_device_radix_sort
+    PRIVATE
+    "../../../Common"
+)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})

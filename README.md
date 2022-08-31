@@ -6,6 +6,9 @@
 - [docs](/docs/)
     - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
 - [Libraries](/Libraries/)
+    - [hipCUB](/Libraries/hipCUB/)
+        - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
+        - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
     - [rocRAND](/Libraries/rocRAND/)
         - [simple_distributions_cpp](/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
     - [rocThrust](/Libraries/rocThrust/)

@@ -23,5 +23,6 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(Libraries)
 add_subdirectory(exampleLibraryTemplate)
+add_subdirectory(hipCUB)
 add_subdirectory(rocRAND)
 add_subdirectory(rocThrust)

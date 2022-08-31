@@ -20,21 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	exampleLibraryTemplate \
-	hipCUB \
-	rocRAND
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocThrust
-endif
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(hipCUB_examples)
 
-all: $(LIBRARIES)
-
-clean: TARGET=clean
-clean: all
-
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(LIBRARIES)
+add_subdirectory(device_radix_sort)
+add_subdirectory(device_sum)
