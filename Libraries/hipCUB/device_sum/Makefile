@@ -20,21 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	exampleLibraryTemplate \
-	hipCUB \
-	rocRAND
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocThrust
+ROCM_INSTALL_DIR = /opt/rocm
+CUDA_INSTALL_DIR = /usr/local/cuda
+CUDACXX = $(CUDA_INSTALL_DIR)/bin/nvcc
+CXX_STD = c++17
+COMMON_INCLUDE_DIR = ../../../Common
+
+HIPCXX = $(ROCM_INSTALL_DIR)/bin/hipcc
+HIP_INCLUDE_DIR = $(ROCM_INSTALL_DIR)/include/
+HIPCUB_INCLUDE_DIR = $(ROCM_INSTALL_DIR)/include/
+
+hipcub_device_sum: main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+ifeq ($(GPU_RUNTIME), CUDA)
+	$(CUDACXX) $< -std=$(CXX_STD) -isystem $(HIPCUB_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -o $@ -D__HIP_PLATFORM_NVIDIA__ -x cu
+else
+	$(HIPCXX) $< -std=$(CXX_STD) -isystem $(HIPCUB_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -o $@ -D__HIP_PLATFORM_AMD__
 endif
 
-all: $(LIBRARIES)
+clean:
+	rm -f hipcub_device_sum
 
-clean: TARGET=clean
-clean: all
-
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(LIBRARIES)
+.PHONY: clean
