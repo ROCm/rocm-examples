@@ -20,10 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries)
-add_subdirectory(exampleLibraryTemplate)
-add_subdirectory(hipCUB)
-add_subdirectory(rocPRIM)
-add_subdirectory(rocRAND)
-add_subdirectory(rocThrust)
+EXAMPLES := \
+	block_sum \
+	device_sum
+
+all: $(EXAMPLES)
+
+clean: TARGET=clean
+clean: all
+
+$(EXAMPLES):
+	$(MAKE) -C $@ $(TARGET)
+
+.PHONY: all clean $(EXAMPLES)

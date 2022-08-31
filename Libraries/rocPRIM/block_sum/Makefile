@@ -20,10 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries)
-add_subdirectory(exampleLibraryTemplate)
-add_subdirectory(hipCUB)
-add_subdirectory(rocPRIM)
-add_subdirectory(rocRAND)
-add_subdirectory(rocThrust)
+ROCM_INSTALL_DIR = /opt/rocm
+HIPCXX = $(ROCM_INSTALL_DIR)/bin/hipcc
+CXX_STD = c++17
+COMMON_INCLUDE_DIR = ../../../Common
+ROCPRIM_INCLUDE_DIR = $(ROCM_INSTALL_DIR)/include
+
+rocprim_block_sum: main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $< -std=$(CXX_STD) -isystem $(ROCPRIM_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -o $@ -D__HIP_PLATFORM_AMD__
+
+clean:
+	rm -f rocprim_block_sum
+
+.PHONY: clean
