@@ -20,10 +20,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Cookbook)
+EXAMPLE := hip_matrix_multiplication
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME := HIP
 
-add_subdirectory(device_query)
-add_subdirectory(hello_world)
-add_subdirectory(matrix_multiplication)
-add_subdirectory(saxpy)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD  := c++17
+CXXFLAGS := -std=$(CXX_STD)
+CPPFLAGS := -I $(COMMON_INCLUDE_DIR)
+LDFLAGS	 :=
+LDLIBS	 :=
+
+ifeq ($(GPU_RUNTIME), CUDA)
+	CXXFLAGS += -x cu
+	CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+else
+$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
