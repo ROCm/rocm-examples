@@ -3,8 +3,9 @@
 ## Repository Contents
 - [Common](/Common/) contains common utility functionality shared between the examples.
 - [Cookbook](/Cookbook/) hosts self-contained recipes showcasing HIP runtime functionality.
-    -  [device_query](/Cookbook/device_query): Program that showcases how properties from the device may be queried.
-    -  [hello_world](/Cookbook/hello_world): Simple program that showcases launching kernels and printing from the device.
+    - [device_query](/Cookbook/device_query): Program that showcases how properties from the device may be queried.
+    - [hello_world](/Cookbook/hello_world): Simple program that showcases launching kernels and printing from the device.
+    - [saxpy](/Cookbook/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
 - [docs](/docs/)
     - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
