@@ -29,3 +29,6 @@ This example showcases launching kernels and printing from device programs.
 - `__host__`
 - `threadIdx`
 - `blockIdx`
+
+## Supported Platforms
+Windows is currently not supported by the hello world example, due to a driver failure with `printf` from device code.
