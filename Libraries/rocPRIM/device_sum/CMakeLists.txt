@@ -21,9 +21,26 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries)
-add_subdirectory(exampleLibraryTemplate)
-add_subdirectory(hipCUB)
-add_subdirectory(rocPRIM)
-add_subdirectory(rocRAND)
-add_subdirectory(rocThrust)
+project(rocprim_device_sum LANGUAGES CXX HIP)
+
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
+
+if(NOT CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "/opt/rocm")
+endif()
+
+find_package(rocprim REQUIRED CONFIG)
+
+add_executable(rocprim_device_sum main.hip)
+add_test(rocprim_device_sum rocprim_device_sum)
+
+target_link_libraries(rocprim_device_sum
+    PRIVATE
+    roc::rocprim
+)
+target_include_directories(rocprim_device_sum
+    PRIVATE
+    "../../../Common"
+)

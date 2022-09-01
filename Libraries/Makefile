@@ -26,6 +26,7 @@ LIBRARIES := \
 	rocRAND
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
+	rocPRIM \
 	rocThrust
 endif
 

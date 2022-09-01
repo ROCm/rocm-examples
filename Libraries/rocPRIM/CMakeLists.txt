@@ -21,9 +21,12 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries)
-add_subdirectory(exampleLibraryTemplate)
-add_subdirectory(hipCUB)
-add_subdirectory(rocPRIM)
-add_subdirectory(rocRAND)
-add_subdirectory(rocThrust)
+project(rocPRIM_examples)
+
+if(GPU_RUNTIME STREQUAL "CUDA")
+    message(STATUS "rocPRIM examples do not support the CUDA runtime")
+    return()
+endif()
+
+add_subdirectory(block_sum)
+add_subdirectory(device_sum)
