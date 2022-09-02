@@ -13,7 +13,13 @@ The examples in this subdirectory showcase the functionality of the [rocRAND](ht
     - CUDA platform: Install rocRAND from source: [instructions](https://github.com/rocmSoftwarePlatform/rocRAND#build-and-install).
 
 ### Windows
-...
+- [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
+- [CMake](https://cmake.org/download/) (at least version 3.21)
+- ROCm toolchain for Windows (No public release yet)
+    - The Visual Studio ROCm extension needs to be installed to build with the solution files.
+- [rocRAND](https://github.com/rocmSoftwarePlatform/rocRAND)
+    - ROCm platform: Installed as part of the ROCm SDK on Windows.
+    - CUDA platform: Install rocRAND from source: [instructions](https://github.com/rocmSoftwarePlatform/rocRAND#build-and-install).
 
 ## Building
 ### Linux
@@ -32,4 +38,7 @@ All examples in the `rocRAND` subdirectory can be built by a single invocation o
 - `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
 
 ### Windows
-...
+#### Visual Studio
+Visual Studio solution files are available for the individual examples. To build all examples for rocRAND open the top level solution file [ROCm-Examples-VS2019.sln](../../ROCm-Examples-VS2019.sln) and filter for rocRAND.
+
+For more detailed build instructions refer to the top level [README.md](../../README.md#visual-studio).

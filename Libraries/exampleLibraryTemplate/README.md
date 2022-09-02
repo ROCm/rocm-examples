@@ -15,6 +15,12 @@ The examples in this subdirectory showcase the functionality of the [`example-li
 
 
 ### Windows
+*Most common prerequisites from the other examples:*
+- [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
+- [CMake](https://cmake.org/download/) (at least version 3.21)
+- ROCm toolchain for Windows (No public release yet)
+  - The Visual Studio ROCm extension needs to be installed to build with the solution files.
+
 
 ## Building
 *List the instructions to build the examples in the subdirectories. Ideally, each example builds similarly, and here the common steps can be described for both Windows and Linux. If there are example-specific build instructions, list those in the example-specific README file.*
@@ -40,3 +46,7 @@ All examples can be built by a single invocation to Make.
 - `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
 
 ### Windows
+#### Visual Studio
+Visual Studio solution files are available for the individual examples. To build all examples for <example-library-name> open the top level solution file [ROCm-Examples-VS2019.sln](../../ROCm-Examples-VS2019.sln) and filter for <example-library-name>.
+
+For more detailed build instructions refer to the top level [README.md](../../README.md#visual-studio).
