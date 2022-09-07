@@ -24,6 +24,7 @@ EXAMPLES := \
 	device_query \
 	hello_world \
 	matrix_multiplication \
+	occupancy \
 	saxpy
 
 all: $(EXAMPLES)
