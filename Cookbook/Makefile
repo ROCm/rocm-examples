@@ -23,6 +23,7 @@
 EXAMPLES := \
 	device_query \
 	hello_world \
+	hipify \
 	matrix_multiplication \
 	occupancy \
 	saxpy
