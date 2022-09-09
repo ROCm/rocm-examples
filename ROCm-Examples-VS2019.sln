@@ -49,6 +49,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_multiplication_vs201
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "occupancy_vs2019", "Cookbook\occupancy\occupancy_vs2019.vcxproj", "{E5B2FC79-3928-47F6-B57B-33AAA3C5D9C5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_vs2019", "Cookbook\dynamic_shared\dynamic_shared_vs2019.vcxproj", "{7B7D1745-7635-40DA-B6AF-B8F728A31124}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -119,6 +121,10 @@ Global
 		{E5B2FC79-3928-47F6-B57B-33AAA3C5D9C5}.Debug|x64.Build.0 = Debug|x64
 		{E5B2FC79-3928-47F6-B57B-33AAA3C5D9C5}.Release|x64.ActiveCfg = Release|x64
 		{E5B2FC79-3928-47F6-B57B-33AAA3C5D9C5}.Release|x64.Build.0 = Release|x64
+		{7B7D1745-7635-40DA-B6AF-B8F728A31124}.Debug|x64.ActiveCfg = Debug|x64
+		{7B7D1745-7635-40DA-B6AF-B8F728A31124}.Debug|x64.Build.0 = Debug|x64
+		{7B7D1745-7635-40DA-B6AF-B8F728A31124}.Release|x64.ActiveCfg = Release|x64
+		{7B7D1745-7635-40DA-B6AF-B8F728A31124}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -145,6 +151,7 @@ Global
 		{D6334F08-D560-439A-A704-ADA0349D72B7} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{ACC2A1E7-5865-4FAE-9016-E6EF73F8FA9E} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{E5B2FC79-3928-47F6-B57B-33AAA3C5D9C5} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{7B7D1745-7635-40DA-B6AF-B8F728A31124} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
