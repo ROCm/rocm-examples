@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Cookbook)
+project(HIP-Basic)
 
 add_subdirectory(device_query)
 add_subdirectory(dynamic_shared)

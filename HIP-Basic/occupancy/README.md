@@ -1,4 +1,4 @@
-# Cookbook Occupany Example
+# HIP-Basic Occupany Example
 
 ## Description
 This example showcases how to find optimal configuation parameters for a kernel launch with maximum occupancy. It uses the HIP occupancy calculator APIs to find a kernel launch configuration that yields maximum occupancy. This configuration is used to launch a kernel and measures the utilization difference against another kernel launch that is manually (and suboptimally) configured. The application kernel is a simple vector-vector multiplication of the form `C[i] = A[i]*B[i]`, where `A`, `B` and `C` are vectors of size `size`.

@@ -1,4 +1,4 @@
-# Cookbook Matrix Multiplication Example
+# HIP-Basic Matrix Multiplication Example
 
 ## Description
 This example showcases the multiplication of two dynamically sized two-dimensional matrices on the GPU ($\mathrm{A \cdot B=C}$). The sizes of the matrices can be provided on the command line, however the sizes must be multiples of the hard-coded block size, which is 16x16. This implementation is not aimed at best performance or best generality, although some optimizations, such as the utilization of shared memory, are in place.

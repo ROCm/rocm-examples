@@ -1,4 +1,4 @@
-# Cookbook Dynamic Shared Memory Example
+# HIP-Basic Dynamic Shared Memory Example
 
 ## Description
 This program showcases an implementation of a simple matrix tranpose kernel, which uses shared memory that is dynamically allocated at runtime.

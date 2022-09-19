@@ -24,5 +24,5 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(ROCMm-SDK-Examples)
 enable_testing()
 
-add_subdirectory(Cookbook)
+add_subdirectory(HIP-Basic)
 add_subdirectory(Libraries)

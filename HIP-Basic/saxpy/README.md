@@ -1,4 +1,4 @@
-# Cookbook "SAXPY" Example
+# HIP-Basic "SAXPY" Example
 
 ## Description
 This program demonstrates a simple implementation of the "SAXPY" kernel. The "S" stands for single-precision (i.e. `float`) and "AXPY" stands for the operation performed: $Y_i=aX_i+Y_i$. The simple nature of this example makes it an ideal starting point for developers who are just getting introduced to HIP.

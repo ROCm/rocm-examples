@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 SUB_PROJECTS := \
-	Cookbook \
+	HIP-Basic \
 	Libraries
 
 all: $(SUB_PROJECTS)

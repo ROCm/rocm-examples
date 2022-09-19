@@ -1,4 +1,4 @@
-# Cookbook Hello World Example
+# HIP-Basic Hello World Example
 
 ## Description
 This example showcases launching kernels and printing from device programs.

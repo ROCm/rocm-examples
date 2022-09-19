@@ -1,4 +1,4 @@
-# Cookbook Device Query Example
+# HIP-Basic Device Query Example
 
 ## Description
 This example shows how the target platform and compiler can be identified, as well as how properties from the device may be queried.

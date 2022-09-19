@@ -1,4 +1,4 @@
-# Cookbook Hipify Example
+# HIP-Basic Hipify Example
 
 ## Description
 The hipify example demonstrates the use of HIP utility `hifipy-perl` to port CUDA code to HIP. It converts a CUDA `.cu` source code into a portable HIP `.hip` source code that can be compiled using `hipcc` and executed on any supported GPU (AMD or NVIDIA).

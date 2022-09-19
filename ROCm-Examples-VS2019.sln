@@ -39,17 +39,17 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_sum_vs2019", "Librar
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "block_sum_vs2019", "Libraries\rocPRIM\block_sum\block_sum_vs2019.vcxproj", "{65B21869-2BE2-4DA5-BEC5-28D1F910731C}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Cookbook", "Cookbook", "{6EB7144D-2707-489E-A043-D59B7BE006D1}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Basic", "HIP-Basic", "{6EB7144D-2707-489E-A043-D59B7BE006D1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_query_vs2019", "Cookbook\device_query\device_query_vs2019.vcxproj", "{C2C6E811-57E3-44C5-9AB9-195D60A1638C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_query_vs2019", "HIP-Basic\device_query\device_query_vs2019.vcxproj", "{C2C6E811-57E3-44C5-9AB9-195D60A1638C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "saxpy_vs2019", "Cookbook\saxpy\saxpy_vs2019.vcxproj", "{D6334F08-D560-439A-A704-ADA0349D72B7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "saxpy_vs2019", "HIP-Basic\saxpy\saxpy_vs2019.vcxproj", "{D6334F08-D560-439A-A704-ADA0349D72B7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_multiplication_vs2019", "Cookbook\matrix_multiplication\matrix_multiplication_vs2019.vcxproj", "{ACC2A1E7-5865-4FAE-9016-E6EF73F8FA9E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_multiplication_vs2019", "HIP-Basic\matrix_multiplication\matrix_multiplication_vs2019.vcxproj", "{ACC2A1E7-5865-4FAE-9016-E6EF73F8FA9E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "occupancy_vs2019", "Cookbook\occupancy\occupancy_vs2019.vcxproj", "{E5B2FC79-3928-47F6-B57B-33AAA3C5D9C5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "occupancy_vs2019", "HIP-Basic\occupancy\occupancy_vs2019.vcxproj", "{E5B2FC79-3928-47F6-B57B-33AAA3C5D9C5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_vs2019", "Cookbook\dynamic_shared\dynamic_shared_vs2019.vcxproj", "{7B7D1745-7635-40DA-B6AF-B8F728A31124}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_vs2019", "HIP-Basic\dynamic_shared\dynamic_shared_vs2019.vcxproj", "{7B7D1745-7635-40DA-B6AF-B8F728A31124}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
