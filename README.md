@@ -10,6 +10,7 @@
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
+    - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
 - [docs](/docs/)
     - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
