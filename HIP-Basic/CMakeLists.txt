@@ -20,16 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	HIP-Basic \
-	Libraries
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(HIP-Basic)
 
-all: $(SUB_PROJECTS)
-
-clean: TARGET=clean
-clean: all
-
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(SUB_PROJECTS)
+add_subdirectory(device_query)
+add_subdirectory(dynamic_shared)
+if(NOT WIN32)
+    add_subdirectory(hello_world)
+    add_subdirectory(hipify)
+endif()
+add_subdirectory(matrix_multiplication)
+add_subdirectory(occupancy)
+add_subdirectory(saxpy)

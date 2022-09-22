@@ -2,6 +2,14 @@
 
 ## Repository Contents
 - [Common](/Common/) contains common utility functionality shared between the examples.
+- [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
+    - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
+    - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
+    - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
+    - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
+    - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
+    - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
+    - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
 - [docs](/docs/)
     - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
@@ -30,7 +38,10 @@
 - For example-specific prerequisites, see the example subdirectories.
 
 ### Windows
-...
+- [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
+- [CMake](https://cmake.org/download/) (at least version 3.21)
+- ROCm toolchain for Windows (No public release yet)
+  - The Visual Studio ROCm extension needs to be installed to build with the solution files.
 
 ## Building the example suite
 ### Linux
@@ -65,4 +76,12 @@ The built executables can be found and run in the `build` directory:
 - `# ./build/Libraries/rocRAND/simple_distributions_cpp/simple_distributions_cpp`
 
 ### Windows
-...
+#### Visual Studio
+The repository has Visual Studio project files for all examples and individually for each example.
+- Project files for Visual Studio are named as the example with `_vs<Visual Studio Version>` suffix added e.g. `device_sum_vs2019.sln` for the device sum example.
+- The project files can be built from Visual Studio or from the command line using MSBuild.
+  - Use the build solution command in Visual Studio to build.
+  - To build from the command line execute `C:\Program Files (x86)\Microsoft Visual Studio\<Visual Studio Version>\<Edition>\MSBuild\Current\Bin\MSBuild.exe <path to project folder>`.
+    - To build in Release mode pass the `/p:Configuration=Release` option to MSBuild.
+    - The exutables will be created in a subfolder named "Debug" or "Release" inside the project folder.
+- The HIP specific project settings like the GPU architectures targeted can be set on the `General [AMD HIP C++]` tab of project properties.

@@ -20,16 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	HIP-Basic \
-	Libraries
+EXAMPLE := hip_hipify
+GPU_RUNTIME := HIP
 
-all: $(SUB_PROJECTS)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-clean: TARGET=clean
-clean: all
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
+# Common variables and flags
+CXX_STD  := c++17
+CXXFLAGS := -std=$(CXX_STD)
+CPPFLAGS :=
+LDFLAGS	 :=
+LDLIBS	 :=
 
-.PHONY: all clean $(SUB_PROJECTS)
+ifeq ($(GPU_RUNTIME), CUDA)
+	CXXFLAGS += -x cu
+	CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+else
+$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+all: $(EXAMPLE)
+# Step
+main.hip: main.cu
+	$(ROCM_INSTALL_DIR)/bin/hipify-perl $< -o $@
+
+$(EXAMPLE): main.hip
+	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+
+clean:
+	$(RM) $(EXAMPLE) main.hip *.o
+
+.PHONY: clean

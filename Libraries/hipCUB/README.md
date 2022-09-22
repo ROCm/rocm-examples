@@ -10,9 +10,18 @@ The examples in this subdirectory showcase the functionality of the [hipCUB](htt
 - [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 5.x.x)
 - [hipCUB](https://github.com/ROCmSoftwarePlatform/hipCUB)
     - ROCm platform: `hipCUB-dev` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/How_to_Install_ROCm.html).
+    - CUDA platform: Install hipCUB from source: [instructions](https://github.com/ROCmSoftwarePlatform/hipCUB#build-and-install).
+      - [CUB](https://github.com/NVIDIA/cub) is a dependency of hipCUB for NVIDIA platforms. CUB is part of the NVIDIA CUDA Toolkit.
 
 ### Windows
-...
+- [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
+- [CMake](https://cmake.org/download/) (at least version 3.21)
+- ROCm toolchain for Windows (No public release yet)
+    - The Visual Studio ROCm extension needs to be installed to build with the solution files.
+- [hipCUB](https://github.com/ROCmSoftwarePlatform/hipCUB)
+    - ROCm platform: Installed as part of the ROCm SDK on Windows for ROCm platform.
+    - CUDA platform: Install hipCUB from source: [instructions](https://github.com/ROCmSoftwarePlatform/hipCUB#build-and-install).
+      - [CUB](https://github.com/NVIDIA/cub) is a dependency of hipCUB for NVIDIA platforms. CUB is part of the NVIDIA CUDA Toolkit.
 
 ## Building
 ### Linux
@@ -31,4 +40,7 @@ All examples can be built by a single invocation to Make.
 - `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
 
 ### Windows
-...
+#### Visual Studio
+Visual Studio solution files are available for the individual examples. To build all examples for hipCUB open the top level solution file [ROCm-Examples-VS2019.sln](../../ROCm-Examples-VS2019.sln) and filter for hipCUB.
+
+For more detailed build instructions refer to the top level [README.md](../../README.md#visual-studio).

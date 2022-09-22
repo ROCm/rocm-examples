@@ -20,16 +20,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-	HIP-Basic \
-	Libraries
+EXAMPLE := hip_device_query
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME := HIP
 
-all: $(SUB_PROJECTS)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-clean: TARGET=clean
-clean: all
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
+# Common variables and flags
+CXX_STD  := c++17
+CXXFLAGS := -std=$(CXX_STD)
+CPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+LDFLAGS	 :=
+LDLIBS	 :=
 
-.PHONY: all clean $(SUB_PROJECTS)
+ifeq ($(GPU_RUNTIME), CUDA)
+	CXXFLAGS += -x cu
+else ifeq ($(GPU_RUNTIME), HIP)
+	HIPCXX = $(CXX)
+	CXXFLAGS += -D__HIP_PLATFORM_AMD__
+	LDFLAGS += -L $(ROCM_INSTALL_DIR)/lib
+	LDLIBS += -lamdhip64
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
