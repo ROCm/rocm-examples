@@ -5,6 +5,7 @@
 - [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
     - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
     - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
+    - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
     - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
     - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
