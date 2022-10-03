@@ -1,5 +1,5 @@
 # ROCm Examples
-
+This project is currently unsupported and in an early testing stage. Feedback on the contents of this repository is appreciated.
 ## Repository Contents
 - [Common](/Common/) contains common utility functionality shared between the examples.
 - [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
