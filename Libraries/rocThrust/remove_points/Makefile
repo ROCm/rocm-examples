@@ -26,7 +26,7 @@ CXX_STD = c++17
 COMMON_INCLUDE_DIR = ../../../Common
 
 rocthrust_remove_points: main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
-	$(HIPCXX) $^ -std=$(CXX_STD) -I $(COMMON_INCLUDE_DIR) -o $@
+	$(HIPCXX) $< -std=$(CXX_STD) -I $(COMMON_INCLUDE_DIR) -o $@
 
 clean:
 	rm -f rocthrust_remove_points
