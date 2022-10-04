@@ -13,6 +13,11 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         ssh \
         sudo \
         wget \
+        pkg-config \
+        glslang-tools \
+        libvulkan-dev \
+        vulkan-validationlayers \
+        libglfw3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG en_US.utf8
