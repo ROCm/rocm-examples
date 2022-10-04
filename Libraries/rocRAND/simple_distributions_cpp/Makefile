@@ -26,7 +26,7 @@ CUDACXX = $(CUDA_INSTALL_DIR)/bin/nvcc
 CXX_STD = c++17
 COMMON_INCLUDE_DIR = ../../../Common
 
-rocrand_simple_distributions_cpp: main.cpp argument_parsing.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+rocrand_simple_distributions_cpp: main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
 ifeq ($(GPU_RUNTIME), CUDA)
 	$(CUDACXX) $< -std=$(CXX_STD) -isystem $(ROCM_INSTALL_DIR)/include -isystem $(CUDA_INSTALL_DIR)/include -I $(COMMON_INCLUDE_DIR) -L $(ROCM_INSTALL_DIR)/lib -L $(CUDA_INSTALL_DIR)/lib64 -lrocrand -lcudart -o $@ -D__HIP_PLATFORM_NVIDIA__ -x cu
 else

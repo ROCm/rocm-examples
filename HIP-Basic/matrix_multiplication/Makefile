@@ -45,7 +45,7 @@ else
 $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
-$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
 
 clean:
