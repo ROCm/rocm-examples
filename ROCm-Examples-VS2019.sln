@@ -1,4 +1,4 @@
-
+﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.32630.194
@@ -54,6 +54,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "streams_vs2019", "HIP-Basic\streams\streams_vs2019.vcxproj", "{4E6B2034-D7ED-4CB4-98B2-7B2D2B71E0A9}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "events_vs2019", "HIP-Basic\events\events_vs2019.vcxproj", "{5B822836-110B-44D8-8E02-2A9B2CB83D14}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bandwidth_vs2019", "HIP-Basic\bandwidth\bandwidth_vs2019.vcxproj", "{16B11B54-CD72-43B6-B226-38C668B41A79}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -137,6 +139,10 @@ Global
 		{5B822836-110B-44D8-8E02-2A9B2CB83D14}.Debug|x64.Build.0 = Debug|x64
 		{5B822836-110B-44D8-8E02-2A9B2CB83D14}.Release|x64.ActiveCfg = Release|x64
 		{5B822836-110B-44D8-8E02-2A9B2CB83D14}.Release|x64.Build.0 = Release|x64
+		{16B11B54-CD72-43B6-B226-38C668B41A79}.Debug|x64.ActiveCfg = Debug|x64
+		{16B11B54-CD72-43B6-B226-38C668B41A79}.Debug|x64.Build.0 = Debug|x64
+		{16B11B54-CD72-43B6-B226-38C668B41A79}.Release|x64.ActiveCfg = Release|x64
+		{16B11B54-CD72-43B6-B226-38C668B41A79}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -166,6 +172,7 @@ Global
 		{7B7D1745-7635-40DA-B6AF-B8F728A31124} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{4E6B2034-D7ED-4CB4-98B2-7B2D2B71E0A9} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{5B822836-110B-44D8-8E02-2A9B2CB83D14} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{16B11B54-CD72-43B6-B226-38C668B41A79} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

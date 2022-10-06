@@ -99,4 +99,61 @@ std::string format_pairs(const BidirectionalIteratorT begin_a,
     return sstream.str();
 }
 
+/// \brief A function to parse a string for an int. If the string is a valid integer then return true
+/// else if it has non-numeric character then return false.
+bool parse_int_string(const std::string& str, int& out)
+{
+    try
+    {
+        size_t end;
+        int    value = std::stoi(str, &end);
+        if(end == str.size())
+        {
+            out = value;
+            return true;
+        }
+        return false;
+    }
+    catch(const std::exception&)
+    {
+        return false;
+    }
+}
+
+/// \brief A class to measures time between intervals
+class HostClock
+{
+private:
+    std::chrono::steady_clock::time_point start_time;
+    std::chrono::steady_clock::duration   elapsed_time;
+
+public:
+    HostClock()
+    {
+        this->reset_timer();
+    }
+
+    void reset_timer()
+    {
+        this->elapsed_time = std::chrono::steady_clock::duration(0);
+    }
+
+    void start_timer()
+    {
+        this->start_time = std::chrono::steady_clock::now();
+    }
+    void stop_timer()
+    {
+        const auto end_time = std::chrono::steady_clock::now();
+        this->elapsed_time += end_time - this->start_time;
+    }
+
+    /// @brief Returns time elapsed in Seconds
+    /// @return type double that contains the elapsed time in Seconds
+    double get_elapsed_time() const
+    {
+        return std::chrono::duration_cast<std::chrono::duration<double>>(this->elapsed_time)
+            .count();
+    }
+};
 #endif // COMMON_EXAMPLE_UTILS_HPP
