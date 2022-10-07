@@ -47,6 +47,7 @@ endif()
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(${example_name} ${example_name})
+
 set(include_dirs "../../Common")
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")

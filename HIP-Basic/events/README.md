@@ -4,7 +4,7 @@ Memory transfer and kernel execution are the most important parameter in paralle
 
 This example showcases measuring kernel and memory transfer timing using HIP events. The kernel under measurement is a trivial one that performs square matrix transposition.
 
-### Application flow 
+### Application flow
 1. A number of parameters are defined that control the problem details and the kernel launch.
 2. Input data is set up in host memory.
 3. The necessary amount of device memory is allocated.
