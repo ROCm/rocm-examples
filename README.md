@@ -1,15 +1,17 @@
 # ROCm Examples
-
+This project is currently unsupported and in an early testing stage. Feedback on the contents of this repository is appreciated.
 ## Repository Contents
 - [Common](/Common/) contains common utility functionality shared between the examples.
 - [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
     - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
     - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
+    - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
     - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
     - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
+    - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
 - [docs](/docs/)
     - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
