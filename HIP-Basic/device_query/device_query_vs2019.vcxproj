@@ -20,7 +20,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{C2C6E811-57E3-44C5-9AB9-195D60A1638C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>example_template_vs2019</RootNamespace>
+    <RootNamespace>device_query_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
