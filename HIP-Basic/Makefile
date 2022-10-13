@@ -29,6 +29,7 @@ EXAMPLES := \
 	hipify \
 	matrix_multiplication \
 	occupancy \
+	runtime_compilation \
 	saxpy \
 	streams
 

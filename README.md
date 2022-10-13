@@ -11,6 +11,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
+    - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
     - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
