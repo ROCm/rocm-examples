@@ -1,4 +1,4 @@
-# HIP-Basic "RUNTIME_COMPILATION" Example
+# HIP-Basic Runtime Compilation Example
 
 ## Description
 Runtime compilation allows compiling code to machine code while a program is being executed rather than before, as happens with static compilation.
