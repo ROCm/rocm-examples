@@ -31,6 +31,7 @@ EXAMPLES := \
 	occupancy \
 	runtime_compilation \
 	saxpy \
+	shared_memory \
 	streams
 
 all: $(EXAMPLES)
