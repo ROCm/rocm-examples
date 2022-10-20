@@ -37,7 +37,9 @@ EXAMPLES := \
 
 # Only supported on HIP (not CUDA).
 ifneq ($(GPU_RUNTIME), CUDA)
-    EXAMPLES += assembly_to_executable
+    EXAMPLES += \
+        assembly_to_executable \
+        llvm_ir_to_executable
 endif
 
 all: $(EXAMPLES)

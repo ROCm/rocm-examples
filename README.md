@@ -10,6 +10,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
     - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
     - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
+    - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
     - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.

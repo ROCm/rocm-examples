@@ -64,6 +64,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "warp_shuffle_vs2019", "HIP-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "assembly_to_executable_vs2019", "HIP-Basic\assembly_to_executable\assembly_to_executable_vs2019.vcxproj", "{60B4ADE0-8286-46AE-B884-5DA51B541DED}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "llvm_ir_to_executable_vs2019", "HIP-Basic\llvm_ir_to_executable\llvm_ir_to_executable_vs2019.vcxproj", "{DBB8DFE9-CB1B-473C-937C-2A8120E0D819}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -166,6 +168,10 @@ Global
 		{60B4ADE0-8286-46AE-B884-5DA51B541DED}.Debug|x64.Build.0 = Debug|x64
 		{60B4ADE0-8286-46AE-B884-5DA51B541DED}.Release|x64.ActiveCfg = Release|x64
 		{60B4ADE0-8286-46AE-B884-5DA51B541DED}.Release|x64.Build.0 = Release|x64
+		{DBB8DFE9-CB1B-473C-937C-2A8120E0D819}.Debug|x64.ActiveCfg = Debug|x64
+		{DBB8DFE9-CB1B-473C-937C-2A8120E0D819}.Debug|x64.Build.0 = Debug|x64
+		{DBB8DFE9-CB1B-473C-937C-2A8120E0D819}.Release|x64.ActiveCfg = Release|x64
+		{DBB8DFE9-CB1B-473C-937C-2A8120E0D819}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -200,6 +206,7 @@ Global
 		{16B11B54-CD72-43B6-B226-38C668B41A79} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{5852BE0E-BDA5-4BD9-8A16-30E8E40F4045} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{60B4ADE0-8286-46AE-B884-5DA51B541DED} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{DBB8DFE9-CB1B-473C-937C-2A8120E0D819} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

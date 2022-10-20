@@ -26,6 +26,7 @@ project(HIP-Basic)
 # Only supported on HIP (not CUDA)
 if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     add_subdirectory(assembly_to_executable)
+    add_subdirectory(llvm_ir_to_executable)
 endif()
 
 add_subdirectory(bandwidth)

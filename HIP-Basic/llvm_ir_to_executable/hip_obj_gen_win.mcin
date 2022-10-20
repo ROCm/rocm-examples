@@ -1,0 +1,20 @@
+# Part of the LLVM Project, under the Apache License v2.0 with LLVM Exceptions.
+# See https://llvm.org/LICENSE.txt for license information.
+# SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+
+#       HIP Object Generator
+# Use this generator to create a host bundled object file
+# with the input of an offload bundled fat binary.
+#
+# Input: Bundled Object file .hipfb file
+# Output: Host Bundled Object File .o
+
+    # Tell the assembler to place the offload bundle in the appropriate section.
+    .section .hip_fatbin,"dw"
+    # Make the symbol that addresses the binary public.
+    .globl __hip_fatbin
+    # Give the bundle the required alignment of 4096 (2 ^ 12).
+    .p2align 12
+__hip_fatbin:
+    # Include the offload bundle.
+    .incbin "offload_bundle.hipfb"
