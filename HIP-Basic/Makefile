@@ -35,6 +35,11 @@ EXAMPLES := \
 	streams \
 	warp_shuffle
 
+# Only supported on HIP (not CUDA).
+ifneq ($(GPU_RUNTIME), CUDA)
+    EXAMPLES += assembly_to_executable
+endif
+
 all: $(EXAMPLES)
 
 clean: TARGET=clean

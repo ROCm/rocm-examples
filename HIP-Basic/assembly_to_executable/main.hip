@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2015-2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <cuda_runtime.h>
+#include "example_utils.hpp"
+
+#include <hip/hip_runtime.h>
 
 #include <cstdlib>
 #include <iostream>
 #include <vector>
 
-#define CHECK(cmd)                                                                          \
-    {                                                                                       \
-        cudaError_t error = cmd;                                                            \
-        if(error != cudaSuccess)                                                            \
-        {                                                                                   \
-            std::cerr << "error: " << cudaGetErrorString(error) << " (" << error << ") at " \
-                      << __FILE__ << ":" << __LINE__ << "\n";                               \
-            exit(EXIT_FAILURE);                                                             \
-        }                                                                                   \
-    }
-
 /// \brief Device function to square each element
 /// in the array `in` and write to array `out`.
 template<typename T>
-__global__ void vector_square_kernel(T* out, T* in, const size_t size)
+__global__ void vector_square_kernel(T* out, const T* in, const long long size)
 {
     // Get the unique global thread ID
     const size_t offset = blockIdx.x * blockDim.x + threadIdx.x;
@@ -60,11 +51,11 @@ int main()
     constexpr size_t size          = 1000000;
     constexpr size_t size_in_bytes = size * sizeof(float);
 
-    cudaDeviceProp props;
-    CHECK(cudaGetDeviceProperties(&props, 0 /*deviceID*/));
+    hipDeviceProp_t props;
+    HIP_CHECK(hipGetDeviceProperties(&props, 0 /*deviceID*/));
     std::cout << "info: running on device " << props.name << "\n";
 
-    std::cout << "info: allocate host mem (" << 2 * size_in_bytes / 1024.0 / 1024.0 << " MB) "
+    std::cout << "info: allocate host mem (" << 2 * size_in_bytes / 1024.0 / 1024.0 << " MiB) "
               << "\n";
 
     // Declare the host side arrays
@@ -76,30 +67,42 @@ int main()
     {
         h_in[i] = 1.618f + i;
     }
+
     // Declare the device side arrays
     float *d_in, *d_out;
-    std::cout << "info: allocate device mem (" << 2 * size_in_bytes / 1024.0 / 1024.0 << " MB) "
-              << "\n";
+    std::cout << "info: allocate device mem (" << 2 * size_in_bytes / 1024.0 / 1024.0 << " MiB)\n";
     // Allocate the device side memory
-    CHECK(cudaMalloc(&d_in, size_in_bytes));
-    CHECK(cudaMalloc(&d_out, size_in_bytes));
+    HIP_CHECK(hipMalloc(&d_in, size_in_bytes));
+    HIP_CHECK(hipMalloc(&d_out, size_in_bytes));
 
-    std::cout << "info: copy Host2Device"
-              << "\n";
+    std::cout << "info: copy Host2Device\n";
+
     // Copy the input from host to the GPU device
-    CHECK(cudaMemcpy(d_in, h_in.data(), size_in_bytes, cudaMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_in, h_in.data(), size_in_bytes, hipMemcpyHostToDevice));
 
     // Set the number of blocks per kernel grid.
     constexpr unsigned int grid_size = 512;
     // Set the number of threads per kernel block.
     constexpr unsigned int threads_per_block = 256;
 
-    std::cout << "info: launch 'vector_square_kernel' kernel"
-              << "\n";
-    vector_square_kernel<<<grid_size, threads_per_block>>>(d_out, d_in, size);
+    std::cout << "info: launch 'vector_square_kernel' kernel\n";
+    hipLaunchKernelGGL(vector_square_kernel,
+                       grid_size,
+                       threads_per_block,
+                       0,
+                       hipStreamDefault,
+                       d_out,
+                       d_in,
+                       size);
+
+    // Check that the kernel invocation was successful.
+    HIP_CHECK(hipGetLastError());
 
     std::cout << "info: copy Device2Host\n";
-    CHECK(cudaMemcpy(h_out.data(), d_out, size_in_bytes, cudaMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_out.data(), d_out, size_in_bytes, hipMemcpyDeviceToHost));
+
+    HIP_CHECK(hipFree(d_in));
+    HIP_CHECK(hipFree(d_out));
 
     std::cout << "info: check result\n";
     for(size_t i = 0; i < size; i++)
@@ -108,7 +111,7 @@ int main()
         {
             std::cerr << "FAILED! h_out[" << i << "] = " << h_out[i]
                       << ", expected:  " << h_in[i] * h_in[i] << '\n';
-            exit(EXIT_FAILURE);
+            exit(error_exit_code);
         }
     }
     std::cout << "PASSED!\n";

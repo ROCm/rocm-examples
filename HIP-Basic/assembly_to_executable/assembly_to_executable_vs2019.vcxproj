@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.hip">
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--cuda-host-only</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--cuda-host-only</AdditionalOptions>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\example_utils.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="hip_obj_gen_win.mcin">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy %(Identity) "$(IntDir)%(Identity)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Copying %(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(IntDir)%(Identity)</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">copy %(Identity) "$(IntDir)%(Identity)"</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying %(Identity)</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Identity)</Outputs>
+    </CustomBuild>
+    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx1030.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1030</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1030</Command>
+    </CustomBuild>
+    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx803.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa  -mcpu=gfx803</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa  -mcpu=gfx803</Command>
+    </CustomBuild>
+    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx900.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang+"+ -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx900</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang+"+ -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx900</Command>
+    </CustomBuild>
+    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx906.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx906</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx906</Command>
+    </CustomBuild>
+    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx908.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx908</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx908</Command>
+    </CustomBuild>
+    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx90a.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a </Command>
+    </CustomBuild>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{60b4ade0-8286-46ae-b884-5da51b541ded}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>assembly_to_executable_vs2019</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>HIP</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>HIP</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+    <Import Condition="'$(HIPPropertiesImported)' != 'true'" Project="$(VCTargetsPath)\AMD.HIP.Common.props" />
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+    <TargetName>hip_$(ProjectName)</TargetName>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+    <TargetName>hip_$(ProjectName)</TargetName>
+    <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+  </PropertyGroup>
+  <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetGPUArchitectures>gfx1030</TargetGPUArchitectures>
+  </PropertyGroup>
+  <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetGPUArchitectures>gfx1030</TargetGPUArchitectures>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level1</WarningLevel>
+      <PreprocessorDefinitions>__HIP_ROCclr__;__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(IntDir)main_device.obj;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuild>
+      <Message>Compiling Device Assembly %(Identity)</Message>
+      <Command>"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa</Command>
+      <Outputs>$(IntDir)%(FileName).o</Outputs>
+    </CustomBuild>
+    <CustomBuildStep>
+      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030 -input=nul "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx803.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx900.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx906.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx908.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx90a.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx1030.o" "-output=$(IntDir)offload_bundle.hipfb"
+cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Generating Device Offload Object</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(IntDIr)main_device.obj</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx803.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx900.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx906.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx908.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx90a.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx1030.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level2</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>__HIP_ROCclr__;__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>$(IntDir)main_device.obj;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <CustomBuild>
+      <Message>Compiling Device Assembly %(Identity)</Message>
+      <Command>"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa</Command>
+      <Outputs>$(IntDir)%(FileName).o</Outputs>
+    </CustomBuild>
+    <CustomBuildStep>
+      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa-gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030 -input=nul "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx803.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx900.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx906.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx908.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx90a.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx1030.o" "-output=$(IntDir)offload_bundle.hipfb"
+cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Message>Generating Device Offload Object</Message>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>$(IntDIr)main_device.obj</Outputs>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Inputs>$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx803.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx900.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx906.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx908.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx90a.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx1030.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Condition="'$(HIPTargetsImported)' != 'true'" Project="$(VCTargetsPath)\AMD.HIP.Common.targets" />
+  </ImportGroup>
+</Project>
