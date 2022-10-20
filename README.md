@@ -13,8 +13,9 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
     - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
-    - [shared_memory](HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
+    - [shared_memory](/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
     - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
+    - [warp_shuffle](/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
 - [docs](/docs/)
     - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
