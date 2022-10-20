@@ -1,8 +1,8 @@
 # HIP-Basic Warp Shuffle Example
 
 ## Description
-Kernel code is SIMT-executed by groups of threads within the same block, known as _warps_ (NVIDIA) or _wavefronts_ (AMD). Each block is divided into as many warps as the block's size allows, if the block size is less than the warp size then part of the warp just stays idle (as happens in this example). 
-In NVIDIA GPUs the warp size is 32 threads, while in AMDs it is 64 threads for architectures previous to RDNA1. After RDNA1 all architectures support both 32 and 64 warp sizes.
+Kernel code is SIMT-executed by groups of threads within the same block, known as _wavefronts_ (AMD) or _warps_ (NVIDIA). Each block is divided into as many warps as the block's size allows, if the block size is less than the warp size then part of the warp just stays idle (as happens in this example). 
+AMD GPUs use 64 threads per wavefront for architectures prior to RDNA1. RDNA architectures support both 32 and 64 wavefront sizes. 
 
 Warps are executed in _lockstep_, i.e. all the threads in each warp execute the same instruction at the same time but with different data. A block contains several warps and the warp size is dependent on the architecture, but the block size is not. Blocks and warps also differ in the way they are executed, and thus they may provide different results when used in the same piece of code. For instance, the kernel code of this example would not work as it is with block execution and shared memory access e.g. because some synchronization would be needed to ensure that every thread has written its correspondent value before trying to access it.
 
