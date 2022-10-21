@@ -22,6 +22,7 @@
 
 EXAMPLES := \
 	bandwidth \
+	bit_extract \
 	device_query \
 	dynamic_shared \
 	events \
