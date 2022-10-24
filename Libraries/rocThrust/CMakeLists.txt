@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocThrust_examples)
+project(rocThrust_examples LANGUAGES NONE)
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocThrust examples do not support the CUDA runtime")

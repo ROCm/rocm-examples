@@ -24,7 +24,7 @@
 # DELETE ME: Change the project name and subdirectory names to the appropriate names.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(exampleLibraryTemplate)
+project(exampleLibraryTemplate LANGUAGES NONE)
 
 # DELETE ME: The order of the directory names should be sorted to reduce merge conflicts
 add_subdirectory(example_template)

@@ -21,5 +21,5 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocRAND_examples)
+project(rocRAND_examples LANGUAGES NONE)
 add_subdirectory(simple_distributions_cpp)

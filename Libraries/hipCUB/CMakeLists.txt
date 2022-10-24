@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipCUB_examples)
+project(hipCUB_examples LANGUAGES NONE)
 
 add_subdirectory(device_radix_sort)
 add_subdirectory(device_sum)

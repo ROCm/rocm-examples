@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocPRIM_examples)
+project(rocPRIM_examples LANGUAGES NONE)
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocPRIM examples do not support the CUDA runtime")

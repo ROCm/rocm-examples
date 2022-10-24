@@ -47,15 +47,17 @@ This project is currently unsupported and in an early testing stage. Feedback on
 
 ### Windows
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
-- [CMake](https://cmake.org/download/) (at least version 3.21)
 - ROCm toolchain for Windows (No public release yet)
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
+- [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
+- [Ninja](https://ninja-build.org/) (optional, to build with CMake)
 
 ## Building the example suite
 ### Linux
 These instructions assume that the prerequisites for every example are installed on the system.
 
 #### CMake
+See [CMake build options](#cmake-build-options) for an overview of build options.
 - `$ git clone https://github.com/amd/rocm-examples.git`
 - `$ cd rocm-examples`
 - `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
@@ -93,3 +95,37 @@ The repository has Visual Studio project files for all examples and individually
     - To build in Release mode pass the `/p:Configuration=Release` option to MSBuild.
     - The exutables will be created in a subfolder named "Debug" or "Release" inside the project folder.
 - The HIP specific project settings like the GPU architectures targeted can be set on the `General [AMD HIP C++]` tab of project properties.
+
+#### CMake
+First, clone the repository and go to the source directory.
+
+```shell
+git clone https://github.com/amd/rocm-examples.git
+cd rocm-examples
+```
+
+There are two ways to build the project using CMake: with the Visual Studio Developer Command Prompt (recommended) or with a standard Command Prompt. See [CMake build options](#cmake-build-options) for an overview of build options.
+
+##### Visual Studio Developer Command Prompt
+Select Start, search for "x64 Native Tools Command Prompt for VS 2019", and the resulting Command Prompt. Ninja must be selected as generator, and Clang as C++ compiler.
+
+```shell
+cmake -S . -B build -G Ninja -D CMAKE_CXX_COMPILER=clang
+cmake --build build
+```
+
+##### Standard Command Prompt
+Run the standard Command Prompt. When using the standard Command Prompt to build the project, the Resource Compiler (RC) path must be specified. The RC is a tool used to build Windows-based applications, its default path is `C:/Program Files (x86)/Windows Kits/10/bin/<Windows version>/x64/rc.exe`. Finally, the generator must be set to Ninja.
+
+```shell
+cmake -S . -B build -G Ninja -D CMAKE_RC_COMPILER="<path to rc compiler>"
+cmake --build build
+```
+
+### CMake build options
+The following options are available when building with CMake.
+| Option                     | Relevant to | Default value    | Description                                                                                             |
+|:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
+| `GPU_RUNTIME`              | HIP / CUDA  | `"HIP"`          | GPU runtime to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.     |
+| `CMAKE_HIP_ARCHITECTURES`  | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
+| `CMAKE_CUDA_ARCHITECTURES` | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capibility 50 and 72.                 |
