@@ -75,13 +75,13 @@ endif()
 # The compiler needs -target amdgcn-amd-amdhsa -mcpu=gfx* in order to assemble the object file
 # for the right GPU.
 foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
-    message(STATUS "Generating main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.${OBJ_TYPE}")
+    message(STATUS "Generating main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
     add_custom_command(
-        OUTPUT main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.${OBJ_TYPE}
+        OUTPUT main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
         COMMAND ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa -mcpu=${HIP_ARCHITECTURE}
-                        ${CMAKE_CURRENT_SOURCE_DIR}/main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.ll
-                        -o ${CMAKE_CURRENT_BINARY_DIR}/main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.${OBJ_TYPE}
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.ll
+                        ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.ll
+                        -o ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.ll
         VERBATIM)
 endforeach()
 
@@ -107,14 +107,14 @@ endif()
 
 # Generate BUNDLE_TARGETS as a string of: -targets=host-${HOST_TARGET},hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE},...
 set(BUNDLE_TARGETS "-targets=host-${HOST_TARGET}")
-# Generate BUNDLE_INPUTS as a string of: -input=${CMAKE_CURRENT_BINARY_DIR}/main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.${OBJ_TYPE} ...
+# Generate BUNDLE_INPUTS as a string of: -input=${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE} ...
 set(BUNDLE_INPUTS "-input=${NULDEV}")
-# Generate BUNDLE_OBJECTS as a string of: ${CMAKE_CURRENT_BINARY_DIR}/main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.${OBJ_TYPE}
+# Generate BUNDLE_OBJECTS as a string of: ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
 set(BUNDLE_OBJECTS "")
 foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
     set(BUNDLE_TARGETS "${BUNDLE_TARGETS},hipv4-amdgcn-amd-amdhsa--${HIP_ARCHITECTURE}")
-    list(APPEND BUNDLE_INPUTS "-input=${CMAKE_CURRENT_BINARY_DIR}/main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.${OBJ_TYPE}")
-    list(APPEND BUNDLE_OBJECTS "${CMAKE_CURRENT_BINARY_DIR}/main-hip-amdgcn-amd-amdhsa-${HIP_ARCHITECTURE}.${OBJ_TYPE}")
+    list(APPEND BUNDLE_INPUTS "-input=${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
+    list(APPEND BUNDLE_OBJECTS "${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
 endforeach()
 
 # Invoke clang-offload-bundler to generate an offload bundle.

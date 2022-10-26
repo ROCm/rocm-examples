@@ -1,13 +1,13 @@
 # HIP-Basic Runtime Compilation Example
 
 ## Description
-Runtime compilation allows compiling code to machine code while a program is being executed rather than before, as happens with static compilation.
-HIP supports runtime compilation (hipRTC), allowing to compile certain fragments of code in runtime and thus permitting runtime optimizations in them.
-Therefore, the usage of hipRTC provides the possibility of obtaining optimizations and performance improvements compared with other APIs with regular offline static compilation.
+
+Runtime compilation allows compiling fragments of source code to machine code at runtime, when a program is already running, rather than compiling the code ahead of time. HIP supports runtime compilation through hipRTC, which can be used to compile HIP device code at runtime. This permits specific optimizations that depend on values determined at runtime. Therefore, usage of hipRTC provides the possibility of obtaining optimizations and performance improvements over offline compilation.
 
 This example showcases how to make use of hipRTC to compile in runtime a kernel and launch it on a device. This kernel is a simple SAXPY, i.e. a single-precision operation $y_i=ax_i+y_i$.
 
-### Application flow 
+### Application flow
+The diagram below summarizes the runtime compilation part of the example.
 1. A number of variables are declared and defined to configure the program which will be compiled in runtime.
 2. The program is created using the above variables as parameters, along with the SAXPY kernel in string form.
 3. The properties of the first device (GPU) available are consulted to set the device architecture as (the only) compile option.
@@ -18,15 +18,15 @@ This example showcases how to make use of hipRTC to compile in runtime a kernel 
 8. The two input vectors, $x$ and $y$, are instantiated in host memory and filled with the increasing sequences $1, 2, 3, 4, ...$ and $2, 4, 6, 8, ...$, respectively.
 9. The necessary amount of device (GPU) memory is allocated and the elements of the input vectors are copied to the device memory.
 10. A HIP module corresponding to the compiled binary is loaded into the current context and the SAXPY kernel is extracted from it into a HIP function object.
-11. The kernel launch configuration options and its arguments are declared and defined. 
+11. The kernel launch configuration options and its arguments are declared and defined.
 12. A trace message is printed to the standard output.
 13. The GPU kernel is then launched with the above mentioned options along with the constants defined previously.
 14. The results are copied back to host vector $y$.
-15. The previously allocated device memory is freed. 
+15. The previously allocated device memory is freed.
 16. The module is unloaded from the current context and freed.
 17. The first few elements of the result vector $y$ are printed to the standard output.
 
-
+![hiprtc.svg](hiprtc.svg)
 ## Key APIs and Concepts
 - `hipGetDeviceProperties` extracts the properties of the desired device. In this example it is used to get the GPU architecture.
 - `hipModuleGetFunction` extracts a handle for a function with a certain name from a given module. Note that if no function with that name is present in the module this method will return an error.

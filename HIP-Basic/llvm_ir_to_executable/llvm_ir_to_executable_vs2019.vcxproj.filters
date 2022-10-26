@@ -25,25 +25,25 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx90a.ll">
+    <CustomBuild Include="main_gfx90a.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx803.ll">
+    <CustomBuild Include="main_gfx803.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx900.ll">
+    <CustomBuild Include="main_gfx900.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx906.ll">
+    <CustomBuild Include="main_gfx906.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx908.ll">
+    <CustomBuild Include="main_gfx908.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx90a.ll">
+    <CustomBuild Include="main_gfx90a.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="main-hip-amdgcn-amd-amdhsa-gfx1030.ll">
+    <CustomBuild Include="main_gfx1030.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
     <CustomBuild Include="hip_obj_gen_win.mcin">

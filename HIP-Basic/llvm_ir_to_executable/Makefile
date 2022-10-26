@@ -65,7 +65,7 @@ $(EXAMPLE): main.o main_device.o
 main_device.o: hip_obj_gen.mcin offload_bundle.hipfb
 	$(LLVM_MC) -triple x86_64-unknown-linux-gnu -o $@ $< --filetype=obj
 
-offload_bundle.hipfb: $(GPU_ARCHS:%=main-hip-amdgcn-amd-amdhsa-%.o)
+offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 	$(CLANG_OFFLOAD_BUNDLER) -type=o -bundle-align=4096 \
 		-targets=host-x86_64-unknown-linux,$(GPU_ARCH_TRIPLES) \
 		-input=/dev/null \
@@ -75,13 +75,13 @@ offload_bundle.hipfb: $(GPU_ARCHS:%=main-hip-amdgcn-amd-amdhsa-%.o)
 main.o: main.hip
 	$(HIPCXX) $(CXXFLAGS) $(CPPFLAGS) -c --cuda-host-only $<
 
-main-hip-amdgcn-amd-amdhsa-%.o: main-hip-amdgcn-amd-amdhsa-%.ll
+main_%.o: main_%.ll
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<
 
 clean:
 	rm -f \
-		main-hip-amdgcn-amd-amdhsa*.o \
-		main-hip-amdgcn-amd-amdhsa*.bc \
+		main_device*.o \
+		main_*.bc \
 		offload_bundle.hipfb \
 		main_device.o \
 		main.o \

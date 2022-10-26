@@ -21,8 +21,8 @@ LLVM IR is the intermediary language used by the LLVM compiler, which hipcc is b
 ## Generating device LLVM IR
 In this example, a HIP executable is compiled from device LLVM IR code. LLVM IR can be written completely manually, but in this example they are generated from `main.hip`, using the following commands:
 ```shell
-$ROCM_INSTALL_DIR/bin/hipcc -cuda-device-only -c -emit-llvm ./main.hip --offload-arch=<arch> -o main-hip-amdgcn-amd-amdhsa-<arch>.bc -I ../../Common
-$ROCM_INSTALL_DIR/bin/llvm-dis main-hip-amdgcn-amd-amdhsa-<arch>.bc -o main-hip-amdgcn-amd-amdhsa-<arch>.ll
+$ROCM_INSTALL_DIR/bin/hipcc -cuda-device-only -c -emit-llvm ./main.hip --offload-arch=<arch> -o main_<arch>.bc -I ../../Common
+$ROCM_INSTALL_DIR/bin/llvm-dis main_<arch>.bc -o main_<arch>.ll
 ```
 Where `<arch>` is the architecture to generate the LLVM IR for. Note that the `--cuda-device-only` flag is required to instruct `hipcc` to only generate LLVM IR for the device part of the computation, and `-c` is required to prevent the compiler from linking the ouputs into an executable. In the case of this example, the LLVM IR files where generated using architectures `gfx803`, `gfx900`, `gfx906`, `gfx908`, `gfx90a`, `gfx1030`. The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
 
@@ -39,8 +39,8 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
 2. Each LLVM IR file is assembled to a device object file using `clang`. This requires specifying the correct architecture using `-target amdgcn-amd-amdhsa`, and the target architecture that should be assembled for using `-mcpu`:
 
     ```shell
-    $ROCM_INSTALL_DIR/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=gfx1030 main-hip-amdgcn-amd-amdhsa-gfx1030.ll -o main-hip-amdgcn-amd-amdhsa-gfx1030.o
-    $ROCM_INSTALL_DIR/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=<arch> main-hip-amdgcn-amd-amdhsa-<arch>.ll -o main-hip-amdgcn-amd-amdhsa-<arch>.o
+    $ROCM_INSTALL_DIR/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=gfx1030 main_gfx1030.ll -o main_gfx1030.o
+    $ROCM_INSTALL_DIR/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=<arch> main_<arch>.ll -o main_<arch>.o
     ...
     ```
 
@@ -50,7 +50,7 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
     $ROCM_INSTALL_DIR/llvm/bin/clang-offload-bundler -type=o -bundle-align=4096 \
             -targets=host-x86_64-unknown-linux,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-... \
             -input=/dev/null \
-            -input=main-hip-amdgcn-amd-amdhsa-gfx1030.o -input=... \
+            -input=main_gfx1030.o -input=... \
             -output=offload_bundle.hipfb
     ```
 
@@ -95,11 +95,11 @@ The above compilation steps are implemented in Visual Studio through Custom Buil
 - Steps 3 and 4 are implemented using a custom build step:
     ```
     Command Line:
-      "$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030 -input=nul "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx803.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx900.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx906.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx908.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx90a.o" "-input=$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx1030.o" "-output=$(IntDir)offload_bundle.hipfb"
+      "$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-output=$(IntDir)offload_bundle.hipfb"
       cd $(IntDir) && "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
     Description: Generating Device Offload Object
     Outputs: $(IntDIr)main_device.obj
-    Additional Dependencies: $(IntDir)main-hip-amdgcn-amd-amdhsa-gfx90a.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx803.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx900.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx906.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx908.o;$(IntDir)main-hip-amdgcn-amd-amdhsa-gfx1030.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)
+    Additional Dependencies: $(IntDir)main_gfx90a.o;$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx1030.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)
     Execute Before: ClCompile
     ```
 - Finally step 5 is implemented by passing additional inputs to the linker in `project -> properties -> Linker -> Input`:
