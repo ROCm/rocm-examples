@@ -29,6 +29,7 @@ EXAMPLES := \
 	hello_world \
 	hipify \
 	matrix_multiplication \
+	multi_gpu_data_transfer \
 	occupancy \
 	runtime_compilation \
 	saxpy \

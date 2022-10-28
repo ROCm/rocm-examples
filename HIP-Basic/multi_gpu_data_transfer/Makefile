@@ -20,29 +20,35 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Basic LANGUAGES NONE)
+EXAMPLE := hip_multi_gpu_data_transfer
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME := HIP
 
-# Only supported on HIP (not CUDA)
-if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
-    add_subdirectory(assembly_to_executable)
-    add_subdirectory(llvm_ir_to_executable)
-endif()
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-add_subdirectory(bandwidth)
-add_subdirectory(bit_extract)
-add_subdirectory(device_query)
-add_subdirectory(dynamic_shared)
-add_subdirectory(events)
-if(NOT WIN32)
-    add_subdirectory(hello_world)
-    add_subdirectory(hipify)
-endif()
-add_subdirectory(matrix_multiplication)
-add_subdirectory(multi_gpu_data_transfer)
-add_subdirectory(occupancy)
-add_subdirectory(runtime_compilation)
-add_subdirectory(saxpy)
-add_subdirectory(shared_memory)
-add_subdirectory(streams)
-add_subdirectory(warp_shuffle)
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD  := c++17
+CXXFLAGS := -std=$(CXX_STD)
+CPPFLAGS := -I $(COMMON_INCLUDE_DIR)
+LDFLAGS	 :=
+LDLIBS	 :=
+
+ifeq ($(GPU_RUNTIME), CUDA)
+	CXXFLAGS += -x cu
+	CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
