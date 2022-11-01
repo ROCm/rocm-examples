@@ -39,7 +39,7 @@ finish () {
 trap finish EXIT
 
 GIT_CLANG_FORMAT="${GIT_CLANG_FORMAT:-git-clang-format}"
-"$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip --diff "$@" "$SOURCE_COMMIT" > "$scratch"
+"$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff "$@" "$SOURCE_COMMIT" > "$scratch"
 
 # Check for no-ops
 grep '^no modified files to format$\|^clang-format did not modify any files$' \

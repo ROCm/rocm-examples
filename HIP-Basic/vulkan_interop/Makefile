@@ -20,37 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	bandwidth \
-	bit_extract \
-	device_query \
-	dynamic_shared \
-	events \
-	hello_world \
-	hipify \
-	matrix_multiplication \
-	multi_gpu_data_transfer \
-	occupancy \
-	runtime_compilation \
-	saxpy \
-	shared_memory \
-	streams \
-	vulkan_interop \
-	warp_shuffle
+EXAMPLE := hip_vulkan_interop
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME := HIP
 
-# Only supported on HIP (not CUDA).
-ifneq ($(GPU_RUNTIME), CUDA)
-    EXAMPLES += \
-        assembly_to_executable \
-        llvm_ir_to_executable
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD  := c++17
+CXXFLAGS := -std=$(CXX_STD) -g
+CPPFLAGS := -I $(COMMON_INCLUDE_DIR) $(shell pkg-config --cflags glfw3 vulkan)
+LDFLAGS	 :=
+LDLIBS	 := $(shell pkg-config --libs glfw3)
+
+GLSLFLAGS := -V100
+
+ifeq ($(GPU_RUNTIME), CUDA)
+	CXXFLAGS += -x cu
+	CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
-all: $(EXAMPLES)
+$(EXAMPLE): main.hip vulkan_utils.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp sinewave.frag.spv.h sinewave.vert.spv.h
+	$(HIPCXX) main.hip vulkan_utils.hip $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
 
-clean: TARGET=clean
-clean: all
+sinewave.vert.spv.h: sinewave.vert
+	glslangValidator $< -o $@ $(GLSLFLAGS) --vn sinewave_vert
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+sinewave.frag.spv.h: sinewave.frag
+	glslangValidator $< -o $@ $(GLSLFLAGS) --vn sinewave_frag
 
-.PHONY: all clean $(EXAMPLES)
+clean:
+	$(RM) $(EXAMPLE) sinewave.frag.spv.h sinewave.vert.spv.h
+
+.PHONY: clean

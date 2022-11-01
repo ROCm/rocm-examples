@@ -195,11 +195,13 @@ test:rocm-windows-vs2019:
     - |-
       Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
-        echo "--" $_.Name
-        & "$_"
-        if (!$?) {
-          throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
-        }
+          if ($_.Name -ne "hip_vulkan_interop_vs2019.exe") {
+              echo "--" $_.Name
+              & "$_"
+              if (!$?) {
+                throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
+              }
+          }
       }
 
 test:rocm-windows-cmake:

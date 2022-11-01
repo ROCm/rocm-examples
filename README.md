@@ -19,6 +19,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
     - [shared_memory](/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
     - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
+    - [vulkan_interop](/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan.
     - [warp_shuffle](/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](/Dockerfiles/README.md) for details.
 - [Docs](/Docs/)
