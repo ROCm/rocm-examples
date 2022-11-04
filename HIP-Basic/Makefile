@@ -31,6 +31,7 @@ EXAMPLES := \
 	matrix_multiplication \
 	multi_gpu_data_transfer \
 	occupancy \
+	opengl_interop \
 	runtime_compilation \
 	saxpy \
 	shared_memory \

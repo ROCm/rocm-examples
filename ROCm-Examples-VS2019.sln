@@ -72,6 +72,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bit_extract_vs2019", "HIP-B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_vs2019", "HIP-Basic\vulkan_interop\vulkan_interop_vs2019.vcxproj", "{688433E2-B189-431D-A5F8-9AC82102B58C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opengl_interop_vs2019", "HIP-Basic\opengl_interop\opengl_interop_vs2019.vcxproj", "{96F8BE41-5C64-4BF2-8A8E-474BEAACAA5A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -190,6 +192,10 @@ Global
 		{688433E2-B189-431D-A5F8-9AC82102B58C}.Debug|x64.Build.0 = Debug|x64
 		{688433E2-B189-431D-A5F8-9AC82102B58C}.Release|x64.ActiveCfg = Release|x64
 		{688433E2-B189-431D-A5F8-9AC82102B58C}.Release|x64.Build.0 = Release|x64
+		{96F8BE41-5C64-4BF2-8A8E-474BEAACAA5A}.Debug|x64.ActiveCfg = Debug|x64
+		{96F8BE41-5C64-4BF2-8A8E-474BEAACAA5A}.Debug|x64.Build.0 = Debug|x64
+		{96F8BE41-5C64-4BF2-8A8E-474BEAACAA5A}.Release|x64.ActiveCfg = Release|x64
+		{96F8BE41-5C64-4BF2-8A8E-474BEAACAA5A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -228,6 +234,7 @@ Global
 		{DBB8DFE9-CB1B-473C-937C-2A8120E0D819} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{63823DD0-787C-42AE-B6E7-C03CF4CF5CE2} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{688433E2-B189-431D-A5F8-9AC82102B58C} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{96F8BE41-5C64-4BF2-8A8E-474BEAACAA5A} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

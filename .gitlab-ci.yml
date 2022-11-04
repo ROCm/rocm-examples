@@ -195,7 +195,7 @@ test:rocm-windows-vs2019:
     - |-
       Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
-          if ($_.Name -ne "hip_vulkan_interop_vs2019.exe") {
+          if (("hip_vulkan_interop_vs2019.exe","hip_opengl_interop_vs2019.exe") -NotContains $_.Name) {
               echo "--" $_.Name
               & "$_"
               if (!$?) {
