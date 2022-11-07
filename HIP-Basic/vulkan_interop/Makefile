@@ -31,30 +31,36 @@ HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
 # Common variables and flags
-CXX_STD  := c++17
-CXXFLAGS := -std=$(CXX_STD) -g
-CPPFLAGS := -I $(COMMON_INCLUDE_DIR) $(shell pkg-config --cflags glfw3 vulkan)
-LDFLAGS	 :=
-LDLIBS	 := $(shell pkg-config --libs glfw3)
-
-GLSLFLAGS := -V100
+CXX_STD    := c++17
+ICXXFLAGS  := -std=$(CXX_STD)
+ICPPFLAGS  := -I $(COMMON_INCLUDE_DIR) $(shell pkg-config --cflags glfw3 vulkan)
+ILDFLAGS   :=
+ILDLIBS    := $(shell pkg-config --libs glfw3)
+IGLSLFLAGS := -V100
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	CXXFLAGS += -x cu
-	CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
 else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS ?= -Wall -Wextra
 else
 	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
+ICXXFLAGS  += $(CXXFLAGS)
+ICPPFLAGS  += $(CPPFLAGS)
+ILDFLAGS   += $(LDFLAGS)
+ILDLIBS    += $(LDLIBS)
+IGLSLFLAGS += $(GLSLFLAGS)
+
 $(EXAMPLE): main.hip vulkan_utils.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp sinewave.frag.spv.h sinewave.vert.spv.h
-	$(HIPCXX) main.hip vulkan_utils.hip $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip vulkan_utils.hip $(ILDLIBS)
 
 sinewave.vert.spv.h: sinewave.vert
-	glslangValidator $< -o $@ $(GLSLFLAGS) --vn sinewave_vert
+	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn sinewave_vert
 
 sinewave.frag.spv.h: sinewave.frag
-	glslangValidator $< -o $@ $(GLSLFLAGS) --vn sinewave_frag
+	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn sinewave_frag
 
 clean:
 	$(RM) $(EXAMPLE) sinewave.frag.spv.h sinewave.vert.spv.h

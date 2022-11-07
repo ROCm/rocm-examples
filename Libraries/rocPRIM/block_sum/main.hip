@@ -36,7 +36,7 @@ std::vector<int> reduce_sum_host(const std::vector<int>& data,
                                  const unsigned int      grid_size)
 {
     std::vector<int> sum_per_block(grid_size);
-    for(int i = 0; i < grid_size; i++)
+    for(unsigned int i = 0; i < grid_size; i++)
     {
         const auto begin = data.begin() + i * run_size;
         const auto end   = data.begin() + std::min(data.size(), (size_t(1) + i) * run_size);

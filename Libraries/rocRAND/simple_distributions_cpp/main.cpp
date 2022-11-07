@@ -29,6 +29,7 @@
 #if defined(__HIP_PLATFORM_AMD__) && !defined(__HIP__) && (defined(WIN32) || defined(_WIN32))
     #include <hip/amd_detail/hip_fp16_gcc.h>
 #endif
+
 #include <rocrand/rocrand.hpp>
 
 #include <chrono>

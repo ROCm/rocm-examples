@@ -82,7 +82,7 @@ int main()
 
     // To guarantee the correct behaviour of the program, keep total number of matrix elements
     // below (or equal to) warp size.
-    assert(size <= props.warpSize
+    assert(size <= static_cast<unsigned int>(props.warpSize)
            && "Matrix has more elements than architecture's warp size value.");
 
     // Block (2D) and grid sizes. Note that in this example we have only 1 block (and 1 warp).

@@ -1,55 +1,55 @@
 	.text
 	.amdgcn_target "amdgcn-amd-amdhsa--gfx1030"
-	.protected	_Z20vector_square_kernelIfEvPT_PKS0_x ; -- Begin function _Z20vector_square_kernelIfEvPT_PKS0_x
-	.globl	_Z20vector_square_kernelIfEvPT_PKS0_x
+	.section	.text._Z20vector_square_kernelIfEvPT_PKS0_y,#alloc,#execinstr
+	.protected	_Z20vector_square_kernelIfEvPT_PKS0_y ; -- Begin function _Z20vector_square_kernelIfEvPT_PKS0_y
+	.globl	_Z20vector_square_kernelIfEvPT_PKS0_y
 	.p2align	8
-	.type	_Z20vector_square_kernelIfEvPT_PKS0_x,@function
-_Z20vector_square_kernelIfEvPT_PKS0_x:  ; @_Z20vector_square_kernelIfEvPT_PKS0_x
+	.type	_Z20vector_square_kernelIfEvPT_PKS0_y,@function
+_Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 ; %bb.0:
 	s_load_dword s0, s[4:5], 0x4
 	s_load_dwordx2 s[2:3], s[6:7], 0x10
-	v_mov_b32_e32 v1, 0
 	s_waitcnt lgkmcnt(0)
 	s_and_b32 s0, s0, 0xffff
-	s_mul_i32 s8, s8, s0
-	v_add_nc_u32_e32 v0, s8, v0
-	v_cmp_gt_u64_e32 vcc_lo, s[2:3], v[0:1]
-	s_and_saveexec_b32 s0, vcc_lo
-	s_cbranch_execz BB0_3
+	v_mad_u64_u32 v[0:1], null, s8, s0, v[0:1]
+	v_mov_b32_e32 v1, 0
+	s_mov_b32 s0, exec_lo
+	v_cmpx_gt_u64_e64 s[2:3], v[0:1]
+	s_cbranch_execz .LBB0_3
 ; %bb.1:
 	s_load_dword s8, s[4:5], 0xc
 	s_load_dwordx4 s[4:7], s[6:7], 0x0
 	v_lshlrev_b64 v[2:3], 2, v[0:1]
 	s_mov_b32 s9, 0
-	s_mov_b32 s1, s9
 	s_waitcnt lgkmcnt(0)
 	s_lshl_b64 s[10:11], s[8:9], 2
 	.p2align	6
-BB0_2:                                  ; =>This Inner Loop Header: Depth=1
+.LBB0_2:                                ; =>This Inner Loop Header: Depth=1
 	v_add_co_u32 v4, vcc_lo, s6, v2
 	v_add_co_ci_u32_e32 v5, vcc_lo, s7, v3, vcc_lo
 	v_add_co_u32 v0, vcc_lo, v0, s8
-	v_add_co_ci_u32_e32 v1, vcc_lo, s9, v1, vcc_lo
+	v_add_co_ci_u32_e32 v1, vcc_lo, 0, v1, vcc_lo
 	global_load_dword v6, v[4:5], off
 	v_add_co_u32 v4, vcc_lo, s4, v2
 	v_add_co_ci_u32_e32 v5, vcc_lo, s5, v3, vcc_lo
 	v_cmp_le_u64_e32 vcc_lo, s[2:3], v[0:1]
 	v_add_co_u32 v2, s0, v2, s10
 	v_add_co_ci_u32_e64 v3, s0, s11, v3, s0
-	s_or_b32 s1, vcc_lo, s1
+	s_or_b32 s9, vcc_lo, s9
 	s_waitcnt vmcnt(0)
 	v_mul_f32_e32 v6, v6, v6
 	global_store_dword v[4:5], v6, off
-	s_andn2_b32 exec_lo, exec_lo, s1
-	s_cbranch_execnz BB0_2
-BB0_3:
+	s_andn2_b32 exec_lo, exec_lo, s9
+	s_cbranch_execnz .LBB0_2
+.LBB0_3:
 	s_endpgm
 	.section	.rodata,#alloc
 	.p2align	6
-	.amdhsa_kernel _Z20vector_square_kernelIfEvPT_PKS0_x
+	.amdhsa_kernel _Z20vector_square_kernelIfEvPT_PKS0_y
 		.amdhsa_group_segment_fixed_size 0
 		.amdhsa_private_segment_fixed_size 0
-		.amdhsa_kernarg_size 80
+		.amdhsa_kernarg_size 24
+		.amdhsa_user_sgpr_count 8
 		.amdhsa_user_sgpr_private_segment_buffer 1
 		.amdhsa_user_sgpr_dispatch_ptr 1
 		.amdhsa_user_sgpr_queue_ptr 0
@@ -77,6 +77,7 @@ BB0_3:
 		.amdhsa_workgroup_processor_mode 1
 		.amdhsa_memory_ordered 1
 		.amdhsa_forward_progress 0
+		.amdhsa_shared_vgpr_count 0
 		.amdhsa_exception_fp_ieee_invalid_op 0
 		.amdhsa_exception_fp_denorm_src 0
 		.amdhsa_exception_fp_ieee_div_zero 0
@@ -85,13 +86,13 @@ BB0_3:
 		.amdhsa_exception_fp_ieee_inexact 0
 		.amdhsa_exception_int_div_zero 0
 	.end_amdhsa_kernel
-	.text
+	.section	.text._Z20vector_square_kernelIfEvPT_PKS0_y,#alloc,#execinstr
 .Lfunc_end0:
-	.size	_Z20vector_square_kernelIfEvPT_PKS0_x, .Lfunc_end0-_Z20vector_square_kernelIfEvPT_PKS0_x
+	.size	_Z20vector_square_kernelIfEvPT_PKS0_y, .Lfunc_end0-_Z20vector_square_kernelIfEvPT_PKS0_y
                                         ; -- End function
 	.section	.AMDGPU.csdata
 ; Kernel info:
-; codeLenInByte = 188
+; codeLenInByte = 212
 ; NumSgprs: 14
 ; NumVgprs: 7
 ; ScratchSize: 0
@@ -147,7 +148,7 @@ _ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE:
 	.zero	1
 	.size	_ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE, 1
 
-	.ident	"AMD clang version 14.0.0 (https://github.com/RadeonOpenCompute/llvm-project roc-5.0.0 22051 235b6880e2e515507478181ec11a20c1ec87945b)"
+	.ident	"AMD clang version 15.0.0 (https://github.com/RadeonOpenCompute/llvm-project roc-5.3.0 22362 3cf23f77f8208174a2ee7c616f4be23674d7b081)"
 	.section	".note.GNU-stack"
 	.addrsig
 	.addrsig_sym _ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE
@@ -169,44 +170,19 @@ amdhsa.kernels:
       - .offset:         16
         .size:           8
         .value_kind:     by_value
-      - .offset:         24
-        .size:           8
-        .value_kind:     hidden_global_offset_x
-      - .offset:         32
-        .size:           8
-        .value_kind:     hidden_global_offset_y
-      - .offset:         40
-        .size:           8
-        .value_kind:     hidden_global_offset_z
-      - .address_space:  global
-        .offset:         48
-        .size:           8
-        .value_kind:     hidden_none
-      - .address_space:  global
-        .offset:         56
-        .size:           8
-        .value_kind:     hidden_none
-      - .address_space:  global
-        .offset:         64
-        .size:           8
-        .value_kind:     hidden_none
-      - .address_space:  global
-        .offset:         72
-        .size:           8
-        .value_kind:     hidden_multigrid_sync_arg
     .group_segment_fixed_size: 0
     .kernarg_segment_align: 8
-    .kernarg_segment_size: 80
+    .kernarg_segment_size: 24
     .language:       OpenCL C
     .language_version:
       - 2
       - 0
     .max_flat_workgroup_size: 1024
-    .name:           _Z20vector_square_kernelIfEvPT_PKS0_x
+    .name:           _Z20vector_square_kernelIfEvPT_PKS0_y
     .private_segment_fixed_size: 0
     .sgpr_count:     14
     .sgpr_spill_count: 0
-    .symbol:         _Z20vector_square_kernelIfEvPT_PKS0_x.kd
+    .symbol:         _Z20vector_square_kernelIfEvPT_PKS0_y.kd
     .vgpr_count:     7
     .vgpr_spill_count: 0
     .wavefront_size: 32

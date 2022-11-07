@@ -35,17 +35,18 @@ HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
 # Common variables and flags
-CXX_STD  := c++17
-CXXFLAGS := -std=$(CXX_STD)
-CPPFLAGS := -I $(COMMON_INCLUDE_DIR)
-LDFLAGS	 :=
-LDLIBS	 :=
+CXX_STD   := c++17
+CXXFLAGS  ?= -Wall -Wextra
+ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) $(CPPFLAGS)
+ILDFLAGS  := $(LDFLAGS)
+ILDLIBS   := $(LDLIBS)
 
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp module.co
-	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 module.co: module.hip
-	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) --genco -o $@
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
 clean:
 	$(RM) $(EXAMPLE) module.co

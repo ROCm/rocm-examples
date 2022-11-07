@@ -49,8 +49,8 @@ endif
 
 ICXXFLAGS += $(CXXFLAGS)
 ICPPFLAGS += $(CPPFLAGS)
-ILDFLAGS += $(LDFLAGS)
-ILDLIBS += $(LDLIBS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
 SRCS := main.hip $(EXTERNAL_DIR)/glad/glad.cpp
 

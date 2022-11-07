@@ -41,10 +41,10 @@ EXAMPLES := \
 
 # Only supported on HIP (not CUDA).
 ifneq ($(GPU_RUNTIME), CUDA)
-    EXAMPLES += \
-        assembly_to_executable \
-        llvm_ir_to_executable \
-        module_api
+	EXAMPLES += \
+		assembly_to_executable \
+		llvm_ir_to_executable \
+		module_api
 endif
 
 all: $(EXAMPLES)

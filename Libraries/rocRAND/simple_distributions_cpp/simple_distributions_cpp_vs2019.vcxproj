@@ -67,11 +67,12 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level1</WarningLevel>
+      <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__HIP_ROCclr__;__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>-Wno-#warnings</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -88,6 +89,7 @@
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <AdditionalOptions>-Wno-#warnings</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

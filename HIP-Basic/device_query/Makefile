@@ -31,25 +31,31 @@ HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
 # Common variables and flags
-CXX_STD  := c++17
-CXXFLAGS := -std=$(CXX_STD)
-CPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
-LDFLAGS	 :=
-LDLIBS	 :=
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	CXXFLAGS += -x cu
+	ICXXFLAGS += -x cu
 else ifeq ($(GPU_RUNTIME), HIP)
-	HIPCXX = $(CXX)
-	CXXFLAGS += -D__HIP_PLATFORM_AMD__
-	LDFLAGS += -L $(ROCM_INSTALL_DIR)/lib
-	LDLIBS += -lamdhip64
+	CXXFLAGS  ?= -Wall -Wextra
+	HIPCXX    := $(CXX)
+	ICXXFLAGS += -D__HIP_PLATFORM_AMD__
+	ILDFLAGS  += -L $(ROCM_INSTALL_DIR)/lib
+	ILDLIBS   += -lamdhip64
 else
 	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
-	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:
 	$(RM) $(EXAMPLE)

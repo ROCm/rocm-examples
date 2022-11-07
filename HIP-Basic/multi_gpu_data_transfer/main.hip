@@ -44,10 +44,10 @@ std::pair<int, int> check_peer_to_peer_support()
     }
 
     // Check accessibility for each device available.
-    for(unsigned int current_gpu = 0; current_gpu < gpu_count; current_gpu++)
+    for(int current_gpu = 0; current_gpu < gpu_count; current_gpu++)
     {
         // Check if current_gpu device can access the memory of the devices with lower ID.
-        for(unsigned int peer_gpu = 0; peer_gpu < current_gpu; peer_gpu++)
+        for(int peer_gpu = 0; peer_gpu < current_gpu; peer_gpu++)
         {
             HIP_CHECK(hipDeviceCanAccessPeer(&can_access_peer, current_gpu, peer_gpu));
 
@@ -65,7 +65,7 @@ std::pair<int, int> check_peer_to_peer_support()
 }
 
 /// \brief Enables (if possible) direct memory access from <tt>current_gpu<\tt> to <tt>peer_gpu<\tt>.
-void enable_peer_to_peer(const unsigned int current_gpu, const unsigned int peer_gpu)
+void enable_peer_to_peer(const int current_gpu, const int peer_gpu)
 {
     // Must be on a multi-gpu system.
     assert(current_gpu != peer_gpu && "Current and peer devices must be different.");
@@ -123,7 +123,8 @@ __global__ void static_shared_matrix_transpose_kernel(float* out, const float* i
 }
 
 /// \brief Simple matrix transpose kernel using dynamic shared memory.
-__global__ void dynamic_shared_matrix_transpose_kernel(float* out, const float* in, const int width)
+__global__ void
+    dynamic_shared_matrix_transpose_kernel(float* out, const float* in, const unsigned int width)
 {
     // Declare that this kernel is using dynamic shared memory to store a number of floats.
     // The unsized array type indicates that the total amount of memory that is going
