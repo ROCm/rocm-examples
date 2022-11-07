@@ -1,6 +1,6 @@
 # HIP-Basic Events Example
 ## Description
-Memory transfer and kernel execution are the most important parameter in parallel computing (especially HPC and machine learning). Memory bottlenecks are the main problem why we are not able to get the highest performance, therefore obtaining the memory transfer timing and kernel execution timing plays key role in application optimization.
+Memory transfer and kernel execution are the most important parameters in parallel computing, especially in high performance computing (HPC) and machine learning. Memory bottlenecks are the main problem why we are not able to get the highest performance, therefore obtaining the memory transfer timing and kernel execution timing plays key role in application optimization.
 
 This example showcases measuring kernel and memory transfer timing using HIP events. The kernel under measurement is a trivial one that performs square matrix transposition.
 
@@ -8,11 +8,14 @@ This example showcases measuring kernel and memory transfer timing using HIP eve
 1. A number of parameters are defined that control the problem details and the kernel launch.
 2. Input data is set up in host memory.
 3. The necessary amount of device memory is allocated.
-4. A pair of `hipEvent` objects are defined and initialized. Time measurement is started on the `start` event.
-5. Memory transfer from host to device of the input data is performed, and the measurement is stopped using the `stop` event. The execution time is calculated via the `start` and `stop` events and it is printed to the standard output.
-6. The kernel is launched, and its runtime is measured similarly using the `start` and `stop` events.
-7. The result data is copied back to the host, and the execution time of the copy is measured similarly.
-8. The result data is validated by comparing it to the product of the reference (host) implementation. The result of the validation is printed to the standard output.
+4. A pair of `hipEvent` objects are defined and initialized.
+5. Time measurement is started on the `start` event.
+6. Memory transfer from host to device of the input data is performed.
+7. The time measurement is stopped using the `stop` event. The execution time is calculated via the `start` and `stop` events and it is printed to the standard output.
+8. The kernel is launched, and its runtime is measured similarly using the `start` and `stop` events.
+9. The result data is copied back to the host, and the execution time of the copy is measured similarly.
+10. The allocated device memory is freed and the event objects are released.
+11. The result data is validated by comparing it to the product of the reference (host) implementation. The result of the validation is printed to the standard output.
 
 ## Key APIs and Concepts
 - The `hipEvent_t` type defines HIP events that can be used for synchronization and time measurement. The events must be initialized using `hipEventCreate` before usage and destroyed using `hipEventDestroy` after they are no longer needed.

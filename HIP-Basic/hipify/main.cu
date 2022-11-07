@@ -89,7 +89,7 @@ int main()
     // Copy the input from host to the GPU device
     CHECK(cudaMemcpy(d_in, h_in.data(), size_in_bytes, cudaMemcpyHostToDevice));
 
-    // Set the the number of blocks per kernel grid.
+    // Set the number of blocks per kernel grid.
     constexpr unsigned int grid_size = 512;
     // Set the number of threads per kernel block.
     constexpr unsigned int threads_per_block = 256;

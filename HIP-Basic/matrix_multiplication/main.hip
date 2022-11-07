@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "argument_parsing.hpp"
+#include "cmdparser.hpp"
 #include "example_utils.hpp"
 
 #include <hip/hip_runtime.h>
@@ -108,18 +108,53 @@ __global__ void matrix_multiplication_kernel(const float*       A,
     // Every thread stores the final result to global memory.
     C[block_offset + b_cols * ty + tx] = thread_result;
 }
+template<unsigned int BlockSize>
+void configure_parser(cli::Parser& parser)
+{
+    // Default parameters
+    constexpr unsigned int a_rows = 2048;
+    constexpr unsigned int a_cols = 1024;
+    constexpr unsigned int b_cols = 1024;
+
+    static_assert(
+        ((a_rows % BlockSize == 0) && (a_cols % BlockSize == 0) && (b_cols % BlockSize == 0)),
+        "Matrix dimensions must be positive multiples of block_size");
+
+    parser.set_optional<unsigned int>("A_rows",
+                                      "A_rows",
+                                      a_rows,
+                                      "Number of rows in Matrix A"); // Default 2048
+    parser.set_optional<unsigned int>("A_cols",
+                                      "A_cols",
+                                      a_cols,
+                                      "Number of columns in Matrix A"); // Default 1024
+    parser.set_optional<unsigned int>("B_cols",
+                                      "B_cols",
+                                      b_cols,
+                                      "Number of columns in Matrix B"); // Default 1024
+}
 
 int main(int argc, const char* argv[])
 {
     constexpr unsigned int block_size = 16;
 
-    // Default values are provided below.
-    unsigned int a_rows = 2048;
-    unsigned int a_cols = 1024;
-    unsigned int b_cols = 1024;
+    // Parse user inputs
+    cli::Parser parser(argc, argv);
+    configure_parser<block_size>(parser);
+    parser.run_and_exit_if_error();
 
     // Get matrix dimensions from the command line, if provided.
-    matrix_dimensions_from_command_line(argc, argv, a_rows, a_cols, b_cols, block_size);
+    const unsigned int a_rows = parser.get<unsigned int>("A_rows");
+    const unsigned int a_cols = parser.get<unsigned int>("A_cols");
+    const unsigned int b_cols = parser.get<unsigned int>("B_cols");
+
+    if((a_rows % block_size != 0) || (a_cols % block_size != 0) || (b_cols % block_size != 0))
+    {
+        std::cout << "Matrix dimensions must be positive multiples of block_size ("
+                         + std::to_string(block_size) + ")"
+                  << std::endl;
+        exit(error_exit_code);
+    }
 
     // Outer matrix dimensions must match.
     const unsigned int b_rows = a_cols;

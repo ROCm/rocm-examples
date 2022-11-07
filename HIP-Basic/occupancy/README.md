@@ -1,7 +1,7 @@
-# HIP-Basic Occupany Example
+# HIP-Basic Occupancy Example
 
 ## Description
-This example showcases how to find optimal configuation parameters for a kernel launch with maximum occupancy. It uses the HIP occupancy calculator APIs to find a kernel launch configuration that yields maximum occupancy. This configuration is used to launch a kernel and measures the utilization difference against another kernel launch that is manually (and suboptimally) configured. The application kernel is a simple vector-vector multiplication of the form `C[i] = A[i]*B[i]`, where `A`, `B` and `C` are vectors of size `size`.
+This example showcases how to find optimal configuration parameters for a kernel launch with maximum occupancy. It uses the HIP occupancy calculator APIs to find a kernel launch configuration that yields maximum occupancy. This configuration is used to launch a kernel and measures the utilization difference against another kernel launch that is manually (and suboptimally) configured. The application kernel is a simple vector--vector multiplication of the form `C[i] = A[i]*B[i]`, where `A`, `B` and `C` are vectors of size `size`.
 
 The example shows 100% occupancy for both manual and automatic configurations, because the simple kernel does not use much resources per-thread or per-block, especially `__shared__` memory. The execution time for the automatic launch is still lower because of a lower overhead associated with fewer blocks being executed.
 

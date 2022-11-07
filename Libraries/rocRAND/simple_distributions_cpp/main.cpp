@@ -20,27 +20,37 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <chrono>
-#include <iostream>
-#include <random>
-#include <string_view>
-#include <vector>
+#include "cmdparser.hpp"
+#include "example_utils.hpp"
 
 #include <hip/hip_runtime.h>
+
 // Workaround for ROCm on Windows not including `__half` definitions, in a host compiler.
 #if defined(__HIP_PLATFORM_AMD__) && !defined(__HIP__) && (defined(WIN32) || defined(_WIN32))
     #include <hip/amd_detail/hip_fp16_gcc.h>
 #endif
 #include <rocrand/rocrand.hpp>
 
-#include "argument_parsing.hpp"
-#include "example_utils.hpp"
+#include <chrono>
+#include <iostream>
+#include <random>
+#include <string_view>
+#include <vector>
 
 // An anonymous namespace sets static linkage to its contents.
 // This means that the contained function definitions will only be visible
 // in the current compilation unit (i.e. cpp source file).
 namespace
 {
+
+/// \brief The random distribution kind selected on the command line.
+enum class Distribution
+{
+    uniform_int,
+    uniform_real,
+    normal,
+    poisson
+};
 
 /// \brief Selects the device (GPU) with the provided ID. If it cannot be selected
 /// (e.g. a non-existent device ID is passed), an exception is thrown.
@@ -184,32 +194,90 @@ void dispatch_distribution_type(const Distribution dist, const size_t size, cons
     }
 }
 
+void configure_parser(cli::Parser& parser)
+{
+    // Default parameters
+    parser.set_optional<int>("device", "device", 0,
+                             "Device Id"); // Default Device 0
+    parser.set_optional<std::string>("distribution",
+                                     "distribution",
+                                     "uniform_int",
+                                     "rocRAND distribution"); // Default "uniform_int"
+    parser.set_optional<size_t>("size", "size", 10000000,
+                                "Problem size"); // Default 10000000
+
+    parser.set_optional<bool>(
+        "print",
+        "print",
+        0,
+        "Toggle printing on or off. This is a boolean argument and takes no value. If it is "
+        "provided the value is set to \"on\""); // Default "off"
+}
+
+Distribution get_distribution(std::string distribution_arg)
+{
+    Distribution distribution_enum;
+    if(distribution_arg == "uniform_int")
+    {
+        distribution_enum = Distribution::uniform_int;
+    }
+    else if(distribution_arg == "uniform_real")
+    {
+        distribution_enum = Distribution::uniform_real;
+    }
+    else if(distribution_arg == "normal")
+    {
+        distribution_enum = Distribution::normal;
+    }
+    else if(distribution_arg == "poisson")
+    {
+        distribution_enum = Distribution::poisson;
+    }
+    else
+    {
+        std::cerr << distribution_arg << (" is not a valid distribution.") << std::endl;
+        exit(error_exit_code);
+    }
+    return distribution_enum;
+}
+
 } // namespace
 
 int main(const int argc, const char** argv)
 {
-    CliArguments args;
-    try
+
+    // Get the number of hip devices in the system
+    int number_of_devies = 0;
+    HIP_CHECK(hipGetDeviceCount(&number_of_devies))
+
+    if(number_of_devies <= 0)
     {
-        // Parsing command line arguments. If something unexpected happens (e.g. missing arguments or
-        // wrong format), an exception is thrown.
-        args = parse_args(argc, argv);
-        // The parsed arguments are logged to the output to provide feedback to the user.
-        // For implementation, see `std::ostream& operator<<(std::ostream& os, const CliArguments& cli_args)`
-        std::cout << args << std::endl;
+        std::cerr << "HIP supported devices not found!"
+                  << "\n";
+        exit(error_exit_code);
     }
-    catch(const std::exception& ex)
+
+    // Parse user inputs
+    cli::Parser parser(argc, argv);
+    configure_parser(parser);
+    parser.run_and_exit_if_error();
+
+    // Get user arguments, if provided.
+    const int device_id = parser.get<int>("device");
+    if(device_id < 0 || device_id >= number_of_devies)
     {
-        // The exception is caught, and an error message and the command line help is printed.
-        // The program returns with a non-zero exit code.
-        std::cerr << "Could not parse arguments. Error: "s.append(ex.what()) << "\n"
-                  << cli_usage_message << std::endl;
-        return error_exit_code;
+        std::cerr << "Invalid device id " << device_id << "!\n"
+                  << "Device does not exist\n";
+        exit(error_exit_code);
     }
+
+    Distribution distribution = get_distribution(parser.get<std::string>("distribution"));
+    size_t       size         = parser.get<size_t>("size");
+    bool         print        = parser.get<bool>("print");
 
     // Set up the used device (GPU) according to the command line supplied argument.
-    set_device(args.device_id_);
+    set_device(device_id);
 
     // Run the selected measurement on the device (GPU) and host (CPU).
-    dispatch_distribution_type(args.distribution_, args.size_, args.print_);
+    dispatch_distribution_type(distribution, size, print);
 }

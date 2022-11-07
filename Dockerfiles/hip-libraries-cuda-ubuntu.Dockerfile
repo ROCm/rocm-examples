@@ -13,12 +13,17 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         ssh \
         sudo \
         wget \
+        pkg-config \
+        glslang-tools \
+        libvulkan-dev \
+        vulkan-validationlayers \
+        libglfw3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install HIP using the installer script
 RUN export DEBIAN_FRONTEND=noninteractive; \
     wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add - \
-    && echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/5.2/ ubuntu main' > /etc/apt/sources.list.d/rocm.list \
+    && echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/5.3/ ubuntu main' > /etc/apt/sources.list.d/rocm.list \
     && apt-get update -qq \
     && apt-get install -y hip-base hipify-clang \
     && apt-get download hip-runtime-nvidia hip-dev \
@@ -36,25 +41,25 @@ RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
     && ldconfig
 
 # Install rocRAND
-RUN wget https://github.com/ROCmSoftwarePlatform/rocRAND/archive/refs/tags/rocm-5.2.0.tar.gz \
-    && tar -xf ./rocm-5.2.0.tar.gz \
-    && rm ./rocm-5.2.0.tar.gz \
-    && cmake -S ./rocRAND-rocm-5.2.0 -B ./rocRAND-rocm-5.2.0/build \
-        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
+RUN wget https://github.com/ROCmSoftwarePlatform/rocRAND/archive/refs/tags/rocm-5.3.0.tar.gz \
+    && tar -xf ./rocm-5.3.0.tar.gz \
+    && rm ./rocm-5.3.0.tar.gz \
+    && cmake -S ./rocRAND-rocm-5.3.0 -B ./rocRAND-rocm-5.3.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
         -D BUILD_HIPRAND=OFF \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
-    && cmake --build ./rocRAND-rocm-5.2.0/build --target install \
-    && rm -rf ./rocRAND-rocm-5.2.0
+    && cmake --build ./rocRAND-rocm-5.3.0/build --target install \
+    && rm -rf ./rocRAND-rocm-5.3.0
 
 # Install hipCUB
-RUN wget https://github.com/ROCmSoftwarePlatform/hipCUB/archive/refs/tags/rocm-5.2.0.tar.gz \
-    && tar -xf ./rocm-5.2.0.tar.gz \
-    && rm ./rocm-5.2.0.tar.gz \
-    && cmake -S ./hipCUB-rocm-5.2.0 -B ./hipCUB-rocm-5.2.0/build \
-        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
+RUN wget https://github.com/ROCmSoftwarePlatform/hipCUB/archive/refs/tags/rocm-5.3.0.tar.gz \
+    && tar -xf ./rocm-5.3.0.tar.gz \
+    && rm ./rocm-5.3.0.tar.gz \
+    && cmake -S ./hipCUB-rocm-5.3.0 -B ./hipCUB-rocm-5.3.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
-    && cmake --build ./hipCUB-rocm-5.2.0/build --target install \
-    && rm -rf ./hipCUB-rocm-5.2.0
+    && cmake --build ./hipCUB-rocm-5.3.0/build --target install \
+    && rm -rf ./hipCUB-rocm-5.3.0
 
 # Add the render group and a user with sudo permissions for the container
 RUN groupadd --system --gid 109 render \

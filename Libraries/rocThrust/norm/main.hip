@@ -27,6 +27,7 @@
 
 #include <thrust/device_vector.h>
 #include <thrust/reduce.h>
+#include <thrust/transform_reduce.h>
 
 #include "example_utils.hpp"
 

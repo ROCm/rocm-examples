@@ -13,16 +13,21 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         ssh \
         sudo \
         wget \
+        pkg-config \
+        glslang-tools \
+        libvulkan-dev \
+        vulkan-validationlayers \
+        libglfw3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG en_US.utf8
 
 # Install ROCM HIP and libraries using the installer script
 RUN export DEBIAN_FRONTEND=noninteractive; \
-    wget https://repo.radeon.com/amdgpu-install/22.20/ubuntu/focal/amdgpu-install_22.20.50200-1_all.deb \
+    wget https://repo.radeon.com/amdgpu-install/5.3/ubuntu/focal/amdgpu-install_5.3.50300-1_all.deb \
     && apt-get update -qq \
-    && apt-get install -y ./amdgpu-install_22.20.50200-1_all.deb \
-    && rm ./amdgpu-install_22.20.50200-1_all.deb \
+    && apt-get install -y ./amdgpu-install_5.3.50300-1_all.deb \
+    && rm ./amdgpu-install_5.3.50300-1_all.deb \
     && amdgpu-install -y --usecase=hiplibsdk --no-dkms \
     && apt-get install -y libnuma-dev \
     && rm -rf /var/lib/apt/lists/*

@@ -3,18 +3,24 @@ This project is currently unsupported and in an early testing stage. Feedback on
 ## Repository Contents
 - [Common](/Common/) contains common utility functionality shared between the examples.
 - [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
+    - [assembly_to_executable](/HIP-Basic/assembly_to_executable): Program and accompanying build systems that show how to manually compile and link a HIP application from host and device code.
+    - [bandwidth](/HIP-Basic/bandwidth): Program that measures memory bandwidth from host to device, device to host, and device to device.
     - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
     - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
     - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
     - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
     - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
+    - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
+    - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
+    - [shared_memory](/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
     - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
-- [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](Dockerfiles/README.md) for details.
-- [docs](/docs/)
-    - [CONTRIBUTING.md](docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
+    - [warp_shuffle](/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
+- [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](/Dockerfiles/README.md) for details.
+- [Docs](/Docs/)
+    - [CONTRIBUTING.md](/Docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
 - [Libraries](/Libraries/)
     - [hipCUB](/Libraries/hipCUB/)
         - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.

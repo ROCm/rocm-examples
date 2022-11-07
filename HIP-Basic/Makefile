@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
+	bandwidth \
 	device_query \
 	dynamic_shared \
 	events \
@@ -28,8 +29,18 @@ EXAMPLES := \
 	hipify \
 	matrix_multiplication \
 	occupancy \
+	runtime_compilation \
 	saxpy \
-	streams
+	shared_memory \
+	streams \
+	warp_shuffle
+
+# Only supported on HIP (not CUDA).
+ifneq ($(GPU_RUNTIME), CUDA)
+    EXAMPLES += \
+        assembly_to_executable \
+        llvm_ir_to_executable
+endif
 
 all: $(EXAMPLES)
 

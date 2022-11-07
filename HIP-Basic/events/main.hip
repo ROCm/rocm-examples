@@ -27,7 +27,7 @@
 #include <iostream>
 #include <vector>
 
-#include <cstddef>
+#include <cstdlib>
 
 /// \brief Performs a simple matrix transpose on the GPU.
 __global__ void matrix_transpose_kernel(float* out, const float* in, const unsigned int width)
@@ -154,10 +154,12 @@ int main()
     const auto ref_transposed_matrix = matrix_transpose_reference(h_matrix, width);
 
     // Check the results' validity.
-    constexpr double eps = 1.0E-6;
-    unsigned int     errors{};
+    constexpr float eps    = 1.0E-6F;
+    unsigned int    errors = 0;
     for(unsigned int i = 0; i < size; i++)
     {
+        // Most likely the values are bitwise equal, since they were plainly copied,
+        // however it is a good practice to compare floating point values using an epsilon.
         if(std::abs(h_transposed_matrix[i] - ref_transposed_matrix[i]) > eps)
         {
             errors++;

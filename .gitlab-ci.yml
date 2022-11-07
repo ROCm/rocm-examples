@@ -48,9 +48,10 @@ clang-format:
   script:
     - cd $CI_PROJECT_DIR
     - git config --global --add safe.directory $CI_PROJECT_DIR
-    - scripts/code-format/check-format.sh $CI_MERGE_REQUEST_DIFF_BASE_SHA --binary "$CLANG_FORMAT"
+    - Scripts/CodeFormat/check_format.sh $CI_MERGE_REQUEST_DIFF_BASE_SHA --binary "$CLANG_FORMAT"
 
 .build:dockerfiles:
+  timeout: 20m
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
@@ -209,7 +210,7 @@ test:rocm-windows-cmake:
       -S "$CI_PROJECT_DIR"
       -B "$CI_PROJECT_DIR/build"
       -G Ninja
-      -D CMAKE_BUILD_TYPE="$CONFIG"
+      -D CMAKE_BUILD_TYPE="$BUILD_TYPE"
       -D CMAKE_HIP_ARCHITECTURES=gfx1030
       -D CMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe"
     - cmake --build "$CI_PROJECT_DIR/build"

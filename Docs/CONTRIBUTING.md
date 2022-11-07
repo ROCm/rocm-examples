@@ -13,12 +13,16 @@ Every example has to be able to be built separately from the others, but also ha
 ## Code Format
 The formatting rules of the examples are enforced by `clang-format` using the `.clang-format` file in the top-level directory.
 
-## Naming Conventions
+## Variable Naming Conventions
 - Use `lower_snake_case` style to name variables and functions (e.g. block_size, multiply_kernel and multiply_host).
 - Use `PascalCase` for `class`, `struct`, `enum` and template argument definitions.
 
-## Binary Naming Conventions
-Use the prefix of the library for the name of the binary, so that there are no conflicts between libraries (e.g. hipcub_device_sum and rocprim_device_sum).
+## File and Directory Naming Conventions
+- Top-level directories use `PascalCase`.
+- The directories in Libraries/ should use the exact name of the library they represent, including casing. If any directory does not represent a library (`exampleLibraryTemplate`), it should named in `camelCase`.
+- Directories for individual examples use `snake_case`.
+- Files generally use `snake_case`, with the exception of files for which an existing convention already applies (`README.md`, `LICENSE.md`, `CMakeLists.txt`, etc).
+- Example binaries should be prefixed with the library name of the binary, so that there are no conflicts between libraries (e.g. `hipcub_device_sum` and `rocprim_device_sum`).
 
 ## Utilities
 Utility-functions (printing vectors, etc) and common error-handling code, that is used by all examples, should be moved to the common utility-header [example_utils.hpp](../Common/example_utils.hpp).
