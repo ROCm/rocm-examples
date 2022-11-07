@@ -53,7 +53,7 @@ endif()
 
 # DELETE ME: Remove if no required libraries (such as HIP examples without dependencies).
 # List required packages
-find_package(${library_name} REQUIRED CONFIG)
+# find_package(${library_name} REQUIRED)
 
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
@@ -61,7 +61,7 @@ add_test(${example_name} ${example_name})
 
 # DELETE ME: Update path depending on directory nesting.
 set(include_dirs "../../../Common")
-# DELETE ME: Adding the HIP header directory is only required for examples that directly 
+# DELETE ME: Adding the HIP header directory is only required for examples that directly
 #            depend on HIP without linking to a HIP-based library
 # For examples targeting NVIDIA, include the HIP header directory.
 if(GPU_RUNTIME STREQUAL "CUDA")

@@ -31,7 +31,7 @@ if(NOT CMAKE_PREFIX_PATH)
     set(CMAKE_PREFIX_PATH "/opt/rocm")
 endif()
 
-find_package(rocprim REQUIRED CONFIG)
+find_package(rocprim REQUIRED)
 
 add_executable(rocprim_block_sum main.hip)
 add_test(rocprim_block_sum rocprim_block_sum)

@@ -40,7 +40,7 @@ if(NOT CMAKE_PREFIX_PATH)
     set(CMAKE_PREFIX_PATH "/opt/rocm")
 endif()
 
-find_package(hipcub REQUIRED CONFIG)
+find_package(hipcub REQUIRED)
 
 add_executable(hipcub_device_sum main.hip)
 add_test(hipcub_device_sum hipcub_device_sum)

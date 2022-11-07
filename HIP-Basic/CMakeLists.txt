@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Basic LANGUAGES NONE)
+project(HIP-Basic LANGUAGES CXX)
 
 # Only supported on HIP (not CUDA)
 if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
@@ -37,7 +37,14 @@ add_subdirectory(dynamic_shared)
 add_subdirectory(events)
 if(NOT WIN32)
     add_subdirectory(hello_world)
-    add_subdirectory(hipify)
+
+    find_package(Perl)
+
+    if(Perl_FOUND)
+        add_subdirectory(hipify)
+    else()
+        message("Perl not found, not building hipify example")
+    endif()
 endif()
 add_subdirectory(matrix_multiplication)
 add_subdirectory(multi_gpu_data_transfer)
@@ -47,5 +54,15 @@ add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
 add_subdirectory(streams)
-add_subdirectory(vulkan_interop)
 add_subdirectory(warp_shuffle)
+
+find_package(glfw3)
+find_package(Vulkan COMPONENTS glslangValidator)
+
+if(NOT glfw3_FOUND)
+    message("GLFW not found, not building Vulkan example")
+elseif(NOT Vulkan_FOUND)
+    message("Vulkan not found, not building Vulkan example")
+else()
+    add_subdirectory(vulkan_interop)
+endif()

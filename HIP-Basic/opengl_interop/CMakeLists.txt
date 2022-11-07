@@ -51,7 +51,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()
 
-find_package(glfw3 REQUIRED CONFIG)
+find_package(glfw3 REQUIRED)
 
 target_link_libraries(${example_name} PRIVATE glfw)
 target_include_directories(${example_name} PRIVATE ${include_dirs})

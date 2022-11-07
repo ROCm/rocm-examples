@@ -22,6 +22,7 @@
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(Libraries LANGUAGES NONE)
+
 add_subdirectory(exampleLibraryTemplate)
 add_subdirectory(hipCUB)
 add_subdirectory(rocPRIM)

@@ -31,7 +31,7 @@ if(NOT CMAKE_PREFIX_PATH)
     set(CMAKE_PREFIX_PATH "/opt/rocm")
 endif()
 
-find_package(rocthrust REQUIRED CONFIG)
+find_package(rocthrust REQUIRED)
 add_executable(rocthrust_norm main.hip)
 target_link_libraries(rocthrust_norm PRIVATE roc::rocthrust)
 add_test(rocthrust_norm rocthrust_norm)

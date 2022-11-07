@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(ROCMm-SDK-Examples LANGUAGES NONE)
+project(ROCMm-SDK-Examples LANGUAGES CXX)
 enable_testing()
 
 add_subdirectory(HIP-Basic)

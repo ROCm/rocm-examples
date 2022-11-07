@@ -52,7 +52,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
 endif()
 
 find_package(Vulkan REQUIRED COMPONENTS glslangValidator)
-find_package(glfw3 REQUIRED CONFIG)
+find_package(glfw3 REQUIRED)
 
 set(SHADER_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
