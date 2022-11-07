@@ -27,6 +27,7 @@ project(HIP-Basic LANGUAGES NONE)
 if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     add_subdirectory(assembly_to_executable)
     add_subdirectory(llvm_ir_to_executable)
+    add_subdirectory(module_api)
 endif()
 
 add_subdirectory(bandwidth)

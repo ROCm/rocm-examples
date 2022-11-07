@@ -20,39 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	bandwidth \
-	bit_extract \
-	device_query \
-	dynamic_shared \
-	events \
-	hello_world \
-	hipify \
-	matrix_multiplication \
-	multi_gpu_data_transfer \
-	occupancy \
-	opengl_interop \
-	runtime_compilation \
-	saxpy \
-	shared_memory \
-	streams \
-	vulkan_interop \
-	warp_shuffle
+EXAMPLE := hip_module_api
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME := HIP
 
-# Only supported on HIP (not CUDA).
-ifneq ($(GPU_RUNTIME), CUDA)
-    EXAMPLES += \
-        assembly_to_executable \
-        llvm_ir_to_executable \
-        module_api
+ifneq ($(GPU_RUNTIME), HIP)
+    $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
-all: $(EXAMPLES)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-clean: TARGET=clean
-clean: all
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+# Common variables and flags
+CXX_STD  := c++17
+CXXFLAGS := -std=$(CXX_STD)
+CPPFLAGS := -I $(COMMON_INCLUDE_DIR)
+LDFLAGS	 :=
+LDLIBS	 :=
 
-.PHONY: all clean $(EXAMPLES)
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp module.co
+	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+
+module.co: module.hip
+	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) --genco -o $@
+
+clean:
+	$(RM) $(EXAMPLE) module.co
+
+.PHONY: clean
