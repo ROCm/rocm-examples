@@ -1,0 +1,3 @@
+hip_static_device_library
+libhip_static_device.a
+library.o

@@ -22,6 +22,8 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
     - [shared_memory](/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
+    - [static_device_library](/HIP-Basic/static_device_library): Shows how to create a static library containing device functions, and how to link it with an executable.
+    - [static_host_library](/HIP-Basic/static_host_library): Shows how to create a static library containing HIP host functions, and how to link it with an executable.
     - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
     - [vulkan_interop](/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan.
     - [warp_shuffle](/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.

@@ -55,6 +55,7 @@ add_subdirectory(opengl_interop)
 add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
+add_subdirectory(static_host_library)
 add_subdirectory(streams)
 add_subdirectory(warp_shuffle)
 
