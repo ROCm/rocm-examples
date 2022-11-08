@@ -76,6 +76,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "module_api_vs2019", "HIP-Ba
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_globals_vs2019", "HIP-Basic\device_globals\device_globals_vs2019.vcxproj", "{F7DD9451-B0CA-4C76-AB92-0E01CBEBDBBE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "moving_average_vs2019", "HIP-Basic\moving_average\moving_average_vs2019.vcxproj", "{628390E3-DB62-4D52-9594-DE6BC15F9943}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -198,6 +200,10 @@ Global
 		{F7DD9451-B0CA-4C76-AB92-0E01CBEBDBBE}.Debug|x64.Build.0 = Debug|x64
 		{F7DD9451-B0CA-4C76-AB92-0E01CBEBDBBE}.Release|x64.ActiveCfg = Release|x64
 		{F7DD9451-B0CA-4C76-AB92-0E01CBEBDBBE}.Release|x64.Build.0 = Release|x64
+		{628390E3-DB62-4D52-9594-DE6BC15F9943}.Debug|x64.ActiveCfg = Debug|x64
+		{628390E3-DB62-4D52-9594-DE6BC15F9943}.Debug|x64.Build.0 = Debug|x64
+		{628390E3-DB62-4D52-9594-DE6BC15F9943}.Release|x64.ActiveCfg = Release|x64
+		{628390E3-DB62-4D52-9594-DE6BC15F9943}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -237,6 +243,7 @@ Global
 		{63823DD0-787C-42AE-B6E7-C03CF4CF5CE2} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{688433E2-B189-431D-A5F8-9AC82102B58C} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{F7DD9451-B0CA-4C76-AB92-0E01CBEBDBBE} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{628390E3-DB62-4D52-9594-DE6BC15F9943} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

@@ -15,6 +15,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
     - [module_api]((/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
+    - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
     - [multi_gpu_data_transfer](/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
     - [opengl_interop](/HIP-Basic/opengl_interop): Showcases how to share resources and computation between HIP and OpenGL.
