@@ -6,6 +6,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [assembly_to_executable](/HIP-Basic/assembly_to_executable): Program and accompanying build systems that show how to manually compile and link a HIP application from host and device code.
     - [bandwidth](/HIP-Basic/bandwidth): Program that measures memory bandwidth from host to device, device to host, and device to device.
     - [bit_extract](/HIP-Basic/bit_extract): Program that showcases how to use HIP built-in bit extract.
+    - [device_globals](/HIP-Basic/device_globals): Show cases how to set global variables on the device from the host.
     - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
     - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
     - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
