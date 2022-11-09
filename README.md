@@ -10,9 +10,11 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
     - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
     - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
+    - [gpu_arch](/HIP-Basic/gpu_arch/): Program that showcases how to implement GPU architecture-specific code.
     - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
     - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
     - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
+    - [inline_assembly](/HIP-Basic/inline_assembly/): Program that showcases how to use inline assembly in a portable manner.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
     - [module_api]((/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
     - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
