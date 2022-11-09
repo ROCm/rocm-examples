@@ -58,6 +58,10 @@ add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
 add_subdirectory(static_host_library)
 add_subdirectory(streams)
+# temporarily exclude texture management on Windows 
+if(NOT WIN32)
+    add_subdirectory(texture_management)
+endif()
 add_subdirectory(warp_shuffle)
 
 find_package(glfw3)

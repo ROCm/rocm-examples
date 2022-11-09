@@ -27,6 +27,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [static_device_library](/HIP-Basic/static_device_library): Shows how to create a static library containing device functions, and how to link it with an executable.
     - [static_host_library](/HIP-Basic/static_host_library): Shows how to create a static library containing HIP host functions, and how to link it with an executable.
     - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
+    - [texture_management](/HIP-Basic/texture_management/): Shows the usage of texture memory.
     - [vulkan_interop](/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan.
     - [warp_shuffle](/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](/Dockerfiles/README.md) for details.
