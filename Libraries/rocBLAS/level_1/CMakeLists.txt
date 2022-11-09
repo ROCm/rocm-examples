@@ -20,23 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	exampleLibraryTemplate \
-	hipCUB \
-	rocRAND
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocBLAS \
-	rocPRIM \
-	rocThrust
-endif
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocBLAS_level_1_examples LANGUAGES NONE)
 
-all: $(LIBRARIES)
-
-clean: TARGET=clean
-clean: all
-
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(LIBRARIES)
+add_subdirectory(axpy)

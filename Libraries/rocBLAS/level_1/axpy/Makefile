@@ -20,23 +20,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	exampleLibraryTemplate \
-	hipCUB \
-	rocRAND
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocBLAS \
-	rocPRIM \
-	rocThrust
+EXAMPLE := rocblas_axpy
+COMMON_INCLUDE_DIR := ../../../../Common
+GPU_RUNTIME := HIP
+
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
-all: $(LIBRARIES)
+ROCM_INSTALL_DIR := /opt/rocm
 
-clean: TARGET=clean
-clean: all
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+ROCBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+CXX ?= g++
 
-.PHONY: all clean $(LIBRARIES)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocblas
+
+CXXFLAGS ?= -Wall -Wextra
+ICPPFLAGS += -D__HIP_PLATFORM_AMD__ -isystem $(HIP_INCLUDE_DIR)
+ILDLIBS += -lamdhip64
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS += $(LDFLAGS)
+ILDLIBS += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

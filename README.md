@@ -39,6 +39,9 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [hipCUB](/Libraries/hipCUB/)
         - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
         - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
+    - [rocBLAS](/Libraries/rocBLAS/)
+        - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
+            - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
     - [rocPRIM](/Libraries/rocPRIM/)
         - [block_sum](/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
         - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.

@@ -31,7 +31,7 @@ The variable `GPU_RUNTIME` can be used to set the targeted runtime. Use `HIP` to
 ### Linux
 Make sure that the dependencies are installed, or use the [provided Dockerfile](../../Dockerfiles/hip-libraries-rocm-ubuntu.Dockerfile) to build and run the examples in a containerized environment that has all prerequisites installed.
 
-####  Using CMake
+#### Using CMake
 All examples in the `example-library-name` subdirectory can either be built by a single CMake project or be built independently.
 
 - `$ cd Libraries/<example-library-name>`
