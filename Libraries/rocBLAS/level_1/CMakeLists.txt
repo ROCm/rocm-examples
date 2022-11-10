@@ -24,3 +24,4 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(rocBLAS_level_1_examples LANGUAGES NONE)
 
 add_subdirectory(axpy)
+add_subdirectory(dot)
