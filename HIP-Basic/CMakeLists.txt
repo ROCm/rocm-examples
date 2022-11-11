@@ -32,6 +32,7 @@ endif()
 
 add_subdirectory(bandwidth)
 add_subdirectory(bit_extract)
+add_subdirectory(cooperative_groups)
 add_subdirectory(device_query)
 add_subdirectory(device_globals)
 add_subdirectory(dynamic_shared)

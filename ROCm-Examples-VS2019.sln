@@ -90,6 +90,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libstatic_host_vs2019", "HI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_msvc_vs2019", "HIP-Basic\static_host_library\static_host_library_msvc\static_host_library_msvc_vs2019.vcxproj", "{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cooperative_groups_vs2019", "HIP-Basic\cooperative_groups\cooperative_groups_vs2019.vcxproj", "{7A25CE69-BACE-4410-BEB0-12A69890F212}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -244,6 +246,10 @@ Global
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}.Debug|x64.Build.0 = Debug|x64
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}.Release|x64.ActiveCfg = Release|x64
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}.Release|x64.Build.0 = Release|x64
+		{7A25CE69-BACE-4410-BEB0-12A69890F212}.Debug|x64.ActiveCfg = Debug|x64
+		{7A25CE69-BACE-4410-BEB0-12A69890F212}.Debug|x64.Build.0 = Debug|x64
+		{7A25CE69-BACE-4410-BEB0-12A69890F212}.Release|x64.ActiveCfg = Release|x64
+		{7A25CE69-BACE-4410-BEB0-12A69890F212}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -291,6 +297,7 @@ Global
 		{5F8A7FEE-3A79-4588-9244-8575748026F7} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{6D3F8F78-225E-490E-ABD3-762857EBF597} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{7A25CE69-BACE-4410-BEB0-12A69890F212} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
