@@ -21,8 +21,9 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	axpy    \
-	dot
+	axpy \
+	dot  \
+	swap
 
 all: $(EXAMPLES)
 

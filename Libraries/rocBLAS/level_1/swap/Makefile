@@ -20,9 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocBLAS_level_1_examples LANGUAGES NONE)
+EXAMPLE := rocblas_swap
+COMMON_INCLUDE_DIR := ../../../../Common
+GPU_RUNTIME := HIP
 
-add_subdirectory(axpy)
-add_subdirectory(dot)
-add_subdirectory(swap)
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
+
+ROCM_INSTALL_DIR := /opt/rocm
+
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+ROCBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+CXX ?= g++
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocblas -lamdhip64
+
+CXXFLAGS ?= -Wall -Wextra
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS += $(LDFLAGS)
+ILDLIBS += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

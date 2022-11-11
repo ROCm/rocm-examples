@@ -43,6 +43,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
             - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
             - [dot](/Libraries/rocBLAS/level_1/dot/): Simple program that showcases dot product.
+            - [swap](/Libraries/rocBLAS/level_1/swap/): Showcases exchanging elements between two vectors.
     - [rocPRIM](/Libraries/rocPRIM/)
         - [block_sum](/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
         - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
