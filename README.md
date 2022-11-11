@@ -1,6 +1,8 @@
 # ROCm Examples
 This project is currently unsupported and in an early testing stage. Feedback on the contents of this repository is appreciated.
 ## Repository Contents
+- [Applications](/Applications/) groups a number of examples ... .
+    - [floyd_warshall](/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
 - [Common](/Common/) contains common utility functionality shared between the examples.
 - [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
     - [assembly_to_executable](/HIP-Basic/assembly_to_executable): Program and accompanying build systems that show how to manually compile and link a HIP application from host and device code.
