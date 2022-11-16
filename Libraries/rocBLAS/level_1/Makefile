@@ -23,6 +23,7 @@
 EXAMPLES := \
 	axpy \
 	dot  \
+	nrm2 \
 	swap
 
 all: $(EXAMPLES)

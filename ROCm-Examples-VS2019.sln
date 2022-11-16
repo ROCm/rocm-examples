@@ -106,6 +106,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dot_vs2019", "Libraries\roc
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "swap_vs2019", "Libraries\rocBLAS\level_1\swap\swap_vs2019.vcxproj", "{00EFF6D1-EA39-4FD7-A84D-2D93FEABD6CF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "nrm2_vs2019", "Libraries\rocBLAS\level_1\nrm2\nrm2_vs2019.vcxproj", "{16A9CB28-E8ED-4040-BD0B-7290685EE782}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -280,6 +282,10 @@ Global
 		{00EFF6D1-EA39-4FD7-A84D-2D93FEABD6CF}.Debug|x64.Build.0 = Debug|x64
 		{00EFF6D1-EA39-4FD7-A84D-2D93FEABD6CF}.Release|x64.ActiveCfg = Release|x64
 		{00EFF6D1-EA39-4FD7-A84D-2D93FEABD6CF}.Release|x64.Build.0 = Release|x64
+		{16A9CB28-E8ED-4040-BD0B-7290685EE782}.Debug|x64.ActiveCfg = Debug|x64
+		{16A9CB28-E8ED-4040-BD0B-7290685EE782}.Debug|x64.Build.0 = Debug|x64
+		{16A9CB28-E8ED-4040-BD0B-7290685EE782}.Release|x64.ActiveCfg = Release|x64
+		{16A9CB28-E8ED-4040-BD0B-7290685EE782}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -334,6 +340,7 @@ Global
 		{47AA4236-66EE-4DCE-B55D-C1A0D534796F} = {1B9C112F-CF4A-497D-AA09-C5A636E31086}
 		{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4} = {47AA4236-66EE-4DCE-B55D-C1A0D534796F}
 		{00EFF6D1-EA39-4FD7-A84D-2D93FEABD6CF} = {47AA4236-66EE-4DCE-B55D-C1A0D534796F}
+		{16A9CB28-E8ED-4040-BD0B-7290685EE782} = {47AA4236-66EE-4DCE-B55D-C1A0D534796F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
