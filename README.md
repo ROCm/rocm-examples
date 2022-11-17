@@ -44,6 +44,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
             - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
             - [dot](/Libraries/rocBLAS/level_1/dot/): Simple program that showcases dot product.
             - [nrm2](/Libraries/rocBLAS/level_1/nrm2/): Simple program that showcases Euclidean norm of a vector.
+            - [scal](/Libraries/rocBLAS/level_1/scal/): Simple program that showcases vector scaling (SCAL) operation.
             - [swap](/Libraries/rocBLAS/level_1/swap/): Showcases exchanging elements between two vectors.
         - [level_2](/Libraries/rocBLAS/level_2/): Opertions between vectors and matrices.
             - [her](/Libraries/rocBLAS/level_2/her/): Showcases a rank-1 update of a Hermitian matrix with complex values.

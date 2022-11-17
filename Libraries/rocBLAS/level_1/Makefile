@@ -24,6 +24,7 @@ EXAMPLES := \
 	axpy \
 	dot  \
 	nrm2 \
+	scal \
 	swap
 
 all: $(EXAMPLES)
