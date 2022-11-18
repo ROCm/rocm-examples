@@ -1,7 +1,7 @@
 # rocBLAS Level 1 Dot Example
 
 ## Description
-This example showcases the usage of rocBLAS' Level 1 DOT function. The Level 1 API defines operations between vector and vector. DOT is a dot product operator between $X$ and $Y$ vectors defined as $\sum_i{X_i \cdot Y_i}$.
+This example showcases the usage of rocBLAS' Level 1 DOT function. The Level 1 API defines operations between vector and vector. DOT is a dot product operator between $x$ and $y$ vectors defined as $\sum_i{x_i \cdot y_i}$.
 
 ### Application flow 
 1. Read in and parse command line parameters.
@@ -17,9 +17,9 @@ This example showcases the usage of rocBLAS' Level 1 DOT function. The Level 1 A
 
 ### Command line interface
 The application provides the following optional command line arguments:
-- `-x` or `--incx`. The stride between consecutive values in the data array that makes up vector $X$, must be greater than zero. Its default value is 1.
-- `-y` or `--incy`. The stride between consecutive values in the data array that makes up vector $Y$, must be greater than zero. Its default value is 1.
-- `-n`. The number of elements in vectors $X$ and $Y$. Its default value is 5.
+- `-x` or `--incx`. The stride between consecutive values in the data array that makes up vector $x$, must be greater than zero. Its default value is 1.
+- `-y` or `--incy`. The stride between consecutive values in the data array that makes up vector $y$, must be greater than zero. Its default value is 1.
+- `-n`. The number of elements in vectors $x$ and $y$. Its default value is 5.
 
 ## Key APIs and Concepts
 - rocBLAS is initialized by calling `rocblas_create_handle(rocblas_handle*)` and it is terminated by calling `rocblas_destroy_handle(rocblas_handle)`.

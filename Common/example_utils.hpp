@@ -24,6 +24,7 @@
 #define COMMON_EXAMPLE_UTILS_HPP
 
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -167,6 +168,19 @@ template<typename T,
 __host__ __device__ auto ceiling_div(const T& dividend, const U& divisor)
 {
     return (dividend + divisor - 1) / divisor;
+}
+
+/// \brief Report validation results.
+inline int report_validation_result(int errors)
+{
+    if(errors)
+    {
+        std::cout << "Validation failed. Errors: " << errors << std::endl;
+        return error_exit_code;
+    }
+
+    std::cout << "Validation passed." << std::endl;
+    return 0;
 }
 
 #endif // COMMON_EXAMPLE_UTILS_HPP

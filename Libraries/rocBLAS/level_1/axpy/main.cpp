@@ -22,28 +22,17 @@
 
 #include "cmdparser.hpp"
 #include "example_utils.hpp"
+#include "rocblas_utils.hpp"
 
 #include <rocblas/rocblas.h>
 
 #include <hip/hip_runtime.h>
 
+#include <cstdlib>
 #include <iostream>
+#include <limits>
 #include <numeric>
 #include <vector>
-
-/// \brief Checks if the provided status code is \p rocblas_status_success and if not,
-/// prints an error message to the standard error output and terminates the program
-/// with an error code.
-#define ROCBLAS_CHECK(condition)                                                             \
-    {                                                                                        \
-        const rocblas_status status = condition;                                             \
-        if(status != rocblas_status_success)                                                 \
-        {                                                                                    \
-            std::cerr << "rocBLAS error encountered: \"" << rocblas_status_to_string(status) \
-                      << "\" at " << __FILE__ << ':' << __LINE__ << std::endl;               \
-            std::exit(error_exit_code);                                                      \
-        }                                                                                    \
-    }
 
 int main(const int argc, const char** argv)
 {
@@ -55,7 +44,7 @@ int main(const int argc, const char** argv)
     parser.set_optional<int>("n", "n", 5, "Size of vector");
     parser.run_and_exit_if_error();
 
-    // Stride between consecutive values of input vector X.
+    // Stride between consecutive values of input vector x.
     const rocblas_int incx = parser.get<int>("x");
     if(incx <= 0)
     {
@@ -63,7 +52,7 @@ int main(const int argc, const char** argv)
         return 0;
     }
 
-    // Stride between consecutive values of input vector Y.
+    // Stride between consecutive values of input vector y.
     const rocblas_int incy = parser.get<int>("y");
     if(incy <= 0)
     {
@@ -71,7 +60,7 @@ int main(const int argc, const char** argv)
         return 0;
     }
 
-    // Number of elements in input vector X and input vector Y.
+    // Number of elements in input vector x and input vector y.
     const rocblas_int n = parser.get<int>("n");
     if(n <= 0)
     {
@@ -82,23 +71,23 @@ int main(const int argc, const char** argv)
     // Scalar value used for multiplication.
     const rocblas_float h_alpha = parser.get<float>("a");
 
-    // Adjust the size of input vector X for values of stride (incx) not equal to 1.
+    // Adjust the size of input vector x for values of stride (incx) not equal to 1.
     const size_t size_x = n * incx;
 
-    // Adjust the size of input vector Y for values of stride (incy) not equal to 1.
+    // Adjust the size of input vector y for values of stride (incy) not equal to 1.
     const size_t size_y = n * incy;
 
-    // Allocate memory for both the host input vectors X and Y
+    // Allocate memory for both the host input vectors x and y
     std::vector<float> h_x(size_x);
     std::vector<float> h_y(size_y);
 
-    // Initialize the values to both the host vectors X and Y to the
+    // Initialize the values to both the host vectors x and y to the
     // increasing sequence 0, 1, 2, ...
     std::iota(h_x.begin(), h_x.end(), 0.f);
     std::iota(h_y.begin(), h_y.end(), 0.f);
 
-    std::cout << "Input Vector X: " << format_range(h_x.begin(), h_x.end()) << "\n";
-    std::cout << "Input Vector Y: " << format_range(h_y.begin(), h_y.end()) << std::endl;
+    std::cout << "Input Vector x: " << format_range(h_x.begin(), h_x.end()) << std::endl;
+    std::cout << "Input Vector y: " << format_range(h_y.begin(), h_y.end()) << std::endl;
 
     // Initialize the values for vector h_y_gold, this vector will be used as a
     // Gold Standard to compare our results from rocBLAS SAXPY function.
@@ -114,7 +103,7 @@ int main(const int argc, const char** argv)
     rocblas_handle handle;
     ROCBLAS_CHECK(rocblas_create_handle(&handle));
 
-    // Allocate memory for both the both device vectors X and Y.
+    // Allocate memory for both the both device vectors x and y.
     float* d_x{};
     float* d_y{};
     HIP_CHECK(hipMalloc(&d_x, size_x * sizeof(float)));
@@ -130,7 +119,7 @@ int main(const int argc, const char** argv)
     // SAXPY calculation on the device.
     ROCBLAS_CHECK(rocblas_saxpy(handle, n, &h_alpha, d_x, incx, d_y, incy));
 
-    // Transfer the result from device vector Y to host vector Y,
+    // Transfer the result from device vector y to host vector y,
     // which halts host execution until results ready.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, sizeof(float) * size_y, hipMemcpyDeviceToHost));
 
@@ -141,8 +130,8 @@ int main(const int argc, const char** argv)
     HIP_CHECK(hipFree(d_x));
 
     // Print rocBLAS and CPU output.
-    std::cout << "Output Vector Y:     " << format_range(h_y.begin(), h_y.end()) << "\n";
-    std::cout << "Output Vector YGold: " << format_range(h_y_gold.begin(), h_y_gold.end())
+    std::cout << "Output Vector y:      " << format_range(h_y.begin(), h_y.end()) << std::endl;
+    std::cout << "Output Vector y_gold: " << format_range(h_y_gold.begin(), h_y_gold.end())
               << std::endl;
 
     // Check the relative error between output generated by the rocBLAS API and the CPU.
@@ -152,12 +141,5 @@ int main(const int argc, const char** argv)
     {
         errors += std::fabs(h_y[i] - h_y_gold[i]) > eps;
     }
-
-    if(errors)
-    {
-        std::cout << "Validation failed. Errors: " << errors << std::endl;
-        return error_exit_code;
-    }
-
-    std::cout << "Validation passed." << std::endl;
+    return report_validation_result(errors);
 }

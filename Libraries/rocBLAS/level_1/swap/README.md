@@ -1,7 +1,7 @@
 # rocBLAS Level 1 Swap Example
 
 ## Description
-This example shows the usse of the rocBLAS Level 1 swap operation, which exchanges elements between two HIP vectors. The Level 1 API defines operations between vectors.
+This example shows the use of the rocBLAS Level 1 swap operation, which exchanges elements between two HIP vectors. The Level 1 API defines operations between vectors.
 
 ### Application flow
 1. Read in command-line parameters.
@@ -16,9 +16,9 @@ This example shows the usse of the rocBLAS Level 1 swap operation, which exchang
 
 ### Command line interface
 The application provides the following optional command line arguments:
-- `-x` or `--incx`. The stride between consecutive values in the data array that makes up vector $X$, which must be greater than 0. Its default value is 1.
-- `-y` or `--incy`. The stride between consecutive values in the data array that makes up vector $Y$, which must be greater than 0. Its default value is 1.
-- `-n` or `--n`. The number of elements in vectors $X$ and $Y$, which must be greater than 0. Its default value is 5.
+- `-x` or `--incx`. The stride between consecutive values in the data array that makes up vector $x$, which must be greater than 0. Its default value is 1.
+- `-y` or `--incy`. The stride between consecutive values in the data array that makes up vector $y$, which must be greater than 0. Its default value is 1.
+- `-n` or `--n`. The number of elements in vectors $x$ and $y$, which must be greater than 0. Its default value is 5.
 
 ## Key APIs and Concepts
 - rocBLAS is initialized by calling `rocblas_create_handle(rocblas_handle*)` and it is terminated by calling `rocblas_destroy_handle(rocblas_handle)`.
