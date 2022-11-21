@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	gemm
+	gemm \
+	gemm_strided_batched
 
 all: $(EXAMPLES)
 

@@ -51,6 +51,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
             - [gemv](/Libraries/rocBLAS/level_2/gemv/): Showcases the general matrix-vector product operation.
         - [level_3](/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
             - [gemm](/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
+            - [gemm_strided_batched](/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
     - [rocPRIM](/Libraries/rocPRIM/)
         - [block_sum](/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
         - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.

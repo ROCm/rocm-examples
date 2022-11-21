@@ -28,6 +28,7 @@
 
 #include <hip/hip_runtime.h>
 
+#include <algorithm>
 #include <cstdlib>
 #include <iostream>
 #include <limits>
@@ -40,15 +41,19 @@ int main(const int argc, const char** argv)
     cli::Parser parser(argc, argv);
     parser.set_optional<float>("a", "alpha", 1.f, "Alpha scalar");
     parser.set_optional<float>("b", "beta", 1.f, "Beta scalar");
-    parser.set_optional<int>("m", "m", 5, "Number of rows of matrices f(A) and C");
-    parser.set_optional<int>("n", "n", 5, "Number of columns of matrices f(B) and C");
-    parser.set_optional<int>("k", "k", 5, "Number of columns of matrix f(A) and rows of f(B)");
+    parser.set_optional<int>("c", "count", 3, "Batch count");
+    parser.set_optional<int>("m", "m", 5, "Number of rows of matrices f(A_i) and C_i");
+    parser.set_optional<int>("n", "n", 5, "Number of columns of matrices f(B_i) and C_i");
+    parser.set_optional<int>("k", "k", 5, "Number of columns of matrix f(A_i) and rows of f(B_i)");
     parser.run_and_exit_if_error();
 
     // Set sizes of matrices.
     const rocblas_int m = parser.get<int>("m");
     const rocblas_int n = parser.get<int>("n");
     const rocblas_int k = parser.get<int>("k");
+
+    // Set batch counter.
+    const rocblas_int batch_count = parser.get<int>("c");
 
     // Check input values validity.
     if(m <= 0)
@@ -69,48 +74,63 @@ int main(const int argc, const char** argv)
         return 0;
     }
 
+    if(batch_count <= 0)
+    {
+        std::cout << "Value of 'c' should be greater than 0" << std::endl;
+        return 0;
+    }
+
     // Set scalar values used for multiplication.
     const rocblas_float h_alpha = parser.get<float>("a");
     const rocblas_float h_beta  = parser.get<float>("b");
 
-    // Set GEMM operation as identity operation: $f(X) = X$
+    // Set GEMM operation as identity operation: $f(X) = X$.
     const rocblas_operation trans_a = rocblas_operation_none;
     const rocblas_operation trans_b = rocblas_operation_none;
 
-    rocblas_int lda, ldb, ldc, size_a, size_b, size_c;
-    int         stride1_a, stride2_a, stride1_b, stride2_b;
+    rocblas_int    lda, ldb, ldc;
+    int            stride1_a, stride2_a, stride1_b, stride2_b;
+    rocblas_stride stride_a, stride_b, stride_c;
 
-    // Set up matrix dimension variables
+    // Set up matrix dimension variables.
     if(trans_a == rocblas_operation_none)
     {
         lda       = m;
-        size_a    = k * lda;
+        stride_a  = rocblas_stride(k) * lda;
         stride1_a = 1;
         stride2_a = lda;
     }
     else
     {
         lda       = k;
-        size_a    = m * lda;
+        stride_a  = rocblas_stride(m) * lda;
         stride1_a = lda;
         stride2_a = 1;
     }
     if(trans_b == rocblas_operation_none)
     {
         ldb       = k;
-        size_b    = n * ldb;
+        stride_b  = rocblas_stride(n) * ldb;
         stride1_b = 1;
         stride2_b = ldb;
     }
     else
     {
         ldb       = n;
-        size_b    = k * ldb;
+        stride_b  = rocblas_stride(k) * ldb;
         stride1_b = ldb;
         stride2_b = 1;
     }
-    ldc    = m;
-    size_c = n * ldc;
+    ldc      = m;
+    stride_c = rocblas_stride(n) * ldc;
+
+    // Get maximum of batch count.
+    rocblas_int count_max = std::max(batch_count, 1);
+
+    // Get vector sizes.
+    size_t size_a = size_t(stride_a) * count_max;
+    size_t size_b = size_t(stride_b) * count_max;
+    size_t size_c = size_t(stride_c) * count_max;
 
     // Allocate host data.
     std::vector<float> h_a(size_a, 1);
@@ -118,26 +138,32 @@ int main(const int argc, const char** argv)
     std::vector<float> h_c(size_c, 1);
     std::vector<float> h_gold(size_c);
 
-    // Set B matrix to an identity matrix.
-    generate_identity_matrix(h_b.data(), k, n, ldb);
+    // Set B_i matrix.
+    for(rocblas_int i = 0; i < batch_count; ++i)
+    {
+        generate_identity_matrix(h_b.data() + i * stride_b, k, n, ldb);
+    }
 
     // Initialize gold standard matrix.
     h_gold = h_c;
 
     // Calculate gold standard on CPU.
-    multiply_matrices<float>(h_alpha,
-                             h_beta,
-                             m,
-                             n,
-                             k,
-                             h_a.data(),
-                             stride1_a,
-                             stride2_a,
-                             h_b.data(),
-                             stride1_b,
-                             stride2_b,
-                             h_gold.data(),
-                             ldc);
+    for(rocblas_int i = 0; i < batch_count; ++i)
+    {
+        multiply_matrices<float>(h_alpha,
+                                 h_beta,
+                                 m,
+                                 n,
+                                 k,
+                                 h_a.data() + i * stride_a,
+                                 stride1_a,
+                                 stride2_a,
+                                 h_b.data() + i * stride_b,
+                                 stride1_b,
+                                 stride2_b,
+                                 h_gold.data() + i * stride_c,
+                                 ldc);
+    }
 
     // Allocate device memory.
     float* d_a{};
@@ -169,22 +195,26 @@ int main(const int argc, const char** argv)
     ROCBLAS_CHECK(rocblas_set_pointer_mode(handle, rocblas_pointer_mode_host));
 
     // Asynchronous matrix multiplication calculation on device.
-    ROCBLAS_CHECK(rocblas_sgemm(handle,
-                                trans_a,
-                                trans_b,
-                                m,
-                                n,
-                                k,
-                                &h_alpha,
-                                d_a,
-                                lda,
-                                d_b,
-                                ldb,
-                                &h_beta,
-                                d_c,
-                                ldc));
+    ROCBLAS_CHECK(rocblas_sgemm_strided_batched(handle,
+                                                trans_a,
+                                                trans_b,
+                                                m,
+                                                n,
+                                                k,
+                                                &h_alpha,
+                                                d_a,
+                                                lda,
+                                                stride_a,
+                                                d_b,
+                                                ldb,
+                                                stride_b,
+                                                &h_beta,
+                                                d_c,
+                                                ldc,
+                                                stride_c,
+                                                batch_count));
 
-    // Fetch device memory results, automatically blocked until results ready
+    // Fetch device memory results, automatically blocks until results are ready.
     HIP_CHECK(hipMemcpy(h_c.data(), d_c, sizeof(float) * size_c, hipMemcpyDeviceToHost));
 
     // Destroy the rocBLAS handle.

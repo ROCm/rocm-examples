@@ -20,8 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocBLAS_level_3_examples LANGUAGES NONE)
+set(example_name rocblas_gemm_strided_batched)
 
-add_subdirectory(gemm)
-add_subdirectory(gemm_strided_batched)
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
+
+if(GPU_RUNTIME STREQUAL "CUDA")
+    message(STATUS "rocBLAS examples do not support the CUDA runtime")
+    return()
+endif()
+
+# This example does not contain device code, thereby it can be compiled with any conforming C++ compiler.
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+if(NOT CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+endif()
+
+find_package(rocblas REQUIRED)
+
+add_executable(${example_name} main.cpp)
+# Make example runnable using ctest
+add_test(${example_name} ${example_name})
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE roc::rocblas)
+
+target_include_directories(${example_name} PRIVATE "../../../../Common")

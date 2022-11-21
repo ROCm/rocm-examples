@@ -116,6 +116,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "level_3", "level_3", "{2AF2
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gemm_vs2019", "Libraries\rocBLAS\level_3\gemm\gemm_vs2019.vcxproj", "{4E28F2B0-CE5D-40F4-9AF5-5BC18A27C59B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gemm_strided_batched_vs2019", "Libraries\rocBLAS\level_3\gemm_strided_batched\gemm_strided_batched_vs2019.vcxproj", "{1E9ED0DD-CCD1-4658-B958-34E85E5348FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -306,6 +308,10 @@ Global
 		{4E28F2B0-CE5D-40F4-9AF5-5BC18A27C59B}.Debug|x64.Build.0 = Debug|x64
 		{4E28F2B0-CE5D-40F4-9AF5-5BC18A27C59B}.Release|x64.ActiveCfg = Release|x64
 		{4E28F2B0-CE5D-40F4-9AF5-5BC18A27C59B}.Release|x64.Build.0 = Release|x64
+		{1E9ED0DD-CCD1-4658-B958-34E85E5348FE}.Debug|x64.ActiveCfg = Debug|x64
+		{1E9ED0DD-CCD1-4658-B958-34E85E5348FE}.Debug|x64.Build.0 = Debug|x64
+		{1E9ED0DD-CCD1-4658-B958-34E85E5348FE}.Release|x64.ActiveCfg = Release|x64
+		{1E9ED0DD-CCD1-4658-B958-34E85E5348FE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -365,6 +371,7 @@ Global
 		{E4A7C45C-BF68-455A-A37B-3558F427DC53} = {84E6E336-5964-4E20-8E38-27F44C524CFB}
 		{2AF2679F-5554-48D0-86BD-A59BA6DC2D9E} = {1B9C112F-CF4A-497D-AA09-C5A636E31086}
 		{4E28F2B0-CE5D-40F4-9AF5-5BC18A27C59B} = {2AF2679F-5554-48D0-86BD-A59BA6DC2D9E}
+		{1E9ED0DD-CCD1-4658-B958-34E85E5348FE} = {2AF2679F-5554-48D0-86BD-A59BA6DC2D9E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

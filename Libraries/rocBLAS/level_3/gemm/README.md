@@ -13,7 +13,7 @@ $f(A)$ an $m \times k$ matrix, $f(B)$ a $k \times n$ matrix and $C$ an $m \times
 ### Application flow
 1. Read in command-line parameters.
 2. Set $f$ operation and set sizes of matrices.
-3. Allocate and initialize the host matrices. Set up $C$ matrix as an identity matrix.
+3. Allocate and initialize the host matrices. Set up $B$ matrix as an identity matrix.
 4. Initialize gold standard matrix.
 5. Compute CPU reference result.
 6. Allocate device memory.
@@ -35,14 +35,15 @@ The application provides the following optional command line arguments:
 ## Key APIs and Concepts
 - rocBLAS is initialized by calling `rocblas_create_handle(rocblas_handle*)` and it is terminated by calling `rocblas_destroy_handle(rocblas_handle)`.
 - The _pointer mode_ controls whether scalar parameters must be allocated on the host (`rocblas_pointer_mode_host`) or on the device (`rocblas_pointer_mode_device`). It is controlled by `rocblas_set_pointer_mode`.
-- `rocblas_[sdhcz]gemm` 
-Depending on the character matched in `[sdhcz]`, the norm can be obtained with different precisions:
+- `rocblas_[sdhcz]gemm`
+    Depending on the character matched in `[sdhcz]`, the norm can be obtained with different precisions:
     - `s` (single-precision: `rocblas_float`)
     - `d` (double-precision: `rocblas_double`)
     - `h` (half-precision: `rocblas_half`)
     - `c` (single-precision complex: `rocblas_complex`)
     - `z` (double-precision complex: `rocblas_double_complex`).
-Input parameters:
+
+    Input parameters:
     - `rocblas_handle handle`
     - `rocblas_operation transA`: transformation operator on $A$ matrix
     - `rocblas_operation transB`: transformation operator on $B$ matrix
@@ -57,7 +58,8 @@ Input parameters:
     - `const float *beta`: scalar multiplier of the $B \cdot C$ matrix product
     - `float *C`: pointer to the $C$ matrix
     - `rocblas_int ldc`: leading dimension of $C$ matrix
-Return value: `rocblas_status`
+
+    Return value: `rocblas_status`
 
 ## Demonstrated API Calls
 
