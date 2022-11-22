@@ -45,8 +45,9 @@ This project is currently unsupported and in an early testing stage. Feedback on
             - [dot](/Libraries/rocBLAS/level_1/dot/): Simple program that showcases dot product.
             - [nrm2](/Libraries/rocBLAS/level_1/nrm2/): Simple program that showcases Euclidean norm of a vector.
             - [swap](/Libraries/rocBLAS/level_1/swap/): Showcases exchanging elements between two vectors.
-        - [level_2](/Libraries/rocBLAS/level_2/): Operations between vectors and matrices.
+        - [level_2](/Libraries/rocBLAS/level_2/): Opertions between vectors and matrices.
             - [her](/Libraries/rocBLAS/level_2/her/): Showcases a rank-1 update of a Hermitian matrix with complex values.
+            - [gemv](/Libraries/rocBLAS/level_2/gemv/): Showcases the general matrix-vector product operation.
     - [rocPRIM](/Libraries/rocPRIM/)
         - [block_sum](/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
         - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.

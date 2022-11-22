@@ -23,4 +23,5 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(rocBLAS_level_2_examples LANGUAGES NONE)
 
+add_subdirectory(gemv)
 add_subdirectory(her)

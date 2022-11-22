@@ -112,6 +112,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "level_2", "level_2", "{84E6
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "her_vs2019", "Libraries\rocBLAS\level_2\her\her_vs2019.vcxproj", "{1BF2770A-A16C-428E-9BD0-09070D2BEE30}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gemv_vs2019", "Libraries\rocBLAS\level_2\gemv\gemv_vs2019.vcxproj", "{E4A7C45C-BF68-455A-A37B-3558F427DC53}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -294,6 +296,10 @@ Global
 		{1BF2770A-A16C-428E-9BD0-09070D2BEE30}.Debug|x64.Build.0 = Debug|x64
 		{1BF2770A-A16C-428E-9BD0-09070D2BEE30}.Release|x64.ActiveCfg = Release|x64
 		{1BF2770A-A16C-428E-9BD0-09070D2BEE30}.Release|x64.Build.0 = Release|x64
+		{E4A7C45C-BF68-455A-A37B-3558F427DC53}.Debug|x64.ActiveCfg = Debug|x64
+		{E4A7C45C-BF68-455A-A37B-3558F427DC53}.Debug|x64.Build.0 = Debug|x64
+		{E4A7C45C-BF68-455A-A37B-3558F427DC53}.Release|x64.ActiveCfg = Release|x64
+		{E4A7C45C-BF68-455A-A37B-3558F427DC53}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -351,6 +357,7 @@ Global
 		{16A9CB28-E8ED-4040-BD0B-7290685EE782} = {47AA4236-66EE-4DCE-B55D-C1A0D534796F}
 		{84E6E336-5964-4E20-8E38-27F44C524CFB} = {1B9C112F-CF4A-497D-AA09-C5A636E31086}
 		{1BF2770A-A16C-428E-9BD0-09070D2BEE30} = {84E6E336-5964-4E20-8E38-27F44C524CFB}
+		{E4A7C45C-BF68-455A-A37B-3558F427DC53} = {84E6E336-5964-4E20-8E38-27F44C524CFB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
