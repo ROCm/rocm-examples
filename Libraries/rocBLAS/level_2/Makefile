@@ -20,14 +20,15 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocBLAS_examples LANGUAGES NONE)
+EXAMPLES := \
+	her
 
-find_package(rocblas)
-if(NOT rocblas_FOUND)
-    message(STATUS "rocBLAS could not be found, not building rocBLAS examples")
-    return()
-endif()
+all: $(EXAMPLES)
 
-add_subdirectory(level_1)
-add_subdirectory(level_2)
+clean: TARGET=clean
+clean: all
+
+$(EXAMPLES):
+	$(MAKE) -C $@ $(TARGET)
+
+.PHONY: all clean $(EXAMPLES)

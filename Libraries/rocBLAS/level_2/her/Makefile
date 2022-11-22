@@ -20,14 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocBLAS_examples LANGUAGES NONE)
+EXAMPLE := rocblas_her
+COMMON_INCLUDE_DIR := ../../../../Common
+GPU_RUNTIME := HIP
 
-find_package(rocblas)
-if(NOT rocblas_FOUND)
-    message(STATUS "rocBLAS could not be found, not building rocBLAS examples")
-    return()
-endif()
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
 
-add_subdirectory(level_1)
-add_subdirectory(level_2)
+ROCM_INSTALL_DIR := /opt/rocm
+
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+ROCBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+CXX ?= g++
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocblas -lamdhip64
+
+CXXFLAGS ?= -Wall -Wextra
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS += $(LDFLAGS)
+ILDLIBS += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocblas_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

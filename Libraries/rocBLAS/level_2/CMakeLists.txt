@@ -21,13 +21,6 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocBLAS_examples LANGUAGES NONE)
+project(rocBLAS_level_2_examples LANGUAGES NONE)
 
-find_package(rocblas)
-if(NOT rocblas_FOUND)
-    message(STATUS "rocBLAS could not be found, not building rocBLAS examples")
-    return()
-endif()
-
-add_subdirectory(level_1)
-add_subdirectory(level_2)
+add_subdirectory(her)
