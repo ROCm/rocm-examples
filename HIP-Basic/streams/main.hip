@@ -190,7 +190,7 @@ int main()
     HIP_CHECK(hipHostMalloc(&h_transpose_matrix[1], size_in_bytes));
 
     // Initialize the host input matrix
-    for(int i = 0; i < size; i++)
+    for(unsigned int i = 0; i < size; i++)
     {
         h_in[i] = static_cast<float>(i);
     }
@@ -199,7 +199,7 @@ int main()
 
     // Free host memory
     HIP_CHECK(hipHostFree(h_in));
-    for(int i = 0; i < num_streams; i++)
+    for(unsigned int i = 0; i < num_streams; i++)
     {
 
         HIP_CHECK(hipHostFree(h_transpose_matrix[i]));

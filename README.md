@@ -1,22 +1,36 @@
 # ROCm Examples
 This project is currently unsupported and in an early testing stage. Feedback on the contents of this repository is appreciated.
 ## Repository Contents
+- [Applications](/Applications/) groups a number of examples ... .
+    - [floyd_warshall](/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
 - [Common](/Common/) contains common utility functionality shared between the examples.
 - [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
     - [assembly_to_executable](/HIP-Basic/assembly_to_executable): Program and accompanying build systems that show how to manually compile and link a HIP application from host and device code.
     - [bandwidth](/HIP-Basic/bandwidth): Program that measures memory bandwidth from host to device, device to host, and device to device.
+    - [bit_extract](/HIP-Basic/bit_extract): Program that showcases how to use HIP built-in bit extract.
+    - [device_globals](/HIP-Basic/device_globals): Show cases how to set global variables on the device from the host.
     - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
     - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
     - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
+    - [gpu_arch](/HIP-Basic/gpu_arch/): Program that showcases how to implement GPU architecture-specific code.
     - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
     - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
     - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
+    - [inline_assembly](/HIP-Basic/inline_assembly/): Program that showcases how to use inline assembly in a portable manner.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
+    - [module_api]((/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
+    - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
+    - [multi_gpu_data_transfer](/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
+    - [opengl_interop](/HIP-Basic/opengl_interop): Showcases how to share resources and computation between HIP and OpenGL.
     - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
     - [shared_memory](/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
+    - [static_device_library](/HIP-Basic/static_device_library): Shows how to create a static library containing device functions, and how to link it with an executable.
+    - [static_host_library](/HIP-Basic/static_host_library): Shows how to create a static library containing HIP host functions, and how to link it with an executable.
     - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
+    - [texture_management](/HIP-Basic/texture_management/): Shows the usage of texture memory.
+    - [vulkan_interop](/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan.
     - [warp_shuffle](/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
 - [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](/Dockerfiles/README.md) for details.
 - [Docs](/Docs/)
@@ -47,15 +61,17 @@ This project is currently unsupported and in an early testing stage. Feedback on
 
 ### Windows
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
-- [CMake](https://cmake.org/download/) (at least version 3.21)
 - ROCm toolchain for Windows (No public release yet)
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
+- [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
+- [Ninja](https://ninja-build.org/) (optional, to build with CMake)
 
 ## Building the example suite
 ### Linux
 These instructions assume that the prerequisites for every example are installed on the system.
 
 #### CMake
+See [CMake build options](#cmake-build-options) for an overview of build options.
 - `$ git clone https://github.com/amd/rocm-examples.git`
 - `$ cd rocm-examples`
 - `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
@@ -93,3 +109,37 @@ The repository has Visual Studio project files for all examples and individually
     - To build in Release mode pass the `/p:Configuration=Release` option to MSBuild.
     - The exutables will be created in a subfolder named "Debug" or "Release" inside the project folder.
 - The HIP specific project settings like the GPU architectures targeted can be set on the `General [AMD HIP C++]` tab of project properties.
+
+#### CMake
+First, clone the repository and go to the source directory.
+
+```shell
+git clone https://github.com/amd/rocm-examples.git
+cd rocm-examples
+```
+
+There are two ways to build the project using CMake: with the Visual Studio Developer Command Prompt (recommended) or with a standard Command Prompt. See [CMake build options](#cmake-build-options) for an overview of build options.
+
+##### Visual Studio Developer Command Prompt
+Select Start, search for "x64 Native Tools Command Prompt for VS 2019", and the resulting Command Prompt. Ninja must be selected as generator, and Clang as C++ compiler.
+
+```shell
+cmake -S . -B build -G Ninja -D CMAKE_CXX_COMPILER=clang
+cmake --build build
+```
+
+##### Standard Command Prompt
+Run the standard Command Prompt. When using the standard Command Prompt to build the project, the Resource Compiler (RC) path must be specified. The RC is a tool used to build Windows-based applications, its default path is `C:/Program Files (x86)/Windows Kits/10/bin/<Windows version>/x64/rc.exe`. Finally, the generator must be set to Ninja.
+
+```shell
+cmake -S . -B build -G Ninja -D CMAKE_RC_COMPILER="<path to rc compiler>"
+cmake --build build
+```
+
+### CMake build options
+The following options are available when building with CMake.
+| Option                     | Relevant to | Default value    | Description                                                                                             |
+|:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
+| `GPU_RUNTIME`              | HIP / CUDA  | `"HIP"`          | GPU runtime to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.     |
+| `CMAKE_HIP_ARCHITECTURES`  | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
+| `CMAKE_CUDA_ARCHITECTURES` | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capibility 50 and 72.                 |

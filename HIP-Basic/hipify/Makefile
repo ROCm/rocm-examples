@@ -30,19 +30,25 @@ HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
 # Common variables and flags
-CXX_STD  := c++17
-CXXFLAGS := -std=$(CXX_STD)
-CPPFLAGS :=
-LDFLAGS	 :=
-LDLIBS	 :=
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	CXXFLAGS += -x cu
-	CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
 else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS ?= -Wall -Wextra
 else
-$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
 all: $(EXAMPLE)
 # Step
@@ -50,7 +56,7 @@ main.hip: main.cu
 	$(ROCM_INSTALL_DIR)/bin/hipify-perl $< -o $@
 
 $(EXAMPLE): main.hip
-	$(HIPCXX) $< $(CXXFLAGS) $(CPPFLAGS) $(LDFLAGS) $(LDLIBS) -o $@
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:
 	$(RM) $(EXAMPLE) main.hip *.o

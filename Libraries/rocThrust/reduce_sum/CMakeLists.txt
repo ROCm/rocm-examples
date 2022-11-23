@@ -31,7 +31,7 @@ if(NOT CMAKE_PREFIX_PATH)
     set(CMAKE_PREFIX_PATH "/opt/rocm")
 endif()
 
-find_package(rocthrust REQUIRED CONFIG)
+find_package(rocthrust REQUIRED)
 add_executable(rocthrust_reduce_sum main.hip)
 target_link_libraries(rocthrust_reduce_sum PRIVATE roc::rocthrust)
 add_test(rocthrust_reduce_sum rocthrust_reduce_sum)

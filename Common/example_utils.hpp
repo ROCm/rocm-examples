@@ -28,6 +28,7 @@
 #include <iterator>
 #include <sstream>
 #include <string>
+#include <type_traits>
 
 #include <hip/hip_runtime.h>
 
@@ -52,7 +53,7 @@ constexpr int error_exit_code = -1;
 /// must be dereferencable in host code. Its value type must be formattable to
 /// \p std::ostream.
 template<class BidirectionalIterator>
-std::string format_range(const BidirectionalIterator begin, const BidirectionalIterator end)
+inline std::string format_range(const BidirectionalIterator begin, const BidirectionalIterator end)
 {
     std::stringstream sstream;
     sstream << "[ ";
@@ -74,10 +75,10 @@ std::string format_range(const BidirectionalIterator begin, const BidirectionalI
 /// \tparam BidirectionalIteratorU - must implement the BidirectionalIterator concept and
 /// must be dereferencable in host code. Its value type must be formattable to \p std::ostream.
 template<class BidirectionalIteratorT, typename BidirectionalIteratorU>
-std::string format_pairs(const BidirectionalIteratorT begin_a,
-                         const BidirectionalIteratorT end_a,
-                         const BidirectionalIteratorU begin_b,
-                         const BidirectionalIteratorU end_b)
+inline std::string format_pairs(const BidirectionalIteratorT begin_a,
+                                const BidirectionalIteratorT end_a,
+                                const BidirectionalIteratorU begin_b,
+                                const BidirectionalIteratorU end_b)
 {
     (void)end_b;
     assert(std::distance(begin_a, end_a) == std::distance(begin_b, end_b));
@@ -101,7 +102,7 @@ std::string format_pairs(const BidirectionalIteratorT begin_a,
 
 /// \brief A function to parse a string for an int. If the string is a valid integer then return true
 /// else if it has non-numeric character then return false.
-bool parse_int_string(const std::string& str, int& out)
+inline bool parse_int_string(const std::string& str, int& out)
 {
     try
     {
@@ -133,16 +134,17 @@ public:
         this->reset_timer();
     }
 
-    void reset_timer()
+    inline void reset_timer()
     {
         this->elapsed_time = std::chrono::steady_clock::duration(0);
     }
 
-    void start_timer()
+    inline void start_timer()
     {
         this->start_time = std::chrono::steady_clock::now();
     }
-    void stop_timer()
+
+    inline void stop_timer()
     {
         const auto end_time = std::chrono::steady_clock::now();
         this->elapsed_time += end_time - this->start_time;
@@ -150,10 +152,21 @@ public:
 
     /// @brief Returns time elapsed in Seconds
     /// @return type double that contains the elapsed time in Seconds
-    double get_elapsed_time() const
+    inline double get_elapsed_time() const
     {
         return std::chrono::duration_cast<std::chrono::duration<double>>(this->elapsed_time)
             .count();
     }
 };
+
+/// \brief Returns <tt>ceil(dividend / divisor)</tt>, where \p dividend is an integer and
+/// \p divisor is an unsigned integer.
+template<typename T,
+         typename U,
+         std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<U>::value, int> = 0>
+__host__ __device__ auto ceiling_div(const T& dividend, const U& divisor)
+{
+    return (dividend + divisor - 1) / divisor;
+}
+
 #endif // COMMON_EXAMPLE_UTILS_HPP

@@ -433,11 +433,8 @@ public:
                          [this](CallbackArgs& args)
                          {
                              args.output << this->usage();
-#pragma warning(push)
-#pragma warning(disable : 4702)
                              exit(0);
                              return false;
-#pragma warning(pop)
                          }),
                      "",
                      true);

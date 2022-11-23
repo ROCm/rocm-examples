@@ -22,24 +22,37 @@
 
 EXAMPLES := \
 	bandwidth \
+	bit_extract \
+	cooperative_groups \
 	device_query \
+	device_globals \
 	dynamic_shared \
 	events \
+	gpu_arch \
 	hello_world \
 	hipify \
+	inline_assembly \
 	matrix_multiplication \
+	moving_average \
+	multi_gpu_data_transfer \
 	occupancy \
+	opengl_interop \
 	runtime_compilation \
 	saxpy \
 	shared_memory \
 	streams \
+	static_host_library \
+	texture_management \
+	vulkan_interop \
 	warp_shuffle
 
 # Only supported on HIP (not CUDA).
 ifneq ($(GPU_RUNTIME), CUDA)
-    EXAMPLES += \
-        assembly_to_executable \
-        llvm_ir_to_executable
+	EXAMPLES += \
+		assembly_to_executable \
+		llvm_ir_to_executable \
+		module_api \
+		static_device_library
 endif
 
 all: $(EXAMPLES)

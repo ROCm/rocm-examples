@@ -20,15 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-ROCM_INSTALL_DIR = /opt/rocm
-HIPCXX = $(ROCM_INSTALL_DIR)/bin/hipcc
-CXX_STD = c++17
-COMMON_INCLUDE_DIR = ../../../Common
+EXAMPLE := rocthrust_saxpy
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-rocthrust_saxpy: main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
-	$(HIPCXX) $< -std=$(CXX_STD) -I $(COMMON_INCLUDE_DIR) -o $@
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
+
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+
+HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+ROCTHRUST_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+CXXFLAGS  ?= -Wall -Wextra
+ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCTHRUST_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS)
+ILDFLAGS  := $(LDFLAGS)
+ILDLIBS   := $(LDLIBS)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:
-	rm -f rocthrust_saxpy
+	$(RM) $(EXAMPLE)
 
 .PHONY: clean

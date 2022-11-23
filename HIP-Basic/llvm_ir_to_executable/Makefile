@@ -23,9 +23,8 @@ COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME ?= HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
-
 
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
@@ -37,11 +36,11 @@ LLVM_MC               ?= $(ROCM_INSTALL_DIR)/llvm/bin/llvm-mc
 CLANG_OFFLOAD_BUNDLER ?= $(ROCM_INSTALL_DIR)/llvm/bin/clang-offload-bundler
 
 # Common variables and flags
-CXX_STD  := c++17
-CXXFLAGS := -std=$(CXX_STD)
-CPPFLAGS := -I $(COMMON_INCLUDE_DIR)
-LDFLAGS	 :=
-LDLIBS	 :=
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) $(CPPFLAGS)
+ILDFLAGS  := $(LDFLAGS)
+ILDLIBS   := $(LDLIBS)
 
 # Compile for these GPU architectures
 HIP_ARCHITECTURES ?= gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030
@@ -60,7 +59,7 @@ GPU_ARCH_TRIPLES := $(subst $(space),$(comma),$(GPU_ARCHS:%=hipv4-amdgcn-amd-amd
 all: $(EXAMPLE)
 
 $(EXAMPLE): main.o main_device.o
-	$(HIPCXX) -o $@ $^
+	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 main_device.o: hip_obj_gen.mcin offload_bundle.hipfb
 	$(LLVM_MC) -triple x86_64-unknown-linux-gnu -o $@ $< --filetype=obj
@@ -73,7 +72,7 @@ offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 		-output=$@
 
 main.o: main.hip
-	$(HIPCXX) $(CXXFLAGS) $(CPPFLAGS) -c --cuda-host-only $<
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c --cuda-host-only $<
 
 main_%.o: main_%.ll
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<

@@ -20,20 +20,51 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-ROCM_INSTALL_DIR = /opt/rocm
-CUDA_INSTALL_DIR = /usr/local/cuda
-CUDACXX = $(CUDA_INSTALL_DIR)/bin/nvcc
-CXX_STD = c++17
-COMMON_INCLUDE_DIR = ../../../Common
+EXAMPLE := rocrand_simple_distributions_cpp
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-rocrand_simple_distributions_cpp: main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+CUDA_INSTALL_DIR := /usr/local/cuda
+
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+ROCRAND_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+CXX     ?= g++
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCRAND_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocrand
+
 ifeq ($(GPU_RUNTIME), CUDA)
-	$(CUDACXX) $< -std=$(CXX_STD) -isystem $(ROCM_INSTALL_DIR)/include -isystem $(CUDA_INSTALL_DIR)/include -I $(COMMON_INCLUDE_DIR) -L $(ROCM_INSTALL_DIR)/lib -L $(CUDA_INSTALL_DIR)/lib64 -lrocrand -lcudart -o $@ -D__HIP_PLATFORM_NVIDIA__ -x cu
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -D__HIP_PLATFORM_NVIDIA__ -isystem $(HIP_INCLUDE_DIR)
+	ILDFLAGS  += -L $(CUDA_INSTALL_DIR)/lib64
+	ILDLIBS   += -lcudart
+	COMPILER  := $(CUDACXX)
+else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS  ?= -Wall -Wextra
+	ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+	ILDLIBS   += -lamdhip64
+	COMPILER  := $(CXX)
 else
-	$(CXX) $< -std=$(CXX_STD) -isystem $(ROCM_INSTALL_DIR)/include -I $(COMMON_INCLUDE_DIR) -L $(ROCM_INSTALL_DIR)/lib -lrocrand -lamdhip64 -o $@ -D__HIP_PLATFORM_AMD__
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
 clean:
-	rm -f rocrand_simple_distributions_cpp
+	$(RM) $(EXAMPLE)
 
 .PHONY: clean

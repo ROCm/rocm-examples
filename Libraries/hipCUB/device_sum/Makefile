@@ -20,24 +20,48 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-ROCM_INSTALL_DIR = /opt/rocm
-CUDA_INSTALL_DIR = /usr/local/cuda
-CUDACXX = $(CUDA_INSTALL_DIR)/bin/nvcc
-CXX_STD = c++17
-COMMON_INCLUDE_DIR = ../../../Common
+EXAMPLE := hipcub_device_sum
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-HIPCXX = $(ROCM_INSTALL_DIR)/bin/hipcc
-HIP_INCLUDE_DIR = $(ROCM_INSTALL_DIR)/include/
-HIPCUB_INCLUDE_DIR = $(ROCM_INSTALL_DIR)/include/
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+CUDA_INSTALL_DIR := /usr/local/cuda
 
-hipcub_device_sum: main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+HIP_INCLUDE_DIR    := $(ROCM_INSTALL_DIR)/include
+HIPCUB_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+HIPCXX  ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(HIPCUB_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
+
 ifeq ($(GPU_RUNTIME), CUDA)
-	$(CUDACXX) $< -std=$(CXX_STD) -isystem $(HIPCUB_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -o $@ -D__HIP_PLATFORM_NVIDIA__ -x cu
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
+	COMPILER := $(CUDACXX)
+else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS ?= -Wall -Wextra
+	ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+	COMPILER := $(HIPCXX)
 else
-	$(HIPCXX) $< -std=$(CXX_STD) -isystem $(HIPCUB_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -o $@ -D__HIP_PLATFORM_AMD__
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
 clean:
-	rm -f hipcub_device_sum
+	$(RM) $(EXAMPLE)
 
 .PHONY: clean

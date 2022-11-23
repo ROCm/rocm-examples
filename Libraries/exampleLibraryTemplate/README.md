@@ -17,10 +17,10 @@ The examples in this subdirectory showcase the functionality of the [`example-li
 ### Windows
 *Most common prerequisites from the other examples:*
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
-- [CMake](https://cmake.org/download/) (at least version 3.21)
 - ROCm toolchain for Windows (No public release yet)
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
-
+- [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
+- [Ninja](https://ninja-build.org/) (optional, to build with CMake)
 
 ## Building
 *List the instructions to build the examples in the subdirectories. Ideally, each example builds similarly, and here the common steps can be described for both Windows and Linux. If there are example-specific build instructions, list those in the example-specific README file.*
@@ -32,7 +32,7 @@ The variable `GPU_RUNTIME` can be used to set the targeted runtime. Use `HIP` to
 Make sure that the dependencies are installed, or use the [provided Dockerfile](../../Dockerfiles/hip-libraries-rocm-ubuntu.Dockerfile) to build and run the examples in a containerized environment that has all prerequisites installed.
 
 ####  Using CMake
-All examples in the `example-library-name` subdirectory can be built by a single CMake project.
+All examples in the `example-library-name` subdirectory can either be built by a single CMake project or be built independently.
 
 - `$ cd Libraries/<example-library-name>`
 - `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
@@ -41,7 +41,8 @@ All examples in the `example-library-name` subdirectory can be built by a single
 #### Using Make
 *Only if applicable! Not all examples have to support Make*
 
-All examples can be built by a single invocation to Make.
+All examples can be built by a single invocation to Make or be built independently.
+
 - `$ cd Libraries/<example-library-name>`
 - `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
 
@@ -50,3 +51,6 @@ All examples can be built by a single invocation to Make.
 Visual Studio solution files are available for the individual examples. To build all examples for <example-library-name> open the top level solution file [ROCm-Examples-VS2019.sln](../../ROCm-Examples-VS2019.sln) and filter for <example-library-name>.
 
 For more detailed build instructions refer to the top level [README.md](../../README.md#visual-studio).
+
+#### CMake
+All examples in the `example-library-name` subdirectory can either be built by a single CMake project or be built independently. For build instructions refer to the top-level [README.md](../../README.md#cmake-2).

@@ -31,7 +31,7 @@
 /// \brief Device function to square each element
 /// in the array `in` and write to array `out`.
 template<typename T>
-__global__ void vector_square_kernel(T* out, const T* in, const long long size)
+__global__ void vector_square_kernel(T* out, const T* in, const unsigned long long size)
 {
     // Get the unique global thread ID
     const size_t offset = blockIdx.x * blockDim.x + threadIdx.x;

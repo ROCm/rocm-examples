@@ -21,5 +21,12 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocRAND_examples)
+project(rocRAND_examples LANGUAGES CXX)
+
+find_package(rocrand)
+if(NOT rocrand_FOUND)
+    message(STATUS "rocRAND could not be found, not building rocRAND examples")
+    return()
+endif()
+
 add_subdirectory(simple_distributions_cpp)

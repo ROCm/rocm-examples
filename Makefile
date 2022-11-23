@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 SUB_PROJECTS := \
+	Applications \
 	HIP-Basic \
 	Libraries
 

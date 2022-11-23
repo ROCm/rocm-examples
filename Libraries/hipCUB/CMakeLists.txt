@@ -21,7 +21,13 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipCUB_examples)
+project(hipCUB_examples LANGUAGES CXX)
+
+find_package(hipcub)
+if(NOT hipcub_FOUND)
+    message(STATUS "hipCUB could not be found, not building hipCUB examples")
+    return()
+endif()
 
 add_subdirectory(device_radix_sort)
 add_subdirectory(device_sum)

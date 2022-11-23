@@ -29,6 +29,12 @@ include:
       - /gpus-nvcc.yaml
       - /rules.yaml
 
+variables:
+  # suppressing 186 allows us to write `assert(a && "message")`.
+  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror --Werror all-warnings --diag-suppress 186"
+  CXX_FLAGS: "-Wall -Wextra -Werror"
+  HIP_FLAGS: "-Wall -Wextra -Werror"
+
 stages:
   - lint
   - build
@@ -98,7 +104,7 @@ build:make-rocm:
     - rocm-build
   needs: []
   script:
-    - cd $CI_PROJECT_DIR && make -j $(nproc)
+    - cd $CI_PROJECT_DIR && make CXXFLAGS="$HIP_FLAGS" -j $(nproc)
 
 build:make-cuda:
   image: $DOCKER_TAG_PREFIX:cuda-ubuntu
@@ -109,7 +115,7 @@ build:make-cuda:
     - nvcc-build
   needs: []
   script:
-    - cd $CI_PROJECT_DIR && make GPU_RUNTIME=CUDA -j $(nproc)
+    - cd $CI_PROJECT_DIR && make CXXFLAGS="$CUDA_FLAGS" GPU_RUNTIME=CUDA -j $(nproc)
 
 .build:cmake:
   stage: build
@@ -132,6 +138,15 @@ build:cmake-rocm:
       -S $CI_PROJECT_DIR
       -B $CI_PROJECT_DIR/build
       -D CMAKE_HIP_ARCHITECTURES="$GPU_TARGETS"
+      -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
+      -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
+      | tee cmake_log.txt
+    # check if all dependencies were found
+    - |-
+      if grep -q "Could NOT find" cmake_log.txt; then
+          echo "Some CMake libraries could not be found"
+          exit 1
+      fi
     - cmake --build $CI_PROJECT_DIR/build
 
 build:cmake-cuda:
@@ -145,6 +160,15 @@ build:cmake-cuda:
       -S $CI_PROJECT_DIR
       -B $CI_PROJECT_DIR/build
       -D GPU_RUNTIME=CUDA
+      -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
+      -D CMAKE_CUDA_FLAGS="$CUDA_FLAGS"
+      | tee cmake_log.txt
+    # check if all dependencies were found
+    - |-
+      if grep -q "Could NOT find" cmake_log.txt; then
+          echo "Some CMake libraries could not be found"
+          exit 1
+      fi
     - cmake --build $CI_PROJECT_DIR/build
 
 .test:
@@ -190,16 +214,19 @@ test:rocm-windows-vs2019:
     - >
       & "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe"
       /maxCpuCount
+      /warnAsError
       "/p:Configuration=$BUILD_TYPE"
       "$CI_PROJECT_DIR"
     - |-
       Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
-        echo "--" $_.Name
-        & "$_"
-        if (!$?) {
-          throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
-        }
+          if (("hip_vulkan_interop_vs2019.exe","hip_opengl_interop_vs2019.exe") -NotContains $_.Name) {
+              echo "--" $_.Name
+              & "$_"
+              if (!$?) {
+                throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
+              }
+          }
       }
 
 test:rocm-windows-cmake:
@@ -210,8 +237,16 @@ test:rocm-windows-cmake:
       -S "$CI_PROJECT_DIR"
       -B "$CI_PROJECT_DIR/build"
       -G Ninja
+      -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
+      -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
       -D CMAKE_BUILD_TYPE="$BUILD_TYPE"
       -D CMAKE_HIP_ARCHITECTURES=gfx1030
       -D CMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe"
+      -D CMAKE_TOOLCHAIN_FILE="C:/Tools/Microsoft/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      | Tee-Object -filepath cmake_log.txt
+    - |-
+      if (Select-String -Path cmake_log.txt -Pattern "Could NOT find") {
+          throw "Some cmake libraries are missing"
+      }
     - cmake --build "$CI_PROJECT_DIR/build"
     - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure

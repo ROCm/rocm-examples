@@ -61,10 +61,10 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     # Include the HIP header directory.
     list(APPEND include_dirs "${ROCM_ROOT}/include")
     # In this example we also need to link nvrtc CUDA library
-    find_package("CUDAToolkit" REQUIRED)
+    find_package(CUDAToolkit)
     list(APPEND link_libs "CUDA::nvrtc")
 endif()
-    
+
 target_link_libraries(${example_name} ${link_libs})
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
