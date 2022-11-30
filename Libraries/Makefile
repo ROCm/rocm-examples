@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 LIBRARIES := \
-	exampleLibraryTemplate \
 	hipCUB \
 	rocRAND
+
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
 	rocBLAS \
