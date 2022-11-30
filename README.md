@@ -21,7 +21,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [module_api]((/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
     - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
     - [multi_gpu_data_transfer](/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
-    - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
+    - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuration parameters for a kernel launch with maximum occupancy.
     - [opengl_interop](/HIP-Basic/opengl_interop): Showcases how to share resources and computation between HIP and OpenGL.
     - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
     - [saxpy](/HIP-Basic/saxpy/): Implements the $y_i=ax_i+y_i$ kernel and explains basic HIP functionality.
@@ -46,9 +46,11 @@ This project is currently unsupported and in an early testing stage. Feedback on
             - [nrm2](/Libraries/rocBLAS/level_1/nrm2/): Simple program that showcases Euclidean norm of a vector.
             - [scal](/Libraries/rocBLAS/level_1/scal/): Simple program that showcases vector scaling (SCAL) operation.
             - [swap](/Libraries/rocBLAS/level_1/swap/): Showcases exchanging elements between two vectors.
-        - [level_2](/Libraries/rocBLAS/level_2/): Opertions between vectors and matrices.
+        - [level_2](/Libraries/rocBLAS/level_2/): Operations between vectors and matrices.
             - [her](/Libraries/rocBLAS/level_2/her/): Showcases a rank-1 update of a Hermitian matrix with complex values.
             - [gemv](/Libraries/rocBLAS/level_2/gemv/): Showcases the general matrix-vector product operation.
+        - [level_3](/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
+            - [gemm](/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
     - [rocPRIM](/Libraries/rocPRIM/)
         - [block_sum](/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
         - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.

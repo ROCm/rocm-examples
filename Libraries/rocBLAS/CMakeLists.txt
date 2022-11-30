@@ -31,3 +31,4 @@ endif()
 
 add_subdirectory(level_1)
 add_subdirectory(level_2)
+add_subdirectory(level_3)
