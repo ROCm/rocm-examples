@@ -20,24 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipCUB \
-	rocRAND
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(hipBLAS_examples LANGUAGES NONE)
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	hipBLAS \
-	rocBLAS \
-	rocPRIM \
-	rocThrust
-endif
+find_package(hipblas)
+if(NOT hipblas_FOUND)
+    message(STATUS "hipBLAS could not be found, not building hipBLAS examples")
+    return()
+endif()
 
-all: $(LIBRARIES)
-
-clean: TARGET=clean
-clean: all
-
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(LIBRARIES)
+add_subdirectory(her)

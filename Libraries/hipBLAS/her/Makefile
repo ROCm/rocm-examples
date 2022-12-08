@@ -20,24 +20,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipCUB \
-	rocRAND
+EXAMPLE := hipblas_her
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	hipBLAS \
-	rocBLAS \
-	rocPRIM \
-	rocThrust
-endif
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
 
-all: $(LIBRARIES)
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+HIPBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-clean: TARGET=clean
-clean: all
+HIPCXX  ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(HIPBLAS_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   := -lhipblas
 
-.PHONY: all clean $(LIBRARIES)
+CXXFLAGS  ?= -Wall -Wextra
+ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+COMPILER  := $(HIPCXX)
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipblas_utils.hpp
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
