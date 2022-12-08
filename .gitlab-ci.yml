@@ -140,10 +140,10 @@ build:cmake-rocm:
       -D CMAKE_HIP_ARCHITECTURES="$GPU_TARGETS"
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
-      | tee cmake_log.txt
+      2>&1 | tee cmake_log.txt
     # check if all dependencies were found
     - |-
-      if grep -q "Could NOT find" cmake_log.txt; then
+      if grep -qi "could not find" cmake_log.txt; then
           echo "Some CMake libraries could not be found"
           exit 1
       fi
@@ -162,10 +162,11 @@ build:cmake-cuda:
       -D GPU_RUNTIME=CUDA
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_CUDA_FLAGS="$CUDA_FLAGS"
-      | tee cmake_log.txt
+      -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake
+      2>&1 | tee cmake_log.txt
     # check if all dependencies were found
     - |-
-      if grep -q "Could NOT find" cmake_log.txt; then
+      if grep -qi "could not find" cmake_log.txt; then
           echo "Some CMake libraries could not be found"
           exit 1
       fi
@@ -243,9 +244,9 @@ test:rocm-windows-cmake:
       -D CMAKE_HIP_ARCHITECTURES=gfx1030
       -D CMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe"
       -D CMAKE_TOOLCHAIN_FILE="C:/Tools/Microsoft/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      | Tee-Object -filepath cmake_log.txt
+      2>&1 | Tee-Object -filepath cmake_log.txt
     - |-
-      if (Select-String -Path cmake_log.txt -Pattern "Could NOT find") {
+      if (Select-String -Path cmake_log.txt -Pattern "could not find") {
           throw "Some cmake libraries are missing"
       }
     - cmake --build "$CI_PROJECT_DIR/build"

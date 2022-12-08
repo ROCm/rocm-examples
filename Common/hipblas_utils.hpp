@@ -25,7 +25,7 @@
 
 #include "example_utils.hpp"
 
-#include <hipblas.h>
+#include <hipblas/hipblas.h>
 
 #include <iostream>
 
