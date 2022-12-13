@@ -50,7 +50,7 @@ else()
 endif()
 
 if(GPU_ARCHITECTURES STREQUAL "all")
-    set(GPU_ARCHITECTURES "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030" CACHE STRING "GPU architectures to compile for" FORCE)
+    set(GPU_ARCHITECTURES "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102" CACHE STRING "GPU architectures to compile for" FORCE)
 endif()
 
 # Remove duplicates

@@ -72,10 +72,10 @@
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
   </PropertyGroup>
   <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetGPUArchitectures>gfx1030</TargetGPUArchitectures>
+    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
   </PropertyGroup>
   <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetGPUArchitectures>gfx1030</TargetGPUArchitectures>
+    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
