@@ -20,15 +20,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipBLAS_examples LANGUAGES NONE)
+EXAMPLE := hipblas_gemm_strided_batched
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-find_package(hipblas)
-if(NOT hipblas_FOUND)
-    message(STATUS "hipBLAS could not be found, not building hipBLAS examples")
-    return()
-endif()
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
 
-add_subdirectory(gemm_strided_batched)
-add_subdirectory(her)
-add_subdirectory(scal)
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+HIPBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+HIPCXX  ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(HIPBLAS_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   := -lhipblas
+
+CXXFLAGS ?= -Wall -Wextra
+ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+COMPILER := $(HIPCXX)
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipblas_utils.hpp
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
