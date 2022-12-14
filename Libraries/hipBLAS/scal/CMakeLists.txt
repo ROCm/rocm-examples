@@ -20,14 +20,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipBLAS_examples LANGUAGES NONE)
+set(example_name hipblas_scal)
 
-find_package(hipblas)
-if(NOT hipblas_FOUND)
-    message(STATUS "hipBLAS could not be found, not building hipBLAS examples")
-    return()
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
+
+set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
+set(GPU_RUNTIMES "HIP" "CUDA")
+set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+
+if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
+    message(FATAL_ERROR "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}")
 endif()
 
-add_subdirectory(her)
-add_subdirectory(scal)
+enable_language(${GPU_RUNTIME})
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+if(NOT CMAKE_PREFIX_PATH)
+    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+endif()
+
+find_package(hipblas REQUIRED)
+
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(${example_name} ${example_name})
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE roc::hipblas)
+
+target_include_directories(${example_name} PRIVATE "../../../Common")

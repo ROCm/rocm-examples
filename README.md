@@ -38,6 +38,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
 - [Libraries](/Libraries/)
     - [hipBLAS](/Libraries/hipBLAS/)
         - [her](/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.
+        - [scal](/Libraries/hipBLAS/scal/): Simple program that showcases vector scaling (SCAL) operation.
     - [hipCUB](/Libraries/hipCUB/)
         - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
         - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.

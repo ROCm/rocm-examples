@@ -15,10 +15,8 @@ The examples in this subdirectory showcase the functionality of the [hipBLAS](ht
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
 - ROCm toolchain for Windows (No public release yet)
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
-- [rocBLAS](https://github.com/ROCmSoftwarePlatform/rocBLAS)
-    - Installed as part of the ROCm SDK on Windows for ROCm platform.
 - [hipBLAS](https://github.com/ROCmSoftwarePlatform/hipBLAS)
-  - Installed as part of the ROCm SDK on Windows for ROCm platform.
+    - Installed as part of the ROCm SDK on Windows for ROCm platform.
 - [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
 - [Ninja](https://ninja-build.org/) (optional, to build with CMake)
 

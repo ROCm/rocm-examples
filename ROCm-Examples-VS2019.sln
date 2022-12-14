@@ -117,9 +117,12 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gemm_vs2019", "Libraries\rocBLAS\level_3\gemm\gemm_vs2019.vcxproj", "{4E28F2B0-CE5D-40F4-9AF5-5BC18A27C59B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gemm_strided_batched_vs2019", "Libraries\rocBLAS\level_3\gemm_strided_batched\gemm_strided_batched_vs2019.vcxproj", "{1E9ED0DD-CCD1-4658-B958-34E85E5348FE}"
+EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hipBLAS", "hipBLAS", "{2F78B214-9230-4176-AFE6-8B2550B1E4B6}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "her_vs2019", "Libraries\hipBLAS\her\her_vs2019.vcxproj", "{984032B2-170B-4DF2-AF16-96713C42C47D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scal_vs2019", "Libraries\hipBLAS\scal\scal_vs2019.vcxproj", "{658C0200-6FC1-4460-B7A5-BB1876830607}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -319,6 +322,10 @@ Global
 		{984032B2-170B-4DF2-AF16-96713C42C47D}.Debug|x64.Build.0 = Debug|x64
 		{984032B2-170B-4DF2-AF16-96713C42C47D}.Release|x64.ActiveCfg = Release|x64
 		{984032B2-170B-4DF2-AF16-96713C42C47D}.Release|x64.Build.0 = Release|x64
+		{658C0200-6FC1-4460-B7A5-BB1876830607}.Debug|x64.ActiveCfg = Debug|x64
+		{658C0200-6FC1-4460-B7A5-BB1876830607}.Debug|x64.Build.0 = Debug|x64
+		{658C0200-6FC1-4460-B7A5-BB1876830607}.Release|x64.ActiveCfg = Release|x64
+		{658C0200-6FC1-4460-B7A5-BB1876830607}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -381,6 +388,7 @@ Global
 		{1E9ED0DD-CCD1-4658-B958-34E85E5348FE} = {2AF2679F-5554-48D0-86BD-A59BA6DC2D9E}
 		{2F78B214-9230-4176-AFE6-8B2550B1E4B6} = {052412EF-7CEB-4E32-96F9-AADBC70945D7}
 		{984032B2-170B-4DF2-AF16-96713C42C47D} = {2F78B214-9230-4176-AFE6-8B2550B1E4B6}
+		{658C0200-6FC1-4460-B7A5-BB1876830607} = {2F78B214-9230-4176-AFE6-8B2550B1E4B6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

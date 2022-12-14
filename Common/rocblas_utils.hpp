@@ -23,6 +23,8 @@
 #ifndef COMMON_ROCBLAS_UTILS_HPP
 #define COMMON_ROCBLAS_UTILS_HPP
 
+#include "example_utils.hpp"
+
 #include <rocblas/rocblas.h>
 
 #include <iostream>

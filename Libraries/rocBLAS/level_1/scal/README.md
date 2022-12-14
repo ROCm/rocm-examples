@@ -17,7 +17,7 @@ This example showcases the usage of rocBLAS' Level 1 SCAL function. The Level 1 
 
 ### Command line interface
 The application provides the following optional command line arguments:
-- `-a` or `--alpha`. The scalar value $a$ used in the AXPY operation. Its default value is 3.
+- `-a` or `--alpha`. The scalar value $a$ used in the SCAL operation. Its default value is 3.
 - `-x` or `--incx`. The stride between consecutive values in the data array that makes up vector $x$, must be greater than zero. Its default value is 1.
 - `-n` or `--n`. The number of elements in vector $x$, must be greater than zero. Its default value is 5.
 
