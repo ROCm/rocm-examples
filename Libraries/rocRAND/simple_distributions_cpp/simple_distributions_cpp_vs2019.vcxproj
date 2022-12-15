@@ -15,7 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\Common\example_utils.hpp" />
-    <ClInclude Include="argument_parsing.hpp" />
+    <ClInclude Include="..\..\..\Common\cmdparser.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>

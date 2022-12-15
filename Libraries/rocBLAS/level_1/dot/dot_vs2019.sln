@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32630.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dot_vs2019", "dot_vs2019.vcxproj", "{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4}.Debug|x64.ActiveCfg = Debug|x64
+		{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4}.Debug|x64.Build.0 = Debug|x64
+		{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4}.Release|x64.ActiveCfg = Release|x64
+		{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {49E443EC-E630-4662-9805-00832907C5F8}
+	EndGlobalSection
+EndGlobal

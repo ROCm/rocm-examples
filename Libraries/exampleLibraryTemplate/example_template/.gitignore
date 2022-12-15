@@ -1,2 +1,0 @@
-# DELETE ME: This file is needed to exclude the binary, that is generated when calling `make`, from the git-repository. The name has to match the target name in the corresponding Makefile.
-library_example_template

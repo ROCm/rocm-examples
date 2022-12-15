@@ -21,10 +21,10 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [module_api]((/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
     - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
     - [multi_gpu_data_transfer](/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
-    - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuation parameters for a kernel launch with maximum occupancy.
+    - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuration parameters for a kernel launch with maximum occupancy.
     - [opengl_interop](/HIP-Basic/opengl_interop): Showcases how to share resources and computation between HIP and OpenGL.
     - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
-    - [saxpy](/HIP-Basic/saxpy/): Implements the $Y_i=aX_i+Y_i$ kernel and explains basic HIP functionality.
+    - [saxpy](/HIP-Basic/saxpy/): Implements the $y_i=ax_i+y_i$ kernel and explains basic HIP functionality.
     - [shared_memory](/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
     - [static_device_library](/HIP-Basic/static_device_library): Shows how to create a static library containing device functions, and how to link it with an executable.
     - [static_host_library](/HIP-Basic/static_host_library): Shows how to create a static library containing HIP host functions, and how to link it with an executable.
@@ -39,6 +39,19 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [hipCUB](/Libraries/hipCUB/)
         - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
         - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
+    - [rocBLAS](/Libraries/rocBLAS/)
+        - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
+            - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
+            - [dot](/Libraries/rocBLAS/level_1/dot/): Simple program that showcases dot product.
+            - [nrm2](/Libraries/rocBLAS/level_1/nrm2/): Simple program that showcases Euclidean norm of a vector.
+            - [scal](/Libraries/rocBLAS/level_1/scal/): Simple program that showcases vector scaling (SCAL) operation.
+            - [swap](/Libraries/rocBLAS/level_1/swap/): Showcases exchanging elements between two vectors.
+        - [level_2](/Libraries/rocBLAS/level_2/): Operations between vectors and matrices.
+            - [her](/Libraries/rocBLAS/level_2/her/): Showcases a rank-1 update of a Hermitian matrix with complex values.
+            - [gemv](/Libraries/rocBLAS/level_2/gemv/): Showcases the general matrix-vector product operation.
+        - [level_3](/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
+            - [gemm](/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
+            - [gemm_strided_batched](/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
     - [rocPRIM](/Libraries/rocPRIM/)
         - [block_sum](/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
         - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
@@ -49,7 +62,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
         - [reduce_sum](/Libraries/rocThrust/reduce_sum/): An example that computes the sum of a `thrust::device_vector` integer vector using the `thrust::reduce()` generalized summation and the `thrust::plus` operator.
         - [remove_points](/Libraries/rocThrust/remove_points/): Simple program that demonstrates the usage of the `thrust` random number generation, host vector, generation, tuple, zip iterator, and conditional removal templates. It generates a number of random points in a unit square and then removes all of them outside the unit circle.
-        - [saxpy](/Libraries/rocThrust/saxpy/): Simple program that implements the SAXPY operation (`Y[i] = a * X[i] + Y[i]`) using rocThrust and showcases the usage of the vector and functor templates and of `thrust::fill` and `thrust::transform` operations.
+        - [saxpy](/Libraries/rocThrust/saxpy/): Simple program that implements the SAXPY operation (`y[i] = a * x[i] + y[i]`) using rocThrust and showcases the usage of the vector and functor templates and of `thrust::fill` and `thrust::transform` operations.
         - [vectors](/Libraries/rocThrust/vectors/): Simple program that showcases the `host_vector` and the `device_vector` of rocThrust.
 
 ## Prerequisites

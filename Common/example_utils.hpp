@@ -24,6 +24,7 @@
 #define COMMON_EXAMPLE_UTILS_HPP
 
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <iterator>
 #include <sstream>
@@ -167,6 +168,64 @@ template<typename T,
 __host__ __device__ auto ceiling_div(const T& dividend, const U& divisor)
 {
     return (dividend + divisor - 1) / divisor;
+}
+
+/// \brief Report validation results.
+inline int report_validation_result(int errors)
+{
+    if(errors)
+    {
+        std::cout << "Validation failed. Errors: " << errors << std::endl;
+        return error_exit_code;
+    }
+
+    std::cout << "Validation passed." << std::endl;
+    return 0;
+}
+
+/// \brief Generate an identity matrix.
+/// The identity matrix is a $m \times n$ matrix with ones in the main diagonal and zeros elsewhere.
+template<typename T>
+void generate_identity_matrix(T* A, int m, int n, size_t lda)
+{
+    for(int i = 0; i < m; ++i)
+    {
+        for(int j = 0; j < n; ++j)
+        {
+            A[i + j * lda] = T(i == j);
+        }
+    }
+}
+
+/// \brief Multiply an $A$ matrix ($m \times k$) with a $B$ matrix ($k \times n$) as:
+/// $C := \alpha \cdot A \cdot B + \beta \cdot C$
+template<typename T>
+void multiply_matrices(T   alpha,
+                       T   beta,
+                       int m,
+                       int n,
+                       int k,
+                       T*  A,
+                       int stride1_a,
+                       int stride2_a,
+                       T*  B,
+                       int stride1_b,
+                       int stride2_b,
+                       T*  C,
+                       int stride_c)
+{
+    for(int i1 = 0; i1 < m; ++i1)
+    {
+        for(int i2 = 0; i2 < n; ++i2)
+        {
+            T t = T(0.0);
+            for(int i3 = 0; i3 < k; ++i3)
+            {
+                t += A[i1 * stride1_a + i3 * stride2_a] * B[i3 * stride1_b + i2 * stride2_b];
+            }
+            C[i1 + i2 * stride_c] = beta * C[i1 + i2 * stride_c] + alpha * t;
+        }
+    }
 }
 
 #endif // COMMON_EXAMPLE_UTILS_HPP
