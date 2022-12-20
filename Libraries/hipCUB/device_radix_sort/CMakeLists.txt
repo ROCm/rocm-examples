@@ -54,3 +54,6 @@ target_include_directories(hipcub_device_radix_sort
     "../../../Common"
 )
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+if(WIN32)
+    target_compile_definitions(hipcub_device_radix_sort PRIVATE WIN32)
+endif()

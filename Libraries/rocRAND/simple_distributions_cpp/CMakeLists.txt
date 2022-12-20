@@ -59,3 +59,6 @@ else()
 endif()
 
 target_include_directories(rocrand_simple_distributions_cpp PRIVATE "../../../Common")
+if(WIN32)
+    target_compile_definitions(rocrand_simple_distributions_cpp PRIVATE WIN32)
+endif()

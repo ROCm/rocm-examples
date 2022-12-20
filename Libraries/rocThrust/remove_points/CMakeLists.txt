@@ -36,5 +36,7 @@ find_package(rocthrust REQUIRED)
 add_executable(rocthrust_remove_points main.hip)
 target_link_libraries(rocthrust_remove_points PRIVATE roc::rocthrust)
 target_include_directories(rocthrust_remove_points PRIVATE "../../../Common")
-
 add_test(rocthrust_remove_points rocthrust_remove_points)
+if(WIN32)
+    target_compile_definitions(rocthrust_remove_points PRIVATE WIN32)
+endif()
