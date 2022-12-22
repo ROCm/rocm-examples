@@ -44,3 +44,6 @@ target_include_directories(rocprim_block_sum
     PRIVATE
     "../../../Common"
 )
+if(WIN32)
+    target_compile_definitions(rocprim_block_sum PRIVATE WIN32)
+endif()

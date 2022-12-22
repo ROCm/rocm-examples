@@ -59,7 +59,22 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a </Command>
     </CustomBuild>
-  </ItemGroup>
+    <CustomBuild Include="main_gfx1100.ll">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1100 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1100 </Command>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1101.ll">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1101 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1101 </Command>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1102.ll">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
+    </CustomBuild>
+   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{dbb8dfe9-cb1b-473c-937c-2a8120e0d819}</ProjectGuid>
@@ -71,19 +86,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP</PlatformToolset>
+    <PlatformToolset>HIP_clang</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP</PlatformToolset>
+    <PlatformToolset>HIP_clang</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Condition="'$(HIPPropertiesImported)' != 'true'" Project="$(VCTargetsPath)\AMD.HIP.Common.props" />
+    <Import Condition="'$(HIPPropertiesImported)' != 'true' and '$(PlatformToolset)'=='HIP_clang'" Project="$(VCTargetsPath)\AMD.HIP.Clang.Common.props" />
+    <Import Condition="'$(HIPPropertiesImported)' != 'true' and '$(PlatformToolset)'=='HIP_nvcc'" Project="$(VCTargetsPath)\AMD.HIP.Nvcc.Common.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -104,16 +120,16 @@
     <TargetName>hip_$(ProjectName)</TargetName>
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
   </PropertyGroup>
-  <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetGPUArchitectures>gfx1030</TargetGPUArchitectures>
+  <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
   </PropertyGroup>
-  <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetGPUArchitectures>gfx1030</TargetGPUArchitectures>
+  <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
-      <PreprocessorDefinitions>__HIP_ROCclr__;__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -128,7 +144,7 @@
       <Outputs>$(IntDir)%(FileName).o</Outputs>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-output=$(IntDir)offload_bundle.hipfb"
+      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
 cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
     </CustomBuildStep>
     <CustomBuildStep>
@@ -138,15 +154,15 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <Outputs>$(IntDIr)main_device.obj</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
+      <Inputs>$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP_clang'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
-      <PreprocessorDefinitions>__HIP_ROCclr__;__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
@@ -163,7 +179,7 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <Outputs>$(IntDir)%(FileName).o</Outputs>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa-gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030 -input=NUL "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-output=$(IntDir)offload_bundle.hipfb"
+      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
 cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
     </CustomBuildStep>
     <CustomBuildStep>
@@ -173,11 +189,12 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <Outputs>$(IntDIr)main_device.obj</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
+      <Inputs>$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Condition="'$(HIPTargetsImported)' != 'true'" Project="$(VCTargetsPath)\AMD.HIP.Common.targets" />
+    <Import Condition="'$(HIPTargetsImported)' != 'true' and '$(PlatformToolset)'=='HIP_clang'" Project="$(VCTargetsPath)\AMD.HIP.Clang.Common.targets" />
+    <Import Condition="'$(HIPTargetsImported)' != 'true' and '$(PlatformToolset)'=='HIP_nvcc'" Project="$(VCTargetsPath)\AMD.HIP.Nvcc.Common.targets" />
   </ImportGroup>
 </Project>

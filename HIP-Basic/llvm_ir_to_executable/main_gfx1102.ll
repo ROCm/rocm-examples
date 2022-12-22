@@ -1,4 +1,4 @@
-; ModuleID = 'main_gfx1030.bc'
+; ModuleID = 'main_gfx1102.bc'
 source_filename = "./main.hip"
 target datalayout = "e-p:64:64-p1:64:64-p2:32:32-p3:32:32-p4:64:64-p5:32:32-p6:32:32-i64:64-v16:16-v24:32-v32:32-v48:64-v96:128-v192:256-v256:256-v512:512-v1024:1024-v2048:2048-n32:64-S32-A5-G1-ni:7"
 target triple = "amdgcn-amd-amdhsa"
@@ -48,7 +48,7 @@ declare align 4 i8 addrspace(4)* @llvm.amdgcn.dispatch.ptr() #1
 ; Function Attrs: nounwind readnone speculatable willreturn
 declare i32 @llvm.amdgcn.workgroup.id.x() #1
 
-attributes #0 = { argmemonly mustprogress nofree norecurse nosync nounwind "amdgpu-flat-work-group-size"="1,1024" "frame-pointer"="none" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="gfx1030" "target-features"="+16-bit-insts,+ci-insts,+dl-insts,+dot1-insts,+dot2-insts,+dot5-insts,+dot6-insts,+dot7-insts,+dpp,+flat-address-space,+gfx10-3-insts,+gfx10-insts,+gfx8-insts,+gfx9-insts,+s-memrealtime,+s-memtime-inst" "uniform-work-group-size"="true" }
+attributes #0 = { argmemonly mustprogress nofree norecurse nosync nounwind "amdgpu-flat-work-group-size"="1,1024" "frame-pointer"="none" "min-legal-vector-width"="0" "no-trapping-math"="true" "stack-protector-buffer-size"="8" "target-cpu"="gfx1102" "target-features"="+16-bit-insts,+ci-insts,+dl-insts,+dot1-insts,+dot5-insts,+dot6-insts,+dot7-insts,+dot8-insts,+dpp,+flat-address-space,+gfx10-3-insts,+gfx10-insts,+gfx11-insts,+gfx8-insts,+gfx9-insts" "uniform-work-group-size"="true" }
 attributes #1 = { nounwind readnone speculatable willreturn }
 attributes #2 = { nounwind }
 

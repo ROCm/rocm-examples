@@ -45,7 +45,7 @@ ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
 
 # Compile for these GPU architectures
-HIP_ARCHITECTURES ?= gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030
+HIP_ARCHITECTURES ?= gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102
 
 # If white-space is given as a literal the `subst` cannot recognize it.
 # There this `empty` `space` hack is used in the tokenizing of GPU_TARGETS

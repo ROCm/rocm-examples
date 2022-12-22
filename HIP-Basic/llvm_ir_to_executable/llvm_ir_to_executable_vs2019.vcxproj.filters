@@ -46,6 +46,15 @@
     <CustomBuild Include="main_gfx1030.ll">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="main_gfx1100.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1101.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1102.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
     <CustomBuild Include="hip_obj_gen_win.mcin">
       <Filter>Source Files</Filter>
     </CustomBuild>

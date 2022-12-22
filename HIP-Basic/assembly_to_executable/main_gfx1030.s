@@ -116,45 +116,9 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 	.text
 	.p2alignl 6, 3214868480
 	.fill 48, 4, 3214868480
-	.protected	_ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE ; @_ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE
-	.type	_ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE,@object
-	.section	.rodata._ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE,#alloc
-	.weak	_ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE
-_ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE:
-	.zero	1
-	.size	_ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE, 1
-
-	.protected	_ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE ; @_ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE
-	.type	_ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE,@object
-	.section	.rodata._ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE,#alloc
-	.weak	_ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE
-_ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE:
-	.zero	1
-	.size	_ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE, 1
-
-	.protected	_ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE ; @_ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE
-	.type	_ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE,@object
-	.section	.rodata._ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE,#alloc
-	.weak	_ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE
-_ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE:
-	.zero	1
-	.size	_ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE, 1
-
-	.protected	_ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE ; @_ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE
-	.type	_ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE,@object
-	.section	.rodata._ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE,#alloc
-	.weak	_ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE
-_ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE:
-	.zero	1
-	.size	_ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE, 1
-
 	.ident	"AMD clang version 15.0.0 (https://github.com/RadeonOpenCompute/llvm-project roc-5.3.0 22362 3cf23f77f8208174a2ee7c616f4be23674d7b081)"
 	.section	".note.GNU-stack"
 	.addrsig
-	.addrsig_sym _ZN17__HIP_CoordinatesI14__HIP_BlockIdxE1xE
-	.addrsig_sym _ZN17__HIP_CoordinatesI14__HIP_BlockDimE1xE
-	.addrsig_sym _ZN17__HIP_CoordinatesI15__HIP_ThreadIdxE1xE
-	.addrsig_sym _ZN17__HIP_CoordinatesI13__HIP_GridDimE1xE
 	.amdgpu_metadata
 ---
 amdhsa.kernels:

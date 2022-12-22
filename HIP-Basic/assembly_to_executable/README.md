@@ -9,11 +9,11 @@ Building HIP executables from device assembly can be useful for example to exper
 
 - Build with Makefile: to compile for specific GPU architectures, optionally provide the HIP_ARCHITECTURES variable. Provide the architectures separated by comma.
     ```shell
-    make HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030"
+    make HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102"
     ```
 - Build with CMake:
     ```shell
-    cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030"
+    cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102"
     cmake --build build
     ```
     On Windows the path to RC compiler may be needed: `-DCMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/path/to/x64/rc.exe"`
@@ -21,7 +21,7 @@ Building HIP executables from device assembly can be useful for example to exper
 ## Generating device assembly
 This example creates a HIP file from device assembly code, however, such assembly files can also be created from HIP source code using `hipcc`. This can be done by passing `-S` and `--cuda-device-only` to hipcc. The former flag instructs the compiler to generate human-readable assembly instead of machine code, and the latter instruct the compiler to only compile the device part of the program. The six assembly files for this example were generated as follows:
 ```shell
-$ROCM_INSTALL_DIR/bin/hipcc -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx1030 main.hip
+$ROCM_INSTALL_DIR/bin/hipcc -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102 main.hip
 ```
 
 The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
@@ -93,11 +93,11 @@ The above compilation steps are implemented in Visual Studio through Custom Buil
 - Steps 3 and 4 are implemented using a custom build step:
     ```
     Command Line:
-      "$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-output=$(IntDir)offload_bundle.hipfb"
-      cd $(IntDir) && "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
+        "$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
+        cd $(IntDir) && "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
     Description: Generating Device Offload Object
     Outputs: $(IntDIr)main_device.obj
-    Additional Dependencies: $(IntDir)main_gfx90a.o;$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx1030.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)
+    Additional Dependencies: $(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)
     Execute Before: ClCompile
     ```
 - Finally step 5 is implemented by passing additional inputs to the linker in `project -> properties -> Linker -> Input`:
