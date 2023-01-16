@@ -27,7 +27,7 @@ In this example, the result of a matrix transpose kernel execution on one device
 - Once a current device is selected, and if a P2P communication is possible with a certain peer device, `hipDeviceEnablePeerAccess` can be used to enable access from the current device to the peer device's memory. With `hipDeviceDisablePeerAccess` it can also be disabled (provided that `hipDeviceEnablePeerAccess` has already been called for the same current and peer devices).
 - `hipMalloc` allocates memory in the global memory of the device. When `hipSetDevice` is called to set a specific current device, the subsequent calls to `hipMalloc` will allocate memory in the current device's global memory. In the example it is showcased how to use these two functions to allocate memory on the two devices used.
 - With `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`), from device to host (using `hipMemcpyDeviceToHost`) or from device to device (using `hipMemcpyDeviceToDevice`). The latter will only work if P2P communication has been enabled from the destination to the source device.
-- `hipLaunchKernelGGL` queues the execution of a kernel in the current device and `hipDeviceSynchronize` makes the host to wait on all active streams on the current device. In this example `hipDeviceSynchronize` is necessary because the second device needs the results obtained from the previous kernel execution on the first device.
+- `myKernelName<<<...>>>` queues the execution of a kernel in the current device and `hipDeviceSynchronize` makes the host to wait on all active streams on the current device. In this example `hipDeviceSynchronize` is necessary because the second device needs the results obtained from the previous kernel execution on the first device.
 - `hipDeviceReset` discards the state of the current device and updates it to fresh one. It also frees all the resources (e.g. streams, events, ...) associated with the current device.
 
 ## Demonstrated API Calls
@@ -50,7 +50,6 @@ In this example, the result of a matrix transpose kernel execution on one device
 - `hipDeviceSynchronize`
 - `hipFree`
 - `hipGetDeviceCount`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMemcpy`
 - `hipMemcpyDeviceToDevice`

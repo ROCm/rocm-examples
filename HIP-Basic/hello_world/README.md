@@ -8,7 +8,7 @@ This example showcases launching kernels and printing from device programs.
 2. _Synchronization_ is performed: the host program execution halts until all kernels on the device have finished executing.
 
 ## Key APIs and Concepts
-- `hipLaunchKernelGGL(kernel_name, grid_dim, block_dim, dynamic_shared, stream, <kernel arguments>)` launches a kernel. In other words: it calls a function marked with `__global__` to execute on the device. An _execution configuration_ is specified, which are the grid and block dimensions, the amount of additional shared memory to allocate, and the stream where the kernel should execute. Optionally, the kernel function may take arguments as well.
+- `myKernelName<<<gridDim, blockDim, dynamicShared, stream>>>(kernelArguments)` launches a kernel. In other words: it calls a function marked with `__global__` to execute on the device. An _execution configuration_ is specified, which are the grid and block dimensions, the amount of additional shared memory to allocate, and the stream where the kernel should execute. Optionally, the kernel function may take arguments as well.
 - `hipDeviceSynchronize` synchronizes with the device, halting the host until all commands associated with the device have finished executing.
 - Printing from device functions is performed using `printf`.
 - Function-type qualifiers are used to indicate the type of a function. 
@@ -22,7 +22,6 @@ This example showcases launching kernels and printing from device programs.
 
 ## Demonstrated API Calls
 ### HIP Runtime
-- `hipLaunchKernelGGL`
 - `hipDeviceSynchronize`
 - `__device__`
 - `__global__`

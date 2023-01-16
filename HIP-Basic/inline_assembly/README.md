@@ -42,7 +42,5 @@ However, since the instruction set differs between GPU architectures, you usuall
 #### Host symbols
 - `hipMalloc`
 - `hipMemcpy`
-- `hipLaunchKernelGGL`
-- `HIP_KERNEL_NAME`
 - `hipGetLastError`
 - `hipFree`

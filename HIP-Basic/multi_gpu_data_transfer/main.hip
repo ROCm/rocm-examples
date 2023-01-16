@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -205,13 +205,10 @@ int main()
 
     // Launch kernel in current device. Note that, as this kernel uses static shared memory, no
     // bytes of shared memory need to be allocated when launching the kernel.
-    hipLaunchKernelGGL(static_shared_matrix_transpose_kernel<width>,
-                       grid_dim,
-                       block_dim,
-                       0 /*shared_memory_bytes*/,
-                       hipStreamDefault,
-                       d_transposed_matrix[0],
-                       d_matrix[0]);
+    static_shared_matrix_transpose_kernel<width>
+        <<<grid_dim, block_dim, 0 /*shared_memory_bytes*/, hipStreamDefault>>>(
+            d_transposed_matrix[0],
+            d_matrix[0]);
 
     // Wait on all active streams on the current device.
     HIP_CHECK(hipDeviceSynchronize());
@@ -238,14 +235,12 @@ int main()
 
     // Launch kernel in current device. Note that size_bytes bytes of shared memory are required to launch
     // this kernel because it uses dynamically allocated shared memory.
-    hipLaunchKernelGGL(dynamic_shared_matrix_transpose_kernel,
-                       grid_dim,
-                       block_dim,
-                       size_bytes /*shared_memory_bytes*/,
-                       hipStreamDefault,
-                       d_transposed_matrix[1],
-                       d_matrix[1],
-                       width);
+    dynamic_shared_matrix_transpose_kernel<<<grid_dim,
+                                             block_dim,
+                                             size_bytes /*shared_memory_bytes*/,
+                                             hipStreamDefault>>>(d_transposed_matrix[1],
+                                                                 d_matrix[1],
+                                                                 width);
 
     // Wait on all active streams on the current device.
     HIP_CHECK(hipDeviceSynchronize());

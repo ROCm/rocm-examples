@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -117,14 +117,9 @@ int main()
                                 h_global_array.size() * sizeof(float)));
 
     // Launch the kernel on the default stream and with the above configuration.
-    hipLaunchKernelGGL(test_globals_kernel,
-                       dim3(block_size),
-                       dim3(grid_size),
-                       0,
-                       hipStreamDefault,
-                       d_out,
-                       d_in,
-                       size);
+    test_globals_kernel<<<dim3(block_size), dim3(grid_size), 0, hipStreamDefault>>>(d_out,
+                                                                                    d_in,
+                                                                                    size);
 
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());

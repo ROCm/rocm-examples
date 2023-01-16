@@ -27,7 +27,5 @@ These architecture-specific compiler definitions only exist within GPU kernels. 
 #### Host symbols
 - `hipMalloc`
 - `hipMemcpy`
-- `hipLaunchKernelGGL`
-- `HIP_KERNEL_NAME`
 - `hipGetLastError`
 - `hipFree`

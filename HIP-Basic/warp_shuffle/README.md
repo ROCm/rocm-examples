@@ -28,7 +28,8 @@ Warp shuffle is a warp-level primitive that allows for the communication between
 ![warp_shuffle.svg](warp_shuffle.svg)
 
 - `hipGetDeviceProperties` gets the properties of the specified device. In this example, it is used to get the warp size of the device (GPU) used.
-- `hipMalloc` allocates memory in the global memory of the device, and with `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`) or from device to host (using `hipMemcpyDeviceToHost`), among others.- `hipLaunchKernelGGL` queues the execution of a kernel on a device (GPU).
+- `hipMalloc` allocates memory in the global memory of the device, and with `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`) or from device to host (using `hipMemcpyDeviceToHost`), among others.
+- ``myKernelName<<<...>>>`` queues the execution of a kernel on a device (GPU).
 - `hipGetLastError` gets the last error returned by any HIP runtime API call.
 - `hipFree` deallocates device memory allocated with `hipMalloc`.
 
@@ -45,7 +46,6 @@ Warp shuffle is a warp-level primitive that allows for the communication between
 - `hipFree`
 - `hipGetDeviceProperties`
 - `hipGetLastError`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMemcpy`
 - `hipMemcpyDeviceToHost`

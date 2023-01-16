@@ -112,6 +112,5 @@ The above compilation steps are implemented in Visual Studio through Custom Buil
 - `hipFree`
 - `hipGetDeviceProperties`
 - `hipGetLastError`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMemcpy`

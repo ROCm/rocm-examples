@@ -29,7 +29,6 @@ Occupancy is the ratio of active wavefronts (or warps) to the maximum number of 
 - `hipEventCreate`
 - `hipOccupancyMaxPotentialBlockSize`
 - `hipEventRecord`
-- `hipLaunchKernelGGL`
 - `hipEventSynchronize`
 - `hipEventElapsedTime`
 - `hipEventDestroy`

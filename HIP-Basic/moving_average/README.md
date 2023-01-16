@@ -11,7 +11,7 @@ This example shows the use of a kernel that computes a moving average on one-dim
 5. Copy the result back to the host and validate it. As each average is computed using $n$ consecutive values from the input array, the average is computed over the values $0, 1, 2,\ldots, n - 1 $, the average of which is equal to $(n-1)/2$.
 
 ## Key APIs and Concepts
-Device memory is allocated with `hipMalloc`, deallocated with `hipFree`. Copies to and from the device are made with `hipMemcpy` with options `hipMemcpyHostToDevice` and `hipMemcpyDeviceToHost`, respectively. A kernel is launched with `hipLaunchKernelGGL`, which requires the use of `HIP_KERNEL_NAME` to pass kernel template arguments. Shared memory is allocated in the kernel with the `__shared__` memory space specifier.
+Device memory is allocated with `hipMalloc`, deallocated with `hipFree`. Copies to and from the device are made with `hipMemcpy` with options `hipMemcpyHostToDevice` and `hipMemcpyDeviceToHost`, respectively. A kernel is launched with the `myKernel<<<params>>>()`-syntax. Shared memory is allocated in the kernel with the `__shared__` memory space specifier.
 
 ## Demonstrated API Calls
 ### HIP runtime
@@ -26,10 +26,8 @@ Device memory is allocated with `hipMalloc`, deallocated with `hipFree`. Copies 
 - `__global__`
 - `hipFree`
 - `hipGetLastError`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMemcpy`
 - `hipMemcpyDeviceToHost`
 - `hipMemcpyHostToDevice`
 - `hipStreamDefault`
-- `HIP_KERNEL_NAME`

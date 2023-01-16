@@ -7,7 +7,7 @@ This simple program showcases the usage of the `rocprim::block_reduce` block-lev
 1. Host side data is instantiated in a `std::vector<int>`.
 2. Device storage for input and output data is allocated using `hipMalloc`.
 3. Input data is copied from the host to the device using  `hipMemcpy`.
-4. Device kernel `reduce_sum_kernel` is launched using `hipLaunchKernelGGL`.
+4. Device kernel `reduce_sum_kernel` is launched using the `myKernelName<<<...>>>`-syntax.
     - The kernel uses `rocprim::block_load` to load input from the device global memory into per-thread local register memory.
     - The kernel uses `rocprim::block_reduce` to perform reduction on `valid_items` elements per block.
     - If the input array is not evenly divisible by the number of threads in a block then for that block the kernel sets the `valid_items` to the correct size, i.e. `valid_items = input_size % (BlockSize * ItemsPerThread);`

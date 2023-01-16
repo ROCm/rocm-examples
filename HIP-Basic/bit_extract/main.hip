@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -72,14 +72,10 @@ int main()
     // Launch bit_extract_kernel()
     constexpr unsigned int number_of_blocks  = 512;
     constexpr unsigned int threads_per_block = 256;
-    hipLaunchKernelGGL(bit_extract_kernel,
-                       dim3(number_of_blocks),
-                       dim3(threads_per_block),
-                       0,
-                       hipStreamDefault,
-                       d_output,
-                       d_input,
-                       size);
+    bit_extract_kernel<<<dim3(number_of_blocks), dim3(threads_per_block), 0, hipStreamDefault>>>(
+        d_output,
+        d_input,
+        size);
 
     // Copy data from device to host
     HIP_CHECK(hipMemcpy(h_output.data(), d_output, size_in_bytes, hipMemcpyDeviceToHost));

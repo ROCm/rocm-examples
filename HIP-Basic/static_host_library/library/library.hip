@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -71,14 +71,7 @@ int run_test()
     HIP_CHECK(hipMemcpy(d_in, in.data(), size_bytes, hipMemcpyHostToDevice));
 
     // Launch the kernel on the default stream.
-    hipLaunchKernelGGL(copy_kernel,
-                       dim3(grid_size),
-                       dim3(block_size),
-                       0,
-                       hipStreamDefault,
-                       d_out,
-                       d_in,
-                       size);
+    copy_kernel<<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(d_out, d_in, size);
 
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());

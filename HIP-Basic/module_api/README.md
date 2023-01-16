@@ -57,7 +57,6 @@ The `main.hip` example file is compiled similarly as in the other examples.
 - `hipGetLastError`
 - `hipGetSymbolAddress`
 - `hipGetSymbolSize`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMemcpy`
 - `hipMemcpyHostToDevice`
