@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "llvm_ir_to_executable_vs2017", "llvm_ir_to_executable_vs2017.vcxproj", "{8588F3A8-6540-483F-92F4-191DB4953F95}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8588F3A8-6540-483F-92F4-191DB4953F95}.Debug|x64.ActiveCfg = Debug|x64
+		{8588F3A8-6540-483F-92F4-191DB4953F95}.Debug|x64.Build.0 = Debug|x64
+		{8588F3A8-6540-483F-92F4-191DB4953F95}.Release|x64.ActiveCfg = Release|x64
+		{8588F3A8-6540-483F-92F4-191DB4953F95}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {062E5664-03E8-42A6-ADEF-3B9F0DCC7768}
+	EndGlobalSection
+EndGlobal

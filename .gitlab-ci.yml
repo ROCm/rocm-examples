@@ -217,7 +217,7 @@ test:rocm-windows-vs2019:
       /maxCpuCount
       /warnAsError
       "/p:Configuration=$BUILD_TYPE"
-      "$CI_PROJECT_DIR"
+      "$CI_PROJECT_DIR/ROCm-Examples-VS2019.sln"
     - |-
       Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
@@ -229,6 +229,28 @@ test:rocm-windows-vs2019:
               }
           }
       }
+
+test:rocm-windows-vs2017:
+  extends:
+    - .test:windows
+  script:
+    - >
+      & "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/MSBuild/15.0/Bin/MSBuild.exe"
+      /maxCpuCount
+      /warnAsError
+      "/p:Configuration=$BUILD_TYPE"
+      "$CI_PROJECT_DIR/ROCm-Examples-VS2017.sln"
+
+test:rocm-windows-vs2022:
+  extends:
+    - .test:windows
+  script:
+    - >
+      & "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe"
+      /maxCpuCount
+      /warnAsError
+      "/p:Configuration=$BUILD_TYPE"
+      "$CI_PROJECT_DIR/ROCm-Examples-VS2022.sln"
 
 test:rocm-windows-cmake:
   extends:

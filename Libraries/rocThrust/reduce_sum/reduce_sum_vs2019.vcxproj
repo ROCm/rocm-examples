@@ -13,8 +13,11 @@
   <ItemGroup>
     <ClCompile Include="main.hip" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Common\example_utils.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
+    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
     <ProjectGuid>{c0405ffb-7aa2-49c2-9ab5-af336a54b41c}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>reduce_sum_vs2019</RootNamespace>
@@ -57,10 +60,10 @@
     <TargetName>rocthrust_$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
     <ClCompile>

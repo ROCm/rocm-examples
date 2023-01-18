@@ -17,7 +17,7 @@
     <ClCompile Include="main.hip" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
+    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
     <ProjectGuid>{628390E3-DB62-4D52-9594-DE6BC15F9943}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>moving_average_vs2019</RootNamespace>
@@ -60,10 +60,10 @@
     <TargetName>hip_$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
     <ClCompile>

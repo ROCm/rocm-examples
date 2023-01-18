@@ -13,8 +13,11 @@
   <ItemGroup>
     <ClCompile Include="main.hip" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\Common\example_utils.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
+    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
     <ProjectGuid>{8dea1f0f-8bf3-422c-9bcd-99f69f43d013}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>vectors_vs2019</RootNamespace>
@@ -57,10 +60,10 @@
     <TargetName>rocthrust_$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
     <ClCompile>
@@ -118,9 +121,6 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClInclude Include="msvc_defines.h" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Condition="'$(HIPTargetsImported)' != 'true' and '$(PlatformToolset)'=='HIP_clang'" Project="$(VCTargetsPath)\AMD.HIP.Clang.Common.targets" />

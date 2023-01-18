@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{afafe63b-d54d-4f68-80b9-6e568363a35b}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx;hip;cu</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{4ed645f6-2e7a-47f2-958a-d0a8b9a5aa85}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cuh</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{c4a476ed-7573-4241-a099-e8d010387ef8}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.hip">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\example_utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="main_gfx90a.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx803.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx900.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx906.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx908.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx90a.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1030.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1100.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1101.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1102.ll">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="hip_obj_gen_win.mcin">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+</Project>

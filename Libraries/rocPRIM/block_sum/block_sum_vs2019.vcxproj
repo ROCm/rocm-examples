@@ -17,7 +17,7 @@
     <ClInclude Include="..\..\..\Common\example_utils.hpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>15.0</VCProjectVersion>
+    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
     <ProjectGuid>{65B21869-2BE2-4DA5-BEC5-28D1F910731C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>block_sum_vs2019</RootNamespace>
@@ -60,10 +60,10 @@
     <TargetName>rocprim_$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <TargetGPUArchitectures>gfx1030;gfx1100;gfx1101;gfx1102</TargetGPUArchitectures>
+    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
     <ClCompile>
