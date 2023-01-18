@@ -128,6 +128,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "llvm_ir_to_executable_vs201
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "events_vs2017", "HIP-Basic\events\events_vs2017.vcxproj", "{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2017", "HIP-Basic\hello_world\hello_world_vs2017.vcxproj", "{BD725C86-E381-4BDD-B3FC-06A42221BEBB}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -338,6 +340,10 @@ Global
 		{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82}.Debug|x64.Build.0 = Debug|x64
 		{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82}.Release|x64.ActiveCfg = Release|x64
 		{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82}.Release|x64.Build.0 = Release|x64
+		{BD725C86-E381-4BDD-B3FC-06A42221BEBB}.Debug|x64.ActiveCfg = Debug|x64
+		{BD725C86-E381-4BDD-B3FC-06A42221BEBB}.Debug|x64.Build.0 = Debug|x64
+		{BD725C86-E381-4BDD-B3FC-06A42221BEBB}.Release|x64.ActiveCfg = Release|x64
+		{BD725C86-E381-4BDD-B3FC-06A42221BEBB}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -403,6 +409,7 @@ Global
 		{F72A2CE8-6391-4929-8688-DD5D1E338773} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{8588F3A8-6540-483F-92F4-191DB4953F95} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
+		{BD725C86-E381-4BDD-B3FC-06A42221BEBB} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

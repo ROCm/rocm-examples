@@ -78,7 +78,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_vs2022", "HI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cooperative_groups_vs2022", "HIP-Basic\cooperative_groups\cooperative_groups_vs2022.vcxproj", "{6C44066E-6E5B-4DCB-8AF9-4E8D0630A849}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_vs2019", "HIP-Basic\vulkan_interop\vulkan_interop_vs2022.vcxproj", "{73FCEDE4-FD46-43DC-8AE3-784318ACCB39}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_vs2022", "HIP-Basic\vulkan_interop\vulkan_interop_vs2022.vcxproj", "{73FCEDE4-FD46-43DC-8AE3-784318ACCB39}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "runtime_compilation_vs2022", "HIP-Basic\runtime_compilation\runtime_compilation_vs2022.vcxproj", "{F233F9B0-DA39-49B7-A776-0FAC215E6D0C}"
 EndProject
@@ -127,6 +127,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "events_vs2022", "HIP-Basic\events\events_vs2022.vcxproj", "{DF601563-B579-4571-88C9-3EC7312D567F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libhip_static_host_vs2022", "HIP-Basic\static_host_library\library\libhip_static_host_vs2022.vcxproj", "{5FC8C701-B961-4719-A465-FC0FC84D2EEE}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2022", "HIP-Basic\hello_world\hello_world_vs2022.vcxproj", "{AA92EF7E-2323-4497-ACCD-B76FB196C545}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -338,6 +340,10 @@ Global
 		{5FC8C701-B961-4719-A465-FC0FC84D2EEE}.Debug|x64.Build.0 = Debug|x64
 		{5FC8C701-B961-4719-A465-FC0FC84D2EEE}.Release|x64.ActiveCfg = Release|x64
 		{5FC8C701-B961-4719-A465-FC0FC84D2EEE}.Release|x64.Build.0 = Release|x64
+		{AA92EF7E-2323-4497-ACCD-B76FB196C545}.Debug|x64.ActiveCfg = Debug|x64
+		{AA92EF7E-2323-4497-ACCD-B76FB196C545}.Debug|x64.Build.0 = Debug|x64
+		{AA92EF7E-2323-4497-ACCD-B76FB196C545}.Release|x64.ActiveCfg = Release|x64
+		{AA92EF7E-2323-4497-ACCD-B76FB196C545}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -403,6 +409,7 @@ Global
 		{A8E51ED9-38FD-462B-A992-FCE1044BDCC2} = {94393B51-B70E-4111-A22C-6A752D41E454}
 		{DF601563-B579-4571-88C9-3EC7312D567F} = {94393B51-B70E-4111-A22C-6A752D41E454}
 		{5FC8C701-B961-4719-A465-FC0FC84D2EEE} = {94393B51-B70E-4111-A22C-6A752D41E454}
+		{AA92EF7E-2323-4497-ACCD-B76FB196C545} = {94393B51-B70E-4111-A22C-6A752D41E454}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

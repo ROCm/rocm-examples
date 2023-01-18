@@ -219,14 +219,22 @@ test:rocm-windows-vs2019:
       "/p:Configuration=$BUILD_TYPE"
       "$CI_PROJECT_DIR/ROCm-Examples-VS2019.sln"
     - |-
+      $SkippedExamples = @(
+          "hip_vulkan_interop_vs2019.exe"     # Graphical
+          "hip_opengl_interop_vs2019.exe"     # Graphical
+          "hip_texture_management_vs2019.exe" # Hangs sometimes
+          "hip_hello_world_vs2019.exe"        # Crashes (known driver issue)
+      )
       Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
-          if (("hip_vulkan_interop_vs2019.exe","hip_opengl_interop_vs2019.exe") -NotContains $_.Name) {
+          if ($SkippedExamples -NotContains $_.Name) {
               echo "--" $_.Name
               & "$_"
               if (!$?) {
                 throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
               }
+          } else {
+              echo "-- SKIPPING " $_.Name
           }
       }
 

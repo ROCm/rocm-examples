@@ -86,7 +86,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "opengl_interop_vs2019", "HI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_vs2019", "HIP-Basic\static_host_library\static_host_library_vs2019.vcxproj", "{5F8A7FEE-3A79-4588-9244-8575748026F7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libstatic_host_vs2019", "HIP-Basic\static_host_library\library\libhip_static_host_vs2019.vcxproj", "{6D3F8F78-225E-490E-ABD3-762857EBF597}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libhip_static_host_vs2019", "HIP-Basic\static_host_library\library\libhip_static_host_vs2019.vcxproj", "{6D3F8F78-225E-490E-ABD3-762857EBF597}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_msvc_vs2019", "HIP-Basic\static_host_library\static_host_library_msvc\static_host_library_msvc_vs2019.vcxproj", "{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}"
 EndProject
@@ -125,6 +125,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scal_vs2019", "Libraries\hipBLAS\scal\scal_vs2019.vcxproj", "{658C0200-6FC1-4460-B7A5-BB1876830607}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gemm_strided_batched_vs2019", "Libraries\hipBLAS\gemm_strided_batched\gemm_strided_batched_vs2019.vcxproj", "{961A0EAA-2C41-42AD-A96B-D865203F3A94}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2019", "HIP-Basic\hello_world\hello_world_vs2019.vcxproj", "{5E0E9AB0-B708-481F-9226-DD92C3798341}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texture_management_vs2019", "HIP-Basic\texture_management\texture_management_vs2019.vcxproj", "{40E56BFB-1A0C-4618-BB49-A9AA635127C1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -332,6 +336,14 @@ Global
 		{961A0EAA-2C41-42AD-A96B-D865203F3A94}.Debug|x64.Build.0 = Debug|x64
 		{961A0EAA-2C41-42AD-A96B-D865203F3A94}.Release|x64.ActiveCfg = Release|x64
 		{961A0EAA-2C41-42AD-A96B-D865203F3A94}.Release|x64.Build.0 = Release|x64
+		{5E0E9AB0-B708-481F-9226-DD92C3798341}.Debug|x64.ActiveCfg = Debug|x64
+		{5E0E9AB0-B708-481F-9226-DD92C3798341}.Debug|x64.Build.0 = Debug|x64
+		{5E0E9AB0-B708-481F-9226-DD92C3798341}.Release|x64.ActiveCfg = Release|x64
+		{5E0E9AB0-B708-481F-9226-DD92C3798341}.Release|x64.Build.0 = Release|x64
+		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Debug|x64.ActiveCfg = Debug|x64
+		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Debug|x64.Build.0 = Debug|x64
+		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.ActiveCfg = Release|x64
+		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -396,6 +408,8 @@ Global
 		{984032B2-170B-4DF2-AF16-96713C42C47D} = {2F78B214-9230-4176-AFE6-8B2550B1E4B6}
 		{658C0200-6FC1-4460-B7A5-BB1876830607} = {2F78B214-9230-4176-AFE6-8B2550B1E4B6}
 		{961A0EAA-2C41-42AD-A96B-D865203F3A94} = {2F78B214-9230-4176-AFE6-8B2550B1E4B6}
+		{5E0E9AB0-B708-481F-9226-DD92C3798341} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{40E56BFB-1A0C-4618-BB49-A9AA635127C1} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
