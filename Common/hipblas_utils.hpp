@@ -20,27 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef COMMON_ROCBLAS_UTILS_HPP
-#define COMMON_ROCBLAS_UTILS_HPP
+#ifndef COMMON_HIPBLAS_UTILS_HPP
+#define COMMON_HIPBLAS_UTILS_HPP
 
 #include "example_utils.hpp"
 
-#include <rocblas/rocblas.h>
+#include <hipblas.h>
 
 #include <iostream>
 
-/// \brief Checks if the provided status code is \p rocblas_status_success and if not,
+/// \brief Checks if the provided status code is \p HIPBLAS_STATUS_SUCCESS and if not,
 /// prints an error message to the standard error output and terminates the program
 /// with an error code.
-#define ROCBLAS_CHECK(condition)                                                             \
-    {                                                                                        \
-        const rocblas_status status = condition;                                             \
-        if(status != rocblas_status_success)                                                 \
-        {                                                                                    \
-            std::cerr << "rocBLAS error encountered: \"" << rocblas_status_to_string(status) \
-                      << "\" at " << __FILE__ << ':' << __LINE__ << std::endl;               \
-            std::exit(error_exit_code);                                                      \
-        }                                                                                    \
+#define HIPBLAS_CHECK(condition)                                                          \
+    {                                                                                     \
+        const hipblasStatus_t status = condition;                                         \
+        if(status != HIPBLAS_STATUS_SUCCESS)                                              \
+        {                                                                                 \
+            std::cerr << "hipBLAS error encountered: \"" << hipblasStatusToString(status) \
+                      << "\" at " << __FILE__ << ':' << __LINE__ << std::endl;            \
+            std::exit(error_exit_code);                                                   \
+        }                                                                                 \
     }
 
-#endif // COMMON_ROCBLAS_UTILS_HPP
+#endif // COMMON_HIPBLAS_UTILS_HPP
