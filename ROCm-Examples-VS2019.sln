@@ -126,6 +126,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2019", "HIP-B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texture_management_vs2019", "HIP-Basic\texture_management\texture_management_vs2019.vcxproj", "{40E56BFB-1A0C-4618-BB49-A9AA635127C1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hipSOLVER", "hipSOLVER", "{2700C908-113C-4429-A889-DF34D44AB29B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decomposition_vs2019", "Libraries\hipSOLVER\singular_value_decomposition\singular_value_decomposition_vs2019.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169757}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -332,6 +336,10 @@ Global
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Debug|x64.Build.0 = Debug|x64
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.ActiveCfg = Release|x64
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.Build.0 = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Debug|x64.ActiveCfg = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Debug|x64.Build.0 = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Release|x64.ActiveCfg = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -396,6 +404,8 @@ Global
 		{961A0EAA-2C41-42AD-A96B-D865203F3A94} = {2F78B214-9230-4176-AFE6-8B2550B1E4B6}
 		{5E0E9AB0-B708-481F-9226-DD92C3798341} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{2700C908-113C-4429-A889-DF34D44AB29B} = {052412EF-7CEB-4E32-96F9-AADBC70945D7}
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

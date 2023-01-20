@@ -19,6 +19,9 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         vulkan-validationlayers \
         libglfw3-dev \
         gfortran \
+        # Nvidia driver version needed for hipSOLVER's CUDA backend.
+        # See https://docs.nvidia.com/deploy/cuda-compatibility/index.html#default-to-minor-version.
+        nvidia-driver-455 \
     && rm -rf /var/lib/apt/lists/*
 
 # Install HIP using the installer script
@@ -72,6 +75,17 @@ RUN wget https://github.com/ROCmSoftwarePlatform/hipBLAS/archive/refs/tags/rocm-
         -D USE_CUDA=ON \
     && cmake --build ./hipBLAS-rocm-5.3.0/build --target install \
     && rm -rf ./hipBLAS-rocm-5.3.0
+
+# Install hipSOLVER
+RUN wget https://github.com/ROCmSoftwarePlatform/hipSOLVER/archive/refs/tags/rocm-5.3.0.tar.gz \
+    && tar -xf ./rocm-5.3.0.tar.gz \
+    && rm ./rocm-5.3.0.tar.gz \
+    && cmake -S ./hipSOLVER-rocm-5.3.0 -B ./hipSOLVER-rocm-5.3.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+        -D CMAKE_INSTALL_PREFIX=/opt/rocm \
+        -D USE_CUDA=ON \
+    && cmake --build ./hipSOLVER-rocm-5.3.0/build --target install \
+    && rm -rf ./hipSOLVER-rocm-5.3.0
 
 # Use render group as an argument from user
 ARG GID=109

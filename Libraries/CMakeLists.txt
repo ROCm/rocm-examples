@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,8 +28,10 @@ project(Libraries LANGUAGES NONE)
 if (NOT (CMAKE_SYSTEM_NAME MATCHES Windows AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
     add_subdirectory(hipBLAS)
     add_subdirectory(hipCUB)
+    add_subdirectory(hipSOLVER)
     add_subdirectory(rocBLAS)
     add_subdirectory(rocPRIM)
     add_subdirectory(rocRAND)
     add_subdirectory(rocThrust)
+    add_subdirectory(rocSOLVER)
 endif()
