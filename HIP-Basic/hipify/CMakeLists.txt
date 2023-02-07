@@ -45,7 +45,12 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+if(WIN32)
+    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+else()
+    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+endif()
+
 if(NOT CMAKE_PREFIX_PATH)
     set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 endif()
