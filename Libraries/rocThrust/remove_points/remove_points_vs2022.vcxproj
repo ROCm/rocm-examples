@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{3754051f-0225-4667-9982-570e319a19f6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>remove_points_vs2022</RootNamespace>

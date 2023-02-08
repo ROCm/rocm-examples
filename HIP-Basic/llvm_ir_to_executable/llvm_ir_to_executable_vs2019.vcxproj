@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{dbb8dfe9-cb1b-473c-937c-2a8120e0d819}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>llvm_ir_to_executable_vs2019</RootNamespace>

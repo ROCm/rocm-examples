@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{f72a2ce8-6391-4929-8688-dd5d1e338773}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>assembly_to_executable_vs2017</RootNamespace>

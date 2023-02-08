@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{428c7c0b-c055-4126-a6d2-1e51344e5d40}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>device_query_vs2022</RootNamespace>

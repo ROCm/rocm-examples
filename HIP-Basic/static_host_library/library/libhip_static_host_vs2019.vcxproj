@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{6d3f8f78-225e-490e-abd3-762857ebf597}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>libhip_static_host_vs2019</RootNamespace>

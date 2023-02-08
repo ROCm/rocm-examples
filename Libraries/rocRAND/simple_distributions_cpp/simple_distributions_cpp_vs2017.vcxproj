@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{0609d861-fceb-4a19-9786-ac4c57a6b955}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>simple_distributions_cpp_vs2017</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5852BE0E-BDA5-4BD9-8A16-30E8E40F4045}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>warp_shuffle_vs2019</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{ef1e1a7e-2803-4606-bd9a-da8fa981aba4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>device_sum_vs2019</RootNamespace>

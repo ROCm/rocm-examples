@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>dot_vs2019</RootNamespace>

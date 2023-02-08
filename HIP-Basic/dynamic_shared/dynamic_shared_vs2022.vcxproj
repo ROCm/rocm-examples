@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{a1d6c8e8-9e43-4703-a368-39fec450548c}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>dynamic_shared_vs2022</RootNamespace>

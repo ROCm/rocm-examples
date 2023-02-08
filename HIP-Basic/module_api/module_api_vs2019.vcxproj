@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{306eb993-653a-45f6-863a-5f43bc86da79}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>module_api_vs2019</RootNamespace>

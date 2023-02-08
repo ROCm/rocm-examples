@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{2a7579ab-7148-406b-ac28-e6c3fedd5b75}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>nrm2_vs2017</RootNamespace>

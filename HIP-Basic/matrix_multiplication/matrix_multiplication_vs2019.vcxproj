@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{ACC2A1E7-5865-4FAE-9016-E6EF73F8FA9E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>matrix_multiplication_vs2019</RootNamespace>

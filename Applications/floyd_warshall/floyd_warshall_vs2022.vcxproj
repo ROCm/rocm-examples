@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{015df085-feb3-4c7a-acee-7cffb3c9aff0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>floyd_warshall_vs2022</RootNamespace>

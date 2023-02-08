@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{740b1c46-e54e-415f-900e-eb154402427c}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>shared_memory_vs2022</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{6fb2bcb7-bfa5-4342-a04d-b4ebfe570d46}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>multi_gpu_data_transfer_vs2022</RootNamespace>

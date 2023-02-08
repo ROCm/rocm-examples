@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{a5a197db-acf8-438b-b4f7-ceddfb786ead}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>device_sum_vs2022</RootNamespace>

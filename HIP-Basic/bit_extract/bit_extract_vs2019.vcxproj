@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{63823DD0-787C-42AE-B6E7-C03CF4CF5CE2}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>bit_extract_vs2019</RootNamespace>

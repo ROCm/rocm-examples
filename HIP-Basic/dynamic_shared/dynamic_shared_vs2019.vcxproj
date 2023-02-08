@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{7b7d1745-7635-40da-b6af-b8f728a31124}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>dynamic_shared_vs2019</RootNamespace>

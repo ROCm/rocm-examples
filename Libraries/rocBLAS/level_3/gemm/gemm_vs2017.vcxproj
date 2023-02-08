@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{cc8acbf9-40da-40e5-875a-10263c2c7809}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gemm_vs2017</RootNamespace>

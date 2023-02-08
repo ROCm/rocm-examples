@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{7a25ce69-bace-4410-beb0-12a69890f212}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>cooperative_groups_vs2019</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{8f2ece57-1e5f-4175-8a7a-8b5f12663d68}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>inline_assembly_vs2022</RootNamespace>

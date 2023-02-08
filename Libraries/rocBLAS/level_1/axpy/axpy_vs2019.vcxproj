@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{DDC6904E-B174-4F08-908E-0535C3BD5A9A}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>axpy_vs2019</RootNamespace>

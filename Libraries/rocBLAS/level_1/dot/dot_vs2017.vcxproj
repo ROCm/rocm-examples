@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{9477b5df-e2c3-42d2-b1ec-dc158f75db43}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>dot_vs2017</RootNamespace>

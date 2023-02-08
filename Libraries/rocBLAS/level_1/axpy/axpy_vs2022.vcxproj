@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{29da7c17-c373-4197-963b-78d870c79dfe}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>axpy_vs2022</RootNamespace>

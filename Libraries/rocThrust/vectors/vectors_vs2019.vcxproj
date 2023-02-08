@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{8dea1f0f-8bf3-422c-9bcd-99f69f43d013}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>vectors_vs2019</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{27a6f412-bae5-49ff-b557-c86ee98352c9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>static_host_library_vs2022</RootNamespace>

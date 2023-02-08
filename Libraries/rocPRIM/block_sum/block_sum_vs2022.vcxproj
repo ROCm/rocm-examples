@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{5e910bcc-9b1d-4c26-9689-d46d14bb08ce}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>block_sum_vs2022</RootNamespace>

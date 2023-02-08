@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{d5ceb4c2-4867-4a5c-ad3a-e025ef3c7c0e}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gpu_arch_vs2022</RootNamespace>

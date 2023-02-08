@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{aa9e497a-fede-45a4-a6ce-a8e3ddddeb82}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>events_vs2017</RootNamespace>

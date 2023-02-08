@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{8b999fec-741b-4ff7-9835-11077ee3726e}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>bandwidth_vs2022</RootNamespace>

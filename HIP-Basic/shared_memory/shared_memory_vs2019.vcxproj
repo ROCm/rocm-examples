@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{C370ACB7-AE52-4AD8-8C3D-4C32567FFE7D}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>shared_memory_vs2019</RootNamespace>

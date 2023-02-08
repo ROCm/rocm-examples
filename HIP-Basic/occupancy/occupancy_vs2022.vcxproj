@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{e6d8c701-08b7-482b-af43-1ca6765ca5fb}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>occupancy_vs2022</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{be0294b1-c162-4877-b7a5-4ca9bb73146b}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>texture_management_vs2022</RootNamespace>

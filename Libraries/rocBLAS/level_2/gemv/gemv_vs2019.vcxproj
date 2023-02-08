@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{E4A7C45C-BF68-455A-A37B-3558F427DC53}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gemv_vs2019</RootNamespace>

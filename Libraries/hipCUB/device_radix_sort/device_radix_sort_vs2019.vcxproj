@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{be670e16-8a40-46e0-9cf2-93352ed685b0}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>device_radix_sort_vs2019</RootNamespace>

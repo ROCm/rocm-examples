@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{5e0e9ab0-b708-481f-9226-dd92c3798341}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>hello_world_vs2019</RootNamespace>

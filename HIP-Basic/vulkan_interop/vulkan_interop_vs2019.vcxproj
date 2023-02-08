@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{688433e2-b189-431d-a5f8-9ac82102b58c}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>vulkan_interop_vs2019</RootNamespace>

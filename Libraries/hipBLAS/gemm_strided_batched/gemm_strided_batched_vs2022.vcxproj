@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{68e1c6f4-9bdb-440e-abbd-54700571932b}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gemm_strided_batched_vs2022</RootNamespace>

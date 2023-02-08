@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{71f0f220-961d-4e58-847e-4afac2e43143}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>streams_vs2017</RootNamespace>

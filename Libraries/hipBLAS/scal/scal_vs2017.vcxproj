@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{9a7fa569-e93a-4066-ac8b-096dd2955df7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>scal_vs2017</RootNamespace>

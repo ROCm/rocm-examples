@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{D6334F08-D560-439A-A704-ADA0349D72B7}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>saxpy_vs2019</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{a07ecfa4-c1be-4b7f-a202-08695f0227e4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>norm_vs2017</RootNamespace>

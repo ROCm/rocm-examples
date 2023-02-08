@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{66b01cd4-735e-4e83-9def-e7ee88546e8f}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>inline_assembly_vs2017</RootNamespace>

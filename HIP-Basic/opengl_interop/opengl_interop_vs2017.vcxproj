@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{3a7b4351-9f76-4863-aeb3-2ca6d2fc3bef}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>opengl_interop_vs2017</RootNamespace>

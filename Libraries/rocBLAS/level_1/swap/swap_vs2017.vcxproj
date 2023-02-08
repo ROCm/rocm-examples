@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{141c9b9b-1319-4f7a-be3f-6b3c410fe562}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>swap_vs2017</RootNamespace>

@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{628390E3-DB62-4D52-9594-DE6BC15F9943}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>moving_average_vs2019</RootNamespace>

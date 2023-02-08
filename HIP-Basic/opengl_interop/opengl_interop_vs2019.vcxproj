@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{96f8be41-5c64-4bf2-8a8e-474beaacaa5a}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>opengl_interop_vs2019</RootNamespace>
