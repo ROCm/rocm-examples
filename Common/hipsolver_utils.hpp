@@ -30,7 +30,7 @@
 #include <iostream>
 
 /// \brief Converts a \p hipsolverStatus_t variable to its correspondent string.
-const char* hipsolverStatusToString(hipsolverStatus_t status)
+inline const char* hipsolverStatusToString(hipsolverStatus_t status)
 {
     switch(status)
     {
@@ -65,5 +65,18 @@ const char* hipsolverStatusToString(hipsolverStatus_t status)
             std::exit(error_exit_code);                                                       \
         }                                                                                     \
     }
+
+/// \brief Interprets the output parameter \p info used in hipSOLVER API calls.
+inline void hipsolver_print_info(int info)
+{
+    if(info == 0)
+    {
+        std::cout << "hipSOLVER call finished successfully." << std::endl;
+    }
+    else
+    {
+        std::cout << "hipSOLVER call finished unsuccessfully (" << info << ")." << std::endl;
+    }
+}
 
 #endif // COMMON_HIPSOLVER_UTILS_HPP

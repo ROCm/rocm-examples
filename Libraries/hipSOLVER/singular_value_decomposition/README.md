@@ -19,6 +19,11 @@ This example illustrates the use of the hipSOLVER Singular Value Decomposition f
 10. Validate the solution by checking if $U \cdot S \cdot V^H - A$ is the zero matrix using the hipBLAS API.
 11. Free device memory and the handles.
 
+### Command line interface
+The application provides the following optional command line arguments:
+- `--n <n>`. Number of rows of input matrix $A$, the default value is `3`.
+- `--m <m>`. Number of columns of input matrix $A$, the default value is `2`.
+
 ## Key APIs and Concepts
 ### hipSOLVER
 - hipSOLVER is initialized by calling `hipsolverCreate(hipsolverHandle_t*)` and it is terminated by calling `hipsolverDestroy(hipsolverHandle_t)`.

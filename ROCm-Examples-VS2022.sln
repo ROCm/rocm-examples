@@ -130,6 +130,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2022", "HIP-B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decomposition_vs2022", "Libraries\hipSOLVER\singular_value_decomposition\singular_value_decomposition_vs2022.vcxproj", "{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_least_squares_vs2022", "Libraries\hipSOLVER\linear_least_squares\linear_least_squares_vs2022.vcxproj", "{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -340,6 +342,10 @@ Global
 		{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}.Debug|x64.Build.0 = Debug|x64
 		{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}.Release|x64.ActiveCfg = Release|x64
 		{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}.Release|x64.Build.0 = Release|x64
+		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}.Debug|x64.ActiveCfg = Debug|x64
+		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}.Debug|x64.Build.0 = Debug|x64
+		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}.Release|x64.ActiveCfg = Release|x64
+		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -406,6 +412,7 @@ Global
 		{5FC8C701-B961-4719-A465-FC0FC84D2EEE} = {94393B51-B70E-4111-A22C-6A752D41E454}
 		{AA92EF7E-2323-4497-ACCD-B76FB196C545} = {94393B51-B70E-4111-A22C-6A752D41E454}
 		{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

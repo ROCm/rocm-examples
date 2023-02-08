@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
+	linear_least_squares \
 	singular_value_decomposition
 
 all: $(EXAMPLES)

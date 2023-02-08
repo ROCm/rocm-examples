@@ -130,6 +130,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2017", "HIP-B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decomposition_vs2017", "Libraries\hipSOLVER\singular_value_decomposition\singular_value_decomposition_vs2017.vcxproj", "{112D9E7B-A590-4BC4-B9AA-3B167F853098}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_least_squares_vs2017", "Libraries\hipSOLVER\linear_least_squares\linear_least_squares_vs2017.vcxproj", "{8C00B558-05CB-476A-B9FE-16A141392F78}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -340,6 +342,10 @@ Global
 		{112D9E7B-A590-4BC4-B9AA-3B167F853098}.Debug|x64.Build.0 = Debug|x64
 		{112D9E7B-A590-4BC4-B9AA-3B167F853098}.Release|x64.ActiveCfg = Release|x64
 		{112D9E7B-A590-4BC4-B9AA-3B167F853098}.Release|x64.Build.0 = Release|x64
+		{8C00B558-05CB-476A-B9FE-16A141392F78}.Debug|x64.ActiveCfg = Debug|x64
+		{8C00B558-05CB-476A-B9FE-16A141392F78}.Debug|x64.Build.0 = Debug|x64
+		{8C00B558-05CB-476A-B9FE-16A141392F78}.Release|x64.ActiveCfg = Release|x64
+		{8C00B558-05CB-476A-B9FE-16A141392F78}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -406,6 +412,7 @@ Global
 		{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{BD725C86-E381-4BDD-B3FC-06A42221BEBB} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{112D9E7B-A590-4BC4-B9AA-3B167F853098} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{8C00B558-05CB-476A-B9FE-16A141392F78} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
