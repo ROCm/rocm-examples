@@ -10,6 +10,13 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <ProjectGuid>{688433e2-b189-431d-a5f8-9ac82102b58c}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>vulkan_interop_vs2019</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\example_utils.hpp" />
   </ItemGroup>
@@ -42,13 +49,6 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">%(IntDir)%(Identity).spv.h</Outputs>
     </CustomBuild>
   </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
-    <ProjectGuid>{688433e2-b189-431d-a5f8-9ac82102b58c}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>vulkan_interop_vs2019</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

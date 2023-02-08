@@ -10,12 +10,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.hip" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Common\example_utils.hpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
     <ProjectGuid>{3271c75f-a07a-454a-9ef7-f72f79845d77}</ProjectGuid>
@@ -23,6 +17,12 @@
     <RootNamespace>streams_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="main.hip" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\example_utils.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

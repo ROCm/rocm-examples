@@ -10,12 +10,6 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="main.hip" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Common\example_utils.hpp" />
-  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
     <ProjectGuid>{63823DD0-787C-42AE-B6E7-C03CF4CF5CE2}</ProjectGuid>
@@ -23,6 +17,12 @@
     <RootNamespace>bit_extract_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
+  <ItemGroup>
+    <ClCompile Include="main.hip" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\example_utils.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

@@ -10,6 +10,13 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <ProjectGuid>{68e84ad8-8fdc-44ae-a10a-b576803913d4}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>scal_vs2022</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />
   </ItemGroup>
@@ -18,13 +25,6 @@
     <ClInclude Include="..\..\..\Common\cmdparser.hpp" />
     <ClInclude Include="..\..\..\Common\hipblas_utils.hpp" />
   </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
-    <ProjectGuid>{68e84ad8-8fdc-44ae-a10a-b576803913d4}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>scal_vs2022</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

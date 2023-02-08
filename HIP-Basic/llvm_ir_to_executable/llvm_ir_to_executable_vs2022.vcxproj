@@ -10,6 +10,13 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <ProjectGuid>{a8e51ed9-38fd-462b-a992-fce1044bdcc2}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>llvm_ir_to_executable_vs2022</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip">
       <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--cuda-host-only</AdditionalOptions>
@@ -75,13 +82,6 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
     </CustomBuild>
    </ItemGroup>
-  <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
-    <ProjectGuid>{a8e51ed9-38fd-462b-a992-fce1044bdcc2}</ProjectGuid>
-    <Keyword>Win32Proj</Keyword>
-    <RootNamespace>llvm_ir_to_executable_vs2022</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
