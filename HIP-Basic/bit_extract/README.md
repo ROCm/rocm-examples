@@ -15,7 +15,7 @@ A HIP-specific bit extract solution is presented in this example.
 9. "PASSED!" is printed when the flow was successful.
 
 ## Key APIs and Concepts
-- `hipLaunchKernelGGL(kernel_name, grid_dim, block_dim, dynamic_shared_memory_size, stream, <kernel arguments>)` is the HIP kernel launcher where the grid and block dimension, dynamic shared memory size and HIP stream is defined. We use NULL stream in the recent example.
+- `kernel_name<<<kernel_name, grid_dim, block_dim, dynamic_shared_memory_size, stream>>>(<kernel arguments>)` is the HIP kernel launcher where the grid and block dimension, dynamic shared memory size and HIP stream is defined. We use NULL stream in the recent example.
 - `__bitextract_u32(source, bit_start, num_bits)` is the built-in AMD HIP bit extract operator, where we define a source scalar, a `bit_start` start bit and a `num_bits` number of extraction bits. The operator returns with a scalar value.
 
 ## Demonstrated API Calls
@@ -30,4 +30,3 @@ A HIP-specific bit extract solution is presented in this example.
 - `hipMemcpy`
 - `hipMemcpyHostToDevice`
 - `hipMemcpyDeviceToHost`
-- `hipLaunchKernelGGL`

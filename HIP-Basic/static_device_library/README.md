@@ -41,6 +41,5 @@ hipcc -fgpu-rdc liblibrary.a main.hip -o hip_static_device_library
 #### Host symbols
 - `hipMalloc`
 - `hipMemcpy`
-- `hipLaunchKernelGGL`
 - `hipGetLastError`
 - `hipFree`

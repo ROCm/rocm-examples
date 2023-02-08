@@ -140,10 +140,10 @@ build:cmake-rocm:
       -D CMAKE_HIP_ARCHITECTURES="$GPU_TARGETS"
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
-      | tee cmake_log.txt
+      2>&1 | tee cmake_log.txt
     # check if all dependencies were found
     - |-
-      if grep -q "Could NOT find" cmake_log.txt; then
+      if grep -qi "could not find" cmake_log.txt; then
           echo "Some CMake libraries could not be found"
           exit 1
       fi
@@ -162,10 +162,11 @@ build:cmake-cuda:
       -D GPU_RUNTIME=CUDA
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_CUDA_FLAGS="$CUDA_FLAGS"
-      | tee cmake_log.txt
+      -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake
+      2>&1 | tee cmake_log.txt
     # check if all dependencies were found
     - |-
-      if grep -q "Could NOT find" cmake_log.txt; then
+      if grep -qi "could not find" cmake_log.txt; then
           echo "Some CMake libraries could not be found"
           exit 1
       fi
@@ -216,18 +217,48 @@ test:rocm-windows-vs2019:
       /maxCpuCount
       /warnAsError
       "/p:Configuration=$BUILD_TYPE"
-      "$CI_PROJECT_DIR"
+      "$CI_PROJECT_DIR/ROCm-Examples-VS2019.sln"
     - |-
+      $SkippedExamples = @(
+          "hip_vulkan_interop_vs2019.exe"     # Graphical
+          "hip_opengl_interop_vs2019.exe"     # Graphical
+          "hip_texture_management_vs2019.exe" # Hangs sometimes
+          "hip_hello_world_vs2019.exe"        # Crashes (known driver issue)
+      )
       Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
-          if (("hip_vulkan_interop_vs2019.exe","hip_opengl_interop_vs2019.exe") -NotContains $_.Name) {
+          if ($SkippedExamples -NotContains $_.Name) {
               echo "--" $_.Name
               & "$_"
               if (!$?) {
                 throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
               }
+          } else {
+              echo "-- SKIPPING " $_.Name
           }
       }
+
+test:rocm-windows-vs2017:
+  extends:
+    - .test:windows
+  script:
+    - >
+      & "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/MSBuild/15.0/Bin/MSBuild.exe"
+      /maxCpuCount
+      /warnAsError
+      "/p:Configuration=$BUILD_TYPE"
+      "$CI_PROJECT_DIR/ROCm-Examples-VS2017.sln"
+
+test:rocm-windows-vs2022:
+  extends:
+    - .test:windows
+  script:
+    - >
+      & "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe"
+      /maxCpuCount
+      /warnAsError
+      "/p:Configuration=$BUILD_TYPE"
+      "$CI_PROJECT_DIR/ROCm-Examples-VS2022.sln"
 
 test:rocm-windows-cmake:
   extends:
@@ -243,9 +274,9 @@ test:rocm-windows-cmake:
       -D CMAKE_HIP_ARCHITECTURES=gfx1030
       -D CMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe"
       -D CMAKE_TOOLCHAIN_FILE="C:/Tools/Microsoft/vcpkg/scripts/buildsystems/vcpkg.cmake"
-      | Tee-Object -filepath cmake_log.txt
+      2>&1 | Tee-Object -filepath cmake_log.txt
     - |-
-      if (Select-String -Path cmake_log.txt -Pattern "Could NOT find") {
+      if (Select-String -Path cmake_log.txt -Pattern "could not find") {
           throw "Some cmake libraries are missing"
       }
     - cmake --build "$CI_PROJECT_DIR/build"

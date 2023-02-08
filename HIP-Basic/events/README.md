@@ -32,7 +32,6 @@ This example showcases measuring kernel and memory transfer timing using HIP eve
 - `hipMalloc`
 - `hipFree`
 - `hipMemcpy`
-- `hipLaunchKernelGGL`
 - `hipEventCreate`
 - `hipEventRecord`
 - `hipEventElapsedTime`

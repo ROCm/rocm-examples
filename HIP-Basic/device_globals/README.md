@@ -35,7 +35,6 @@ Device global variables may also be initialized directly by using the `hipMemcpy
 - `hipGetLastError`
 - `hipGetSymbolAddress`
 - `hipGetSymbolSize`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMemcpy`
 - `hipMemcpyDeviceToHost`

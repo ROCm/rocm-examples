@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -190,15 +190,8 @@ int main(int argc, const char* argv[])
     // Launch matrix multiplication kernel.
     std::cout << "Matrix multiplication: [" << a_rows << 'x' << a_cols << "] * [" << b_rows << 'x'
               << b_cols << "], block size: " << block_size << 'x' << block_size << std::endl;
-    hipLaunchKernelGGL(HIP_KERNEL_NAME(matrix_multiplication_kernel<block_size>),
-                       grid_dim,
-                       block_dim,
-                       0,
-                       hipStreamDefault,
-                       d_A,
-                       d_B,
-                       d_C,
-                       a_cols);
+    matrix_multiplication_kernel<block_size>
+        <<<grid_dim, block_dim, 0, hipStreamDefault>>>(d_A, d_B, d_C, a_cols);
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());
 

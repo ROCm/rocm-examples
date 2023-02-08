@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2015-2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2015-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -67,11 +67,11 @@ int main()
     print_hello();
 
     // Launch the kernel.
-    hipLaunchKernelGGL(helloworld_kernel,
-                       dim3(2), // 3D grid specifying number of blocks to launch: (2, 1, 1)
-                       dim3(2), // 3D grid specifying number of threads to launch: (2, 1, 1)
-                       0, // number of bytes of additional shared memory to allocate
-                       hipStreamDefault); // stream where the kernel should execute: default stream
+    helloworld_kernel<<<dim3(2), // 3D grid specifying number of blocks to launch: (2, 1, 1)
+                        dim3(2), // 3D grid specifying number of threads to launch: (2, 1, 1)
+                        0, // number of bytes of additional shared memory to allocate
+                        hipStreamDefault // stream where the kernel should execute: default stream
+                        >>>();
 
     // Wait on all active streams on the current device.
     HIP_CHECK(hipDeviceSynchronize());

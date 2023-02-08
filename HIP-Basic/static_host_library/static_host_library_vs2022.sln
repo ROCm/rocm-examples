@@ -1,0 +1,36 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.33027.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_vs2022", "static_host_library_vs2022.vcxproj", "{27A6F412-BAE5-49FF-B557-C86EE98352C9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_msvc_vs2022", "static_host_library_msvc\static_host_library_msvc_vs2022.vcxproj", "{78759A7F-2B5C-4FE3-AE66-71DF7A90A500}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libhip_static_host_vs2022", "library\libhip_static_host_vs2022.vcxproj", "{5FC8C701-B961-4719-A465-FC0FC84D2EEE}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{27A6F412-BAE5-49FF-B557-C86EE98352C9}.Debug|x64.ActiveCfg = Debug|x64
+		{27A6F412-BAE5-49FF-B557-C86EE98352C9}.Debug|x64.Build.0 = Debug|x64
+		{27A6F412-BAE5-49FF-B557-C86EE98352C9}.Release|x64.ActiveCfg = Release|x64
+		{27A6F412-BAE5-49FF-B557-C86EE98352C9}.Release|x64.Build.0 = Release|x64
+		{78759A7F-2B5C-4FE3-AE66-71DF7A90A500}.Debug|x64.ActiveCfg = Debug|x64
+		{78759A7F-2B5C-4FE3-AE66-71DF7A90A500}.Debug|x64.Build.0 = Debug|x64
+		{78759A7F-2B5C-4FE3-AE66-71DF7A90A500}.Release|x64.ActiveCfg = Release|x64
+		{78759A7F-2B5C-4FE3-AE66-71DF7A90A500}.Release|x64.Build.0 = Release|x64
+		{5FC8C701-B961-4719-A465-FC0FC84D2EEE}.Debug|x64.ActiveCfg = Debug|x64
+		{5FC8C701-B961-4719-A465-FC0FC84D2EEE}.Debug|x64.Build.0 = Debug|x64
+		{5FC8C701-B961-4719-A465-FC0FC84D2EEE}.Release|x64.ActiveCfg = Release|x64
+		{5FC8C701-B961-4719-A465-FC0FC84D2EEE}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {269E7FBB-05D9-4947-9462-2CA8D5B2C250}
+	EndGlobalSection
+EndGlobal

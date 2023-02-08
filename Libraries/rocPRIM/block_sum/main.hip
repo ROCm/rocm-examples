@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -126,14 +126,8 @@ int main()
     HIP_CHECK(hipMemcpy(d_in, h_in.data(), h_in_bytes, hipMemcpyHostToDevice));
 
     // Running kernel
-    hipLaunchKernelGGL(HIP_KERNEL_NAME(reduce_sum_kernel<block_size, items_per_thread>),
-                       dim3(grid_size),
-                       dim3(block_size),
-                       0,
-                       0,
-                       d_in,
-                       d_out,
-                       size);
+    reduce_sum_kernel<block_size, items_per_thread>
+        <<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(d_in, d_out, size);
 
     // Allocate out vector on the host
     std::vector<int> h_out(grid_size);

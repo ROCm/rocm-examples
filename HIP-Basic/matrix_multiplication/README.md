@@ -37,7 +37,5 @@ $$c_{ij}=\sum_{k=1}^{N}a_{ik}b_{kj}$$
 #### Host symbols
 - `hipMalloc`
 - `hipMemcpy`
-- `hipLaunchKernelGGL`
-- `HIP_KERNEL_NAME`
 - `hipGetLastError`
 - `hipFree`

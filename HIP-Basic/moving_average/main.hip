@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -118,14 +118,8 @@ int main()
               << window_size << std::endl;
 
     // Launch the kernel on the default stream.
-    hipLaunchKernelGGL(HIP_KERNEL_NAME(moving_average<block_size, window_size>),
-                       dim3(grid_size),
-                       dim3(block_size),
-                       0,
-                       hipStreamDefault,
-                       d_input,
-                       d_output,
-                       input_size);
+    moving_average<block_size, window_size>
+        <<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(d_input, d_output, input_size);
 
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());

@@ -20,9 +20,9 @@ A GPU multiprocessor can process multiple blocks of a kernel invocation simultan
 extern __shared__ type var[];
 ```
 
-The GPU runtime still needs to know the total amount of shared memory that a kernel will use, and for this reason this value needs to be passed with the execution configuration when launching the kernel. When using `hipLaunchKernelGGL`, this is simply a parameter that indicates the required amount:
+The GPU runtime still needs to know the total amount of shared memory that a kernel will use, and for this reason this value needs to be passed with the execution configuration when launching the kernel. When using the `myKernelName<<<...>>>` kernel launch syntax, this is simply a parameter that indicates the required amount:
 ```c++
-hipLaunchKernelGGL(kernel_name, grid_dim, block_dim, dynamic_shared_memory_size, stream, <kernel arguments>)
+kernel_name<<<grid_dim, block_dim, dynamic_shared_memory_size, stream>>>(<kernel arguments>);
 ```
 
 ## Demonstrated API Calls
@@ -34,7 +34,5 @@ hipLaunchKernelGGL(kernel_name, grid_dim, block_dim, dynamic_shared_memory_size,
 #### Host symbols
 - `hipMalloc`
 - `hipMemcpy`
-- `hipLaunchKernelGGL`
-- `HIP_KERNEL_NAME`
 - `hipGetLastError`
 - `hipFree`

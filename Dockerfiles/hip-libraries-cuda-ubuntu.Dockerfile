@@ -18,6 +18,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         libvulkan-dev \
         vulkan-validationlayers \
         libglfw3-dev \
+        gfortran \
     && rm -rf /var/lib/apt/lists/*
 
 # Install HIP using the installer script
@@ -60,6 +61,17 @@ RUN wget https://github.com/ROCmSoftwarePlatform/hipCUB/archive/refs/tags/rocm-5
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
     && cmake --build ./hipCUB-rocm-5.3.0/build --target install \
     && rm -rf ./hipCUB-rocm-5.3.0
+
+# Install hipBLAS
+RUN wget https://github.com/ROCmSoftwarePlatform/hipBLAS/archive/refs/tags/rocm-5.3.0.tar.gz \
+    && tar -xf ./rocm-5.3.0.tar.gz \
+    && rm ./rocm-5.3.0.tar.gz \
+    && cmake -S ./hipBLAS-rocm-5.3.0 -B ./hipBLAS-rocm-5.3.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+        -D CMAKE_INSTALL_PREFIX=/opt/rocm \
+        -D USE_CUDA=ON \
+    && cmake --build ./hipBLAS-rocm-5.3.0/build --target install \
+    && rm -rf ./hipBLAS-rocm-5.3.0
 
 # Add the render group and a user with sudo permissions for the container
 RUN groupadd --system --gid 109 render \

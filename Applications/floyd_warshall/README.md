@@ -31,7 +31,7 @@ There are three parameters available:
 - For this GPU implementation of the Floyd-Warshall algorithm, the main kernel (`floyd_warshall_kernel`) that is launched in a 2-dimensional grid. Each thread in the grid computes the shortest path between two nodes of the graph at a certain step $k$ $\left(0 \leq k < n \right)$. The threads compare the previously computed shortest paths using only the nodes in $V'=\{v_0,v_1,...,v_{k-1}\} \subseteq V$ as intermediate nodes with the paths that include node $v_k$ as an intermediate node, and take the shortest option. Therefore, the kernel is launched $n$ times.
 - For improved performance, pinned memory is used to pass the results obtained in each iteration to the next one. With `hipHostMalloc` pinned host memory (accessible by the device) can be allocated, and `hipHostFree` frees it. In this example, host pinned memory is allocated using the `hipHostMallocMapped` flag, which indicates that `hipHostMalloc` must map the allocation into the address space of the current device. The device pointer to such allocated pinned memory is obtained with `hipHostGetDevicePointer`. Beware that an excessive allocation of pinned memory can slow down the host execution, as the program is left with less physical memory available to map the rest of the virtual addresses used.
 - With `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`) or from device to host (using `hipMemcpyDeviceToHost`), among others.
-- `hipLaunchKernelGGL` queues the kernel execution on the device. All the kernels are launched on the `hipStreamDefault`, meaning that these executions are performed in order. `hipGetLastError` returns the last error produced by any runtime API call, allowing to check if any kernel launch resulted in error.
+- `myKernelName<<<...>>>` queues the kernel execution on the device. All the kernels are launched on the `hipStreamDefault`, meaning that these executions are performed in order. `hipGetLastError` returns the last error produced by any runtime API call, allowing to check if any kernel launch resulted in error.
 - `hipEventCreate` creates the events used to measure kernel execution time, `hipEventRecord` starts recording an event and  `hipEventSynchronize` waits for all the previous work in the stream when the specified event was recorded. With these three functions it can be measured the start and stop times of the kernel, and with `hipEventElapsedTime` the kernel execution time (in milliseconds) can be obtained.
 
 ## Demonstrated API Calls
@@ -53,7 +53,6 @@ There are three parameters available:
 - `hipHostGetDevicePointer`
 - `hipHostMalloc`
 - `hipHostMallocMapped`
-- `hipLaunchKernelGGL`
 - `hipMemcpy`
 - `hipMemcpyDeviceToHost`
 - `hipMemcpyHostToDevice`

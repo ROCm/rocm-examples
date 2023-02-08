@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -478,14 +478,11 @@ struct simulator
         constexpr size_t tile_size = 8;
 
         // Launch the HIP kernel to advance the simulation.
-        hipLaunchKernelGGL(sinewave_kernel,
-                           dim3((grid_width + tile_size - 1) / tile_size,
-                                (grid_height + tile_size - 1) / tile_size),
-                           dim3(tile_size, tile_size),
-                           0,
-                           this->hip_stream,
-                           this->hip_height_ptr,
-                           time);
+        sinewave_kernel<<<dim3((grid_width + tile_size - 1) / tile_size,
+                               (grid_height + tile_size - 1) / tile_size),
+                          dim3(tile_size, tile_size),
+                          0,
+                          this->hip_stream>>>(this->hip_height_ptr, time);
 
         // Check that no errors occured while launching the kernel.
         HIP_CHECK(hipGetLastError());

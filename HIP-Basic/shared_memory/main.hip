@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -114,14 +114,9 @@ int main()
     std::cout << "Computing matrix transpose." << std::endl;
 
     // Launch kernel on the default stream. Passing kernel arguments at the end of the
-    // hipLaunchKernelGGL function call.
-    hipLaunchKernelGGL(matrix_transpose_kernel<width>,
-                       grid_dim,
-                       block_dim,
-                       0,
-                       hipStreamDefault,
-                       d_transposed_matrix,
-                       d_matrix);
+    // <<<...>>> function call.
+    matrix_transpose_kernel<width>
+        <<<grid_dim, block_dim, 0, hipStreamDefault>>>(d_transposed_matrix, d_matrix);
 
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -80,15 +80,7 @@ int main()
     std::cout << "Calculating y[i] = a * x[i] + y[i] over " << size << " elements." << std::endl;
 
     // Launch the kernel on the default stream.
-    hipLaunchKernelGGL(HIP_KERNEL_NAME(saxpy_kernel),
-                       dim3(grid_size),
-                       dim3(block_size),
-                       0,
-                       hipStreamDefault,
-                       a,
-                       d_x,
-                       d_y,
-                       size);
+    saxpy_kernel<<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(a, d_x, d_y, size);
 
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());

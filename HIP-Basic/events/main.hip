@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -110,14 +110,10 @@ int main()
     HIP_CHECK(hipEventRecord(start, hipStreamDefault));
 
     // Lauching kernel from host.
-    hipLaunchKernelGGL(HIP_KERNEL_NAME(matrix_transpose_kernel),
-                       dim3(width / threads_per_block_x, width / threads_per_block_y),
-                       dim3(threads_per_block_x, threads_per_block_y),
-                       0,
-                       hipStreamDefault,
-                       d_transposed_matrix,
-                       d_matrix,
-                       width);
+    matrix_transpose_kernel<<<dim3(width / threads_per_block_x, width / threads_per_block_y),
+                              dim3(threads_per_block_x, threads_per_block_y),
+                              0,
+                              hipStreamDefault>>>(d_transposed_matrix, d_matrix, width);
 
     // Record and synchronize with the stop event.
     HIP_CHECK(hipEventRecord(stop, hipStreamDefault));

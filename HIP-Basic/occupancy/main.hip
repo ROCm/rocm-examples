@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2015-2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2015-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -86,15 +86,10 @@ void deploy_kernel_manual_parameters(float*             d_C,
     HIP_CHECK(hipEventRecord(start, nullptr));
 
     // Launch the kernel
-    hipLaunchKernelGGL(HIP_KERNEL_NAME(pairwise_product_kernel),
-                       dim3(grid_size),
-                       dim3(block_size),
-                       0,
-                       0,
-                       d_C,
-                       d_A,
-                       d_B,
-                       size);
+    pairwise_product_kernel<<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(d_C,
+                                                                                        d_A,
+                                                                                        d_B,
+                                                                                        size);
 
     // Record the stop event
     HIP_CHECK(hipEventRecord(stop, nullptr));
@@ -139,15 +134,10 @@ void deploy_kernel_automatic_parameters(float*             d_C,
     HIP_CHECK(hipEventRecord(start, nullptr));
 
     // Launch the kernel
-    hipLaunchKernelGGL(HIP_KERNEL_NAME(pairwise_product_kernel),
-                       dim3(grid_size),
-                       dim3(block_size),
-                       0,
-                       0,
-                       d_C,
-                       d_A,
-                       d_B,
-                       size);
+    pairwise_product_kernel<<<dim3(grid_size), dim3(block_size), 0, hipStreamDefault>>>(d_C,
+                                                                                        d_A,
+                                                                                        d_B,
+                                                                                        size);
 
     // Record the stop event
     HIP_CHECK(hipEventRecord(stop, nullptr));

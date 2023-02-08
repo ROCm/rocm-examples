@@ -34,9 +34,9 @@ if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
 endif()
 
 enable_language(${GPU_RUNTIME})
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
+set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
+set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
 set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 if(NOT CMAKE_PREFIX_PATH)
@@ -53,3 +53,4 @@ add_test(${example_name} ${example_name})
 target_link_libraries(${example_name} PRIVATE roc::hipblas)
 
 target_include_directories(${example_name} PRIVATE "../../../Common")
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})

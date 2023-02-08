@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_radix_sort_vs2017", "device_radix_sort_vs2017.vcxproj", "{C8EDEFF9-36B0-4942-B6DD-2548911D0677}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8EDEFF9-36B0-4942-B6DD-2548911D0677}.Debug|x64.ActiveCfg = Debug|x64
+		{C8EDEFF9-36B0-4942-B6DD-2548911D0677}.Debug|x64.Build.0 = Debug|x64
+		{C8EDEFF9-36B0-4942-B6DD-2548911D0677}.Release|x64.ActiveCfg = Release|x64
+		{C8EDEFF9-36B0-4942-B6DD-2548911D0677}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C4F9E6B-BCF9-45F8-AFED-AC5B1D4EADD6}
+	EndGlobalSection
+EndGlobal

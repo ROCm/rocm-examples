@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_globals_vs2017", "device_globals_vs2017.vcxproj", "{F6B4FC89-465A-455A-B1E9-FF4C8689E3F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F6B4FC89-465A-455A-B1E9-FF4C8689E3F0}.Debug|x64.ActiveCfg = Debug|x64
+		{F6B4FC89-465A-455A-B1E9-FF4C8689E3F0}.Debug|x64.Build.0 = Debug|x64
+		{F6B4FC89-465A-455A-B1E9-FF4C8689E3F0}.Release|x64.ActiveCfg = Release|x64
+		{F6B4FC89-465A-455A-B1E9-FF4C8689E3F0}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2C837F6C-F3E0-42E8-AF29-9400D3E06576}
+	EndGlobalSection
+EndGlobal

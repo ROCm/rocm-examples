@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -86,14 +86,7 @@ int main()
     constexpr unsigned int threads_per_block = 256;
 
     std::cout << "info: launch 'vector_square_kernel' kernel\n";
-    hipLaunchKernelGGL(vector_square_kernel,
-                       grid_size,
-                       threads_per_block,
-                       0,
-                       hipStreamDefault,
-                       d_out,
-                       d_in,
-                       size);
+    vector_square_kernel<<<grid_size, threads_per_block, 0, hipStreamDefault>>>(d_out, d_in, size);
 
     // Check that the kernel invocation was successful.
     HIP_CHECK(hipGetLastError());

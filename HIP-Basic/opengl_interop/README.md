@@ -60,7 +60,6 @@ When using OpenGL-HIP interop on multi-gpu systems, the OpenGL context must be c
 - `hipGraphicsResourceGetMappedPointer`
 - `hipGraphicsUnmapResources`
 - `hipGraphicsUnregisterResource`
-- `hipLaunchKernelGGL`
 - `hipSetDevice`
 - `hipStreamCreate`
 - `hipStreamDestroy`

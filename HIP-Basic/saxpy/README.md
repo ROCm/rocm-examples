@@ -17,7 +17,7 @@ This program demonstrates a simple implementation of the "SAXPY" kernel. The "S"
 - `hipMalloc` is used to allocate memory in the global memory of the device (GPU). This is usually necessary, since the kernels running on the device cannot access host (CPU) memory (unless it is device-accessible pinned host memory, see `hipHostMalloc`). Beware, that the memory returned is uninitialized.
 - `hipFree` de-allocates device memory allocated by `hipMalloc`. It is necessary to free no longer used memory with this function to avoid resource leakage.
 - `hipMemcpy` is used to transfer bytes between the host and the device memory in both directions. A call to it synchronizes the device with the host, meaning that all kernels queued before `hipMemcpy` will finish before the copying starts. The function returns once the copying has finished.
-- `hipLaunchKernelGGL` queues the execution of the provided kernel on the device. It is asynchronous, the call may return before the execution of the kernel is finished. Its arguments come as the following:
+- `myKernelName<<<gridDim, blockDim, dynamicShared, stream>>>(kernelArguments)` queues the execution of the provided kernel on the device. It is asynchronous, the call may return before the execution of the kernel is finished. Its arguments come as the following:
     - The kernel (`__global__`) function to launch.
     - The number of blocks in the kernel grid, i.e. the grid size. It can be up to 3 dimensions.
     - The number of threads in each block, i.e. the block size. It can be up to 3 dimensions.
@@ -37,5 +37,4 @@ This program demonstrates a simple implementation of the "SAXPY" kernel. The "S"
 - `hipMemcpy`
 - `hipMemcpyHostToDevice`
 - `hipMemcpyDeviceToHost`
-- `hipLaunchKernelGGL`
 - `hipGetLastError`

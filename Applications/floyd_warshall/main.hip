@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -220,15 +220,11 @@ int main(int argc, char* argv[])
             HIP_CHECK(hipEventRecord(start, hipStreamDefault));
 
             // Launch Floyd-Warshall kernel on the default stream.
-            hipLaunchKernelGGL(floyd_warshall_kernel,
-                               grid_dim,
-                               block_dim,
-                               0,
-                               hipStreamDefault,
-                               part_adjacency_matrix,
-                               part_next_matrix,
-                               nodes,
-                               k);
+            floyd_warshall_kernel<<<grid_dim, block_dim, 0, hipStreamDefault>>>(
+                part_adjacency_matrix,
+                part_next_matrix,
+                nodes,
+                k);
 
             // Check if the kernel launch was successful.
             HIP_CHECK(hipGetLastError());

@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_multiplication_vs2017", "matrix_multiplication_vs2017.vcxproj", "{E300ED61-E779-4009-80A7-D566DAC4ED52}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E300ED61-E779-4009-80A7-D566DAC4ED52}.Debug|x64.ActiveCfg = Debug|x64
+		{E300ED61-E779-4009-80A7-D566DAC4ED52}.Debug|x64.Build.0 = Debug|x64
+		{E300ED61-E779-4009-80A7-D566DAC4ED52}.Release|x64.ActiveCfg = Release|x64
+		{E300ED61-E779-4009-80A7-D566DAC4ED52}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AD0EF6B9-7A8B-4955-B34C-C2A0E47DAD89}
+	EndGlobalSection
+EndGlobal

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -138,16 +138,10 @@ int main()
 
     // Invoke histogram kernel.
     constexpr unsigned int block_dim = 16;
-    hipLaunchKernelGGL(histogram_kernel,
-                       dim3(ceiling_div(size_x, block_dim), ceiling_div(size_y, block_dim)),
+    histogram_kernel<<<dim3(ceiling_div(size_x, block_dim), ceiling_div(size_y, block_dim)),
                        dim3(block_dim, block_dim),
                        0,
-                       hipStreamDefault,
-                       d_histogram,
-                       size_x,
-                       size_y,
-                       hist_bin_count,
-                       tex_obj);
+                       hipStreamDefault>>>(d_histogram, size_x, size_y, hist_bin_count, tex_obj);
 
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());

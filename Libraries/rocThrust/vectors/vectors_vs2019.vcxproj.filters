@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="msvc_defines.h">
+    <ClInclude Include="..\..\..\Common\example_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

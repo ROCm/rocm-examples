@@ -45,7 +45,6 @@ This example demonstrates how a kernel may use texture memory through the textur
 - `hipFree`
 - `hipFreeArray`
 - `hipGetLastError`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMallocArray`
 - `hipMemcpy`

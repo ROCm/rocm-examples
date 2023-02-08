@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "occupancy_vs2022", "occupancy_vs2022.vcxproj", "{E6D8C701-08B7-482B-AF43-1CA6765CA5FB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E6D8C701-08B7-482B-AF43-1CA6765CA5FB}.Debug|x64.ActiveCfg = Debug|x64
+		{E6D8C701-08B7-482B-AF43-1CA6765CA5FB}.Debug|x64.Build.0 = Debug|x64
+		{E6D8C701-08B7-482B-AF43-1CA6765CA5FB}.Release|x64.ActiveCfg = Release|x64
+		{E6D8C701-08B7-482B-AF43-1CA6765CA5FB}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E592A31F-51CE-4952-B476-16D505816F9A}
+	EndGlobalSection
+EndGlobal

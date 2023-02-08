@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2015-2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2015-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -102,7 +102,7 @@ void deploy_multiple_stream(const float*         h_in,
     for(int i = 0; i < num_streams; i++)
     {
         // hipMemcpyAsync is used without needing to sync before the kernel launch
-        // Because both the hipMemcpyAsync and hipLaunchKernelGGL reside in the same stream.
+        // Because both the hipMemcpyAsync and the kernel launch reside in the same stream.
         // The kernel will be executed only after hipMemcpyAsync finishes. There is implicit synchronization.
         // Note: If the host memory is not pinned at allocation time using hipHostMalloc then hipMemcpyAsync
         // will behave as synchronous.
@@ -114,23 +114,18 @@ void deploy_multiple_stream(const float*         h_in,
     static_assert(Width % threads_per_block_y == 0);
 
     // Launch kernel with stream[0]
-    hipLaunchKernelGGL(matrix_transpose_static_shared<Width>,
-                       dim3(Width / threads_per_block_x, Width / threads_per_block_y),
-                       dim3(threads_per_block_x, threads_per_block_y),
-                       0,
-                       streams[0],
-                       d_transpose_matrix[0],
-                       d_in[0]);
+    matrix_transpose_static_shared<Width>
+        <<<dim3(Width / threads_per_block_x, Width / threads_per_block_y),
+           dim3(threads_per_block_x, threads_per_block_y),
+           0,
+           streams[0]>>>(d_transpose_matrix[0], d_in[0]);
 
     // Launch kernel with stream[1]
-    hipLaunchKernelGGL(matrix_transpose_dynamic_shared,
-                       dim3(Width / threads_per_block_x, Width / threads_per_block_y),
-                       dim3(threads_per_block_x, threads_per_block_y),
-                       sizeof(float) * Width * Width,
-                       streams[1],
-                       d_transpose_matrix[1],
-                       d_in[1],
-                       Width);
+    matrix_transpose_dynamic_shared<<<dim3(Width / threads_per_block_x,
+                                           Width / threads_per_block_y),
+                                      dim3(threads_per_block_x, threads_per_block_y),
+                                      sizeof(float) * Width * Width,
+                                      streams[1]>>>(d_transpose_matrix[1], d_in[1], Width);
 
     // Asynchronously copy the results from device to host
     for(int i = 0; i < num_streams; i++)

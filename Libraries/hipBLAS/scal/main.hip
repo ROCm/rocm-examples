@@ -24,7 +24,7 @@
 #include "example_utils.hpp"
 #include "hipblas_utils.hpp"
 
-#include <hipblas.h>
+#include <hipblas/hipblas.h>
 
 #include <hip/hip_runtime.h>
 

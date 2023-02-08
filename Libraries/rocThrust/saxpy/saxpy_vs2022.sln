@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "saxpy_vs2022", "saxpy_vs2022.vcxproj", "{4634D5EA-9F81-4B15-8D6A-61A531555DA8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4634D5EA-9F81-4B15-8D6A-61A531555DA8}.Debug|x64.ActiveCfg = Debug|x64
+		{4634D5EA-9F81-4B15-8D6A-61A531555DA8}.Debug|x64.Build.0 = Debug|x64
+		{4634D5EA-9F81-4B15-8D6A-61A531555DA8}.Release|x64.ActiveCfg = Release|x64
+		{4634D5EA-9F81-4B15-8D6A-61A531555DA8}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FFEA61A3-A33F-44C4-BFC7-CDB7EB3928AE}
+	EndGlobalSection
+EndGlobal

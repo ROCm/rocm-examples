@@ -21,7 +21,7 @@ This example implements a simple matrix transpose kernel to showcase how to use 
 - `__shared__` is a variable declaration specifier necessary to allocate shared memory from the device. 
 - `__syncthreads` allows to synchronize all the threads within the same block. This synchronization barrier is used to ensure that every thread in a block have finished writing in shared memory before another threads in the block try to access that data.
 - `hipMalloc` allocates host device memory in global memory, and with `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`) or from device to host (using `hipMemcpyDeviceToHost`), among others.
-- `hipLaunchKernelGGL` queues the execution of a kernel on a device (GPU).
+- `myKernelName<<<...>>>` queues the execution of a kernel on a device (GPU).
 - `hipGetLastError` gets the last error returned by any HIP runtime API call.
 - `hipFree` deallocates device memory allocated with `hipMalloc`.
 
@@ -40,7 +40,6 @@ This example implements a simple matrix transpose kernel to showcase how to use 
 #### Host symbols
 - `hipFree`
 - `hipGetLastError`
-- `hipLaunchKernelGGL`
 - `hipMalloc`
 - `hipMemcpy`
 - `hipMemcpyDeviceToHost`

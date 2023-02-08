@@ -25,7 +25,7 @@
 #include "hipblas_utils.hpp"
 
 #define ROCM_MATHLIBS_API_USE_HIP_COMPLEX
-#include <hipblas.h>
+#include <hipblas/hipblas.h>
 
 #include <hip/hip_complex.h>
 #include <hip/hip_runtime.h>
@@ -57,7 +57,7 @@ void cher_reference(const int                        n,
                 = x[j * incx] * std::conj(y[i * incy]) * std::complex<float>(alpha, 0)
                   + y[j * incy] * std::conj(x[i * incx]) * std::complex<float>(alpha, 0);
 
-            a[i * lda + j] = hipCaddf(hipFloatComplex(r.real(), r.imag()), a[i * lda + j]);
+            a[i * lda + j] = hipCaddf(make_hipFloatComplex(r.real(), r.imag()), a[i * lda + j]);
         }
     }
 }
@@ -135,7 +135,7 @@ int main(const int argc, const char** argv)
     {
         for(int j = 0; j < n; ++j)
         {
-            h_a[i * lda + j] = hipFloatComplex(i == j, 0);
+            h_a[i * lda + j] = make_hipFloatComplex(float(i == j), 0);
         }
     }
 
@@ -188,7 +188,7 @@ int main(const int argc, const char** argv)
                 continue;
             }
 
-            const hipFloatComplex diff = h_a[i * lda + j] - h_a_gold[i * lda + j];
+            const hipFloatComplex diff = hipCsubf(h_a[i * lda + j], h_a_gold[i * lda + j]);
             errors += diff.x > eps;
             errors += diff.y > eps;
         }

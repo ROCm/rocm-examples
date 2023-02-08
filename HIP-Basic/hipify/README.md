@@ -15,4 +15,3 @@ The hipify example demonstrates the use of HIP utility `hifipy-perl` to port CUD
 - `hipGetErrorString`
 - `hipGetDeviceProperties`
 - `hipMalloc`
-- `hipLaunchKernelGGL`

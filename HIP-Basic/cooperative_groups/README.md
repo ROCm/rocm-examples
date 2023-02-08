@@ -36,6 +36,5 @@ The partitioned threads can reside across multiple devices.
 - `hipLaunchCooperativeKernel`
 - `hipDeviceAttributeCooperativeLaunch`
 - `hipDeviceGetAttribute`
-- `HIP_KERNEL_NAME`
 - `hipGetLastError`
 - `hipFree`

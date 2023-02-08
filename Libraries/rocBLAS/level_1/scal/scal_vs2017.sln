@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "scal_vs2017", "scal_vs2017.vcxproj", "{316DCCE2-84EC-46E0-9BB0-2622FCF88206}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{316DCCE2-84EC-46E0-9BB0-2622FCF88206}.Debug|x64.ActiveCfg = Debug|x64
+		{316DCCE2-84EC-46E0-9BB0-2622FCF88206}.Debug|x64.Build.0 = Debug|x64
+		{316DCCE2-84EC-46E0-9BB0-2622FCF88206}.Release|x64.ActiveCfg = Release|x64
+		{316DCCE2-84EC-46E0-9BB0-2622FCF88206}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D2E314D6-1028-47A8-9D98-664C2E991B3E}
+	EndGlobalSection
+EndGlobal

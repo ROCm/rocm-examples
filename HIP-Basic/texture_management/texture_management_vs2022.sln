@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texture_management_vs2022", "texture_management_vs2022.vcxproj", "{BE0294B1-C162-4877-B7A5-4CA9BB73146B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BE0294B1-C162-4877-B7A5-4CA9BB73146B}.Debug|x64.ActiveCfg = Debug|x64
+		{BE0294B1-C162-4877-B7A5-4CA9BB73146B}.Debug|x64.Build.0 = Debug|x64
+		{BE0294B1-C162-4877-B7A5-4CA9BB73146B}.Release|x64.ActiveCfg = Release|x64
+		{BE0294B1-C162-4877-B7A5-4CA9BB73146B}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {05D8DDBF-6DBC-4C1C-B389-D3E60479EA73}
+	EndGlobalSection
+EndGlobal

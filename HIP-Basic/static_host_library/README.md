@@ -60,6 +60,5 @@ Linking with a HIP static host library can then be done simply by adding a refer
 #### Host symbols
 - `hipMalloc`
 - `hipMemcpy`
-- `hipLaunchKernelGGL`
 - `hipGetLastError`
 - `hipFree`

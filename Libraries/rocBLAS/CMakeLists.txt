@@ -23,6 +23,11 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(rocBLAS_examples LANGUAGES NONE)
 
+if(GPU_RUNTIME STREQUAL "CUDA")
+    message(STATUS "rocBLAS examples do not support the CUDA runtime")
+    return()
+endif()
+
 find_package(rocblas)
 if(NOT rocblas_FOUND)
     message(STATUS "rocBLAS could not be found, not building rocBLAS examples")
