@@ -15,7 +15,7 @@
     <ProjectGuid>{6A0FFF7E-9C0A-4BF5-BBA5-745CB4253EFB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>multi_gpu_data_transfer_vs2019</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />

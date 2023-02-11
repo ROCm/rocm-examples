@@ -15,7 +15,7 @@
     <ProjectGuid>{29da7c17-c373-4197-963b-78d870c79dfe}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>axpy_vs2022</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

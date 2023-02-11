@@ -15,7 +15,7 @@
     <ProjectGuid>{a9e1c716-820c-4b29-b36e-4f0ab057f09f}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>device_query_vs2017</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

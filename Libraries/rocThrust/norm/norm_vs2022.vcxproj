@@ -15,7 +15,7 @@
     <ProjectGuid>{933121f0-5c1d-44da-9db7-260dc8dd0c44}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>norm_vs2022</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />

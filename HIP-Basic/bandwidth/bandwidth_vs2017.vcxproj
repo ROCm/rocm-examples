@@ -15,7 +15,7 @@
     <ProjectGuid>{8c3bbaaf-04f6-46f5-96a2-81c047167343}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>bandwidth_vs2017</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />

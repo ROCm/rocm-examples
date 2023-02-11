@@ -15,7 +15,7 @@
     <ProjectGuid>{cc8acbf9-40da-40e5-875a-10263c2c7809}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gemm_vs2017</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
