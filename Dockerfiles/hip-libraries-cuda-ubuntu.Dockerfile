@@ -73,8 +73,11 @@ RUN wget https://github.com/ROCmSoftwarePlatform/hipBLAS/archive/refs/tags/rocm-
     && cmake --build ./hipBLAS-rocm-5.3.0/build --target install \
     && rm -rf ./hipBLAS-rocm-5.3.0
 
+# Use render group as an argument from user
+ARG GID=109
+
 # Add the render group and a user with sudo permissions for the container
-RUN groupadd --system --gid 109 render \
+RUN groupadd --system --gid ${ARG} render \
     && useradd -Um -G sudo,video,render developer \
     && echo developer ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/developer \
     && chmod 0440 /etc/sudoers.d/developer

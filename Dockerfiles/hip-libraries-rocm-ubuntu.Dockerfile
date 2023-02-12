@@ -43,8 +43,11 @@ ENV PATH="/cmake/bin:/opt/rocm/bin:${PATH}"
 RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
     && ldconfig
 
+# Use render group as an argument from user
+ARG GID=109
+
 # Add the render group and a user with sudo permissions for the container
-RUN groupadd --system --gid 109 render \
+RUN groupadd --system --gid ${GID} render \
     && useradd -Um -G sudo,video,render developer \
     && echo developer ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/developer \
     && chmod 0440 /etc/sudoers.d/developer
