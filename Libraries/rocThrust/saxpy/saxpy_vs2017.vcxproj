@@ -15,7 +15,7 @@
     <ProjectGuid>{176119ca-c9c7-49df-be61-4361f908239e}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>saxpy_vs2017</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />

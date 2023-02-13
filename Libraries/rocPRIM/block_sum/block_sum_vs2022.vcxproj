@@ -15,7 +15,7 @@
     <ProjectGuid>{5e910bcc-9b1d-4c26-9689-d46d14bb08ce}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>block_sum_vs2022</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />

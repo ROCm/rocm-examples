@@ -15,7 +15,7 @@
     <ProjectGuid>{bd725c86-e381-4bdd-b3fc-06a42221bebb}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>hello_world_vs2017</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />
