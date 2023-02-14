@@ -132,6 +132,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decompositio
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_least_squares_vs2022", "Libraries\hipSOLVER\linear_least_squares\linear_least_squares_vs2022.vcxproj", "{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_inversion_vs2022", "Libraries\rocSOLVER\matrix_inversion\matrix_inversion_vs2022.vcxproj", "{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocSOLVER", "rocSOLVER", "{594C0813-02D5-4F93-A4D6-E10100A0539F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -346,6 +350,10 @@ Global
 		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}.Debug|x64.Build.0 = Debug|x64
 		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}.Release|x64.ActiveCfg = Release|x64
 		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}.Release|x64.Build.0 = Release|x64
+		{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}.Debug|x64.ActiveCfg = Debug|x64
+		{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}.Debug|x64.Build.0 = Debug|x64
+		{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}.Release|x64.ActiveCfg = Release|x64
+		{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -413,6 +421,8 @@ Global
 		{AA92EF7E-2323-4497-ACCD-B76FB196C545} = {94393B51-B70E-4111-A22C-6A752D41E454}
 		{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
+		{594C0813-02D5-4F93-A4D6-E10100A0539F} = {7676633F-925E-4AEF-9F60-7A715A1EFBFE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}
