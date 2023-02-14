@@ -15,7 +15,7 @@
     <ProjectGuid>{9144246D-5E29-4477-8C8E-F3BB291A2714}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>linear_least_squares_vs2019</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hipsolver_singular_value_decomposition
+EXAMPLE := hipsolver_cholesky_decomposition
 COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME := HIP
 
@@ -29,7 +29,6 @@ ROCM_INSTALL_DIR := /opt/rocm
 CUDA_INSTALL_DIR := /usr/local/cuda
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
-HIPBLAS_INCLUDE_DIR   := $(HIP_INCLUDE_DIR)
 HIPSOLVER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
@@ -38,9 +37,9 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(HIPBLAS_INCLUDE_DIR) -isystem $(HIPSOLVER_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ICPPFLAGS := -isystem $(HIPSOLVER_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
-ILDLIBS   := -lhipblas -lhipsolver
+ILDLIBS   := -lhipsolver
 
 ifeq ($(GPU_RUNTIME), CUDA)
 	CXXFLAGS += -x cu
@@ -59,7 +58,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipblas_utils.hpp $(COMMON_INCLUDE_DIR)/hipsolver_utils.hpp
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipsolver_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:

@@ -136,6 +136,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_inversion_vs2017", "
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocSOLVER", "rocSOLVER", "{2CD1AF85-3AEE-4002-AF14-69D50BA39DA7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cholesky_decomposition_vs2017", "Libraries\hipSOLVER\cholesky_decomposition\cholesky_decomposition_vs2017.vcxproj", "{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -354,6 +356,10 @@ Global
 		{9952D458-A7A6-4D97-944A-EBBC3505B1EA}.Debug|x64.Build.0 = Debug|x64
 		{9952D458-A7A6-4D97-944A-EBBC3505B1EA}.Release|x64.ActiveCfg = Release|x64
 		{9952D458-A7A6-4D97-944A-EBBC3505B1EA}.Release|x64.Build.0 = Release|x64
+		{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F}.Debug|x64.ActiveCfg = Debug|x64
+		{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F}.Debug|x64.Build.0 = Debug|x64
+		{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F}.Release|x64.ActiveCfg = Release|x64
+		{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -423,6 +429,7 @@ Global
 		{8C00B558-05CB-476A-B9FE-16A141392F78} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{9952D458-A7A6-4D97-944A-EBBC3505B1EA} = {2CD1AF85-3AEE-4002-AF14-69D50BA39DA7}
 		{2CD1AF85-3AEE-4002-AF14-69D50BA39DA7} = {7BFB14C7-DDB4-4583-9261-8450600CDE29}
+		{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

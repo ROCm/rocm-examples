@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
+	cholesky_decomposition \
 	linear_least_squares \
 	singular_value_decomposition
 
