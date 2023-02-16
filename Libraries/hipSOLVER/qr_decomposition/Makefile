@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hipsolver_singular_value_decomposition
+EXAMPLE := hipsolver_qr_decomposition
 COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME := HIP
 
@@ -38,7 +38,7 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(HIPBLAS_INCLUDE_DIR) -isystem $(HIPSOLVER_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ICPPFLAGS := -isystem $(HIPBLAS_INCLUDE_DIR) -isystem $(HIPSOLVER_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lhipblas -lhipsolver
 

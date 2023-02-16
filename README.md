@@ -18,7 +18,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
     - [inline_assembly](/HIP-Basic/inline_assembly/): Program that showcases how to use inline assembly in a portable manner.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
-    - [module_api]((/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
+    - [module_api](/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
     - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
     - [multi_gpu_data_transfer](/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuration parameters for a kernel launch with maximum occupancy.
@@ -46,6 +46,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [hipSOLVER](/Libraries/hipSOLVER/)
         - [cholesky_decomposition](/Libraries/hipSOLVER/cholesky_decomposition): Perform Cholesky factorization and solve linear system with result.
         - [linear_least_squares](/Libraries/hipSOLVER/linear_least_squares): Solve a linear system of the form $A\times X=B$.
+        - [qr_decomposition](/Libraries/hipSOLVER/qr_decomposition): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
         - [singular_value_decomposition](/Libraries/hipSOLVER/singular_value_decomposition): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
     - [rocBLAS](/Libraries/rocBLAS/)
         - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.

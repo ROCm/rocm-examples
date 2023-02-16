@@ -27,7 +27,7 @@ The application provides the following optional command line arguments:
 ## Key APIs and Concepts
 ### hipSOLVER
 - hipSOLVER is initialized by calling `hipsolverCreate(hipsolverHandle_t*)` and it is terminated by calling `hipsolverDestroy(hipsolverHandle_t)`.
-- `hipsolver[SDCZ]gesvd` computes the singular values and optionally the left and right singular vectors of an $m \times n$ matrix $A$. The correct function signature should be chosen based on the datatype of the input matrix::
+- `hipsolver[SDCZ]gesvd` computes the singular values and optionally the left and right singular vectors of an $m \times n$ matrix $A$. The correct function signature should be chosen based on the datatype of the input matrix:
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
     - `C` (single-precision complex: `hipFloatComplex`)
@@ -38,7 +38,7 @@ The application provides the following optional command line arguments:
     - `signed char jobu` and `signed char jobv`: define how the left and right singular vectors, respectively, are calculated and stored. The following values are accepted:
         - `'A'`: all columns of $U$, or rows of $V^H$, are calculated.
         - `'S'`: only the singular vectors associated to the singular values of $A$ are calculated and stored as columns of $U$ or rows of $V^H$. In this case some columns of $U$ or rows of $V^H$ may be left unmodified.
-        - `'O'`: same as `'S'`, but the singular vectors are stored in matrix $A$, overwritting it.
+        - `'O'`: same as `'S'`, but the singular vectors are stored in matrix $A$, overwriting it.
         - `'N'`: singular vectors are not computed.
     - `int m`: number of rows of $A$
     - `int n`: number of columns of $A$

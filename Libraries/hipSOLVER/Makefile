@@ -23,6 +23,7 @@
 EXAMPLES := \
 	cholesky_decomposition \
 	linear_least_squares \
+	qr_decomposition \
 	singular_value_decomposition
 
 all: $(EXAMPLES)
