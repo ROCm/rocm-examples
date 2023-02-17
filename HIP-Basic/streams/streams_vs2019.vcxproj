@@ -65,6 +65,12 @@
   <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
   </PropertyGroup>
+  <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <NvccAdditionalOptions>-std=c++17</NvccAdditionalOptions>
+  </PropertyGroup>
+  <PropertyGroup Label="HIP" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <NvccAdditionalOptions>-std=c++17</NvccAdditionalOptions>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>

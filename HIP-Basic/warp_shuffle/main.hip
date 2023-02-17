@@ -86,8 +86,8 @@ int main()
            && "Matrix has more elements than architecture's warp size value.");
 
     // Block (2D) and grid sizes. Note that in this example we have only 1 block (and 1 warp).
-    constexpr dim3 block_dim(width, width);
-    constexpr dim3 grid_dim(1);
+    const dim3 block_dim(width, width);
+    const dim3 grid_dim(1);
 
     // Allocate host input matrix and initialize with increasing sequence 10, 20, 30, ....
     std::vector<float> matrix(size);

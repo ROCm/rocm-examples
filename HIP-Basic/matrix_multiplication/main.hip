@@ -184,7 +184,7 @@ int main(int argc, const char* argv[])
     HIP_CHECK(hipMemcpy(d_A, A.data(), a_bytes, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_B, B.data(), b_bytes, hipMemcpyHostToDevice));
 
-    constexpr dim3 block_dim(block_size, block_size);
+    const dim3 block_dim(block_size, block_size);
     const dim3     grid_dim(c_cols / block_size, c_rows / block_size);
 
     // Launch matrix multiplication kernel.
