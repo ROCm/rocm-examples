@@ -45,9 +45,7 @@ else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
-endif()
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 set(library_name hip_static_host)
 set(example_name_cxx ${example_name}_cxx)
@@ -94,3 +92,5 @@ endif()
 # Make examples runnable using ctest
 add_test(${example_name} ${example_name})
 add_test(${example_name_cxx} ${example_name_cxx})
+
+install(TARGETS ${example_name} ${example_name_cxx})

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -51,9 +51,7 @@ else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
-endif()
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 # create main.hip
 add_custom_command(
@@ -73,3 +71,5 @@ endif()
 
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+
+install(TARGETS ${example_name})

@@ -44,9 +44,7 @@ else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
-endif()
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 set(offload_archs ${CMAKE_HIP_ARCHITECTURES})
 list(TRANSFORM offload_archs PREPEND "--offload-arch=")
@@ -79,3 +77,5 @@ add_test(${example_name} ${example_name})
 set(include_dirs "../../Common")
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+
+install(TARGETS ${example_name})

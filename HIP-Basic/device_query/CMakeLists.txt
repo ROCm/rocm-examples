@@ -52,9 +52,7 @@ else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
-endif()
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
@@ -76,3 +74,5 @@ if(GPU_RUNTIME STREQUAL "HIP")
     find_package(HIP)
     target_link_libraries(${example_name} PRIVATE hip::host)
 endif()
+
+install(TARGETS ${example_name})

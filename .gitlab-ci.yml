@@ -148,6 +148,7 @@ build:cmake-rocm:
           exit 1
       fi
     - cmake --build $CI_PROJECT_DIR/build
+    - cmake --install $CI_PROJECT_DIR/build --prefix $CI_PROJECT_DIR/install
 
 build:cmake-cuda:
   image: $DOCKER_TAG_PREFIX:cuda-ubuntu
@@ -171,6 +172,7 @@ build:cmake-cuda:
           exit 1
       fi
     - cmake --build $CI_PROJECT_DIR/build
+    - cmake --install $CI_PROJECT_DIR/build --prefix $CI_PROJECT_DIR/install
 
 .test:
   stage: test
@@ -263,17 +265,22 @@ test:rocm-windows-cmake:
   extends:
     - .test:windows
   script:
+    - Import-Module 'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
+    - Enter-VsDevShell -InstallPath 'C:\Program Files\Microsoft Visual Studio\2022\Community' -SkipAutomaticLocation -DevCmdArguments '/arch=x64 /host_arch=x64 /no_logo'
     - cmake
       -S "$CI_PROJECT_DIR"
       -B "$CI_PROJECT_DIR/build"
       -G Ninja
+      -D CMAKE_CXX_COMPILER:PATH="${env:HIP_PATH}\bin\clang++.exe"
+      -D CMAKE_HIP_COMPILER:PATH="${env:HIP_PATH}\bin\clang++.exe"
+      -D CMAKE_HIP_LINK_EXECUTABLE:PATH="${env:HIP_PATH}\bin\lld-link.exe"
+      -D CMAKE_HIP_FLAGS="-fuse-ld=lld"
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_CXX_COMPILER:PATH="${env:HIP_PATH}\bin\clang++.exe"
       -D CMAKE_PREFIX_PATH:PATH="${env:HIP_PATH}"
       -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
       -D CMAKE_BUILD_TYPE="$BUILD_TYPE"
       -D CMAKE_HIP_ARCHITECTURES=gfx1030
-      -D CMAKE_RC_COMPILER:PATH="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\rc.exe"
       -D CMAKE_TOOLCHAIN_FILE:PATH="C:\Tools\Microsoft\vcpkg\scripts\buildsystems\vcpkg.cmake"
       2>&1 | Tee-Object -filepath cmake_log.txt
     - |-
@@ -284,4 +291,5 @@ test:rocm-windows-cmake:
     # CMake does not copy the dependencies to the test folder, and there is no sufficiently concise way of doing it.
     # So for now, just add the library path here.
     - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
-    - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure
+    - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure --timeout 10
+    - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"

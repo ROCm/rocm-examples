@@ -45,9 +45,7 @@ else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
-endif()
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_executable(${example_name} main.hip ../../External/glad/glad.cpp)
 
@@ -67,3 +65,5 @@ endif()
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
 set_source_files_properties(vulkan_utils.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+
+install(TARGETS ${example_name})

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name rocthrust_vectors)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocthrust_vectors LANGUAGES CXX HIP)
+project(${example_name} LANGUAGES CXX HIP)
 
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
@@ -32,10 +34,17 @@ if(NOT CMAKE_PREFIX_PATH)
 endif()
 
 find_package(rocthrust REQUIRED)
-add_executable(rocthrust_vectors main.hip)
-target_link_libraries(rocthrust_vectors PRIVATE roc::rocthrust)
-add_test(rocthrust_vectors rocthrust_vectors)
-target_include_directories(rocthrust_vectors PRIVATE "../../../Common")
-if(WIN32)
-    target_compile_definitions(rocthrust_vectors PRIVATE WIN32)
-endif()
+
+add_executable(${example_name} main.hip)
+add_test(${example_name} ${example_name})
+
+target_link_libraries(${example_name}
+    PRIVATE
+    roc::rocthrust
+)
+target_include_directories(${example_name}
+    PRIVATE
+    "../../../Common"
+)
+
+install(TARGETS ${example_name})

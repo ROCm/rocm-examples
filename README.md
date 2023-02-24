@@ -93,6 +93,7 @@ See [CMake build options](#cmake-build-options) for an overview of build options
 - `$ cd rocm-examples`
 - `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
 - `$ cmake --build build`
+- `$ cmake --install build --prefix install`
 
 #### Make
 Beware that only a subset of the examples support building via Make.

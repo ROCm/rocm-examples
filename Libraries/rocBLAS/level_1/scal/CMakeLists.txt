@@ -42,9 +42,7 @@ else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
-endif()
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(rocblas REQUIRED)
 
@@ -56,3 +54,9 @@ add_test(${example_name} ${example_name})
 target_link_libraries(${example_name} PRIVATE roc::rocblas)
 
 target_include_directories(${example_name} PRIVATE "../../../../Common")
+
+install(TARGETS ${example_name})
+
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+    install(IMPORTED_RUNTIME_ARTIFACTS roc::rocblas)
+endif()

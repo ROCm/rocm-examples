@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name hipcub_device_radix_sort)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipcub_device_radix_sort LANGUAGES CXX)
+project(${example_name} LANGUAGES CXX)
 
 set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
 set(GPU_RUNTIMES "HIP" "CUDA")
@@ -42,18 +44,20 @@ endif()
 
 find_package(hipcub REQUIRED)
 
-add_executable(hipcub_device_radix_sort main.hip)
-add_test(hipcub_device_radix_sort hipcub_device_radix_sort)
+add_executable(${example_name} main.hip)
+add_test(${example_name} ${example_name})
 
-target_link_libraries(hipcub_device_radix_sort
+target_link_libraries(${example_name}
     PRIVATE
     hip::hipcub
 )
-target_include_directories(hipcub_device_radix_sort
+target_include_directories(${example_name}
     PRIVATE
     "../../../Common"
 )
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
 if(WIN32)
-    target_compile_definitions(hipcub_device_radix_sort PRIVATE WIN32)
+    target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
+
+install(TARGETS ${example_name})
