@@ -24,7 +24,8 @@ EXAMPLES := \
 	cholesky_decomposition \
 	linear_least_squares \
 	qr_decomposition \
-	singular_value_decomposition
+	singular_value_decomposition \
+	symmetric_eigenvalue_divide_and_conquer
 
 all: $(EXAMPLES)
 

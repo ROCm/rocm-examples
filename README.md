@@ -48,6 +48,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [linear_least_squares](/Libraries/hipSOLVER/linear_least_squares): Solve a linear system of the form $A\times X=B$.
         - [qr_decomposition](/Libraries/hipSOLVER/qr_decomposition): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
         - [singular_value_decomposition](/Libraries/hipSOLVER/singular_value_decomposition): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
+        - [symmetric_eigenvalue_divide_and_conquer](/Libraries/hipSOLVER/symmetric_eigenvalue_divide_and_conquer/): Program that showcases how to calculate the eigenvalues of a matrix using a divide-and-conquer algorithm in hipSOLVER.
     - [rocBLAS](/Libraries/rocBLAS/)
         - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
             - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.

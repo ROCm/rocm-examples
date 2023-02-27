@@ -140,6 +140,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cholesky_decomposition_vs20
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qr_decomposition_vs2017", "Libraries\hipSOLVER\qr_decomposition\qr_decomposition_vs2017.vcxproj", "{ADA05FC0-06CF-4427-89A9-7A8446E66FB7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symmetric_eigenvalue_divide_and_conquer_vs2017", "Libraries\hipSOLVER\symmetric_eigenvalue_divide_and_conquer\symmetric_eigenvalue_divide_and_conquer_vs2017.vcxproj", "{B8458274-7CCF-4D96-9C07-88CBD1ACDB99}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -366,6 +368,10 @@ Global
 		{ADA05FC0-06CF-4427-89A9-7A8446E66FB7}.Debug|x64.Build.0 = Debug|x64
 		{ADA05FC0-06CF-4427-89A9-7A8446E66FB7}.Release|x64.ActiveCfg = Release|x64
 		{ADA05FC0-06CF-4427-89A9-7A8446E66FB7}.Release|x64.Build.0 = Release|x64
+		{B8458274-7CCF-4D96-9C07-88CBD1ACDB99}.Debug|x64.ActiveCfg = Debug|x64
+		{B8458274-7CCF-4D96-9C07-88CBD1ACDB99}.Debug|x64.Build.0 = Debug|x64
+		{B8458274-7CCF-4D96-9C07-88CBD1ACDB99}.Release|x64.ActiveCfg = Release|x64
+		{B8458274-7CCF-4D96-9C07-88CBD1ACDB99}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -437,6 +443,7 @@ Global
 		{2CD1AF85-3AEE-4002-AF14-69D50BA39DA7} = {7BFB14C7-DDB4-4583-9261-8450600CDE29}
 		{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{ADA05FC0-06CF-4427-89A9-7A8446E66FB7} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{B8458274-7CCF-4D96-9C07-88CBD1ACDB99} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

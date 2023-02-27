@@ -19,26 +19,52 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+set(example_name hipsolver_symmetric_eigenvalue_divide_and_conquer)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipSOLVER_examples LANGUAGES NONE)
+project(${example_name} LANGUAGES CXX)
+
+set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
+set(GPU_RUNTIMES "HIP" "CUDA")
+set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+
+if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
+    message(FATAL_ERROR "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}")
+endif()
+
+enable_language(${GPU_RUNTIME})
+set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
+set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
+set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
 if(WIN32)
     set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
 else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
-
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hipsolver)
-if(NOT hipsolver_FOUND)
-    message(STATUS "hipSOLVER could not be found, not building hipSOLVER examples")
-    return()
+find_package(hipsolver REQUIRED)
+
+add_executable(${example_name} main.cpp)
+# Make example runnable using ctest
+add_test(${example_name} ${example_name})
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE roc::hipsolver)
+
+target_include_directories(${example_name} PRIVATE "../../../Common")
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+
+install(TARGETS ${example_name})
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+    install(IMPORTED_RUNTIME_ARTIFACTS roc::hipsolver)
+    if(GPU_RUNTIME STREQUAL "HIP")
+        find_package(rocsolver REQUIRED)
+        install(IMPORTED_RUNTIME_ARTIFACTS roc::rocsolver)
+    elseif(GPU_RUNTIME STREQUAL "CUDA")
+        find_package(CUDAToolkit REQUIRED)
+        install(IMPORTED_RUNTIME_ARTIFACTS CUDA::cusolver)
+    endif()
 endif()
 
-add_subdirectory(cholesky_decomposition)
-add_subdirectory(linear_least_squares)
-add_subdirectory(qr_decomposition)
-add_subdirectory(singular_value_decomposition)
-add_subdirectory(symmetric_eigenvalue_divide_and_conquer)
