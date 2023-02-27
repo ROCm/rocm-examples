@@ -221,7 +221,6 @@ test:rocm-windows-vs2019:
     - |-
       $SkippedExamples = @(
           "hip_vulkan_interop_vs2019.exe"     # Graphical
-          "hip_opengl_interop_vs2019.exe"     # Graphical
           "hip_texture_management_vs2019.exe" # Hangs sometimes
           "hip_hello_world_vs2019.exe"        # Crashes (known driver issue)
       )
