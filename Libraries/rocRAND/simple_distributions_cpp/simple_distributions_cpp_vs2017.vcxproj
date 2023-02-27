@@ -24,6 +24,11 @@
     <ClInclude Include="..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\Common\cmdparser.hpp" />
   </ItemGroup>
+  <ItemGroup Condition="'$(PlatformToolset)'=='HIP_clang'">
+    <Content Include="$(HIPExecutablePath)\rocrand.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
