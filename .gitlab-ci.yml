@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -268,15 +268,20 @@ test:rocm-windows-cmake:
       -B "$CI_PROJECT_DIR/build"
       -G Ninja
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
+      -D CMAKE_CXX_COMPILER:PATH="${env:HIP_PATH}\bin\clang++.exe"
+      -D CMAKE_PREFIX_PATH:PATH="${env:HIP_PATH}"
       -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
       -D CMAKE_BUILD_TYPE="$BUILD_TYPE"
       -D CMAKE_HIP_ARCHITECTURES=gfx1030
-      -D CMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/10/bin/10.0.19041.0/x64/rc.exe"
-      -D CMAKE_TOOLCHAIN_FILE="C:/Tools/Microsoft/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      -D CMAKE_RC_COMPILER:PATH="C:\Program Files (x86)\Windows Kits\10\bin\10.0.19041.0\x64\rc.exe"
+      -D CMAKE_TOOLCHAIN_FILE:PATH="C:\Tools\Microsoft\vcpkg\scripts\buildsystems\vcpkg.cmake"
       2>&1 | Tee-Object -filepath cmake_log.txt
     - |-
       if (Select-String -Path cmake_log.txt -Pattern "could not find") {
           throw "Some cmake libraries are missing"
       }
     - cmake --build "$CI_PROJECT_DIR/build"
+    # CMake does not copy the dependencies to the test folder, and there is no sufficiently concise way of doing it.
+    # So for now, just add the library path here.
+    - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
     - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure
