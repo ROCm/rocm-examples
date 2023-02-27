@@ -38,6 +38,7 @@ if(NOT hipsolver_FOUND)
 endif()
 
 add_subdirectory(cholesky_decomposition)
+add_subdirectory(generalized_symmetric_eigenvalue_divide_and_conquer)
 add_subdirectory(linear_least_squares)
 add_subdirectory(qr_decomposition)
 add_subdirectory(singular_value_decomposition)

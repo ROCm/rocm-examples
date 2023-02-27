@@ -45,6 +45,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
     - [hipSOLVER](/Libraries/hipSOLVER/)
         - [cholesky_decomposition](/Libraries/hipSOLVER/cholesky_decomposition): Perform Cholesky factorization and solve linear system with result.
+        - [generalized_symmetric_eigenvalue_divide_and_conquer](/Libraries/hipSOLVER/generalized_symmetric_eigenvalue_divide_and_conquer): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
         - [linear_least_squares](/Libraries/hipSOLVER/linear_least_squares): Solve a linear system of the form $A\times X=B$.
         - [qr_decomposition](/Libraries/hipSOLVER/qr_decomposition): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
         - [singular_value_decomposition](/Libraries/hipSOLVER/singular_value_decomposition): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.

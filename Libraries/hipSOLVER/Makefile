@@ -22,6 +22,7 @@
 
 EXAMPLES := \
 	cholesky_decomposition \
+	generalized_symmetric_eigenvalue_divide_and_conquer \
 	linear_least_squares \
 	qr_decomposition \
 	singular_value_decomposition \

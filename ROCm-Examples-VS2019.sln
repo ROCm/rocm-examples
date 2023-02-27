@@ -142,6 +142,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qr_decomposition_vs2019", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symmetric_eigenvalue_divide_and_conquer_vs2019", "Libraries\hipSOLVER\symmetric_eigenvalue_divide_and_conquer\symmetric_eigenvalue_divide_and_conquer_vs2019.vcxproj", "{578F7B33-698D-4B8A-B8E6-7CBF82F42556}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generalized_symmetric_eigenvalue_divide_and_conquer_vs2019", "Libraries\hipSOLVER\generalized_symmetric_eigenvalue_divide_and_conquer\generalized_symmetric_eigenvalue_divide_and_conquer_vs2019.vcxproj", "{1209C293-D1F0-4BFC-B6D0-65A96B801135}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -372,6 +374,10 @@ Global
 		{578F7B33-698D-4B8A-B8E6-7CBF82F42556}.Debug|x64.Build.0 = Debug|x64
 		{578F7B33-698D-4B8A-B8E6-7CBF82F42556}.Release|x64.ActiveCfg = Release|x64
 		{578F7B33-698D-4B8A-B8E6-7CBF82F42556}.Release|x64.Build.0 = Release|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Debug|x64.ActiveCfg = Debug|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Debug|x64.Build.0 = Debug|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Release|x64.ActiveCfg = Release|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -444,6 +450,7 @@ Global
 		{7CD5972B-BC1C-405E-9B90-EBE5733A41D8} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{64A75FF5-B298-4256-A35B-A164972A91F9} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{578F7B33-698D-4B8A-B8E6-7CBF82F42556} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
