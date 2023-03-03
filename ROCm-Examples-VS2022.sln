@@ -128,21 +128,21 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libhip_static_host_vs2022",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2022", "HIP-Basic\hello_world\hello_world_vs2022.vcxproj", "{AA92EF7E-2323-4497-ACCD-B76FB196C545}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decomposition_vs2022", "Libraries\hipSOLVER\singular_value_decomposition\singular_value_decomposition_vs2022.vcxproj", "{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gesvd_vs2022", "Libraries\hipSOLVER\gesvd\gesvd_vs2022.vcxproj", "{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_least_squares_vs2022", "Libraries\hipSOLVER\linear_least_squares\linear_least_squares_vs2022.vcxproj", "{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gels_vs2022", "Libraries\hipSOLVER\gels\gels_vs2022.vcxproj", "{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getri_vs2022", "Libraries\rocSOLVER\getri\getri_vs2022.vcxproj", "{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocSOLVER", "rocSOLVER", "{594C0813-02D5-4F93-A4D6-E10100A0539F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cholesky_decomposition_vs2022", "Libraries\hipSOLVER\cholesky_decomposition\cholesky_decomposition_vs2022.vcxproj", "{F78A1C37-A4B6-42DC-85EE-F30A0FD1ACD2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "potrf_vs2022", "Libraries\hipSOLVER\potrf\potrf_vs2022.vcxproj", "{F78A1C37-A4B6-42DC-85EE-F30A0FD1ACD2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qr_decomposition_vs2022", "Libraries\hipSOLVER\qr_decomposition\qr_decomposition_vs2022.vcxproj", "{D5636463-4796-4B79-A182-B97D116A6735}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geqrf_vs2022", "Libraries\hipSOLVER\geqrf\geqrf_vs2022.vcxproj", "{D5636463-4796-4B79-A182-B97D116A6735}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symmetric_eigenvalue_divide_and_conquer_vs2022", "Libraries\hipSOLVER\symmetric_eigenvalue_divide_and_conquer\symmetric_eigenvalue_divide_and_conquer_vs2022.vcxproj", "{10C958EF-0908-488E-8CD1-A320D3807DBD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevd_vs2022", "Libraries\hipSOLVER\syevd\syevd_vs2022.vcxproj", "{10C958EF-0908-488E-8CD1-A320D3807DBD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generalized_symmetric_eigenvalue_divide_and_conquer_vs2022", "Libraries\hipSOLVER\generalized_symmetric_eigenvalue_divide_and_conquer\generalized_symmetric_eigenvalue_divide_and_conquer_vs2022.vcxproj", "{C2804CFB-1D49-4E39-9757-3901F50CF3AA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sygvd_vs2022", "Libraries\hipSOLVER\sygvd\sygvd_vs2022.vcxproj", "{C2804CFB-1D49-4E39-9757-3901F50CF3AA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getf2_vs2022", "Libraries\rocSOLVER\getf2\getf2_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169335}"
 EndProject

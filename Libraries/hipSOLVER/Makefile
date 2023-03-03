@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	cholesky_decomposition \
-	generalized_symmetric_eigenvalue_divide_and_conquer \
+	gels \
 	getrf \
-	linear_least_squares \
-	qr_decomposition \
-	singular_value_decomposition \
-	symmetric_eigenvalue_divide_and_conquer
+	geqrf \
+	gesvd \
+	potrf \
+	syevd \
+	sygvd
 
 all: $(EXAMPLES)
 

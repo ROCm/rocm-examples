@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 LIBRARIES := \
-	hipCUB \
 	hipBLAS \
+	hipCUB \
 	hipSOLVER \
 	rocRAND
 
