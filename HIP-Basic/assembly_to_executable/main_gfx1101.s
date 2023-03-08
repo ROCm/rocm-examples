@@ -12,7 +12,8 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 	s_waitcnt lgkmcnt(0)
 	s_and_b32 s5, s5, 0xffff
 	s_delay_alu instid0(SALU_CYCLE_1) | instskip(SKIP_2) | instid1(VALU_DEP_1)
-	v_mad_u64_u32 v[1:2], null, s4, s5, v[0:1]
+	v_mad_u64_u32 v[3:4], null, s4, s5, v[0:1]
+	v_mov_b32_e32 v1, v3
 	v_mov_b32_e32 v2, 0
 	s_mov_b32 s4, exec_lo
 	v_cmpx_gt_u64_e64 s[8:9], v[1:2]
@@ -117,7 +118,6 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 	.text
 	.p2alignl 7, 3214868480
 	.fill 96, 4, 3214868480
-	.ident	"clang version 17.0.0 (https://github.com/RadeonOpenCompute/llvm-project a74274e615d5af34867976c36845104ade14e084)"
 	.ident	"AMD clang version 15.0.0 (https://github.com/RadeonOpenCompute/llvm-project roc-5.3.0 22362 3cf23f77f8208174a2ee7c616f4be23674d7b081)"
 	.section	".note.GNU-stack"
 	.addrsig
