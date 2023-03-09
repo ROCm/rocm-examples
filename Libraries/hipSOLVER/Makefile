@@ -27,7 +27,8 @@ EXAMPLES := \
 	gesvd \
 	potrf \
 	syevd \
-	sygvd
+	sygvd \
+	syevj
 
 all: $(EXAMPLES)
 

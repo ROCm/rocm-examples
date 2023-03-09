@@ -51,6 +51,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [potrf](/Libraries/hipSOLVER/potrf/): Perform Cholesky factorization and solve linear system with result.
         - [syevd](/Libraries/hipSOLVER/syevd/): Program that showcases how to calculate the eigenvalues of a matrix using a divide-and-conquer algorithm in hipSOLVER.
         - [sygvd](/Libraries/hipSOLVER/sygvd/): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
+        - [syevj](/Libraries/hipSOLVER/syevj): Calculates the eigenvalues and eigenvectors from a real symmetric matrix using the Jacobi method.
     - [rocBLAS](/Libraries/rocBLAS/)
         - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
             - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
