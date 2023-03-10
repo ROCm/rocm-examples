@@ -23,6 +23,11 @@
 EXAMPLES := \
 	floyd_warshall
 
+ifneq ($(GPU_RUNTIME), CUDA)
+EXAMPLES += \
+	monte_carlo_pi
+endif
+
 all: $(EXAMPLES)
 
 clean: TARGET=clean
