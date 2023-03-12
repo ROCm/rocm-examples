@@ -4,6 +4,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
 
 ## Repository Contents
 - [Applications](https://github.com/amd/rocm-examples/tree/develop/Applications/) groups a number of examples ... .
+    - [bitonic_sort](https://github.com/amd/rocm-examples/tree/develop/Applications/bitonic_sort/): Showcases how to order an array of $n$ elements using a GPU implementation of the bitonic sort.
     - [convolution](https://github.com/amd/rocm-examples/tree/develop/Applications/convolution/): A simple GPU implementation for the calculation of discrete convolutions.
     - [floyd_warshall](https://github.com/amd/rocm-examples/tree/develop/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
     - [histogram](https://github.com/amd/rocm-examples/tree/develop/Applications/histogram/): Histogram over a byte array with memory bank optimization.
