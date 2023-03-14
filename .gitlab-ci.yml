@@ -59,6 +59,19 @@ clang-format:
     - git config --global --add safe.directory $CI_PROJECT_DIR
     - Scripts/CodeFormat/check_format.sh $CI_MERGE_REQUEST_DIFF_BASE_SHA --binary "$CLANG_FORMAT"
 
+copyright-date:
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  stage: lint
+  needs: []
+  tags:
+    - rocm-build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  script:
+    - cd $CI_PROJECT_DIR
+    - git config --global --add safe.directory $CI_PROJECT_DIR
+    - Scripts/CopyrightDate/check_copyright.sh -v -d $CI_MERGE_REQUEST_DIFF_BASE_SHA
+
 .build:dockerfiles:
   timeout: 60m
   image:
