@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,6 +24,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(Applications LANGUAGES CXX)
 
 add_subdirectory(floyd_warshall)
+add_subdirectory(prefix_sum)
 if(NOT WIN32 AND GPU_RUNTIME STREQUAL "HIP")
     add_subdirectory(monte_carlo_pi)
 endif()
