@@ -144,6 +144,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symmetric_eigenvalue_divide
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generalized_symmetric_eigenvalue_divide_and_conquer_vs2022", "Libraries\hipSOLVER\generalized_symmetric_eigenvalue_divide_and_conquer\generalized_symmetric_eigenvalue_divide_and_conquer_vs2022.vcxproj", "{C2804CFB-1D49-4E39-9757-3901F50CF3AA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LU_factorization_vs2022", "Libraries\rocSOLVER\LU_factorization\LU_factorization_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169335}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getrf_vs2022", "Libraries\hipSOLVER\getrf\getrf_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169325}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -378,6 +382,14 @@ Global
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA}.Debug|x64.Build.0 = Debug|x64
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA}.Release|x64.ActiveCfg = Release|x64
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA}.Release|x64.Build.0 = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169335}.Debug|x64.ActiveCfg = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169335}.Debug|x64.Build.0 = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169335}.Release|x64.ActiveCfg = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169335}.Release|x64.Build.0 = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169325}.Debug|x64.ActiveCfg = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169325}.Debug|x64.Build.0 = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169325}.Release|x64.ActiveCfg = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169325}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -451,6 +463,8 @@ Global
 		{D5636463-4796-4B79-A182-B97D116A6735} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{10C958EF-0908-488E-8CD1-A320D3807DBD} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{D1C40C14-2881-43C7-8DAD-72BAAB169335} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
+		{D1C40C14-2881-43C7-8DAD-72BAAB169325} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

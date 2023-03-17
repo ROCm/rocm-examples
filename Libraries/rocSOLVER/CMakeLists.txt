@@ -49,3 +49,4 @@ if(NOT rocsolver_FOUND)
 endif()
 
 add_subdirectory(matrix_inversion)
+add_subdirectory(LU_factorization)
