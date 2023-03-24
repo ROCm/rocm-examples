@@ -29,10 +29,10 @@
     <Content Include="$(HIPExecutablePath)\rocblas.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(HIPExecutablePath)\rocblas\**">
+    <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>rocblas\%(RecursiveDir)\%(FileName)%(Extension)</TargetPath>
-    </Content>
+    </ContentWithTargetPath>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

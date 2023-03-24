@@ -215,13 +215,17 @@ test:cuda:
 
 .test:windows-vs:
   script:
+   # MSBuild cannot properly resolve the `<Content Include=` dependencies, and will sometimes try to copy
+   # two or more files at once. This results in a warning before it retries, which is counted towards
+   # /warnAsError by default. For this reason, we disable the relevant warning (MSB3026).
     - >
       & $MSBUILD
       /maxCpuCount
       "/p:Configuration=$BUILD_TYPE"
-      "$CI_PROJECT_DIR/$SOLUTION"
-      "/warnAsError"
+      /warnAsError
+      /warnAsMessage:MSB3026
       $MSBUILD_EXTRA_OPTIONS
+      "$CI_PROJECT_DIR/$SOLUTION"
 
 test:rocm-windows-vs2019:
   extends:
