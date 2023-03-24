@@ -56,6 +56,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "events_vs2017", "HIP-Basic\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2017", "HIP-Basic\hello_world\hello_world_vs2017.vcxproj", "{BD725C86-E381-4BDD-B3FC-06A42221BEBB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_vs2017", "Applications\histogram\histogram_vs2017.vcxproj", "{D3531843-4D0D-445D-BD8D-2352038D8221}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -154,6 +156,10 @@ Global
 		{BD725C86-E381-4BDD-B3FC-06A42221BEBB}.Debug|x64.Build.0 = Debug|x64
 		{BD725C86-E381-4BDD-B3FC-06A42221BEBB}.Release|x64.ActiveCfg = Release|x64
 		{BD725C86-E381-4BDD-B3FC-06A42221BEBB}.Release|x64.Build.0 = Release|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Debug|x64.ActiveCfg = Debug|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Debug|x64.Build.0 = Debug|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.ActiveCfg = Release|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +189,7 @@ Global
 		{8C3BBAAF-04F6-46F5-96A2-81C047167343} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{BD725C86-E381-4BDD-B3FC-06A42221BEBB} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
+		{D3531843-4D0D-445D-BD8D-2352038D8221} = {0328C27A-BB25-46F6-89F7-4EEF7AC225D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

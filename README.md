@@ -5,6 +5,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
 ## Repository Contents
 - [Applications](https://github.com/amd/rocm-examples/tree/develop/Applications/) groups a number of examples ... .
     - [floyd_warshall](https://github.com/amd/rocm-examples/tree/develop/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
+    - [histogram](https://github.com/amd/rocm-examples/tree/develop/Applications/histogram/): Histogram over a byte array with memory bank optimization.
     - [monte_carlo_pi](https://github.com/amd/rocm-examples/tree/develop/Applications/monte_carlo_pi/): Monte Carlo estimation of $\pi$ using hipRAND for random number generation and hipCUB for evaluation.
     - [prefix_sum](https://github.com/amd/rocm-examples/tree/develop/Applications/prefix_sum/): Showcases a GPU implementation of a prefix sum with a 2-kernel scan algorithm.
 - [Common](https://github.com/amd/rocm-examples/tree/develop/Common/) contains common utility functionality shared between the examples.

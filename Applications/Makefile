@@ -22,6 +22,7 @@
 
 EXAMPLES := \
 	floyd_warshall \
+	histogram \
 	prefix_sum
 
 ifneq ($(GPU_RUNTIME), CUDA)

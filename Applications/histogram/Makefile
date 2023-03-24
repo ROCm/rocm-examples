@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,12 +20,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Applications LANGUAGES CXX)
+EXAMPLE := applications_histogram
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME := HIP
 
-add_subdirectory(floyd_warshall)
-add_subdirectory(histogram)
-if(NOT WIN32 AND GPU_RUNTIME STREQUAL "HIP")
-    add_subdirectory(monte_carlo_pi)
-endif()
-add_subdirectory(prefix_sum)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
+
+ifeq ($(GPU_RUNTIME), CUDA)
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS ?= -Wall -Wextra
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

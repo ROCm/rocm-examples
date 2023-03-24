@@ -56,6 +56,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2019", "HIP-B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texture_management_vs2019", "HIP-Basic\texture_management\texture_management_vs2019.vcxproj", "{40E56BFB-1A0C-4618-BB49-A9AA635127C1}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_vs2019", "Applications\histogram\histogram_vs2019.vcxproj", "{D3531843-4D0D-445D-BD8D-2352038D8221}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -154,6 +156,10 @@ Global
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Debug|x64.Build.0 = Debug|x64
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.ActiveCfg = Release|x64
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.Build.0 = Release|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Debug|x64.ActiveCfg = Debug|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Debug|x64.Build.0 = Debug|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.ActiveCfg = Release|x64
+		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -183,6 +189,7 @@ Global
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{5E0E9AB0-B708-481F-9226-DD92C3798341} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{D3531843-4D0D-445D-BD8D-2352038D8221} = {9254BAD9-FDFC-4645-B2C8-EEB42F1F069D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
