@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{015df085-feb3-4c7a-acee-7cffb3c9aff0}</ProjectGuid>
+    <ProjectGuid>{BE12D9BE-704A-4697-9D3D-5351A6E30189}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>prefix_sum_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>

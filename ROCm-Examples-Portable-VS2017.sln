@@ -58,6 +58,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2017", "HIP-B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_vs2017", "Applications\histogram\histogram_vs2017.vcxproj", "{D3531843-4D0D-445D-BD8D-2352038D8221}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "prefix_sum_vs2017", "Applications\prefix_sum\prefix_sum_vs2017.vcxproj", "{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -160,6 +162,10 @@ Global
 		{D3531843-4D0D-445D-BD8D-2352038D8221}.Debug|x64.Build.0 = Debug|x64
 		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.ActiveCfg = Release|x64
 		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.Build.0 = Release|x64
+		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}.Debug|x64.ActiveCfg = Debug|x64
+		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}.Debug|x64.Build.0 = Debug|x64
+		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}.Release|x64.ActiveCfg = Release|x64
+		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -190,6 +196,7 @@ Global
 		{AA9E497A-FEDE-45A4-A6CE-A8E3DDDDEB82} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{BD725C86-E381-4BDD-B3FC-06A42221BEBB} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{D3531843-4D0D-445D-BD8D-2352038D8221} = {0328C27A-BB25-46F6-89F7-4EEF7AC225D8}
+		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0} = {0328C27A-BB25-46F6-89F7-4EEF7AC225D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

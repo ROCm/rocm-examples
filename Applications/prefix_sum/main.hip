@@ -193,8 +193,8 @@ int main(int argc, char* argv[])
     std::vector<float> input(size);
     std::vector<float> output(size);
 
-    std::default_random_engine             generator;
-    std::uniform_real_distribution<double> distribution(-1, 1);
+    std::default_random_engine            generator;
+    std::uniform_real_distribution<float> distribution(-1, 1);
 
     std::generate(input.begin(), input.end(), [&]() { return distribution(generator); });
 
