@@ -30,8 +30,7 @@ include:
       - /rules.yaml
 
 variables:
-  # suppressing 186 allows us to write `assert(a && "message")`.
-  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror --Werror all-warnings --diag-suppress 186"
+  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror --Werror all-warnings"
   CXX_FLAGS: "-Wall -Wextra -Werror"
   HIP_FLAGS: "-Wall -Wextra -Werror"
 
@@ -201,25 +200,38 @@ test:cuda:
   extends:
     - .rules:test
   stage: test
-  tags:
-    - windows
-    - shell
-    - rx6900
   needs: []
   parallel:
     matrix:
       - BUILD_TYPE: [Debug, Release]
 
-test:rocm-windows-vs2019:
+.test:rocm-windows:
   extends:
     - .test:windows
+  tags:
+    - windows
+    - shell
+    - rx6900
+
+.test:windows-vs:
   script:
     - >
-      & "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe"
+      & $MSBUILD
       /maxCpuCount
-      /warnAsError
       "/p:Configuration=$BUILD_TYPE"
-      "$CI_PROJECT_DIR/ROCm-Examples-VS2019.sln"
+      "$CI_PROJECT_DIR/$SOLUTION"
+      "/warnAsError"
+      $MSBUILD_EXTRA_OPTIONS
+
+test:rocm-windows-vs2019:
+  extends:
+    - .test:rocm-windows
+    - .test:windows-vs
+  variables:
+    MSBUILD: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe"
+    SOLUTION: "ROCm-Examples-VS2019.sln"
+  script:
+    - !reference [".test:windows-vs", script]
     - |-
       $SkippedExamples = @(
           "hip_vulkan_interop_vs2019.exe"     # Graphical
@@ -241,29 +253,25 @@ test:rocm-windows-vs2019:
 
 test:rocm-windows-vs2017:
   extends:
-    - .test:windows
-  script:
-    - >
-      & "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/MSBuild/15.0/Bin/MSBuild.exe"
-      /maxCpuCount
-      /warnAsError
-      "/p:Configuration=$BUILD_TYPE"
-      "$CI_PROJECT_DIR/ROCm-Examples-VS2017.sln"
+    - .test:rocm-windows
+    - .test:windows-vs
+  variables:
+    MSBUILD: "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/MSBuild/15.0/Bin/MSBuild.exe"
+    SOLUTION: "ROCm-Examples-VS2017.sln"
+    # See https://developercommunity.visualstudio.com/t/windowstargetplatformversion-makes-it-impossible-t/140294
+    MSBUILD_EXTRA_OPTIONS: "/p:WindowsTargetPlatformVersion=10.0.20348.0"
 
 test:rocm-windows-vs2022:
   extends:
-    - .test:windows
-  script:
-    - >
-      & "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe"
-      /maxCpuCount
-      /warnAsError
-      "/p:Configuration=$BUILD_TYPE"
-      "$CI_PROJECT_DIR/ROCm-Examples-VS2022.sln"
+    - .test:rocm-windows
+    - .test:windows-vs
+  variables:
+    MSBUILD: "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe"
+    SOLUTION: "ROCm-Examples-VS2022.sln"
 
 test:rocm-windows-cmake:
   extends:
-    - .test:windows
+    - .test:rocm-windows
   script:
     - Import-Module 'C:\Program Files\Microsoft Visual Studio\2022\Community\Common7\Tools\Microsoft.VisualStudio.DevShell.dll'
     - Enter-VsDevShell -InstallPath 'C:\Program Files\Microsoft Visual Studio\2022\Community' -SkipAutomaticLocation -DevCmdArguments '/arch=x64 /host_arch=x64 /no_logo'
@@ -292,4 +300,93 @@ test:rocm-windows-cmake:
     # So for now, just add the library path here.
     - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
     - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure --timeout 10
+    - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"
+
+.test:nvcc-windows:
+  extends:
+    - .test:windows
+  tags:
+    - nvcc-windows
+  before_script:
+    # To test for NVIDIA, we need to set the platform toolset to HIP_nvcc. This cannot be done with /p:PlatformToolset
+    # though, as some examples use the regular msvc toolchain.
+    - |
+      Foreach ($f in (Get-ChildItem -Recurse -Filter "*.vcxproj" "$CI_PROJECT_DIR").FullName) {
+        (Get-Content $f) |
+          % { $_ -replace "<PlatformToolset>HIP_clang</PlatformToolset>","<PlatformToolset>HIP_nvcc</PlatformToolset>" } |
+          Set-Content $f
+      }
+
+test:nvcc-windows-vs2019:
+  extends:
+    - .test:nvcc-windows
+    - .test:windows-vs
+  variables:
+    MSBUILD: "C:/Program Files (x86)/Microsoft Visual Studio/2019/Community/MSBuild/Current/Bin/MSBuild.exe"
+    SOLUTION: "ROCm-Examples-Portable-VS2019.sln"
+  script:
+    - !reference [".test:windows-vs", script]
+    - |-
+      $SkippedExamples = @(
+          "hip_vulkan_interop_vs2019.exe" # Graphical
+          "hip_opengl_interop_vs2019.exe" # Graphical
+      )
+      Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
+      ForEach-Object {
+          if ($SkippedExamples -NotContains $_.Name) {
+              echo "--" $_.Name
+              & "$CI_PROJECT_DIR/$BUILD_TYPE/$_"
+              if (!$?) {
+                throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
+              }
+          } else {
+              echo "-- SKIPPING " $_.Name
+          }
+      }
+
+test:nvcc-windows-vs2017:
+  extends:
+    - .test:nvcc-windows
+    - .test:windows-vs
+  variables:
+    MSBUILD: "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/MSBuild/15.0/Bin/MSBuild.exe"
+    SOLUTION: "ROCm-Examples-Portable-VS2017.sln"
+    # See https://developercommunity.visualstudio.com/t/windowstargetplatformversion-makes-it-impossible-t/140294
+    MSBUILD_EXTRA_OPTIONS: "/p:WindowsTargetPlatformVersion=10.0.20348.0"
+
+test:nvcc-windows-vs2022:
+  extends:
+    - .test:nvcc-windows
+    - .test:windows-vs
+  variables:
+    MSBUILD: "C:/Program Files/Microsoft Visual Studio/2022/Community/MSBuild/Current/Bin/MSBuild.exe"
+    SOLUTION: "ROCm-Examples-Portable-VS2022.sln"
+
+test:nvcc-windows-cmake:
+  extends:
+    - .test:nvcc-windows
+  script:
+    # Import the VisualStudio 2022 development environment
+    - |-
+      $vs = &"C:/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -version 17.0 -property InstallationPath
+      Import-Module (Join-Path $vs "Common7/Tools/Microsoft.VisualStudio.DevShell.dll")
+      Enter-VsDevShell -VsInstallPath $vs -SkipAutomaticLocation -DevCmdArguments "/arch=x64 /host_arch=x64 /no_logo"
+    # Note: The current version of the HIP SDK does not ship with CMake config files for Nvidia, so we can only test
+    # the HIP-Basic and Applications examples. It is expected that some dependencies will not be found for this.
+    - cmake
+      -S "$CI_PROJECT_DIR"
+      -B "$CI_PROJECT_DIR/build"
+      -G Ninja
+      -D CMAKE_CXX_COMPILER="cl.exe"
+      -D CMAKE_BUILD_TYPE="$BUILD_TYPE"
+      -D CMAKE_TOOLCHAIN_FILE="C:/Tools/Microsoft/vcpkg/scripts/buildsystems/vcpkg.cmake"
+      -D GPU_RUNTIME=CUDA
+      2>&1 | Tee-Object -filepath cmake_log.txt
+    - |-
+      if (Select-String -Path cmake_log.txt -Pattern "could not find") {
+          throw "Some cmake libraries are missing"
+      }
+    - cmake --build "$CI_PROJECT_DIR/build"
+    - cd "$CI_PROJECT_DIR/build"
+    - ctest --output-on-failure --timeout 10
     - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"

@@ -32,9 +32,11 @@
 
 // SAXPY kernel stored as a string
 static constexpr auto saxpy_kernel{
+    // MSVC 19.16 does not properly handle R-strings in its preprocessor when they are on a separate line,
+    // if the /E flag is passed (as NVCC does).
+    "#include \"test_header.h\"\n"
+    "#include \"test_header1.h\"\n"
     R"(
-#include "test_header.h"
-#include "test_header1.h"
 extern "C"
 __global__ void saxpy_kernel(const real a, const realptr d_x, realptr d_y, const unsigned int size)
 {
@@ -77,14 +79,20 @@ int main()
     constexpr unsigned int device_id = 0;
     HIP_CHECK(hipGetDeviceProperties(&props, device_id));
 
+    std::vector<const char*> options;
+
     // Obtain architecture's name from device properties and initialize array of compile options. When in CUDA we omit this option.
-    std::string sarg
-        = (props.gcnArchName[0]) ? std::string("--gpu-architecture=") + props.gcnArchName : "";
-    const char* options[]   = {sarg.c_str()};
-    const int   num_options = !sarg.empty();
+#ifdef __HIP_PLATFORM_AMD__
+    std::string arch_option;
+    if(props.gcnArchName[0])
+    {
+        arch_option = std::string("--gpu-architecture=") + props.gcnArchName;
+        options.push_back(arch_option.c_str());
+    }
+#endif
 
     // Compile program in runtime. Parameters are the program, number of options and array with options.
-    const hiprtcResult compile_result{hiprtcCompileProgram(prog, num_options, options)};
+    const hiprtcResult compile_result{hiprtcCompileProgram(prog, options.size(), options.data())};
 
     // Get the size of the log (possibly) generated during the compilation.
     size_t log_size;

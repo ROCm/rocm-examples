@@ -23,9 +23,13 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(Libraries LANGUAGES NONE)
 
-add_subdirectory(hipBLAS)
-add_subdirectory(hipCUB)
-add_subdirectory(rocBLAS)
-add_subdirectory(rocPRIM)
-add_subdirectory(rocRAND)
-add_subdirectory(rocThrust)
+# CMake configuration files for CUDA versions of HIP libraries are not yet
+# included under the HIP SDK for Windows.
+if (NOT (CMAKE_SYSTEM_NAME MATCHES Windows AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
+    add_subdirectory(hipBLAS)
+    add_subdirectory(hipCUB)
+    add_subdirectory(rocBLAS)
+    add_subdirectory(rocPRIM)
+    add_subdirectory(rocRAND)
+    add_subdirectory(rocThrust)
+endif()

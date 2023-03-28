@@ -72,22 +72,12 @@ set_target_properties(${example_name} PROPERTIES HIP_ARCHITECTURES FALSE)
 
 # Create a driver executable using the host c++ compiler.
 add_executable(${example_name_cxx} main.cpp)
-add_dependencies(${example_name_cxx} ${library_name})
-# Link the static host library we have just created.
-# Note, pass the linker commands manually to prevent cmake from
-# automatically deducting this as a HIP-compilation. and using
-# the ROCm bundled clang.
-target_link_libraries(${example_name_cxx} PRIVATE -L$<TARGET_FILE_DIR:${library_name}> -l${library_name})
-target_include_directories(${example_name_cxx} PRIVATE library)
 
-# If linking with the host c++ compiler, we also need to link the runtime libraries from the respective language.
-if(GPU_RUNTIME STREQUAL "HIP")
-    find_package(HIP)
-    target_link_libraries(${example_name_cxx} PRIVATE hip::host)
-else()
-    find_package(CUDAToolkit)
-    target_link_libraries(${example_name_cxx} PRIVATE CUDA::cudart)
-endif()
+# Link the static host library we have just created.
+target_link_libraries(${example_name_cxx} PRIVATE ${library_name})
+# Set the linker language to CXX so that CMake uses the host CXX compiler to compile
+# and link this version of the executable.
+set_target_properties(${example_name_cxx} PROPERTIES LINKER_LANGUAGE CXX)
 
 # Make examples runnable using ctest
 add_test(${example_name} ${example_name})

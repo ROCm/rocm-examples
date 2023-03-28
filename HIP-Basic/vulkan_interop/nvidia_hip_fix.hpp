@@ -40,6 +40,8 @@
     #define hipExternalSemaphore_t cudaExternalSemaphore_t
     #define hipExternalSemaphoreSignalParams cudaExternalSemaphoreSignalParams
     #define hipExternalSemaphoreWaitParams cudaExternalSemaphoreWaitParams
+    #define hipExternalMemoryHandleTypeOpaqueWin32Kmt cudaExternalMemoryHandleTypeOpaqueWin32Kmt
+    #define hipExternalSemaphoreHandleTypeOpaqueWin32 cudaExternalSemaphoreHandleTypeOpaqueWin32
 
 hipError_t hipImportExternalMemory(hipExternalMemory_t* extmem, hipExternalMemoryHandleDesc* desc)
 {

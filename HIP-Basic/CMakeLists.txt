@@ -30,9 +30,12 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     add_subdirectory(module_api)
 endif()
 
+if(WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
+    add_subdirectory(cooperative_groups)
+endif()
+
 add_subdirectory(bandwidth)
 add_subdirectory(bit_extract)
-add_subdirectory(cooperative_groups)
 add_subdirectory(device_query)
 add_subdirectory(device_globals)
 add_subdirectory(dynamic_shared)

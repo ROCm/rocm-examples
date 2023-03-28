@@ -47,11 +47,11 @@ enum class TestMode : unsigned int
 
 /// \brief Run host to device or device to host transfer, bandwidth calculated for the specified configuration
 std::vector<double>
-    run_bandwidth_host_device(const std::vector<unsigned long>& memory_copy_measurement_sizes,
-                              const int                         device,
-                              hipMemcpyKind                     hip_memcpy_kind,
-                              const MemoryMode                  memory_mode,
-                              const unsigned int                trails)
+    run_bandwidth_host_device(const std::vector<size_t>& memory_copy_measurement_sizes,
+                              const int                  device,
+                              hipMemcpyKind              hip_memcpy_kind,
+                              const MemoryMode           memory_mode,
+                              const unsigned int         trails)
 {
 
     // Check for invalid configurations
@@ -249,10 +249,9 @@ std::vector<double>
 }
 
 /// \brief Run device to device transfer, bandwidth calculated for the specified configuration
-std::vector<double>
-    run_bandwidth_device_device(std::vector<unsigned long> memory_copy_measurement_sizes,
-                                const int                  device,
-                                const unsigned int         trails)
+std::vector<double> run_bandwidth_device_device(std::vector<size_t> memory_copy_measurement_sizes,
+                                                const int           device,
+                                                const unsigned int  trails)
 {
 
     // The bandwidths calculated will be stored in bandwidth_measurements
@@ -333,13 +332,12 @@ std::vector<double>
     return bandwidth_measurements;
 }
 
-std::vector<unsigned long>
-    generate_measurement_sizes_range(const size_t start_measurement,
-                                     const size_t end_measurement,
-                                     const size_t stride_between_measurements)
+std::vector<size_t> generate_measurement_sizes_range(const size_t start_measurement,
+                                                     const size_t end_measurement,
+                                                     const size_t stride_between_measurements)
 {
     // The size of data to copy for each measurement
-    std::vector<unsigned long> memory_copy_measurement_sizes;
+    std::vector<size_t> memory_copy_measurement_sizes;
 
     for(size_t i = start_measurement; i < end_measurement; i += stride_between_measurements)
     {
@@ -349,7 +347,7 @@ std::vector<unsigned long>
     return memory_copy_measurement_sizes;
 }
 
-std::vector<unsigned long> generate_measurement_sizes_shmoo()
+std::vector<size_t> generate_measurement_sizes_shmoo()
 {
 
     // Constants for shmoo mode
@@ -371,7 +369,7 @@ std::vector<unsigned long> generate_measurement_sizes_shmoo()
     const size_t shmoo_limit_32MB  = 1 << 25; // 32 MB
 
     // The size of data to copy for each measurement
-    std::vector<unsigned long> memory_copy_measurement_sizes;
+    std::vector<size_t> memory_copy_measurement_sizes;
 
     size_t current_size = 0;
 
@@ -573,7 +571,7 @@ int main(int argc, char** argv)
         }
     }
 
-    std::vector<unsigned long> memory_copy_measurement_sizes;
+    std::vector<size_t> memory_copy_measurement_sizes;
     if(mode_of_test == TestMode::RANGED)
     {
         memory_copy_measurement_sizes

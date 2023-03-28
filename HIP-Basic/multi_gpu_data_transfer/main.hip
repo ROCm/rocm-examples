@@ -68,7 +68,11 @@ std::pair<int, int> check_peer_to_peer_support()
 void enable_peer_to_peer(const int current_gpu, const int peer_gpu)
 {
     // Must be on a multi-gpu system.
-    assert(current_gpu != peer_gpu && "Current and peer devices must be different.");
+    if(current_gpu == peer_gpu)
+    {
+        std::cerr << "Current and peer devices must be different." << std::endl;
+        exit(error_exit_code);
+    }
 
     // Set current GPU as default device for subsequent API calls.
     HIP_CHECK(hipSetDevice(current_gpu));
@@ -81,7 +85,11 @@ void enable_peer_to_peer(const int current_gpu, const int peer_gpu)
 void disable_peer_to_peer(const unsigned int current_gpu, const unsigned int peer_gpu)
 {
     // Must be on a multi-gpu system.
-    assert(current_gpu != peer_gpu && "Current and peer devices must be different.");
+    if(current_gpu == peer_gpu)
+    {
+        std::cerr << "Current and peer devices must be different." << std::endl;
+        exit(error_exit_code);
+    }
 
     // Set current GPU as default device for subsequent API calls.
     HIP_CHECK(hipSetDevice(current_gpu));
@@ -177,8 +185,8 @@ int main()
     constexpr unsigned int grid_size = (width + block_size - 1) / block_size;
 
     // Block and grid sizes in 2D.
-    constexpr dim3 block_dim(block_size, block_size);
-    constexpr dim3 grid_dim(grid_size, grid_size);
+    const dim3 block_dim(block_size, block_size);
+    const dim3 grid_dim(grid_size, grid_size);
 
     // Allocate host input matrix and initialize with increasing sequence 1, 2, 3, ....
     std::vector<float> matrix(size);

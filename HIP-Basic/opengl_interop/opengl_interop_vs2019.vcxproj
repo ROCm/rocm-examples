@@ -26,6 +26,11 @@
     <ClInclude Include="..\..\External\glad\glad.h" />
     <ClInclude Include="..\..\External\KHR\khrplatform.h" />
   </ItemGroup>
+  <ItemGroup Condition="Exists('$(GLFW_DIR)\lib-vc2019\glfw3.dll')">
+    <Content Include="$(GLFW_DIR)\lib-vc2019\glfw3.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -88,6 +93,8 @@
       <PreprocessorDefinitions>__CUDACC__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);$(GLFW_DIR)\include\;$(MSBuildProjectDirectory)\..\..\Common;$(MSBuildProjectDirectory)\..\..\External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <!-- Many warnings originating from windows headers -->
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--diag-suppress 108 --diag-suppress 174 --diag-suppress 1835</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -122,6 +129,8 @@
       <PreprocessorDefinitions>__CUDACC__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(IntDir);$(GLFW_DIR)\include\;$(MSBuildProjectDirectory)\..\..\Common;$(MSBuildProjectDirectory)\..\..\External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <!-- Many warnings originating from windows headers -->
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--diag-suppress 108 --diag-suppress 174 --diag-suppress 1835</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
