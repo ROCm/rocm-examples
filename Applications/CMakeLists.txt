@@ -23,6 +23,7 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(Applications LANGUAGES CXX)
 
+add_subdirectory(convolution)
 add_subdirectory(floyd_warshall)
 add_subdirectory(histogram)
 if(NOT WIN32 AND GPU_RUNTIME STREQUAL "HIP")

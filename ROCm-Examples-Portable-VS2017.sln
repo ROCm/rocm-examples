@@ -60,6 +60,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_vs2017", "Applica
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "prefix_sum_vs2017", "Applications\prefix_sum\prefix_sum_vs2017.vcxproj", "{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "convolution_vs2017", "Applications\convolution\convolution_vs2017.vcxproj", "{4232B140-4C47-4961-8A8A-F67D14DC9349}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -166,6 +168,10 @@ Global
 		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}.Debug|x64.Build.0 = Debug|x64
 		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}.Release|x64.ActiveCfg = Release|x64
 		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0}.Release|x64.Build.0 = Release|x64
+		{4232B140-4C47-4961-8A8A-F67D14DC9349}.Debug|x64.ActiveCfg = Debug|x64
+		{4232B140-4C47-4961-8A8A-F67D14DC9349}.Debug|x64.Build.0 = Debug|x64
+		{4232B140-4C47-4961-8A8A-F67D14DC9349}.Release|x64.ActiveCfg = Release|x64
+		{4232B140-4C47-4961-8A8A-F67D14DC9349}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -197,6 +203,7 @@ Global
 		{BD725C86-E381-4BDD-B3FC-06A42221BEBB} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{D3531843-4D0D-445D-BD8D-2352038D8221} = {0328C27A-BB25-46F6-89F7-4EEF7AC225D8}
 		{015DF085-FEB3-4C7A-ACEE-7CFFB3C9AFF0} = {0328C27A-BB25-46F6-89F7-4EEF7AC225D8}
+		{4232B140-4C47-4961-8A8A-F67D14DC9349} = {0328C27A-BB25-46F6-89F7-4EEF7AC225D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
