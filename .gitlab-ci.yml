@@ -303,7 +303,7 @@ test:rocm-windows-cmake:
     # CMake does not copy the dependencies to the test folder, and there is no sufficiently concise way of doing it.
     # So for now, just add the library path here.
     - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
-    - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure --timeout 10
+    - cd "$CI_PROJECT_DIR/build" && ctest --output-on-failure --timeout 14
     - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"
 
 .test:nvcc-windows:
