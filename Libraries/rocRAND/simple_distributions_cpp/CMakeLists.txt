@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name rocrand_simple_distributions_cpp)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocrand_simple_distributions_cpp LANGUAGES CXX)
+project(${example_name} LANGUAGES CXX)
 
 set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
 set(GPU_RUNTIMES "HIP" "CUDA")
@@ -48,17 +50,23 @@ endif()
 
 find_package(rocrand REQUIRED)
 
-add_executable(rocrand_simple_distributions_cpp main.cpp)
-add_test(rocrand_simple_distributions_cpp rocrand_simple_distributions_cpp)
+add_executable(${example_name} main.cpp)
+add_test(${example_name} ${example_name})
 
 if(GPU_RUNTIME STREQUAL "CUDA")
-    target_link_libraries(rocrand_simple_distributions_cpp PRIVATE roc::rocrand)
+    target_link_libraries(${example_name} PRIVATE roc::rocrand)
     set_source_files_properties(main.cpp PROPERTIES LANGUAGE CUDA)
 else()
-    target_link_libraries(rocrand_simple_distributions_cpp roc::rocrand hip::host)
+    target_link_libraries(${example_name} roc::rocrand hip::host)
 endif()
 
-target_include_directories(rocrand_simple_distributions_cpp PRIVATE "../../../Common")
+target_include_directories(${example_name} PRIVATE "../../../Common")
 if(WIN32)
-    target_compile_definitions(rocrand_simple_distributions_cpp PRIVATE WIN32)
+    target_compile_definitions(${example_name} PRIVATE WIN32)
+endif()
+
+install(TARGETS ${example_name})
+
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+    install(IMPORTED_RUNTIME_ARTIFACTS roc::rocrand)
 endif()

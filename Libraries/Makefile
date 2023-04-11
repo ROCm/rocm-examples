@@ -22,11 +22,11 @@
 
 LIBRARIES := \
 	hipCUB \
+	hipBLAS \
 	rocRAND
 
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
-	hipBLAS \
 	rocBLAS \
 	rocPRIM \
 	rocThrust

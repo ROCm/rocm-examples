@@ -69,7 +69,7 @@ int main()
               << std::endl;
     thrust::device_ptr<int> wrapped_ptr = thrust::device_pointer_cast(raw_ptr);
     // The wrapped pointer is expected to be equal with the original one
-    assert(wrapped_ptr == d_ptr);
+    assert((wrapped_ptr == d_ptr));
 
     std::cout << "The sum of values in \"wrapped_ptr\" is "
               << thrust::reduce(wrapped_ptr, wrapped_ptr + N) << std::endl;

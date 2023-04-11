@@ -90,8 +90,8 @@ int main()
     constexpr unsigned int grid_size = (width + block_size - 1) / block_size;
 
     // Block and grid sizes in 2D.
-    constexpr dim3 block_dim(block_size, block_size);
-    constexpr dim3 grid_dim(grid_size, grid_size);
+    const dim3 block_dim(block_size, block_size);
+    const dim3 grid_dim(grid_size, grid_size);
 
     // Allocate host input matrix and initialize with increasing sequence 10, 20, 30, ....
     std::vector<float> matrix(size);

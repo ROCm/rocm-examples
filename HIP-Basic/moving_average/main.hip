@@ -101,7 +101,7 @@ int main()
     std::transform(h_input.begin(),
                    h_input.end(),
                    h_input.begin(),
-                   [](unsigned int i) { return i % window_size; });
+                   [&](unsigned int i) { return i % window_size; });
 
     // Allocate device input data and copy host data to it.
     unsigned int*    d_input{};

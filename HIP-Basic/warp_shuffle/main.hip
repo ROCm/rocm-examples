@@ -82,12 +82,15 @@ int main()
 
     // To guarantee the correct behaviour of the program, keep total number of matrix elements
     // below (or equal to) warp size.
-    assert(size <= static_cast<unsigned int>(props.warpSize)
-           && "Matrix has more elements than architecture's warp size value.");
+    if(size > static_cast<unsigned int>(props.warpSize))
+    {
+        std::cerr << "Matrix has more elements than architecture's warp size value." << std::endl;
+        exit(error_exit_code);
+    }
 
     // Block (2D) and grid sizes. Note that in this example we have only 1 block (and 1 warp).
-    constexpr dim3 block_dim(width, width);
-    constexpr dim3 grid_dim(1);
+    const dim3 block_dim(width, width);
+    const dim3 grid_dim(1);
 
     // Allocate host input matrix and initialize with increasing sequence 10, 20, 30, ....
     std::vector<float> matrix(size);

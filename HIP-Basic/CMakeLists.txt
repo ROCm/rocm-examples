@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,9 +30,12 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     add_subdirectory(module_api)
 endif()
 
+if(WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
+    add_subdirectory(cooperative_groups)
+endif()
+
 add_subdirectory(bandwidth)
 add_subdirectory(bit_extract)
-add_subdirectory(cooperative_groups)
 add_subdirectory(device_query)
 add_subdirectory(device_globals)
 add_subdirectory(dynamic_shared)
@@ -57,9 +60,12 @@ add_subdirectory(occupancy)
 add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
-add_subdirectory(static_host_library)
+# We cannot build the static library on Windows as the HIP SDK does not include CMAKE_AR.
+if(NOT WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "HIP")
+    add_subdirectory(static_host_library)
+endif()
 add_subdirectory(streams)
-# temporarily exclude texture management on Windows 
+# temporarily exclude texture management on Windows
 if(NOT WIN32)
     add_subdirectory(texture_management)
 endif()

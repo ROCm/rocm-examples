@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,12 +38,15 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+if(WIN32)
+    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+else()
+    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
 
-if (NOT DEFINED CMAKE_HIP_ARCHITECTURES)
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
     set(GPU_ARCHITECTURES "all" CACHE STRING "GPU architectures to compile for")
 else()
     set(GPU_ARCHITECTURES "${CMAKE_HIP_ARCHITECTURES}" CACHE STRING "GPU architectures to compile for")
@@ -59,7 +62,7 @@ message(STATUS "GPU_ARCHITECTURES: ${GPU_ARCHITECTURES}")
 
 set_source_files_properties(main.hip PROPERTIES COMPILE_OPTIONS "--cuda-host-only")
 
-if (WIN32)
+if(WIN32)
     set(OBJ_TYPE obj)
     set(NULDEV NUL)
     set(HOST_TARGET x86_64-pc-windows-msvc)
@@ -75,14 +78,15 @@ endif()
 # The compiler needs -target amdgcn-amd-amdhsa -mcpu=gfx* in order to assemble the object file
 # for the right GPU.
 foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
-    message(STATUS "Generating main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
     add_custom_command(
         OUTPUT main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
-        COMMAND ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa -mcpu=${HIP_ARCHITECTURE}
-                        ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.ll
-                        -o ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
+        COMMAND
+            ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa -mcpu=${HIP_ARCHITECTURE}
+            ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.ll
+            -o ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.ll
-        VERBATIM)
+        VERBATIM
+        COMMENT "Generating main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
 endforeach()
 
 # Create an offload-bundle from the assembled object files. This needs the clang-offload-bundler tool.
@@ -93,12 +97,6 @@ find_program(
     ${ROCM_ROOT}/llvm
     ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED)
-
-if(OFFLOAD_BUNDLER_COMMAND)
-    message(STATUS "clang-offload-bundler found: ${CLANG_OFFLOAD_BUNDLER}")
-else()
-    message(FATAL_ERROR "clang-offload-bundler not found")
-endif()
 
 # Generate object bundle.
 # The invocation to generate is
@@ -138,14 +136,9 @@ find_program(
     LLVM_MC_COMMAND llvm-mc
     PATH_SUFFIXES bin
     PATHS
-    ${ROCM_ROOT}/llvm
-    ${CMAKE_INSTALL_PREFIX}/llvm)
-
-if(LLVM_MC_COMMAND)
-    message(STATUS "llvm-mc found: ${LLVM_MC_COMMAND}")
-else()
-    message(FATAL_ERROR "llvm-mc not found")
-endif()
+        ${ROCM_ROOT}/llvm
+        ${CMAKE_INSTALL_PREFIX}/llvm
+    REQUIRED)
 
 # Invoke llvm-mc to generate an object file containing the offload bundle.
 set(DEVICE_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/main_device.${OBJ_TYPE}")
@@ -172,3 +165,5 @@ add_test(${example_name} ${example_name})
 set(include_dirs "../../Common")
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+
+install(TARGETS ${example_name})

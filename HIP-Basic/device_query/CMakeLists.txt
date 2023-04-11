@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -46,10 +46,13 @@ set(CMAKE_${USED_LANGUAGE}_STANDARD 17)
 set(CMAKE_${USED_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${USED_LANGUAGE}_STANDARD_REQUIRED ON)
 
-set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+if(WIN32)
+    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+else()
+    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
@@ -71,3 +74,5 @@ if(GPU_RUNTIME STREQUAL "HIP")
     find_package(HIP)
     target_link_libraries(${example_name} PRIVATE hip::host)
 endif()
+
+install(TARGETS ${example_name})

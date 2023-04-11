@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name rocprim_block_sum)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocprim_block_sum LANGUAGES CXX HIP)
+project(${example_name} LANGUAGES CXX HIP)
 
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
@@ -33,17 +35,19 @@ endif()
 
 find_package(rocprim REQUIRED)
 
-add_executable(rocprim_block_sum main.hip)
-add_test(rocprim_block_sum rocprim_block_sum)
+add_executable(${example_name} main.hip)
+add_test(${example_name} ${example_name})
 
-target_link_libraries(rocprim_block_sum
+target_link_libraries(${example_name}
     PRIVATE
     roc::rocprim
 )
-target_include_directories(rocprim_block_sum
+target_include_directories(${example_name}
     PRIVATE
     "../../../Common"
 )
 if(WIN32)
-    target_compile_definitions(rocprim_block_sum PRIVATE WIN32)
+    target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
+
+install(TARGETS ${example_name})
