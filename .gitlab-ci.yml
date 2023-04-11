@@ -56,7 +56,7 @@ clang-format:
     - Scripts/CodeFormat/check_format.sh $CI_MERGE_REQUEST_DIFF_BASE_SHA --binary "$CLANG_FORMAT"
 
 .build:dockerfiles:
-  timeout: 20m
+  timeout: 60m
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
