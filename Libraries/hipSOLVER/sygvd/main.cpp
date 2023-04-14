@@ -125,7 +125,7 @@ int main()
 
     if(sygvd_info < 0)
     {
-        std::cout << sygvd_info << "-th parameter is wrong.\n" << std::endl;
+        std::cout << -sygvd_info << "-th parameter is wrong.\n" << std::endl;
         errors++;
         goto cleanup;
     }

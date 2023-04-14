@@ -27,6 +27,7 @@ EXAMPLES := \
 	gesvd \
 	potrf \
 	syevd \
+	syevdx \
 	sygvd \
 	syevj
 
