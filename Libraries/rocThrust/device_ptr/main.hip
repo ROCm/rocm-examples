@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "example_utils.hpp"
+
 #include <cassert>
 #include <iostream>
 #include <sstream>
@@ -32,8 +34,6 @@
 // thrust algorithms
 #include <thrust/reduce.h>
 #include <thrust/sequence.h>
-
-#include "example_utils.hpp"
 
 int main()
 {
