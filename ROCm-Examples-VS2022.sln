@@ -160,6 +160,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_batched_vs2022", "Libr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_strided_batched_vs2022", "Libraries\rocSOLVER\syev_strided_batched\syev_strided_batched_vs2022.vcxproj", "{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevjBatched_vs2022", "Libraries\hipSOLVER\syevjBatched\syevjBatched_vs2022.vcxproj", "{88775D9B-45DB-44F0-95B4-3CF373E1D505}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -426,6 +428,10 @@ Global
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}.Debug|x64.Build.0 = Debug|x64
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}.Release|x64.ActiveCfg = Release|x64
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}.Release|x64.Build.0 = Release|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Debug|x64.ActiveCfg = Debug|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Debug|x64.Build.0 = Debug|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Release|x64.ActiveCfg = Release|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -506,6 +512,7 @@ Global
 		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
 		{A08FB6DB-31F7-48B7-8561-59B16E311F60} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

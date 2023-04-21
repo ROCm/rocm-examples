@@ -86,7 +86,7 @@ $A x_i = \lambda_i x_i$  for $i = 0, \dots, n-1$.
     Return type: `hipsolverStatus_t`.
 
 ### hipBLAS
-- For validating the solution we have used the hipBLAS functions `hipblasDdgmm` and `hipblasDgemm`. `hipblasDgemm` computes a general scaled matrix multiplication $\left(C = \alpha \cdot f(A) \cdot f(B) + \beta \cdot C\right)$ and is showcased (strided-batched and with single-precision real type) in the [gemm_strided_batched example](/Libraries/hipBLAS/gemm_strided_batched/).
+- For validating the solution we have used the hipBLAS functions `hipblasDdgmm` and `hipblasDgemm`. `hipblasDgemm` computes a general scaled matrix multiplication $\left(C = \alpha \cdot A \cdot B + \beta \cdot C\right)$ and is showcased (strided-batched and with single-precision real type) in the [gemm_strided_batched example](/Libraries/hipBLAS/gemm_strided_batched/).
     - The `hipblas[SDCZ]dgmm` function performs a matrix--matrix operation between a diagonal matrix and a general $m \times n$ matrix. The order of the multiplication can be determined using a `hipblasSideMode_t` type parameter:
         - `HIPBLAS_SIDE_RIGHT`: the operation performed is $C = A \cdot diag(x)$. This is the one used in the example for computing $X \cdot \Lambda$.
         - `HIPBLAS_SIDE_LEFT`: the operation performed is $C = diag(x) \cdot A$.

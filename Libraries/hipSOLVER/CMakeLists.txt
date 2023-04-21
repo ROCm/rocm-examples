@@ -45,6 +45,7 @@ add_subdirectory(potrf)
 add_subdirectory(syevd)
 add_subdirectory(syevdx)
 add_subdirectory(syevj)
+add_subdirectory(syevjBatched)
 add_subdirectory(sygvd)
 
 # this example currently does not work with CUDA

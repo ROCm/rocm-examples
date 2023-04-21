@@ -10,7 +10,7 @@ The results are the eigenvalues $W$ and orthonormal eigenvectors $V$, meaning th
 The results are verified by filling in the equation we wanted to solve:
 $A \underset{\text{right}}{\times} V = V \times W$ and checking the error.
 
-### Command line arguments
+### Command line interface
 The application has an optional argument:
 - `-n <n>` with size of the $n \times n$ matrix $A$. The default value is `3`.
 

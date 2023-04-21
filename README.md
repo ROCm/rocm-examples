@@ -53,6 +53,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [syevdx](/Libraries/hipSOLVER/syevdx/): Shows how to compute a subset of the eigenvalues and the corresponding eigenvectors of a real symmetric matrix A using the Compatibility API of hipSOLVER.
         - [sygvd](/Libraries/hipSOLVER/sygvd/): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
         - [syevj](/Libraries/hipSOLVER/syevj): Calculates the eigenvalues and eigenvectors from a real symmetric matrix using the Jacobi method.
+        - [syevjBatched](/Libraries/hipSOLVER/syevjBatched): Showcases how to compute the eigenvalues and eigenvectors (via Jacobi method) of each matrix in a batch of real symmetric matrices.
         - [sygvj](/Libraries/hipSOLVER/sygvj): Calculates the generalized eigenvalues and eigenvectors from a pair of real symmetric matrices using the Jacobi method.
     - [rocBLAS](/Libraries/rocBLAS/)
         - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.

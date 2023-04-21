@@ -3,7 +3,7 @@
 ## Description
 This example illustrates the use of hipSOLVER's linear least-squares solver, `gels`. The `gels` functions solve an overdetermined (or underdetermined) linear system defined by an $m$-by-$n$ matrix $A$, and a corresponding matrix $B$, using the QR factorization computed by `geqrf` (or the LQ factorization computed by `gelqf`). The problem solved by this function is of the form $A\times X=B$.
 
-If $m\geq n$, the system is overdetermined and a least-squares solution approximating $X$ is found by minimizing $||B−A\times X||$ (or $||B−A^\prime\times X||$). If $m<n$, the system is underdetermined and a unique solution for X is chosen such that $||X||$ is minimal.
+If $m\geq n$, the system is overdetermined and a least-squares solution approximating $X$ is found by minimizing $||B−A\times X||$ (or $||B−A^\prime\times X||$). If $m \text{ \textless}\ n$, the system is underdetermined and a unique solution for X is chosen such that $||X||$ is minimal.
 
 This example shows how $A\times X = B$ is solved for $X$, where $X$ is an $m$-by-$1$ matrix. The result is validated by calculating $A\times X$ for the found result, and comparing that with $B$.
 
