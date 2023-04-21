@@ -22,14 +22,21 @@
 
 EXAMPLES := \
 	gels \
-	getrf \
 	geqrf \
 	gesvd \
+	getrf \
 	potrf \
 	syevd \
 	syevdx \
-	sygvd \
-	syevj
+	syevj \
+	sygvd
+
+# this example currently does not work with CUDA
+# https://github.com/ROCmSoftwarePlatform/hipSOLVER/issues/152
+ifneq ($(GPU_RUNTIME), CUDA)
+EXAMPLES += \
+	sygvj
+endif
 
 all: $(EXAMPLES)
 

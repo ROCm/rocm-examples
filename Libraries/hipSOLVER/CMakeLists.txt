@@ -38,11 +38,17 @@ if(NOT hipsolver_FOUND)
 endif()
 
 add_subdirectory(gels)
-add_subdirectory(getrf)
 add_subdirectory(geqrf)
 add_subdirectory(gesvd)
+add_subdirectory(getrf)
 add_subdirectory(potrf)
 add_subdirectory(syevd)
 add_subdirectory(syevdx)
-add_subdirectory(sygvd)
 add_subdirectory(syevj)
+add_subdirectory(sygvd)
+
+# this example currently does not work with CUDA
+# https://github.com/ROCmSoftwarePlatform/hipSOLVER/issues/152
+if (NOT ("${GPU_RUNTIME}" STREQUAL "CUDA"))
+    add_subdirectory(sygvj)
+endif()
