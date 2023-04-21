@@ -35,9 +35,13 @@ $(A - \lambda_i B)x_i = 0$  for $i = 0, \dots, n-1$.
 ## Key APIs and Concepts
 ### hipSOLVER
 - hipSOLVER is initialized by calling `hipsolverCreate(hipsolverHandle_t*)` and is terminated by calling `hipsolverDestroy(hipsolverHandle_t)`.
-- `hipsolver[SD]sygvd` computes the eigenvalues and optionally the eigenvectors of an $n \times n$ symmetric pair $(A, B)$, where $B$ is also positive difinite. The correct function signature should be chosen based on the datatype of the input pair:
+- `hipsolver[SD]sygvd` computes the eigenvalues and optionally the eigenvectors of an $n \times n$ symmetric pair $(A, B)$, where $B$ is also positive definite. The correct function signature should be chosen based on the datatype of the input pair:
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`).
+
+    A complex version of this function is also available under the name `hipsolver[CZ]hegvd`. It accepts the same parameters as `hipsolver[SD]sygvd`, except that the correct function signature should be chosen based on the following data types:
+    - `C` (single-precision complex: `hipFloatComplex`).
+    - `Z` (double-precision complex: `hipDoubleComplex`).
 
     In this example, a double-precision real input pair is used, in which case the function accepts the following parameters:
     - `hipsolverHandle_t handle`

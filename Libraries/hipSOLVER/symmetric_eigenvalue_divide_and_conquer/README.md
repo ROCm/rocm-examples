@@ -30,6 +30,10 @@ where
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
 
+    A complex version of this function is also available under the name `hipsolver[CZ]heevd`. It accepts the same parameters as `hipsolver[SD]syevd`, except that the correct function signature should be chosen based on the following data types:
+    - `C` (single-precision complex: `hipFloatComplex`).
+    - `Z` (double-precision complex: `hipDoubleComplex`).
+
     In this example, a double-precision real input matrix is used, in which case the function accepts the following parameters:
     - `hipsolverHandle_t handle`
     - `hipsolverEigMode_t jobz`: Specifies whether the eigenvectors should also be calculated besides the eigenvalues. The following values are accepted:

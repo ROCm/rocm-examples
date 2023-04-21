@@ -21,8 +21,8 @@ This example showcases computing the inversion $A^{-1}$ of a rectangular matrix 
 - `rocsolver_[sdcz]getrf` computes the LU-factorization of an $m\times n$ matrix $A$, and optionally also provides a permutation matrix $P$ when partial pivoting is used. Depending on the character matched in `[sdcz]`, the factorization can be computed with different precision:
     - `s` (single-precision: `float`)
     - `d` (double-precision: `double`)
-    - `c` (single-precision complex: `hipFloatComplex`)
-    - `z` (double-precision complex: `hipDoubleComplex`).
+    - `c` (single-precision complex: `rocblas_float_complex`)
+    - `z` (double-precision complex: `rocblas_double_complex`).
 
     Double precision is used in the example. In this case, the function accepts the following parameters:
     -`rocblas_handle handle` is a handle to the rocBLAS library, created using `rocblas_create_handle`.
@@ -30,7 +30,7 @@ This example showcases computing the inversion $A^{-1}$ of a rectangular matrix 
     - `rocblas_int n` is the number of columns in $A$.
     - `double* A` is a device-pointer to the memory of matrix $A$. It should hold at least $n\times lda$ elements. The `getrf` operation is performed in-place, and the resulting $L$ and $U$ matrices are stored in the memory of $A$. Diagonal elements of $L$ are not stored.
     - `rocblas_int lda` is the leading dimension of matrix $A$, which is the stride between the first element of the columns of the matrix. Note that the matrix is laid out in column-major ordering.
-    - `rocblas_int* ipiv` is a device-pointer to where the permutation matrix is written to, if partial pivoting is allowed. Note that the permutation matrix can be represented using a single array, and so this parameter requires only `min(n, m)` ints of memory. If `ipiv[i] = j`, then row `j` was interchanged with row `i`. Note that row indices are 1-indexed. When `ipiv` is set to `NULL`, then partial pivoting is not allowed. Enabling partial pivoting provides numerical stability.
+    - `rocblas_int* ipiv` is a device-pointer to where the permutation matrix used for partial pivoting is written to. Note that the permutation matrix can be represented using a single array, and so this parameter requires only `min(n, m)` ints of memory. If `ipiv[i] = j`, then row `j` was interchanged with row `i`. Note that row indices are 1-indexed. Partial pivoting enables numerical stability for this algorithm. If this is undesired, the fucntion `rocsolver_[sdcz]getrf_npvt` can be used to omit partial pivoting.
     - `rocblas_int* info` is a device-pointer to a single integer that describes the result of the operation. If `*info` is `0`, the operation was successful. Otherwise `*info` holds the first non-zero pivot (1-indexed), and means that $A$ was not invertible.
 
     The function returns a `rocblas_status` value, which indicates whether any errors have occurred during the operation.
@@ -42,7 +42,7 @@ This example showcases computing the inversion $A^{-1}$ of a rectangular matrix 
     - `rocblas_int n` is the number of rows and columns of the matrix.
     - `double* A` is a device-pointer to an LU-factorized matrix $A$. The matrix should have at least $n\times lda$ elements. On successful exit, the values in this matrix are overwritten with the inversion $A^{-1}$ of the original matrix $A$.
     - `rocblas_int lda` is the leading dimension of $A$, which is the stride between the first element of the columns of the matrix. Note that the matrices are laid out in column-major ordering.
-    - `rocblas_int* ipiv` is a device-pointer to the permutation matrix of the LU-factorization of $A$. `NULL` can be passed here to indicate that partial pivoting was not used during the LU-factorization.
+    - `rocblas_int* ipiv` is a device-pointer to the permutation matrix of the LU-factorization of $A$. If no permutation matrix is available, the `rocsolver_[sdcz]_getri_npvt` function can be used instead.
     - `rocblas_int* info` is a device-pointer to a single integer that describes the result of the inversion operation. If `*info` is non-zero, then the inversion failed, and the value indicates the first zero pivot in $A$. If `*info` is zero, then the operation was successful and `A` holds the inverted matrix $A^{-1}$ of the original matrix $A$.
 
     The function returns a `rocblas_status` value, which indicates whether any errors have occurred during the operation.
@@ -66,8 +66,9 @@ This example showcases computing the inversion $A^{-1}$ of a rectangular matrix 
 - `rocblas_operation_none`
 
 ### HIP runtime
-- `hipMalloc`
 - `hipFree`
+- `hipMalloc`
 - `hipMemcpy`
-- `hipMemcpyHostToDevice`
+- `hipMemcpyDeviceToDevice`
 - `hipMemcpyDeviceToHost`
+- `hipMemcpyHostToDevice

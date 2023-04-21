@@ -118,7 +118,7 @@ int main(const int argc, char* argv[])
     // Allocate the amount of working space so that it can be used for both hipsolver calls.
     lwork = std::max(lwork_geqrf, lwork_orgqr);
     double* d_work{}; // Temporary working space
-    HIP_CHECK(hipMalloc(&d_work, sizeof(double) * lwork));
+    HIP_CHECK(hipMalloc(&d_work, lwork));
 
     // Compute the QR factorization.
     HIPSOLVER_CHECK(

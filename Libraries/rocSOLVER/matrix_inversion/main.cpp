@@ -188,6 +188,7 @@ int main(const int argc, char* argv[])
     }
 
     HIP_CHECK(hipFree(d_p));
+    HIP_CHECK(hipFree(d_Ainv));
     HIP_CHECK(hipFree(d_A));
     ROCBLAS_CHECK(rocblas_destroy_handle(handle));
 

@@ -93,13 +93,11 @@ int main(const int argc, char* argv[])
     double* d_S{};
     double* d_U{};
     double* d_V_H{};
-    double* d_E{}; // Array of dimension min(m,n)-1 used internally in GESVD for BDSQR.
     double* d_W{}; // W = S * V_H, for solution checking.
     HIP_CHECK(hipMalloc(&d_A, sizeof(double) * size_A));
     HIP_CHECK(hipMalloc(&d_S, sizeof(double) * size_S));
     HIP_CHECK(hipMalloc(&d_U, sizeof(double) * size_U));
     HIP_CHECK(hipMalloc(&d_V_H, sizeof(double) * size_V_H));
-    HIP_CHECK(hipMalloc(&d_E, sizeof(double) * (size_S - 1)));
     HIP_CHECK(hipMalloc(&d_W, sizeof(double) * size_A));
     HIP_CHECK(hipMalloc(&d_bdsqr_info, sizeof(int)));
     HIP_CHECK(hipMemcpy(d_A, A.data(), sizeof(double) * size_A, hipMemcpyHostToDevice));
@@ -207,7 +205,6 @@ int main(const int argc, char* argv[])
     HIP_CHECK(hipFree(d_U));
     HIP_CHECK(hipFree(d_V_H));
     HIP_CHECK(hipFree(d_S));
-    HIP_CHECK(hipFree(d_E));
     HIP_CHECK(hipFree(d_W));
     HIP_CHECK(hipFree(d_work));
     HIP_CHECK(hipFree(d_rwork));

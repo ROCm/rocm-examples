@@ -59,6 +59,9 @@ int main()
     constexpr std::array<double, size_a> a1 = {1.0, 2.0,  3.0,
                                                2.0, 5.0,  5.0,
                                                3.0, 5.0, 12.0};
+    // Result of the linear system.
+    constexpr std::array<double, size_bx> b = {1.0, 1.0, 1.0};
+
     // clang-format on
     double* d_a0{};
     double* d_a1{};
@@ -67,16 +70,26 @@ int main()
     HIP_CHECK(hipMemcpy(d_a0, a0.data(), sizeof(double) * size_a, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_a1, a1.data(), sizeof(double) * size_a, hipMemcpyHostToDevice));
 
+    double* d_b{};
+    HIP_CHECK(hipMalloc(&d_b, sizeof(double) * size_bx));
+    HIP_CHECK(hipMemcpy(d_b, b.data(), sizeof(double) * size_bx, hipMemcpyHostToDevice));
+
     // Use the hipSOLVER API to create a handle.
     hipsolverHandle_t handle;
     HIPSOLVER_CHECK(hipsolverCreate(&handle));
 
-    // Size of and pointer to working space.
-    int     lwork{};
-    double* d_work{};
+    // Query working space size for potrf (A0 and A1 are the same size).
+    int lwork_potrf{};
+    HIPSOLVER_CHECK(hipsolverDpotrf_bufferSize(handle, uplo, n, d_a0, lda, &lwork_potrf));
 
-    // Query working space size and allocate (A0 and A1 are the same size).
-    HIPSOLVER_CHECK(hipsolverDnDpotrf_bufferSize(handle, uplo, n, d_a0, lda, &lwork));
+    // Query working space size for potrs (A0 and A1 are the same size).
+    int lwork_potrs{};
+    HIPSOLVER_CHECK(
+        hipsolverDpotrs_bufferSize(handle, uplo, n, nrhs, d_a1, lda, d_b, ldbx, &lwork_potrs));
+
+    // Allocate working space.
+    int     lwork = std::max(lwork_potrf, lwork_potrs);
+    double* d_work{};
     HIP_CHECK(hipMalloc(&d_work, lwork));
 
     // Allocate space for device function return status.
@@ -86,7 +99,7 @@ int main()
     int info{};
     { // Process A0.
         // Perform Cholesky decomposition.
-        HIPSOLVER_CHECK(hipsolverDnDpotrf(handle, uplo, n, d_a0, lda, d_work, lwork, d_info));
+        HIPSOLVER_CHECK(hipsolverDpotrf(handle, uplo, n, d_a0, lda, d_work, lwork, d_info));
 
         // Copy device output data to host.
         HIP_CHECK(hipMemcpy(&info, d_info, sizeof(int), hipMemcpyDeviceToHost));
@@ -99,7 +112,7 @@ int main()
     }
     { // Process A1.
         // Perform Cholesky decomposition.
-        HIPSOLVER_CHECK(hipsolverDnDpotrf(handle, uplo, n, d_a1, lda, d_work, lwork, d_info));
+        HIPSOLVER_CHECK(hipsolverDpotrf(handle, uplo, n, d_a1, lda, d_work, lwork, d_info));
 
         // Copy device output data to host.
         HIP_CHECK(hipMemcpy(&info, d_info, sizeof(int), hipMemcpyDeviceToHost));
@@ -111,14 +124,9 @@ int main()
         }
     }
 
-    // Result of the linear system.
-    constexpr std::array<double, size_bx> b = {1.0, 1.0, 1.0};
-    double*                               d_b{};
-    HIP_CHECK(hipMalloc(&d_b, sizeof(double) * size_bx));
-    HIP_CHECK(hipMemcpy(d_b, b.data(), sizeof(double) * size_bx, hipMemcpyHostToDevice));
-
     // Solve A1 * X = B. Result will be placed in B.
-    HIPSOLVER_CHECK(hipsolverDnDpotrs(handle, uplo, n, nrhs, d_a1, lda, d_b, ldbx, d_info));
+    HIPSOLVER_CHECK(
+        hipsolverDpotrs(handle, uplo, n, nrhs, d_a1, lda, d_b, ldbx, d_work, lwork, d_info));
 
     // Copy device output data to host.
     std::vector<double> x(size_bx);
