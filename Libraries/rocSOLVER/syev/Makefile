@@ -20,17 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	matrix_inversion \
-	LU_factorization \
-	syev
+EXAMPLE := rocsolver_syev
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-all: $(EXAMPLES)
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
 
-clean: TARGET=clean
-clean: all
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+ROCBLAS_INCLUDE_DIR   := $(HIP_INCLUDE_DIR)
+ROCSOLVER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-.PHONY: all clean $(EXAMPLES)
+CXX ?= g++
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(ROCSOLVER_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocblas -lrocsolver -lamdhip64
+
+CXXFLAGS  ?= -Wall -Wextra
+ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocblas_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

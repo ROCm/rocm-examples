@@ -148,6 +148,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LU_factorization_vs2017", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getrf_vs2017", "Libraries\hipSOLVER\getrf\getrf_vs2017.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169323}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_vs2017", "Libraries\rocSOLVER\syev\syev_vs2017.vcxproj", "{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -390,7 +392,10 @@ Global
 		{D1C40C14-2881-43C7-8DAD-72BAAB169323}.Debug|x64.Build.0 = Debug|x64
 		{D1C40C14-2881-43C7-8DAD-72BAAB169323}.Release|x64.ActiveCfg = Release|x64
 		{D1C40C14-2881-43C7-8DAD-72BAAB169323}.Release|x64.Build.0 = Release|x64
-	EndGlobalSection
+		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Debug|x64.ActiveCfg = Debug|x64
+		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Debug|x64.Build.0 = Debug|x64
+		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Release|x64.ActiveCfg = Release|x64
+		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Release|x64.Build.0 = Release|x64
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
