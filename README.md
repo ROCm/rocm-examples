@@ -73,6 +73,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [matrix_inversion](/Libraries/rocSOLVER/matrix_inversion): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
         - [LU_factorization](/Libraries/rocSOLVER/LU_factorization): Program that showcases how to perform a LU factorization with rocSOLVER.
         - [syev](/Libraries/rocSOLVER/syev): Shows how to compute the eigenvalues and eigenvectors from a symmetrical real matrix.
+        - [syev_strided_batched](/Libraries/rocSOLVER/syev): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
     - [rocThrust](/Libraries/rocThrust/)
         - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
         - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
