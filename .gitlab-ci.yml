@@ -242,11 +242,11 @@ test:rocm-windows-vs2019:
           "hip_texture_management_vs2019.exe" # Hangs sometimes
           "hip_hello_world_vs2019.exe"        # Crashes (known driver issue)
       )
-      Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
+      Get-ChildItem -Recurse -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
           if ($SkippedExamples -NotContains $_.Name) {
               echo "--" $_.Name
-              & "$_"
+              & $_.FullName
               if (!$?) {
                 throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
               }
@@ -335,11 +335,11 @@ test:nvcc-windows-vs2019:
           "hip_vulkan_interop_vs2019.exe" # Graphical
           "hip_opengl_interop_vs2019.exe" # Graphical
       )
-      Get-ChildItem -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
+      Get-ChildItem -Recurse -Path "$CI_PROJECT_DIR/$BUILD_TYPE" -Filter "*_vs2019.exe" |
       ForEach-Object {
           if ($SkippedExamples -NotContains $_.Name) {
               echo "--" $_.Name
-              & "$CI_PROJECT_DIR/$BUILD_TYPE/$_"
+              & $_.FullName
               if (!$?) {
                 throw "{0} returned: {1}" -f $_.Name, $LASTEXITCODE
               }
