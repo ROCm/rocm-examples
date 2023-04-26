@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{10C958EF-0908-488E-8CD1-A320D3807DBD}</ProjectGuid>
+    <ProjectGuid>{DB1441F5-295D-4A82-BB70-122212A26A09}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>syevdx_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
