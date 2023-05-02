@@ -125,8 +125,9 @@ The repository has Visual Studio project files for all examples and individually
   - Use the build solution command in Visual Studio to build.
   - To build from the command line execute `C:\Program Files (x86)\Microsoft Visual Studio\<Visual Studio Version>\<Edition>\MSBuild\Current\Bin\MSBuild.exe <path to project folder>`.
     - To build in Release mode pass the `/p:Configuration=Release` option to MSBuild.
-    - The exutables will be created in a subfolder named "Debug" or "Release" inside the project folder.
+    - The executables will be created in a subfolder named "Debug" or "Release" inside the project folder.
 - The HIP specific project settings like the GPU architectures targeted can be set on the `General [AMD HIP C++]` tab of project properties.
+- The top level solution files come in two flavors: `ROCm-Examples-VS<Visual Studio Verson>.sln` and `ROCm-Examples-Portable-VS<Visual Studio Version>.sln`. The former contains all examples, while the latter contains the examples that support both ROCm and CUDA.
 
 #### CMake
 First, clone the repository and go to the source directory.
