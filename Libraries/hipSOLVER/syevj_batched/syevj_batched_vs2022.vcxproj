@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{EDD787C9-D057-4831-BB40-21A617C28B22}</ProjectGuid>
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <ProjectGuid>{88775D9B-45DB-44F0-95B4-3CF373E1D505}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>syevjBatched_vs2019</RootNamespace>
+    <RootNamespace>syevj_batched_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
@@ -26,7 +26,7 @@
     <ClInclude Include="..\..\..\Common\hipblas_utils.hpp" />
     <ClInclude Include="..\..\..\Common\hipsolver_utils.hpp" />
   </ItemGroup>
-  <ItemGroup Condition="'$(PlatformToolset)'=='HIP_clang'">
+    <ItemGroup Condition="'$(PlatformToolset)'=='HIP_clang'">
     <Content Include="$(HIPExecutablePath)\hipsolver.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

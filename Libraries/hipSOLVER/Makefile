@@ -29,7 +29,7 @@ EXAMPLES := \
 	syevd \
 	syevdx \
 	syevj \
-	syevjBatched \
+	syevj_batched \
 	sygvd
 
 # this example currently does not work with CUDA

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hipsolver_syevjBatched
+EXAMPLE := hipsolver_syevj_batched
 COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME := HIP
 

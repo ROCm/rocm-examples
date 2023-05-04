@@ -14,7 +14,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{0A2F8D99-E6A8-4DDF-9FC0-E6936120A899}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>syevjBatched_vs2017</RootNamespace>
+    <RootNamespace>syevj_batched_vs2017</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>

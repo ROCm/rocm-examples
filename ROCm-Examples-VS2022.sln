@@ -160,7 +160,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_batched_vs2022", "Libr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_strided_batched_vs2022", "Libraries\rocSOLVER\syev_strided_batched\syev_strided_batched_vs2022.vcxproj", "{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevjBatched_vs2022", "Libraries\hipSOLVER\syevjBatched\syevjBatched_vs2022.vcxproj", "{88775D9B-45DB-44F0-95B4-3CF373E1D505}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevj_batched_vs2022", "Libraries\hipSOLVER\syevj_batched\syevj_batched_vs2022.vcxproj", "{88775D9B-45DB-44F0-95B4-3CF373E1D505}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
