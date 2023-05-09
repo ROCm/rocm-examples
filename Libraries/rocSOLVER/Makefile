@@ -21,9 +21,10 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	matrix_inversion \
 	LU_factorization \
+	matrix_inversion \
 	syev \
+	syev_batched \
 	syev_strided_batched
 
 all: $(EXAMPLES)
