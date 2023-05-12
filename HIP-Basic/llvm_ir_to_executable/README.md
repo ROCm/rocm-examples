@@ -19,12 +19,12 @@ LLVM IR is the intermediary language used by the LLVM compiler, which hipcc is b
     On Windows the path to RC compiler may be needed: `-DCMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/path/to/x64/rc.exe"`
 
 ## Generating device LLVM IR
-In this example, a HIP executable is compiled from device LLVM IR code. LLVM IR can be written completely manually, but in this example they are generated from `main.hip`, using the following commands:
+In this example, a HIP executable is compiled from device LLVM IR code. While LLVM IR can be written completely manually, is it not advisable to do so because it is unstable between LLVM versions. Instead, in this example it is generated from `main.hip`, using the following commands:
 ```shell
-$ROCM_INSTALL_DIR/bin/hipcc -cuda-device-only -c -emit-llvm ./main.hip --offload-arch=<arch> -o main_<arch>.bc -I ../../Common
-$ROCM_INSTALL_DIR/bin/llvm-dis main_<arch>.bc -o main_<arch>.ll
+$ROCM_INSTALL_DIR/bin/hipcc --cuda-device-only -c -emit-llvm ./main.hip --offload-arch=<arch> -o main_<arch>.bc -I ../../Common -std=c++17
+$ROCM_INSTALL_DIR/llvm/bin/llvm-dis main_<arch>.bc -o main_<arch>.ll
 ```
-Where `<arch>` is the architecture to generate the LLVM IR for. Note that the `--cuda-device-only` flag is required to instruct `hipcc` to only generate LLVM IR for the device part of the computation, and `-c` is required to prevent the compiler from linking the ouputs into an executable. In the case of this example, the LLVM IR files where generated using architectures `gfx803`, `gfx900`, `gfx906`, `gfx908`, `gfx90a`, `gfx1030`. The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
+Where `<arch>` is the architecture to generate the LLVM IR for. Note that the `--cuda-device-only` flag is required to instruct `hipcc` to only generate LLVM IR for the device part of the computation, and `-c` is required to prevent the compiler from linking the outputs into an executable. In the case of this example, the LLVM IR files where generated using architectures `gfx803`, `gfx900`, `gfx906`, `gfx908`, `gfx90a`, `gfx1030`, `gfx1100`, `gfx1101`, `gfx1102`. The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
 
 The first of these two commands generates a _bitcode_ module: this is a binary encoded version of LLVM IR. The second command, using `llvm-dis` disassembles the bitcode module into textual LLVM IR.
 
@@ -80,29 +80,29 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
     ```
 
 ### Visual Studio 2019
-The above compilation steps are implemented in Visual Studio through Custom Build Steps and Custom Build Tools:
-- The host compilation from step 1 is performed by adding extra options to the source file, under `main.hip -> properties -> C/C++ -> Command Line`:
+The above compilation steps are implemented in Visual Studio through Custom Build Steps:
+- Specifying that only host compilation should be done, is achieved by adding extra options to the source file, under `main.hip -> properties -> C/C++ -> Command Line`:
     ```
     Additional Options: --cuda-host-only
     ```
-- Each device LLVM IR .ll file has a custom build tool associated to it, which performs the operation associated to step 2 from the previous section:
-    ```
-    Command Line: "$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a
-    Description: Compiling Device Assembly %(Identity)
-    Output: $(IntDir)%(FileName).o
-    Execute Before: ClCompile
-    ```
-- Steps 3 and 4 are implemented using a custom build step:
+- Specifying how the LLVM IR and the offload bundle are generated, is done with a custom build step:
     ```
     Command Line:
-        "$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
-        cd $(IntDir) && "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
+        FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)clang++" --cuda-device-only -c -emit-llvm main.hip --offload-arch=%%a -o "$(IntDir)main_%%a.bc" -I ../../Common -std=c++17
+        FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)llvm-dis" "$(IntDir)main_%%a.bc" -o "$(IntDir)main_%%a.ll"
+        FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)clang++" -target amdgcn-amd-amdhsa -mcpu=%%a "$(IntDir)main_%%a.ll" -o "$(IntDir)main_%%a.o"
+        SET TARGETS=host-x86_64-unknown-linux
+        SET INPUTS=-input=nul
+        SETLOCAL ENABLEDELAYEDEXPANSION
+        FOR %%a in ($(OffloadArch)) DO SET TARGETS=!TARGETS!,hipv4-amdgcn-amd-amdhsa--%%a&amp; SET INPUTS=!INPUTS! -input="$(IntDir)main_%%a.o"
+        "$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=%TARGETS%  %INPUTS% -output="$(IntDir)offload_bundle.hipfb"
+        cd "$(IntDir)" &amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc hip_obj_gen_win.mcin -o main_device.obj --filetype=obj
     Description: Generating Device Offload Object
     Outputs: $(IntDIr)main_device.obj
-    Additional Dependencies: $(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)
+    Additional Dependencies: main.hip;$(IntDir)hip_obj_gen_win.mcin
     Execute Before: ClCompile
     ```
-- Finally step 5 is implemented by passing additional inputs to the linker in `project -> properties -> Linker -> Input`:
+- Finally, the linking step is described by passing additional inputs to the linker in `project -> properties -> Linker -> Input`:
     ```
     Additional Dependencies: $(IntDir)main_device.obj;%(AdditionalDependencies)
     ```

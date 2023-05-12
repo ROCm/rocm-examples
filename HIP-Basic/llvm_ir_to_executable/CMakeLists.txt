@@ -62,6 +62,29 @@ message(STATUS "GPU_ARCHITECTURES: ${GPU_ARCHITECTURES}")
 
 set_source_files_properties(main.hip PROPERTIES COMPILE_OPTIONS "--cuda-host-only")
 
+find_program(
+        LLVM_DIS_COMMAND llvm-dis
+        PATH_SUFFIXES bin
+        PATHS
+        ${ROCM_ROOT}/llvm
+        ${CMAKE_INSTALL_PREFIX}/llvm
+        REQUIRED)
+
+# Generate the device LLVM IR using the HIP compiler.
+foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
+    add_custom_command(
+            OUTPUT main_${HIP_ARCHITECTURE}.ll main_${HIP_ARCHITECTURE}.bc
+            COMMAND
+                ${CMAKE_HIP_COMPILER} --cuda-device-only -c -emit-llvm ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
+                --offload-arch=${HIP_ARCHITECTURE} -o main_${HIP_ARCHITECTURE}.bc
+                -I ${CMAKE_CURRENT_SOURCE_DIR}/../../Common -std=c++17
+            COMMAND
+                ${LLVM_DIS_COMMAND} main_${HIP_ARCHITECTURE}.bc -o main_${HIP_ARCHITECTURE}.ll
+            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
+            VERBATIM
+            COMMENT "Generating main_${HIP_ARCHITECTURE}.ll")
+endforeach()
+
 if(WIN32)
     set(OBJ_TYPE obj)
     set(NULDEV NUL)
@@ -81,10 +104,9 @@ foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
     add_custom_command(
         OUTPUT main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
         COMMAND
-            ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa -mcpu=${HIP_ARCHITECTURE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.ll
+            ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa -mcpu=${HIP_ARCHITECTURE} main_${HIP_ARCHITECTURE}.ll
             -o ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.ll
+        DEPENDS main_${HIP_ARCHITECTURE}.ll
         VERBATIM
         COMMENT "Generating main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
 endforeach()
