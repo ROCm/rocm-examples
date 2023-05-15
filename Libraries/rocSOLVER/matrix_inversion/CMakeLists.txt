@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -19,19 +19,39 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+set(example_name rocsolver_matrix_inversion)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries LANGUAGES NONE)
+project(${example_name} LANGUAGES CXX)
 
-# CMake configuration files for CUDA versions of HIP libraries are not yet
-# included under the HIP SDK for Windows.
-if (NOT (CMAKE_SYSTEM_NAME MATCHES Windows AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
-    add_subdirectory(hipBLAS)
-    add_subdirectory(hipCUB)
-    add_subdirectory(hipSOLVER)
-    add_subdirectory(rocBLAS)
-    add_subdirectory(rocPRIM)
-    add_subdirectory(rocRAND)
-    add_subdirectory(rocThrust)
-    add_subdirectory(rocSOLVER)
+if(GPU_RUNTIME STREQUAL "CUDA")
+    message(STATUS "rocBLAS examples do not support the CUDA runtime")
+    return()
 endif()
+
+# This example does not contain device code, thereby it can be compiled with any conforming C++ compiler.
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
+if(WIN32)
+    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+else()
+    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+endif()
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+find_package(rocblas REQUIRED)
+find_package(rocsolver REQUIRED)
+
+add_executable(${example_name} main.cpp)
+# Make example runnable using ctest
+add_test(${example_name} ${example_name})
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE roc::rocblas roc::rocsolver)
+
+target_include_directories(${example_name} PRIVATE "../../../Common")
+
+install(TARGETS ${example_name})

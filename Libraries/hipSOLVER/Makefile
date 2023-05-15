@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,25 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipCUB \
-	hipBLAS \
-	hipSOLVER \
-	rocRAND
+EXAMPLES := \
+	cholesky_decomposition \
+	generalized_symmetric_eigenvalue_divide_and_conquer \
+	linear_least_squares \
+	qr_decomposition \
+	singular_value_decomposition \
+	symmetric_eigenvalue_divide_and_conquer
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocBLAS \
-	rocPRIM \
-	rocThrust
-endif
-
-all: $(LIBRARIES)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(LIBRARIES):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(LIBRARIES)
+.PHONY: all clean $(EXAMPLES)

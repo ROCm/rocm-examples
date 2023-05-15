@@ -200,19 +200,19 @@ void generate_identity_matrix(T* A, int m, int n, size_t lda)
 /// \brief Multiply an $A$ matrix ($m \times k$) with a $B$ matrix ($k \times n$) as:
 /// $C := \alpha \cdot A \cdot B + \beta \cdot C$
 template<typename T>
-void multiply_matrices(T   alpha,
-                       T   beta,
-                       int m,
-                       int n,
-                       int k,
-                       T*  A,
-                       int stride1_a,
-                       int stride2_a,
-                       T*  B,
-                       int stride1_b,
-                       int stride2_b,
-                       T*  C,
-                       int stride_c)
+void multiply_matrices(T        alpha,
+                       T        beta,
+                       int      m,
+                       int      n,
+                       int      k,
+                       const T* A,
+                       int      stride1_a,
+                       int      stride2_a,
+                       const T* B,
+                       int      stride1_b,
+                       int      stride2_b,
+                       T*       C,
+                       int      stride_c)
 {
     for(int i1 = 0; i1 < m; ++i1)
     {

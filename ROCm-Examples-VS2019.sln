@@ -126,6 +126,24 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2019", "HIP-B
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "texture_management_vs2019", "HIP-Basic\texture_management\texture_management_vs2019.vcxproj", "{40E56BFB-1A0C-4618-BB49-A9AA635127C1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "hipSOLVER", "hipSOLVER", "{2700C908-113C-4429-A889-DF34D44AB29B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decomposition_vs2019", "Libraries\hipSOLVER\singular_value_decomposition\singular_value_decomposition_vs2019.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169757}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_least_squares_vs2019", "Libraries\hipSOLVER\linear_least_squares\linear_least_squares_vs2019.vcxproj", "{9144246D-5E29-4477-8C8E-F3BB291A2714}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_inversion_vs2019", "Libraries\rocSOLVER\matrix_inversion\matrix_inversion_vs2019.vcxproj", "{B7BE499D-05E7-4F35-96C5-2326FED355D4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocSOLVER", "rocSOLVER", "{B03B9E85-3FED-4902-9B24-433CF352AB6C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cholesky_decomposition_vs2019", "Libraries\hipSOLVER\cholesky_decomposition\cholesky_decomposition_vs2019.vcxproj", "{7CD5972B-BC1C-405E-9B90-EBE5733A41D8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qr_decomposition_vs2019", "Libraries\hipSOLVER\qr_decomposition\qr_decomposition_vs2019.vcxproj", "{64A75FF5-B298-4256-A35B-A164972A91F9}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symmetric_eigenvalue_divide_and_conquer_vs2019", "Libraries\hipSOLVER\symmetric_eigenvalue_divide_and_conquer\symmetric_eigenvalue_divide_and_conquer_vs2019.vcxproj", "{578F7B33-698D-4B8A-B8E6-7CBF82F42556}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generalized_symmetric_eigenvalue_divide_and_conquer_vs2019", "Libraries\hipSOLVER\generalized_symmetric_eigenvalue_divide_and_conquer\generalized_symmetric_eigenvalue_divide_and_conquer_vs2019.vcxproj", "{1209C293-D1F0-4BFC-B6D0-65A96B801135}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -332,6 +350,34 @@ Global
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Debug|x64.Build.0 = Debug|x64
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.ActiveCfg = Release|x64
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1}.Release|x64.Build.0 = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Debug|x64.ActiveCfg = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Debug|x64.Build.0 = Debug|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Release|x64.ActiveCfg = Release|x64
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757}.Release|x64.Build.0 = Release|x64
+		{9144246D-5E29-4477-8C8E-F3BB291A2714}.Debug|x64.ActiveCfg = Debug|x64
+		{9144246D-5E29-4477-8C8E-F3BB291A2714}.Debug|x64.Build.0 = Debug|x64
+		{9144246D-5E29-4477-8C8E-F3BB291A2714}.Release|x64.ActiveCfg = Release|x64
+		{9144246D-5E29-4477-8C8E-F3BB291A2714}.Release|x64.Build.0 = Release|x64
+		{B7BE499D-05E7-4F35-96C5-2326FED355D4}.Debug|x64.ActiveCfg = Debug|x64
+		{B7BE499D-05E7-4F35-96C5-2326FED355D4}.Debug|x64.Build.0 = Debug|x64
+		{B7BE499D-05E7-4F35-96C5-2326FED355D4}.Release|x64.ActiveCfg = Release|x64
+		{B7BE499D-05E7-4F35-96C5-2326FED355D4}.Release|x64.Build.0 = Release|x64
+		{7CD5972B-BC1C-405E-9B90-EBE5733A41D8}.Debug|x64.ActiveCfg = Debug|x64
+		{7CD5972B-BC1C-405E-9B90-EBE5733A41D8}.Debug|x64.Build.0 = Debug|x64
+		{7CD5972B-BC1C-405E-9B90-EBE5733A41D8}.Release|x64.ActiveCfg = Release|x64
+		{7CD5972B-BC1C-405E-9B90-EBE5733A41D8}.Release|x64.Build.0 = Release|x64
+		{64A75FF5-B298-4256-A35B-A164972A91F9}.Debug|x64.ActiveCfg = Debug|x64
+		{64A75FF5-B298-4256-A35B-A164972A91F9}.Debug|x64.Build.0 = Debug|x64
+		{64A75FF5-B298-4256-A35B-A164972A91F9}.Release|x64.ActiveCfg = Release|x64
+		{64A75FF5-B298-4256-A35B-A164972A91F9}.Release|x64.Build.0 = Release|x64
+		{578F7B33-698D-4B8A-B8E6-7CBF82F42556}.Debug|x64.ActiveCfg = Debug|x64
+		{578F7B33-698D-4B8A-B8E6-7CBF82F42556}.Debug|x64.Build.0 = Debug|x64
+		{578F7B33-698D-4B8A-B8E6-7CBF82F42556}.Release|x64.ActiveCfg = Release|x64
+		{578F7B33-698D-4B8A-B8E6-7CBF82F42556}.Release|x64.Build.0 = Release|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Debug|x64.ActiveCfg = Debug|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Debug|x64.Build.0 = Debug|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Release|x64.ActiveCfg = Release|x64
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -396,6 +442,15 @@ Global
 		{961A0EAA-2C41-42AD-A96B-D865203F3A94} = {2F78B214-9230-4176-AFE6-8B2550B1E4B6}
 		{5E0E9AB0-B708-481F-9226-DD92C3798341} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 		{40E56BFB-1A0C-4618-BB49-A9AA635127C1} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
+		{2700C908-113C-4429-A889-DF34D44AB29B} = {052412EF-7CEB-4E32-96F9-AADBC70945D7}
+		{D1C40C14-2881-43C7-8DAD-72BAAB169757} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{9144246D-5E29-4477-8C8E-F3BB291A2714} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{B7BE499D-05E7-4F35-96C5-2326FED355D4} = {B03B9E85-3FED-4902-9B24-433CF352AB6C}
+		{B03B9E85-3FED-4902-9B24-433CF352AB6C} = {052412EF-7CEB-4E32-96F9-AADBC70945D7}
+		{7CD5972B-BC1C-405E-9B90-EBE5733A41D8} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{64A75FF5-B298-4256-A35B-A164972A91F9} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{578F7B33-698D-4B8A-B8E6-7CBF82F42556} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{1209C293-D1F0-4BFC-B6D0-65A96B801135} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

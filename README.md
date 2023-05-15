@@ -18,7 +18,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
     - [inline_assembly](/HIP-Basic/inline_assembly/): Program that showcases how to use inline assembly in a portable manner.
     - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
-    - [module_api]((/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
+    - [module_api](/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
     - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
     - [multi_gpu_data_transfer](/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
     - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuration parameters for a kernel launch with maximum occupancy.
@@ -43,6 +43,13 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [hipCUB](/Libraries/hipCUB/)
         - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
         - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
+    - [hipSOLVER](/Libraries/hipSOLVER/)
+        - [cholesky_decomposition](/Libraries/hipSOLVER/cholesky_decomposition): Perform Cholesky factorization and solve linear system with result.
+        - [generalized_symmetric_eigenvalue_divide_and_conquer](/Libraries/hipSOLVER/generalized_symmetric_eigenvalue_divide_and_conquer): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
+        - [linear_least_squares](/Libraries/hipSOLVER/linear_least_squares): Solve a linear system of the form $A\times X=B$.
+        - [qr_decomposition](/Libraries/hipSOLVER/qr_decomposition): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
+        - [singular_value_decomposition](/Libraries/hipSOLVER/singular_value_decomposition): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
+        - [symmetric_eigenvalue_divide_and_conquer](/Libraries/hipSOLVER/symmetric_eigenvalue_divide_and_conquer/): Program that showcases how to calculate the eigenvalues of a matrix using a divide-and-conquer algorithm in hipSOLVER.
     - [rocBLAS](/Libraries/rocBLAS/)
         - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
             - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
@@ -61,6 +68,8 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
     - [rocRAND](/Libraries/rocRAND/)
         - [simple_distributions_cpp](/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
+    - [rocSOLVER](/Libraries/rocSOLVER/)
+        - [matrix_inversion](/Libraries/rocSOLVER/matrix_inversion): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
     - [rocThrust](/Libraries/rocThrust/)
         - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
         - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
