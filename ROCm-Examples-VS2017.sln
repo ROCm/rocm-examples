@@ -168,6 +168,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "level_2", "level_2", "{4581
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsrmv_vs2017", "Libraries\rocSPARSE\level_2\bsrmv\bsrmv_vs2017.vcxproj", "{0214F832-8FD4-45DC-8425-DE8AD13CCBEF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsrsv_vs2017", "Libraries\rocSPARSE\level_2\bsrsv\bsrsv_vs2017.vcxproj", "{5F1B4CA0-3C30-4491-88B2-1DC5048BBCA5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -442,6 +444,10 @@ Global
 		{0214F832-8FD4-45DC-8425-DE8AD13CCBEF}.Debug|x64.Build.0 = Debug|x64
 		{0214F832-8FD4-45DC-8425-DE8AD13CCBEF}.Release|x64.ActiveCfg = Release|x64
 		{0214F832-8FD4-45DC-8425-DE8AD13CCBEF}.Release|x64.Build.0 = Release|x64
+		{5F1B4CA0-3C30-4491-88B2-1DC5048BBCA5}.Debug|x64.ActiveCfg = Debug|x64
+		{5F1B4CA0-3C30-4491-88B2-1DC5048BBCA5}.Debug|x64.Build.0 = Debug|x64
+		{5F1B4CA0-3C30-4491-88B2-1DC5048BBCA5}.Release|x64.ActiveCfg = Release|x64
+		{5F1B4CA0-3C30-4491-88B2-1DC5048BBCA5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -527,6 +533,7 @@ Global
 		{5BBC0349-7989-4373-886A-041D7C8D1FAC} = {7BFB14C7-DDB4-4583-9261-8450600CDE29}
 		{4581A6EF-211D-4B00-A65E-C29F55CEE886} = {5BBC0349-7989-4373-886A-041D7C8D1FAC}
 		{0214F832-8FD4-45DC-8425-DE8AD13CCBEF} = {4581A6EF-211D-4B00-A65E-C29F55CEE886}
+		{5F1B4CA0-3C30-4491-88B2-1DC5048BBCA5} = {4581A6EF-211D-4B00-A65E-C29F55CEE886}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
