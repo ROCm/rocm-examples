@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{dca81aef-6607-48b5-90e7-8699a5acaf74}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>syev_vs2022</RootNamespace>

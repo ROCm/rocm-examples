@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>$(MSBuildVersion)</VCProjectVersion>
+    <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{D15701D6-BBA1-4909-8CD1-15D1C19E484F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>syev_strided_batched_vs2017</RootNamespace>

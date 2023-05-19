@@ -4,49 +4,49 @@
 
 This example illustrates how to solve an eigenvalue problem for a batch $A$ of $m$ symmetric matrices $A_i$ using rocSOLVER. That is, showcases how to compute the eigenvalues and eigenvectors of a batch of symmetric matrices.
 
-Generally, in an eigenvalue problem, we are looking for $\mathbf{x}$ vectors with $\lambda$ scalars that fulfil the
+Generally, in an eigenvalue problem, we are looking for $\mathbf{x}$ vectors with $\lambda$ scalars that fulfill the
 
 $$
-A \cdot \mathbf{x} = \lambda \cdot \mathbf{x}
+A_i \cdot \mathbf{x} = \lambda \cdot \mathbf{x}
 $$
 
 equation.
 
-The solver evaluates the following equation for a batch of $m$ symmetric matrices, named as $A^i$, and with the size of $n \times n$:
+The solver evaluates the following equation for a strided batch of $m$ symmetric matrices, named as $A_i$, and with the size of $n \times n$:
 
-$$A^i \cdot V^i = W^i \cdot V^i$$
+$$A_i \cdot V_i = W_i \cdot V_i$$
 
 for each $0 \leq i < m$.
 
 The set of orthonormalized eigenvectors can be settled to a column of a matrix as
 
 $$
-V^i = \left[\mathbf{x^i_0}, \dots, \mathbf{x^i_j}, \dots, \mathbf{x^i_{n-1}}\right]
+V_i = \left[\mathbf{x_{i_0}}, \dots, \mathbf{x_{i_j}}, \dots, \mathbf{x_{i_{n-1}}}\right]
 $$
 
 and the eigenvalues as a diagonal matrix:
 
 $$
-W^i = \mathrm{diag}\left(\mathbf{w^i}\right) = \mathrm{diag}\left([\lambda^i_0, \dots, \lambda^i_j, \dots, \lambda^i_{n-1}]\right) =
+W_i = \mathrm{diag}\left(\mathbf{w_i}\right) = \mathrm{diag}\left([\lambda_{i_0}, \dots, \lambda_{i_j}, \dots, \lambda_{i_{n-1}}]\right) =
 \begin{bmatrix}
-\lambda^i_0 & & & & & \\ 
- & \lambda^i_1 & & & & \\ 
+\lambda_{i_0} & & & & & \\ 
+ & \lambda_{i_1} & & & & \\ 
  & & \ddots & & & \\ 
- & & & \lambda^i_j & & \\ 
+ & & & \lambda_{i_j} & & \\ 
  & & & & \ddots & \\ 
- & & & & & \lambda^i_{n-1}
+ & & & & & \lambda_{i_{n-1}}
 \end{bmatrix}
 $$
 
-The solver gives back an array of $V^i$ matrices and the $W$ matrix of the eigenvalues:
+The solver gives back an array of $V_i$ matrices and the $W$ matrix of the eigenvalues:
 
 $$
-W = \left[\mathbf{w^0}, \dots, \mathbf{w^i}, \dots \mathbf{w^{m-1}}\right]
+W = \left[\mathbf{w_0}, \dots, \mathbf{w_i}, \dots \mathbf{w_{m-1}}\right]
 $$
 
 The results are verified, in the example, by filling in the equation we wanted to solve for each matrix of the batch:
 
-$A^i \cdot V^i = V^i \cdot W^i$
+$A_i \cdot V_i = V_i \cdot W_i$
 and checking the error.
 
 ### Command line interface

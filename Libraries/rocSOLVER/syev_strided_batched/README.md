@@ -2,27 +2,52 @@
 
 ## Description
 
-This example illustrates how to solve the standard symmetric-definite eigenvalue problem for a strided batch $A$ of $m$ symmetric matrices $A_i$ using rocSOLVER. That is, showcases how to compute the eigenvalues and eigenvectors of a strided batch of symmetric matrices.
+This example illustrates how to solve the standard symmetric-definite eigenvalue problem for a strided batch $A$ of $m$ symmetric matrices $A_i$ using rocSOLVER. That is, showcases how to compute the eigenvalues and eigenvectors of a strided batch of symmetric matrices. In this example, *batch* refers to multiple matrices for which the same computation is executed. And stride is the distance in memory among the data necessary for the computation for each matrix, including input-output and intermediary storage.
 
-Given a (strided) batch of $m$ symmetric matrices $A_i$ of dimension $n$, the said problem consists on solving the following equation:
+Generally, in an eigenvalue problem, we are looking for $\mathbf{x}$ vectors with $\lambda$ scalars that fulfill the
 
-$A_i V_i = W_i V_i$
+$$
+A_i \cdot \mathbf{x} = \lambda \cdot \mathbf{x}
+$$
+
+equation.
+
+The solver evaluates the following equation for a strided batch of $m$ symmetric matrices, named as $A_i$, and with the size of $n \times n$:
+
+$$A_i \cdot V_i = W_i \cdot V_i$$
 
 for each $0 \leq i < m$.
 
-A solution for this problem is given by $m$ pairs $(V_i, W_i)$, where
-- $V_i$ is an $n \times n$ orthonormal matrix containing (as columns) the eigenvectors $V_{i_j}$ for $j = 0, \dots, n-1$ and
-- $\W_i$ is an $n \times n$ diagonal matrix containing the eigenvalues $\lambda_{i_j}$ for $j = 0, \dots, n-1$
+The set of orthonormalized eigenvectors can be settled to a column of a matrix as
 
-such that
+$$
+V_i = \left[\mathbf{x_{i_0}}, \dots, \mathbf{x_{i_j}}, \dots, \mathbf{x_{i_{n-1}}}\right]
+$$
 
-$A_i V_{i_j} = W_{i_j} V_{i_j}$
+and the eigenvalues as a diagonal matrix:
 
-for $j = 0, \dots, n-1$ and $i = 0, \dots, m-1$.
+$$
+W_i = \mathrm{diag}\left(\mathbf{w_i}\right) = \mathrm{diag}\left([\lambda_{i_0}, \dots, \lambda_{i_j}, \dots, \lambda_{i_{n-1}}]\right) =
+\begin{bmatrix}
+\lambda_{i_0} & & & & & \\ 
+ & \lambda_{i_1} & & & & \\ 
+ & & \ddots & & & \\ 
+ & & & \lambda_{i_j} & & \\ 
+ & & & & \ddots & \\ 
+ & & & & & \lambda_{i_{n-1}}
+\end{bmatrix}
+$$
 
-The results are verified by filling in the equation we wanted to solve for each matrix of the batch:
+The solver gives back an array of $V_i$ dense matrices and the $W$ matrix of the eigenvalues as an array:
 
-$A_i \cdot V_i = V_i \ctod W_i$ and checking the error.
+$$
+W = \left[\mathbf{w_0}, \dots, \mathbf{w_i}, \dots \mathbf{w_{m-1}}\right]
+$$
+
+The results are verified, in the example, by filling in the equation we wanted to solve for each matrix of the strided batch:
+
+$A_i \cdot V_i = V_i \cdot W_i$
+and checking the error.
 
 ### Command line interface
 
