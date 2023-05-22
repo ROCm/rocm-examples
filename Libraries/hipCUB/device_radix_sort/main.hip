@@ -32,7 +32,7 @@
 int main()
 {
     // Allocate and initialize data on the host
-    const std::vector<float> h_keys{9.3, 2.1, 7.3, 4, 2.2, 5, 3.6, 2.7, 1.1, 0};
+    const std::vector<float> h_keys{9.3f, 2.1f, 7.3f, 4.0f, 2.2f, 5.0f, 3.6f, 2.7f, 1.1f, 0.0f};
     const std::vector<int>   h_values{0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     assert(h_keys.size() == h_values.size());
     const int num_elements = h_keys.size();
