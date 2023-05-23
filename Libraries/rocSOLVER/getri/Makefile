@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := rocsolver_matrix_inversion
+EXAMPLE := rocsolver_getri
 COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME := HIP
 

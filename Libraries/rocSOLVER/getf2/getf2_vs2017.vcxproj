@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{D1C40C14-2881-43C7-8DAD-72BAAB169335}</ProjectGuid>
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{D1C40C14-2881-43C7-8DAD-72BAAB169333}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>LU_factorization_vs2022</RootNamespace>
+    <RootNamespace>getf2_vs2017</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>

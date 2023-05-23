@@ -19,39 +19,43 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
-set(example_name rocsolver_matrix_inversion)
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(${example_name} LANGUAGES CXX)
+EXAMPLE := rocsolver_getf2
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-if(GPU_RUNTIME STREQUAL "CUDA")
-    message(STATUS "rocBLAS examples do not support the CUDA runtime")
-    return()
-endif()
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
 
-# This example does not contain device code, thereby it can be compiled with any conforming C++ compiler.
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
+HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+ROCBLAS_INCLUDE_DIR   := $(HIP_INCLUDE_DIR)
+ROCSOLVER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
-else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-endif()
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+CXX ?= g++
 
-find_package(rocblas REQUIRED)
-find_package(rocsolver REQUIRED)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(ROCSOLVER_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR)  -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocblas -lrocsolver -lamdhip64
 
-add_executable(${example_name} main.cpp)
-# Make example runnable using ctest
-add_test(${example_name} ${example_name})
+CXXFLAGS  ?= -Wall -Wextra
+ICPPFLAGS += -D__HIP_PLATFORM_AMD__
 
-# Link to example library
-target_link_libraries(${example_name} PRIVATE roc::rocblas roc::rocsolver)
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
-target_include_directories(${example_name} PRIVATE "../../../Common")
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocblas_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-install(TARGETS ${example_name})
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

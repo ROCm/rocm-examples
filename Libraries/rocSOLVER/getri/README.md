@@ -58,7 +58,7 @@ This example showcases computing the inversion $A^{-1}$ of a rectangular matrix 
 ### rocBLAS
 - `rocblas_create_handle`
 - `rocblas_destroy_handle`
-- `rocblas_dgemm``
+- `rocblas_dgemm`
 - `rocblas_int`
 - `rocblas_handle`
 - `rocblas_set_pointer_mode`
@@ -71,4 +71,4 @@ This example showcases computing the inversion $A^{-1}$ of a rectangular matrix 
 - `hipMemcpy`
 - `hipMemcpyDeviceToDevice`
 - `hipMemcpyDeviceToHost`
-- `hipMemcpyHostToDevice
+- `hipMemcpyHostToDevice`

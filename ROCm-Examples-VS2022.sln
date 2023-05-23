@@ -132,7 +132,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decompositio
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_least_squares_vs2022", "Libraries\hipSOLVER\linear_least_squares\linear_least_squares_vs2022.vcxproj", "{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_inversion_vs2022", "Libraries\rocSOLVER\matrix_inversion\matrix_inversion_vs2022.vcxproj", "{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getri_vs2022", "Libraries\rocSOLVER\getri\getri_vs2022.vcxproj", "{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocSOLVER", "rocSOLVER", "{594C0813-02D5-4F93-A4D6-E10100A0539F}"
 EndProject
@@ -144,7 +144,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symmetric_eigenvalue_divide
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generalized_symmetric_eigenvalue_divide_and_conquer_vs2022", "Libraries\hipSOLVER\generalized_symmetric_eigenvalue_divide_and_conquer\generalized_symmetric_eigenvalue_divide_and_conquer_vs2022.vcxproj", "{C2804CFB-1D49-4E39-9757-3901F50CF3AA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LU_factorization_vs2022", "Libraries\rocSOLVER\LU_factorization\LU_factorization_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169335}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getf2_vs2022", "Libraries\rocSOLVER\getf2\getf2_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169335}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getrf_vs2022", "Libraries\hipSOLVER\getrf\getrf_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169325}"
 EndProject

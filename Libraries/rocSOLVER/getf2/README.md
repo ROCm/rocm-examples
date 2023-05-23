@@ -1,7 +1,7 @@
 # rocSOLVER LU Factorization Example
 
 ## Description
-This example illustrates the use of the rocSOLVER LU factorization functionality. The rocSOLVER `getf2` computes the [LU decomposition](https://en.wikipedia.org/wiki/LU_decomposition) of an $m \times n$ matrix $A$, with partial pivoting. This factorization is given by $P \cdot A = L \cdot U$, where:
+This example illustrates the use of the rocSOLVER `getf2` functionality. The rocSOLVER `getf2` computes the [LU decomposition](https://en.wikipedia.org/wiki/LU_decomposition) of an $m \times n$ matrix $A$, with partial pivoting. This factorization is given by $P \cdot A = L \cdot U$, where:
 - `getf2()`: This is the unblocked Level-2-BLAS version of the LU factorization algorithm. An optimized internal implementation without rocBLAS calls could be executed with small and mid-size matrices.
 - $A$ is the $m \times n$ input matrix.
 - $P$ is an $m \times m$ [permutation matrix](https://en.wikipedia.org/wiki/Permutation_matrix), in this example stored as column representation vector in `vector<int> Ipiv` of size `min(m, n)`.

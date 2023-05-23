@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	LU_factorization \
-	matrix_inversion \
+	getf2 \
+	getri \
 	syev \
 	syev_batched \
 	syev_strided_batched

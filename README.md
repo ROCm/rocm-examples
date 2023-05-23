@@ -70,8 +70,8 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [rocRAND](/Libraries/rocRAND/)
         - [simple_distributions_cpp](/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
     - [rocSOLVER](/Libraries/rocSOLVER/)
-        - [LU_factorization](/Libraries/rocSOLVER/LU_factorization): Program that showcases how to perform a LU factorization with rocSOLVER.
-        - [matrix_inversion](/Libraries/rocSOLVER/matrix_inversion): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
+        - [getf2](/Libraries/rocSOLVER/getf2): Program that showcases how to perform a LU factorization with rocSOLVER.
+        - [getri](/Libraries/rocSOLVER/getri): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
         - [syev](/Libraries/rocSOLVER/syev): Shows how to compute the eigenvalues and eigenvectors from a symmetrical real matrix.
         - [syev_batched](/Libraries/rocSOLVER/syev_batched): Shows how to compute the eigenvalues and eigenvectors for each matrix in a batch of real symmetric matrices.
         - [syev_strided_batched](/Libraries/rocSOLVER/syev_strided_batched): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
