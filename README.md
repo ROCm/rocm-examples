@@ -79,6 +79,9 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [syev](/Libraries/rocSOLVER/syev): Shows how to compute the eigenvalues and eigenvectors from a symmetrical real matrix.
         - [syev_batched](/Libraries/rocSOLVER/syev_batched): Shows how to compute the eigenvalues and eigenvectors for each matrix in a batch of real symmetric matrices.
         - [syev_strided_batched](/Libraries/rocSOLVER/syev_strided_batched): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
+    - [rocSPARSE](/Libraries/rocSPARSE/)
+        - [level_2](/Libraries/rocSPARSE/level_2/): Operations between sparse matrices and dense vectors.
+            - [bsrmv](/Libraries/rocSPARSE/level_2/bsrmv/): Showcases a sparse matrix--vector multiplication using BSR storage format.
     - [rocThrust](/Libraries/rocThrust/)
         - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
         - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
