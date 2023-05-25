@@ -214,6 +214,7 @@ test:cuda:
     - rx6900
 
 .test:windows-vs:
+  timeout: 60m
   script:
    # MSBuild cannot properly resolve the `<Content Include=` dependencies, and will sometimes try to copy
    # two or more files at once. This results in a warning before it retries, which is counted towards
