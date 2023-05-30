@@ -1,23 +1,24 @@
-# rocSPARSE Level 2 BSR Matrix--Vector Multiplication
+# rocSPARSE Level-3 BSR Matrix--Matrix Multiplication
 ## Description
-This example illustrates the use of the `rocSPARSE` level 2 sparse matrix--vector multiplication using BSR storage format.
+This example illustrates the use of the `rocSPARSE` level 3 sparse matrix--matrix multiplication using BSR storage format.
 
 The operation calculates the following product:
 
-$$\hat{\mathbf{y}} = \alpha \cdot A' \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
+$\hat{C} = \alpha \cdot A' \cdot B' + \beta \cdot C$
 
 where
 
 - $\alpha$ and $\beta$ are scalars
-- $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
-- $A'$ is a sparse matrix in BSR format with `rocsparse_operation` and described below.
+- $A$ is a sparse matrix in BSR format
+- $B$ and $C$ are dense matrices
+- and $A'$ is the result of applying to matrix $A$ one of the `rocsparse_operation` described below.
 
 ## Application flow
-1. Setup a sparse matrix in BSR format. Allocate an x and a y vector and set up $\alpha$ and $\beta$ scalars.
-2. Setup a handle, a matrix descriptor and a matrix info.
-3. Allocate device memory and copy input matrix and vectors from host to device.
+1. Setup a sparse matrix in BSR format. Allocate an $A$ and a $B$ matrix and set up $\alpha$ and $\beta$ scalars.
+2. Setup a handle, a matrix descriptor.
+3. Allocate device memory and copy input matrix from host to device.
 4. Compute a sparse matrix multiplication, using BSR storage format.
-5. Copy the result vector from device to host.
+5. Copy the result matrix from device to host.
 6. Clear rocSPARSE allocations on device.
 7. Clear device arrays.
 8. Print result to the standard output.
@@ -35,9 +36,9 @@ Therefore, defining
 we can describe a sparse matrix using the following arrays:
 - `bsr_val`: contains the elements of the non-zero blocks of the sparse matrix. The elements are stored block by block in column- or row-major order. That is, it is an array of size $nnzb \cdot bsr\_dim \cdot bsr\_dim$.
 
-- `bsr_row_ptr`: given $i \in [0, mb]$, $bsr\_row\_ptr[i]$ stores the index of the non-zero block that is the first non-zero block in row $i$ of the block matrix.
+- `bsr_row_ptr`: given $i \in [0, \texttt{mb}]$, $\texttt{bsr\_row\_ptr}[i]$ stores the index of the non-zero block that is the first non-zero block in row $i$ of the block matrix.
 
-- `bsr_col_ind`: given $i \in [0, nnzb-1]$, $bsr\_col\_ind[i]$ stores the index of the column in the block matrix containing the non-zero block $i$.
+- `bsr_col_ind`: given $i \in [0, \texttt{nnzb}-1]$, $\texttt{bsr\_col\_ind}[i]$ stores the index of the column in the block matrix containing the non-zero block $i$.
 
 Note that, for a given $m\times n$ matrix, if the dimensions are not evenly divisible by the block dimension then zeros are padded to the matrix so that $mb$ and $nb$ are the smallest integers greater than or equal to $\frac{m}{bsr\_dim}$ and $\frac{n}{bsr\_dim}$, respectively.
 
@@ -154,16 +155,16 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 ```
 
 ### rocSPARSE
-- `rocsparse_[dscz]bsrmv_ex(...)` is the solver with four different function signatures depending on the type of the input matrix:
+- `rocsparse_[cdsz]bsrmm(...)` is the matrix--matrix multiplication solver with four different function signatures depending on the type of the input matrix:
+   - `c` single-precision complex (`rocsparse_float_complex`)
    - `d` double-precision real (`double`)
    - `s` single-precision real (`float`)
-   - `c` single-precision complex (`rocsparse_float_complex`)
    - `z` double-precision complex (`rocsparse_double_complex`)
 
-- `rocsparse_operation trans`: matrix operation type with the following options:
-   - `rocsparse_operation_none`: identity operation: $A' = A$
-   - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-   - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+- `rocsparse_operation`: matrix operation type with the following options:
+   - `rocsparse_operation_none`: identity operation: $\mathrm{op}(A) = A$
+   - `rocsparse_operation_transpose`: transpose operation: $\mathrm{op}(A) = A^\mathrm{T}$
+   - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $\mathrm{op}(A) = A^\mathrm{H}$
 
    Currently, only `rocsparse_operation_none` is supported.
 - `rocsparse_mat_descr`: descriptor of the sparse BSR matrix.
@@ -176,17 +177,14 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 ### rocSPARSE
 - `rocsparse_create_handle`
 - `rocsparse_create_mat_descr`
-- `rocsparse_create_mat_info`
-- `rocsparse_dbsrmv_ex`
+- `rocsparse_dbsrmm`
 - `rocsparse_destroy_handle`
 - `rocsparse_destroy_mat_descr`
-- `rocsparse_destroy_mat_info`
 - `rocsparse_direction`
-- `rocsparse_direction_column`
+- `rocsparse_direction_row`
 - `rocsparse_handle`
 - `rocsparse_int`
 - `rocsparse_mat_descr`
-- `rocsparse_mat_info`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
 

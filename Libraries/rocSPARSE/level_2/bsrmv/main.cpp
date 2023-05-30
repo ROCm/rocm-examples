@@ -26,7 +26,6 @@
 
 #include <hip/hip_runtime.h>
 
-#include <cstdlib>
 #include <iostream>
 
 int main()

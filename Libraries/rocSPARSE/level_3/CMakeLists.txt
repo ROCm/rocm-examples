@@ -20,16 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	level_2 \
-	level_3
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocSPARSE_level_3_examples LANGUAGES NONE)
 
-all: $(EXAMPLES)
-
-clean: TARGET=clean
-clean: all
-
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(EXAMPLES)
+add_subdirectory(bsrmm)

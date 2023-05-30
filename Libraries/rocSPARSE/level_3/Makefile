@@ -21,8 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	level_2 \
-	level_3
+	bsrmm
 
 all: $(EXAMPLES)
 

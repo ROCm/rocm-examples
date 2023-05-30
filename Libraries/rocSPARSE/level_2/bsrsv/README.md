@@ -25,7 +25,7 @@ Obtaining solution for such a system consists on finding concrete values of all 
 1. Setup input data.
 2. Allocate device memory and offload input data to device.
 3. Initialize rocSPARSE by creating a handle.
-4. Prepare device for rocSPARSE bsrmv invocation.
+4. Prepare device for rocSPARSE bsrsv invocation.
 5. Perform analysis step.
 6. Perform triangular solve $Ay = \alpha x$.
 7. Check results obtained. If no zero-pivots, copy solution vector $y$ from device to host and compare with expected result.
@@ -71,7 +71,7 @@ A=
 0 & 0 & 0 & 1 & 9 & 0 & 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 5 & 6 & 4 & 0 & 0 & 0 & 0 \\
 \end{array}
-\right).
+\right)
 $$
 
 Taking $bsr\_dim = 4$, we can represent $A$ as an $mb \times nb$ block matrix

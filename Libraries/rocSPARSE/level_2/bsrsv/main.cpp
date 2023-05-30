@@ -134,7 +134,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
     ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
-    // 4. Prepare device for rocSPARSE bsrmv invocation.
+    // 4. Prepare device for rocSPARSE bsrsv invocation.
     // Matrix descriptor.
     rocsparse_mat_descr descr;
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));

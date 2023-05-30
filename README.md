@@ -83,6 +83,8 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [level_2](/Libraries/rocSPARSE/level_2/): Operations between sparse matrices and dense vectors.
             - [bsrmv](/Libraries/rocSPARSE/level_2/bsrmv/): Showcases a sparse matrix--vector multiplication using BSR storage format.
             - [bsrsv](/Libraries/rocSPARSE/level2/bsrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a sparse triangular matrix.
+        - [level_3](/Libraries/rocSPARSE/level_3_/): Operations between sparse matrices and dense vectors.
+            - [bsrmm](/Libraries/rocSPARSE/level_3/bsrmm/): Showcases a sparse matrix--matrix multiplication using BSR storage format.
     - [rocThrust](/Libraries/rocThrust/)
         - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
         - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
