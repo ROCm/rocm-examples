@@ -25,36 +25,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="main_gfx90a.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx803.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx900.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx906.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx908.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx90a.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1030.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1100.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1101.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1102.ll">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="hip_obj_gen_win.mcin">
       <Filter>Source Files</Filter>
     </CustomBuild>

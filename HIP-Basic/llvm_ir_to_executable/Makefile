@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,6 +36,7 @@ HIPCXX 				  ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 CLANG                 ?= $(ROCM_INSTALL_DIR)/llvm/bin/clang
 LLVM_MC               ?= $(ROCM_INSTALL_DIR)/llvm/bin/llvm-mc
 CLANG_OFFLOAD_BUNDLER ?= $(ROCM_INSTALL_DIR)/llvm/bin/clang-offload-bundler
+LLVM_DIS              ?= $(ROCM_INSTALL_DIR)/llvm/bin/llvm-dis
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -79,6 +80,12 @@ main.o: main.hip
 main_%.o: main_%.ll
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<
 
+main_%.ll : main_%.bc
+	$(LLVM_DIS) -o $@ $<
+
+main_%.bc : main.hip
+	$(HIPCXX) --cuda-device-only -c -emit-llvm --offload-arch=$* -o $@ -I ../../Common -std=c++17 $<
+
 clean:
 	rm -f \
 		main_device*.o \
@@ -86,6 +93,7 @@ clean:
 		offload_bundle.hipfb \
 		main_device.o \
 		main.o \
+		main_*.ll \
 		$(EXAMPLE)
 
 .PHONY: clean $(EXAMPLE)
