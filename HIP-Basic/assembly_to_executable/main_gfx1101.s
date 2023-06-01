@@ -12,15 +12,16 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 	s_waitcnt lgkmcnt(0)
 	s_and_b32 s5, s5, 0xffff
 	s_delay_alu instid0(SALU_CYCLE_1) | instskip(SKIP_2) | instid1(VALU_DEP_1)
-	v_mad_u64_u32 v[2:3], null, s4, s5, v[0:1]
+	v_mad_u64_u32 v[3:4], null, s4, s5, v[0:1]
+	v_mov_b32_e32 v1, v3
 	v_mov_b32_e32 v2, 0
 	s_mov_b32 s4, exec_lo
-	v_cmpx_gt_u64_e64 s[8:9], v[2:3]
+	v_cmpx_gt_u64_e64 s[8:9], v[1:2]
 	s_cbranch_execz .LBB0_3
 ; %bb.1:
 	s_load_b32 s10, s[0:1], 0xc
 	s_load_b128 s[4:7], s[2:3], 0x0
-	v_lshlrev_b64 v[4:5], 2, v[2:3]
+	v_lshlrev_b64 v[3:4], 2, v[1:2]
 	s_mov_b32 s11, 0
 	s_waitcnt lgkmcnt(0)
 	s_lshl_b64 s[2:3], s[10:11], 2
@@ -31,24 +32,24 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 	v_add_co_ci_u32_e32 v6, vcc_lo, s7, v4, vcc_lo
 	v_add_co_u32 v1, vcc_lo, v1, s10
 	v_add_co_ci_u32_e32 v2, vcc_lo, 0, v2, vcc_lo
-	global_load_b32 v0, v[6:7], off
+	global_load_b32 v0, v[5:6], off
 	v_add_co_u32 v5, vcc_lo, s4, v3
 	v_add_co_ci_u32_e32 v6, vcc_lo, s5, v4, vcc_lo
-	v_cmp_le_u64_e32 vcc_lo, s[8:9], v[2:3]
+	v_cmp_le_u64_e32 vcc_lo, s[8:9], v[1:2]
 	v_add_co_u32 v3, s0, v3, s2
 	s_delay_alu instid0(VALU_DEP_1)
 	v_add_co_ci_u32_e64 v4, s0, s3, v4, s0
 	s_or_b32 s11, vcc_lo, s11
 	s_waitcnt vmcnt(0)
 	v_mul_f32_e32 v0, v0, v0
-	global_store_b32 v[6:7], v0, off
+	global_store_b32 v[5:6], v0, off
 	s_and_not1_b32 exec_lo, exec_lo, s11
 	s_cbranch_execnz .LBB0_2
 .LBB0_3:
 	s_sendmsg sendmsg(MSG_DEALLOC_VGPRS)
 	s_endpgm
 	.section	.rodata,#alloc
-	.p2align	6
+	.p2align	6, 0x0
 	.amdhsa_kernel _Z20vector_square_kernelIfEvPT_PKS0_y
 		.amdhsa_group_segment_fixed_size 0
 		.amdhsa_private_segment_fixed_size 0
@@ -66,7 +67,7 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 		.amdhsa_system_sgpr_workgroup_id_z 0
 		.amdhsa_system_sgpr_workgroup_info 0
 		.amdhsa_system_vgpr_workitem_id 0
-		.amdhsa_next_free_vgpr 8
+		.amdhsa_next_free_vgpr 7
 		.amdhsa_next_free_sgpr 12
 		.amdhsa_float_round_mode_32 0
 		.amdhsa_float_round_mode_16_64 0
@@ -95,7 +96,7 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 ; Kernel info:
 ; codeLenInByte = 228
 ; NumSgprs: 14
-; NumVgprs: 8
+; NumVgprs: 7
 ; ScratchSize: 0
 ; MemoryBound: 0
 ; FloatMode: 240
@@ -106,7 +107,7 @@ _Z20vector_square_kernelIfEvPT_PKS0_y:  ; @_Z20vector_square_kernelIfEvPT_PKS0_y
 ; NumSGPRsForWavesPerEU: 14
 ; NumVGPRsForWavesPerEU: 7
 ; Occupancy: 16
-; WaveLimiterHint : 1
+; WaveLimiterHint : 0
 ; COMPUTE_PGM_RSRC2:SCRATCH_EN: 0
 ; COMPUTE_PGM_RSRC2:USER_SGPR: 4
 ; COMPUTE_PGM_RSRC2:TRAP_HANDLER: 0
@@ -148,7 +149,7 @@ amdhsa.kernels:
     .sgpr_count:     14
     .sgpr_spill_count: 0
     .symbol:         _Z20vector_square_kernelIfEvPT_PKS0_y.kd
-    .vgpr_count:     8
+    .vgpr_count:     7
     .vgpr_spill_count: 0
     .wavefront_size: 32
 amdhsa.target:   amdgcn-amd-amdhsa--gfx1101
