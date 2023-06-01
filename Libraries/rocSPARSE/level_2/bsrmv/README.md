@@ -33,13 +33,13 @@ Therefore, defining
 - `bsr_dim`: dimension of each block
 
 we can describe a sparse matrix using the following arrays:
-- `bsr_val`: contains the elements of the non-zero blocks of the sparse matrix. The elements are stored block by block in column- or row-major order. That is, it is an array of size $nnzb \cdot bsr\_dim \cdot bsr\_dim$.
+- `bsr_val`: contains the elements of the non-zero blocks of the sparse matrix. The elements are stored block by block in column- or row-major order. That is, it is an array of size `nnzb` $\cdot$ `bsr_dim` $\cdot$ `bsr_dim`.
 
-- `bsr_row_ptr`: given $i \in [0, mb]$, $bsr\_row\_ptr[i]$ stores the index of the non-zero block that is the first non-zero block in row $i$ of the block matrix.
+- `bsr_row_ptr`: given $i \in [0, mb]$, `bsr_row_ptr[i]` stores the index of the non-zero block that is the first non-zero block in row $i$ of the block matrix.
 
-- `bsr_col_ind`: given $i \in [0, nnzb-1]$, $bsr\_col\_ind[i]$ stores the index of the column in the block matrix containing the non-zero block $i$.
+- `bsr_col_ind`: given $i \in [0, nnzb-1]$, `bsr_col_ind[i]` stores the index of the column in the block matrix containing the non-zero block $i$.
 
-Note that, for a given $m\times n$ matrix, if the dimensions are not evenly divisible by the block dimension then zeros are padded to the matrix so that $mb$ and $nb$ are the smallest integers greater than or equal to $\frac{m}{bsr\_dim}$ and $\frac{n}{bsr\_dim}$, respectively.
+Note that, for a given $m\times n$ matrix, if the dimensions are not evenly divisible by the block dimension then zeros are padded to the matrix so that $mb$ and $nb$ are the smallest integers greater than or equal to $`\frac{m}{\texttt{bsr\_dim}}`$ and $`\frac{n}{\texttt{bsr\_dim}}`$, respectively.
 
 For instance, consider a sparse matrix as
 
@@ -64,7 +64,7 @@ A=
 \right)
 $$
 
-Taking $bsr\_dim = 4$, we can represent $A$ as an $mb \times nb$ block matrix
+Taking $`\texttt{bsr\_dim} = 4`$, we can represent $A$ as an $mb \times nb$ block matrix
 
 $$
 A=
@@ -79,7 +79,6 @@ with the following non-zero blocks:
 
 $$
 \begin{matrix}
-
 A_{00}=
 \begin{pmatrix}
 8 & 0 & 2 & 0\\
@@ -87,7 +86,6 @@ A_{00}=
 7 & 0 & 1 & 0\\
 2 & 5 & 0 & 0
 \end{pmatrix} &
-
 A_{10}=
 \begin{pmatrix}
 4 & 0 & 0 & 0 \\
@@ -95,9 +93,7 @@ A_{10}=
 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0
 \end{pmatrix} \\
-
 \\
-
 A_{12}=
 \begin{pmatrix}
 0 & 0 & 0 & 0 \\
@@ -105,7 +101,6 @@ A_{12}=
 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0
 \end{pmatrix} &
-
 A_{20}=
 \begin{pmatrix}
 0 & 0 & 0 & 0 \\
@@ -113,9 +108,7 @@ A_{20}=
 0 & 0 & 0 & 5 \\
 0 & 0 & 0 & 0
 \end{pmatrix} \\
-
 \\
-
 A_{21}=
 \begin{pmatrix}
 0 & 0 & 0 & 0 \\
@@ -136,7 +129,6 @@ O = 0_4=
 0 & 0 & 0 & 0 \\
 0 & 0 & 0 & 0
 \end{pmatrix}
-
 $$
 
 Therefore, the BSR representation of $A$ is:
