@@ -60,9 +60,14 @@ int main(const int argc, char* argv[])
     }
 
     // Calculate the number of elements needed for the batch.
-    const rocblas_int lda                           = n;
-    const rocblas_int single_matrix_num_elements    = lda * n;
-    const rocblas_int batch_eigenvalue_num_elements = n * batch_size;
+    const rocblas_int lda                            = n;
+    const rocblas_int single_matrix_num_elements     = lda * n;
+    const rocblas_int single_eigenvalue_num_elements = n;
+    const rocblas_int batch_eigenvalue_num_elements  = single_eigenvalue_num_elements * batch_size;
+
+    // Calculate the number of elements for the internal tridiagonal matrices.
+    const rocblas_int single_tridiagonal_num_elements = n * 3 - 1;
+    const rocblas_int batch_tridiagonal_num_elements = single_tridiagonal_num_elements * batch_size;
 
     // 2. Data vectors.
     std::vector<rocblas_double> A(single_matrix_num_elements * batch_size); // Input matrix.
@@ -81,10 +86,10 @@ int main(const int argc, char* argv[])
         int offset = k * single_matrix_num_elements;
         for(int i = 0; i < n; ++i)
         {
-            A[(n + 1) * i + offset] = random_number();
+            A[(lda + 1) * i + offset] = random_number();
             for(int j = 0; j < i; ++j)
             {
-                A[i * n + j + offset] = A[j * n + i + offset] = random_number();
+                A[i * lda + j + offset] = A[j * lda + i + offset] = random_number();
             }
         }
     }
@@ -101,9 +106,9 @@ int main(const int argc, char* argv[])
     rocblas_int*     d_info = nullptr;
 
     const rocblas_int info_size  = sizeof(rocblas_int) * batch_size;
-    const rocblas_int array_size = batch_size * sizeof(rocblas_double**);
+    const rocblas_int array_size = batch_size * sizeof(rocblas_double*);
 
-    const rocblas_int full_size = batch_size * single_matrix_num_elements * sizeof(rocblas_double*);
+    const rocblas_int full_size = batch_size * single_matrix_num_elements * sizeof(rocblas_double);
     const rocblas_int batch_eigenvalue_size = sizeof(double) * batch_eigenvalue_num_elements;
 
     HIP_CHECK(hipMalloc(&d_info, info_size));
@@ -124,7 +129,7 @@ int main(const int argc, char* argv[])
 
     // 7. Get and reserve the working space on device.
     const rocblas_int batch_tridiagonal_size
-        = batch_eigenvalue_num_elements * sizeof(rocblas_double);
+        = batch_tridiagonal_num_elements * sizeof(rocblas_double);
     rocblas_double* d_work = nullptr;
     HIP_CHECK(hipMalloc(&d_work, batch_tridiagonal_size));
 
@@ -136,9 +141,9 @@ int main(const int argc, char* argv[])
                                           array_dA,
                                           lda,
                                           d_W,
-                                          batch_size,
+                                          n,
                                           d_work,
-                                          n * n,
+                                          single_tridiagonal_num_elements,
                                           d_info,
                                           batch_size));
 
@@ -170,14 +175,14 @@ int main(const int argc, char* argv[])
         std::cout << "\nGiven the n x n square input matrix A; we computed the orthonormal "
                      "eigenvectors V and the associated eigenvalues W."
                   << std::endl;
-        auto A_begin = A.begin();
-        auto W_begin = W.begin();
-        auto V_begin = V.begin();
+        auto A_begin = A.begin() + batch_id * single_matrix_num_elements;
+        auto W_begin = W.begin() + batch_id * single_eigenvalue_num_elements;
+        auto V_begin = V.begin() + batch_id * single_matrix_num_elements;
         std::cout << "A = " << format_range(A_begin, A_begin + single_matrix_num_elements)
                   << std::endl;
-        std::cout << "W = " << format_range(W_begin, W_begin + single_matrix_num_elements)
+        std::cout << "W = " << format_range(W_begin, W_begin + single_eigenvalue_num_elements)
                   << std::endl;
-        std::cout << "V = " << format_range(V_begin, V_begin + batch_eigenvalue_num_elements)
+        std::cout << "V = " << format_range(V_begin, V_begin + single_matrix_num_elements)
                   << std::endl;
     };
 
@@ -201,13 +206,13 @@ int main(const int argc, char* argv[])
                           n,
                           n,
                           A.data() + matrix_offset,
-                          n,
+                          lda,
                           1,
                           V.data() + eigenvector_offset,
                           1,
-                          n,
+                          lda,
                           AV.data(),
-                          n);
+                          lda);
         std::cout << "AV = " << format_range(AV.begin(), AV.end()) << std::endl;
 
         // Construct the diagonal D from eigenvalues W.
@@ -226,12 +231,12 @@ int main(const int argc, char* argv[])
                           n,
                           V.data() + eigenvector_offset,
                           1,
-                          n,
+                          lda,
                           D.data(),
-                          n,
+                          lda,
                           1,
                           VD.data(),
-                          n);
+                          lda);
         std::cout << "VD = " << format_range(VD.begin(), VD.end()) << std::endl;
 
         constexpr double epsilon = 1.0e5 * std::numeric_limits<double>::epsilon();

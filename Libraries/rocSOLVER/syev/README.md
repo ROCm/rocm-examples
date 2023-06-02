@@ -40,6 +40,8 @@ The application has an optional argument:
   - There are 2 different function signatures depending on the type of the input matrix:
     - `s` single-precision real (`float`)
     - `d` double-precision real (`double`)
+
+    For single- and double-precision complex values, the function `rocsolver_[cz]heev(...)` is available in rocSOLVER.
 - `rocblas_evect`: specifies how the eigenvectors are computed.
   - `rocblas_evect_original`: compute the eigenvalues and eigenvectors
   - `rocblas_evect_tridiagonal`: compute eigenvectors for the symmetric tri-diagonal matrix. However, this is currently not supported.
@@ -52,6 +54,8 @@ The application has an optional argument:
 
 ### rocSOLVER
 
+- `rocblas_evect`
+- `rocblas_evect_original`
 - `rocsolver_dsyev`
 
 ### rocBLAS
@@ -59,8 +63,8 @@ The application has an optional argument:
 - `rocblas_create_handle`
 - `rocblas_destroy_handle`
 - `rocblas_double`
-- `rocblas_evect::rocblas_evect_original`
-- `rocblas_fill::rocblas_fill_lower`
+- `rocblas_fill`
+- `rocblas_fill_lower`
 - `rocblas_handle`
 - `rocblas_int`
 

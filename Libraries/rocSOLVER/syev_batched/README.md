@@ -12,7 +12,7 @@ $$
 
 equation.
 
-The solver evaluates the following equation for a strided batch of $m$ symmetric matrices, named as $A_i$, and with the size of $n \times n$:
+The solver evaluates the following equation for a batch of $m$ symmetric matrices, named as $A_i$, and with the size of $n \times n$:
 
 $$A_i \cdot V_i = W_i \cdot V_i$$
 
@@ -82,6 +82,8 @@ We can apply the same operation for several matrices if we combine them into bat
     - `s` single-precision real (`float`)
     - `d` double-precision real (`double`)
 
+    For single- and double-precision complex values, the function `rocsolver_[cz]heev_batched(...)` is available in rocSOLVER.
+
     In this example a double-precision real input matrix is used, in which case the function accepts the following parameters:
     - `rocblas_handle handle`
     - `const rocblas_evect evect` Specifies whether the eigenvectors should also be calculated besides the eigenvalues. The following values are accepted:
@@ -107,6 +109,8 @@ We can apply the same operation for several matrices if we combine them into bat
 
 ### rocSOLVER
 
+- `rocblas_evect`
+- `rocblas_evect_original`
 - `rocsolver_dsyev_batched`
 
 ### rocBLAS
@@ -114,10 +118,8 @@ We can apply the same operation for several matrices if we combine them into bat
 - `rocblas_create_handle`
 - `rocblas_destroy_handle`
 - `rocblas_double`
-- `rocblas_evect`
-- `rocblas_evect::rocblas_evect_original`
 - `rocblas_fill`
-- `rocblas_fill::rocblas_fill_lower`
+- `rocblas_fill_lower`
 - `rocblas_handle`
 - `rocblas_int`
 

@@ -4,10 +4,13 @@
 This example illustrates the use of the rocSOLVER `getf2` functionality. The rocSOLVER `getf2` computes the [LU decomposition](https://en.wikipedia.org/wiki/LU_decomposition) of an $m \times n$ matrix $A$, with partial pivoting. This factorization is given by $P \cdot A = L \cdot U$, where:
 - `getf2()`: This is the unblocked Level-2-BLAS version of the LU factorization algorithm. An optimized internal implementation without rocBLAS calls could be executed with small and mid-size matrices.
 - $A$ is the $m \times n$ input matrix.
-- $P$ is an $m \times m$ [permutation matrix](https://en.wikipedia.org/wiki/Permutation_matrix), in this example stored as column representation vector in `vector<int> Ipiv` of size `min(m, n)`.
-- $L$ is an $m \times m$ lower triangular matrix.
-- $U$ is an $m \times n$ upper triangular matrix.
-- $L$ and $U$ are stored together in a single matrix, the lower triangular diagonal values are the "unit elements".
+- $P$ is an $m \times m$ [permutation matrix](https://en.wikipedia.org/wiki/Permutation_matrix), in this example stored as an array of row indices `vector<int> Ipiv` of size `min(m, n)`.
+- $L$ is:
+  - an $m \times m$ lower triangular matrix, when $m \leq n$.
+  - an $m \times n$ lower trapezoidal matrix, when $` m > n `$.
+- $U$ is:
+  - an $m \times n$ upper trapezoidal matrix, when $` m < n `$.
+  - an $n \times n$ upper tridiagonal matrix, when $m \geq n$
 
 ### Application flow
 1. Parse command line arguments for the dimension of the input matrix.
@@ -18,7 +21,7 @@ This example illustrates the use of the rocSOLVER `getf2` functionality. The roc
 6. Create a rocBLAS handle.
 7. Invoke the rocSOLVER `getf2` function with double precision.
 8. Copy the results from device to host.
-9. Print the LU matrix and Ipiv vector.
+9. Print trace messages.
 10. Free device memory and the rocBLAS handle.
 
 ## Key APIs and Concepts

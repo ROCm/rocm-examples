@@ -107,11 +107,11 @@ int main(const int argc, char* argv[])
         for(int i = 0; i < n; ++i)
         {
             // Populate the diagonal.
-            A[offset + (n + 1) * i] = random_number();
+            A[offset + (lda + 1) * i] = random_number();
             for(int j = 0; j < i; ++j)
             {
                 // Populate the upper and the lower triangular matrix.
-                A[offset + i * n + j] = A[offset + j * n + i] = random_number();
+                A[offset + i * lda + j] = A[offset + j * lda + i] = random_number();
             }
         }
     };
@@ -161,7 +161,7 @@ int main(const int argc, char* argv[])
                                                   d_W,
                                                   single_eigenvalue_num_elements_padded,
                                                   d_work,
-                                                  n * n,
+                                                  single_tridiagonal_num_elements_padded,
                                                   d_info,
                                                   batch_size));
 
@@ -216,13 +216,13 @@ int main(const int argc, char* argv[])
                           n,
                           n,
                           A.data() + matrix_offset,
-                          n,
+                          lda,
                           1,
                           V.data() + eigenvector_offset,
                           1,
-                          n,
+                          lda,
                           AV.data(),
-                          n);
+                          lda);
         std::cout << "AV = " << format_range(AV.begin(), AV.end()) << std::endl;
 
         // Construct the diagonal D from eigenvalues W.
@@ -241,12 +241,12 @@ int main(const int argc, char* argv[])
                           n,
                           V.data() + eigenvector_offset,
                           1,
-                          n,
+                          lda,
                           D.data(),
-                          n,
+                          lda,
                           1,
                           VD.data(),
-                          n);
+                          lda);
         std::cout << "VD = " << format_range(VD.begin(), VD.end()) << std::endl;
 
         constexpr double epsilon = 1.0e5 * std::numeric_limits<double>::epsilon();
