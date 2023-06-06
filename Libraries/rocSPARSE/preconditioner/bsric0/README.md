@@ -1,36 +1,27 @@
-# rocSPARSE Level 2 BSR Triangular Solver Example
+# rocSPARSE Preconditioner BSR Incomplete Cholesky Decomposition Example
 
 ## Description
-This example illustrates the use of the `rocSPARSE` level 2 triangular solver using the BSR storage format.
+This example illustrates the use of the `rocSPARSE` incomplete Cholesky factorization preconditioner using the BSR storage format.
 
-This triangular solver is used to solve a linear system of the form
-$$
-A'y = \alpha x,
-$$
+Given a Hermitian and [positive definite](https://en.wikipedia.org/wiki/Definite_matrix) matrix $A$, computing its Cholesky decomposition consists of finding a lower triangular matrix $L$ such that
+$$A = L \cdot L^H,$$
 
-where
+where $L^H$ denotes the Hermitian/conjugate transpose of matrix $L$.
 
-- $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
-- $A'$ is one of the following:
-    - $A' = A$ (identity)
-    - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
-    - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
-- $\alpha$ is a scalar,
-- $x$ is a dense vector of size $n$ containing the constant terms of the equations, and
-- $y$ is a dense vector of size $n$ which contains the unknowns of the system.
-
-Obtaining solution for such a system consists on finding concrete values of all the unknowns such that the above equality holds.
+The _incomplete_ Cholesky decomposition is a sparse approximation of the above-mentioned Cholesky decomposition. Thus, `rocSPARSE` allows us to compute a sparse lower triangular matrix $L$ such that
+$$A \approx L \cdot L^H.$$
 
 ### Application flow
 1. Setup input data.
-2. Allocate device memory and offload input data to device.
+2. Allocate device memory and offload input data to the device.
 3. Initialize rocSPARSE by creating a handle.
-4. Prepare utility variables for rocSPARSE bsrmv invocation.
-5. Perform analysis step.
-6. Perform triangular solve $Ay = \alpha x$.
-7. Check results obtained. If no zero-pivots, copy solution vector $y$ from device to host and compare with expected result.
-8. Free rocSPARSE resources and device memory.
-9. Print validation result.
+4. Prepare utility variables for rocSPARSE bsric0 invocation.
+5. Perform the analysis step.
+6. Call dbsric0 to perform incomplete Cholesky factorization.
+7. Check zero-pivots.
+8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
+9. Free rocSPARSE resources and device memory.
+10. Print validation result.
 
 ## Key APIs and Concepts
 ### BSR Matrix Storage Format
@@ -157,59 +148,49 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 
 ### rocSPARSE
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
-- `rocsparse_pointer_mode` controls whether scalar parameters must be allocated on the host (`rocsparse_pointer_mode_host`) or on the device (`rocsparse_pointer_mode_device`). It is controlled by `rocsparse_set_pointer_mode`.
 - `rocsparse_direction dir`: matrix storage of BSR blocks. The following values are accepted:
     - `rocsparse_direction_row`: parse blocks by rows.
     - `rocsparse_direction_column`: parse blocks by columns.
-- `rocsparse_operation trans`: matrix operation applied to the given input matrix. The following values are accepted:
-    - `rocsparse_operation_none`: identity operation $A' = A$.
-    - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-    - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
 - `rocsparse_mat_descr descr`: holds all properties of a matrix. The properties set in this example are the following:
-    - `rocsparse_diag_type`: indicates whether the diagonal entries of a matrix are unit elements (`rocsparse_diag_type_unit`) or not (`rocsparse_diag_type_non_unit`).
     - `rocsparse_fill_mode`: indicates whether a (triangular) matrix is lower (`rocsparse_fill_mode_lower`) or upper (`rocsparse_fill_mode_upper`) triangular.
-- `rocsparse_[sdcz]bsrsv_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the `rocsparse_[sdcz]bsrsv_analysis` and `rocsparse_[sdcz]bsrsv_solve` functions. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
 - `rocsparse_solve_policy policy`: specifies the policy to follow for triangular solvers and factorizations. The only value accepted is `rocsparse_solve_policy_auto`.
-- `rocsparse_[sdcz]bsrsv_solve` solves a sparse triangular linear system $A'y = \alpha x$. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_analysis_policy analysis`: specifies the policy to follow for analysis data. The following values are accepted:
+    - `rocsparse_analysis_policy_reuse`: the analysis data gathered is re-used.
+    - `rocsparse_analysis_policy_force`: the analysis data will be re-built.
+- `rocsparse_[sdcz]bsric0` computes the incomplete Cholesky factorization of a sparse BSR matrix $A$, such that $A \approx L \cdot L^H$. The correct function signature should be chosen based on the datatype of the input matrix:
     - `s` single-precision real (`float`)
     - `d` double-precision real (`double`)
     - `c` single-precision complex (`rocsparse_float_complex`)
     - `z` double-precision complex (`rocsparse_double_complex`)
-- `rocsparse_analysis_policy analysis`: specifies the policy to follow for analysis data. The following values are accepted:
-    - `rocsparse_analysis_policy_reuse`: the analysis data gathered is re-used.
-    - `rocsparse_analysis_policy_force`: the analysis data will be re-built.
-- `rocsparse_[sdcz]bsrsv_analysis` performs the analysis step for `rocsparse_[sdcz]bsrsv_solve`. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]bsrsv_solve`.
-- `rocsparse_bsrsv_zero_pivot(rocsparse_handle, rocsparse_mat_info, rocsparse_int *position)` returns `rocsparse_status_zero_pivot` if either a structural or numerical zero has been found during the execution of `rocsparse_[sbcz]bsrsv_solve(....)` and stores in `position` the index $i$ of the first zero pivot $A_{ii}$ found. If no zero pivot is found it returns `rocsparse_status_success`.
+- `rocsparse_[sdcz]bsric0_analysis` performs the analysis step for `rocsparse_[sdcz]bsric0`. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]bsric0`.
+- `rocsparse_[sdcz]bsric0_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the `rocsparse_[sdcz]bsric0_analysis` and `rocsparse_[sdcz]bsric0` functions. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
+- `rocsparse_bsric0_zero_pivot(rocsparse_handle, rocsparse_mat_info, rocsparse_int *position)` returns `rocsparse_status_zero_pivot` if either a structural or numerical zero has been found during the execution of `rocsparse_[sbcz]bsric0(....)` and stores in `position` the index $i$ of the first zero pivot $A_{ii}$ found. If no zero pivot is found it returns `rocsparse_status_success`.
 
 ## Demonstrated API Calls
 
 ### rocSPARSE
 - `rocsparse_analysis_policy`
 - `rocsparse_analysis_policy_reuse`
-- `rocsparse_bsrsv_zero_pivot`
+- `rocsparse_bsric0_zero_pivot`
 - `rocsparse_create_handle`
 - `rocsparse_create_mat_descr`
 - `rocsparse_create_mat_info`
-- `rocsparse_dbsrsv_analysis`
-- `rocsparse_dbsrsv_buffer_size`
-- `rocsparse_dbsrsv_solve`
+- `rocsparse_dbsr2csr`
+- `rocsparse_dbsric0`
+- `rocsparse_dbsric0_analysis`
+- `rocsparse_dbsric0_buffer_size`
+- `rocsparse_dcsr2dense`
 - `rocsparse_destroy_handle`
 - `rocsparse_destroy_mat_descr`
 - `rocsparse_destroy_mat_info`
-- `rocsparse_diag_type_unit`
 - `rocsparse_direction`
-- `rocsparse_direction_column`
+- `rocsparse_direction_row`
 - `rocsparse_fill_mode_lower`
 - `rocsparse_handle`
 - `rocsparse_int`
 - `rocsparse_mat_descr`
 - `rocsparse_mat_info`
-- `rocsparse_operation`
-- `rocsparse_operation_none`
-- `rocsparse_pointer_mode_host`
-- `rocsparse_set_mat_diag_type`
 - `rocsparse_set_mat_fill_mode`
-- `rocsparse_set_pointer_mode`
 - `rocsparse_solve_policy`
 - `rocsparse_solve_policy_auto`
 - `rocsparse_status`

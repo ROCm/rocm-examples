@@ -21,9 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	level_2 \
-	level_3 \
-	preconditioner
+	bsric0
 
 all: $(EXAMPLES)
 

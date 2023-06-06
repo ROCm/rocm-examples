@@ -50,49 +50,49 @@ int main()
     //     ( A_{10} | A_{11} )
 
     // BSR block dimension.
-    rocsparse_int bsr_dim = 2;
-
-    // Number of rows and columns of the block matrix.
-    rocsparse_int nb = 2;
+    constexpr rocsparse_int bsr_dim = 2;
 
     // Number of rows and columns of the input matrix.
-    rocsparse_int n = nb * bsr_dim;
+    constexpr rocsparse_int n = 4;
 
-    // BSR values vector.
-    double h_bsr_val[12] = {1.0,
-                            2.0,
-                            0.0,
-                            3.0, /*A_{00}*/
-                            4.0,
-                            7.0,
-                            5.0,
-                            0.0, /*A_{10}*/
-                            6.0,
-                            8.0,
-                            0.0,
-                            9.0}; /*A_{11}*/
-
-    // BSR row pointers vector.
-    rocsparse_int h_bsr_row_ptr[3] = {0, 1, 3};
-
-    // BSR column indices vector.
-    rocsparse_int h_bsr_col_ind[3] = {0, 0, 1};
+    // Number of rows and columns of the block matrix.
+    constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
 
     // Number of non-zero blocks.
-    rocsparse_int nnzb = 3;
+    constexpr rocsparse_int nnzb = 3;
+
+    // BSR row pointers vector.
+    constexpr rocsparse_int h_bsr_row_ptr[nb + 1] = {0, 1, 3};
+
+    // BSR column indices vector.
+    constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 0, 1};
+
+    // BSR values vector.
+    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim] = {1.0,
+                                                            2.0,
+                                                            0.0,
+                                                            3.0, /*A_{00}*/
+                                                            4.0,
+                                                            7.0,
+                                                            5.0,
+                                                            0.0, /*A_{10}*/
+                                                            6.0,
+                                                            8.0,
+                                                            0.0,
+                                                            9.0}; /*A_{11}*/
 
     // Storage scheme of the BSR blocks.
-    rocsparse_direction dir = rocsparse_direction_column;
+    constexpr rocsparse_direction dir = rocsparse_direction_column;
 
     // Operation applied to the matrix.
-    rocsparse_operation trans = rocsparse_operation_none;
+    constexpr rocsparse_operation trans = rocsparse_operation_none;
 
     // Analysis and solve policies.
-    rocsparse_analysis_policy analysis_policy = rocsparse_analysis_policy_reuse;
-    rocsparse_solve_policy    solve_policy    = rocsparse_solve_policy_auto;
+    constexpr rocsparse_analysis_policy analysis_policy = rocsparse_analysis_policy_reuse;
+    constexpr rocsparse_solve_policy    solve_policy    = rocsparse_solve_policy_auto;
 
     // Scalar alpha.
-    double alpha = 1.0;
+    constexpr double alpha = 1.0;
 
     // Host vectors for the right hand side and solution of the linear system.
     std::vector<double> h_x(4);
@@ -134,7 +134,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
     ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
-    // 4. Prepare device for rocSPARSE bsrsv invocation.
+    // 4. Prepare utility variables for rocSPARSE bsrmv invocation.
     // Matrix descriptor.
     rocsparse_mat_descr descr;
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
