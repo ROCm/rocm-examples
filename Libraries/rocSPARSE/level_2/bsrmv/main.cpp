@@ -48,14 +48,14 @@ int main()
     constexpr rocsparse_int nb = 2;
 
     // BSR values
-    constexpr double hbsr_val[16]
+    constexpr double h_bsr_val[16]
         = {1.0, 3.0, 0.0, 0.0, 2.0, 4.0, 0.0, 0.0, 5.0, 7.0, 6.0, 0.0, 0.0, 8.0, 0.0, 0.0};
 
     // BSR row pointers
-    constexpr rocsparse_int hbsr_row_ptr[3] = {0, 2, 4};
+    constexpr rocsparse_int h_bsr_row_ptr[3] = {0, 2, 4};
 
     // BSR column indices
-    constexpr rocsparse_int hbsr_col_ind[4] = {0, 1, 0, 1};
+    constexpr rocsparse_int h_bsr_col_ind[4] = {0, 1, 0, 1};
 
     // Number of non-zero blocks
     constexpr rocsparse_int nnzb = 4;
@@ -71,8 +71,8 @@ int main()
     constexpr double beta  = 1.3;
 
     // Set up x and y vectors
-    constexpr double hx[4] = {1.0, 2.0, 3.0, 0.0};
-    double           hy[4] = {4.0, 5.0, 6.0, 7.0};
+    constexpr double h_x[4] = {1.0, 2.0, 3.0, 0.0};
+    double           h_y[4] = {4.0, 5.0, 6.0, 7.0};
 
     // 2. Prepare device for calculation
 
@@ -89,29 +89,29 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_info(&info));
 
     // 3. Offload data to device
-    rocsparse_int* dbsr_row_ptr;
-    rocsparse_int* dbsr_col_ind;
-    double*        dbsr_val;
-    double*        dx;
-    double*        dy;
+    rocsparse_int* d_bsr_row_ptr;
+    rocsparse_int* d_bsr_col_ind;
+    double*        d_bsr_val;
+    double*        d_x;
+    double*        d_y;
 
-    constexpr size_t x_size       = sizeof(double) * nb * bsr_dim;
-    constexpr size_t y_size       = sizeof(double) * mb * bsr_dim;
-    constexpr size_t val_size     = sizeof(double) * nnzb * bsr_dim * bsr_dim;
-    constexpr size_t row_ptr_size = sizeof(rocsparse_int) * (mb + 1);
-    constexpr size_t col_ind_size = sizeof(rocsparse_int) * nnzb;
+    constexpr size_t x_size       = sizeof(*d_x) * nb * bsr_dim;
+    constexpr size_t y_size       = sizeof(*d_y) * mb * bsr_dim;
+    constexpr size_t val_size     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
+    constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
 
-    HIP_CHECK(hipMalloc((void**)&dbsr_row_ptr, row_ptr_size));
-    HIP_CHECK(hipMalloc((void**)&dbsr_col_ind, col_ind_size));
-    HIP_CHECK(hipMalloc((void**)&dbsr_val, val_size));
-    HIP_CHECK(hipMalloc((void**)&dx, x_size));
-    HIP_CHECK(hipMalloc((void**)&dy, y_size));
+    HIP_CHECK(hipMalloc((void**)&d_bsr_row_ptr, row_ptr_size));
+    HIP_CHECK(hipMalloc((void**)&d_bsr_col_ind, col_ind_size));
+    HIP_CHECK(hipMalloc((void**)&d_bsr_val, val_size));
+    HIP_CHECK(hipMalloc((void**)&d_x, x_size));
+    HIP_CHECK(hipMalloc((void**)&d_y, y_size));
 
-    HIP_CHECK(hipMemcpy(dbsr_row_ptr, hbsr_row_ptr, row_ptr_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(dbsr_col_ind, hbsr_col_ind, col_ind_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(dbsr_val, hbsr_val, val_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(dx, hx, x_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(dy, hy, y_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr, row_ptr_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind, col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val, val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x, x_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_y, h_y, y_size, hipMemcpyHostToDevice));
 
     // 4. Call bsrmv to perform y = alpha * A x + beta * y
     ROCSPARSE_CHECK(rocsparse_dbsrmv_ex(handle,
@@ -122,17 +122,17 @@ int main()
                                         nnzb,
                                         &alpha,
                                         descr,
-                                        dbsr_val,
-                                        dbsr_row_ptr,
-                                        dbsr_col_ind,
+                                        d_bsr_val,
+                                        d_bsr_row_ptr,
+                                        d_bsr_col_ind,
                                         bsr_dim,
                                         info,
-                                        dx,
+                                        d_x,
                                         &beta,
-                                        dy));
+                                        d_y));
 
     // 5. Copy y to host from device
-    HIP_CHECK(hipMemcpy(hy, dy, y_size, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_y, d_y, y_size, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
@@ -140,17 +140,17 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_mat_info(info));
 
     // 7. Clear device memory
-    HIP_CHECK(hipFree(dbsr_row_ptr));
-    HIP_CHECK(hipFree(dbsr_col_ind));
-    HIP_CHECK(hipFree(dbsr_val));
-    HIP_CHECK(hipFree(dx));
-    HIP_CHECK(hipFree(dy));
+    HIP_CHECK(hipFree(d_bsr_row_ptr));
+    HIP_CHECK(hipFree(d_bsr_col_ind));
+    HIP_CHECK(hipFree(d_bsr_val));
+    HIP_CHECK(hipFree(d_x));
+    HIP_CHECK(hipFree(d_y));
 
     // 8. Print result
     std::cout << "y = (";
     for(int i = 0; i < mb * bsr_dim; ++i)
     {
-        std::cout << " " << hy[i];
+        std::cout << " " << h_y[i];
     }
     std::cout << ")" << std::endl;
     return 0;

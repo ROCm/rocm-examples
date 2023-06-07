@@ -1,8 +1,8 @@
-# rocSPARSE Level 2 BSR Matrix-Vector Multiplication
+# rocSPARSE Level 2 BSR Matrix-Vector Multiplication with Mask Operation
 ## Description
-This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector multiplication using BSR storage format.
+This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector multiplication with mask operation using BSR storage format.
 
-The operation calculates the following product:
+The function returns the BSR matrix-vector product for the masked blocks
 
 $$\hat{\mathbf{y}} = \alpha \cdot A' \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
 
@@ -11,16 +11,19 @@ where
 - $\alpha$ and $\beta$ are scalars
 - $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
 - $A'$ is a sparse matrix in BSR format with `rocsparse_operation` and described below.
+- $\textbf{m}$ is the mask vector with elements 0 and 1. Value 1 represents the elements where the function returns with the product, and value 0 represents the identity values.
+- $\mathbf{\bar{m}} = \mathbf{1} - \mathbf{m}$
+
+otherwise it returns the identical $\mathbf{y}$ vector elements.
 
 ## Application flow
-1. Setup a sparse matrix in BSR format. Allocate an x and a y vector and set up $\alpha$ and $\beta$ scalars.
-2. Setup a handle, a matrix descriptor and a matrix info.
-3. Allocate device memory and copy input matrix and vectors from host to device.
-4. Compute a sparse matrix multiplication, using BSR storage format.
+1. Set up a sparse matrix in BSR format. Allocate an x and a y vector, set up $\alpha$ and $\beta$ scalars and set up the mask.
+2. Set up a handle, a matrix descriptor and a matrix info.
+3. Allocate device memory and copy input matrix and vectors, and mask array from host to device.
+4. Compute a masked sparse matrix multiplication, using BSR storage format.
 5. Copy the result vector from device to host.
-6. Clear rocSPARSE allocations on device.
-7. Clear device arrays.
-8. Print result to the standard output.
+6. Free rocSPARSE resources and device memory.
+7. Print result to the standard output.
 
 ## Key APIs and Concepts
 ### BSR Matrix Storage Format
@@ -145,8 +148,49 @@ bsr_row_ptr = { 0, 1, 3, 4 }
 bsr_col_ind = { 0, 0, 2, 0, 1 }
 ```
 
+### Masked BSR (BSRX)
+
+It is a common case that not all the elements are required from the result. Therefore a mask can be introduced that defines an array of block row indices.
+
+Mathematically it means we are looking for the following product:
+
+$$\hat{\mathbf{y}} = \mathbf{m} \circ \left( \alpha \cdot A' \cdot \mathbf{x} \right) + \left( \mathbf{m} \cdot \beta + \mathbf{\bar{m}} \right) \circ \mathbf{y}$$
+
+For instance the mask:
+
+`mask_row_ptr = {0, 2}`
+
+means
+
+$$ \mathbf{m} = \left(
+\begin{array}{cccc:cccc:cc}
+1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1
+\end{array}
+\right)$$
+
+and
+
+$$ \mathbf{\bar{m}} = \left(
+\begin{array}{cccc:cccc:cc}
+0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & 0
+\end{array}
+\right)$$
+
+The BSRX format is the same as BSR, but the `bsr_row_ptr` is separated into starting and ending indices.
+- `bsrx_row_ptr`: the first block of each row that is used for the calculation. This block is typically the first nonzero block.
+- `bsrx_end_ptr`: the position next to the last block (last + 1) that is used for the calculation. This block is typically the last nonzero block.
+
+Therefore:
+```
+bsrx_row_ptr = { 0, 1, 3 }
+
+bsrx_end_ptr = { 1, 3, 4 }
+```
+
+Additionally, `bsrx_end_ptr` can be used for column masking, how it is presented in the example.
+
 ### rocSPARSE
-- `rocsparse_[dscz]bsrmv_ex(...)` is the solver with four different function signatures depending on the type of the input matrix:
+- `rocsparse_[dscz]bsrxmv(...)` is the solver with four different function signatures depending on the type of the input matrix:
    - `d` double-precision real (`double`)
    - `s` single-precision real (`float`)
    - `c` single-precision complex (`rocsparse_float_complex`)
@@ -168,17 +212,14 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 ### rocSPARSE
 - `rocsparse_create_handle`
 - `rocsparse_create_mat_descr`
-- `rocsparse_create_mat_info`
-- `rocsparse_dbsrmv_ex`
+- `rocsparse_dbsrxmv`
 - `rocsparse_destroy_handle`
 - `rocsparse_destroy_mat_descr`
-- `rocsparse_destroy_mat_info`
 - `rocsparse_direction`
 - `rocsparse_direction_column`
 - `rocsparse_handle`
 - `rocsparse_int`
 - `rocsparse_mat_descr`
-- `rocsparse_mat_info`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
 

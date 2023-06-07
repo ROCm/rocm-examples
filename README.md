@@ -81,7 +81,8 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [syev_strided_batched](/Libraries/rocSOLVER/syev_strided_batched): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
     - [rocSPARSE](/Libraries/rocSPARSE/)
         - [level_2](/Libraries/rocSPARSE/level_2/): Operations between sparse matrices and dense vectors.
-            - [bsrmv](/Libraries/rocSPARSE/level_2/bsrmv/): Showcases a sparse matrix--vector multiplication using BSR storage format.
+            - [bsrmv](/Libraries/rocSPARSE/level_2/bsrmv/): Showcases a sparse matrix-vector multiplication using BSR storage format.
+            - [bsrxmv](/Libraries/rocSPARSE/level_2/bsrxmv/): Showcases a masked sparse matrix-vector multiplication using BSR storage format.
             - [bsrsv](/Libraries/rocSPARSE/level2/bsrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a sparse triangular matrix.
         - [level_3](/Libraries/rocSPARSE/level_3_/): Operations between sparse matrices and dense vectors.
             - [bsrmm](/Libraries/rocSPARSE/level_3/bsrmm/): Showcases a sparse matrix--matrix multiplication using BSR storage format.
