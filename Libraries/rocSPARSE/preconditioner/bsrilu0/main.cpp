@@ -285,9 +285,9 @@ int main()
 
         std::cout << "and U matrix: \n";
 
-        for(int i = 0; i < n; ++i)
+        for(rocsparse_int i = 0; i < n; ++i)
         {
-            for(int j = 0; j < n; ++j)
+            for(rocsparse_int j = 0; j < n; ++j)
             {
                 const double val = (j >= i) ? A[j * n + i] : 0;
                 std::cout << val << " ";

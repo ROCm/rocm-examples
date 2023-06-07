@@ -207,29 +207,31 @@ int main()
 
     // 7. Check results obtained.
     rocsparse_int    position;
-    rocsparse_status status = rocsparse_bsrsv_zero_pivot(handle, info, &position);
+    rocsparse_status bsrsv_status = rocsparse_bsrsv_zero_pivot(handle, info, &position);
 
     int errors{};
 
-    if(status == rocsparse_status_zero_pivot)
+    if(bsrsv_status == rocsparse_status_zero_pivot)
     {
         std::cout << "Found zero pivot in matrix row " << position << std::endl;
         errors++;
     }
     else
     {
-        std::cout << "Solution successfully computed: ";
+        ROCSPARSE_CHECK(bsrsv_status);
+    }
 
-        HIP_CHECK(hipMemcpy(h_y.data(), d_y, sizeof(*d_y) * n, hipMemcpyDeviceToHost));
+    std::cout << "Solution successfully computed: ";
 
-        std::cout << "y = " << format_range(h_y.begin(), h_y.end()) << std::endl;
+    HIP_CHECK(hipMemcpy(h_y.data(), d_y, sizeof(*d_y) * n, hipMemcpyDeviceToHost));
 
-        // Compare solution with the expected result.
-        const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
-        for(size_t i = 0; i < h_y.size(); i++)
-        {
-            errors += std::fabs(h_y[i] - expected_y[i]) > eps;
-        }
+    std::cout << "y = " << format_range(h_y.begin(), h_y.end()) << std::endl;
+
+    // Compare solution with the expected result.
+    const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
+    for(size_t i = 0; i < h_y.size(); i++)
+    {
+        errors += std::fabs(h_y[i] - expected_y[i]) > eps;
     }
 
     // 8. Free rocSPARSE resources and device memory.

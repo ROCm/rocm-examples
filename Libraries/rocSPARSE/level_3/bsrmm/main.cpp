@@ -173,10 +173,10 @@ int main()
     // 8. Print result
     std::cout << "C =" << std::endl;
 
-    for(int i = 0; i < m; ++i)
+    for(rocsparse_int i = 0; i < m; ++i)
     {
         std::cout << "    (";
-        for(int j = 0; j < n; ++j)
+        for(rocsparse_int j = 0; j < n; ++j)
         {
             std::printf("%5.0lf", h_C[i + j * ldc]);
         }

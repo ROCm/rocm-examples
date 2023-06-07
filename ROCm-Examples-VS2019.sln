@@ -180,6 +180,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "preconditioner", "precondit
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsric0_vs2019", "Libraries\rocSPARSE\preconditioner\bsric0\bsric0_vs2019.vcxproj", "{E912342B-9B39-44AC-9EC8-61D3F4197700}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsrsm_vs2019", "Libraries\rocSPARSE\level_3\bsrsm\bsrsm_vs2019.vcxproj", "{1C2BA747-6507-4E44-8DA2-A771BD762425}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsrilu0_vs2019", "Libraries\rocSPARSE\preconditioner\bsrilu0\bsrilu0_vs2019.vcxproj", "{2A1C2114-C270-483F-AF59-849996E1E77D}"
 EndProject
 Global
@@ -476,6 +478,10 @@ Global
 		{2A1C2114-C270-483F-AF59-849996E1E77D}.Debug|x64.Build.0 = Debug|x64
 		{2A1C2114-C270-483F-AF59-849996E1E77D}.Release|x64.ActiveCfg = Release|x64
 		{2A1C2114-C270-483F-AF59-849996E1E77D}.Release|x64.Build.0 = Release|x64
+		{1C2BA747-6507-4E44-8DA2-A771BD762425}.Debug|x64.ActiveCfg = Debug|x64
+		{1C2BA747-6507-4E44-8DA2-A771BD762425}.Debug|x64.Build.0 = Debug|x64
+		{1C2BA747-6507-4E44-8DA2-A771BD762425}.Release|x64.ActiveCfg = Release|x64
+		{1C2BA747-6507-4E44-8DA2-A771BD762425}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -567,6 +573,8 @@ Global
 		{8B7AD0F4-4288-4ACF-9980-3C500A00EF31} = {FC6C82D9-23BD-42A8-99A5-B879E9821486}
 		{E912342B-9B39-44AC-9EC8-61D3F4197700} = {8B7AD0F4-4288-4ACF-9980-3C500A00EF31}
 		{2A1C2114-C270-483F-AF59-849996E1E77D} = {8B7AD0F4-4288-4ACF-9980-3C500A00EF31}
+		{1C2BA747-6507-4E44-8DA2-A771BD762425} = {06DEE87C-F773-49A8-A856-8CB55BDFED6D}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
 	EndGlobalSection

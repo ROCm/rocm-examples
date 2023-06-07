@@ -1,34 +1,38 @@
-# rocSPARSE Level 2 BSR Triangular Solver Example
+# rocSPARSE Level 3 BSR Triangular Solver Example
 
 ## Description
-This example illustrates the use of the `rocSPARSE` level 2 triangular solver using the BSR storage format.
+This example illustrates the use of the `rocSPARSE` level 3 triangular solver using the BSR storage format.
 
 This triangular solver is used to solve a linear system of the form
+
 $$
-A'y = \alpha x,
+A' X' = \alpha B'.
 $$
 
 where
 
 - $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
-- $A'$ is one of the following:
-    - $A' = A$ (identity)
-    - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
-    - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
+- given a matrix $C$, $C'$ is one of the following:
+    - $C' = C$ (identity)
+    - $C' = C^T$ (transpose $C$: $C_{ij}^T = C_{ji}$)
+    - $C' = C^H$ (conjugate transpose/Hermitian $C$: $C_{ij}^H = \bar C_{ji}$),
 - $\alpha$ is a scalar,
-- $x$ is a dense vector of size $n$ containing the constant terms of the equations, and
-- $y$ is a dense vector of size $n$ which contains the unknowns of the system.
+- $X$ is a dense matrix of size $n \times nrhs$ which contains the unknowns of the system, and
+- $B$ is a dense matrix of size $n \times nrhs$ containing the constant terms of the equations,
+- the performed operation on $B$ and $X$ must be the same.
 
 Obtaining the solution for such a system consists of finding concrete values of all the unknowns such that the above equality holds.
 
+This is the same as solving the classical system of linear equations $A' x_i = \alpha b_i$, where $x_i$ and $b_i$ are the $i$-th rows or columns of $X$ and $B$, depending on the operation performed on $X$ and $B$. This is showcased in [level 2 example bsrsv](../../level_2/bsrsv/README.md).
+
 ### Application flow
 1. Setup input data.
-2. Allocate device memory and offload input data to device.
+2. Allocate device memory and copy input data to device.
 3. Initialize rocSPARSE by creating a handle.
-4. Prepare utility variables for rocSPARSE bsrsv invocation.
+4. Prepare utility variables for rocSPARSE bsrsm invocation.
 5. Perform analysis step.
-6. Perform triangular solve $Ay = \alpha x$.
-7. Check results obtained. If no zero-pivots, copy solution vector $y$ from device to host and compare with expected result.
+6. Call dbsrsm to solve $A' X' = \alpha B$
+7. Check results. If no zero-pivots, copy solution matrix $X$ from device to host and compare with expected result.
 8. Free rocSPARSE resources and device memory.
 9. Print validation result.
 
@@ -165,16 +169,16 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 - `rocsparse_direction dir`: matrix storage of BSR blocks. The following values are accepted:
     - `rocsparse_direction_row`: parse blocks by rows.
     - `rocsparse_direction_column`: parse blocks by columns.
-- `rocsparse_operation trans`: matrix operation applied to the given input matrix. The following values are accepted:
+- `rocsparse_operation trans`: matrix operation applied to the given matrix. The following values are accepted:
     - `rocsparse_operation_none`: identity operation $A' = A$.
     - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
     - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
 - `rocsparse_mat_descr descr`: holds all properties of a matrix. The properties set in this example are the following:
     - `rocsparse_diag_type`: indicates whether the diagonal entries of a matrix are unit elements (`rocsparse_diag_type_unit`) or not (`rocsparse_diag_type_non_unit`).
     - `rocsparse_fill_mode`: indicates whether a (triangular) matrix is lower (`rocsparse_fill_mode_lower`) or upper (`rocsparse_fill_mode_upper`) triangular.
-- `rocsparse_[sdcz]bsrsv_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the `rocsparse_[sdcz]bsrsv_analysis` and `rocsparse_[sdcz]bsrsv_solve` functions. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
+- `rocsparse_[sdcz]bsrsm_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the `rocsparse_[sdcz]bsrsm_analysis` and `rocsparse_[sdcz]bsrsm_solve` functions. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
 - `rocsparse_solve_policy policy`: specifies the policy to follow for triangular solvers and factorizations. The only value accepted is `rocsparse_solve_policy_auto`.
-- `rocsparse_[sdcz]bsrsv_solve` solves a sparse triangular linear system $A'y = \alpha x$. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[sdcz]bsrsm_solve` solves a sparse triangular linear system $A X = \alpha B$. The correct function signature should be chosen based on the datatype of the input matrix:
     - `s` single-precision real (`float`)
     - `d` double-precision real (`double`)
     - `c` single-precision complex (`rocsparse_float_complex`)
@@ -182,21 +186,21 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 - `rocsparse_analysis_policy analysis`: specifies the policy to follow for analysis data. The following values are accepted:
     - `rocsparse_analysis_policy_reuse`: the analysis data gathered is re-used.
     - `rocsparse_analysis_policy_force`: the analysis data will be re-built.
-- `rocsparse_[sdcz]bsrsv_analysis` performs the analysis step for `rocsparse_[sdcz]bsrsv_solve`. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]bsrsv_solve`.
-- `rocsparse_bsrsv_zero_pivot(rocsparse_handle, rocsparse_mat_info, rocsparse_int *position)` returns `rocsparse_status_zero_pivot` if either a structural or numerical zero has been found during the execution of `rocsparse_[sdcz]bsrsv_solve(....)` and stores in `position` the index $i$ of the first zero pivot $A_{ii}$ found. If no zero pivot is found it returns `rocsparse_status_success`.
+- `rocsparse_[sdcz]bsrsm_analysis` performs the analysis step for `rocsparse_[sdcz]bsrsm_solve`. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]bsrsm_solve`.
+- `rocsparse_bsrsm_zero_pivot(rocsparse_handle, rocsparse_mat_info, rocsparse_int *position)` returns `rocsparse_status_zero_pivot` if either a structural or numerical zero has been found during the execution of `rocsparse_[sdcz]bsrsm_solve(....)` and stores in `position` the index $i$ of the first zero pivot $A_{ii}$ found. If no zero pivot is found it returns `rocsparse_status_success`.
 
 ## Demonstrated API Calls
 
 ### rocSPARSE
 - `rocsparse_analysis_policy`
 - `rocsparse_analysis_policy_reuse`
-- `rocsparse_bsrsv_zero_pivot`
+- `rocsparse_bsrsm_zero_pivot`
 - `rocsparse_create_handle`
 - `rocsparse_create_mat_descr`
 - `rocsparse_create_mat_info`
-- `rocsparse_dbsrsv_analysis`
-- `rocsparse_dbsrsv_buffer_size`
-- `rocsparse_dbsrsv_solve`
+- `rocsparse_dbsrsm_analysis`
+- `rocsparse_dbsrsm_buffer_size`
+- `rocsparse_dbsrsm_solve`
 - `rocsparse_destroy_handle`
 - `rocsparse_destroy_mat_descr`
 - `rocsparse_destroy_mat_info`
@@ -218,6 +222,7 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 - `rocsparse_solve_policy_auto`
 - `rocsparse_status`
 - `rocsparse_status_zero_pivot`
+- `rocsparse_status_success`
 
 ### HIP runtime
 - `hipFree`

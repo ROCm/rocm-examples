@@ -267,9 +267,9 @@ int main()
                      "matrix: \n";
 
         const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
-        for(int i = 0; i < n; ++i)
+        for(rocsparse_int i = 0; i < n; ++i)
         {
-            for(int j = 0; j < n; ++j)
+            for(rocsparse_int j = 0; j < n; ++j)
             {
                 const double val = (j <= i) ? A[j * n + i] : 0;
                 std::string  sep = (val < 10) ? "   " : "  ";
