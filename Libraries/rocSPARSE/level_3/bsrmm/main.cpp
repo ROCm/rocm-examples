@@ -116,11 +116,11 @@ int main()
     double*        d_B;
     double*        d_C;
 
-    const size_t size_B       = sizeof(*d_C) * k * n;
-    const size_t size_C       = sizeof(*d_C) * m * n;
-    const size_t size_val     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
-    const size_t size_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
-    const size_t size_col_ind = sizeof(*d_bsr_row_ptr) * nnzb;
+    constexpr size_t size_B       = sizeof(*d_C) * k * n;
+    constexpr size_t size_C       = sizeof(*d_C) * m * n;
+    constexpr size_t size_val     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
+    constexpr size_t size_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t size_col_ind = sizeof(*d_bsr_row_ptr) * nnzb;
 
     HIP_CHECK(hipMalloc((void**)&d_bsr_row_ptr, size_row_ptr));
     HIP_CHECK(hipMalloc((void**)&d_bsr_col_ind, size_col_ind));

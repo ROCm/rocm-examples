@@ -26,40 +26,38 @@
 #include <hip/hip_runtime.h>
 #include <rocsparse/rocsparse.h>
 
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <limits>
-#include <string>
 #include <vector>
 
 int main()
 {
     // 1. Setup input data.
-
-    // A = L * L^H
     //
-    //   = (  1  0  0  0  0  0 ) * (  1  2  3  4  5  6 )
-    //     (  2  1  0  0  0  0 )   (  0  1  2  3  4  5 )
-    //     (  3  2  1  0  0  0 )   (  0  0  1  2  3  4 )
-    //     (  4  3  2  1  0  0 )   (  0  0  0  1  2  3 )
-    //     (  5  4  3  2  1  0 )   (  0  0  0  0  1  2 )
-    //     (  6  5  4  3  2  1 )   (  0  0  0  0  0  1 )
+    // A = (  1  0  0  0  0  0 ) * (  2  3  4  5  6  7 )
+    //     (  2  1  0  0  0  0 )   (  0  2  3  4  5  6 )
+    //     (  3  2  1  0  0  0 )   (  0  0  2  3  4  5 )
+    //     (  4  3  2  1  0  0 )   (  0  0  0  2  3  4 )
+    //     (  5  4  3  2  1  0 )   (  0  0  0  0  2  3 )
+    //     (  6  5  4  3  2  1 )   (  0  0  0  0  0  2 )
     //
-    //   = (  1  2   3   4   5   6  )
-    //     (  2  5   8   11  14  17 )
-    //     (  3  8   14  20  26  32 )
-    //     (  4  11  20  30  40  50 )
-    //     (  5  14  26  40  55  70 )
-    //     (  6  17  32  50  70  91 )
+    //   = (  2  3   4   5   6   7   )
+    //     (  4  8   11  14  17  20  )
+    //     (  6  13  20  26  32  38  )
+    //     (  8  18  29  40  50  60  )
+    //     (  10 23  38  54  70  85  )
+    //     (  12 28  47  68  90  112 )
     //
-    //   = (  1  2  | 3   4  | 5   6  )
-    //     (  2  5  | 8   11 | 14  17 )
-    //     (--------------------------)
-    //     (  3  8  | 14  20 | 26  32 )
-    //     (  4  11 | 20  30 | 40  50 )
-    //     (--------------------------)
-    //     (  5  14 | 26  40 | 55  70 )
-    //     (  6  17 | 32  50 | 70  91 )
+    //   = (  2  3  | 4   5  | 6   7   )
+    //     (  4  8  | 11  14 | 17  20  )
+    //     (---------------------------)
+    //     (  6  13 | 20  26 | 32  38  )
+    //     (  8  18 | 29  40 | 50  60  )
+    //     (---------------------------)
+    //     (  10 23 | 38  54 | 70  85  )
+    //     (  12 28 | 47  68 | 90  112 )
     //
     //   = ( A_{00} | A_{O1} | A_{O2} )
     //     (--------------------------)
@@ -82,19 +80,19 @@ int main()
     constexpr rocsparse_int nnzb = 9;
 
     // BSR row pointers vector.
-    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 3, 6, 9};
+    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 3, 6, 9};
 
     // BSR column indices vector.
-    constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 1, 2, 0, 1, 2, 0, 1, 2};
+    constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 2, 0, 1, 2, 0, 1, 2};
 
     // BSR values vector.
-    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim]
-        = {1, 2,  2, 5 /*A_{00}*/,  3,  4,  8,  11 /*A_{01}*/, 5,  6,  14, 17 /*A_{02}*/,
-           3, 8,  4, 11 /*A_{10}*/, 14, 20, 20, 30 /*A_{11}*/, 26, 32, 40, 50 /*A_{12}*/,
-           5, 14, 6, 17 /*A_{20}*/, 26, 40, 32, 50 /*A_{21}*/, 55, 70, 70, 91 /*A_{22}*/};
+    constexpr std::array<double, nnzb* bsr_dim* bsr_dim> h_bsr_val
+        = {2,  4,  3,  8 /*A_{00}*/,  4,  11, 5,  14 /*A_{01}*/, 6,  17, 7,  20 /*A_{02}*/,
+           6,  8,  13, 18 /*A_{10}*/, 20, 29, 26, 40 /*A_{11}*/, 32, 50, 38, 60 /*A_{12}*/,
+           10, 12, 23, 28 /*A_{20}*/, 38, 47, 54, 68 /*A_{21}*/, 70, 90, 85, 112 /*A_{22}*/};
 
     // Storage scheme of the BSR blocks.
-    constexpr rocsparse_direction dir = rocsparse_direction_row;
+    constexpr rocsparse_direction dir = rocsparse_direction_column;
 
     // Analysis and solve policies.
     constexpr rocsparse_analysis_policy analysis_policy = rocsparse_analysis_policy_reuse;
@@ -105,28 +103,25 @@ int main()
     rocsparse_int* d_bsr_col_ind{};
     double*        d_bsr_val{};
 
-    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, sizeof(*d_bsr_row_ptr) * (mb + 1)));
-    HIP_CHECK(hipMalloc(&d_bsr_col_ind, sizeof(*d_bsr_col_ind) * nnzb));
-    HIP_CHECK(hipMalloc(&d_bsr_val, sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim));
+    constexpr size_t size_bsr_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t size_bsr_col_ind = sizeof(*d_bsr_col_ind) * nnzb;
+    constexpr size_t size_bsr_val     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
 
-    HIP_CHECK(hipMemcpy(d_bsr_row_ptr,
-                        h_bsr_row_ptr,
-                        sizeof(*d_bsr_row_ptr) * (mb + 1),
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_col_ind,
-                        h_bsr_col_ind,
-                        sizeof(*d_bsr_col_ind) * nnzb,
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_val,
-                        h_bsr_val,
-                        sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim,
-                        hipMemcpyHostToDevice));
+    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, size_bsr_row_ptr));
+    HIP_CHECK(hipMalloc(&d_bsr_col_ind, size_bsr_col_ind));
+    HIP_CHECK(hipMalloc(&d_bsr_val, size_bsr_val));
+
+    HIP_CHECK(
+        hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), size_bsr_row_ptr, hipMemcpyHostToDevice));
+    HIP_CHECK(
+        hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), size_bsr_col_ind, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), size_bsr_val, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
 
-    // 4. Prepare utility variables for rocSPARSE bsric0 invocation.
+    // 4. Prepare utility variables for rocSPARSE bsrilu0 invocation.
     // Matrix descriptor.
     rocsparse_mat_descr descr;
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
@@ -140,54 +135,54 @@ int main()
 
     // Obtain the required buffer size in bytes for analysis and solve stages.
     size_t buffer_size;
-    ROCSPARSE_CHECK(rocsparse_dbsric0_buffer_size(handle,
-                                                  dir,
-                                                  mb,
-                                                  nnzb,
-                                                  descr,
-                                                  d_bsr_val,
-                                                  d_bsr_row_ptr,
-                                                  d_bsr_col_ind,
-                                                  bsr_dim,
-                                                  info,
-                                                  &buffer_size));
+    ROCSPARSE_CHECK(rocsparse_dbsrilu0_buffer_size(handle,
+                                                   dir,
+                                                   mb,
+                                                   nnzb,
+                                                   descr,
+                                                   d_bsr_val,
+                                                   d_bsr_row_ptr,
+                                                   d_bsr_col_ind,
+                                                   bsr_dim,
+                                                   info,
+                                                   &buffer_size));
 
     // Allocate temporary buffer.
     void* temp_buffer{};
     HIP_CHECK(hipMalloc(&temp_buffer, buffer_size));
 
     // 5. Perform the analysis step.
-    ROCSPARSE_CHECK(rocsparse_dbsric0_analysis(handle,
-                                               dir,
-                                               mb,
-                                               nnzb,
-                                               descr,
-                                               d_bsr_val,
-                                               d_bsr_row_ptr,
-                                               d_bsr_col_ind,
-                                               bsr_dim,
-                                               info,
-                                               analysis_policy,
-                                               solve_policy,
-                                               temp_buffer));
+    ROCSPARSE_CHECK(rocsparse_dbsrilu0_analysis(handle,
+                                                dir,
+                                                mb,
+                                                nnzb,
+                                                descr,
+                                                d_bsr_val,
+                                                d_bsr_row_ptr,
+                                                d_bsr_col_ind,
+                                                bsr_dim,
+                                                info,
+                                                analysis_policy,
+                                                solve_policy,
+                                                temp_buffer));
 
-    // 6. Call dbsric0 to perform incomplete Cholesky factorization.
-    ROCSPARSE_CHECK(rocsparse_dbsric0(handle,
-                                      dir,
-                                      mb,
-                                      nnzb,
-                                      descr,
-                                      d_bsr_val,
-                                      d_bsr_row_ptr,
-                                      d_bsr_col_ind,
-                                      bsr_dim,
-                                      info,
-                                      solve_policy,
-                                      temp_buffer))
+    // 6. Call dbsrilu0 to perform incomplete LU factorization.
+    ROCSPARSE_CHECK(rocsparse_dbsrilu0(handle,
+                                       dir,
+                                       mb,
+                                       nnzb,
+                                       descr,
+                                       d_bsr_val,
+                                       d_bsr_row_ptr,
+                                       d_bsr_col_ind,
+                                       bsr_dim,
+                                       info,
+                                       solve_policy,
+                                       temp_buffer))
 
     // 7. Check zero-pivots.
     rocsparse_int    position;
-    rocsparse_status status = rocsparse_bsric0_zero_pivot(handle, info, &position);
+    rocsparse_status status = rocsparse_bsrilu0_zero_pivot(handle, info, &position);
 
     int errors{};
 
@@ -200,10 +195,10 @@ int main()
     {
         // 8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
         // Host and device allocations of the result matrix for conversion routines.
-        constexpr size_t    size_A = n * n;
+        constexpr size_t    size_A = m * n;
         std::vector<double> A(size_A);
 
-        double* d_A{};
+        double*          d_A{};
         constexpr size_t size_bytes_A = sizeof(*d_A) * size_A;
         HIP_CHECK(hipMalloc(&d_A, size_bytes_A));
 
@@ -212,15 +207,19 @@ int main()
         ROCSPARSE_CHECK(rocsparse_create_mat_descr(&csr_descr));
         ROCSPARSE_CHECK(rocsparse_set_mat_type(csr_descr, rocsparse_matrix_type_general));
 
-        constexpr rocsparse_int nnze = size_A; /*non-zero elements*/
+        constexpr rocsparse_int nnze = nnzb * bsr_dim * bsr_dim; /*non-zero elements*/
 
         rocsparse_int* d_csr_row_ptr{};
         rocsparse_int* d_csr_col_ind{};
         double*        d_csr_val{};
 
-        HIP_CHECK(hipMalloc(&d_csr_row_ptr, sizeof(*d_csr_row_ptr) * (n + 1)));
-        HIP_CHECK(hipMalloc(&d_csr_col_ind, sizeof(*d_csr_col_ind) * nnze));
-        HIP_CHECK(hipMalloc(&d_csr_val, sizeof(*d_csr_val) * nnze));
+        constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (n + 1);
+        constexpr size_t size_csr_col_ind = sizeof(*d_csr_col_ind) * nnze;
+        constexpr size_t size_csr_val     = sizeof(*d_csr_val) * nnze;
+
+        HIP_CHECK(hipMalloc(&d_csr_row_ptr, size_csr_row_ptr));
+        HIP_CHECK(hipMalloc(&d_csr_col_ind, size_csr_col_ind));
+        HIP_CHECK(hipMalloc(&d_csr_val, size_csr_val));
 
         ROCSPARSE_CHECK(rocsparse_dbsr2csr(handle,
                                            dir,
@@ -238,7 +237,7 @@ int main()
 
         // 8b. Convert CSR sparse matrix to dense.
         ROCSPARSE_CHECK(rocsparse_dcsr2dense(handle,
-                                             n,
+                                             m,
                                              n,
                                              csr_descr,
                                              d_csr_val,
@@ -257,27 +256,48 @@ int main()
         HIP_CHECK(hipFree(d_csr_val));
         HIP_CHECK(hipFree(d_A));
 
-        // 8c. Print the resulting L matrix and compare it with the expected result.
-        // Expected L matrix in dense format.
-        constexpr double expected[size_A] = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
-                                             0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
+        // 8c. Print the resulting L and U matrices and compare it with the expected results.
+        // Expected L and U matrices in dense format.
+        constexpr std::array<double, size_A> L_expected
+            = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
+               0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
+        constexpr std::array<double, size_A> U_expected
+            = {2, 0, 0, 0, 0, 0, 3, 2, 0, 0, 0, 0, 4, 3, 2, 0, 0, 0,
+               5, 4, 3, 2, 0, 0, 6, 5, 4, 3, 2, 0, 7, 6, 5, 4, 3, 2};
 
-        std::cout << "Incomplete Cholesky factorization A = L * L^H successfully computed with L "
+        std::cout << "Incomplete LU factorization A = L * U successfully computed with L "
                      "matrix: \n";
 
+        // L matrix is stored in the lower part of A. The diagonal is not stored as it is known
+        // that all the diagonal elements are the multiplicative identity (1 in this case).
         const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
         for(int i = 0; i < n; ++i)
         {
             for(int j = 0; j < n; ++j)
             {
-                const double val = (j <= i) ? A[j * n + i] : 0;
-                std::string  sep = (val < 10) ? "   " : "  ";
-                std::cout << val << sep;
+                const double val = (j < i) ? A[j * n + i] : (j == i);
+                std::cout << val << " ";
 
-                errors += std::fabs(val - expected[j * n + i]) > eps;
+                errors += std::fabs(val - L_expected[j * n + i]) > eps;
             }
-            std::cout << std::endl;
+            std::cout << "\n";
         }
+        std::cout << std::endl;
+
+        std::cout << "and U matrix: \n";
+
+        for(int i = 0; i < n; ++i)
+        {
+            for(int j = 0; j < n; ++j)
+            {
+                const double val = (j >= i) ? A[j * n + i] : 0;
+                std::cout << val << " ";
+
+                errors += std::fabs(val - U_expected[j * n + i]) > eps;
+            }
+            std::cout << "\n";
+        }
+        std::cout << std::endl;
     }
 
     // 9. Free rocSPARSE resources and device memory.

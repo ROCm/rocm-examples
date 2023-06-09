@@ -26,7 +26,9 @@
 #include <hip/hip_runtime.h>
 #include <rocsparse/rocsparse.h>
 
+#include <cmath>
 #include <iostream>
+#include <limits>
 #include <numeric>
 #include <vector>
 

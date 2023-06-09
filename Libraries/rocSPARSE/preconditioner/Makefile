@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	bsric0
+	bsric0 \
+	bsrilu0
 
 all: $(EXAMPLES)
 
