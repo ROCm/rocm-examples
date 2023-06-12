@@ -100,7 +100,7 @@ int main()
     std::vector<double> h_y(4);
 
     // Expected solution.
-    std::vector<double> expected_y = {1.0, 0.0, -1.0, 5.0};
+    std::vector<double> expected_y = {1.0, 0.0, -1.0 / 6.0, -5.0 / 27.0};
 
     // 2. Allocate device memory and offload input data to device.
     rocsparse_int* d_bsr_row_ptr{};
@@ -143,7 +143,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_set_mat_fill_mode(descr, rocsparse_fill_mode_lower));
 
     // Matrix diagonal type.
-    ROCSPARSE_CHECK(rocsparse_set_mat_diag_type(descr, rocsparse_diag_type_unit));
+    ROCSPARSE_CHECK(rocsparse_set_mat_diag_type(descr, rocsparse_diag_type_non_unit));
 
     // Matrix info structure.
     rocsparse_mat_info info;
