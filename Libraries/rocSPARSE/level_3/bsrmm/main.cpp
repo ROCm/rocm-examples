@@ -32,39 +32,42 @@
 int main()
 {
     // 1. Setup input data
-    // Matrix A (m x k)
+    // Number of rows and columns of the input matrices.
+    constexpr rocsparse_int m = 4;
+    constexpr rocsparse_int k = 6;
+    constexpr rocsparse_int n = 10;
+
+    // Sparse matrix A (m x k)
     //     ( 1 2 0 3 0 0 )
     // A = ( 0 4 5 0 0 0 )
     //     ( 0 0 0 7 8 0 )
     //     ( 0 0 1 2 4 1 )
 
-    // Number of rows and columns
-    constexpr rocsparse_int block_dim = 2;
-    constexpr rocsparse_int mb        = 2;
-    constexpr rocsparse_int kb        = 3;
-    constexpr rocsparse_int n         = 10;
-    constexpr rocsparse_int m         = mb * block_dim;
-    constexpr rocsparse_int k         = kb * block_dim;
+    // BSR block dimension.
+    constexpr rocsparse_int bsr_dim = 2;
+
+    // Number of rows and columns of the block matrix
+    constexpr rocsparse_int mb = (m + bsr_dim - 1) / bsr_dim;
+    constexpr rocsparse_int kb = (k + bsr_dim - 1) / bsr_dim;
 
     // Number of non-zero block entries
     constexpr rocsparse_int nnzb = 4;
 
     // BSR row pointers
-    constexpr rocsparse_int h_bsr_row_ptr[3] = {0, 2, 4};
+    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 2, 4};
 
     // BSR column indices
-    constexpr rocsparse_int hbsr_col_ind[4] = {0, 1, 1, 2};
+    constexpr rocsparse_int hbsr_col_ind[nnzb] = {0, 1, 1, 2};
 
     // BSR values
-    constexpr double h_bsr_val[16]
+    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim]
         = {1.0, 2.0, 0.0, 4.0, 0.0, 3.0, 5.0, 0.0, 0.0, 7.0, 1.0, 2.0, 8.0, 0.0, 4.0, 1.0};
 
     // Transposition of the matrix
     constexpr rocsparse_direction dir     = rocsparse_direction_row;
     constexpr rocsparse_operation trans_A = rocsparse_operation_none;
-    constexpr rocsparse_operation trans_B = rocsparse_operation_none;
 
-    // Matrix B (k x n) column major order
+    // Dense matrix B (k x n)
     //     ( 9  11 13 15 17 10 12 14 16 18 )
     //     ( 8  10 1  10 6  11 7  3  12 17 )
     // B = ( 11 11 0  4  6  12 2  9  13 2  )
@@ -72,22 +75,25 @@ int main()
     //     ( 2  5  7  0  1  15 9  4  10 1  )
     //     ( 7  12 12 1  12 5  1  11 1  14 )
 
-    // Matrix B in column-major
+    // Matrix B elements in column-major
     const rocsparse_int ldb = k;
-    constexpr double    h_B[6 * 10]
+    constexpr double    h_B[k * n]
         = {9, 8, 11, 15, 2,  7, 11, 10, 11, 3,  5,  12, 13, 1, 0,  2,  7,  12, 15, 10,
            4, 3, 0,  1,  17, 6, 6,  8,  1,  12, 10, 11, 12, 1, 15, 5,  12, 7,  2,  2,
            9, 1, 14, 3,  9,  4, 4,  11, 16, 12, 13, 6,  10, 1, 18, 17, 2,  6,  1,  14};
 
-    // Matrix C (m x n) column major order
+    // Transposition of the matrix
+    constexpr rocsparse_operation trans_B = rocsparse_operation_none;
+
+    // Dense matrix C (m x n)
     //     ( 0 0 0 0 0 0 0 0 0 0 )
     // C = ( 0 0 0 0 0 0 0 0 0 0 )
     //     ( 0 0 0 0 0 0 0 0 0 0 )
     //     ( 0 0 0 0 0 0 0 0 0 0 )
 
-    // Matrix C (m x n) in column-major
+    // Matrix C elements in column-major
     const rocsparse_int ldc         = m;
-    double              h_C[4 * 10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    double              h_C[m * n]  = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // Scalar alpha and beta
@@ -112,7 +118,7 @@ int main()
 
     const size_t size_B       = sizeof(*d_C) * k * n;
     const size_t size_C       = sizeof(*d_C) * m * n;
-    const size_t size_val     = sizeof(*d_bsr_val) * nnzb * block_dim * block_dim;
+    const size_t size_val     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
     const size_t size_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
     const size_t size_col_ind = sizeof(*d_bsr_row_ptr) * nnzb;
 
@@ -142,7 +148,7 @@ int main()
                                      d_bsr_val,
                                      d_bsr_row_ptr,
                                      d_bsr_col_ind,
-                                     block_dim,
+                                     bsr_dim,
                                      d_B,
                                      ldb,
                                      &beta,

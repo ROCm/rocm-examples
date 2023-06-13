@@ -53,16 +53,17 @@ int main()
     constexpr rocsparse_int bsr_dim = 2;
 
     // Number of rows and columns of the input matrix.
+    constexpr rocsparse_int m = 4;
     constexpr rocsparse_int n = 4;
 
     // Number of rows and columns of the block matrix.
-    constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
+    constexpr rocsparse_int mb = (m + bsr_dim - 1) / bsr_dim;
 
     // Number of non-zero blocks.
     constexpr rocsparse_int nnzb = 3;
 
     // BSR row pointers vector.
-    constexpr rocsparse_int h_bsr_row_ptr[nb + 1] = {0, 1, 3};
+    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 1, 3};
 
     // BSR column indices vector.
     constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 0, 1};
@@ -95,9 +96,9 @@ int main()
     constexpr double alpha = 1.0;
 
     // Host vectors for the right hand side and solution of the linear system.
-    std::vector<double> h_x(4);
+    std::vector<double> h_x(m);
     std::iota(h_x.begin(), h_x.end(), 1.0);
-    std::vector<double> h_y(4);
+    std::vector<double> h_y(n);
 
     // Expected solution.
     std::vector<double> expected_y = {1.0, 0.0, -1.0 / 6.0, -5.0 / 27.0};
@@ -109,15 +110,15 @@ int main()
     double*        d_x{};
     double*        d_y{};
 
-    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, sizeof(*d_bsr_row_ptr) * (nb + 1)));
+    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, sizeof(*d_bsr_row_ptr) * (mb + 1)));
     HIP_CHECK(hipMalloc(&d_bsr_col_ind, sizeof(*d_bsr_col_ind) * nnzb));
     HIP_CHECK(hipMalloc(&d_bsr_val, sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim));
-    HIP_CHECK(hipMalloc(&d_x, sizeof(*d_x) * n));
+    HIP_CHECK(hipMalloc(&d_x, sizeof(*d_x) * m));
     HIP_CHECK(hipMalloc(&d_y, sizeof(*d_y) * n));
 
     HIP_CHECK(hipMemcpy(d_bsr_row_ptr,
                         h_bsr_row_ptr,
-                        sizeof(*d_bsr_row_ptr) * (nb + 1),
+                        sizeof(*d_bsr_row_ptr) * (mb + 1),
                         hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_col_ind,
                         h_bsr_col_ind,
@@ -127,7 +128,7 @@ int main()
                         h_bsr_val,
                         sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim,
                         hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_x, h_x.data(), sizeof(*d_x) * n, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x.data(), sizeof(*d_x) * m, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
@@ -154,7 +155,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_dbsrsv_buffer_size(handle,
                                                  dir,
                                                  trans,
-                                                 nb,
+                                                 mb,
                                                  nnzb,
                                                  descr,
                                                  d_bsr_val,
@@ -172,7 +173,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_dbsrsv_analysis(handle,
                                               dir,
                                               trans,
-                                              nb,
+                                              mb,
                                               nnzb,
                                               descr,
                                               d_bsr_val,
@@ -188,7 +189,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_dbsrsv_solve(handle,
                                            dir,
                                            trans,
-                                           nb,
+                                           mb,
                                            nnzb,
                                            &alpha,
                                            descr,

@@ -43,22 +43,30 @@ int main()
     // BSR block dimension
     constexpr rocsparse_int bsr_dim = 2;
 
+    // Number of rows and columns of the input matrix.
+    constexpr rocsparse_int m = 4;
+    constexpr rocsparse_int n = 3;
+
     // Number of block rows and columns
-    constexpr rocsparse_int mb = 2;
-    constexpr rocsparse_int nb = 2;
+    constexpr rocsparse_int mb = (m + bsr_dim - 1) / bsr_dim;
+    constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
 
-    // BSR values
-    constexpr double h_bsr_val[16]
-        = {1.0, 3.0, 0.0, 0.0, 2.0, 4.0, 0.0, 0.0, 5.0, 7.0, 6.0, 0.0, 0.0, 8.0, 0.0, 0.0};
-
-    // BSR row pointers
-    constexpr rocsparse_int h_bsr_row_ptr[3] = {0, 2, 4};
-
-    // BSR column indices
-    constexpr rocsparse_int h_bsr_col_ind[4] = {0, 1, 0, 1};
+    // Padded dimensions of input matrix
+    constexpr size_t nb_padded = nb * bsr_dim;
+    constexpr size_t mb_padded = mb * bsr_dim;
 
     // Number of non-zero blocks
     constexpr rocsparse_int nnzb = 4;
+
+    // BSR values
+    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim]
+        = {1.0, 3.0, 0.0, 0.0, 2.0, 4.0, 0.0, 0.0, 5.0, 7.0, 6.0, 0.0, 0.0, 8.0, 0.0, 0.0};
+
+    // BSR row pointers
+    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 2, 4};
+
+    // BSR column indices
+    constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 1, 0, 1};
 
     // Block storage in column major
     constexpr rocsparse_direction dir = rocsparse_direction_column;
@@ -71,8 +79,8 @@ int main()
     constexpr double beta  = 1.3;
 
     // Set up x and y vectors
-    constexpr double h_x[4] = {1.0, 2.0, 3.0, 0.0};
-    double           h_y[4] = {4.0, 5.0, 6.0, 7.0};
+    constexpr double h_x[nb_padded] = {1.0, 2.0, 3.0, 0.0};
+    double           h_y[mb_padded] = {4.0, 5.0, 6.0, 7.0};
 
     // 2. Prepare device for calculation
 
@@ -95,8 +103,8 @@ int main()
     double*        d_x;
     double*        d_y;
 
-    constexpr size_t x_size       = sizeof(*d_x) * nb * bsr_dim;
-    constexpr size_t y_size       = sizeof(*d_y) * mb * bsr_dim;
+    constexpr size_t x_size       = sizeof(*d_x) * nb_padded;
+    constexpr size_t y_size       = sizeof(*d_y) * mb_padded;
     constexpr size_t val_size     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
     constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
     constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
@@ -147,11 +155,7 @@ int main()
     HIP_CHECK(hipFree(d_y));
 
     // 8. Print result
-    std::cout << "y = (";
-    for(int i = 0; i < mb * bsr_dim; ++i)
-    {
-        std::cout << " " << h_y[i];
-    }
-    std::cout << ")" << std::endl;
+    std::cout << "y = " << format_range(std::begin(h_y), std::end(h_y)) << std::endl;
+
     return 0;
 }

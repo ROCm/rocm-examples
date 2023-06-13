@@ -69,16 +69,18 @@ int main()
     constexpr rocsparse_int bsr_dim = 2;
 
     // Number of rows and columns of the input matrix.
+    constexpr rocsparse_int m = 6;
     constexpr rocsparse_int n = 6;
 
     // Number of rows and columns of the block matrix.
+    constexpr rocsparse_int mb = (m + bsr_dim - 1) / bsr_dim;
     constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
 
     // Number of non-zero blocks.
     constexpr rocsparse_int nnzb = 9;
 
     // BSR row pointers vector.
-    constexpr rocsparse_int h_bsr_row_ptr[nb + 1] = {0, 3, 6, 9};
+    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 3, 6, 9};
 
     // BSR column indices vector.
     constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 1, 2, 0, 1, 2, 0, 1, 2};
@@ -101,13 +103,13 @@ int main()
     rocsparse_int* d_bsr_col_ind{};
     double*        d_bsr_val{};
 
-    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, sizeof(*d_bsr_row_ptr) * (nb + 1)));
+    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, sizeof(*d_bsr_row_ptr) * (mb + 1)));
     HIP_CHECK(hipMalloc(&d_bsr_col_ind, sizeof(*d_bsr_col_ind) * nnzb));
     HIP_CHECK(hipMalloc(&d_bsr_val, sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim));
 
     HIP_CHECK(hipMemcpy(d_bsr_row_ptr,
                         h_bsr_row_ptr,
-                        sizeof(*d_bsr_row_ptr) * (nb + 1),
+                        sizeof(*d_bsr_row_ptr) * (mb + 1),
                         hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_col_ind,
                         h_bsr_col_ind,
@@ -138,7 +140,7 @@ int main()
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dbsric0_buffer_size(handle,
                                                   dir,
-                                                  nb,
+                                                  mb,
                                                   nnzb,
                                                   descr,
                                                   d_bsr_val,
@@ -155,7 +157,7 @@ int main()
     // 5. Perform the analysis step.
     ROCSPARSE_CHECK(rocsparse_dbsric0_analysis(handle,
                                                dir,
-                                               nb,
+                                               mb,
                                                nnzb,
                                                descr,
                                                d_bsr_val,
@@ -170,7 +172,7 @@ int main()
     // 6. Call dbsric0 to perform incomplete Cholesky factorization.
     ROCSPARSE_CHECK(rocsparse_dbsric0(handle,
                                       dir,
-                                      nb,
+                                      mb,
                                       nnzb,
                                       descr,
                                       d_bsr_val,
@@ -218,7 +220,7 @@ int main()
 
         ROCSPARSE_CHECK(rocsparse_dbsr2csr(handle,
                                            dir,
-                                           nb,
+                                           mb,
                                            nb,
                                            descr,
                                            d_bsr_val,

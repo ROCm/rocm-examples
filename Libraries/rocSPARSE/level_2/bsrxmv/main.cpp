@@ -53,11 +53,18 @@ int main()
     // BSR block dimension
     constexpr rocsparse_int bsr_dim = 2;
 
-    // Number of block rows and columns
-    constexpr rocsparse_int mb = 2;
-    constexpr rocsparse_int nb = 2;
-    constexpr rocsparse_int m  = mb * bsr_dim;
-    constexpr rocsparse_int n  = nb * bsr_dim;
+    // Number of rows and columns of the input matrix
+    constexpr rocsparse_int m = 4;
+    constexpr rocsparse_int n = 3;
+
+    // Number of rows and columns of the block matrix
+    constexpr rocsparse_int mb = (m + bsr_dim - 1) / bsr_dim;
+    constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
+
+    // Padded dimensions of input matrix
+    constexpr size_t nb_padded = nb * bsr_dim;
+    constexpr size_t mb_padded = mb * bsr_dim;
+
     // Number of non-zero blocks
     constexpr rocsparse_int nnzb = 4;
 
@@ -86,8 +93,8 @@ int main()
     constexpr double beta  = 1.3;
 
     // Set up x and y vectors.
-    constexpr std::array<double, n> hx = {1.0, 2.0, 3.0, 0.0};
-    std::array<double, m>           hy = {4.0, 5.0, 6.0, 7.0};
+    constexpr std::array<double, nb_padded> h_x = {1.0, 2.0, 3.0, 0.0};
+    std::array<double, mb_padded>           h_y = {4.0, 5.0, 6.0, 7.0};
 
     // Set up mask pointers.
     constexpr rocsparse_int                          mask_length    = 1;
@@ -112,8 +119,8 @@ int main()
     double*        d_x;
     double*        d_y;
 
-    constexpr size_t x_size       = sizeof(*d_x) * n;
-    constexpr size_t y_size       = sizeof(*d_y) * m;
+    constexpr size_t x_size       = sizeof(*d_x) * nb_padded;
+    constexpr size_t y_size       = sizeof(*d_y) * mb_padded;
     constexpr size_t val_size     = sizeof(*d_bsr_val) * number_of_values;
     constexpr size_t ptr_size     = sizeof(*d_bsrx_row_ptr) * mb;
     constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
@@ -132,8 +139,8 @@ int main()
     HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_mask_row_ptr, h_mask_row_ptr.data(), mask_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), val_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_x, hx.data(), x_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_y, hy.data(), y_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
     // 4. Call masked matrix-vector multiplication.
     ROCSPARSE_CHECK(rocsparse_dbsrxmv(handle,
@@ -156,7 +163,7 @@ int main()
                                       d_y));
 
     // 5. Copy y to host from device.
-    HIP_CHECK(hipMemcpy(hy.data(), d_y, y_size, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 6. Free rocSPARSE resources and device memory.
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
@@ -171,11 +178,7 @@ int main()
     HIP_CHECK(hipFree(d_y));
 
     // 7. Print result: (4 5 70.7 35)
-    std::cout << "y = (";
-    for(int i = 0; i < m; ++i)
-    {
-        std::cout << " " << hy[i];
-    }
-    std::cout << ")" << std::endl;
+    std::cout << "y = " << format_range(std::begin(h_y), std::end(h_y)) << std::endl;
+
     return 0;
 }
