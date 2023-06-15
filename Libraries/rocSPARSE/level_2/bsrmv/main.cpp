@@ -61,10 +61,11 @@ int main()
 
     // BSR values
     // clang-format off
-    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim] = {1.0, 3.0, 0.0, 0.0,  // A_{00}
-                                                            2.0, 4.0, 0.0, 0.0,  // A_{01}
-                                                            5.0, 7.0, 6.0, 0.0,  // A_{10}
-                                                            0.0, 8.0, 0.0, 0.0}; // A_{11}
+    constexpr std::array<double, nnzb * bsr_dim * bsr_dim>
+        h_bsr_val {1.0, 3.0, 0.0, 0.0,  // A_{00}
+                   2.0, 4.0, 0.0, 0.0,  // A_{01}
+                   5.0, 7.0, 6.0, 0.0,  // A_{10}
+                   0.0, 8.0, 0.0, 0.0}; // A_{11}
     // clang-format on
 
     // BSR row pointers
