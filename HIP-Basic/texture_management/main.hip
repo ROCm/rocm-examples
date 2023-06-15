@@ -147,8 +147,8 @@ int main()
     HIP_CHECK(hipGetLastError());
 
     // Copy data from device back to host.
-    unsigned int h_histogram[hist_bin_count];
-    HIP_CHECK(hipMemcpy(h_histogram, d_histogram, hist_bytes, hipMemcpyDeviceToHost));
+    std::array<unsigned int, hist_bin_count> h_histogram;
+    HIP_CHECK(hipMemcpy(h_histogram.data(), d_histogram, hist_bytes, hipMemcpyDeviceToHost));
 
     // Print out results.
     std::cout << "Equal-width histogram with " << hist_bin_count << " bins of values [0, " << size
