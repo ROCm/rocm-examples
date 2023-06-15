@@ -53,15 +53,19 @@ int main()
     constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
 
     // Padded dimensions of input matrix
-    constexpr size_t nb_padded = nb * bsr_dim;
-    constexpr size_t mb_padded = mb * bsr_dim;
+    constexpr size_t n_padded = nb * bsr_dim;
+    constexpr size_t m_padded = mb * bsr_dim;
 
     // Number of non-zero blocks
     constexpr rocsparse_int nnzb = 4;
 
     // BSR values
-    constexpr std::array<double, (nnzb * bsr_dim * bsr_dim)> h_bsr_val
-        = {1.0, 3.0, 0.0, 0.0, 2.0, 4.0, 0.0, 0.0, 5.0, 7.0, 6.0, 0.0, 0.0, 8.0, 0.0, 0.0};
+    // clang-format off
+    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim] = {1.0, 3.0, 0.0, 0.0,  // A_{00}
+                                                            2.0, 4.0, 0.0, 0.0,  // A_{01}
+                                                            5.0, 7.0, 6.0, 0.0,  // A_{10}
+                                                            0.0, 8.0, 0.0, 0.0}; // A_{11}
+    // clang-format on
 
     // BSR row pointers
     constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 2, 4};
@@ -80,8 +84,8 @@ int main()
     constexpr double beta  = 1.3;
 
     // Set up x and y vectors
-    constexpr std::array<double, nb_padded> h_x = {1.0, 2.0, 3.0, 0.0};
-    std::array<double, mb_padded>           h_y = {4.0, 5.0, 6.0, 7.0};
+    constexpr std::array<double, n_padded> h_x = {1.0, 2.0, 3.0, 0.0};
+    std::array<double, m_padded>           h_y = {4.0, 5.0, 6.0, 7.0};
 
     // 2. Prepare device for calculation
 
@@ -104,8 +108,8 @@ int main()
     double*        d_x;
     double*        d_y;
 
-    constexpr size_t x_size       = sizeof(*d_x) * nb_padded;
-    constexpr size_t y_size       = sizeof(*d_y) * mb_padded;
+    constexpr size_t x_size       = sizeof(*d_x) * n_padded;
+    constexpr size_t y_size       = sizeof(*d_y) * m_padded;
     constexpr size_t val_size     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
     constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
     constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;

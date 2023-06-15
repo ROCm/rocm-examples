@@ -45,9 +45,13 @@ Therefore, defining
 we can describe a sparse matrix using the following arrays:
 - `bsr_val`: contains the elements of the non-zero blocks of the sparse matrix. The elements are stored block by block in column- or row-major order. That is, it is an array of size `nnzb` $\cdot$ `bsr_dim` $\cdot$ `bsr_dim`.
 
-- `bsr_row_ptr`: given $i \in [0, mb]$, `bsr_row_ptr[i]` stores the index of the non-zero block that is the first non-zero block in row $i$ of the block matrix.
+- `bsr_row_ptr`: given $i \in [0, mb]$
+    - if $` 0 \leq i < mb `$, `bsr_row_ptr[i]` stores the index of the first non-zero block in row $i$ of the block matrix
+    - if $i = mb$, `bsr_row_ptr[i]` stores `nnzb`.
 
-- `bsr_col_ind`: given $i \in [0, nnzb-1]$, `bsr_col_ind[i]` stores the index of the column in the block matrix containing the non-zero block $i$.
+    This way, row $j \in [0, mb)$ contains the non-zero blocks of indices from `bsr_row_ptr[j]` to `bsr_row_ptr[j+1]-1`. The corresponding values in `bsr_val` can be accessed from `bsr_row_ptr[j] * bsr_dim * bsr_dim` to `(bsr_row_ptr[j+1]-1) * bsr_dim * bsr_dim`.
+
+- `bsr_col_ind`: given $i \in [0, nnzb-1]$, `bsr_col_ind[i]` stores the column of the $i^{th}$ non-zero block in the block matrix.
 
 Note that, for a given $m\times n$ matrix, if the dimensions are not evenly divisible by the block dimension then zeros are padded to the matrix so that $mb$ and $nb$ are the smallest integers greater than or equal to $`\frac{m}{\texttt{bsr\_dim}}`$ and $`\frac{n}{\texttt{bsr\_dim}}`$, respectively.
 
@@ -141,7 +145,7 @@ O = 0_4=
 \end{pmatrix}
 $$
 
-Therefore, the BSR representation of $A$ is:
+Therefore, the BSR representation of $A$, using column-major ordering, is:
 
 ```
 bsr_val = { 8, 0, 7, 2, 0, 3, 0, 5, 2, 0, 1, 0, 0, 0, 0, 0   // A_{00}
