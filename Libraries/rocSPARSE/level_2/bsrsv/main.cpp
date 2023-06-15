@@ -26,11 +26,11 @@
 #include <hip/hip_runtime.h>
 #include <rocsparse/rocsparse.h>
 
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <numeric>
-#include <vector>
 
 int main()
 {
@@ -65,24 +65,24 @@ int main()
     constexpr rocsparse_int nnzb = 3;
 
     // BSR row pointers vector.
-    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 1, 3};
+    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 1, 3};
 
     // BSR column indices vector.
-    constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 0, 1};
+    constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 0, 1};
 
     // BSR values vector.
-    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim] = {1.0,
-                                                            2.0,
-                                                            0.0,
-                                                            3.0, /*A_{00}*/
-                                                            4.0,
-                                                            7.0,
-                                                            5.0,
-                                                            0.0, /*A_{10}*/
-                                                            6.0,
-                                                            8.0,
-                                                            0.0,
-                                                            9.0}; /*A_{11}*/
+    constexpr std::array<double, (nnzb * bsr_dim * bsr_dim)> h_bsr_val = {1.0,
+                                                                          2.0,
+                                                                          0.0,
+                                                                          3.0, /*A_{00}*/
+                                                                          4.0,
+                                                                          7.0,
+                                                                          5.0,
+                                                                          0.0, /*A_{10}*/
+                                                                          6.0,
+                                                                          8.0,
+                                                                          0.0,
+                                                                          9.0}; /*A_{11}*/
 
     // Storage scheme of the BSR blocks.
     constexpr rocsparse_direction dir = rocsparse_direction_column;
@@ -98,12 +98,12 @@ int main()
     constexpr double alpha = 1.0;
 
     // Host vectors for the right hand side and solution of the linear system.
-    std::vector<double> h_x(m);
+    std::array<double, m> h_x;
     std::iota(h_x.begin(), h_x.end(), 1.0);
-    std::vector<double> h_y(n);
+    std::array<double, n> h_y;
 
     // Expected solution.
-    std::vector<double> expected_y = {1.0, 0.0, -1.0 / 6.0, -5.0 / 27.0};
+    constexpr std::array<double, n> expected_y = {1.0, 0.0, -1.0 / 6.0, -5.0 / 27.0};
 
     // 2. Allocate device memory and offload input data to device.
     rocsparse_int* d_bsr_row_ptr{};
@@ -119,15 +119,15 @@ int main()
     HIP_CHECK(hipMalloc(&d_y, sizeof(*d_y) * n));
 
     HIP_CHECK(hipMemcpy(d_bsr_row_ptr,
-                        h_bsr_row_ptr,
+                        h_bsr_row_ptr.data(),
                         sizeof(*d_bsr_row_ptr) * (mb + 1),
                         hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_col_ind,
-                        h_bsr_col_ind,
+                        h_bsr_col_ind.data(),
                         sizeof(*d_bsr_col_ind) * nnzb,
                         hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_val,
-                        h_bsr_val,
+                        h_bsr_val.data(),
                         sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim,
                         hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_x, h_x.data(), sizeof(*d_x) * m, hipMemcpyHostToDevice));

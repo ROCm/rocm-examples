@@ -26,6 +26,7 @@
 
 #include <hip/hip_runtime.h>
 
+#include <array>
 #include <cstdio>
 #include <iostream>
 
@@ -54,13 +55,13 @@ int main()
     constexpr rocsparse_int nnzb = 4;
 
     // BSR row pointers
-    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 2, 4};
+    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 2, 4};
 
     // BSR column indices
-    constexpr rocsparse_int hbsr_col_ind[nnzb] = {0, 1, 1, 2};
+    constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 1, 2};
 
     // BSR values
-    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim]
+    constexpr std::array<double, (nnzb * bsr_dim * bsr_dim)> h_bsr_val
         = {1.0, 2.0, 0.0, 4.0, 0.0, 3.0, 5.0, 0.0, 0.0, 7.0, 1.0, 2.0, 8.0, 0.0, 4.0, 1.0};
 
     // Transposition of the matrix
@@ -76,8 +77,8 @@ int main()
     //     ( 7  12 12 1  12 5  1  11 1  14 )
 
     // Matrix B elements in column-major
-    const rocsparse_int ldb = k;
-    constexpr double    h_B[k * n]
+    const rocsparse_int                   ldb = k;
+    constexpr std::array<double, (k * n)> h_B
         = {9, 8, 11, 15, 2,  7, 11, 10, 11, 3,  5,  12, 13, 1, 0,  2,  7,  12, 15, 10,
            4, 3, 0,  1,  17, 6, 6,  8,  1,  12, 10, 11, 12, 1, 15, 5,  12, 7,  2,  2,
            9, 1, 14, 3,  9,  4, 4,  11, 16, 12, 13, 6,  10, 1, 18, 17, 2,  6,  1,  14};
@@ -92,8 +93,8 @@ int main()
     //     ( 0 0 0 0 0 0 0 0 0 0 )
 
     // Matrix C elements in column-major
-    const rocsparse_int ldc         = m;
-    double              h_C[m * n]  = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    const rocsparse_int         ldc = m;
+    std::array<double, (m * n)> h_C = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
                                        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
     // Scalar alpha and beta
@@ -128,11 +129,11 @@ int main()
     HIP_CHECK(hipMalloc((void**)&d_B, size_B));
     HIP_CHECK(hipMalloc((void**)&d_C, size_C));
 
-    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr, size_row_ptr, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_col_ind, hbsr_col_ind, size_col_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val, size_val, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_B, h_B, size_B, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_C, h_C, size_C, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), size_row_ptr, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), size_col_ind, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), size_val, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_B, h_B.data(), size_B, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_C, h_C.data(), size_C, hipMemcpyHostToDevice));
 
     // 4. Call bsrmm to perform C = alpha * A' * B' + beta * C
     ROCSPARSE_CHECK(rocsparse_dbsrmm(handle,
@@ -156,7 +157,7 @@ int main()
                                      ldc));
 
     // 5. Copy y to host from device
-    HIP_CHECK(hipMemcpy(h_C, d_C, size_C, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_C.data(), d_C, size_C, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));

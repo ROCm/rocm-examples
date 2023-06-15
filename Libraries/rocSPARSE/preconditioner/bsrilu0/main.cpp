@@ -30,7 +30,6 @@
 #include <cmath>
 #include <iostream>
 #include <limits>
-#include <vector>
 
 int main()
 {
@@ -86,7 +85,7 @@ int main()
     constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 2, 0, 1, 2, 0, 1, 2};
 
     // BSR values vector.
-    constexpr std::array<double, nnzb* bsr_dim* bsr_dim> h_bsr_val
+    constexpr std::array<double, (nnzb * bsr_dim * bsr_dim)> h_bsr_val
         = {2,  4,  3,  8 /*A_{00}*/,  4,  11, 5,  14 /*A_{01}*/, 6,  17, 7,  20 /*A_{02}*/,
            6,  8,  13, 18 /*A_{10}*/, 20, 29, 26, 40 /*A_{11}*/, 32, 50, 38, 60 /*A_{12}*/,
            10, 12, 23, 28 /*A_{20}*/, 38, 47, 54, 68 /*A_{21}*/, 70, 90, 85, 112 /*A_{22}*/};
@@ -195,8 +194,8 @@ int main()
     {
         // 8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
         // Host and device allocations of the result matrix for conversion routines.
-        constexpr size_t    size_A = m * n;
-        std::vector<double> A(size_A);
+        constexpr size_t           size_A = m * n;
+        std::array<double, size_A> A;
 
         double*          d_A{};
         constexpr size_t size_bytes_A = sizeof(*d_A) * size_A;

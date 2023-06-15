@@ -26,11 +26,11 @@
 #include <hip/hip_runtime.h>
 #include <rocsparse/rocsparse.h>
 
+#include <array>
 #include <cmath>
 #include <iostream>
 #include <limits>
 #include <string>
-#include <vector>
 
 int main()
 {
@@ -82,13 +82,13 @@ int main()
     constexpr rocsparse_int nnzb = 9;
 
     // BSR row pointers vector.
-    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 3, 6, 9};
+    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 3, 6, 9};
 
     // BSR column indices vector.
-    constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 1, 2, 0, 1, 2, 0, 1, 2};
+    constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 2, 0, 1, 2, 0, 1, 2};
 
     // BSR values vector.
-    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim]
+    constexpr std::array<double, (nnzb * bsr_dim * bsr_dim)> h_bsr_val
         = {1, 2,  2, 5 /*A_{00}*/,  3,  4,  8,  11 /*A_{01}*/, 5,  6,  14, 17 /*A_{02}*/,
            3, 8,  4, 11 /*A_{10}*/, 14, 20, 20, 30 /*A_{11}*/, 26, 32, 40, 50 /*A_{12}*/,
            5, 14, 6, 17 /*A_{20}*/, 26, 40, 32, 50 /*A_{21}*/, 55, 70, 70, 91 /*A_{22}*/};
@@ -110,15 +110,15 @@ int main()
     HIP_CHECK(hipMalloc(&d_bsr_val, sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim));
 
     HIP_CHECK(hipMemcpy(d_bsr_row_ptr,
-                        h_bsr_row_ptr,
+                        h_bsr_row_ptr.data(),
                         sizeof(*d_bsr_row_ptr) * (mb + 1),
                         hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_col_ind,
-                        h_bsr_col_ind,
+                        h_bsr_col_ind.data(),
                         sizeof(*d_bsr_col_ind) * nnzb,
                         hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_val,
-                        h_bsr_val,
+                        h_bsr_val.data(),
                         sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim,
                         hipMemcpyHostToDevice));
 
@@ -200,10 +200,10 @@ int main()
     {
         // 8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
         // Host and device allocations of the result matrix for conversion routines.
-        constexpr size_t    size_A = n * n;
-        std::vector<double> A(size_A);
+        constexpr size_t           size_A = n * n;
+        std::array<double, size_A> A;
 
-        double* d_A{};
+        double*          d_A{};
         constexpr size_t size_bytes_A = sizeof(*d_A) * size_A;
         HIP_CHECK(hipMalloc(&d_A, size_bytes_A));
 
@@ -259,8 +259,9 @@ int main()
 
         // 8c. Print the resulting L matrix and compare it with the expected result.
         // Expected L matrix in dense format.
-        constexpr double expected[size_A] = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
-                                             0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
+        constexpr std::array<double, size_A> expected
+            = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
+               0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
 
         std::cout << "Incomplete Cholesky factorization A = L * L^H successfully computed with L "
                      "matrix: \n";

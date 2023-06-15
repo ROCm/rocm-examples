@@ -26,6 +26,7 @@
 
 #include <hip/hip_runtime.h>
 
+#include <array>
 #include <iostream>
 
 int main()
@@ -59,14 +60,14 @@ int main()
     constexpr rocsparse_int nnzb = 4;
 
     // BSR values
-    constexpr double h_bsr_val[nnzb * bsr_dim * bsr_dim]
+    constexpr std::array<double, (nnzb * bsr_dim * bsr_dim)> h_bsr_val
         = {1.0, 3.0, 0.0, 0.0, 2.0, 4.0, 0.0, 0.0, 5.0, 7.0, 6.0, 0.0, 0.0, 8.0, 0.0, 0.0};
 
     // BSR row pointers
-    constexpr rocsparse_int h_bsr_row_ptr[mb + 1] = {0, 2, 4};
+    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 2, 4};
 
     // BSR column indices
-    constexpr rocsparse_int h_bsr_col_ind[nnzb] = {0, 1, 0, 1};
+    constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 0, 1};
 
     // Block storage in column major
     constexpr rocsparse_direction dir = rocsparse_direction_column;
@@ -79,8 +80,8 @@ int main()
     constexpr double beta  = 1.3;
 
     // Set up x and y vectors
-    constexpr double h_x[nb_padded] = {1.0, 2.0, 3.0, 0.0};
-    double           h_y[mb_padded] = {4.0, 5.0, 6.0, 7.0};
+    constexpr std::array<double, nb_padded> h_x = {1.0, 2.0, 3.0, 0.0};
+    std::array<double, mb_padded>           h_y = {4.0, 5.0, 6.0, 7.0};
 
     // 2. Prepare device for calculation
 
@@ -115,11 +116,11 @@ int main()
     HIP_CHECK(hipMalloc((void**)&d_x, x_size));
     HIP_CHECK(hipMalloc((void**)&d_y, y_size));
 
-    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr, row_ptr_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind, col_ind_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val, val_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_x, h_x, x_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_y, h_y, y_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
     // 4. Call bsrmv to perform y = alpha * A x + beta * y
     ROCSPARSE_CHECK(rocsparse_dbsrmv_ex(handle,
@@ -140,7 +141,7 @@ int main()
                                         d_y));
 
     // 5. Copy y to host from device
-    HIP_CHECK(hipMemcpy(h_y, d_y, y_size, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
