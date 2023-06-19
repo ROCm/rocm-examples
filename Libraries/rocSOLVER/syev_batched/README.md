@@ -95,9 +95,9 @@ We can apply the same operation for several matrices if we combine them into bat
     - `const rocblas_int n`: Number of rows and columns of $A$.
     - `double* const A[]`: Array of batch $A_i$ matrices in device memory. After execution it contains the eigenvectors, if they were requested and the algorithm converged.
     - `rocblas_int lda`: Leading dimension of matrix $A$ (same for all matrices in the batch). $lda \geq n$.
-    - `double* D`:  Pointer to array $\lambda_i$, where the resulting eigenvalues are written.
+    - `double* D`:  Pointer to array $\lambda_i$. It is initially used to internally store the leading diagonals of the internal tridiagonal matrices $T_i$ associated with the $A_i$. Eventually this diagonal converges to the resulting eigenvalues.
     - `const rocblas_stride strideD`: Stride from the start of one vector $D_i$ to the next one $D_{j+1}$.
-    - `double* E`: This array is used to work internally with the tridiagonal matrix $T_i$ associated with $A_i$.
+    - `double* E`: This array is used to work internally with the tridiagonal matrices $T_i$ associated with the $A_i$. It stores the super/subdiagonals of these tridiagonal matrices (they are symmetric, so only one of the diagonals is needed).
     - `const rocblas_stride strideE`: Stride from the start of one vector $E_i$ to the next one $E_{i+1}$.
     - `rocblas_int* info`: Array of $m$ integers on the GPU. If `info[i]` = 0, successful exit for matrix $A_i$. If `info[i] > 0`, the algorithm did not converge.
     - `const rocblas_int batch_count`: Number of matrices in the batch.

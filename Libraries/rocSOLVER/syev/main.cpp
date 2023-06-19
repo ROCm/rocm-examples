@@ -88,8 +88,10 @@ int main(const int argc, char* argv[])
     rocblas_handle handle;
     ROCBLAS_CHECK(rocblas_create_handle(&handle));
 
-    // 7. Get and reserve the working space on device.
-    rocblas_int     d_work_size = n * 3 - 1;
+    // 7. Get and reserve the working space on device. Only n - 1 elements (super and subdiagonal's
+    // size) are needed, as the matrix is symmetric and the leading diagonal is stored in d_W
+    // (given that it converges to the eigenvalues).
+    rocblas_int     d_work_size = n - 1;
     rocblas_double* d_work      = nullptr;
     HIP_CHECK(hipMalloc(&d_work, sizeof(rocblas_double) * d_work_size));
 

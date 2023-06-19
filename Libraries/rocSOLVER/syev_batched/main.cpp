@@ -65,8 +65,8 @@ int main(const int argc, char* argv[])
     const rocblas_int single_eigenvalue_num_elements = n;
     const rocblas_int batch_eigenvalue_num_elements  = single_eigenvalue_num_elements * batch_size;
 
-    // Calculate the number of elements for the internal tridiagonal matrices.
-    const rocblas_int single_tridiagonal_num_elements = n * 3 - 1;
+    // Calculate the number of elements needed for the internal tridiagonal matrices.
+    const rocblas_int single_tridiagonal_num_elements = n - 1;
     const rocblas_int batch_tridiagonal_num_elements = single_tridiagonal_num_elements * batch_size;
 
     // 2. Data vectors.
