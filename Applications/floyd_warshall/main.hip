@@ -198,8 +198,8 @@ int main(int argc, char* argv[])
     // Allocate device memory
     unsigned int* d_adjacency_matrix;
     unsigned int* d_next_matrix;
-    HIP_CHECK(hipMalloc((void**)&d_adjacency_matrix, size_bytes));
-    HIP_CHECK(hipMalloc((void**)&d_next_matrix, size_bytes));
+    HIP_CHECK(hipMalloc(&d_adjacency_matrix, size_bytes));
+    HIP_CHECK(hipMalloc(&d_next_matrix, size_bytes));
 
     // Create events to measure the execution time of the kernels.
     hipEvent_t start, stop;
