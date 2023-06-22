@@ -115,11 +115,11 @@ int main()
     constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
     constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
 
-    HIP_CHECK(hipMalloc((void**)&d_bsr_row_ptr, row_ptr_size));
-    HIP_CHECK(hipMalloc((void**)&d_bsr_col_ind, col_ind_size));
-    HIP_CHECK(hipMalloc((void**)&d_bsr_val, val_size));
-    HIP_CHECK(hipMalloc((void**)&d_x, x_size));
-    HIP_CHECK(hipMalloc((void**)&d_y, y_size));
+    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_bsr_col_ind, col_ind_size));
+    HIP_CHECK(hipMalloc(&d_bsr_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, x_size));
+    HIP_CHECK(hipMalloc(&d_y, y_size));
 
     HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));

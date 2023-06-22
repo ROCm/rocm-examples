@@ -126,13 +126,13 @@ int main()
     constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
     constexpr size_t mask_size    = sizeof(*d_mask_row_ptr) * mask_length;
 
-    HIP_CHECK(hipMalloc((void**)&d_bsrx_row_ptr, ptr_size));
-    HIP_CHECK(hipMalloc((void**)&d_bsrx_end_ptr, ptr_size));
-    HIP_CHECK(hipMalloc((void**)&d_bsr_col_ind, col_ind_size));
-    HIP_CHECK(hipMalloc((void**)&d_mask_row_ptr, mask_size));
-    HIP_CHECK(hipMalloc((void**)&d_bsr_val, val_size));
-    HIP_CHECK(hipMalloc((void**)&d_x, x_size));
-    HIP_CHECK(hipMalloc((void**)&d_y, y_size));
+    HIP_CHECK(hipMalloc(&d_bsrx_row_ptr, ptr_size));
+    HIP_CHECK(hipMalloc(&d_bsrx_end_ptr, ptr_size));
+    HIP_CHECK(hipMalloc(&d_bsr_col_ind, col_ind_size));
+    HIP_CHECK(hipMalloc(&d_mask_row_ptr, mask_size));
+    HIP_CHECK(hipMalloc(&d_bsr_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, x_size));
+    HIP_CHECK(hipMalloc(&d_y, y_size));
 
     HIP_CHECK(hipMemcpy(d_bsrx_row_ptr, h_bsrx_row_ptr.data(), ptr_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_bsrx_end_ptr, h_bsrx_end_ptr.data(), ptr_size, hipMemcpyHostToDevice));
