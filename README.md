@@ -93,6 +93,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
             - [bsric0](/Libraries/rocSPARSE/preconditioner/bsric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse BSR matrix.
             - [bsrilu0](/Libraries/rocSPARSE/preconditioner/bsrilu0/): Showcases how to obtain the incomplete LU decomposition of a sparse BSR square matrix.
             - [csric0](/Libraries/rocSPARSE/preconditioner/csric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse CSR matrix.
+            - [csrilu0](/Libraries/rocSPARSE/preconditioner/csrilu0/): Showcases how to obtain the incomplete LU decomposition of a sparse CSR square matrix.
     - [rocThrust](/Libraries/rocThrust/)
         - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
         - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
