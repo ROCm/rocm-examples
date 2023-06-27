@@ -19,37 +19,42 @@
 # LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
+set(example_name rocsolver_getf2)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocSOLVER_examples LANGUAGES NONE)
+project(${example_name} LANGUAGES CXX)
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocSOLVER examples do not support the CUDA runtime")
     return()
 endif()
 
+# This example does not contain device code, thereby it can be compiled with any conforming C++ compiler.
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
+
 if(WIN32)
     set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
 else()
     set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 endif()
-
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocblas)
-if(NOT rocblas_FOUND)
-    message(STATUS "rocBLAS could not be found, not building rocSOLVER examples")
-    return()
-endif()
+find_package(rocsolver REQUIRED)
 
-find_package(rocsolver)
-if(NOT rocsolver_FOUND)
-    message(STATUS "rocSOLVER could not be found, not building rocSOLVER examples")
-    return()
-endif()
+add_executable(${example_name} main.cpp)
+# Make example runnable using ctest
+add_test(${example_name} ${example_name})
 
-add_subdirectory(getf2)
-add_subdirectory(getri)
-add_subdirectory(syev)
-add_subdirectory(syev_batched)
-add_subdirectory(syev_strided_batched)
+# Link to example library
+target_link_libraries(${example_name} PRIVATE roc::rocsolver)
+
+target_include_directories(${example_name} PRIVATE "../../../Common")
+
+install(TARGETS ${example_name})
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+    install(IMPORTED_RUNTIME_ARTIFACTS roc::rocsolver)
+endif()

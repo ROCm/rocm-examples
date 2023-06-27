@@ -46,6 +46,7 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [hipSOLVER](/Libraries/hipSOLVER/)
         - [cholesky_decomposition](/Libraries/hipSOLVER/cholesky_decomposition): Perform Cholesky factorization and solve linear system with result.
         - [generalized_symmetric_eigenvalue_divide_and_conquer](/Libraries/hipSOLVER/generalized_symmetric_eigenvalue_divide_and_conquer): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
+        - [getrf](/Libraries/hipSOLVER/getrf): Program that showcases how to perform a LU factorization with hipSOLVER.
         - [linear_least_squares](/Libraries/hipSOLVER/linear_least_squares): Solve a linear system of the form $A\times X=B$.
         - [qr_decomposition](/Libraries/hipSOLVER/qr_decomposition): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
         - [singular_value_decomposition](/Libraries/hipSOLVER/singular_value_decomposition): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
@@ -69,7 +70,11 @@ This project is currently unsupported and in an early testing stage. Feedback on
     - [rocRAND](/Libraries/rocRAND/)
         - [simple_distributions_cpp](/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
     - [rocSOLVER](/Libraries/rocSOLVER/)
-        - [matrix_inversion](/Libraries/rocSOLVER/matrix_inversion): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
+        - [getf2](/Libraries/rocSOLVER/getf2): Program that showcases how to perform a LU factorization with rocSOLVER.
+        - [getri](/Libraries/rocSOLVER/getri): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
+        - [syev](/Libraries/rocSOLVER/syev): Shows how to compute the eigenvalues and eigenvectors from a symmetrical real matrix.
+        - [syev_batched](/Libraries/rocSOLVER/syev_batched): Shows how to compute the eigenvalues and eigenvectors for each matrix in a batch of real symmetric matrices.
+        - [syev_strided_batched](/Libraries/rocSOLVER/syev_strided_batched): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
     - [rocThrust](/Libraries/rocThrust/)
         - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
         - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.

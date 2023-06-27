@@ -30,6 +30,7 @@ ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
 	rocBLAS \
 	rocPRIM \
+	rocSOLVER \
 	rocThrust
 endif
 

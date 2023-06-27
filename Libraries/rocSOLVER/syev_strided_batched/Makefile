@@ -20,36 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocSOLVER_examples LANGUAGES NONE)
+EXAMPLE := rocsolver_syev_strided_batched
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-if(GPU_RUNTIME STREQUAL "CUDA")
-    message(STATUS "rocSOLVER examples do not support the CUDA runtime")
-    return()
-endif()
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
 
-if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
-else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-endif()
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+ROCBLAS_INCLUDE_DIR   := $(HIP_INCLUDE_DIR)
+ROCSOLVER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-find_package(rocblas)
-if(NOT rocblas_FOUND)
-    message(STATUS "rocBLAS could not be found, not building rocSOLVER examples")
-    return()
-endif()
+CXX ?= g++
 
-find_package(rocsolver)
-if(NOT rocsolver_FOUND)
-    message(STATUS "rocSOLVER could not be found, not building rocSOLVER examples")
-    return()
-endif()
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(ROCSOLVER_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocblas -lrocsolver -lamdhip64
 
-add_subdirectory(getf2)
-add_subdirectory(getri)
-add_subdirectory(syev)
-add_subdirectory(syev_batched)
-add_subdirectory(syev_strided_batched)
+CXXFLAGS  ?= -Wall -Wextra
+ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocblas_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
