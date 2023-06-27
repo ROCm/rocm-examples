@@ -57,7 +57,7 @@ For instance, consider a sparse matrix as
 $$
 A=
 \left(
-\begin{array}{cccc:cccc:cc}
+\begin{array}{ccccc}
 1 & 2 & 0 & 3 & 0 \\
 0 & 4 & 5 & 0 & 0 \\
 6 & 0 & 0 & 7 & 8

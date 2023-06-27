@@ -10,7 +10,7 @@ The _incomplete_ LU decomposition is a sparse approximation of the above-mention
 $$A \approx L \cdot U.$$
 
 ### Application flow
-1. Setup input data.
+1. Set up input data.
 2. Allocate device memory and offload input data to the device.
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare utility variables for rocSPARSE bsrilu0 invocation.
