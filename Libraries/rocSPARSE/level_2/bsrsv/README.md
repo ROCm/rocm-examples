@@ -16,7 +16,7 @@ where
     - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
     - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
 - $\alpha$ is a scalar,
-- $x$ is a dense vector of size $n$ containing the constant terms of the equations, and
+- $x$ is a dense vector of size $m$ containing the constant terms of the equations, and
 - $y$ is a dense vector of size $n$ which contains the unknowns of the system.
 
 Obtaining the solution for such a system consists of finding concrete values of all the unknowns such that the above equality holds.

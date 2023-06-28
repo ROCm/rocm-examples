@@ -24,7 +24,8 @@ EXAMPLES := \
 	bsrmv \
 	bsrsv \
 	bsrxmv \
-	csrmv
+	csrmv \
+	csrsv
 
 all: $(EXAMPLES)
 
