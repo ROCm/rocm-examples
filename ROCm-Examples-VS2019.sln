@@ -186,6 +186,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bsrilu0_vs2019", "Libraries
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csrmv_vs2019", "Libraries\rocSPARSE\level_2\csrmv\csrmv_vs2019.vcxproj", "{82AB0E9C-461D-49F1-A0A3-257C3CD052AC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csrsv_vs2019", "Libraries\rocSPARSE\level_2\csrsv\csrsv_vs2019.vcxproj", "{2532A54D-F703-45C1-B7A0-77E1BC07563C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -488,6 +490,10 @@ Global
 		{1C2BA747-6507-4E44-8DA2-A771BD762425}.Debug|x64.Build.0 = Debug|x64
 		{1C2BA747-6507-4E44-8DA2-A771BD762425}.Release|x64.ActiveCfg = Release|x64
 		{1C2BA747-6507-4E44-8DA2-A771BD762425}.Release|x64.Build.0 = Release|x64
+		{2532A54D-F703-45C1-B7A0-77E1BC07563C}.Debug|x64.ActiveCfg = Debug|x64
+		{2532A54D-F703-45C1-B7A0-77E1BC07563C}.Debug|x64.Build.0 = Debug|x64
+		{2532A54D-F703-45C1-B7A0-77E1BC07563C}.Release|x64.ActiveCfg = Release|x64
+		{2532A54D-F703-45C1-B7A0-77E1BC07563C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -581,6 +587,8 @@ Global
 		{2A1C2114-C270-483F-AF59-849996E1E77D} = {8B7AD0F4-4288-4ACF-9980-3C500A00EF31}
 		{82AB0E9C-461D-49F1-A0A3-257C3CD052AC} = {F0B0FD83-2B22-47F8-92B1-7A5ED88B8B5E}
 		{1C2BA747-6507-4E44-8DA2-A771BD762425} = {06DEE87C-F773-49A8-A856-8CB55BDFED6D}
+		{2532A54D-F703-45C1-B7A0-77E1BC07563C} = {F0B0FD83-2B22-47F8-92B1-7A5ED88B8B5E}
+	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
 	EndGlobalSection
