@@ -223,6 +223,8 @@ test:cuda:
       & $MSBUILD
       /maxCpuCount
       "/p:Configuration=$BUILD_TYPE"
+      "/p:Verbose=false"
+      /verbosity:m
       /warnAsError
       /warnAsMessage:MSB3026
       $MSBUILD_EXTRA_OPTIONS
