@@ -194,6 +194,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csrilu0_vs2022", "Libraries
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csrmm_vs2022", "Libraries\rocSPARSE\level_3\csrmm\csrmm_vs2022.vcxproj", "{25593A4B-E226-4111-8672-702ADB785F87}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csritilu0_vs2022", "Libraries\rocSPARSE\preconditioner\csritilu0\csritilu0_vs2022.vcxproj", "{0CB451D7-57CC-4300-9A3C-DC442EE7A38F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -512,6 +514,10 @@ Global
 		{25593A4B-E226-4111-8672-702ADB785F87}.Debug|x64.Build.0 = Debug|x64
 		{25593A4B-E226-4111-8672-702ADB785F87}.Release|x64.ActiveCfg = Release|x64
 		{25593A4B-E226-4111-8672-702ADB785F87}.Release|x64.Build.0 = Release|x64
+		{0CB451D7-57CC-4300-9A3C-DC442EE7A38F}.Debug|x64.ActiveCfg = Debug|x64
+		{0CB451D7-57CC-4300-9A3C-DC442EE7A38F}.Debug|x64.Build.0 = Debug|x64
+		{0CB451D7-57CC-4300-9A3C-DC442EE7A38F}.Release|x64.ActiveCfg = Release|x64
+		{0CB451D7-57CC-4300-9A3C-DC442EE7A38F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -607,7 +613,7 @@ Global
 		{18349F0C-868C-48FA-82E7-1A430A6733AA} = {0AFB7E3F-4173-4F47-A068-17CAB93DA563}
 		{F5251916-EBCE-4C9C-A76D-1D5D1B0D36C3} = {0AFB7E3F-4173-4F47-A068-17CAB93DA563}
 		{25593A4B-E226-4111-8672-702ADB785F87} = {7EDDB5A2-7601-435F-AEDB-30EBC68D19C9}
-	EndGlobalSection
+		{0CB451D7-57CC-4300-9A3C-DC442EE7A38F} = {0AFB7E3F-4173-4F47-A068-17CAB93DA563}
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}
 	EndGlobalSection
