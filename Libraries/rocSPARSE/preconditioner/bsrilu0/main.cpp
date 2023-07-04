@@ -69,18 +69,16 @@ int main()
     constexpr rocsparse_int bsr_dim = 2;
 
     // Number of rows and columns of the input matrix.
-    constexpr rocsparse_int m = 6;
     constexpr rocsparse_int n = 6;
 
     // Number of rows and columns of the block matrix.
-    constexpr rocsparse_int mb = (m + bsr_dim - 1) / bsr_dim;
     constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
 
     // Number of non-zero blocks.
     constexpr rocsparse_int nnzb = 9;
 
     // BSR row pointers vector.
-    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 3, 6, 9};
+    constexpr std::array<rocsparse_int, nb + 1> h_bsr_row_ptr = {0, 3, 6, 9};
 
     // BSR column indices vector.
     constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 2, 0, 1, 2, 0, 1, 2};
@@ -103,7 +101,7 @@ int main()
     rocsparse_int* d_bsr_col_ind{};
     double*        d_bsr_val{};
 
-    constexpr size_t size_bsr_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t size_bsr_row_ptr = sizeof(*d_bsr_row_ptr) * (nb + 1);
     constexpr size_t size_bsr_col_ind = sizeof(*d_bsr_col_ind) * nnzb;
     constexpr size_t size_bsr_val     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
 
@@ -137,7 +135,7 @@ int main()
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dbsrilu0_buffer_size(handle,
                                                    dir,
-                                                   mb,
+                                                   nb,
                                                    nnzb,
                                                    descr,
                                                    d_bsr_val,
@@ -154,7 +152,7 @@ int main()
     // 5. Perform the analysis step.
     ROCSPARSE_CHECK(rocsparse_dbsrilu0_analysis(handle,
                                                 dir,
-                                                mb,
+                                                nb,
                                                 nnzb,
                                                 descr,
                                                 d_bsr_val,
@@ -169,7 +167,7 @@ int main()
     // 6. Call dbsrilu0 to perform incomplete LU factorization.
     ROCSPARSE_CHECK(rocsparse_dbsrilu0(handle,
                                        dir,
-                                       mb,
+                                       nb,
                                        nnzb,
                                        descr,
                                        d_bsr_val,
@@ -198,7 +196,7 @@ int main()
 
     // 8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
     // Host and device allocations of the result matrix for conversion routines.
-    constexpr size_t           size_A = m * n;
+    constexpr size_t           size_A = n * n;
     std::array<double, size_A> A;
 
     double*          d_A{};
@@ -226,7 +224,7 @@ int main()
 
     ROCSPARSE_CHECK(rocsparse_dbsr2csr(handle,
                                        dir,
-                                       mb,
+                                       nb,
                                        nb,
                                        descr,
                                        d_bsr_val,
@@ -240,7 +238,7 @@ int main()
 
     // 8b. Convert CSR sparse matrix to dense.
     ROCSPARSE_CHECK(rocsparse_dcsr2dense(handle,
-                                         m,
+                                         n,
                                          n,
                                          csr_descr,
                                          d_csr_val,

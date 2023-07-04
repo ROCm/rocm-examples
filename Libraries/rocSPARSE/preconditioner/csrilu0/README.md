@@ -92,10 +92,10 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 ### rocSPARSE
 - `rocsparse_analysis_policy`
 - `rocsparse_analysis_policy_reuse`
-- `rocsparse_csrilu0_zero_pivot`
 - `rocsparse_create_handle`
 - `rocsparse_create_mat_descr`
 - `rocsparse_create_mat_info`
+- `rocsparse_csrilu0_zero_pivot`
 - `rocsparse_dcsrilu0`
 - `rocsparse_dcsrilu0_analysis`
 - `rocsparse_dcsrilu0_buffer_size`

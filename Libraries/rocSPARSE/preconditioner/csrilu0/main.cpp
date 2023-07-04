@@ -51,7 +51,6 @@ int main()
     //     (  12  28  47  68  90  112 )
 
     // Number of rows and columns of the input matrix.
-    constexpr rocsparse_int m = 6;
     constexpr rocsparse_int n = 6;
 
     // Number of non-zero elements.
@@ -69,7 +68,7 @@ int main()
     // clang-format on
 
     // CSR row pointers vector.
-    constexpr std::array<rocsparse_int, m + 1> h_csr_row_ptr = {0, 6, 12, 18, 24, 30, 36};
+    constexpr std::array<rocsparse_int, n + 1> h_csr_row_ptr = {0, 6, 12, 18, 24, 30, 36};
 
     // CSR column indices vector.
     constexpr std::array<rocsparse_int, nnz> h_csr_col_ind
@@ -81,7 +80,7 @@ int main()
     rocsparse_int* d_csr_col_ind{};
     double*        d_csr_val{};
 
-    constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (m + 1);
+    constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (n + 1);
     constexpr size_t size_csr_col_ind = sizeof(*d_csr_col_ind) * nnz;
     constexpr size_t size_csr_val     = sizeof(*d_csr_val) * nnz;
 
@@ -118,7 +117,7 @@ int main()
     // Obtain the required buffer size in bytes for analysis and solve stages.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dcsrilu0_buffer_size(handle,
-                                                   m,
+                                                   n,
                                                    nnz,
                                                    descr,
                                                    d_csr_val,
@@ -133,7 +132,7 @@ int main()
 
     // 5. Perform the analysis step.
     ROCSPARSE_CHECK(rocsparse_dcsrilu0_analysis(handle,
-                                                m,
+                                                n,
                                                 nnz,
                                                 descr,
                                                 d_csr_val,
@@ -146,7 +145,7 @@ int main()
 
     // 6. Call dcsrilu0 to perform incomplete LU factorization.
     ROCSPARSE_CHECK(rocsparse_dcsrilu0(handle,
-                                       m,
+                                       n,
                                        nnz,
                                        descr,
                                        d_csr_val,
@@ -174,7 +173,7 @@ int main()
 
     // 8. Convert the resulting CSR sparse matrix to a dense matrix. Check and print the resulting matrix.
     // Host and device allocations of the result matrix for conversion routines.
-    constexpr size_t           size_A = m * n;
+    constexpr size_t           size_A = n * n;
     std::array<double, size_A> A;
 
     double*          d_A{};
@@ -183,7 +182,7 @@ int main()
 
     // 8b. Convert CSR sparse matrix to dense.
     ROCSPARSE_CHECK(
-        rocsparse_dcsr2dense(handle, m, n, descr, d_csr_val, d_csr_row_ptr, d_csr_col_ind, d_A, n));
+        rocsparse_dcsr2dense(handle, n, n, descr, d_csr_val, d_csr_row_ptr, d_csr_col_ind, d_A, n));
 
     HIP_CHECK(hipMemcpy(A.data(), d_A, size_bytes_A, hipMemcpyDeviceToHost));
 
@@ -196,7 +195,7 @@ int main()
         = {2, 0, 0, 0, 0, 0, 3, 2, 0, 0, 0, 0, 4, 3, 2, 0, 0, 0,
            5, 4, 3, 2, 0, 0, 6, 5, 4, 3, 2, 0, 7, 6, 5, 4, 3, 2};
 
-    std::cout << "Incomplete LU factorization A = L * U successfully computed with L "
+    std::cout << "Incomplete LU factorization A ~= L * U successfully computed with L "
                  "matrix: \n";
 
     // L matrix is stored in the lower part of A. The diagonal is not stored as it is known
@@ -204,7 +203,7 @@ int main()
     const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
     for(rocsparse_int i = 0; i < n; ++i)
     {
-        for(rocsparse_int j = 0; j < m; ++j)
+        for(rocsparse_int j = 0; j < n; ++j)
         {
             const double val = (j < i) ? A[j * n + i] : (j == i);
             std::cout << std::setw(3) << val;
@@ -219,7 +218,7 @@ int main()
 
     for(rocsparse_int i = 0; i < n; ++i)
     {
-        for(rocsparse_int j = 0; j < m; ++j)
+        for(rocsparse_int j = 0; j < n; ++j)
         {
             const double val = (j >= i) ? A[j * n + i] : 0;
             std::cout << std::setw(3) << val;
