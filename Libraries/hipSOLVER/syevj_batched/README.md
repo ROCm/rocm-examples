@@ -57,11 +57,13 @@ The application provides the following command line arguments:
 - `hipsolverDestroySyevjInfo`: destroys the structure for the input parameters and output information for calling `syevjBatched`.
 - `hipsolverXsyevjSetMaxSweeps`: configures the maximum amounts of sweeps.
 - `hipsolverXsyevjSetTolerance`: configures  the tolerance of `syevj`.
-- `hipsolverXsyevjSetSortEig` : configures wether to sort the eigenvalues (and eigenvectors, if applicable) or not. By default they are always sorted increasingly.
+- `hipsolverXsyevjSetSortEig` : configures whether to sort the eigenvalues (and eigenvectors, if applicable) or not. By default they are always sorted increasingly.
 - `hipsolver[SD]syevjBatched_bufferSize`: computes the required workspace size `lwork` on the device for a given configuration.
 - `hipsolver[SD]syevjBatched`: computes the eigenvalues of a batch $A$ of $n \times n$ symmetric matrices $A_i$. The correct function signature should be chosen based on the datatype of the input matrices:
   - `S` single-precision real (`float`)
   - `D` double-precision real (`double`)
+
+  For single- and double-precision complex values, the function `hipsolver[CZ]heevjBatched(...)` is available in hipSOLVER.
 
   In this example, a double-precision real input matrix is used, in which case the function accepts the following parameters:
   - `hipsolverHandle_t handle`
@@ -76,7 +78,7 @@ The application provides the following command line arguments:
   - `int* devInfo`: pointer to where the convergence result of the function is written to in device memory.
         - If 0, the algorithm converged.
         - If greater than 0 (`devInfo = i` for $1 \leq i \leq n$), then `devInfo` eigenvectors did not converge.
-        - If lesser than 0 (`devInfo = -i` for $1 \leq i \leq n$), then the the $i^{th}$ parameter is wrong (not counting the handle).
+        - For CUDA backend, if lesser than 0 (`devInfo = -i` for $1 \leq i \leq n$) then the the $i^{th}$ parameter is wrong (not counting the handle).
   - `syevjInfo_t params`: the structure for the input parameters and output information of `syevjBatched`.
 - `hipsolverXsyevjGetSweeps`: gets the amount of executed sweeps of `syevjBatched`. Currently it's not supported for the batched version and a `HIPSOLVER_STATUS_NOT_SUPPORTED` error is emitted if this function is invoked.
 - `hipsolverXsyevjGetResidual`: gets the residual of `syevjBatched`. Currently it's not supported for the batched version and a `HIPSOLVER_STATUS_NOT_SUPPORTED` error is emitted if this function is invoked.

@@ -128,7 +128,7 @@ int main(const int argc, char* argv[])
               << std::endl;
 
     // Right multiplication of the input matrix with the eigenvectors.
-    std::vector<double> AV(n * n);
+    std::vector<double> AV(n * lda);
     multiply_matrices(1.0, 0.0, n, n, n, A.data(), lda, 1, V.data(), 1, lda, AV.data(), lda);
     std::cout << "AV = " << format_range(AV.begin(), AV.end()) << std::endl;
 
@@ -140,7 +140,7 @@ int main(const int argc, char* argv[])
     }
 
     // Scale eigenvectors V with W by multiplying V with D.
-    std::vector<double> VD(n * n);
+    std::vector<double> VD(n * lda);
     multiply_matrices(1.0, 0.0, n, n, n, V.data(), 1, lda, D.data(), lda, 1, VD.data(), lda);
     std::cout << "VD = " << format_range(VD.begin(), VD.end()) << std::endl;
 

@@ -122,14 +122,13 @@ int main(const int /*argc*/, char* /*argv*/[])
     {
         std::cout << -syevdx_info << "-th parameter is wrong.\n" << std::endl;
         errors++;
-        goto cleanup;
     }
     else if(syevdx_info > 0)
     {
         std::cout << "Computing eigenvalues did not converge.\n" << std::endl;
         errors++;
-        goto cleanup;
     }
+    else
     {
 
         // Copy the resulting vector of eigenvalues to the host and print it to standard output.
@@ -194,7 +193,6 @@ int main(const int /*argc*/, char* /*argv*/[])
         }
     }
 
-cleanup:
     // Free resources.
     HIP_CHECK(hipFree(d_A));
     HIP_CHECK(hipFree(d_W));

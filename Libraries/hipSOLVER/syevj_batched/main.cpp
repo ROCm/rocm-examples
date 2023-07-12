@@ -74,10 +74,10 @@ int main(const int argc, char* argv[])
     {
         for(int i = 0; i < n; ++i)
         {
-            A[k + (n + 1) * i] = random_number();
+            A[k + (lda + 1) * i] = random_number();
             for(int j = 0; j < i; ++j)
             {
-                A[k + i * n + j] = A[k + j * n + i] = random_number();
+                A[k + i * lda + j] = A[k + j * lda + i] = random_number();
             }
         }
     }

@@ -19,7 +19,7 @@ where
 This choice corresponds to `HIPSOLVER_EIG_TYPE_1` parameter value of the solver function `hipsolverDsygvj`. Two other possibilities include $ABv_i = \lambda_i v_i$ for `HIPSOLVER_EIG_TYPE_2` and $BAv_i = \lambda_i v_i$ for `HIPSOLVER_EIG_TYPE_3`.
 
 ### Application flow
-1. Instantiate two vectors containing $A$'s and $B$'s 9 elements.
+1. Instantiate two vectors of size $n\times n$ for $n=3$ containing $A$'s and $B$'s elements.
 2. Allocate device memory and copy $A$'s and $B$'s elements to the device.
 3. Allocate device memory for the outputs of the hipSOLVER function, namely for the calculated eigenvalue vector $W=[\lambda_1, \lambda_2, \lambda_3]$, and the returned `info` value.
 4. Create a hipSOLVER handle.
@@ -39,12 +39,14 @@ This choice corresponds to `HIPSOLVER_EIG_TYPE_1` parameter value of the solver 
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
 
+    For single- and double-precision complex values, the function `hipsolver[CZ]hegvj(...)` is available in hipSOLVER.
+
     In this example, a double-precision real input matrix pair is used, in which case the function accepts the following parameters:
     - `hipsolverHandle_t handle`
     - `hipsolverEigType_t itype`: Specifies the type of eigensystem problem, see [above](#description).
     - `hipsolverEigMode_t jobz`: Specifies whether the eigenvectors should also be calculated besides the eigenvalues. The following values are accepted:
         - `HIPSOLVER_EIG_MODE_NOVECTOR`: Calculate the eigenvalues only.
-        - `HIPSOLVER_EIG_MODE_VECTOR`: Calculate both the eigenvalues and the eigenvectors. The eigenvectors are calculated by a divide and conquer algorithm and are written to the memory location specified by `*A`.
+        - `HIPSOLVER_EIG_MODE_VECTOR`: Calculate both the eigenvalues and the eigenvectors. The eigenvectors are calculated using the Jacobi method and written to the memory location specified by `*A`.
     - `hipSolverFillMode_t uplo`: Specifies whether the upper or lower triangle of the symmetric matrix is stored. The following values are accepted:
         - `HIPSOLVER_FILL_MODE_UPPER`: The provided `*A` pointer points to the upper triangle matrix data.
         - `HIPSOLVER_FILL_MODE_LOWER`: The provided `*A` pointer points to the lower triangle matrix data.
@@ -57,9 +59,9 @@ This choice corresponds to `HIPSOLVER_EIG_TYPE_1` parameter value of the solver 
     - `double *work`: Pointer to working space in device memory.
     - `int lwork`: Size of the working space.
     - `int *devInfo`: Convergence result of the function in device memory. If 0, the algorithm converged, if greater than 0 and less or equal to `n` then `devInfo`-th leading minor of `B` is not positive definite, if equal to `n+1` than convergence is not achieved. Also, for CUDA backend, if `devInfo = -i` for $0 < i \leq n$, then the the $i^{th}$ parameter is wrong (not counting the handle).
-    - `hipsolverSyevjInfo_t params`: Pointer to the structure with parameters of solver, that should be created by function `hipsolverDnCreateSyevjInfo(&params)`. Solver has two parameters:
-        - Tolerance `tol`, set by function `hipsolverDnXsyevjSetTolerance(syevj_params, tol)`, default value of tolerance is machine zero.
-        - Maximal number of sweeps to obtain convergence `max_sweeps`, set by function `hipsolverDnXsyevjSetMaxSweeps(syevj_params, max_sweeps)`, default value is 100.
+    - `hipsolverSyevjInfo_t params`: Pointer to the structure with parameters of solver, that should be created by function `hipsolverCreateSyevjInfo(&params)`. Solver has two parameters:
+        - Tolerance `tol`, set by function `hipsolverXsyevjSetTolerance(syevj_params, tol)`, default value of tolerance is machine zero.
+        - Maximal number of sweeps to obtain convergence `max_sweeps`, set by function `hipsolverXsyevjSetMaxSweeps(syevj_params, max_sweeps)`, default value is 100.
 
     Return type: `hipsolverStatus_t`.
 - `hipsolver[SD]sygvj_bufferSize` allows to obtain the size (in bytes) needed for the working space for the `hipsolver[SD]sygvj` function. The character matched in `[SD]` coincides with the one in `hipsolver[SD]sygvj`.
@@ -92,12 +94,12 @@ Types:
 Functions:
 - `hipsolverCreate`
 - `hipsolverDestroy`
-- `hipsolverDnCreateSyevjInfo`
-- `hipsolverDnDestroySyevjInfo`
-- `hipsolverDnXsyevjSetTolerance`
-- `hipsolverDnXsyevjSetMaxSweeps`
-- `hipsolverDnXsyevjGetResidual`
-- `hipsolverDnXsyevjGetSweeps`
+- `hipsolverCreateSyevjInfo`
+- `hipsolverDestroySyevjInfo`
+- `hipsolverXsyevjSetTolerance`
+- `hipsolverXsyevjSetMaxSweeps`
+- `hipsolverXsyevjGetResidual`
+- `hipsolverXsyevjGetSweeps`
 - `hipsolverDsygvj_bufferSize`
 - `hipsolverDsygvj`
 

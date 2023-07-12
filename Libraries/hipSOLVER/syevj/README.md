@@ -21,7 +21,7 @@ The application has an optional argument:
 4. Set the solver parameters.
 5. Allocate device memory and copy input matrix from host to device.
 6. Initialize hipSOLVER.
-7. Query the required working space and allocate this on device. 
+7. Query the required working space and allocate this on device.
 8. Compute the eigenvector and eigenvalues.
 9. Retrieve the results by copying from device to host.
 10. Print the results
@@ -41,13 +41,15 @@ The application has an optional argument:
 - `hipsolverDestroySyevjInfo`: destroys the structure for the parameters and results for calling `syevj`.
 - `hipsolverXsyevjSetMaxSweeps`: configures the max amounts of sweeps
 - `hipsolverXsyevjSetTolerance`: configures  the tolerance of `syevj`.
-- `hipsolverXsyevjSetSortEig` : configures wether to sort the results or not
+- `hipsolverXsyevjSetSortEig` : configures whether to sort the results or not
 - `hipsolver[SD]sygvj_bufferSize` computes the required buffersize `lwork` from a given configuration.
 - `hipsolver[SD]syevj` computes the eigenvalue and optional eigenvector.
   - There are 2 different function signatures depending on the type of the input matrix:
     - `S` single-precision real (`float`)
     - `D` double-precision real (`double`)
-    
+
+    For single- and double-precision complex values, the function `hipsolver[CZ]heevj(...)` is available in hipSOLVER.
+
     For example, `hipsolverDsyevj(...)` works on `double`s. For the complex datatypes see `hipsolver[CZ]heevj`.
   - `hipsolverHandle_t handle`: hipSOLVER handle, see `hipsolverCreate`
   - `hipsolverEigMode_t jobz`: eigenvector output mode, see `hipsolverEigMode_t`.
@@ -55,7 +57,7 @@ The application has an optional argument:
   - `int n`: number of columns of $A$.
   - `double* A`: pointer to the input matrix $A$ on device memory.
   - `int lda`: leading dimension of $A$.
-  - `double* W`: pointer to the output $W$ for the eigenvalues. 
+  - `double* W`: pointer to the output $W$ for the eigenvalues.
   - `double* work`: pointer to the working space.
   - `int lwork`: size of the working space.
   - `int* info`: pointer to write the convergence result to.

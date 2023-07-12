@@ -83,11 +83,11 @@ int main(const int /*argc*/, char* /*argv*/[])
     const hipsolverEigMode_t  jobz       = HIPSOLVER_EIG_MODE_VECTOR; // compute eigenvectors
     const hipsolverFillMode_t uplo       = HIPSOLVER_FILL_MODE_LOWER;
 
-    HIPSOLVER_CHECK(hipsolverDnCreateSyevjInfo(&syevj_params));
+    HIPSOLVER_CHECK(hipsolverCreateSyevjInfo(&syevj_params));
     // Default value of tolerance is machine zero.
-    HIPSOLVER_CHECK(hipsolverDnXsyevjSetTolerance(syevj_params, tol));
+    HIPSOLVER_CHECK(hipsolverXsyevjSetTolerance(syevj_params, tol));
     // Default value of max. sweeps is 100.
-    HIPSOLVER_CHECK(hipsolverDnXsyevjSetMaxSweeps(syevj_params, max_sweeps));
+    HIPSOLVER_CHECK(hipsolverXsyevjSetMaxSweeps(syevj_params, max_sweeps));
 
     // Query and allocate working space.
     HIPSOLVER_CHECK(hipsolverDsygvj_bufferSize(hipsolver_handle,
@@ -150,7 +150,7 @@ int main(const int /*argc*/, char* /*argv*/[])
             std::cout << "{ ";
             for(int j = 0; j < n; ++j)
             {
-                std::cout << V[i * n + j] << (j < n - 1 ? ", " : " }\n");
+                std::cout << V[i * lda + j] << (j < n - 1 ? ", " : " }\n");
             }
         }
 
@@ -158,9 +158,9 @@ int main(const int /*argc*/, char* /*argv*/[])
         double residual{};
         int    executed_sweeps{};
 
-        HIPSOLVER_CHECK(hipsolverDnXsyevjGetResidual(hipsolver_handle, syevj_params, &residual));
+        HIPSOLVER_CHECK(hipsolverXsyevjGetResidual(hipsolver_handle, syevj_params, &residual));
         HIPSOLVER_CHECK(
-            hipsolverDnXsyevjGetSweeps(hipsolver_handle, syevj_params, &executed_sweeps));
+            hipsolverXsyevjGetSweeps(hipsolver_handle, syevj_params, &executed_sweeps));
 
         std::cout << "Residual = " << residual << std::endl;
         std::cout << "Number of executed sweeps = " << executed_sweeps << std::endl;
@@ -173,12 +173,12 @@ int main(const int /*argc*/, char* /*argv*/[])
         }
         else if(syevj_info <= n)
         {
-            std::cout << "Leading minor of order " << -syevj_info
+            std::cout << "Leading minor of order " << syevj_info
                       << " of B is not positive definite.";
         }
         else if(syevj_info == n + 1)
         {
-            std::cout << "Sygvj doen not converge, error " << syevj_info << ".";
+            std::cout << "Sygvj does not converge, error " << syevj_info << ".";
         }
         else
         {
@@ -194,7 +194,7 @@ int main(const int /*argc*/, char* /*argv*/[])
     HIP_CHECK(hipFree(d_W));
     HIP_CHECK(hipFree(d_work));
     HIP_CHECK(hipFree(d_sygvj_info));
-    HIPSOLVER_CHECK(hipsolverDnDestroySyevjInfo(syevj_params));
+    HIPSOLVER_CHECK(hipsolverDestroySyevjInfo(syevj_params));
     HIPSOLVER_CHECK(hipsolverDestroy(hipsolver_handle));
 
     // Print validation result.

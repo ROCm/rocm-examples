@@ -35,6 +35,8 @@ $A x_i = \lambda_i x_i$  for $i = 0, \dots, n-1$.
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
 
+    For single- and double-precision complex values, the function `hipsolverDn[CZ]heevdx(...)` is available in hipSOLVER.
+
     In this example, a double-precision real input matrix is used, in which case the function accepts the following parameters:
     - `hipsolverHandle_t handle`
     - `hipsolverEigMode_t jobz`: Specifies whether the eigenvectors should also be calculated besides the eigenvalues. The following values are accepted:
@@ -61,7 +63,7 @@ $A x_i = \lambda_i x_i$  for $i = 0, \dots, n-1$.
     - `int *devInfo`: Convergence result of the function in device memory.
         - If 0, the algorithm converged.
         - If greater than 0 (`devInfo = i` for $0 < i \leq n$), then `devInfo` eigenvectors did not converge.
-        - If lesser than 0 (`devInfo = -i` for $0 < i \leq n$), then the the $i^{th}$ parameter is wrong (not counting the handle).
+        - For CUDA backend, if lesser than 0 (`devInfo = -i` for $0 < i \leq n$) then the the $i^{th}$ parameter is wrong (not counting the handle).
 
     Return type: `hipsolverStatus_t`.
 - `hipsolverDn[SD]syevdx` internally calls to `cusolverDn[SD]syevdx` for CUDA backend and to a rocSOLVER's internal `syevx` function (not the one from the public API) for ROCm backend, as no `hipsolver[SD]syevdx` function exists yet in hipSOLVER regular API.

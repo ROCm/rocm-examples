@@ -127,14 +127,13 @@ int main()
     {
         std::cout << -sygvd_info << "-th parameter is wrong.\n" << std::endl;
         errors++;
-        goto cleanup;
     }
     else if(sygvd_info > 0)
     {
         std::cout << "Computing eigenvalues did not converge.\n" << std::endl;
         errors++;
-        goto cleanup;
     }
+    else
     {
         std::cout << "Eigenvalues successfully computed: ";
 
@@ -222,7 +221,6 @@ int main()
         }
     }
 
-cleanup:
     // Free resources.
     HIP_CHECK(hipFree(d_A));
     HIP_CHECK(hipFree(d_B));
