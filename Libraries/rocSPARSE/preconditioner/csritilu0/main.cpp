@@ -148,9 +148,9 @@ int main()
                                                   d_csr_row_ptr,
                                                   d_csr_col_ind,
                                                   &sort_buffer_size));
-
-    // Synchronize with device because rocsparse_csrsort_buffer_size is non-blocking.
-    HIP_CHECK(hipDeviceSynchronize());
+    // No synchronization with the device is needed because, for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host.
 
     HIP_CHECK(hipMalloc(&sort_temp_buffer, sort_buffer_size));
 
@@ -181,6 +181,10 @@ int main()
                                                     idx_base,
                                                     data_type,
                                                     &buffer_size));
+    // No synchronization with the device is needed because, for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host.
+
     // Allocate temporary buffer.
     void* temp_buffer{};
     HIP_CHECK(hipMalloc(&temp_buffer, buffer_size));
