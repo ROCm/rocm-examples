@@ -12,12 +12,12 @@ $$
 where
 
 - $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
-- given a matrix $C$, $C'$ is one of the following:
-    - $C' = C$ (identity)
-    - $C' = C^T$ (transpose $C$: $C_{ij}^T = C_{ji}$)
-    - $C' = C^H$ (conjugate transpose/Hermitian $C$: $C_{ij}^H = \bar C_{ji}$),
-- $\alpha$ is a scalar,
+- given a matrix $M$, $M'$ denotes one of the following:
+    - $M' = M$ (identity)
+    - $M' = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
+    - $M' = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
 - $X$ is a dense matrix of size $n \times nrhs$ which contains the unknowns of the system, and
+- $\alpha$ is a scalar,
 - $B$ is a dense matrix of size $n \times nrhs$ containing the constant terms of the equations,
 - the performed operation on $B$ and $X$ must be the same.
 
@@ -26,7 +26,7 @@ Obtaining the solution for such a system consists of finding concrete values of 
 This is the same as solving the classical system of linear equations $A' x_i = \alpha b_i$, where $x_i$ and $b_i$ are the $i$-th rows or columns of $X$ and $B$, depending on the operation performed on $X$ and $B$. This is showcased in [level 2 example bsrsv](../../level_2/bsrsv/README.md).
 
 ### Application flow
-1. Setup input data.
+1. Set up input data.
 2. Allocate device memory and copy input data to device.
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare utility variables for rocSPARSE bsrsm invocation.

@@ -88,9 +88,9 @@ This project is currently unsupported and in an early testing stage. Feedback on
             - [csrsv](/Libraries/rocSPARSE/level_2/csrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
         - [level_3](/Libraries/rocSPARSE/level_3/): Operations between sparse and dense matrices.
             - [bsrmm](/Libraries/rocSPARSE/level_3/bsrmm/): Showcases a sparse matrix-matrix multiplication using BSR storage format.
-            - [bsrsm](/Libraries/rocSPARSE/level_3/bsrsm): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix, with dense solution and right-hand side stored in dense matrices.
+            - [bsrsm](/Libraries/rocSPARSE/level_3/bsrsm): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix, with solution and right-hand side stored in dense matrices.
             - [csrmm](/Libraries/rocSPARSE/level_3/csrmm/): Showcases a sparse matrix-matrix multiplication using CSR storage format.
-        - [preconditioner](/Libraries/rocSPARSE/preconditioner/): Manipulations on sparse matrices to obtain sparse preconditioner matrices.
+            - [csrsm](/Libraries/rocSPARSE/level_3/csrsm): Showcases how to solve a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix, with solution and right-hand side stored in dense matrices.
             - [bsric0](/Libraries/rocSPARSE/preconditioner/bsric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse BSR matrix.
             - [bsrilu0](/Libraries/rocSPARSE/preconditioner/bsrilu0/): Showcases how to obtain the incomplete LU decomposition of a sparse BSR square matrix.
             - [csric0](/Libraries/rocSPARSE/preconditioner/csric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse CSR matrix.

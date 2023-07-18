@@ -147,7 +147,6 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_mat_descr`
 
 ### HIP runtime
-- `hipDeviceSynchronize`
 - `hipFree`
 - `hipMalloc`
 - `hipMemcpy`
