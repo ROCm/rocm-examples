@@ -44,13 +44,17 @@ This project is currently unsupported and in an early testing stage. Feedback on
         - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
         - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
     - [hipSOLVER](/Libraries/hipSOLVER/)
-        - [cholesky_decomposition](/Libraries/hipSOLVER/cholesky_decomposition): Perform Cholesky factorization and solve linear system with result.
-        - [generalized_symmetric_eigenvalue_divide_and_conquer](/Libraries/hipSOLVER/generalized_symmetric_eigenvalue_divide_and_conquer): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
+        - [gels](/Libraries/hipSOLVER/gels/): Solve a linear system of the form $A\times X=B$.
+        - [geqrf](/Libraries/hipSOLVER/geqrf/): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
+        - [gesvd](/Libraries/hipSOLVER/gesvd/): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
         - [getrf](/Libraries/hipSOLVER/getrf): Program that showcases how to perform a LU factorization with hipSOLVER.
-        - [linear_least_squares](/Libraries/hipSOLVER/linear_least_squares): Solve a linear system of the form $A\times X=B$.
-        - [qr_decomposition](/Libraries/hipSOLVER/qr_decomposition): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
-        - [singular_value_decomposition](/Libraries/hipSOLVER/singular_value_decomposition): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
-        - [symmetric_eigenvalue_divide_and_conquer](/Libraries/hipSOLVER/symmetric_eigenvalue_divide_and_conquer/): Program that showcases how to calculate the eigenvalues of a matrix using a divide-and-conquer algorithm in hipSOLVER.
+        - [potrf](/Libraries/hipSOLVER/potrf/): Perform Cholesky factorization and solve linear system with result.
+        - [syevd](/Libraries/hipSOLVER/syevd/): Program that showcases how to calculate the eigenvalues of a matrix using a divide-and-conquer algorithm in hipSOLVER.
+        - [syevdx](/Libraries/hipSOLVER/syevdx/): Shows how to compute a subset of the eigenvalues and the corresponding eigenvectors of a real symmetric matrix A using the Compatibility API of hipSOLVER.
+        - [sygvd](/Libraries/hipSOLVER/sygvd/): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
+        - [syevj](/Libraries/hipSOLVER/syevj): Calculates the eigenvalues and eigenvectors from a real symmetric matrix using the Jacobi method.
+        - [syevj_batched](/Libraries/hipSOLVER/syevj_batched): Showcases how to compute the eigenvalues and eigenvectors (via Jacobi method) of each matrix in a batch of real symmetric matrices.
+        - [sygvj](/Libraries/hipSOLVER/sygvj): Calculates the generalized eigenvalues and eigenvectors from a pair of real symmetric matrices using the Jacobi method.
     - [rocBLAS](/Libraries/rocBLAS/)
         - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
             - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.

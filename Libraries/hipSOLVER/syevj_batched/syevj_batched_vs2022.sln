@@ -1,0 +1,24 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.3.33027.108
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevj_batched_vs2022", "syevj_batched_vs2022.vcxproj", "{88775D9B-45DB-44F0-95B4-3CF373E1D505}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Debug|x64.ActiveCfg = Debug|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Debug|x64.Build.0 = Debug|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Release|x64.ActiveCfg = Release|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C8382AA7-80C0-483A-AF52-CE152F60FCF8}
+	EndGlobalSection
+EndGlobal

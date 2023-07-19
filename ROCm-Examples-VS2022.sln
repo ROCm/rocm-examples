@@ -128,33 +128,42 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libhip_static_host_vs2022",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hello_world_vs2022", "HIP-Basic\hello_world\hello_world_vs2022.vcxproj", "{AA92EF7E-2323-4497-ACCD-B76FB196C545}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "singular_value_decomposition_vs2022", "Libraries\hipSOLVER\singular_value_decomposition\singular_value_decomposition_vs2022.vcxproj", "{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gesvd_vs2022", "Libraries\hipSOLVER\gesvd\gesvd_vs2022.vcxproj", "{3AFE92F1-30A9-4574-B46B-B4715EF0B0D5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linear_least_squares_vs2022", "Libraries\hipSOLVER\linear_least_squares\linear_least_squares_vs2022.vcxproj", "{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gels_vs2022", "Libraries\hipSOLVER\gels\gels_vs2022.vcxproj", "{C2D0A5E7-30CD-4D1A-BB6E-00231FA3FDD4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getri_vs2022", "Libraries\rocSOLVER\getri\getri_vs2022.vcxproj", "{50631880-DCE1-4E5E-B7A5-E255A1B4A5E7}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "rocSOLVER", "rocSOLVER", "{594C0813-02D5-4F93-A4D6-E10100A0539F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cholesky_decomposition_vs2022", "Libraries\hipSOLVER\cholesky_decomposition\cholesky_decomposition_vs2022.vcxproj", "{F78A1C37-A4B6-42DC-85EE-F30A0FD1ACD2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "potrf_vs2022", "Libraries\hipSOLVER\potrf\potrf_vs2022.vcxproj", "{F78A1C37-A4B6-42DC-85EE-F30A0FD1ACD2}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "qr_decomposition_vs2022", "Libraries\hipSOLVER\qr_decomposition\qr_decomposition_vs2022.vcxproj", "{D5636463-4796-4B79-A182-B97D116A6735}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "geqrf_vs2022", "Libraries\hipSOLVER\geqrf\geqrf_vs2022.vcxproj", "{D5636463-4796-4B79-A182-B97D116A6735}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "symmetric_eigenvalue_divide_and_conquer_vs2022", "Libraries\hipSOLVER\symmetric_eigenvalue_divide_and_conquer\symmetric_eigenvalue_divide_and_conquer_vs2022.vcxproj", "{10C958EF-0908-488E-8CD1-A320D3807DBD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevd_vs2022", "Libraries\hipSOLVER\syevd\syevd_vs2022.vcxproj", "{10C958EF-0908-488E-8CD1-A320D3807DBD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "generalized_symmetric_eigenvalue_divide_and_conquer_vs2022", "Libraries\hipSOLVER\generalized_symmetric_eigenvalue_divide_and_conquer\generalized_symmetric_eigenvalue_divide_and_conquer_vs2022.vcxproj", "{C2804CFB-1D49-4E39-9757-3901F50CF3AA}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sygvd_vs2022", "Libraries\hipSOLVER\sygvd\sygvd_vs2022.vcxproj", "{C2804CFB-1D49-4E39-9757-3901F50CF3AA}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevj_vs2022", "Libraries\hipSOLVER\syevj\syevj_vs2022.vcxproj", "{7139C801-489D-464A-82DC-3ABDB706C7A2}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sygvj_vs2022", "Libraries\hipSOLVER\sygvj\sygvj_vs2022.vcxproj", "{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC943}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getf2_vs2022", "Libraries\rocSOLVER\getf2\getf2_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169335}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getrf_vs2022", "Libraries\hipSOLVER\getrf\getrf_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169325}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_vs2022", "Libraries\rocSOLVER\syev\syev_vs2022.vcxproj", "{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevdx_vs2022", "Libraries\hipSOLVER\syevdx\syevdx_vs2022.vcxproj", "{DB1441F5-295D-4A82-BB70-122212A26A09}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_vs2022", "Libraries\rocSOLVER\syev\syev_vs2022.vcxproj", "{DCA81AEF-6607-48B5-90E7-8699A5ACAF74}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_batched_vs2022", "Libraries\rocSOLVER\syev_batched\syev_batched_vs2022.vcxproj", "{A08FB6DB-31F7-48B7-8561-59B16E311F60}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syev_strided_batched_vs2022", "Libraries\rocSOLVER\syev_strided_batched\syev_strided_batched_vs2022.vcxproj", "{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevj_batched_vs2022", "Libraries\hipSOLVER\syevj_batched\syevj_batched_vs2022.vcxproj", "{88775D9B-45DB-44F0-95B4-3CF373E1D505}"
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
 		Release|x64 = Release|x64
 	EndGlobalSection
@@ -387,6 +396,14 @@ Global
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA}.Debug|x64.Build.0 = Debug|x64
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA}.Release|x64.ActiveCfg = Release|x64
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA}.Release|x64.Build.0 = Release|x64
+		{7139C801-489D-464A-82DC-3ABDB706C7A2}.Debug|x64.ActiveCfg = Debug|x64
+		{7139C801-489D-464A-82DC-3ABDB706C7A2}.Debug|x64.Build.0 = Debug|x64
+		{7139C801-489D-464A-82DC-3ABDB706C7A2}.Release|x64.ActiveCfg = Release|x64
+		{7139C801-489D-464A-82DC-3ABDB706C7A2}.Release|x64.Build.0 = Release|x64
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC943}.Debug|x64.ActiveCfg = Debug|x64
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC943}.Debug|x64.Build.0 = Debug|x64
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC943}.Release|x64.ActiveCfg = Release|x64
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC943}.Release|x64.Build.0 = Release|x64
 		{D1C40C14-2881-43C7-8DAD-72BAAB169335}.Debug|x64.ActiveCfg = Debug|x64
 		{D1C40C14-2881-43C7-8DAD-72BAAB169335}.Debug|x64.Build.0 = Debug|x64
 		{D1C40C14-2881-43C7-8DAD-72BAAB169335}.Release|x64.ActiveCfg = Release|x64
@@ -395,10 +412,14 @@ Global
 		{D1C40C14-2881-43C7-8DAD-72BAAB169325}.Debug|x64.Build.0 = Debug|x64
 		{D1C40C14-2881-43C7-8DAD-72BAAB169325}.Release|x64.ActiveCfg = Release|x64
 		{D1C40C14-2881-43C7-8DAD-72BAAB169325}.Release|x64.Build.0 = Release|x64
-		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Debug|x64.ActiveCfg = Debug|x64
-		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Debug|x64.Build.0 = Debug|x64
-		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Release|x64.ActiveCfg = Release|x64
-		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3}.Release|x64.Build.0 = Release|x64
+		{DB1441F5-295D-4A82-BB70-122212A26A09}.Debug|x64.ActiveCfg = Debug|x64
+		{DB1441F5-295D-4A82-BB70-122212A26A09}.Debug|x64.Build.0 = Debug|x64
+		{DB1441F5-295D-4A82-BB70-122212A26A09}.Release|x64.ActiveCfg = Release|x64
+		{DB1441F5-295D-4A82-BB70-122212A26A09}.Release|x64.Build.0 = Release|x64
+		{DCA81AEF-6607-48B5-90E7-8699A5ACAF74}.Debug|x64.ActiveCfg = Debug|x64
+		{DCA81AEF-6607-48B5-90E7-8699A5ACAF74}.Debug|x64.Build.0 = Debug|x64
+		{DCA81AEF-6607-48B5-90E7-8699A5ACAF74}.Release|x64.ActiveCfg = Release|x64
+		{DCA81AEF-6607-48B5-90E7-8699A5ACAF74}.Release|x64.Build.0 = Release|x64
 		{A08FB6DB-31F7-48B7-8561-59B16E311F60}.Debug|x64.ActiveCfg = Debug|x64
 		{A08FB6DB-31F7-48B7-8561-59B16E311F60}.Debug|x64.Build.0 = Debug|x64
 		{A08FB6DB-31F7-48B7-8561-59B16E311F60}.Release|x64.ActiveCfg = Release|x64
@@ -407,6 +428,10 @@ Global
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}.Debug|x64.Build.0 = Debug|x64
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}.Release|x64.ActiveCfg = Release|x64
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE}.Release|x64.Build.0 = Release|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Debug|x64.ActiveCfg = Debug|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Debug|x64.Build.0 = Debug|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Release|x64.ActiveCfg = Release|x64
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -480,11 +505,14 @@ Global
 		{D5636463-4796-4B79-A182-B97D116A6735} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{10C958EF-0908-488E-8CD1-A320D3807DBD} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{C2804CFB-1D49-4E39-9757-3901F50CF3AA} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{7139C801-489D-464A-82DC-3ABDB706C7A2} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC943} = {2700C908-113C-4429-A889-DF34D44AB29B}
 		{D1C40C14-2881-43C7-8DAD-72BAAB169335} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
-		{D1C40C14-2881-43C7-8DAD-72BAAB169325} = {2700C908-113C-4429-A889-DF34D44AB29B}
-		{EA84A9DF-D7EE-4E10-8DE5-0E411C2AC0A3} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
+		{DB1441F5-295D-4A82-BB70-122212A26A09} = {2700C908-113C-4429-A889-DF34D44AB29B}
+		{DCA81AEF-6607-48B5-90E7-8699A5ACAF74} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
 		{A08FB6DB-31F7-48B7-8561-59B16E311F60} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
 		{4DE6554A-03B0-4788-A7A1-1D8BFC049CAE} = {594C0813-02D5-4F93-A4D6-E10100A0539F}
+		{88775D9B-45DB-44F0-95B4-3CF373E1D505} = {2700C908-113C-4429-A889-DF34D44AB29B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

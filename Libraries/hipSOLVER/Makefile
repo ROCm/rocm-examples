@@ -21,13 +21,23 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	cholesky_decomposition \
-	generalized_symmetric_eigenvalue_divide_and_conquer \
+	gels \
+	geqrf \
+	gesvd \
 	getrf \
-	linear_least_squares \
-	qr_decomposition \
-	singular_value_decomposition \
-	symmetric_eigenvalue_divide_and_conquer
+	potrf \
+	syevd \
+	syevdx \
+	syevj \
+	syevj_batched \
+	sygvd
+
+# this example currently does not work with CUDA
+# https://github.com/ROCmSoftwarePlatform/hipSOLVER/issues/152
+ifneq ($(GPU_RUNTIME), CUDA)
+EXAMPLES += \
+	sygvj
+endif
 
 all: $(EXAMPLES)
 
