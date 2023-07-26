@@ -59,7 +59,7 @@ inline const char* rocsparse_status_to_string(rocsparse_status status)
 /// with an error code.
 #define ROCSPARSE_CHECK(condition)                                                               \
     {                                                                                            \
-        const rocsparse_status status = condition;                                               \
+        const rocsparse_status status = (condition);                                               \
         if(status != rocsparse_status_success)                                                   \
         {                                                                                        \
             std::cerr << "rocSPARSE error encountered: \"" << rocsparse_status_to_string(status) \
