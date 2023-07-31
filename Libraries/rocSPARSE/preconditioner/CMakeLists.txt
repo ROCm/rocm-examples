@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipCUB \
-	hipBLAS \
-	hipSOLVER \
-	rocRAND
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocSPARSE_preconditioner_examples LANGUAGES NONE)
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocBLAS \
-	rocPRIM \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust
-endif
-
-all: $(LIBRARIES)
-
-clean: TARGET=clean
-clean: all
-
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(LIBRARIES)
+add_subdirectory(bsric0)
+add_subdirectory(bsrilu0)

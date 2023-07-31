@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,27 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipCUB \
-	hipBLAS \
-	hipSOLVER \
-	rocRAND
+EXAMPLE := rocsparse_bsrmm
+COMMON_INCLUDE_DIR := ../../../../Common
+GPU_RUNTIME := HIP
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocBLAS \
-	rocPRIM \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
-all: $(LIBRARIES)
+ROCM_INSTALL_DIR := /opt/rocm
 
-clean: TARGET=clean
-clean: all
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+ROCSPARSE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+CXX ?= g++
 
-.PHONY: all clean $(LIBRARIES)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCSPARSE_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocsparse -lamdhip64
+
+CXXFLAGS ?= -Wall -Wextra
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS += $(LDFLAGS)
+ILDLIBS += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocsparse_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

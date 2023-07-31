@@ -99,11 +99,11 @@ int main(const int argc, char* argv[])
     const rocblas_fill  uplo  = rocblas_fill::rocblas_fill_lower;
 
     // 5. Reserve and copy data to device.
-    rocblas_double*  array_A[batch_size];
-    rocblas_double** array_dA;
-    rocblas_double*  d_A    = nullptr;
-    rocblas_double*  d_W    = nullptr;
-    rocblas_int*     d_info = nullptr;
+    std::vector<rocblas_double*> array_A(batch_size);
+    rocblas_double**             array_dA;
+    rocblas_double*              d_A    = nullptr;
+    rocblas_double*              d_W    = nullptr;
+    rocblas_int*                 d_info = nullptr;
 
     const rocblas_int info_size  = sizeof(rocblas_int) * batch_size;
     const rocblas_int array_size = batch_size * sizeof(rocblas_double*);
@@ -121,7 +121,7 @@ int main(const int argc, char* argv[])
     {
         array_A[k] = &d_A[k * single_matrix_num_elements];
     }
-    HIP_CHECK(hipMemcpy(array_dA, array_A, array_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(array_dA, array_A.data(), array_size, hipMemcpyHostToDevice));
 
     // 6. Initialize rocBLAS.
     rocblas_handle handle;
