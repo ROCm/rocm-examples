@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spmm_vs2017", "spmm_vs2017.vcxproj", "{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}.Debug|x64.ActiveCfg = Debug|x64
+		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}.Debug|x64.Build.0 = Debug|x64
+		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}.Release|x64.ActiveCfg = Release|x64
+		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {93191189-5B3E-4A2B-B2F6-F786E0225BC5}
+	EndGlobalSection
+EndGlobal

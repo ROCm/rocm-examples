@@ -108,6 +108,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
             - [gebsrmm](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/gebsrmm/): Showcases a sparse matrix-matrix multiplication using GEBSR storage format.
             - [gemmi](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/gemmi/): Showcases a dense matrix sparse matrix multiplication using CSR storage format.
             - [sddmm](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/sddmm/): Showcases a sampled dense-dense matrix multiplication using CSR storage format.
+            - [spmm](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/spmm/): Showcases a sparse matrix-dense matrix multiplication.
             - [spsm](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/spsm/): Showcases a sparse triangular linear system solver using CSR storage format.
         - [preconditioner](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/): Manipulations on sparse matrices to obtain sparse preconditioner matrices.
             - [bsric0](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/bsric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse BSR matrix.
