@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtsv_vs2022", "gtsv_vs2022.vcxproj", "{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Debug|x64.ActiveCfg = Debug|x64
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Debug|x64.Build.0 = Debug|x64
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Release|x64.ActiveCfg = Release|x64
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4A1F593F-4BC3-4C81-B8AA-466ED1B83168}
+	EndGlobalSection
+EndGlobal

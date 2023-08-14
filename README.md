@@ -117,6 +117,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
       - [csric0](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/csric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse CSR matrix.
       - [csrilu0](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/csrilu0/): Showcases how to obtain the incomplete LU decomposition of a sparse CSR square matrix.
       - [csritilu0](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/csritilu0/): Showcases how to obtain iteratively the incomplete LU decomposition of a sparse CSR square matrix.
+      - [gtsv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/gtsv/): Shows how to compute the solution of a tridiagonal linear system.
   - [rocThrust](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocThrust/)
     - [device_ptr](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
     - [norm](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.

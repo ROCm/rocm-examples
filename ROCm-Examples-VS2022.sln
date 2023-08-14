@@ -230,6 +230,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spmm_vs2022", "Libraries\ro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "monte_carlo_pi_vs2022", "Applications\monte_carlo_pi\monte_carlo_pi_vs2022.vcxproj", "{107AC26F-A20D-4B25-81DE-AFCDCDECBFFC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtsv_vs2022", "Libraries\rocSPARSE\preconditioner\gtsv\gtsv_vs2022.vcxproj", "{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -620,6 +622,10 @@ Global
 		{107AC26F-A20D-4B25-81DE-AFCDCDECBFFC}.Debug|x64.Build.0 = Debug|x64
 		{107AC26F-A20D-4B25-81DE-AFCDCDECBFFC}.Release|x64.ActiveCfg = Release|x64
 		{107AC26F-A20D-4B25-81DE-AFCDCDECBFFC}.Release|x64.Build.0 = Release|x64
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Debug|x64.ActiveCfg = Debug|x64
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Debug|x64.Build.0 = Debug|x64
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Release|x64.ActiveCfg = Release|x64
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -735,6 +741,7 @@ Global
 		{D32D396C-4B52-4AAC-AC5A-21CC99207E32} = {F91F4254-0ADD-4955-BDFE-53CB4EDBF601}
 		{A6919683-9E28-400A-8910-1BB207B29C4D} = {7EDDB5A2-7601-435F-AEDB-30EBC68D19C9}
 		{107AC26F-A20D-4B25-81DE-AFCDCDECBFFC} = {C735FFA9-12E1-4BEF-87B2-8891A3006505}
+		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E} = {0AFB7E3F-4173-4F47-A068-17CAB93DA563}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

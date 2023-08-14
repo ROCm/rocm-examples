@@ -25,7 +25,8 @@ EXAMPLES := \
 	bsrilu0 \
 	csric0 \
 	csrilu0 \
-	csritilu0
+	csritilu0 \
+	gtsv
 
 all: $(EXAMPLES)
 
