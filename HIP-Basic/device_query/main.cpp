@@ -83,6 +83,8 @@ void print_device_properties(int device_id)
     // On the AMD platform only, print the architecture name.
 #ifdef __HIP_PLATFORM_AMD__
     std::cout << std::setw(col_w) << "gcnArchName: " << props.gcnArchName << '\n';
+#elif defined(__HIP_PLATFORM_NVIDIA__)
+    std::cout << std::setw(col_w) << "major.minor: " << props.major << "." << props.minor << '\n';
 #endif
     std::cout << '\n';
 
