@@ -28,7 +28,7 @@ Obtaining solution for such a system consists on finding concrete values of all 
 1. Setup input data.
 2. Allocate device memory and offload input data to device.
 3. Initialize rocSPARSE by creating a handle.
-4. Prepare utility variables for rocSPARSE csrmv invocation.
+4. Prepare utility variables for rocSPARSE csrsv invocation.
 5. Perform analysis step.
 6. Perform triangular solve $Ay = \alpha x$.
 7. Check results obtained. If no zero-pivots, copy solution vector $y$ from device to host and compare with expected result.

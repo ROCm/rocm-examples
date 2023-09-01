@@ -232,6 +232,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "monte_carlo_pi_vs2019", "Ap
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtsv_vs2019", "Libraries\rocSPARSE\preconditioner\gtsv\gtsv_vs2019.vcxproj", "{65A27F2B-C070-4FDD-93EC-0DFEA35C2E53}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csritsv_vs2019", "Libraries\rocSPARSE\level_2\csritsv\csritsv_vs2019.vcxproj", "{99A25D0A-93FE-47F2-8223-7313E53E7951}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -626,6 +628,10 @@ Global
 		{65A27F2B-C070-4FDD-93EC-0DFEA35C2E53}.Debug|x64.Build.0 = Debug|x64
 		{65A27F2B-C070-4FDD-93EC-0DFEA35C2E53}.Release|x64.ActiveCfg = Release|x64
 		{65A27F2B-C070-4FDD-93EC-0DFEA35C2E53}.Release|x64.Build.0 = Release|x64
+		{99A25D0A-93FE-47F2-8223-7313E53E7951}.Debug|x64.ActiveCfg = Debug|x64
+		{99A25D0A-93FE-47F2-8223-7313E53E7951}.Debug|x64.Build.0 = Debug|x64
+		{99A25D0A-93FE-47F2-8223-7313E53E7951}.Release|x64.ActiveCfg = Release|x64
+		{99A25D0A-93FE-47F2-8223-7313E53E7951}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -743,6 +749,7 @@ Global
 		{EC8FA476-A120-469B-BB48-DA4E0B3E50AD} = {06DEE87C-F773-49A8-A856-8CB55BDFED6D}
 		{6E278B7D-E928-4151-8613-08E91FC6D4D5} = {9254BAD9-FDFC-4645-B2C8-EEB42F1F069D}
 		{65A27F2B-C070-4FDD-93EC-0DFEA35C2E53} = {8B7AD0F4-4288-4ACF-9980-3C500A00EF31}
+		{99A25D0A-93FE-47F2-8223-7313E53E7951} = {F0B0FD83-2B22-47F8-92B1-7A5ED88B8B5E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

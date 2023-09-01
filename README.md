@@ -94,6 +94,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
       - [bsrxmv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/bsrxmv/): Showcases a masked sparse matrix-vector multiplication using BSR storage format.
       - [bsrsv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/bsrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix.
       - [coomv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/coomv/): Showcases a sparse matrix-vector multiplication using COO storage format.
+      - [csritsv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/csritsv/): Showcases how find an iterative solution with the Jacobi method for a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
       - [csrmv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/csrmv/): Showcases a sparse matrix-vector multiplication using CSR storage format.
       - [csrsv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/csrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
       - [ellmv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/ellmv/): Showcases a sparse matrix-vector multiplication using ELL storage format.
