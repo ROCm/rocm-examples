@@ -1,102 +1,102 @@
 # ROCm Examples
 This project is currently unsupported and in an early testing stage. Feedback on the contents of this repository is appreciated.
 ## Repository Contents
-- [Applications](/Applications/) groups a number of examples ... .
-    - [floyd_warshall](/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
-- [Common](/Common/) contains common utility functionality shared between the examples.
-- [HIP-Basic](/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
-    - [assembly_to_executable](/HIP-Basic/assembly_to_executable): Program and accompanying build systems that show how to manually compile and link a HIP application from host and device code.
-    - [bandwidth](/HIP-Basic/bandwidth): Program that measures memory bandwidth from host to device, device to host, and device to device.
-    - [bit_extract](/HIP-Basic/bit_extract): Program that showcases how to use HIP built-in bit extract.
-    - [device_globals](/HIP-Basic/device_globals): Show cases how to set global variables on the device from the host.
-    - [device_query](/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
-    - [dynamic_shared](/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
-    - [events](/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
-    - [gpu_arch](/HIP-Basic/gpu_arch/): Program that showcases how to implement GPU architecture-specific code.
-    - [hello_world](/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
-    - [hipify](/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
-    - [llvm_ir_to_executable](/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
-    - [inline_assembly](/HIP-Basic/inline_assembly/): Program that showcases how to use inline assembly in a portable manner.
-    - [matrix_multiplication](/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
-    - [module_api](/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
-    - [moving_average](/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
-    - [multi_gpu_data_transfer](/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
-    - [occupancy](/HIP-Basic/occupancy/): Shows how to find optimal configuration parameters for a kernel launch with maximum occupancy.
-    - [opengl_interop](/HIP-Basic/opengl_interop): Showcases how to share resources and computation between HIP and OpenGL.
-    - [runtime_compilation](/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
-    - [saxpy](/HIP-Basic/saxpy/): Implements the $y_i=ax_i+y_i$ kernel and explains basic HIP functionality.
-    - [shared_memory](/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
-    - [static_device_library](/HIP-Basic/static_device_library): Shows how to create a static library containing device functions, and how to link it with an executable.
-    - [static_host_library](/HIP-Basic/static_host_library): Shows how to create a static library containing HIP host functions, and how to link it with an executable.
-    - [streams](/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
-    - [texture_management](/HIP-Basic/texture_management/): Shows the usage of texture memory.
-    - [vulkan_interop](/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan.
-    - [warp_shuffle](/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
-- [Dockerfiles](/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](/Dockerfiles/README.md) for details.
-- [Docs](/Docs/)
-    - [CONTRIBUTING.md](/Docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
-- [Libraries](/Libraries/)
-    - [hipBLAS](/Libraries/hipBLAS/)
-        - [gemm_strided_batched](/Libraries/hipBLAS/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
-        - [her](/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.
-        - [scal](/Libraries/hipBLAS/scal/): Simple program that showcases vector scaling (SCAL) operation.
-    - [hipCUB](/Libraries/hipCUB/)
-        - [device_radix_sort](/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
-        - [device_sum](/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
-    - [hipSOLVER](/Libraries/hipSOLVER/)
-        - [gels](/Libraries/hipSOLVER/gels/): Solve a linear system of the form $A\times X=B$.
-        - [geqrf](/Libraries/hipSOLVER/geqrf/): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
-        - [gesvd](/Libraries/hipSOLVER/gesvd/): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
-        - [getrf](/Libraries/hipSOLVER/getrf): Program that showcases how to perform a LU factorization with hipSOLVER.
-        - [potrf](/Libraries/hipSOLVER/potrf/): Perform Cholesky factorization and solve linear system with result.
-        - [syevd](/Libraries/hipSOLVER/syevd/): Program that showcases how to calculate the eigenvalues of a matrix using a divide-and-conquer algorithm in hipSOLVER.
-        - [syevdx](/Libraries/hipSOLVER/syevdx/): Shows how to compute a subset of the eigenvalues and the corresponding eigenvectors of a real symmetric matrix A using the Compatibility API of hipSOLVER.
-        - [sygvd](/Libraries/hipSOLVER/sygvd/): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
-        - [syevj](/Libraries/hipSOLVER/syevj): Calculates the eigenvalues and eigenvectors from a real symmetric matrix using the Jacobi method.
-        - [syevj_batched](/Libraries/hipSOLVER/syevj_batched): Showcases how to compute the eigenvalues and eigenvectors (via Jacobi method) of each matrix in a batch of real symmetric matrices.
-        - [sygvj](/Libraries/hipSOLVER/sygvj): Calculates the generalized eigenvalues and eigenvectors from a pair of real symmetric matrices using the Jacobi method.
-    - [rocBLAS](/Libraries/rocBLAS/)
-        - [level_1](/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
-            - [axpy](/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
-            - [dot](/Libraries/rocBLAS/level_1/dot/): Simple program that showcases dot product.
-            - [nrm2](/Libraries/rocBLAS/level_1/nrm2/): Simple program that showcases Euclidean norm of a vector.
-            - [scal](/Libraries/rocBLAS/level_1/scal/): Simple program that showcases vector scaling (SCAL) operation.
-            - [swap](/Libraries/rocBLAS/level_1/swap/): Showcases exchanging elements between two vectors.
-        - [level_2](/Libraries/rocBLAS/level_2/): Operations between vectors and matrices.
-            - [her](/Libraries/rocBLAS/level_2/her/): Showcases a rank-1 update of a Hermitian matrix with complex values.
-            - [gemv](/Libraries/rocBLAS/level_2/gemv/): Showcases the general matrix-vector product operation.
-        - [level_3](/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
-            - [gemm](/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
-            - [gemm_strided_batched](/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
-    - [rocPRIM](/Libraries/rocPRIM/)
-        - [block_sum](/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
-        - [device_sum](/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
-    - [rocRAND](/Libraries/rocRAND/)
-        - [simple_distributions_cpp](/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
-    - [rocSOLVER](/Libraries/rocSOLVER/)
-        - [getf2](/Libraries/rocSOLVER/getf2): Program that showcases how to perform a LU factorization with rocSOLVER.
-        - [getri](/Libraries/rocSOLVER/getri): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
-        - [syev](/Libraries/rocSOLVER/syev): Shows how to compute the eigenvalues and eigenvectors from a symmetrical real matrix.
-        - [syev_batched](/Libraries/rocSOLVER/syev_batched): Shows how to compute the eigenvalues and eigenvectors for each matrix in a batch of real symmetric matrices.
-        - [syev_strided_batched](/Libraries/rocSOLVER/syev_strided_batched): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
-    - [rocSPARSE](/Libraries/rocSPARSE/)
-        - [level_2](/Libraries/rocSPARSE/level_2/): Operations between sparse matrices and dense vectors.
-            - [bsrmv](/Libraries/rocSPARSE/level_2/bsrmv/): Showcases a sparse matrix-vector multiplication using BSR storage format.
-            - [bsrxmv](/Libraries/rocSPARSE/level_2/bsrxmv/): Showcases a masked sparse matrix-vector multiplication using BSR storage format.
-            - [bsrsv](/Libraries/rocSPARSE/level_2/bsrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix.
-        - [level_3](/Libraries/rocSPARSE/level_3/): Operations between sparse and dense matrices.
-            - [bsrmm](/Libraries/rocSPARSE/level_3/bsrmm/): Showcases a sparse matrix-matrix multiplication using BSR storage format.
-            - [bsrsm](/Libraries/rocSPARSE/level_3/bsrsm): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix, with dense solution and right-hand side stored in dense matrices.
-        - [preconditioner](/Libraries/rocSPARSE/preconditioner/): Manipulations on sparse matrices to obtain sparse preconditioner matrices.
-            - [bsric0](/Libraries/rocSPARSE/preconditioner/bsric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse BSR matrix.
-            - [bsrilu0](/Libraries/rocSPARSE/preconditioner/bsrilu0/): Showcases how to obtain the incomplete LU decomposition of a sparse BSR square matrix.
-    - [rocThrust](/Libraries/rocThrust/)
-        - [device_ptr](/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
-        - [norm](/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
-        - [reduce_sum](/Libraries/rocThrust/reduce_sum/): An example that computes the sum of a `thrust::device_vector` integer vector using the `thrust::reduce()` generalized summation and the `thrust::plus` operator.
-        - [remove_points](/Libraries/rocThrust/remove_points/): Simple program that demonstrates the usage of the `thrust` random number generation, host vector, generation, tuple, zip iterator, and conditional removal templates. It generates a number of random points in a unit square and then removes all of them outside the unit circle.
-        - [saxpy](/Libraries/rocThrust/saxpy/): Simple program that implements the SAXPY operation (`y[i] = a * x[i] + y[i]`) using rocThrust and showcases the usage of the vector and functor templates and of `thrust::fill` and `thrust::transform` operations.
-        - [vectors](/Libraries/rocThrust/vectors/): Simple program that showcases the `host_vector` and the `device_vector` of rocThrust.
+- [Applications](/amd/rocm-examples/tree/develop/Applications/) groups a number of examples ... .
+    - [floyd_warshall](/amd/rocm-examples/tree/develop/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
+- [Common](/amd/rocm-examples/tree/develop/Common/) contains common utility functionality shared between the examples.
+- [HIP-Basic](/amd/rocm-examples/tree/develop/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
+    - [assembly_to_executable](/amd/rocm-examples/tree/develop/HIP-Basic/assembly_to_executable): Program and accompanying build systems that show how to manually compile and link a HIP application from host and device code.
+    - [bandwidth](/amd/rocm-examples/tree/develop/HIP-Basic/bandwidth): Program that measures memory bandwidth from host to device, device to host, and device to device.
+    - [bit_extract](/amd/rocm-examples/tree/develop/HIP-Basic/bit_extract): Program that showcases how to use HIP built-in bit extract.
+    - [device_globals](/amd/rocm-examples/tree/develop/HIP-Basic/device_globals): Show cases how to set global variables on the device from the host.
+    - [device_query](/amd/rocm-examples/tree/develop/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
+    - [dynamic_shared](/amd/rocm-examples/tree/develop/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
+    - [events](/amd/rocm-examples/tree/develop/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
+    - [gpu_arch](/amd/rocm-examples/tree/develop/HIP-Basic/gpu_arch/): Program that showcases how to implement GPU architecture-specific code.
+    - [hello_world](/amd/rocm-examples/tree/develop/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
+    - [hipify](/amd/rocm-examples/tree/develop/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
+    - [llvm_ir_to_executable](/amd/rocm-examples/tree/develop/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
+    - [inline_assembly](/amd/rocm-examples/tree/develop/HIP-Basic/inline_assembly/): Program that showcases how to use inline assembly in a portable manner.
+    - [matrix_multiplication](/amd/rocm-examples/tree/develop/HIP-Basic/matrix_multiplication/): Multiply two dynamically sized matrices utilizing shared memory.
+    - [module_api](/amd/rocm-examples/tree/develop/HIP-Basic/module_api/): Shows how to load and execute a HIP module in runtime.
+    - [moving_average](/amd/rocm-examples/tree/develop/HIP-Basic/moving_average/): Simple program that demonstrates parallel computation of a moving average of one-dimensional data.
+    - [multi_gpu_data_transfer](/amd/rocm-examples/tree/develop/HIP-Basic/multi_gpu_data_transfer/): Performs two matrix transposes on two different devices (one on each) to showcase how to use peer-to-peer communication among devices.
+    - [occupancy](/amd/rocm-examples/tree/develop/HIP-Basic/occupancy/): Shows how to find optimal configuration parameters for a kernel launch with maximum occupancy.
+    - [opengl_interop](/amd/rocm-examples/tree/develop/HIP-Basic/opengl_interop): Showcases how to share resources and computation between HIP and OpenGL.
+    - [runtime_compilation](/amd/rocm-examples/tree/develop/HIP-Basic/runtime_compilation/): Simple program that showcases how to use HIP runtime compilation (hipRTC) to compile a kernel and launch it on a device.
+    - [saxpy](/amd/rocm-examples/tree/develop/HIP-Basic/saxpy/): Implements the $y_i=ax_i+y_i$ kernel and explains basic HIP functionality.
+    - [shared_memory](/amd/rocm-examples/tree/develop/HIP-Basic/shared_memory/): Showcases how to use static shared memory by implementing a simple matrix transpose kernel.
+    - [static_device_library](/amd/rocm-examples/tree/develop/HIP-Basic/static_device_library): Shows how to create a static library containing device functions, and how to link it with an executable.
+    - [static_host_library](/amd/rocm-examples/tree/develop/HIP-Basic/static_host_library): Shows how to create a static library containing HIP host functions, and how to link it with an executable.
+    - [streams](/amd/rocm-examples/tree/develop/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
+    - [texture_management](/amd/rocm-examples/tree/develop/HIP-Basic/texture_management/): Shows the usage of texture memory.
+    - [vulkan_interop](/amd/rocm-examples/tree/develop/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan.
+    - [warp_shuffle](/amd/rocm-examples/tree/develop/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
+- [Dockerfiles](/amd/rocm-examples/tree/develop/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](/Dockerfiles/README.md) for details.
+- [Docs](/amd/rocm-examples/tree/develop/Docs/)
+    - [CONTRIBUTING.md](/amd/rocm-examples/tree/develop/Docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
+- [Libraries](/amd/rocm-examples/tree/develop/Libraries/)
+    - [hipBLAS](/amd/rocm-examples/tree/develop/Libraries/hipBLAS/)
+        - [gemm_strided_batched](/amd/rocm-examples/tree/develop/Libraries/hipBLAS/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
+        - [her](/amd/rocm-examples/tree/develop/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.
+        - [scal](/amd/rocm-examples/tree/develop/Libraries/hipBLAS/scal/): Simple program that showcases vector scaling (SCAL) operation.
+    - [hipCUB](/amd/rocm-examples/tree/develop/Libraries/hipCUB/)
+        - [device_radix_sort](/amd/rocm-examples/tree/develop/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
+        - [device_sum](/amd/rocm-examples/tree/develop/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
+    - [hipSOLVER](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/)
+        - [gels](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/gels/): Solve a linear system of the form $A\times X=B$.
+        - [geqrf](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/geqrf/): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
+        - [gesvd](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/gesvd/): Program that showcases how to obtain a singular value decomposition with the hipSOLVER API.
+        - [getrf](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/getrf): Program that showcases how to perform a LU factorization with hipSOLVER.
+        - [potrf](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/potrf/): Perform Cholesky factorization and solve linear system with result.
+        - [syevd](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/syevd/): Program that showcases how to calculate the eigenvalues of a matrix using a divide-and-conquer algorithm in hipSOLVER.
+        - [syevdx](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/syevdx/): Shows how to compute a subset of the eigenvalues and the corresponding eigenvectors of a real symmetric matrix A using the Compatibility API of hipSOLVER.
+        - [sygvd](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/sygvd/): Showcases how to obtain a solution $(X, \Lambda)$ for a generalized symmetric-definite eigenvalue problem of the form $A \cdot X = B\cdot X \cdot \Lambda$.
+        - [syevj](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/syevj): Calculates the eigenvalues and eigenvectors from a real symmetric matrix using the Jacobi method.
+        - [syevj_batched](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/syevj_batched): Showcases how to compute the eigenvalues and eigenvectors (via Jacobi method) of each matrix in a batch of real symmetric matrices.
+        - [sygvj](/amd/rocm-examples/tree/develop/Libraries/hipSOLVER/sygvj): Calculates the generalized eigenvalues and eigenvectors from a pair of real symmetric matrices using the Jacobi method.
+    - [rocBLAS](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/)
+        - [level_1](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
+            - [axpy](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
+            - [dot](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_1/dot/): Simple program that showcases dot product.
+            - [nrm2](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_1/nrm2/): Simple program that showcases Euclidean norm of a vector.
+            - [scal](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_1/scal/): Simple program that showcases vector scaling (SCAL) operation.
+            - [swap](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_1/swap/): Showcases exchanging elements between two vectors.
+        - [level_2](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_2/): Operations between vectors and matrices.
+            - [her](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_2/her/): Showcases a rank-1 update of a Hermitian matrix with complex values.
+            - [gemv](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_2/gemv/): Showcases the general matrix-vector product operation.
+        - [level_3](/amd/rocm-examples/tree/develop/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
+            - [gemm](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
+            - [gemm_strided_batched](/amd/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
+    - [rocPRIM](/amd/rocm-examples/tree/develop/Libraries/rocPRIM/)
+        - [block_sum](/amd/rocm-examples/tree/develop/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
+        - [device_sum](/amd/rocm-examples/tree/develop/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
+    - [rocRAND](/amd/rocm-examples/tree/develop/Libraries/rocRAND/)
+        - [simple_distributions_cpp](/amd/rocm-examples/tree/develop/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
+    - [rocSOLVER](/amd/rocm-examples/tree/develop/Libraries/rocSOLVER/)
+        - [getf2](/amd/rocm-examples/tree/develop/Libraries/rocSOLVER/getf2): Program that showcases how to perform a LU factorization with rocSOLVER.
+        - [getri](/amd/rocm-examples/tree/develop/Libraries/rocSOLVER/getri): Program that showcases matrix inversion by LU-decomposition using rocSOLVER.
+        - [syev](/amd/rocm-examples/tree/develop/Libraries/rocSOLVER/syev): Shows how to compute the eigenvalues and eigenvectors from a symmetrical real matrix.
+        - [syev_batched](/amd/rocm-examples/tree/develop/Libraries/rocSOLVER/syev_batched): Shows how to compute the eigenvalues and eigenvectors for each matrix in a batch of real symmetric matrices.
+        - [syev_strided_batched](/amd/rocm-examples/tree/develop/Libraries/rocSOLVER/syev_strided_batched): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
+    - [rocSPARSE](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/)
+        - [level_2](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/): Operations between sparse matrices and dense vectors.
+            - [bsrmv](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/bsrmv/): Showcases a sparse matrix-vector multiplication using BSR storage format.
+            - [bsrxmv](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/bsrxmv/): Showcases a masked sparse matrix-vector multiplication using BSR storage format.
+            - [bsrsv](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/bsrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix.
+        - [level_3](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/): Operations between sparse and dense matrices.
+            - [bsrmm](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/bsrmm/): Showcases a sparse matrix-matrix multiplication using BSR storage format.
+            - [bsrsm](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/bsrsm): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix, with dense solution and right-hand side stored in dense matrices.
+        - [preconditioner](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/): Manipulations on sparse matrices to obtain sparse preconditioner matrices.
+            - [bsric0](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/bsric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse BSR matrix.
+            - [bsrilu0](/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/bsrilu0/): Showcases how to obtain the incomplete LU decomposition of a sparse BSR square matrix.
+    - [rocThrust](/amd/rocm-examples/tree/develop/Libraries/rocThrust/)
+        - [device_ptr](/amd/rocm-examples/tree/develop/Libraries/rocThrust/device_ptr/): Simple program that showcases the usage of the `thrust::device_ptr` template.
+        - [norm](/amd/rocm-examples/tree/develop/Libraries/rocThrust/norm/): An example that computes the Euclidean norm of a `thrust::device_vector`.
+        - [reduce_sum](/amd/rocm-examples/tree/develop/Libraries/rocThrust/reduce_sum/): An example that computes the sum of a `thrust::device_vector` integer vector using the `thrust::reduce()` generalized summation and the `thrust::plus` operator.
+        - [remove_points](/amd/rocm-examples/tree/develop/Libraries/rocThrust/remove_points/): Simple program that demonstrates the usage of the `thrust` random number generation, host vector, generation, tuple, zip iterator, and conditional removal templates. It generates a number of random points in a unit square and then removes all of them outside the unit circle.
+        - [saxpy](/amd/rocm-examples/tree/develop/Libraries/rocThrust/saxpy/): Simple program that implements the SAXPY operation (`y[i] = a * x[i] + y[i]`) using rocThrust and showcases the usage of the vector and functor templates and of `thrust::fill` and `thrust::transform` operations.
+        - [vectors](/amd/rocm-examples/tree/develop/Libraries/rocThrust/vectors/): Simple program that showcases the `host_vector` and the `device_vector` of rocThrust.
 
 ## Prerequisites
 ### Linux
