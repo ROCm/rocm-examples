@@ -46,7 +46,7 @@ inline const char* hipsolverStatusToString(hipsolverStatus_t status)
         case HIPSOLVER_STATUS_HANDLE_IS_NULLPTR: return "HIPSOLVER_STATUS_HANDLE_IS_NULLPTR";
         case HIPSOLVER_STATUS_INVALID_ENUM: return "HIPSOLVER_STATUS_INVALID_ENUM";
         case HIPSOLVER_STATUS_UNKNOWN: return "HIPSOLVER_STATUS_UNKNOWN";
-#if hipsolverVersionMajor * 10 + hipsolverVersionMinor >= 18
+#if (hipsolverVersionMajor == 1 && hipsolverVersionMinor >= 8) || hipsolverVersionMajor >= 2
         case HIPSOLVER_STATUS_ZERO_PIVOT: return "HIPSOLVER_STATUS_ZERO_PIVOT";
 #endif
     }
