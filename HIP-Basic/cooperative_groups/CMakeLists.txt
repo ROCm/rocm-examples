@@ -54,6 +54,11 @@ add_test(${example_name} ${example_name})
 set(include_dirs "../../Common")
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
+else()
+    # Add NDEBUG for HIP version >= 5.5 and < 6.0 due to a known bug in the cooperative groups header
+    if( ${hip-lang_VERSION} VERSION_GREATER_EQUAL 5.5 AND ${hip-lang_VERSION} VERSION_LESS 6 )
+        add_compile_definitions(NDEBUG)
+    endif()
 endif()
 
 target_include_directories(${example_name} PRIVATE ${include_dirs})
