@@ -53,10 +53,10 @@ inline const char* rocsparse_status_to_string(rocsparse_status status)
 #endif
         case rocsparse_status_requires_sorted_storage:
             return "rocsparse_status_requires_sorted_storage";
+        // We do use default because we are not in control of these enumeration values.
+        // Ideally this function is something rocsparse would provide
+        default: return "<unknown rocsparse_status value>";
     }
-    // We don't use default so that the compiler warns if any valid enums are missing from the
-    // switch. If the value is not a valid rocsparse_status, we return the following.
-    return "<undefined rocsparse_status value>";
 }
 
 /// \brief Checks if the provided status code is \p rocsparse_status_success and if not,
