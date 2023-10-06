@@ -3,26 +3,29 @@ param(
     [string]$Path = "Debug",
     [string]$Filter = "*.exe",
     [int]$Timeout = 10,
-    [string[]]$Skipped = @()
+    [string[]]$Skip = @()
 )
-$Skipped = $Skipped | ForEach-Object { $_.Trim() }
+$Skip = $Skip | ForEach-Object { $_.Trim() }
 
 Write-Host "Testing all '$Filter' in '$Path' with a timeout of $Timeout"
-Write-Host "Skipping the following examples:"
-foreach($item in $Skipped) {
+Write-Host "Skipping examples that match any of:"
+foreach($item in $Skip) {
     Write-Host "- $item"
 }
 
 $FailureCount = 0
 $Results = @()
 
-Get-ChildItem -Recurse -Path $Path -Filter $Filter -Exclude $Skipped | ForEach-Object {
-    Write-Host ("`e[36m-- {0}`e[0m" -f $_.Name)
+function Run-Example {
+    param(
+        [System.IO.FileInfo]$FileInfo
+    )
+
     $Job = Start-Job -ScriptBlock {
         param([string]$FullName)
         $Time = Measure-Command { 
             try {
-                $Log = & $FullName 
+                $Log = & $FullName
                 $JobExitStatus = $LASTEXITCODE
             } catch {
                 $JobExitStatus = "CRASH!"
@@ -33,7 +36,7 @@ Get-ChildItem -Recurse -Path $Path -Filter $Filter -Exclude $Skipped | ForEach-O
             Log        = $Log
             Time       = $Time
         }
-    } -ArgumentList $_.FullName
+    } -ArgumentList $FileInfo.FullName
 
     # Execute the job with a timeout
     $Job | Wait-Job -TimeOut $Timeout | Out-Null
@@ -62,16 +65,40 @@ Get-ChildItem -Recurse -Path $Path -Filter $Filter -Exclude $Skipped | ForEach-O
         $FailureCount += 1
     }
 
-    # Put into a hash table and append to a list for table magic!
-    $Results += [PSCustomObject]@{
-        Name       = $_.Name
-        Pass       = $Status
+    # Clean up!
+    Remove-Job -force $Job
+
+    [PSCustomObject]@{
+        Name       = $FileInfo.Name
+        State      = $Status
         ExitStatus = $ExitDisplay
         Time       = $TimeSpan
     }
+}
 
-    # Clean up!
-    Remove-Job -force $Job
+Get-ChildItem -Recurse -File -Path $Path -Filter $Filter | ForEach-Object {
+    Write-Host ("`e[36m-- {0}`e[0m" -f $_.Name)
+
+    $ShouldSkip = $false
+    foreach($F in $Skip) {
+        if ($_.Name -like $F) {
+            Write-Host "`e[33m`e[1mSkipped by wildcard:`e[0m $F"
+            $ShouldSkip = $true
+            break
+        }
+    }
+
+    # Put into a hash table and append to a list for table magic!
+    if (-not $ShouldSkip) {
+        $Results += Run-Example $_
+    } else {
+        $Results += [PSCustomObject]@{
+            Name       = $_.Name
+            State      = "`e[33m`e[1mSkip`e[0m"
+            ExitStatus = $null 
+            Time       = $null
+        }
+    }
 }
 
 $Results | Format-Table
