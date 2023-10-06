@@ -293,14 +293,6 @@ test:windows-rocm-vs:
     SkippedExamples: >
       hip_vulkan_interop_*.exe,
       hip_texture_management_*.exe,
-      rocsparse_bsric0_*.exe,
-      rocsparse_bsrilu0_*.exe,
-      rocsparse_bsrsm_*.exe,
-      rocsparse_bsrsv_*.exe,
-      rocsparse_csric0_*.exe,
-      rocsparse_csrilu0_*.exe,
-      rocsparse_csrsv_*.exe,
-      rocsparse_spsv_*.exe
 
 test:windows-nvcc-vs:
   extends:
