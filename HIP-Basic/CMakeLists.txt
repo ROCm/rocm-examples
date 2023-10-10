@@ -41,9 +41,8 @@ add_subdirectory(device_globals)
 add_subdirectory(dynamic_shared)
 add_subdirectory(events)
 add_subdirectory(gpu_arch)
+add_subdirectory(hello_world)
 if(NOT WIN32)
-    add_subdirectory(hello_world)
-
     find_package(Perl)
 
     if(Perl_FOUND)

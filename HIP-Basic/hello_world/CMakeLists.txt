@@ -22,10 +22,6 @@
 
 set(example_name hip_hello_world)
 
-if(WIN32)
-    message(FATAL_ERROR "The hello world example currently does not support Windows.")
-endif()
-
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
