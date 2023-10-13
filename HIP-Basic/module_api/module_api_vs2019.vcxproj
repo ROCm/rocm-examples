@@ -22,10 +22,10 @@
     <ClCompile Include="main.hip" />
     <CustomBuild Include="module.hip">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -o "$(OutDir)module.co" %(Identity) --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o $(OutDir)module.co %(Identity) --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling HIP Code Object module.co</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)module.co</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -o "$(OutDir)module.co" %(Identity) --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o $(OutDir)module.co %(Identity) --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling HIP Code Object module.co</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)module.co</Outputs>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(BinDir)module.co</ObjectFileName>
