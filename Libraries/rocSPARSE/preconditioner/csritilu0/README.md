@@ -81,12 +81,12 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
     - `rocsparse_itilu0_alg_sync_split_fusion`: Semi-synchronous iterative ILU0 algorithm with explicit storage splitting.
     - `rocsparse_itilu0_alg_default`: same as `rocsparse_itilu0_alg_async_inplace`.
 - `rocsparse_itilu0_option`: available options to perform the iterative ILU0 algorithm. The following values are accepted:
-    - `rocsparse_itilu0_option_verbose` (1)
-    - `rocsparse_itilu0_option_stopping_criteria` (2): Compute a stopping criteria.
-    - `rocsparse_itilu0_option_compute_nrm_correction` (4): Compute correction.
-    - `rocsparse_itilu0_option_compute_nrm_residual` (8): Compute residual.
-    - `rocsparse_itilu0_option_convergence_history` (16): Log convergence history.
-    - `rocsparse_itilu0_option_coo_format` (32): Use internal coordinate format.
+    - `rocsparse_itilu0_option_verbose`
+    - `rocsparse_itilu0_option_stopping_criteria`: Compute a stopping criteria.
+    - `rocsparse_itilu0_option_compute_nrm_correction`: Compute correction.
+    - `rocsparse_itilu0_option_compute_nrm_residual`: Compute residual.
+    - `rocsparse_itilu0_option_convergence_history`: Log convergence history.
+    - `rocsparse_itilu0_option_coo_format`: Use internal coordinate format.
 - `rocsparse_index_base idx_base` indicates the index base of the indices. The following values are accepted:
    - `rocsparse_index_base_zero`: zero based indexing.
    - `rocsparse_index_base_one`: one based indexing.

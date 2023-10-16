@@ -117,12 +117,10 @@ int main()
     constexpr rocsparse_itilu0_alg alg = rocsparse_itilu0_alg_default;
 
     // Options selected for the iterative algorithm:
-    //   rocsparse_itilu0_option_stopping_criteria      (2)
-    // + rocsparse_itilu0_option_compute_nrm_correction (+ 4)
-    // + rocsparse_itilu0_option_compute_nrm_residual   (+ 8)
-    // + rocsparse_itilu0_option_convergence_history    (+ 16)
-    // = 30
-    constexpr rocsparse_int option = 30;
+    constexpr rocsparse_int option = rocsparse_itilu0_option_stopping_criteria
+                                     | rocsparse_itilu0_option_compute_nrm_correction
+                                     | rocsparse_itilu0_option_compute_nrm_residual
+                                     | rocsparse_itilu0_option_convergence_history;
 
     // Tolerance.
     constexpr double tol = 1.0e5 * std::numeric_limits<double>::epsilon(); /*2.22045e-11*/
