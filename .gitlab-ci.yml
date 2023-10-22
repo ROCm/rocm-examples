@@ -347,7 +347,7 @@ test:windows-nvcc-vs:
     # So for now, just add the library path here.
     - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
     - cd "$CI_PROJECT_DIR/build"
-    - ctest --output-on-failure --timeout 15 -E "rocsparse_bsrsv|rocsparse_csrsv|rocsparse_spsv|rocsparse_bsrsm|rocsparse_csrsm|rocsparse_bsric0|rocsparse_bsrilu0|rocsparse_csric0|rocsparse_csrilu0"
+    - ctest --output-on-failure --timeout 15 
     - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"
   needs: []
 
