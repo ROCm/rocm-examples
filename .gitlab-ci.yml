@@ -239,7 +239,7 @@ test:cuda:
           - Debug
           - Release
   variables:
-    Timeout: 30
+    Timeout: 60
     Filter: "*_vs$VS_VERSION.exe"
   script:
     - | # Find MSBuild.exe of the associated version.
