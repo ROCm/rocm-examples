@@ -1,5 +1,7 @@
 # ROCm Examples
-This project is currently unsupported and in an early testing stage. Feedback on the contents of this repository is appreciated.
+
+A collection of examples to enable new users to start using ROCm. Advanced users may learn about new functionality through our advanced examples.
+
 ## Repository Contents
 - [Applications](https://github.com/amd/rocm-examples/tree/develop/Applications/) groups a number of examples ... .
     - [floyd_warshall](https://github.com/amd/rocm-examples/tree/develop/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
