@@ -1,6 +1,6 @@
 # ROCm Examples
 
-A collection of examples to enable end users to start using ROCm. Advanced users may learn about new functionality through our for advanced examples.
+A collection of examples to enable new users to start using ROCm. Advanced users may learn about new functionality through our advanced examples.
 
 ## Repository Contents
 - [Applications](https://github.com/amd/rocm-examples/tree/develop/Applications/) groups a number of examples ... .
