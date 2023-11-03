@@ -62,9 +62,6 @@ target_include_directories(
 
 # Set up the compilation language for the source file.
 # Usually this can be deduced from the file extension, but not in the case of .hip.
-set_source_files_properties(
-    main.hip
-    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
-)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
