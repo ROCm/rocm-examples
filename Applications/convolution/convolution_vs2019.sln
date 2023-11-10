@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32630.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "convolution_vs2019", "convolution_vs2019.vcxproj", "{A557F6A4-C0FD-4D65-B1BD-A201FABAEF7F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A557F6A4-C0FD-4D65-B1BD-A201FABAEF7F}.Debug|x64.ActiveCfg = Debug|x64
+		{A557F6A4-C0FD-4D65-B1BD-A201FABAEF7F}.Debug|x64.Build.0 = Debug|x64
+		{A557F6A4-C0FD-4D65-B1BD-A201FABAEF7F}.Release|x64.ActiveCfg = Release|x64
+		{A557F6A4-C0FD-4D65-B1BD-A201FABAEF7F}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D7C4B290-7C93-4D26-85D9-364F6A448EE0}
+	EndGlobalSection
+EndGlobal
