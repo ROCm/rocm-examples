@@ -24,10 +24,8 @@
 
 #include <hip/hip_runtime.h>
 
-#include <algorithm>
 #include <iomanip>
 #include <iostream>
-#include <string>
 #include <vector>
 
 /// \brief Performs pair-wise multiplication of two vectors and stores the result into
