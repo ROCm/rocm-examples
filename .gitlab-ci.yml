@@ -48,7 +48,7 @@ clang-format:
   stage: lint
   needs: []
   tags:
-    - rocm-build
+    - build
   variables:
     CLANG_FORMAT: "/opt/rocm/llvm/bin/clang-format"
     GIT_CLANG_FORMAT: "/opt/rocm/llvm/bin/git-clang-format"
@@ -64,7 +64,7 @@ copyright-date:
   stage: lint
   needs: []
   tags:
-    - rocm-build
+    - build
   rules:
     - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
   script:
@@ -80,7 +80,7 @@ copyright-date:
   stage: build
   needs: []
   tags:
-    - rocm-build
+    - build
   script:
     - mkdir -p /kaniko/.docker
     - echo "${DOCKER_AUTH_CONFIG}" > /kaniko/.docker/config.json
@@ -121,7 +121,7 @@ build:make-rocm:
   extends:
     - .rules:build
   tags:
-    - rocm-build
+    - build
   needs: []
   script:
     - cd $CI_PROJECT_DIR && make CXXFLAGS="$HIP_FLAGS" -j $(nproc)
@@ -132,7 +132,7 @@ build:make-cuda:
   extends:
     - .rules:build
   tags:
-    - nvcc-build
+    - build
   needs: []
   script:
     - cd $CI_PROJECT_DIR && make CXXFLAGS="$CUDA_FLAGS" GPU_RUNTIME=CUDA -j $(nproc)
@@ -156,7 +156,7 @@ build:cmake-rocm:
     - .build:cmake
     - .gpus:rocm-gpus
   tags:
-    - rocm-build
+    - build
   script:
     - cmake
       -S $CI_PROJECT_DIR
@@ -179,7 +179,7 @@ build:cmake-cuda:
  extends:
    - .build:cmake
  tags:
-   - nvcc-build
+   - build
  script:
    - cmake
      -S $CI_PROJECT_DIR
