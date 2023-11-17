@@ -271,11 +271,7 @@ test:cuda:
         "$CI_PROJECT_DIR\$SOLUTION_PREFIX$VS_VERSION.sln"
       )
     - | # Use external script to test examples
-      if (!$SKIP_TESTS) {
-        & $CI_PROJECT_DIR\Scripts\WindowsRunner.ps1 $CI_PROJECT_DIR\$BUILD_TYPE $Filter $Timeout $("$SkippedExamples".split(','))
-      } else {
-        Write-Output "Tests skipped!"
-      }
+      & $CI_PROJECT_DIR\Scripts\WindowsRunner.ps1 $CI_PROJECT_DIR\$BUILD_TYPE $Filter $Timeout $("$SkippedExamples".split(','))
 
 test:windows-rocm-vs:
   extends:
@@ -306,8 +302,6 @@ test:windows-nvcc-vs:
     SkippedExamples: >
       hip_runtime_compilation_vs2017.exe
   before_script:
-    - | # Release builds are currently broken!
-      $SKIP_TESTS = ($BUILD_TYPE -eq "Release")
     # To test for NVIDIA, we need to set the platform toolset to HIP_nvcc. This cannot be done with /p:PlatformToolset
     # though, as some examples use the regular msvc toolchain.
     - |
