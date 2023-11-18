@@ -24,10 +24,10 @@ ENV LANG en_US.utf8
 
 # Install ROCM HIP and libraries using the installer script
 RUN export DEBIAN_FRONTEND=noninteractive; \
-    wget https://repo.radeon.com/amdgpu-install/5.6.1/ubuntu/focal/amdgpu-install_5.6.50601-1_all.deb \
+    wget https://repo.radeon.com/amdgpu-install/5.7.1/ubuntu/focal/amdgpu-install_5.7.50701-1_all.deb \
     && apt-get update -qq \
-    && apt-get install -y ./amdgpu-install_5.6.50601-1_all.deb \
-    && rm ./amdgpu-install_5.6.50601-1_all.deb \
+    && apt-get install -y ./amdgpu-install_5.7.50701-1_all.deb \
+    && rm ./amdgpu-install_5.7.50701-1_all.deb \
     && amdgpu-install -y --usecase=hiplibsdk --no-dkms \
     && apt-get install -y libnuma-dev \
     && rm -rf /var/lib/apt/lists/*
