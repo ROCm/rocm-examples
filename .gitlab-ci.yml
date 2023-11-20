@@ -298,9 +298,6 @@ test:windows-nvcc-vs:
     - nvcc-windows
   variables:
     SOLUTION_PREFIX: ROCm-Examples-Portable-VS
-    # hip_runtime_compilation: fails on VS2017
-    SkippedExamples: >
-      hip_runtime_compilation_vs2017.exe
   before_script:
     # To test for NVIDIA, we need to set the platform toolset to HIP_nvcc. This cannot be done with /p:PlatformToolset
     # though, as some examples use the regular msvc toolchain.

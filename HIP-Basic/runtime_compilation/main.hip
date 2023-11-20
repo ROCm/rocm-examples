@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,9 +36,10 @@ static constexpr auto saxpy_kernel{
     // if the /E flag is passed (as NVCC does).
     "#include \"test_header.h\"\n"
     "#include \"test_header1.h\"\n"
+    // MSVC 19.16 does not properly preprocess extern "C" when it's not on the same line as the
+    // function declaration if the /E flag is passed (as NVCC does).
     R"(
-extern "C"
-__global__ void saxpy_kernel(const real a, const realptr d_x, realptr d_y, const unsigned int size)
+extern "C" __global__ void saxpy_kernel(const real a, const realptr d_x, realptr d_y, const unsigned int size)
 {
     const unsigned int global_idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(global_idx < size)
