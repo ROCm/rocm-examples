@@ -228,6 +228,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spmv_vs2017", "Libraries\ro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spmm_vs2017", "Libraries\rocSPARSE\level_3\spmm\spmm_vs2017.vcxproj", "{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "monte_carlo_pi_vs2017", "Applications\monte_carlo_pi\monte_carlo_pi_vs2017.vcxproj", "{2ACD5660-DAA6-490B-8C5D-F0B178A80D16}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -614,6 +616,10 @@ Global
 		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}.Debug|x64.Build.0 = Debug|x64
 		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}.Release|x64.ActiveCfg = Release|x64
 		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A}.Release|x64.Build.0 = Release|x64
+		{2ACD5660-DAA6-490B-8C5D-F0B178A80D16}.Debug|x64.ActiveCfg = Debug|x64
+		{2ACD5660-DAA6-490B-8C5D-F0B178A80D16}.Debug|x64.Build.0 = Debug|x64
+		{2ACD5660-DAA6-490B-8C5D-F0B178A80D16}.Release|x64.ActiveCfg = Release|x64
+		{2ACD5660-DAA6-490B-8C5D-F0B178A80D16}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -729,6 +735,7 @@ Global
 		{4CA37D63-1707-4F65-9F91-C49224962498} = {79082CA5-3D7F-41AC-862B-E16EE6EB25A0}
 		{7830AAFE-B001-40B5-BBF4-99EE8AAC519A} = {4581A6EF-211D-4B00-A65E-C29F55CEE886}
 		{DA4B2E3F-E114-49B2-91F6-02061F6AEF1A} = {79082CA5-3D7F-41AC-862B-E16EE6EB25A0}
+		{2ACD5660-DAA6-490B-8C5D-F0B178A80D16} = {0328C27A-BB25-46F6-89F7-4EEF7AC225D8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
