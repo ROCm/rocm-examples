@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <HIPVersion>6.1</HIPVersion>
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{015df085-feb3-4c7a-acee-7cffb3c9aff0}</ProjectGuid>
+    <ProjectGuid>{8A7A18FB-BA38-4C9C-8DB1-193C1052E1A6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>prefix_sum_vs2017</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
