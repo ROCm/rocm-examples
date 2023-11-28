@@ -64,10 +64,7 @@ if(NOT WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "HIP")
     add_subdirectory(static_host_library)
 endif()
 add_subdirectory(streams)
-# temporarily exclude texture management on Windows
-if(NOT WIN32)
-    add_subdirectory(texture_management)
-endif()
+add_subdirectory(texture_management)
 add_subdirectory(warp_shuffle)
 
 find_package(glfw3)

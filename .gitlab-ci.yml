@@ -284,11 +284,9 @@ test:windows-rocm-vs:
   variables:
     SOLUTION_PREFIX: ROCm-Examples-VS
     # hip_vulkant_interop: graphical
-    # hip_texture_management: does not work
     # rocsparse_*: broken with new SDK
     SkippedExamples: >
       hip_vulkan_interop_*.exe,
-      hip_texture_management_*.exe,
 
 test:windows-nvcc-vs:
   extends:
