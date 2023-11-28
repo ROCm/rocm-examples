@@ -242,6 +242,8 @@ test:cuda:
     Timeout: 60
     Filter: "*_vs$VS_VERSION.exe"
   script:
+    - | 
+      & ${env:HIP_PATH}/bin/clang++ --version
     - | # Find MSBuild.exe of the associated version.
       $MSBUILD = (
         & "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe" -find MSBuild\**\Bin\MSBuild.exe
