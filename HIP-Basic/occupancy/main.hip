@@ -165,8 +165,8 @@ int main()
     // Initialize the input data
     for(int i = 0; i < size; i++)
     {
-        h_A[i] = i;
-        h_B[i] = i;
+        h_A[i] = (float)i;
+        h_B[i] = (float)i;
     }
 
     float* d_A = nullptr;
