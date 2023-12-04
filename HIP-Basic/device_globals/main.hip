@@ -135,7 +135,7 @@ int main()
     const std::vector<float> reference = test_globals_reference(h_in, h_global_array, h_global);
 
     // Check the results' validity.
-    constexpr float eps = 1.0E-6;
+    constexpr float eps = 1.0E-6f;
     unsigned int    errors{};
     for(size_t i = 0; i < size; ++i)
     {
