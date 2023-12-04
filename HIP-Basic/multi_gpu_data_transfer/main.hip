@@ -272,7 +272,7 @@ int main()
     // Validate results. The input matrix for the kernel execution on the first device must be
     // the same as the output matrix from the kernel execution on the second device.
     unsigned int    errors = 0;
-    constexpr float eps    = 1.0E-6;
+    constexpr float eps    = 1.0E-6f;
     std::cout << "Validating peer-to-peer." << std::endl;
     for(unsigned int i = 0; i < size; i++)
     {
