@@ -26,7 +26,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Common\example_utils.hpp" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(PlatformToolset)'=='HIP_clang'">
     <CustomBuild Include="hip_obj_gen_win.mcin">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy %(Identity) "$(IntDir)%(Identity)"</Command>
@@ -81,7 +81,6 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
     </CustomBuild>
-
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
