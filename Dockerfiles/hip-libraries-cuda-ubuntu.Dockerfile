@@ -29,9 +29,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add - \
     && echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/5.7/ ubuntu main' > /etc/apt/sources.list.d/rocm.list \
     && apt-get update -qq \
-    && apt-get install -y hip-base hipify-clang \
-    && apt-get download hip-runtime-nvidia hip-dev \
-    && dpkg -i --ignore-depends=cuda hip*
+    && apt-get install -y hip-base hipify-clang rocm-core hipcc hip-dev
 
 # Install CMake
 RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.7/cmake-3.21.7-linux-x86_64.sh \
