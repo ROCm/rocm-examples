@@ -67,6 +67,11 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>rocsparse_$(ProjectName)</TargetName>
   </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+  </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
