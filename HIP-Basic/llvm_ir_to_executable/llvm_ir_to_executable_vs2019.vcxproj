@@ -120,7 +120,6 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(IntDir)main_device.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuildStep>

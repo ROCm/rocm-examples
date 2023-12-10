@@ -167,7 +167,6 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(IntDir)main_device.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuild>
