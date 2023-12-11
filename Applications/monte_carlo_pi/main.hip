@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -126,7 +126,7 @@ int main(int argc, char* argv[])
     if(sample_count <= 0)
     {
         std::cerr << "Sample count should be greater than 0." << std::endl;
-        return 0;
+        return error_exit_code;
     }
 
     // The samples have two dimensions, so two random numbers are required per sample.

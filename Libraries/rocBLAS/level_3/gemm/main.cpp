@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -54,19 +54,19 @@ int main(const int argc, const char** argv)
     if(m <= 0)
     {
         std::cout << "Value of 'm' should be greater than 0" << std::endl;
-        return 0;
+        return error_exit_code;
     }
 
     if(n <= 0)
     {
         std::cout << "Value of 'n' should be greater than 0" << std::endl;
-        return 0;
+        return error_exit_code;
     }
 
     if(k <= 0)
     {
         std::cout << "Value of 'k' should be greater than 0" << std::endl;
-        return 0;
+        return error_exit_code;
     }
 
     // Set scalar values used for multiplication.

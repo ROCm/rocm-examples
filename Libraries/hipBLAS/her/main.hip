@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -77,15 +77,15 @@ int main(const int argc, const char** argv)
     if(incx <= 0)
     {
         std::cout << "Value of 'x' should be greater than 0" << std::endl;
-        return 0;
+        return error_exit_code;
     }
 
     // Increment between consecutive values of the input vector y.
     const int incy = parser.get<int>("y");
-    if(incx <= 0)
+    if(incy <= 0)
     {
         std::cout << "Value of 'y' should be greater than 0" << std::endl;
-        return 0;
+        return error_exit_code;
     }
 
     // Number of elements in the input vectors and dimension of input matrix.
@@ -93,7 +93,7 @@ int main(const int argc, const char** argv)
     if(n <= 0)
     {
         std::cout << "Value of 'n' should be greater than 0" << std::endl;
-        return 0;
+        return error_exit_code;
     }
 
     // Scalar multiplier.
