@@ -56,7 +56,7 @@ find_package(rocblas REQUIRED)
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::rocblas)

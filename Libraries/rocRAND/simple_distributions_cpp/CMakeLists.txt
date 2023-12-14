@@ -54,7 +54,7 @@ endif()
 find_package(rocrand REQUIRED)
 
 add_executable(${example_name} main.cpp)
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     target_link_libraries(${example_name} PRIVATE roc::rocrand)

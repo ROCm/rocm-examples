@@ -60,7 +60,7 @@ find_package(hipsolver REQUIRED)
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example libraries
 target_link_libraries(${example_name} PRIVATE roc::hipblas roc::hipsolver)
