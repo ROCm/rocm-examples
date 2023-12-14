@@ -67,7 +67,7 @@ else()
 endif()
 
 add_executable(${example_name} main.hip)
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 target_link_libraries(${example_name} PRIVATE hip::hipcub hip::hiprand)
 # Workaround for hipRAND, requires manual linking with backend.

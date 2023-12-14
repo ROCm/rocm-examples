@@ -93,7 +93,7 @@ target_link_libraries(${example_name_cxx} PRIVATE ${library_name})
 set_target_properties(${example_name_cxx} PROPERTIES LINKER_LANGUAGE CXX)
 
 # Make examples runnable using ctest
-add_test(${example_name} ${example_name})
-add_test(${example_name_cxx} ${example_name_cxx})
+add_test(NAME ${example_name} COMMAND ${example_name})
+add_test(NAME ${example_name_cxx} COMMAND ${example_name_cxx})
 
 install(TARGETS ${example_name} ${example_name_cxx})

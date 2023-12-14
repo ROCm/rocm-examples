@@ -79,7 +79,7 @@ add_custom_command(
 
 add_executable(${example_name} ${CMAKE_CURRENT_BINARY_DIR}/main.hip)
 # Make example runnable using ctest
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     set(include_dirs "${ROCM_ROOT}/include")

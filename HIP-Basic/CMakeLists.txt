@@ -38,6 +38,9 @@ else()
     )
 endif()
 
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 # Only supported on HIP (not CUDA)
 if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     # Make sure the dependencies can be found before building.

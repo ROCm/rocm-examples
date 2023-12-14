@@ -212,7 +212,7 @@ add_custom_command(
 add_executable(${example_name} main.hip ${DEVICE_OBJECT})
 
 # Make example runnable using ctest
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 set(include_dirs "../../Common")
 target_include_directories(${example_name} PRIVATE ${include_dirs})

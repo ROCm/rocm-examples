@@ -45,7 +45,7 @@ endif()
 add_executable(${example_name} main.hip)
 
 # Make example runnable using ctest
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Make the HIP runtime headers accessible
 target_include_directories(

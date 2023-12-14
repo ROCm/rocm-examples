@@ -59,7 +59,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
-add_test(${example_name} ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Temporary workaround: a known bug prevents the example from executing succesfully
 # if multiple GPUs are visible 
