@@ -184,8 +184,8 @@ int main()
 
     // Number of blocks in each dimension of the grid. Calculated as
     // ceiling(matrix_dimension/block_size) with matrix_dimension being width or height.
-    constexpr unsigned int grid_size_x = (width + block_size - 1) / block_size;
-    constexpr unsigned int grid_size_y = (height + block_size - 1) / block_size;
+    constexpr unsigned int grid_size_x = ceiling_div(width, block_size);
+    constexpr unsigned int grid_size_y = ceiling_div(height, block_size);
 
     // Block and grid sizes in 2D.
     const dim3 block_dim(block_size, block_size);

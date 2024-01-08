@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ int main(int, char* argv[])
     constexpr unsigned int block_size = size;
 
     // Number of blocks per kernel grid. The expression below calculates ceil(size/block_size).
-    constexpr unsigned int grid_size = (size + block_size - 1) / block_size;
+    constexpr unsigned int grid_size = ceiling_div(size, block_size);
 
     // Allocate host vectors for the input and output.
     std::vector<float> h_in(size);

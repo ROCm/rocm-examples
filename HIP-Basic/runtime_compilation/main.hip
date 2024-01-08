@@ -137,7 +137,7 @@ int main()
     constexpr unsigned int block_size = 128;
 
     // Number of blocks per kernel grid, calculated as ceil(size/block_size).
-    constexpr unsigned int grid_size = (size + block_size - 1) / block_size;
+    constexpr unsigned int grid_size = ceiling_div(size, block_size);
 
     // Constant value 'a' to be used in the expression 'a*x+y'.
     constexpr float a = 5.1f;

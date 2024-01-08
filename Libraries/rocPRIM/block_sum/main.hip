@@ -98,7 +98,7 @@ int main()
 
     // Input problem size
     constexpr unsigned int size      = 10000;
-    const unsigned int     grid_size = (size + items_per_block - 1) / items_per_block;
+    const unsigned int     grid_size = ceiling_div(size, items_per_block);
 
     // Allocate input vector on the host
     std::vector<int> h_in(size);

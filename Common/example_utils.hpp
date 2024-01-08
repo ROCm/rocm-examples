@@ -177,7 +177,7 @@ public:
 template<typename T,
          typename U,
          std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<U>::value, int> = 0>
-__host__ __device__ auto ceiling_div(const T& dividend, const U& divisor)
+__host__ __device__ constexpr auto ceiling_div(const T& dividend, const U& divisor)
 {
     return (dividend + divisor - 1) / divisor;
 }

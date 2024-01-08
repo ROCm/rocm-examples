@@ -478,8 +478,8 @@ struct simulator
         constexpr size_t tile_size = 8;
 
         // Launch the HIP kernel to advance the simulation.
-        sinewave_kernel<<<dim3((grid_width + tile_size - 1) / tile_size,
-                               (grid_height + tile_size - 1) / tile_size),
+        sinewave_kernel<<<dim3(ceiling_div(grid_width, tile_size),
+                               ceiling_div(grid_height, tile_size)),
                           dim3(tile_size, tile_size),
                           0,
                           this->hip_stream>>>(this->hip_height_ptr, time);
