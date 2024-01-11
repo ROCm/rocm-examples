@@ -151,10 +151,10 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 ```
 
 ### rocSPARSE
-- `rocsparse_[cdsz]bsrmm(...)` is the matrix--matrix multiplication solver with four different function signatures depending on the type of the input matrix:
-   - `c` single-precision complex (`rocsparse_float_complex`)
-   - `d` double-precision real (`double`)
+- `rocsparse_[sdcz]bsrmm(...)` performs a sparse matrix-dense matrix multiplication. The correct function signature should be chosen based on the datatype of the input matrix:
    - `s` single-precision real (`float`)
+   - `d` double-precision real (`double`)
+   - `c` single-precision complex (`rocsparse_float_complex`)
    - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation`: matrix operation type with the following options:

@@ -143,7 +143,7 @@ int main()
     std::vector<float> ref_transposed_matrix = matrix_transpose_reference(h_matrix, width);
 
     // Check the results' validity.
-    constexpr float eps = 1.0E-6;
+    constexpr float eps = 1.0E-6f;
     unsigned int    errors{};
     for(unsigned int i = 0; i < size; i++)
     {

@@ -25,3 +25,6 @@ project(rocSPARSE_preconditioner_examples LANGUAGES NONE)
 
 add_subdirectory(bsric0)
 add_subdirectory(bsrilu0)
+add_subdirectory(csric0)
+add_subdirectory(csrilu0)
+add_subdirectory(csritilu0)

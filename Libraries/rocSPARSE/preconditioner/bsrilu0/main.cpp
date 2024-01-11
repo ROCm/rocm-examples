@@ -28,12 +28,13 @@
 
 #include <array>
 #include <cmath>
+#include <iomanip>
 #include <iostream>
 #include <limits>
 
 int main()
 {
-    // 1. Setup input data.
+    // 1. Set up input data.
     //
     // A = (  1  0  0  0  0  0 ) * (  2  3  4  5  6  7 )
     //     (  2  1  0  0  0  0 )   (  0  2  3  4  5  6 )
@@ -68,18 +69,16 @@ int main()
     constexpr rocsparse_int bsr_dim = 2;
 
     // Number of rows and columns of the input matrix.
-    constexpr rocsparse_int m = 6;
     constexpr rocsparse_int n = 6;
 
     // Number of rows and columns of the block matrix.
-    constexpr rocsparse_int mb = (m + bsr_dim - 1) / bsr_dim;
     constexpr rocsparse_int nb = (n + bsr_dim - 1) / bsr_dim;
 
     // Number of non-zero blocks.
     constexpr rocsparse_int nnzb = 9;
 
     // BSR row pointers vector.
-    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 3, 6, 9};
+    constexpr std::array<rocsparse_int, nb + 1> h_bsr_row_ptr = {0, 3, 6, 9};
 
     // BSR column indices vector.
     constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 2, 0, 1, 2, 0, 1, 2};
@@ -102,7 +101,7 @@ int main()
     rocsparse_int* d_bsr_col_ind{};
     double*        d_bsr_val{};
 
-    constexpr size_t size_bsr_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t size_bsr_row_ptr = sizeof(*d_bsr_row_ptr) * (nb + 1);
     constexpr size_t size_bsr_col_ind = sizeof(*d_bsr_col_ind) * nnzb;
     constexpr size_t size_bsr_val     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
 
@@ -136,7 +135,7 @@ int main()
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dbsrilu0_buffer_size(handle,
                                                    dir,
-                                                   mb,
+                                                   nb,
                                                    nnzb,
                                                    descr,
                                                    d_bsr_val,
@@ -153,7 +152,7 @@ int main()
     // 5. Perform the analysis step.
     ROCSPARSE_CHECK(rocsparse_dbsrilu0_analysis(handle,
                                                 dir,
-                                                mb,
+                                                nb,
                                                 nnzb,
                                                 descr,
                                                 d_bsr_val,
@@ -168,7 +167,7 @@ int main()
     // 6. Call dbsrilu0 to perform incomplete LU factorization.
     ROCSPARSE_CHECK(rocsparse_dbsrilu0(handle,
                                        dir,
-                                       mb,
+                                       nb,
                                        nnzb,
                                        descr,
                                        d_bsr_val,
@@ -180,134 +179,133 @@ int main()
                                        temp_buffer))
 
     // 7. Check zero-pivots.
-    rocsparse_int    position;
-    rocsparse_status status = rocsparse_bsrilu0_zero_pivot(handle, info, &position);
+    rocsparse_int    pivot_position;
+    rocsparse_status bsrilu0_status = rocsparse_bsrilu0_zero_pivot(handle, info, &pivot_position);
 
     int errors{};
 
-    if(status == rocsparse_status_zero_pivot)
+    if(bsrilu0_status == rocsparse_status_zero_pivot)
     {
-        std::cout << "Found zero pivot in matrix row " << position << std::endl;
+        std::cout << "Found zero pivot in matrix row " << pivot_position << std::endl;
         errors++;
     }
     else
     {
-        // 8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
-        // Host and device allocations of the result matrix for conversion routines.
-        constexpr size_t           size_A = m * n;
-        std::array<double, size_A> A;
-
-        double*          d_A{};
-        constexpr size_t size_bytes_A = sizeof(*d_A) * size_A;
-        HIP_CHECK(hipMalloc(&d_A, size_bytes_A));
-
-        // 8a. Convert BSR sparse matrix to CSR format.
-        rocsparse_mat_descr csr_descr;
-        ROCSPARSE_CHECK(rocsparse_create_mat_descr(&csr_descr));
-        ROCSPARSE_CHECK(rocsparse_set_mat_type(csr_descr, rocsparse_matrix_type_general));
-
-        constexpr rocsparse_int nnze = nnzb * bsr_dim * bsr_dim; /*non-zero elements*/
-
-        rocsparse_int* d_csr_row_ptr{};
-        rocsparse_int* d_csr_col_ind{};
-        double*        d_csr_val{};
-
-        constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (n + 1);
-        constexpr size_t size_csr_col_ind = sizeof(*d_csr_col_ind) * nnze;
-        constexpr size_t size_csr_val     = sizeof(*d_csr_val) * nnze;
-
-        HIP_CHECK(hipMalloc(&d_csr_row_ptr, size_csr_row_ptr));
-        HIP_CHECK(hipMalloc(&d_csr_col_ind, size_csr_col_ind));
-        HIP_CHECK(hipMalloc(&d_csr_val, size_csr_val));
-
-        ROCSPARSE_CHECK(rocsparse_dbsr2csr(handle,
-                                           dir,
-                                           mb,
-                                           nb,
-                                           descr,
-                                           d_bsr_val,
-                                           d_bsr_row_ptr,
-                                           d_bsr_col_ind,
-                                           bsr_dim,
-                                           csr_descr,
-                                           d_csr_val,
-                                           d_csr_row_ptr,
-                                           d_csr_col_ind));
-
-        // 8b. Convert CSR sparse matrix to dense.
-        ROCSPARSE_CHECK(rocsparse_dcsr2dense(handle,
-                                             m,
-                                             n,
-                                             csr_descr,
-                                             d_csr_val,
-                                             d_csr_row_ptr,
-                                             d_csr_col_ind,
-                                             d_A,
-                                             n));
-
-        HIP_CHECK(hipMemcpy(A.data(), d_A, size_bytes_A, hipMemcpyDeviceToHost));
-
-        // Free rocSPARSE resources and device memory.
-        ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(csr_descr));
-
-        HIP_CHECK(hipFree(d_csr_row_ptr));
-        HIP_CHECK(hipFree(d_csr_col_ind));
-        HIP_CHECK(hipFree(d_csr_val));
-        HIP_CHECK(hipFree(d_A));
-
-        // 8c. Print the resulting L and U matrices and compare it with the expected results.
-        // Expected L and U matrices in dense format.
-        constexpr std::array<double, size_A> L_expected
-            = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
-               0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
-        constexpr std::array<double, size_A> U_expected
-            = {2, 0, 0, 0, 0, 0, 3, 2, 0, 0, 0, 0, 4, 3, 2, 0, 0, 0,
-               5, 4, 3, 2, 0, 0, 6, 5, 4, 3, 2, 0, 7, 6, 5, 4, 3, 2};
-
-        std::cout << "Incomplete LU factorization A = L * U successfully computed with L "
-                     "matrix: \n";
-
-        // L matrix is stored in the lower part of A. The diagonal is not stored as it is known
-        // that all the diagonal elements are the multiplicative identity (1 in this case).
-        const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
-        for(int i = 0; i < n; ++i)
-        {
-            for(int j = 0; j < n; ++j)
-            {
-                const double val = (j < i) ? A[j * n + i] : (j == i);
-                std::cout << val << " ";
-
-                errors += std::fabs(val - L_expected[j * n + i]) > eps;
-            }
-            std::cout << "\n";
-        }
-        std::cout << std::endl;
-
-        std::cout << "and U matrix: \n";
-
-        for(rocsparse_int i = 0; i < n; ++i)
-        {
-            for(rocsparse_int j = 0; j < n; ++j)
-            {
-                const double val = (j >= i) ? A[j * n + i] : 0;
-                std::cout << val << " ";
-
-                errors += std::fabs(val - U_expected[j * n + i]) > eps;
-            }
-            std::cout << "\n";
-        }
-        std::cout << std::endl;
+        ROCSPARSE_CHECK(bsrilu0_status);
     }
+
+    // 8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
+    // Host and device allocations of the result matrix for conversion routines.
+    constexpr size_t           size_A = n * n;
+    std::array<double, size_A> A;
+
+    double*          d_A{};
+    constexpr size_t size_bytes_A = sizeof(*d_A) * size_A;
+    HIP_CHECK(hipMalloc(&d_A, size_bytes_A));
+
+    // 8a. Convert BSR sparse matrix to CSR format.
+    rocsparse_mat_descr csr_descr;
+    ROCSPARSE_CHECK(rocsparse_create_mat_descr(&csr_descr));
+    ROCSPARSE_CHECK(rocsparse_set_mat_type(csr_descr, rocsparse_matrix_type_general));
+
+    constexpr rocsparse_int nnze = nnzb * bsr_dim * bsr_dim; /*non-zero elements*/
+
+    rocsparse_int* d_csr_row_ptr{};
+    rocsparse_int* d_csr_col_ind{};
+    double*        d_csr_val{};
+
+    constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (n + 1);
+    constexpr size_t size_csr_col_ind = sizeof(*d_csr_col_ind) * nnze;
+    constexpr size_t size_csr_val     = sizeof(*d_csr_val) * nnze;
+
+    HIP_CHECK(hipMalloc(&d_csr_row_ptr, size_csr_row_ptr));
+    HIP_CHECK(hipMalloc(&d_csr_col_ind, size_csr_col_ind));
+    HIP_CHECK(hipMalloc(&d_csr_val, size_csr_val));
+
+    ROCSPARSE_CHECK(rocsparse_dbsr2csr(handle,
+                                       dir,
+                                       nb,
+                                       nb,
+                                       descr,
+                                       d_bsr_val,
+                                       d_bsr_row_ptr,
+                                       d_bsr_col_ind,
+                                       bsr_dim,
+                                       csr_descr,
+                                       d_csr_val,
+                                       d_csr_row_ptr,
+                                       d_csr_col_ind));
+
+    // 8b. Convert CSR sparse matrix to dense.
+    ROCSPARSE_CHECK(rocsparse_dcsr2dense(handle,
+                                         n,
+                                         n,
+                                         csr_descr,
+                                         d_csr_val,
+                                         d_csr_row_ptr,
+                                         d_csr_col_ind,
+                                         d_A,
+                                         n));
+
+    HIP_CHECK(hipMemcpy(A.data(), d_A, size_bytes_A, hipMemcpyDeviceToHost));
+
+    // 8c. Print the resulting L and U matrices and compare it with the expected results.
+    // Expected L and U matrices in dense format.
+    constexpr std::array<double, size_A> L_expected
+        = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
+           0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
+    constexpr std::array<double, size_A> U_expected
+        = {2, 0, 0, 0, 0, 0, 3, 2, 0, 0, 0, 0, 4, 3, 2, 0, 0, 0,
+           5, 4, 3, 2, 0, 0, 6, 5, 4, 3, 2, 0, 7, 6, 5, 4, 3, 2};
+
+    std::cout << "Incomplete LU factorization A = L * U successfully computed with L "
+                 "matrix: \n";
+
+    // L matrix is stored in the lower part of A. The diagonal is not stored as it is known
+    // that all the diagonal elements are the multiplicative identity (1 in this case).
+    const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
+    for(rocsparse_int i = 0; i < n; ++i)
+    {
+        for(rocsparse_int j = 0; j < n; ++j)
+        {
+            const double val = (j < i) ? A[j * n + i] : (j == i);
+            std::cout << std::setw(3) << val;
+
+            errors += std::fabs(val - L_expected[j * n + i]) > eps;
+        }
+        std::cout << "\n";
+    }
+    std::cout << std::endl;
+
+    std::cout << "and U matrix: \n";
+
+    for(rocsparse_int i = 0; i < n; ++i)
+    {
+        for(rocsparse_int j = 0; j < n; ++j)
+        {
+            const double val = (j >= i) ? A[j * n + i] : 0;
+            std::cout << std::setw(3) << val;
+
+            errors += std::fabs(val - U_expected[j * n + i]) > eps;
+        }
+        std::cout << "\n";
+    }
+    std::cout << std::endl;
 
     // 9. Free rocSPARSE resources and device memory.
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
     ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(descr));
+    ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(csr_descr));
     ROCSPARSE_CHECK(rocsparse_destroy_mat_info(info));
 
     HIP_CHECK(hipFree(d_bsr_row_ptr));
     HIP_CHECK(hipFree(d_bsr_col_ind));
     HIP_CHECK(hipFree(d_bsr_val));
+    HIP_CHECK(hipFree(d_csr_row_ptr));
+    HIP_CHECK(hipFree(d_csr_col_ind));
+    HIP_CHECK(hipFree(d_csr_val));
     HIP_CHECK(hipFree(temp_buffer));
+    HIP_CHECK(hipFree(d_A));
 
     // 10. Print validation result.
     return report_validation_result(errors);

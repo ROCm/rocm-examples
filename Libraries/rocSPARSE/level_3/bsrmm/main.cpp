@@ -86,16 +86,9 @@ int main()
     // Transposition of the matrix
     constexpr rocsparse_operation trans_B = rocsparse_operation_none;
 
-    // Dense matrix C (m x n)
-    //     ( 0 0 0 0 0 0 0 0 0 0 )
-    // C = ( 0 0 0 0 0 0 0 0 0 0 )
-    //     ( 0 0 0 0 0 0 0 0 0 0 )
-    //     ( 0 0 0 0 0 0 0 0 0 0 )
-
-    // Matrix C elements in column-major
+    // Initialize a dense matrix C (m x n)
     const rocsparse_int         ldc = m;
-    std::array<double, (m * n)> h_C = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                                       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+    std::array<double, (m * n)> h_C{};
 
     // Scalar alpha and beta
     constexpr double alpha = 1.0;
@@ -117,11 +110,11 @@ int main()
     double*        d_B;
     double*        d_C;
 
-    constexpr size_t size_B       = sizeof(*d_C) * k * n;
+    constexpr size_t size_B       = sizeof(*d_B) * k * n;
     constexpr size_t size_C       = sizeof(*d_C) * m * n;
     constexpr size_t size_val     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
     constexpr size_t size_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
-    constexpr size_t size_col_ind = sizeof(*d_bsr_row_ptr) * nnzb;
+    constexpr size_t size_col_ind = sizeof(*d_bsr_col_ind) * nnzb;
 
     HIP_CHECK(hipMalloc(&d_bsr_row_ptr, size_row_ptr));
     HIP_CHECK(hipMalloc(&d_bsr_col_ind, size_col_ind));

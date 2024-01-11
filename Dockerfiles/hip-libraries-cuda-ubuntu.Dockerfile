@@ -87,6 +87,16 @@ RUN wget https://github.com/ROCmSoftwarePlatform/hipSOLVER/archive/refs/tags/roc
     && cmake --build ./hipSOLVER-rocm-5.3.0/build --target install \
     && rm -rf ./hipSOLVER-rocm-5.3.0
 
+# Install hipRAND
+RUN wget https://github.com/ROCmSoftwarePlatform/hipRAND/archive/refs/tags/rocm-5.3.0.tar.gz \
+    && tar -xf ./rocm-5.3.0.tar.gz \
+    && rm ./rocm-5.3.0.tar.gz \
+    && cmake -S ./hipRAND-rocm-5.3.0 -B ./hipRAND-rocm-5.3.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+        -D CMAKE_INSTALL_PREFIX=/opt/rocm \
+    && cmake --build ./hipRAND-rocm-5.3.0/build --target install \
+    && rm -rf ./hipRAND-rocm-5.3.0
+
 # Use render group as an argument from user
 ARG GID=109
 

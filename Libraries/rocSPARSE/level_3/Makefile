@@ -22,7 +22,9 @@
 
 EXAMPLES := \
 	bsrmm \
-	bsrsm
+	bsrsm \
+	csrmm \
+	csrsm
 
 all: $(EXAMPLES)
 

@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bitonic_sort_vs2017", "bitonic_sort_vs2017.vcxproj", "{265F7154-A362-45FA-B300-DB74E14BA010}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{265F7154-A362-45FA-B300-DB74E14BA010}.Debug|x64.ActiveCfg = Debug|x64
+		{265F7154-A362-45FA-B300-DB74E14BA010}.Debug|x64.Build.0 = Debug|x64
+		{265F7154-A362-45FA-B300-DB74E14BA010}.Release|x64.ActiveCfg = Release|x64
+		{265F7154-A362-45FA-B300-DB74E14BA010}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6C3AE930-86C0-4E39-A249-BBFA047DBE8C}
+	EndGlobalSection
+EndGlobal

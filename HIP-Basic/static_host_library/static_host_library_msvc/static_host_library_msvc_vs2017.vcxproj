@@ -81,7 +81,6 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <IgnoreSpecificDefaultLibraries>libcmt</IgnoreSpecificDefaultLibraries>
     </Link>
   </ItemDefinitionGroup>

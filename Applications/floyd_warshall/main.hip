@@ -135,12 +135,12 @@ int main(int argc, char* argv[])
     {
         std::cout << "Number of nodes must be a positive multiple of block_size ("
                   << std::to_string(block_size) << ")." << std::endl;
-        exit(0);
+        return error_exit_code;
     }
     if(iterations == 0)
     {
         std::cout << "Number of iterations must be at least 1." << std::endl;
-        exit(0);
+        return error_exit_code;
     }
 
     // Total number of elements and bytes of the input matrices.
@@ -191,26 +191,31 @@ int main(int argc, char* argv[])
     HIP_CHECK(hipHostMalloc(&part_adjacency_matrix, size_bytes, hipHostMallocMapped));
     HIP_CHECK(hipHostMalloc(&part_next_matrix, size_bytes, hipHostMallocMapped));
 
-    // Get device pointer to pinned host memory allocations for the input matrices.
-    float *d_adjacency_matrix, *d_next_matrix;
-    HIP_CHECK(
-        hipHostGetDevicePointer((void**)&d_adjacency_matrix, part_adjacency_matrix, 0 /*flags*/));
-    HIP_CHECK(hipHostGetDevicePointer((void**)&d_next_matrix, part_next_matrix, 0 /*flags*/));
+    // Copy memory to pinned memory region
+    std::copy(adjacency_matrix.begin(), adjacency_matrix.end(), part_adjacency_matrix);
+    std::copy(next_matrix.begin(), next_matrix.end(), part_next_matrix);
+
+    // Allocate device memory
+    unsigned int* d_adjacency_matrix;
+    unsigned int* d_next_matrix;
+    HIP_CHECK(hipMalloc((void**)&d_adjacency_matrix, size_bytes));
+    HIP_CHECK(hipMalloc((void**)&d_next_matrix, size_bytes));
+
+    // Create events to measure the execution time of the kernels.
+    hipEvent_t start, stop;
+    HIP_CHECK(hipEventCreate(&start));
+    HIP_CHECK(hipEventCreate(&stop));
 
     // Run iterations times the Floyd-Warshall GPU algorithm.
     for(unsigned int i = 0; i < iterations; ++i)
     {
         // Copy input data from host to device memory.
         HIP_CHECK(hipMemcpy(d_adjacency_matrix,
-                            adjacency_matrix.data(),
+                            part_adjacency_matrix,
                             size_bytes,
                             hipMemcpyHostToDevice));
-        HIP_CHECK(hipMemcpy(d_next_matrix, next_matrix.data(), size_bytes, hipMemcpyHostToDevice));
+        HIP_CHECK(hipMemcpy(d_next_matrix, part_next_matrix, size_bytes, hipMemcpyHostToDevice));
 
-        // Create events to measure the execution time of the kernels.
-        hipEvent_t start, stop;
-        HIP_CHECK(hipEventCreate(&start));
-        HIP_CHECK(hipEventCreate(&stop));
         float kernel_ms{};
 
         // Floyd-Warshall GPU algorithm: launch Floyd-Warshall kernel for each node of the graph.
@@ -220,11 +225,10 @@ int main(int argc, char* argv[])
             HIP_CHECK(hipEventRecord(start, hipStreamDefault));
 
             // Launch Floyd-Warshall kernel on the default stream.
-            floyd_warshall_kernel<<<grid_dim, block_dim, 0, hipStreamDefault>>>(
-                part_adjacency_matrix,
-                part_next_matrix,
-                nodes,
-                k);
+            floyd_warshall_kernel<<<grid_dim, block_dim, 0, hipStreamDefault>>>(d_adjacency_matrix,
+                                                                                d_next_matrix,
+                                                                                nodes,
+                                                                                k);
 
             // Check if the kernel launch was successful.
             HIP_CHECK(hipGetLastError());
@@ -238,15 +242,22 @@ int main(int argc, char* argv[])
             kernel_time += kernel_ms;
         }
     }
+    // Free events used for time measurement
+    HIP_CHECK(hipEventDestroy(start));
+    HIP_CHECK(hipEventDestroy(stop));
 
     // Copy results back to host.
     HIP_CHECK(
         hipMemcpy(adjacency_matrix.data(), d_adjacency_matrix, size_bytes, hipMemcpyDeviceToHost));
     HIP_CHECK(hipMemcpy(next_matrix.data(), d_next_matrix, size_bytes, hipMemcpyDeviceToHost));
 
-    // Free device memory.
+    // Free host memory.
     HIP_CHECK(hipHostFree(part_adjacency_matrix));
     HIP_CHECK(hipHostFree(part_next_matrix));
+
+    // Free device memory
+    HIP_CHECK(hipFree(d_adjacency_matrix));
+    HIP_CHECK(hipFree(d_next_matrix));
 
     // Print the mean time per iteration (in miliseconds) of the algorithm.
     kernel_time /= iterations;

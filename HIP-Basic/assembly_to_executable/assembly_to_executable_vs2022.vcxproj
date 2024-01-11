@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+    <HIPVersion>5.7</HIPVersion>
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{96af6231-97e6-4fef-8132-11897d33e973}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -26,7 +27,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Common\example_utils.hpp" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <CustomBuild Include="hip_obj_gen_win.mcin">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy %(Identity) "$(IntDir)%(Identity)"</Command>
@@ -81,26 +82,24 @@
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
     </CustomBuild>
-
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP_clang</PlatformToolset>
+    <PlatformToolset>HIP clang 5.7</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP_clang</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>HIP clang 5.7</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Condition="'$(PlatformToolset)'=='HIP_clang'" Project="$(VCTargetsPath)\AMD.HIP.Clang.Common.props" />
-    <Import Condition="'$(PlatformToolset)'=='HIP_nvcc'" Project="$(VCTargetsPath)\AMD.HIP.Nvcc.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPVersion)\AMD.HIP.Clang.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPVersion)\AMD.HIP.Nvcc.Common.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -110,7 +109,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="HIP_nvcc" Condition="'$(PlatformToolset)'=='HIP_nvcc'">
+  <PropertyGroup Label="HIP nvcc $(HIPVersion)" Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'">
     <ProjectExcludedFromBuild>true</ProjectExcludedFromBuild>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" />
@@ -124,13 +123,12 @@
     <TargetName>hip_$(ProjectName)</TargetName>
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
   </PropertyGroup>
-  <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
-  </PropertyGroup>
-  <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -161,11 +159,10 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <Inputs>$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP_clang'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -174,7 +171,6 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>$(IntDir)main_device.obj;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuild>
@@ -198,7 +194,7 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Condition="'$(PlatformToolset)'=='HIP_clang'" Project="$(VCTargetsPath)\AMD.HIP.Clang.Common.targets" />
-    <Import Condition="'$(PlatformToolset)'=='HIP_nvcc'" Project="$(VCTargetsPath)\AMD.HIP.Nvcc.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPVersion)\AMD.HIP.Clang.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPVersion)\AMD.HIP.Nvcc.Common.targets" />
   </ImportGroup>
 </Project>

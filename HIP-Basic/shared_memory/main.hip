@@ -136,7 +136,7 @@ int main()
 
     // Validate results comparing with expected transposed matrix.
     unsigned int    errors = 0;
-    constexpr float eps    = 1.0E-6;
+    constexpr float eps    = 1.0E-6f;
     std::cout << "Validating transposed matrix." << std::endl;
     for(unsigned int i = 0; i < size; i++)
     {

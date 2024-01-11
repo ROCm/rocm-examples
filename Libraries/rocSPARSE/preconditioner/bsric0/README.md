@@ -12,7 +12,7 @@ The _incomplete_ Cholesky decomposition is a sparse approximation of the above-m
 $$A \approx L \cdot L^H.$$
 
 ### Application flow
-1. Setup input data.
+1. Set up input data.
 2. Allocate device memory and offload input data to the device.
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare utility variables for rocSPARSE bsric0 invocation.

@@ -25,3 +25,5 @@ project(rocSPARSE_level_3_examples LANGUAGES NONE)
 
 add_subdirectory(bsrmm)
 add_subdirectory(bsrsm)
+add_subdirectory(csrmm)
+add_subdirectory(csrsm)

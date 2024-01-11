@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
+    <HIPVersion>5.7</HIPVersion>
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{ACF45DFD-5DEA-4BF2-81BD-0C66E971D97F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -25,7 +26,7 @@
     <ClInclude Include="..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\Common\hipsolver_utils.hpp" />
   </ItemGroup>
-  <ItemGroup Condition="'$(PlatformToolset)'=='HIP_clang'">
+  <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <Content Include="$(HIPExecutablePath)\hipsolver.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -44,20 +45,19 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP_clang</PlatformToolset>
+    <PlatformToolset>HIP clang 5.7</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP_clang</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>HIP clang 5.7</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Condition="'$(PlatformToolset)'=='HIP_clang'" Project="$(VCTargetsPath)\AMD.HIP.Clang.Common.props" />
-    <Import Condition="'$(PlatformToolset)'=='HIP_nvcc'" Project="$(VCTargetsPath)\AMD.HIP.Nvcc.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPVersion)\AMD.HIP.Clang.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPVersion)\AMD.HIP.Nvcc.Common.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -67,7 +67,7 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="HIP_nvcc" Condition="'$(PlatformToolset)'=='HIP_nvcc'">
+  <PropertyGroup Label="HIP nvcc $(HIPVersion)" Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'">
     <ProjectExcludedFromBuild>true</ProjectExcludedFromBuild>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" />
@@ -79,13 +79,12 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>hipsolver_$(ProjectName)</TargetName>
   </PropertyGroup>
-  <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
-  </PropertyGroup>
-  <PropertyGroup Label="HIP_clang" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <OffloadArch>gfx1030;gfx1100;gfx1101;gfx1102</OffloadArch>
-  </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_clang'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -99,7 +98,7 @@
       <AdditionalDependencies>hipsolver.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP_nvcc'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__CUDACC__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -111,11 +110,10 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP_clang'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>__clang__;__HIP__;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -125,15 +123,14 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>hipsolver.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP_nvcc'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
       <PreprocessorDefinitions>__CUDACC__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -142,12 +139,12 @@
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Condition="'$(PlatformToolset)'=='HIP_clang'" Project="$(VCTargetsPath)\AMD.HIP.Clang.Common.targets" />
-    <Import Condition="'$(PlatformToolset)'=='HIP_nvcc'" Project="$(VCTargetsPath)\AMD.HIP.Nvcc.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPVersion)\AMD.HIP.Clang.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPVersion)\AMD.HIP.Nvcc.Common.targets" />
   </ImportGroup>
 </Project>
