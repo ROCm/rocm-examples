@@ -37,11 +37,10 @@ as inputs. See: https://github.com/pytorch/pytorch/issues/113744
 
     model_export = capture_pre_autograd_graph(model_fp32, (input_fp32, ))
 
-Use the pt2e API to prepare, calibrate and convert the model
+Use the pt2e API to prepare, calibrate, and convert the model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Torch-MIGraphX provides a custom Quantizer for performing quantization
-that is compatible with MIGraphX. 
+Torch-MIGraphX provides a custom Quantizer for performing quantization that is compatible with MIGraphX. 
 
 Note: Additional configs will also work as long as the configs ensure symmetric quantization using the signed int8
 datatype. Currently, only symmetric quantization is supported in MIGraphX.
@@ -63,7 +62,7 @@ datatype. Currently, only symmetric quantization is supported in MIGraphX.
     q_m = convert_pt2e(m)
     torch_qout = q_m(input_fp32)
 
-2. Lower Quantized Model to MIGraphX
+2. Lower Quantized model to MIGraphX
 ------------------------------------
 
 This step is the same as lowering any other model using torch.compile!
