@@ -1,8 +1,7 @@
 Run Quantized ResNet50 via MIGraphX
 ===================================
 
-This notebook walks through the dynamo PTQ workflow for running a
-quantized model using torch_migraphx.
+This example walks through the dynamo PTQ workflow for running a quantized model using torch_migraphx.
 
 1. Use torch.export and quantize_pt2e APIs to perform quantization
 ------------------------------------------------------------------
