@@ -9,19 +9,20 @@ Building HIP executables from device assembly can be useful for example to exper
 
 - Build with Makefile: to compile for specific GPU architectures, optionally provide the HIP_ARCHITECTURES variable. Provide the architectures separated by comma.
     ```shell
-    make HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102"
+    make HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx942;gfx1030;gfx1100;gfx1101;gfx1102"
     ```
 - Build with CMake:
     ```shell
-    cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102"
+    cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx942;gfx1030;gfx1100;gfx1101;gfx1102"
     cmake --build build
     ```
     On Windows the path to RC compiler may be needed: `-DCMAKE_RC_COMPILER="C:/Program Files (x86)/Windows Kits/path/to/x64/rc.exe"`
+    HIP SDK for window does not support HIP device architecture gfx942. 
 
 ## Generating device assembly
 This example creates a HIP file from device assembly code, however, such assembly files can also be created from HIP source code using `hipcc`. This can be done by passing `-S` and `--cuda-device-only` to hipcc. The former flag instructs the compiler to generate human-readable assembly instead of machine code, and the latter instruct the compiler to only compile the device part of the program. The six assembly files for this example were generated as follows:
 ```shell
-$ROCM_INSTALL_DIR/bin/hipcc -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102 main.hip
+$ROCM_INSTALL_DIR/bin/hipcc -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102 main.hip
 ```
 
 The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
