@@ -1,5 +1,5 @@
-Run Quantized ResNet50 via MIGraphX
-===================================
+Running Quantized ResNet50 via MIGraphX
+========================================
 
 This example walks through the dynamo PTQ workflow for running a quantized model using torch_migraphx.
 
