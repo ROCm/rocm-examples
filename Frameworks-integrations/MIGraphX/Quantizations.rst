@@ -8,6 +8,9 @@ Prerequisite
 
 You must follow the `installation instructions <https://github.com/ROCmSoftwarePlatform/torch_migraphx>`_ before using this example. 
 
+Steps for running a quantized model using torch_migraphx
++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
 1. Use torch.export and quantize_pt2e APIs to perform quantization
 ------------------------------------------------------------------
 
