@@ -6,7 +6,7 @@ This example walks through the dynamo PTQ workflow for running a quantized model
 Prerequisite 
 +++++++++++++++
 
-You must follow the `installation instructions<https://github.com/ROCmSoftwarePlatform/torch_migraphx>` before using this example. 
+You must follow the `installation instructions <https://github.com/ROCmSoftwarePlatform/torch_migraphx>` before using this example. 
 
 1. Use torch.export and quantize_pt2e APIs to perform quantization
 ------------------------------------------------------------------
