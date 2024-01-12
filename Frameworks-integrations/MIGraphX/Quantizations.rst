@@ -42,10 +42,10 @@ Use the pt2e API to prepare, calibrate and convert the model
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Torch-MIGraphX provides a custom Quantizer for performing quantization
-that is compatible with MIGraphX. Additional configs will also work as
-long as the configs ensure symmetric quantization using the signed int8
-datatype. Currently, only symmetric quantization is supported in
-MIGraphX.
+that is compatible with MIGraphX. 
+
+Note: Additional configs will also work as long as the configs ensure symmetric quantization using the signed int8
+datatype. Currently, only symmetric quantization is supported in MIGraphX.
 
 .. code:: ipython3
 
