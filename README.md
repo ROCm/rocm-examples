@@ -95,6 +95,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
             - [csrmv](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/csrmv/): Showcases a sparse matrix-vector multiplication using CSR storage format.
             - [csrsv](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/csrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
             - [ellmv](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/ellmv/): Showcases a sparse matrix-vector multiplication using ELL storage format.
+            - [gebsrmv](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/gebsrmv/): Showcases a sparse matrix-dense vector multiplication using GEBSR storage format.
         - [level_3](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/): Operations between sparse and dense matrices.
             - [bsrmm](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/bsrmm/): Showcases a sparse matrix-matrix multiplication using BSR storage format.
             - [bsrsm](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/bsrsm): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix, with solution and right-hand side stored in dense matrices.

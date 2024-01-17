@@ -150,9 +150,9 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 ```
 
 ### rocSPARSE
-- `rocsparse_[dscz]bsrmv_ex(...)` is the solver with four different function signatures depending on the type of the input matrix:
-   - `d` double-precision real (`double`)
+- `rocsparse_[dscz]bsrmv_ex(...)` performs the sparse matrix-dense vector multiplication $\hat{y}=\alpha \cdot A' x + \beta \cdot y$ using the BSR format. The correct function signature should be chosen based on the datatype of the input matrix:
    - `s` single-precision real (`float`)
+   - `d` double-precision real (`double`)
    - `c` single-precision complex (`rocsparse_float_complex`)
    - `z` double-precision complex (`rocsparse_double_complex`)
 
@@ -163,7 +163,7 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 
    Currently, only `rocsparse_operation_none` is supported.
 - `rocsparse_mat_descr`: descriptor of the sparse BSR matrix.
-    
+
 - `rocsparse_direction` block storage major direction with the following options:
    - `rocsparse_direction_column`
    - `rocsparse_direction_row`

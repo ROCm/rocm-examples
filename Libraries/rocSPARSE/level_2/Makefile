@@ -25,9 +25,10 @@ EXAMPLES := \
 	bsrsv \
 	bsrxmv \
 	coomv \
-	ellmv \
 	csrmv \
-	csrsv
+	csrsv \
+	ellmv \
+	gebsrmv
 
 all: $(EXAMPLES)
 
