@@ -105,6 +105,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
             - [csrmm](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/csrmm/): Showcases a sparse matrix-matrix multiplication using CSR storage format.
             - [csrsm](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/csrsm): Showcases how to solve a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix, with solution and right-hand side stored in dense matrices.
             - [gebsrmm](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/gebsrmm/): Showcases a sparse matrix-matrix multiplication using GEBSR storage format.
+            - [gemmi](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/gemmi/): Showcases a dense matrix sparse matrix multiplication using CSR storage format.
         - [preconditioner](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/): Manipulations on sparse matrices to obtain sparse preconditioner matrices.
             - [bsric0](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/bsric0/): Shows how to compute the incomplete Cholesky decomposition of a Hermitian positive-definite sparse BSR matrix.
             - [bsrilu0](https://github.com/amd/rocm-examples/tree/develop/Libraries/rocSPARSE/preconditioner/bsrilu0/): Showcases how to obtain the incomplete LU decomposition of a sparse BSR square matrix.

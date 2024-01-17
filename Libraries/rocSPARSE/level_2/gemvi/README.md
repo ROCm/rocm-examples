@@ -1,4 +1,4 @@
-# rocSPARSE Dense Matrix Sparse Vector Multiplication
+# rocSPARSE Dense Matrix Sparse Vector Multiplication Example
 
 ## Description
 
