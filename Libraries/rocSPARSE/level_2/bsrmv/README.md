@@ -13,8 +13,8 @@ where
 - $A'$ is a sparse matrix in BSR format with `rocsparse_operation` and described below.
 
 ## Application flow
-1. Setup a sparse matrix in BSR format. Allocate an x and a y vector and set up $\alpha$ and $\beta$ scalars.
-2. Setup a handle, a matrix descriptor and a matrix info.
+1. Set up a sparse matrix in BSR format. Allocate an x and a y vector and set up $\alpha$ and $\beta$ scalars.
+2. Set up a handle, a matrix descriptor and a matrix info.
 3. Allocate device memory and copy input matrix and vectors from host to device.
 4. Compute a sparse matrix multiplication, using BSR storage format.
 5. Copy the result vector from device to host.

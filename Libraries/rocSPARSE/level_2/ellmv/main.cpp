@@ -41,23 +41,21 @@ int main()
     //         ( 5.0  6.0  0.0 ) * ( 3.0 )          ( 6.0 ) = (  70.7 )
     //         ( 7.0  0.0  8.0 ) *                  ( 7.0 ) = ( 123.8 )
 
-    // Set up COO matrix
+    // Set up ELL matrix
 
     // Number of rows and columns
     constexpr rocsparse_int m = 4;
     constexpr rocsparse_int n = 3;
 
-    // Number of non-zero elements
-    constexpr rocsparse_int nnz = 8;
+    // ELL width
+    constexpr rocsparse_int ell_width = 2;
 
-    // COO values
-    constexpr std::array<double, nnz> h_coo_val = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    // ELL values
+    constexpr rocsparse_int                    h_ell_length = m * ell_width;
+    constexpr std::array<double, h_ell_length> h_ell_val = {1.0, 3.0, 5.0, 7.0, 2.0, 4.0, 6.0, 8.0};
 
-    // COO row indices
-    constexpr std::array<rocsparse_int, nnz> h_coo_row_ind = {0, 0, 1, 1, 2, 2, 3, 3};
-
-    // COO column indices
-    constexpr std::array<rocsparse_int, nnz> h_coo_col_ind = {0, 2, 0, 2, 0, 1, 0, 2};
+    // ELL column indices
+    constexpr std::array<rocsparse_int, h_ell_length> h_ell_col_ind = {0, 0, 0, 0, 2, 2, 1, 2};
 
     // Transposition of the matrix
     constexpr rocsparse_operation trans = rocsparse_operation_none;
@@ -81,40 +79,36 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
 
     // 3. Offload data to device
-    rocsparse_int* d_coo_row_ind;
-    rocsparse_int* d_coo_col_ind;
-    double*        d_coo_val;
+    rocsparse_int* d_ell_col_ind;
+    double*        d_ell_val;
     double*        d_x;
     double*        d_y;
 
     constexpr size_t x_size   = sizeof(*d_x) * n;
     constexpr size_t y_size   = sizeof(*d_y) * m;
-    constexpr size_t val_size = sizeof(*d_coo_val) * nnz;
-    constexpr size_t ind_size = sizeof(*d_coo_col_ind) * nnz;
+    constexpr size_t val_size = sizeof(*d_ell_val) * h_ell_length;
+    constexpr size_t ind_size = sizeof(*d_ell_col_ind) * h_ell_length;
 
-    HIP_CHECK(hipMalloc((void**)&d_coo_row_ind, ind_size));
-    HIP_CHECK(hipMalloc((void**)&d_coo_col_ind, ind_size));
-    HIP_CHECK(hipMalloc((void**)&d_coo_val, val_size));
+    HIP_CHECK(hipMalloc((void**)&d_ell_col_ind, ind_size));
+    HIP_CHECK(hipMalloc((void**)&d_ell_val, val_size));
     HIP_CHECK(hipMalloc((void**)&d_x, x_size));
     HIP_CHECK(hipMalloc((void**)&d_y, y_size));
 
-    HIP_CHECK(hipMemcpy(d_coo_row_ind, h_coo_row_ind.data(), ind_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_col_ind, h_coo_col_ind.data(), ind_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_val, h_coo_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_ell_col_ind, h_ell_col_ind.data(), ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_ell_val, h_ell_val.data(), val_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
-    // 4. Call coomv to perform y = alpha * A x + beta * y
-    ROCSPARSE_CHECK(rocsparse_dcoomv(handle,
+    // 4. Call ellmv to perform y = alpha * A x + beta * y
+    ROCSPARSE_CHECK(rocsparse_dellmv(handle,
                                      trans,
                                      m,
                                      n,
-                                     nnz,
                                      &alpha,
                                      descr,
-                                     d_coo_val,
-                                     d_coo_row_ind,
-                                     d_coo_col_ind,
+                                     d_ell_val,
+                                     d_ell_col_ind,
+                                     ell_width,
                                      d_x,
                                      &beta,
                                      d_y));
@@ -127,9 +121,8 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(descr));
 
     // 7. Clear device memory
-    HIP_CHECK(hipFree(d_coo_row_ind));
-    HIP_CHECK(hipFree(d_coo_col_ind));
-    HIP_CHECK(hipFree(d_coo_val));
+    HIP_CHECK(hipFree(d_ell_col_ind));
+    HIP_CHECK(hipFree(d_ell_val));
     HIP_CHECK(hipFree(d_x));
     HIP_CHECK(hipFree(d_y));
 

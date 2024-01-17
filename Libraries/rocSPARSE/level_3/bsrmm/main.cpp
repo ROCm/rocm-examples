@@ -32,7 +32,7 @@
 
 int main()
 {
-    // 1. Setup input data
+    // 1. Set up input data
     // Number of rows and columns of the input matrices.
     constexpr rocsparse_int m = 4;
     constexpr rocsparse_int k = 6;
