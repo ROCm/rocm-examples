@@ -89,7 +89,8 @@ int main()
     constexpr rocsparse_operation trans_B = rocsparse_operation_none;
 
     // Initialize a dense matrix C (m x n)
-    const rocsparse_int         ldc = m;
+    // Matrix C elements in column-major
+    constexpr rocsparse_int     ldc = m;
     std::array<double, (m * n)> h_C{};
 
     // Scalar alpha and beta
@@ -149,7 +150,7 @@ int main()
                                      d_C,
                                      ldc));
 
-    // 5. Copy y to host from device.
+    // 5. Copy C to host from device.
     HIP_CHECK(hipMemcpy(h_C.data(), d_C, size_C, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE.

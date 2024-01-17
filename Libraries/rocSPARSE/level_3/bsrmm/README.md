@@ -1,4 +1,4 @@
-# rocSPARSE Level-3 BSR Matrix--Matrix Multiplication
+# rocSPARSE Level-3 BSR Matrix-Matrix Multiplication
 ## Description
 This example illustrates the use of the `rocSPARSE` level 3 sparse matrix-matrix multiplication using BSR storage format.
 
@@ -16,7 +16,7 @@ where
 ## Application flow
 1. Set up a sparse matrix in BSR format. Allocate an $A$ and a $B$ matrix and set up $\alpha$ and $\beta$ scalars.
 2. Set up a handle, a matrix descriptor.
-3. Allocate device memory and copy input matrix from host to device.
+3. Allocate device memory and copy input matrices from host to device.
 4. Compute a sparse matrix multiplication, using BSR storage format.
 5. Copy the result matrix from device to host.
 6. Clear rocSPARSE allocations on device.
