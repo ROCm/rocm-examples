@@ -24,6 +24,7 @@ EXAMPLES := \
 	bsrmv \
 	bsrsv \
 	bsrxmv \
+	coomv \
 	csrmv \
 	csrsv
 
