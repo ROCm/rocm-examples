@@ -186,10 +186,7 @@ int main()
                                    &buffer_size,
                                    temp_buffer));
 
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 7. Copy result from device to host.
+    // 7. Copy result from device to host. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, size_y, hipMemcpyDeviceToHost));
 
     // 8. Free rocSPARSE resources and device memory.

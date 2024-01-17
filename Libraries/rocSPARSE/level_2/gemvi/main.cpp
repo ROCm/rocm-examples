@@ -106,10 +106,15 @@ int main()
     HIP_CHECK(hipMemcpy(d_y, y.data(), sizeof(*d_y) * A_rows, hipMemcpyHostToDevice));
 
     // Obtain buffer size
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(
         rocsparse_dgemvi_buffer_size(handle, trans, A_rows, A_cols, x_non_zero, &buffer_size));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
+    // Allocate temporary buffer.
     void* buffer;
     HIP_CHECK(hipMalloc(&buffer, buffer_size));
 

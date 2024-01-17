@@ -84,10 +84,6 @@ int main()
     // Scalar alpha
     constexpr double alpha = 1.0;
 
-    // Temporary buffer
-    size_t buffer_size   = 0;
-    void*  d_temp_buffer = nullptr;
-
     // Index and data type.
     constexpr rocsparse_indextype index_type = rocsparse_indextype_i32;
     constexpr rocsparse_datatype  data_type  = rocsparse_datatype_f64_r;
@@ -150,6 +146,8 @@ int main()
 
     // 5. Call spsm to solve A' * C = alpha * B'
     // Query the necessary temp buffer size
+    size_t buffer_size;
+    void*  d_temp_buffer{};
     ROCSPARSE_CHECK(rocsparse_spsm(handle,
                                    trans_A,
                                    trans_B,
@@ -162,8 +160,9 @@ int main()
                                    rocsparse_spsm_stage::rocsparse_spsm_stage_buffer_size,
                                    &buffer_size,
                                    d_temp_buffer));
-
-    HIP_CHECK(hipDeviceSynchronize());
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate the temp buffer
     HIP_CHECK(hipMalloc(&d_temp_buffer, buffer_size));
@@ -183,6 +182,7 @@ int main()
                                    d_temp_buffer));
 
     // Compute the solution.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_spsm(handle,
                                    trans_A,
                                    trans_B,
@@ -196,9 +196,7 @@ int main()
                                    &buffer_size,
                                    d_temp_buffer));
 
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 6. Copy C to host from device
+    // 6. Copy C to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_X.data(), d_X, size_X, hipMemcpyDeviceToHost));
 
     // 7. Clear rocSPARSE

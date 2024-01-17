@@ -145,6 +145,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
 
     // 5. Call gebsrmv to perform y = alpha * A * x + beta * y.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dgebsrmv(handle,
                                        dir,
                                        trans,
@@ -162,7 +163,7 @@ int main()
                                        &beta,
                                        d_y));
 
-    // 6. Copy solution to host from device.
+    // 6. Copy solution to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 7. Clear rocSPARSE allocations on device.

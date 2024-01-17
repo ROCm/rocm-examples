@@ -152,7 +152,7 @@ int main()
                                      &beta,
                                      d_y));
 
-    // 5. Copy y to host from device
+    // 5. Copy y to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE

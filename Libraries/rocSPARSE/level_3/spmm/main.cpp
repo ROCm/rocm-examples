@@ -154,7 +154,6 @@ int main()
     // Obtain required buffer size in bytes for analysis and solve stages.
     // This stage is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
-
     ROCSPARSE_CHECK(rocsparse_spmm(handle,
                                    trans_A,
                                    trans_B,
@@ -168,9 +167,9 @@ int main()
                                    rocsparse_spmm_stage_buffer_size,
                                    &buffer_size,
                                    nullptr));
-
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // 6. Analysis.
     // Allocate temporary buffer.
@@ -208,10 +207,7 @@ int main()
                                    &buffer_size,
                                    temp_buffer));
 
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 8. Copy C to host from device.
+    // 8. Copy C to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_C.data(), d_C, size_C, hipMemcpyDeviceToHost));
 
     // 9. Clear rocSPARSE.

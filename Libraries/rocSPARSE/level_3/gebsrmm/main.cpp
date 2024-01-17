@@ -151,6 +151,7 @@ int main()
     HIP_CHECK(hipMemcpy(d_C, h_C.data(), size_C, hipMemcpyHostToDevice));
 
     // 4. Call gebsrmm to perform C = alpha * A' * B' + beta * C
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dgebsrmm(handle,
                                        dir,
                                        trans_A,
@@ -172,7 +173,7 @@ int main()
                                        d_C,
                                        m_padded));
 
-    // 5. Copy C to host from device
+    // 5. Copy C to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_C.data(), d_C, size_C, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE

@@ -121,6 +121,7 @@ int main()
 
     // 4. Prepare device for rocSPARSE SpSV invocation.
     // Obtain required buffer size in bytes for analysis and solve stages.
+    // This stage is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_spsv(handle,
                                    trans,
@@ -133,6 +134,9 @@ int main()
                                    rocsparse_spsv_stage_buffer_size,
                                    &buffer_size,
                                    nullptr));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // 5. Analysis.
     // Allocate temporary buffer.
@@ -153,6 +157,7 @@ int main()
                                    temp_buffer));
 
     // 6. Perform triangular solve Ay = alpha * x.
+    // This stage is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_spsv(handle,
                                    trans,
                                    &alpha,
@@ -165,7 +170,7 @@ int main()
                                    &buffer_size,
                                    temp_buffer));
 
-    // 7. Copy result from device to host.
+    // 7. Copy result from device to host. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, sizeof(*d_y) * n, hipMemcpyDeviceToHost));
 
     // 8. Free rocSPARSE resources and device memory.

@@ -131,6 +131,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&mat_B_desc));
 
     // 4. Perform the computation.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dgemmi(handle,
                                      trans_A,
                                      trans_B,
@@ -149,10 +150,7 @@ int main()
                                      d_C,
                                      m));
 
-    // Synchronize with device as rocsparse_dgemmi is non-blocking.
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 5. Copy result from device.
+    // 5. Copy result from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_C.data(), d_C, C_size, hipMemcpyDeviceToHost));
 
     // Print solution and compare with expected results.

@@ -172,6 +172,7 @@ int main()
     constexpr rocsparse_solve_policy solve_policy = rocsparse_solve_policy_auto;
 
     // Obtain required buffer size.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dbsrsm_buffer_size(handle,
                                                  dir,
@@ -187,6 +188,9 @@ int main()
                                                  bsr_dim,
                                                  info,
                                                  &buffer_size));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate temporary buffer.
     void* temp_buffer{};

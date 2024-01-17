@@ -4,6 +4,10 @@
 
 The examples in this subdirectory showcase the functionality of the [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE) library. The examples build on both Linux and Windows for both the ROCm (AMD GPU) and CUDA (NVIDIA GPU) backend.
 
+## Note on asynchronous execution
+
+All rocSPARSE library functions, unless otherwise stated, are non blocking and executed asynchronously with respect to the host. They may return before the actual computation has finished. For more information see the [rocSPARSE documentation](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/basics.html#asynchronous-execution).
+
 ## Prerequisites
 
 ### Linux

@@ -159,6 +159,7 @@ int main()
     constexpr rocsparse_solve_policy solve_policy = rocsparse_solve_policy_auto;
 
     // Obtain required buffer size.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dcsrsm_buffer_size(handle,
                                                  trans_A,
@@ -176,9 +177,9 @@ int main()
                                                  info,
                                                  solve_policy,
                                                  &buffer_size));
-    // No synchronization with the device is needed because, for scalar results, when using host
+    // No synchronization with the device is needed because for scalar results, when using host
     // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
-    // the results back to the host.
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate temporary buffer.
     void* temp_buffer{};
@@ -209,6 +210,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_identity_permutation(handle, nnz, perm));
 
     // Query the required buffer size in bytes and allocate a temporary buffer for sorting.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t sort_buffer_size;
     void*  sort_temp_buffer{};
     ROCSPARSE_CHECK(rocsparse_csrsort_buffer_size(handle,
@@ -218,9 +220,9 @@ int main()
                                                   d_csr_row_ptr,
                                                   d_csr_col_ind,
                                                   &sort_buffer_size));
-    // No synchronization with the device is needed because, for scalar results, when using host
+    // No synchronization with the device is needed because for scalar results, when using host
     // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
-    // the results back to the host.
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     HIP_CHECK(hipMalloc(&sort_temp_buffer, sort_buffer_size));
 
@@ -239,6 +241,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_dgthr(handle, nnz, d_csr_val, d_csr_val, perm, idx_base));
 
     // 7. Call to rocSPARSE csrsm to solve the linear system.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dcsrsm_solve(handle,
                                            trans_A,
                                            trans_B,
@@ -256,11 +259,11 @@ int main()
                                            solve_policy,
                                            temp_buffer));
 
-    // Synchronize with device because rocsparse_dcsrsm_solve is non-blocking.
-    HIP_CHECK(hipDeviceSynchronize());
-
     // 8. Check results.
     // Check for zero pivots.
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
     rocsparse_int    pivot_position;
     rocsparse_status csrsm_status = rocsparse_csrsm_zero_pivot(handle, info, &pivot_position);
 

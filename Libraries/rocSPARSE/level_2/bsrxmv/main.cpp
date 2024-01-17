@@ -143,6 +143,7 @@ int main()
     HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
     // 4. Call masked matrix-vector multiplication.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dbsrxmv(handle,
                                       dir,
                                       trans,
@@ -162,7 +163,7 @@ int main()
                                       &beta,
                                       d_y));
 
-    // 5. Copy y to host from device.
+    // 5. Copy y to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 6. Free rocSPARSE resources and device memory.
