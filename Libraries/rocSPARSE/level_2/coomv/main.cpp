@@ -92,11 +92,11 @@ int main()
     constexpr size_t val_size = sizeof(*d_coo_val) * nnz;
     constexpr size_t ind_size = sizeof(*d_coo_col_ind) * nnz;
 
-    HIP_CHECK(hipMalloc((void**)&d_coo_row_ind, ind_size));
-    HIP_CHECK(hipMalloc((void**)&d_coo_col_ind, ind_size));
-    HIP_CHECK(hipMalloc((void**)&d_coo_val, val_size));
-    HIP_CHECK(hipMalloc((void**)&d_x, x_size));
-    HIP_CHECK(hipMalloc((void**)&d_y, y_size));
+    HIP_CHECK(hipMalloc(&d_coo_row_ind, ind_size));
+    HIP_CHECK(hipMalloc(&d_coo_col_ind, ind_size));
+    HIP_CHECK(hipMalloc(&d_coo_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, x_size));
+    HIP_CHECK(hipMalloc(&d_y, y_size));
 
     HIP_CHECK(hipMemcpy(d_coo_row_ind, h_coo_row_ind.data(), ind_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_coo_col_ind, h_coo_col_ind.data(), ind_size, hipMemcpyHostToDevice));

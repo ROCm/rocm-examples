@@ -89,10 +89,10 @@ int main()
     constexpr size_t val_size = sizeof(*d_ell_val) * h_ell_length;
     constexpr size_t ind_size = sizeof(*d_ell_col_ind) * h_ell_length;
 
-    HIP_CHECK(hipMalloc((void**)&d_ell_col_ind, ind_size));
-    HIP_CHECK(hipMalloc((void**)&d_ell_val, val_size));
-    HIP_CHECK(hipMalloc((void**)&d_x, x_size));
-    HIP_CHECK(hipMalloc((void**)&d_y, y_size));
+    HIP_CHECK(hipMalloc(&d_ell_col_ind, ind_size));
+    HIP_CHECK(hipMalloc(&d_ell_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, x_size));
+    HIP_CHECK(hipMalloc(&d_y, y_size));
 
     HIP_CHECK(hipMemcpy(d_ell_col_ind, h_ell_col_ind.data(), ind_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_ell_val, h_ell_val.data(), val_size, hipMemcpyHostToDevice));
