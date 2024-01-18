@@ -13,7 +13,7 @@ This library currently supports two paths for lowering:
 2. Dynamo Backend: Importing torch_migraphx automatically registers the "migraphx" backend that can be used with the `torch.compile` API.
 
 
-## Getting Started
+## Getting started
 ### Docker
 The simplest and recommended way to get started is using the provided Dockerfile.
 Build using:
@@ -27,7 +27,7 @@ sudo docker run -it --network=host --device=/dev/kfd --device=/dev/dri --group-a
 
 The default Dockerfile builds on the nightly pytorch container and installs the latest source version of MIGraphX and torch_migraphx. For more builds refer to the docker directory.
 
-### Installing from Source
+### Installing from source
 Install Pre-reqs:
 - [PyTorch (ROCM version)](https://rocm.docs.amd.com/projects/install-on-linux/en/develop/how-to/3rd-party/pytorch-install.html#using-a-wheels-package)
 - [MIGraphX](https://github.com/ROCm/AMDMIGraphX?tab=readme-ov-file#installing-from-binaries)
@@ -40,7 +40,7 @@ export TORCH_CMAKE_PATH=$(python -c "import torch; print(torch.utils.cmake_prefi
 pip install .
 ```
 
-## Example Usage
+## Example usage
 ```
 # FX Tracing
 torch_migraphx.fx.lower_to_mgx(torch_model, sample_inputs)
