@@ -1,6 +1,6 @@
 # rocSPARSE Level 2 Matrix-Vector Multiplication Example
 ## Description
-This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector multiplication with a chosen sparse format (see: `rocsparse_spmv_ex()` in [Key APIs and Concepts/rocSPARSE](#rocsparse)).
+This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector multiplication with a chosen sparse format (see: `rocsparse_spmv()` in [Key APIs and Concepts/rocSPARSE](#rocsparse)).
 
 The operation calculates the following product:
 
@@ -32,7 +32,7 @@ where
     - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
     - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$.
 
-- `rocsparse_spmv_ex()` solves a sparse matrix-vector product in the following formats: BELL, BSR, COO, COO AoS, CSR, CSC and ELL.
+- `rocsparse_spmv()` solves a sparse matrix-vector product in the following formats: BELL, BSR, COO, COO AoS, CSR, CSC and ELL.
 
 - `rocsparse_datatype`: data type of rocSPARSE vector and matrix elements.
     - `rocsparse_datatype_f32_r`: real 32-bit floating point type
