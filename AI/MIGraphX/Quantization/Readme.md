@@ -27,7 +27,7 @@ sudo docker run -it --network=host --device=/dev/kfd --device=/dev/dri --group-a
 
 The default Dockerfile builds on the nightly pytorch container and installs the latest source version of MIGraphX and torch_migraphx. For more builds refer to the docker directory.
 
-### Install From Source
+### Installing from Source
 Install Pre-reqs:
 - [PyTorch (ROCM version)](https://rocm.docs.amd.com/projects/install-on-linux/en/develop/how-to/3rd-party/pytorch-install.html#using-a-wheels-package)
 - [MIGraphX](https://github.com/ROCm/AMDMIGraphX?tab=readme-ov-file#installing-from-binaries)
