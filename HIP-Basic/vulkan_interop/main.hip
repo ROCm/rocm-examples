@@ -141,7 +141,7 @@ struct uuid
         // Note: function is 0 anyway.
 
         return result;
-#elif defined(__HIP_PLATFORM_NVCC__)
+#elif defined(__HIP_PLATFORM_NVIDIA__)
         // Work around a compile error related to hipDeviceGetUuid when compiling for NVIDIA:
         // "undefined reference to `cuDeviceGetUuid'"
         // \see https://github.com/ROCm-Developer-Tools/hipamd/issues/51.
