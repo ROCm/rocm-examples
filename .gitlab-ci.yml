@@ -222,6 +222,10 @@ test:cuda:
   extends:
     - .test
     - .gpus:nvcc
+  before_script:
+    - export HIP_COMPILER=nvcc
+    - export HIP_PLATFORM=nvidia
+    - export HIP_RUNTIME=cuda
   needs:
     - build:cmake-cuda
 
