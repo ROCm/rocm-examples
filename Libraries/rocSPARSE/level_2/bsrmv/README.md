@@ -150,7 +150,7 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 ```
 
 ### rocSPARSE
-- `rocsparse_[dscz]bsrmv_ex(...)` performs the sparse matrix-dense vector multiplication $\hat{y}=\alpha \cdot A' x + \beta \cdot y$ using the BSR format. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[dscz]bsrmv(...)` performs the sparse matrix-dense vector multiplication $\hat{y}=\alpha \cdot A' x + \beta \cdot y$ using the BSR format. The correct function signature should be chosen based on the datatype of the input matrix:
    - `s` single-precision real (`float`)
    - `d` double-precision real (`double`)
    - `c` single-precision complex (`rocsparse_float_complex`)
