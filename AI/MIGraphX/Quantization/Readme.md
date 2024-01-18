@@ -1,4 +1,10 @@
-# Torch-MIGraphX
+
+# MIGraphX - Torch Examples
+
+## Summary
+The examples in this subdirectory showcase the functionality of the [MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/tree/master) library. The examples build on Linux for the ROCm (AMD GPU) backend.
+
+### Torch-MIGraphX
 
 Torch-MIGraphX integrates AMD's graph inference engine with the PyTorch ecosystem. It provides a `mgx_module` object that may be invoked in the same manner as any other torch module, but utilizes the MIGraphX inference engine internally. 
 
