@@ -28,7 +28,8 @@ torch_fp32_out = model_fp32(input_fp32)
 ```
 
 The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
-Note: Currently, there is a known issue when using only kwargs as inputs. See: pytorch/pytorch#113744 for more information.
+
+Note: Currently, there is a known issue when using only kwargs as inputs. See pytorch/pytorch#113744 for more information.
 
 ```
 model_export = capture_pre_autograd_graph(model_fp32, (input_fp32, ))
@@ -38,6 +39,7 @@ Torch-MIGraphX provides a custom Quantizer for performing quantization that is c
 
 Note: Additional configs will also work as long as the configs ensure symmetric quantization using the signed int8 datatype. Currently, only symmetric quantization is supported in MIGraphX.
 
+```
 quantizer = MGXQuantizer()
 m = prepare_pt2e(model_export, quantizer)
 # psudo calibrate
@@ -46,14 +48,18 @@ with torch.no_grad():
         m(torch.randn(2, 3, 28, 28))
 q_m = convert_pt2e(m)
 torch_qout = q_m(input_fp32)
+```
+
 2. Lower Quantized model to MIGraphX
 This step is the same as lowering any other model using torch.compile!
-
+```
 mgx_mod = torch.compile(q_m, backend='migraphx').cuda()
 mgx_out = mgx_mod(input_fp32.cuda())
 print(f"PyTorch FP32 (Gold Value):\n{torch_fp32_out}")
 print(f"PyTorch INT8 (Fake Quantized):\n{torch_qout}")
 print(f"MIGraphX INT8:\n{mgx_out}")
+```
+
 3. Performance
 Let’s do a quick test to measure the performance gain from using quantization. Note that these performance gains (or lack of gains) will vary depending on the specific hardware in use.
 
