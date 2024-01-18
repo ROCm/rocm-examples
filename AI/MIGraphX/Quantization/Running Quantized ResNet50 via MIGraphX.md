@@ -19,15 +19,20 @@ from torch._export import capture_pre_autograd_graph
 from torch.ao.quantization.quantize_pt2e import prepare_pt2e, convert_pt2e
 ```
 
-import torch_migraphx
+```import torch_migraphx
 from torch_migraphx.dynamo.quantization import MGXQuantizer
 model_fp32 = models.resnet50(weights=models.ResNet50_Weights.IMAGENET1K_V1).eval()
 input_fp32 = torch.randn(2, 3, 28, 28)
 
 torch_fp32_out = model_fp32(input_fp32)
-The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. Currently there is a known issue when using only kwargs as inputs. See: pytorch/pytorch#113744
+```
 
+The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
+Note: Currently, there is a known issue when using only kwargs as inputs. See: pytorch/pytorch#113744 for more information.
+
+```
 model_export = capture_pre_autograd_graph(model_fp32, (input_fp32, ))
+```
 Use the pt2e API to prepare, calibrate, and convert the model
 Torch-MIGraphX provides a custom Quantizer for performing quantization that is compatible with MIGraphX.
 
