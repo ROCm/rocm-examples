@@ -9,7 +9,7 @@ This example walks through the dynamo Post Training Quantization (PTQ) workflow 
 
 Prerequisites
 --------------
-You must follow the installation instructions in [Readme.md] before using this example.
+You must follow the installation instructions in [Readme.md](https://github.com/Rmalavally/rocm-examples/blob/develop/AI/MIGraphX/Quantization/Readme.md) before using this example.
 
 
 
