@@ -172,7 +172,7 @@ build:cmake-cuda:
      -D GPU_RUNTIME=CUDA
      -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
      -D CMAKE_CUDA_FLAGS="$CUDA_FLAGS"
-     -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake
+     -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip
      2>&1 | tee cmake_log.txt
    # check if all dependencies were found
    - |-
