@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32630.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spitsv_vs2019", "spitsv_vs2019.vcxproj", "{E92723FC-411A-4656-9C0F-88D5D9F01EBD}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E92723FC-411A-4656-9C0F-88D5D9F01EBD}.Debug|x64.ActiveCfg = Debug|x64
+		{E92723FC-411A-4656-9C0F-88D5D9F01EBD}.Debug|x64.Build.0 = Debug|x64
+		{E92723FC-411A-4656-9C0F-88D5D9F01EBD}.Release|x64.ActiveCfg = Release|x64
+		{E92723FC-411A-4656-9C0F-88D5D9F01EBD}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {83525873-59D2-45B6-8E6D-389396D22C29}
+	EndGlobalSection
+EndGlobal

@@ -160,9 +160,6 @@ int main()
                                                 solve_policy,
                                                 temp_buffer));
 
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
-
     // 6. Perform triangular solve A' y = alpha * x.
     ROCSPARSE_CHECK(rocsparse_dcsritsv_solve(handle,
                                              &iter_counter,

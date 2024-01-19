@@ -100,6 +100,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
       - [ellmv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/ellmv/): Showcases a sparse matrix-vector multiplication using ELL storage format.
       - [gebsrmv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/gebsrmv/): Showcases a sparse matrix-dense vector multiplication using GEBSR storage format.
       - [gemvi](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/gemvi/): Showcases a dense matrix-sparse vector multiplication.
+      - [spitsv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/spitsv/): Showcases how to solve iteratively a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
       - [spmv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/spmv/): Showcases a general sparse matrix-dense vector multiplication.
       - [spsv](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_2/spsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a sparse triangular matrix.
     - [level_3](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSPARSE/level_3/): Operations between sparse and dense matrices.

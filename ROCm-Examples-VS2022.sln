@@ -234,6 +234,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gtsv_vs2022", "Libraries\ro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csritsv_vs2022", "Libraries\rocSPARSE\level_2\csritsv\csritsv_vs2022.vcxproj", "{DC1DF216-BC97-4797-8EA7-8DDCC38DFDCF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spitsv_vs2022", "Libraries\rocSPARSE\level_2\spitsv\spitsv_vs2022.vcxproj", "{A987BF4A-988D-410A-B3EF-1140AEA10960}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -632,6 +634,10 @@ Global
 		{DC1DF216-BC97-4797-8EA7-8DDCC38DFDCF}.Debug|x64.Build.0 = Debug|x64
 		{DC1DF216-BC97-4797-8EA7-8DDCC38DFDCF}.Release|x64.ActiveCfg = Release|x64
 		{DC1DF216-BC97-4797-8EA7-8DDCC38DFDCF}.Release|x64.Build.0 = Release|x64
+		{A987BF4A-988D-410A-B3EF-1140AEA10960}.Debug|x64.ActiveCfg = Debug|x64
+		{A987BF4A-988D-410A-B3EF-1140AEA10960}.Debug|x64.Build.0 = Debug|x64
+		{A987BF4A-988D-410A-B3EF-1140AEA10960}.Release|x64.ActiveCfg = Release|x64
+		{A987BF4A-988D-410A-B3EF-1140AEA10960}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -749,6 +755,7 @@ Global
 		{107AC26F-A20D-4B25-81DE-AFCDCDECBFFC} = {C735FFA9-12E1-4BEF-87B2-8891A3006505}
 		{3F19C0A7-CD2E-438C-88B1-9AF2F8B63B8E} = {0AFB7E3F-4173-4F47-A068-17CAB93DA563}
 		{DC1DF216-BC97-4797-8EA7-8DDCC38DFDCF} = {F91F4254-0ADD-4955-BDFE-53CB4EDBF601}
+		{A987BF4A-988D-410A-B3EF-1140AEA10960} = {F91F4254-0ADD-4955-BDFE-53CB4EDBF601}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}
