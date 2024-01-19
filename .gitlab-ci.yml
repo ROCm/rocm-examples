@@ -30,7 +30,9 @@ include:
       - /rules.yaml
 
 variables:
-  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror --Werror all-warnings"
+  # Removed -Werror --Werror all-warnings flags due to warnings appearing with
+  # the new release of ROCm (ROCm6.0) for CUDA backend
+  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra"
   # We require '-Wno-unused-command-line-argument' due to the followiwng warning:
   #   argument unused during compilation: '--rtlib=compiler-rt'
   CXX_FLAGS: "-Wno-unused-command-line-argument -Wall -Wextra -Werror"
