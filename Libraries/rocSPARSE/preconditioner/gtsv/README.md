@@ -19,7 +19,7 @@ $$\begin{pmatrix}
   0      & \cdots & 0      & 0       & 0       & l_m     & d_m
 \end{pmatrix}$$
 
-- $B$ is dense right hand side matrix
+- $B$ is dense right hand side matrix.
 - $X$ is the dense solution matrix.
 
 ### Application flow
@@ -38,7 +38,7 @@ The components of the tridiagonal system are stored in length $m$ vectors:
 
 - upper diagonal with last elements 0: $\mathbf{u} = (u_0, u_1, \dots, u_{m-1}, 0)$
 - main diagonal: $\mathbf{d} = (d_0, d_1, \dots, d_{m-1}, d_m)$
-- lower diagonal with first elements 0: $\mathbf{d} = (0, l_1, \dots, l_{m-1}, l_m)$
+- lower diagonal with first elements 0: $\mathbf{l} = (0, l_1, \dots, l_{m-1}, l_m)$
 
 ### rocSPARSE
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.

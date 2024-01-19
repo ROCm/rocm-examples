@@ -236,6 +236,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "csritsv_vs2019", "Libraries
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spitsv_vs2019", "Libraries\rocSPARSE\level_2\spitsv\spitsv_vs2019.vcxproj", "{E92723FC-411A-4656-9C0F-88D5D9F01EBD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "gpsv_vs2019", "Libraries\rocSPARSE\preconditioner\gpsv\gpsv_vs2019.vcxproj", "{17E97A94-213D-413B-A2EB-0164CEEFDEFC}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -638,6 +640,10 @@ Global
 		{E92723FC-411A-4656-9C0F-88D5D9F01EBD}.Debug|x64.Build.0 = Debug|x64
 		{E92723FC-411A-4656-9C0F-88D5D9F01EBD}.Release|x64.ActiveCfg = Release|x64
 		{E92723FC-411A-4656-9C0F-88D5D9F01EBD}.Release|x64.Build.0 = Release|x64
+		{17E97A94-213D-413B-A2EB-0164CEEFDEFC}.Debug|x64.ActiveCfg = Debug|x64
+		{17E97A94-213D-413B-A2EB-0164CEEFDEFC}.Debug|x64.Build.0 = Debug|x64
+		{17E97A94-213D-413B-A2EB-0164CEEFDEFC}.Release|x64.ActiveCfg = Release|x64
+		{17E97A94-213D-413B-A2EB-0164CEEFDEFC}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -757,6 +763,7 @@ Global
 		{65A27F2B-C070-4FDD-93EC-0DFEA35C2E53} = {8B7AD0F4-4288-4ACF-9980-3C500A00EF31}
 		{99A25D0A-93FE-47F2-8223-7313E53E7951} = {F0B0FD83-2B22-47F8-92B1-7A5ED88B8B5E}
 		{E92723FC-411A-4656-9C0F-88D5D9F01EBD} = {F0B0FD83-2B22-47F8-92B1-7A5ED88B8B5E}
+		{17E97A94-213D-413B-A2EB-0164CEEFDEFC} = {8B7AD0F4-4288-4ACF-9980-3C500A00EF31}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
