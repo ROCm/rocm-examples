@@ -90,14 +90,16 @@ RUN wget https://github.com/ROCm/hipSOLVER/archive/refs/tags/rocm-6.0.0.tar.gz \
     && rm -rf ./hipSOLVER-rocm-6.0.0
 
 # Install hipRAND
-RUN wget https://github.com/ROCm/hipRAND/archive/refs/tags/rocm-6.0.0.tar.gz \
-    && tar -xf ./rocm-6.0.0.tar.gz \
-    && rm ./rocm-6.0.0.tar.gz \
-    && cmake -S ./hipRAND-rocm-6.0.0 -B ./hipRAND-rocm-6.0.0/build \
+# Build from commit that removes deprecated macro use
+RUN git clone https://github.com/ROCm/hipRAND.git hipRAND-rocm-6.0.0 \
+    && cd hipRAND-rocm-6.0.0 \
+    && git reset --hard  4925f0da96fad5b9f532ddc79f1f52fc279d329f \
+    && cmake -S . -B ./build \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
         -D BUILD_WITH_LIB=CUDA \
-    && cmake --build ./hipRAND-rocm-6.0.0/build --target install \
+    && cmake --build ./build --target install \
+    && cd .. \
     && rm -rf ./hipRAND-rocm-6.0.0
 
 # Install hipFFT
