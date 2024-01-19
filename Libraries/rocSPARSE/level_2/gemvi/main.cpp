@@ -144,12 +144,7 @@ int main()
     HIP_CHECK(hipFree(buffer));
 
     // 7. Print results
-    std::cout << "y':";
-    for(int i = 0; i < A_rows; ++i)
-    {
-        std::cout << " " << y_accent[i];
-    }
-    std::cout << std::endl;
+    std::cout << "y = " << format_range(std::begin(y_prime), std::end(y_prime)) << std::endl;
 
     return 0;
 }

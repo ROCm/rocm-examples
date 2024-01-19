@@ -80,9 +80,9 @@ int main()
     rocsparse_int* d_coo_row_ind{};
     rocsparse_int* d_coo_col_ind{};
 
-    const size_t size_val    = sizeof(*d_coo_val) * nnz;
-    const size_t size_ind    = sizeof(*d_coo_row_ind) * nnz;
-    const size_t size_vector = sizeof(*d_x) * n;
+    constexpr size_t size_val    = sizeof(*d_coo_val) * nnz;
+    constexpr size_t size_ind    = sizeof(*d_coo_row_ind) * nnz;
+    constexpr size_t size_vector = sizeof(*d_x) * n;
 
     HIP_CHECK(hipMalloc(&d_x, size_vector));
     HIP_CHECK(hipMalloc(&d_y, size_vector));
