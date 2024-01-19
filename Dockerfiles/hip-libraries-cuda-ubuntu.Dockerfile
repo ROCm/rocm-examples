@@ -1,5 +1,5 @@
 # CUDA based docker image
-FROM nvidia/cuda:11.8.0-devel-ubuntu20.04
+FROM nvidia/cuda:12.0.0-devel-ubuntu20.04
 
 # Base packages that are required for the installation
 RUN export DEBIAN_FRONTEND=noninteractive; \
@@ -52,6 +52,7 @@ RUN wget https://github.com/ROCm/rocRAND/archive/refs/tags/rocm-6.0.0.tar.gz \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D BUILD_HIPRAND=OFF \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
+        -D NVGPU_TARGETS="50" \
     && cmake --build ./rocRAND-rocm-6.0.0/build --target install \
     && rm -rf ./rocRAND-rocm-6.0.0
 
@@ -98,6 +99,7 @@ RUN git clone https://github.com/ROCm/hipRAND.git hipRAND-rocm-6.0.0 \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
         -D BUILD_WITH_LIB=CUDA \
+        -D NVGPU_TARGETS="50" \
     && cmake --build ./build --target install \
     && cd .. \
     && rm -rf ./hipRAND-rocm-6.0.0
