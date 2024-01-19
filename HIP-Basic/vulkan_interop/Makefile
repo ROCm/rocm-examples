@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,9 +26,12 @@ GPU_RUNTIME := HIP
 
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
+CUDA_INSTALL_DIR := /usr/local/cuda
+
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 # Common variables and flags
 CXX_STD    := c++17
@@ -40,9 +43,12 @@ IGLSLFLAGS := -V100
 
 ifeq ($(GPU_RUNTIME), CUDA)
 	ICXXFLAGS += -x cu
-	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
+	COMPILER := $(CUDACXX)
 else ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
+	ICXXFLAGS ?= -Wall -Wextra
+	ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+	COMPILER := $(HIPCXX)
 else
 	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
@@ -54,7 +60,7 @@ ILDLIBS    += $(LDLIBS)
 IGLSLFLAGS += $(GLSLFLAGS)
 
 $(EXAMPLE): main.hip vulkan_utils.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp sinewave.frag.spv.h sinewave.vert.spv.h
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip vulkan_utils.hip $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip vulkan_utils.hip $(ILDLIBS)
 
 sinewave.vert.spv.h: sinewave.vert
 	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn sinewave_vert
