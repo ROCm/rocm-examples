@@ -48,11 +48,12 @@ This library currently supports two paths for lowering:
 ## Getting started
 ### Docker
 The simplest and recommended way to get started is using the provided Dockerfile.
-Build using:
+
+1. Build using:
 ```
 ./build_image.sh
 ```
-Start container using:
+2. Start container using:
 ```
 sudo docker run -it --network=host --device=/dev/kfd --device=/dev/dri --group-add=video --ipc=host --cap-add=SYS_PTRACE --security-opt seccomp=unconfined torch_migraphx
 ```
@@ -60,7 +61,9 @@ sudo docker run -it --network=host --device=/dev/kfd --device=/dev/dri --group-a
 The default Dockerfile builds on the nightly pytorch container and installs the latest source version of MIGraphX and torch_migraphx. For more builds refer to the docker directory.
 
 ### Installing from source
-Install Pre-reqs:
+
+Install Prerequisites:
+
 - [PyTorch (ROCM version)](https://rocm.docs.amd.com/projects/install-on-linux/en/develop/how-to/3rd-party/pytorch-install.html#using-a-wheels-package)
 - [MIGraphX](https://github.com/ROCm/AMDMIGraphX?tab=readme-ov-file#installing-from-binaries)
 
