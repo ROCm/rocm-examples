@@ -1,6 +1,6 @@
 
 
-# Running Quantized ResNet50 via MIGraphX
+# Running quantized ResNet50 via MIGraphX
 
 ## Summary
 This example walks through the dynamo Post Training Quantization (PTQ) workflow for running a quantized model using torch_migraphx.
@@ -58,7 +58,7 @@ print(f"MIGraphX INT8:\n{mgx_out}")
 ```
 
 3. Performance
-Let’s do a quick test to measure the performance gain from using quantization.
+Do a quick test to measure the performance gain from using quantization.
 
 ```
 import copy
