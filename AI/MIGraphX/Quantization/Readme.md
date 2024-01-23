@@ -9,16 +9,25 @@ The examples in this subdirectory showcase the functionality of the [MIGraphX](h
 Quantization is an optimization tool that is commonly used to accelerate inferencing for deep learning models. There are many flavors of quantization. In the examples here, we show how the ROCm stack can be used to accelerate inference using [INT8 quantization](https://arxiv.org/pdf/1712.05877.pdf) on pretrained models. 
 
 The quantization workflow consists of two main steps:
+
     1. Generate quantization parameters 
+    
     2. Convert relevant operations in the model's computational graph to use the quantized datatype
 
 ### Generating Quantization Parameters
+
 There are 3 main methods for computing quantization parameters:
+
     1. Dynamic Quantization:
+    
         ○ Model weights are pre-quantized , input/activation quantization parameters are computed dynamically at runtime
+        
     2. Static Post Training Quantization (PTQ):
+    
         ○ Quantization parameters are computed via calibration. Calibration involves calculating statistical attributes for relevant model nodes using provided sample input data
+        
     3. Static Quantization Aware Training (QAT):
+    
         ○ Quantization parameters are calibrated during the training process
 
 All 3 of these techniques are supported by PyTorch (at least in a prototype form), and so the examples leverage PyTorch's quantization APIs to perform this step.
