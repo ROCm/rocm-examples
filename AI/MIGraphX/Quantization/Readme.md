@@ -4,7 +4,7 @@
 # Summary
 The examples in this subdirectory showcase the functionality of the [MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/tree/master) library. The examples build on Linux for the ROCm (AMD GPU) backend.
 
-##Introduction
+## Introduction
 
 Quantization is an optimization tool that is commonly used to accelerate inferencing for deep learning models. There are many flavors of quantization. In the examples here, we show how the ROCm stack can be used to accelerate inference using [INT8 quantization](https://arxiv.org/pdf/1712.05877.pdf) on pretrained models. 
 
