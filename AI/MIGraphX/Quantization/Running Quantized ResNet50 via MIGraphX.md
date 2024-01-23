@@ -27,16 +27,16 @@ input_fp32 = torch.randn(2, 3, 28, 28)
 torch_fp32_out = model_fp32(input_fp32)
 ```
 
-    The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
+The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
 
-    *Note*: Currently, there is a known issue when using only kwargs as inputs. See pytorch/pytorch#113744 for more information.
+**Note**: Currently, there is a known issue when using only kwargs as inputs. See pytorch/pytorch#113744 for more information.
 
 ```
 model_export = capture_pre_autograd_graph(model_fp32, (input_fp32, ))
 ```
 Use the pt2e API to prepare, calibrate, and convert the model. Torch-MIGraphX provides a custom Quantizer for performing quantization that is compatible with MIGraphX.
 
-*Note*: Additional configs will also work as long as the configs ensure symmetric quantization using the signed int8 datatype. Currently, only symmetric quantization is supported in MIGraphX.
+**Note**: Additional configs will also work as long as the configs ensure symmetric quantization using the signed int8 datatype. Currently, only symmetric quantization is supported in MIGraphX.
 
 ```
 quantizer = MGXQuantizer()
