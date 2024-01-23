@@ -18,15 +18,15 @@ The quantization workflow consists of two main steps:
 
 There are 3 main methods for computing quantization parameters:
 
-    1. Dynamic Quantization:
+- Dynamic Quantization:
     
         ○ Model weights are pre-quantized , input/activation quantization parameters are computed dynamically at runtime
         
-    2. Static Post Training Quantization (PTQ):
+- Static Post Training Quantization (PTQ):
     
         ○ Quantization parameters are computed via calibration. Calibration involves calculating statistical attributes for relevant model nodes using provided sample input data
         
-    3. Static Quantization Aware Training (QAT):
+- Static Quantization Aware Training (QAT):
     
         ○ Quantization parameters are calibrated during the training process
 
