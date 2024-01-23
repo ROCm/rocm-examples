@@ -30,7 +30,9 @@ There are 3 main methods for computing quantization parameters:
 All 3 of these techniques are supported by PyTorch (at least in a prototype form), and so the examples leverage PyTorch's quantization APIs to perform this step.
 
 ### Converting and Executing the Quantized Model
-As of the latest PyTorch release, there is no support for executing quantized models on GPUs directly through the framework. To execute these quantized models we use AMD's graph optimizer, MIGraphX, which is built using the rocm stack. The [torch_migraphx](https://github.com/ROCmSoftwarePlatform/torch_migraphx) library provides a friendly interface for optimizing PyTorch models using the MIGraphX graph optimizer. The examples show how to use this library to convert and execute PyTorch quantized models on GPUs using MIGraphX.
+As of the latest PyTorch release, there is no support for executing quantized models on GPUs directly through the framework. To execute these quantized models, use AMD's graph optimizer, MIGraphX, which is built using the ROCm stack. The [torch_migraphx](https://github.com/ROCmSoftwarePlatform/torch_migraphx) library provides a friendly interface for optimizing PyTorch models using the MIGraphX graph optimizer. 
+
+The examples show how to use this library to convert and execute PyTorch quantized models on GPUs using MIGraphX.
 
 ## Torch-MIGraphX
 
