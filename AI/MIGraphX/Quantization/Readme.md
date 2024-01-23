@@ -39,8 +39,10 @@ The examples show how to use this library to convert and execute PyTorch quantiz
 Torch-MIGraphX integrates AMD's graph inference engine with the PyTorch ecosystem. It provides a `mgx_module` object that may be invoked in the same manner as any other torch module, but utilizes the MIGraphX inference engine internally. 
 
 This library currently supports two paths for lowering:
-1. FX Tracing: Uses tracing API provided by the `torch.fx` library.
-2. Dynamo Backend: Importing torch_migraphx automatically registers the "migraphx" backend that can be used with the `torch.compile` API.
+
+- FX Tracing: Uses tracing API provided by the `torch.fx` library.
+  
+-  Dynamo Backend: Importing torch_migraphx automatically registers the "migraphx" backend that can be used with the `torch.compile` API.
 
 
 ## Getting started
