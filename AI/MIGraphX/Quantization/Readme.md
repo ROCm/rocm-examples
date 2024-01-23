@@ -10,9 +10,9 @@ Quantization is an optimization tool that is commonly used to accelerate inferen
 
 The quantization workflow consists of two main steps:
 
-    1. Generate quantization parameters 
+- Generate quantization parameters 
     
-    2. Convert relevant operations in the model's computational graph to use the quantized datatype
+- Convert relevant operations in the model's computational graph to use the quantized datatype
 
 ### Generating Quantization Parameters
 
