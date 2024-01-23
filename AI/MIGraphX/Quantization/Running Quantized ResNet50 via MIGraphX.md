@@ -11,7 +11,7 @@ You must follow the installation instructions in [Readme.md](https://github.com/
 ## Steps for running a quantized model using torch_migraphx
 
 1. Use torch.export and quantize_pt2e APIs to perform quantization
-Note: The export API call is considered a prototype feature at the time this tutorial is written. Some call signatures may be modified in the future.
+*Note*: The export API call is considered a prototype feature at the time this tutorial is written. Some call signatures may be modified in the future.
 
 ```import torch
 from torchvision import models
@@ -27,17 +27,16 @@ input_fp32 = torch.randn(2, 3, 28, 28)
 torch_fp32_out = model_fp32(input_fp32)
 ```
 
-The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
+    The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
 
-Note: Currently, there is a known issue when using only kwargs as inputs. See pytorch/pytorch#113744 for more information.
+    *Note*: Currently, there is a known issue when using only kwargs as inputs. See pytorch/pytorch#113744 for more information.
 
 ```
 model_export = capture_pre_autograd_graph(model_fp32, (input_fp32, ))
 ```
-Use the pt2e API to prepare, calibrate, and convert the model
-Torch-MIGraphX provides a custom Quantizer for performing quantization that is compatible with MIGraphX.
+Use the pt2e API to prepare, calibrate, and convert the model. Torch-MIGraphX provides a custom Quantizer for performing quantization that is compatible with MIGraphX.
 
-Note: Additional configs will also work as long as the configs ensure symmetric quantization using the signed int8 datatype. Currently, only symmetric quantization is supported in MIGraphX.
+*Note*: Additional configs will also work as long as the configs ensure symmetric quantization using the signed int8 datatype. Currently, only symmetric quantization is supported in MIGraphX.
 
 ```
 quantizer = MGXQuantizer()
@@ -50,8 +49,8 @@ q_m = convert_pt2e(m)
 torch_qout = q_m(input_fp32)
 ```
 
-2. Lower Quantized model to MIGraphX
-This step is the same as lowering any other model using torch.compile!
+2. Lower Quantized model to MIGraphX. This step is the same as lowering any other model using torch.compile!
+
 ```
 mgx_mod = torch.compile(q_m, backend='migraphx').cuda()
 mgx_out = mgx_mod(input_fp32.cuda())
@@ -63,6 +62,7 @@ print(f"MIGraphX INT8:\n{mgx_out}")
 3. Performance
 Let’s do a quick test to measure the performance gain from using quantization. Note that these performance gains (or lack of gains) will vary depending on the specific hardware in use.
 
+```
 import copy
 import torch._dynamo
 # We will use this function to benchmark all modules:
@@ -97,7 +97,7 @@ print(f"{mgx_fp32_time=:0.4f}ms")
 print(f"{mgx_fp16_time=:0.4f}ms")
 print(f"{mgx_int8_time=:0.4f}ms")
 
-
+```
 
 
 
