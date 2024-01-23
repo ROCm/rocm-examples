@@ -58,6 +58,7 @@ print(f"MIGraphX INT8:\n{mgx_out}")
 ```
 
 3. Performance
+   
 Do a quick test to measure the performance gain from using quantization.
 
 ```
