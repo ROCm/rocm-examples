@@ -19,16 +19,13 @@ The quantization workflow consists of two main steps:
 There are 3 main methods for computing quantization parameters:
 
 - Dynamic Quantization:
-    
-        ○ Model weights are pre-quantized , input/activation quantization parameters are computed dynamically at runtime
+    - Model weights are pre-quantized , input/activation quantization parameters are computed dynamically at runtime
         
 - Static Post Training Quantization (PTQ):
-    
-        ○ Quantization parameters are computed via calibration. Calibration involves calculating statistical attributes for relevant model nodes using provided sample input data
+    -Quantization parameters are computed via calibration. Calibration involves calculating statistical attributes for relevant model nodes using provided sample input data
         
 - Static Quantization Aware Training (QAT):
-    
-        ○ Quantization parameters are calibrated during the training process
+  - Quantization parameters are calibrated during the training process
 
 All 3 of these techniques are supported by PyTorch (at least in a prototype form), and so the examples leverage PyTorch's quantization APIs to perform this step.
 
