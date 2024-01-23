@@ -22,7 +22,7 @@ There are 3 main methods for computing quantization parameters:
     - Model weights are pre-quantized , input/activation quantization parameters are computed dynamically at runtime
         
 - Static Post Training Quantization (PTQ):
-    -Quantization parameters are computed via calibration. Calibration involves calculating statistical attributes for relevant model nodes using provided sample input data
+    - Quantization parameters are computed via calibration. Calibration involves calculating statistical attributes for relevant model nodes using provided sample input data
         
 - Static Quantization Aware Training (QAT):
   - Quantization parameters are calibrated during the training process
