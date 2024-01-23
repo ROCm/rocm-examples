@@ -16,7 +16,7 @@ The quantization workflow consists of two main steps:
 
 ### Generating quantization parameters
 
-There are 3 main methods for computing quantization parameters:
+There are three main methods for computing quantization parameters:
 
 - Dynamic Quantization:
     - Model weights are pre-quantized , input/activation quantization parameters are computed dynamically at runtime
@@ -27,7 +27,7 @@ There are 3 main methods for computing quantization parameters:
 - Static Quantization Aware Training (QAT):
   - Quantization parameters are calibrated during the training process
 
-All 3 of these techniques are supported by PyTorch (at least in a prototype form), and so the examples leverage PyTorch's quantization APIs to perform this step.
+Note: All three of these techniques are supported by PyTorch (at least in a prototype form), and so the examples leverage PyTorch's quantization APIs to perform this step.
 
 ### Converting and executing the quantized model
 As of the latest PyTorch release, there is no support for executing quantized models on GPUs directly through the framework. To execute these quantized models, use AMD's graph optimizer, MIGraphX, which is built using the ROCm stack. The [torch_migraphx](https://github.com/ROCmSoftwarePlatform/torch_migraphx) library provides a friendly interface for optimizing PyTorch models using the MIGraphX graph optimizer. 
@@ -42,7 +42,7 @@ This library currently supports two paths for lowering:
 
 - FX Tracing: Uses tracing API provided by the `torch.fx` library.
   
--  Dynamo Backend: Importing torch_migraphx automatically registers the "migraphx" backend that can be used with the `torch.compile` API.
+- Dynamo Backend: Importing torch_migraphx automatically registers the "migraphx" backend that can be used with the `torch.compile` API.
 
 
 ## Getting started
