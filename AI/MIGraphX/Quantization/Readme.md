@@ -46,5 +46,5 @@ This library currently supports two paths for lowering:
 
 ### Installation instructions
 
-Refer to the [Torch_MIGraphX] (https://github.com/ROCmSoftwarePlatform/torch_migraphx/blob/master/README.md) page for Docker and source installation instructions. 
+Refer to the [Torch_MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/blob/master/README.md) page for Docker and source installation instructions. 
 
