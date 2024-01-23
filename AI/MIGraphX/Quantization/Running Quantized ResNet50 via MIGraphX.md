@@ -60,7 +60,7 @@ print(f"MIGraphX INT8:\n{mgx_out}")
 ```
 
 3. Performance
-Let’s do a quick test to measure the performance gain from using quantization. Note that these performance gains (or lack of gains) will vary depending on the specific hardware in use.
+Let’s do a quick test to measure the performance gain from using quantization.
 
 ```
 import copy
@@ -98,7 +98,7 @@ print(f"{mgx_fp16_time=:0.4f}ms")
 print(f"{mgx_int8_time=:0.4f}ms")
 
 ```
-
+ Note that these performance gains (or lack of gains) will vary depending on the specific hardware in use.
 
 
 
