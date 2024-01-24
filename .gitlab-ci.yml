@@ -30,10 +30,10 @@ include:
       - /rules.yaml
 
 variables:
-  # Removed -Werror --Werror all-warnings flags due to warnings appearing with
-  # the new release of ROCm (ROCm6.0) for CUDA backend
-  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra"
-  # We require '-Wno-unused-command-line-argument' due to the followiwng warning:
+  # Temporary suppress warnings due to nvidia_hip_runtime_api bug
+  CUDA_WARNING_SUPPRESS_FLAGS: ",-Wno-missing-field-initializers,-Wno-deprecated-declarations,-Wno-sign-compare,-Wno-return-local-addr -diag-suppress=1056"
+  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror${CUDA_WARNING_SUPPRESS_FLAGS} --Werror all-warnings"
+  # We require '-Wno-unused-command-line-argument' due to the following warning:
   #   argument unused during compilation: '--rtlib=compiler-rt'
   CXX_FLAGS: "-Wno-unused-command-line-argument -Wall -Wextra -Werror"
   HIP_FLAGS: "-Wno-unused-command-line-argument -Wall -Wextra -Werror"
