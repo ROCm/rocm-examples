@@ -3,6 +3,7 @@
 A collection of examples to enable new users to start using ROCm. Advanced users may learn about new functionality through our advanced examples.
 
 ## Repository Contents
+- [AI]
 - [Applications](https://github.com/amd/rocm-examples/tree/develop/Applications/) groups a number of examples ... .
     - [bitonic_sort](https://github.com/amd/rocm-examples/tree/develop/Applications/bitonic_sort/): Showcases how to order an array of $n$ elements using a GPU implementation of the bitonic sort.
     - [convolution](https://github.com/amd/rocm-examples/tree/develop/Applications/convolution/): A simple GPU implementation for the calculation of discrete convolutions.
