@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,28 +20,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipBLAS \
-	hipCUB \
-	hipSOLVER \
-	rocRAND
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocFFT_examples LANGUAGES CXX)
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocBLAS \
-	rocFFT \
-	rocPRIM \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust
-endif
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-all: $(LIBRARIES)
+if(GPU_RUNTIME STREQUAL "CUDA")
+    message(STATUS "rocFFT examples do not support the CUDA runtime")
+    return()
+endif()
 
-clean: TARGET=clean
-clean: all
+if(WIN32)
+    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+else()
+    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+endif()
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-.PHONY: all clean $(LIBRARIES)
+find_package(rocFFT)
+if(NOT rocFFT_FOUND)
+    message(STATUS "rocFFT could not be found, not building rocFFT examples")
+    return()
+endif()
+
+add_subdirectory(callback)

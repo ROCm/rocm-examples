@@ -78,6 +78,8 @@ A collection of examples to enable new users to start using ROCm. Advanced users
     - [level_3](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
       - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
+  - [rocFFT](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/)
+      - [callback](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/callback/): Program that showcases the use of rocFFT `callback` functionality.
   - [rocPRIM](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/)
     - [block_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
     - [device_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
