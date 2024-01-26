@@ -83,6 +83,9 @@ A collection of examples to enable new users to start using ROCm. Advanced users
   - [rocPRIM](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/)
     - [block_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
     - [device_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
+  - [hipFFT](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/)
+    - [plan_d2z](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/plan_d2z): Forward fast Fourier transform for 1D, 2D, and 3D real input using a simple plan in hipFFT.
+    - [plan_z2z](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/plan_z2z): Forward fast Fourier transform for 1D, 2D, and 3D complex input using a simple plan in hipFFT.
   - [rocRAND](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocRAND/)
     - [simple_distributions_cpp](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
   - [rocSOLVER](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSOLVER/)

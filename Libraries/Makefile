@@ -23,6 +23,7 @@
 LIBRARIES := \
 	hipBLAS \
 	hipCUB \
+	hipFFT \
 	hipSOLVER \
 	rocRAND
 
