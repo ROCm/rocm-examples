@@ -93,7 +93,7 @@ int main()
     constexpr rocsparse_int elements_of_B = k_padded * n;
     // clang-format off
     constexpr std::array<double, elements_of_B>
-        h_B{ 9,  8, 11, 15,  2,  7, 
+        h_B{ 9,  8, 11, 15,  2,  7,
             11, 10, 11,  3,  5, 12,
             13,  1,  0,  2,  7, 12,
             15, 10,  4,  3,  0,  1,
@@ -128,9 +128,9 @@ int main()
     // 3. Offload data to device
     rocsparse_int* d_bsr_row_ptr;
     rocsparse_int* d_bsr_col_ind;
-    double*        d_bsr_val;
-    double*        d_B;
-    double*        d_C;
+    double*        d_bsr_val{};
+    double*        d_B{};
+    double*        d_C{};
 
     constexpr size_t size_B       = sizeof(*d_B) * elements_of_B;
     constexpr size_t size_C       = sizeof(*d_C) * elements_of_C;

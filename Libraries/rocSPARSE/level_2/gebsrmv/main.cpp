@@ -113,9 +113,9 @@ int main()
     // 2. Allocate device memory and offload input data to device.
     rocsparse_int* d_bsr_row_ptr;
     rocsparse_int* d_bsr_col_ind;
-    double*        d_bsr_val;
-    double*        d_x;
-    double*        d_y;
+    double*        d_bsr_val{};
+    double*        d_x{};
+    double*        d_y{};
 
     constexpr size_t x_size       = sizeof(*d_x) * n_padded;
     constexpr size_t y_size       = sizeof(*d_y) * m_padded;
@@ -184,7 +184,7 @@ int main()
     // Compare solution with the expected result.
     int          errors{};
     const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
-    for(size_t i = 0; i < h_y.size(); i++)
+    for(size_t i = 0; i < h_y.size(); ++i)
     {
         errors += std::fabs(h_y[i] - expected_y[i]) > eps;
     }

@@ -80,9 +80,9 @@ int main()
 
     // 3. Offload data to device
     rocsparse_int* d_ell_col_ind;
-    double*        d_ell_val;
-    double*        d_x;
-    double*        d_y;
+    double*        d_ell_val{};
+    double*        d_x{};
+    double*        d_y{};
 
     constexpr size_t x_size   = sizeof(*d_x) * n;
     constexpr size_t y_size   = sizeof(*d_y) * m;
