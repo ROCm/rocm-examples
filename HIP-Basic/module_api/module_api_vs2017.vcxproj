@@ -18,6 +18,16 @@
     <RootNamespace>module_api_vs2017</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <!-- This initializes the values in Properties > General > Output Directory; builds will fail without this -->
+    <OutDirWasSpecified Condition=" '$(OutDir)'!='' and '$(OutDirWasSpecified)'=='' ">true</OutDirWasSpecified>
+    <OutDirWasSpecified Condition=" '$(OutDir)'=='' and '$(OutDirWasSpecified)'=='' ">false</OutDirWasSpecified>
+    <IntDir Condition="'$(IntDir)'=='' and '$(IntermediateOutputPath)'!=''">$(IntermediateOutputPath)$(PlatformToolset)\</IntDir>
+    <IntDir Condition="'$(IntDir)'=='' and '$(IntermediateOutputPath)'==''">$(Configuration)\$(PlatformToolset)\</IntDir>
+    <OutDir Condition="'$(OutDir)'=='' and '$(SolutionDir)' != ''">$(SolutionDir)$(Configuration)\$(PlatformToolset)\</OutDir>
+    <OutDir Condition="'$(OutDir)'=='' and '$(SolutionDir)' == ''">$(IntDir)$(PlatformToolset)\</OutDir>
+    <DebuggerFlavor Condition="'$(DebuggerFlavor)'==''">WindowsLocalDebugger</DebuggerFlavor>
+  </PropertyGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <ClCompile Include="main.hip" />
     <CustomBuild Include="module.hip">
