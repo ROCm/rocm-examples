@@ -2,7 +2,7 @@
 # MIGraphX - Torch Examples
 
 # Summary
-The examples in this subdirectory showcase the functionality of the [MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/tree/master) library. The examples build on Linux for the ROCm (AMD GPU) backend.
+The examples in this subdirectory showcase the functionality of the [MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/tree/master) library. 
 
 ## Introduction
 
