@@ -2,11 +2,11 @@
 # MIGraphX - Torch Examples
 
 # Summary
-The examples in this subdirectory showcase the functionality of the [Torch-MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/tree/master) library. 
+The examples in this subdirectory showcase the functionality for executing quantized models using MIGraphX. The Torch-MIGraphX integration library is used to achieve this, where PyTorch is used to quantize models, and MIGraphX is used to execute them on AMD GPUs.
+
+For more information, refer to the [Torch-MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/tree/master) library.
 
 ## Introduction
-
-Quantization is an optimization tool that is commonly used to accelerate inferencing for deep learning models. There are many flavors of quantization. In the examples here, we show how the ROCm can be used to accelerate inference using [INT8 quantization](https://arxiv.org/pdf/1712.05877.pdf) on pretrained models. 
 
 The quantization workflow consists of two main steps:
 
