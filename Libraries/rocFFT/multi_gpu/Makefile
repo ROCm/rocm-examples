@@ -20,30 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocFFT_examples LANGUAGES CXX)
+EXAMPLE := rocfft_multi_gpu
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
 
-if(GPU_RUNTIME STREQUAL "CUDA")
-    message(STATUS "rocFFT examples do not support the CUDA runtime")
-    return()
-endif()
+# HIP variables
+ROCM_INSTALL_DIR   := /opt/rocm
+HIP_INCLUDE_DIR    := $(ROCM_INSTALL_DIR)/include
+ROCFFT_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
-else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-endif()
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCFFT_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocfft
 
-find_package(rocFFT)
-if(NOT rocFFT_FOUND)
-    message(STATUS "rocFFT could not be found, not building rocFFT examples")
-    return()
-endif()
+CXXFLAGS  ?= -Wall -Wextra
+CPPFLAGS  ?= -D__HIP_PLATFORM_AMD__ -isystem $(HIP_INCLUDE_DIR)
+LDLIBS    ?= -lamdhip64
+COMPILER  := $(HIPCXX)
 
-add_subdirectory(callback)
-add_subdirectory(multi_gpu)
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/rocfft_utils.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

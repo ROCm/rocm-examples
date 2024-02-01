@@ -62,4 +62,3 @@ clean:
 	$(RM) $(EXAMPLE)
 
 .PHONY: clean
-

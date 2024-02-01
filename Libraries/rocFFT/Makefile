@@ -20,8 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+
 EXAMPLES := \
-	callback
+	callback \
+	multi_gpu
 
 all: $(EXAMPLES)
 
