@@ -244,6 +244,42 @@ void multiply_matrices(T        alpha,
     }
 }
 
+/// \brief Prints an {1,2,3}-dimensional array. The last dimension (fastest-index) specified in
+/// \p n will be printed horizontally.
+template<class Tdata, class Tsize>
+void print_nd_data(const std::vector<Tdata> data,
+                   std::vector<Tsize>       np,
+                   const int                column_width     = 4,
+                   const bool               reverse_indexing = false)
+{
+    if(reverse_indexing)
+    {
+        std::reverse(np.begin(), np.end());
+    }
+    const std::vector<Tsize> n(np);
+    // Note: we want to print the last dimension horizontally (on the x-axis)!
+    int size_x = n[n.size() - 1];
+    int size_y = n.size() > 1 ? n[n.size() - 2] : 1;
+    int size_z = n.size() > 2 ? n[n.size() - 3] : 1;
+    for(int z = 0; z < size_z; ++z)
+    {
+        for(int y = 0; y < size_y; ++y)
+        {
+            for(int x = 0; x < size_x; ++x)
+            {
+                auto index = (z * size_y + y) * size_x + x;
+                std::cout << std::setfill(' ') << std::setw(column_width) << data[index] << " ";
+            }
+            std::cout << "\n";
+        }
+        if(z != size_z - 1)
+        {
+            std::cout << "\n";
+        }
+    }
+    std::cout << std::flush;
+}
+
 /// \brief Returns a string from the double \p value with specified \p precision .
 inline std::string
     double_precision(const double value, const int precision, const bool fixed = false)
