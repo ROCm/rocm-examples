@@ -25,7 +25,10 @@ ROCM_INSTALL_DIR := /opt/rocm
 
 EXAMPLES := \
 	callback \
-	multi_gpu
+	complex_complex \
+	complex_real \
+	multi_gpu \
+	real_complex
 
 all: $(EXAMPLES)
 

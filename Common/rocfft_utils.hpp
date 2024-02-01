@@ -25,9 +25,11 @@
 
 #include "example_utils.hpp"
 
+#include <hip/hip_complex.h>
 #include <rocfft/rocfft.h>
 
 #include <iostream>
+#include <numeric>
 
 /// \brief Converts a \p rocfft_status variable to its correspondent string.
 inline const char* rocfftStatusToString(rocfft_status status)
@@ -63,5 +65,32 @@ inline const char* rocfftStatusToString(rocfft_status status)
             std::exit(error_exit_code);                                                 \
         }                                                                               \
     }
+
+std::ostream& operator<<(std::ostream& stream, hipDoubleComplex c)
+{
+    stream << "(" << c.x << "," << c.y << ")";
+    return stream;
+}
+
+/// \brief Increment the index (column-major) for looping over arbitrary dimensional loops with
+/// dimensions \p length. Returns a bool if end of increment has been reached.
+template<class T1, class T2>
+bool increment_cm(std::vector<T1>& index, const std::vector<T2>& length)
+{
+    for(unsigned int idim = 0; idim < length.size(); ++idim)
+    {
+        if(index[idim] < length[idim])
+        {
+            if(++index[idim] == length[idim])
+            {
+                index[idim] = 0;
+                continue;
+            }
+            break;
+        }
+    }
+    // End the loop when we get back to the start:
+    return !std::all_of(index.begin(), index.end(), [](int i) { return i == 0; });
+}
 
 #endif // COMMON_ROCFFT_UTILS_HPP
