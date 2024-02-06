@@ -23,7 +23,8 @@
 EXAMPLES := \
 	multi_gpu \
 	plan_d2z \
-	plan_z2z
+	plan_z2z \
+	setworkarea
 
 all: $(EXAMPLES)
 
