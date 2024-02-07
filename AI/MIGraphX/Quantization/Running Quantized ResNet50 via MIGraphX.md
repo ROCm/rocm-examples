@@ -30,7 +30,6 @@ torch_fp32_out = model_fp32(input_fp32)
 
 The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
 
-**Note**: Currently, there is a known issue when using only kwargs as inputs. See pytorch/pytorch#113744 for more information.
 
 ```
 model_export = capture_pre_autograd_graph(model_fp32, (input_fp32, ))
