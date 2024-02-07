@@ -28,8 +28,6 @@ input_fp32 = torch.randn(2, 3, 28, 28)
 torch_fp32_out = model_fp32(input_fp32)
 ```
 
-The capture_pre_autograd_graph call will be changed to a torch.export.export call once it supports the pre autograd capture functionallity. 
-
 
 ```
 model_export = capture_pre_autograd_graph(model_fp32, (input_fp32, ))
