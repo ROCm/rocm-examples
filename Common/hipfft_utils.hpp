@@ -25,6 +25,7 @@
 
 #include <hipfft/hipfft.h>
 
+#include <cstdlib>
 #include <iostream>
 
 /// \brief Converts a \p hipfftResult_t variable to its correspondent string.

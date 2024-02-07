@@ -26,6 +26,11 @@ EXAMPLES := \
 	plan_z2z \
 	setworkarea
 
+ifneq ($(GPU_RUNTIME), CUDA)
+	EXAMPLES += \
+		callback
+endif
+
 all: $(EXAMPLES)
 
 clean: TARGET=clean

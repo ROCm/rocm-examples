@@ -20,37 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name hipfft_callback)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipFFT_examples LANGUAGES CXX)
-include(CTest)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
-
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
+if(GPU_RUNTIME STREQUAL "CUDA")
+    message(STATUS "hipFFT callback example does not support the CUDA runtime")
+    return()
 endif()
+
+if(WIN32)
+    message(STATUS "hipFFT callback example does not support windows")
+    return()
+endif()
+
+project(hipfft_callback LANGUAGES CXX HIP)
+
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
+
+set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hipfft)
-if(NOT hipfft_FOUND)
-    message(STATUS "hipFFT could not be found, not building hipFFT examples")
-    return(1)
-endif()
+find_package(hipfft REQUIRED)
 
-add_subdirectory(callback)
-add_subdirectory(multi_gpu)
-add_subdirectory(plan_d2z)
-add_subdirectory(plan_z2z)
-add_subdirectory(setworkarea)
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+set(include_dirs "../../../Common")
+
+target_link_libraries(${example_name} PRIVATE hip::hipfft)
+target_include_directories(${example_name} PRIVATE ${include_dirs})
+set_source_files_properties(main.hip PROPERTIES LANGUAGE HIP)
+
+install(TARGETS ${example_name})
