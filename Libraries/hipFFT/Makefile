@@ -23,6 +23,8 @@
 EXAMPLES := \
 	multi_gpu \
 	plan_d2z \
+	plan_many_2d_r2c \
+	plan_many_2d_z2z \
 	plan_z2z \
 	setworkarea
 
