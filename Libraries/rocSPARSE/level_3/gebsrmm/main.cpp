@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -186,23 +186,36 @@ int main()
     HIP_CHECK(hipFree(d_B));
     HIP_CHECK(hipFree(d_C));
 
-    // 8. Print result.
-    //     (  70  40  21  44  53  35  32  32  58  70 )
-    // C = (  87  95   4  60  54 104  38  57 113  78 )
-    //     ( 121  61  70  21  64 127  86  60 122  50 )
-    //     (  45  38  44   7  32  67  41  35  53  30 )
-    std::cout << "C =" << std::endl;
+    // 8. Print results to standard output.
+    // Define expected result, stored in column-major ordering.
+    constexpr std::array<double, m * n> expected_C{
+        70, 87,  121, 45, /*C1*/
+        40, 95,  61,  38, /*C2*/
+        21, 4,   70,  44, /*C3*/
+        44, 60,  21,  7, /*C4*/
+        53, 54,  64,  32, /*C5*/
+        35, 104, 127, 67, /*C6*/
+        32, 38,  86,  41, /*C7*/
+        32, 57,  60,  35, /*C8*/
+        58, 113, 122, 53, /*C9*/
+        70, 78,  50,  30 /*C10*/
+    };
 
+    std::cout << "Solution successfully computed: " << std::endl;
+    std::cout << "C =" << std::endl;
+    int              errors{};
+    constexpr double eps = std::numeric_limits<double>::epsilon();
     for(rocsparse_int i = 0; i < m; ++i)
     {
         std::cout << "    (";
         for(rocsparse_int j = 0; j < n; ++j)
         {
             std::printf("%5.0lf", h_C[i + j * m_padded]);
+            errors += std::fabs(h_C[i + j * m_padded] - expected_C[i + j * m]) > eps;
         }
 
         std::cout << " )" << std::endl;
     }
 
-    return 0;
+    return report_validation_result(errors);
 }

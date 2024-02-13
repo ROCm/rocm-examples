@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,8 @@ int main()
     constexpr rocsparse_int nnz = 8;
 
     // COO values
-    constexpr std::array<double, nnz> h_coo_val = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    constexpr std::array<double, nnz> h_coo_val  = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0};
+    constexpr std::array<double, m>   expected_y = {31.1, 62.0, 70.7, 123.8};
 
     // COO row indices
     constexpr std::array<rocsparse_int, nnz> h_coo_row_ind = {0, 0, 1, 1, 2, 2, 3, 3};
@@ -133,7 +134,19 @@ int main()
     HIP_CHECK(hipFree(d_x));
     HIP_CHECK(hipFree(d_y));
 
-    // 8. Print result
+    // 8. Print results to standard output.
+    std::cout << "Solution successfully computed: ";
+
     std::cout << "y = " << format_range(std::begin(h_y), std::end(h_y)) << std::endl;
-    return 0;
+
+    // Compare solution with the expected result.
+    int          errors{};
+    const double eps = 1.0e5 * std::numeric_limits<double>::epsilon();
+    for(size_t i = 0; i < h_y.size(); ++i)
+    {
+        errors += std::fabs(h_y[i] - expected_y[i]) > eps;
+    }
+
+    // Print validation result.
+    return report_validation_result(errors);
 }
