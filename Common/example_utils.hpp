@@ -24,6 +24,7 @@
 #define COMMON_EXAMPLE_UTILS_HPP
 
 // Compiling HIP on Windows includes windows.h, and this triggers many silly warnings.
+#include <cstdint>
 #if defined(_WIN32) && defined(__NVCC__)
     #pragma nv_diag_suppress 108 // signed bit field of length 1
     #pragma nv_diag_suppress 174 // expression has no effect
@@ -35,13 +36,16 @@
     #pragma clang diagnostic ignored "-W#warnings"
 #endif
 
+#include <algorithm>
 #include <cassert>
 #include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <iterator>
 #include <sstream>
 #include <string>
 #include <type_traits>
+#include <vector>
 
 #include <hip/hip_runtime.h>
 
@@ -238,6 +242,19 @@ void multiply_matrices(T        alpha,
             C[i1 + i2 * stride_c] = beta * C[i1 + i2 * stride_c] + alpha * t;
         }
     }
+}
+
+/// \brief Returns a string from the double \p value with specified \p precision .
+inline std::string
+    double_precision(const double value, const int precision, const bool fixed = false)
+{
+    std::stringstream ss;
+    if(fixed)
+    {
+        ss << std::fixed;
+    }
+    ss << std::setprecision(precision) << value;
+    return ss.str();
 }
 
 #endif // COMMON_EXAMPLE_UTILS_HPP

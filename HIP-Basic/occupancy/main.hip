@@ -56,9 +56,10 @@ void print_occupancy(const int block_size)
                                                                pairwise_product_kernel,
                                                                block_size,
                                                                0));
-        std::cout << std::setprecision(3) << "Theoretical Occupancy is "
-                  << static_cast<double>(num_blocks) * block_size
-                         / dev_prop.maxThreadsPerMultiProcessor * 100
+        std::cout << "Theoretical Occupancy is "
+                  << double_precision(static_cast<double>(num_blocks) * block_size
+                                          / dev_prop.maxThreadsPerMultiProcessor * 100,
+                                      3)
                   << "%" << std::endl;
     }
 }
@@ -95,8 +96,7 @@ void deploy_kernel_manual_parameters(float*             d_C,
 
     float event_ms;
     HIP_CHECK(hipEventElapsedTime(&event_ms, start, stop));
-    std::cout << std::setprecision(2) << "Kernel Execution Time: " << event_ms << " ms"
-              << std::endl;
+    std::cout << "Kernel Execution Time: " << double_precision(event_ms, 2) << " ms" << std::endl;
 
     // Destroy the events
     HIP_CHECK(hipEventDestroy(start));
@@ -143,8 +143,7 @@ void deploy_kernel_automatic_parameters(float*             d_C,
 
     float event_ms;
     HIP_CHECK(hipEventElapsedTime(&event_ms, start, stop));
-    std::cout << std::setprecision(2) << "Kernel Execution Time: " << event_ms << " ms"
-              << std::endl;
+    std::cout << "Kernel Execution Time: " << double_precision(event_ms, 2) << " ms" << std::endl;
 
     // Destroy the events
     HIP_CHECK(hipEventDestroy(start));

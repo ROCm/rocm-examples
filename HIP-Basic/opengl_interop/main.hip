@@ -367,10 +367,9 @@ struct renderer
         {
             const auto time_diff_sec
                 = std::chrono::duration_cast<std::chrono::duration<float>>(time_diff).count();
-            std::cout << "Average FPS (over " << std::fixed << std::setprecision(2) << time_diff_sec
-                      << " seconds): " << std::fixed << std::setprecision(2)
-                      << this->fps_frame / time_diff_sec << " (" << std::fixed
-                      << std::setprecision(2) << (time_diff_sec * 1000) / this->fps_frame
+            std::cout << "Average FPS (over " << double_precision(time_diff_sec, 2, true)
+                      << " seconds): " << double_precision(this->fps_frame / time_diff_sec, 2, true)
+                      << " (" << double_precision((time_diff_sec * 1000) / this->fps_frame, 2, true)
                       << " ms per frame, " << this->fps_frame << " frames)" << std::endl;
             this->fps_frame      = 0;
             this->fps_start_time = frame_time;

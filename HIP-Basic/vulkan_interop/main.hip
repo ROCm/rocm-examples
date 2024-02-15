@@ -455,9 +455,9 @@ hipExternalMemory_t
     desc.type = hipExternalMemoryHandleTypeOpaqueFd;
 
     VkMemoryGetFdInfoKHR get_fd_info = {};
-    get_fd_info.sType = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
-    get_fd_info.memory = memory;
-    get_fd_info.handleType = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
+    get_fd_info.sType                = VK_STRUCTURE_TYPE_MEMORY_GET_FD_INFO_KHR;
+    get_fd_info.memory               = memory;
+    get_fd_info.handleType           = VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
 
     VK_CHECK(ctx.vkd->get_memory_fd(ctx.dev, &get_fd_info, &desc.handle.fd));
 #endif
@@ -533,9 +533,9 @@ hipExternalSemaphore_t semaphore_to_hip(const graphics_context& ctx, const VkSem
     desc.type = hipExternalSemaphoreHandleTypeOpaqueFd;
 
     VkSemaphoreGetFdInfoKHR get_fd_info = {};
-    get_fd_info.sType = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
-    get_fd_info.semaphore = sema;
-    get_fd_info.handleType = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
+    get_fd_info.sType                   = VK_STRUCTURE_TYPE_SEMAPHORE_GET_FD_INFO_KHR;
+    get_fd_info.semaphore               = sema;
+    get_fd_info.handleType              = VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR;
 
     VK_CHECK(ctx.vkd->get_semaphore_fd(ctx.dev, &get_fd_info, &desc.handle.fd));
 #endif
@@ -1249,10 +1249,10 @@ struct renderer
             const auto time_diff_sec
                 = std::chrono::duration_cast<std::chrono::duration<float>>(time_diff).count();
             const uint32_t frames = this->frame_index - this->fps_start_frame;
-            std::cout << "Average FPS (over " << std::fixed << std::setprecision(2) << time_diff_sec
-                      << " seconds): " << std::fixed << std::setprecision(2)
-                      << frames / time_diff_sec << " (" << std::fixed << std::setprecision(2)
-                      << (time_diff_sec * 1000) / frames << " ms per frame)" << std::endl;
+            std::cout << "Average FPS (over " << double_precision(time_diff_sec, 2, true)
+                      << " seconds): " << double_precision(frames / time_diff_sec, 2, true) << " ("
+                      << double_precision((time_diff_sec * 1000) / frames, 2, true)
+                      << " ms per frame)" << std::endl;
             this->fps_start_frame = this->frame_index;
             this->fps_start_time  = frame_time;
         }
