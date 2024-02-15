@@ -59,13 +59,13 @@ int main()
         [&]() { return std::complex<double>{distribution(generator), distribution(generator)}; });
 
     // Print input data per batch
-    std::cout << "input:\n" << std::setprecision(3);
+    std::cout << "input:\n";
     for(int ibatch = 0; ibatch < batch_size; ++ibatch)
     {
         std::cout << "batch: " << ibatch << "\n";
         const auto                              dist = ibatch * distance;
         const std::vector<std::complex<double>> slice(h_data.begin() + dist, h_data.end());
-        print_nd_data(slice, embed);
+        print_nd_data(slice, embed, 1, 3);
     }
     std::cout << std::endl;
 
@@ -99,13 +99,13 @@ int main()
     HIP_CHECK(hipMemcpy((void*)h_data.data(), d_data, total_bytes, hipMemcpyDeviceToHost));
 
     // Print output data in batches
-    std::cout << "output:\n" << std::setprecision(3);
+    std::cout << "output:\n";
     for(int ibatch = 0; ibatch < batch_size; ++ibatch)
     {
         std::cout << "batch: " << ibatch << "\n";
         const auto                              dist = ibatch * distance;
         const std::vector<std::complex<double>> slice(h_data.begin() + dist, h_data.end());
-        print_nd_data(slice, embed);
+        print_nd_data(slice, embed, 1, 3);
     }
     std::cout << std::endl;
 

@@ -61,14 +61,14 @@ int main()
     std::generate(h_input.begin(), h_input.end(), [&]() { return distribution(generator); });
 
     // Print input data per batch
-    std::cout << "input:\n" << std::setprecision(3);
+    std::cout << "input:\n";
     for(int ibatch = 0; ibatch < batch_size; ++ibatch)
     {
         std::cout << "batch: " << ibatch << "\n";
         const auto               dist = ibatch * input_distance;
         const std::vector<float> slice(h_input.begin() + dist, h_input.end());
         // n is matrix without padding
-        print_nd_data(slice, n, 1);
+        print_nd_data(slice, n, 1, 3);
     }
     std::cout << std::endl;
 
@@ -103,13 +103,13 @@ int main()
     HIP_CHECK(hipMemcpy((void*)h_output.data(), d_data, total_bytes, hipMemcpyDeviceToHost));
 
     // Print output data in batches
-    std::cout << "output:\n" << std::setprecision(3);
+    std::cout << "output:\n";
     for(int ibatch = 0; ibatch < batch_size; ++ibatch)
     {
         std::cout << "batch: " << ibatch << "\n";
         const auto                             dist = ibatch * output_distance;
         const std::vector<std::complex<float>> slice(h_output.begin() + dist, h_output.end());
-        print_nd_data(slice, onembed);
+        print_nd_data(slice, onembed, 1, 3);
     }
 
     // Clean up
