@@ -90,7 +90,7 @@ int main(int argc, char* argv[])
     std::iota(h_input.begin(), h_input.end(), 0.5);
 
     std::cout << "input:\n";
-    print_nd_data(h_input, length, 1, true);
+    print_nd_data(h_input, length, 1, 3, true);
     std::cout << "\n";
 
     ROCFFT_CHECK(rocfft_setup());
@@ -172,7 +172,7 @@ int main(int argc, char* argv[])
     std::vector<hipDoubleComplex> h_output(output_size);
     std::cout << "output:\n";
     HIP_CHECK(hipMemcpy(h_output.data(), d_output, output_bytes, hipMemcpyDeviceToHost));
-    print_nd_data(h_output, output_length, 1, true);
+    print_nd_data(h_output, output_length, 1, 3, true);
 
     // Clean up: free device memory
     HIP_CHECK(hipFree(d_input));
