@@ -242,7 +242,7 @@ test:cuda:
     Timeout: 60
     Filter: "*_vs$VS_VERSION.exe"
   script:
-    - | 
+    - |
       & ${env:HIP_PATH}/bin/clang++ --version
     - | # Find MSBuild.exe of the associated version.
       $MSBUILD = (
@@ -285,11 +285,20 @@ test:windows-rocm-vs:
     - rx6900
   variables:
     SOLUTION_PREFIX: ROCm-Examples-VS
-    # hip_vulkant_interop: graphical
-    # rocsparse_*: broken with new SDK
+    # hip_vulkan_interop: graphical
+    # applications_monte_carlo_pi: broken with new SDK (5.7 v66)
+    # hipfft/rocfft_*: broken with new SDK (5.7 v66)
     SkippedExamples: >
       hip_vulkan_interop_*.exe,
-
+      applications_monte_carlo_pi_*.exe,
+      hipfft_plan_d2z_*.exe,
+      hipfft_plan_z2z_*.exe,
+      hipfft_plan_many_2d_r2c_*.exe,
+      hipfft_plan_many_2d_z2z_*.exe,
+      hipfft_setworkarea_*.exe,
+      rocfft_complex_complex_*.exe,
+      rocfft_complex_real_*.exe,
+      rocfft_real_complex_*.exe
 test:windows-nvcc-vs:
   extends:
     - .test:windows-nvcc
@@ -298,6 +307,9 @@ test:windows-nvcc-vs:
     - nvcc-windows
   variables:
     SOLUTION_PREFIX: ROCm-Examples-Portable-VS
+    # NVCC examples broken with new SDK (5.7 v66)
+    SkippedExamples: >
+      *.exe
   before_script:
     # To test for NVIDIA, we need to set the platform toolset to HIP_nvcc. This cannot be done with /p:PlatformToolset
     # though, as some examples use the regular msvc toolchain.
@@ -338,7 +350,7 @@ test:windows-nvcc-vs:
     # So for now, just add the library path here.
     - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
     - cd "$CI_PROJECT_DIR/build"
-    - ctest --output-on-failure --timeout 15 
+    - ctest --output-on-failure --timeout 15
     - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"
   needs: []
 
