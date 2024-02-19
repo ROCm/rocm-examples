@@ -104,6 +104,8 @@ This works by storing the sparse vector $x$ as:
 - `rocsparse_dgemvi`
 - `rocsparse_index_base::rocsparse_index_base_zero`
 - `rocsparse_operation::rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 

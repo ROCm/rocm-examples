@@ -144,6 +144,8 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_operation_none`
 - `rocsparse_order`
 - `rocsparse_order_column`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 - `rocsparse_spmat_descr`
 - `rocsparse_spsm`
 - `rocsparse_spsm_alg`

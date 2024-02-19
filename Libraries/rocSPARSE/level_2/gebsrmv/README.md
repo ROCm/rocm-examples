@@ -96,6 +96,8 @@ Note that, for a given $m\times n$ matrix, if $m$ is not evenly divisible by the
 - `rocsparse_mat_descr`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 

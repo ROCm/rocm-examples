@@ -112,6 +112,7 @@ int main()
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // Create sparse matrix and dense vector descriptors.
     rocsparse_spmat_descr descr_A{};

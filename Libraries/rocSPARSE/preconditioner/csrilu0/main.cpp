@@ -97,6 +97,7 @@ int main()
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 4. Prepare utility variables for rocSPARSE csrilu0 invocation.
     // Analysis and solve policies.

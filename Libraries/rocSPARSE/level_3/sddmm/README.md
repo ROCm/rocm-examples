@@ -122,10 +122,12 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_operation_none`
 - `rocsparse_order`
 - `rocsparse_order_row`
+- `rocsparse_pointer_mode_host`
 - `rocsparse_sddmm`
 - `rocsparse_sddmm_alg_default`
 - `rocsparse_sddmm_buffer_size`
 - `rocsparse_sddmm_preprocess`
+- `rocsparse_set_pointer_mode`
 - `rocsparse_spmat_descr`
 
 ### HIP runtime

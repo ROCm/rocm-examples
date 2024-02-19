@@ -95,6 +95,7 @@ int main()
     // rocSPARSE handle
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 3. Offload data to device
     double*        d_csr_val;

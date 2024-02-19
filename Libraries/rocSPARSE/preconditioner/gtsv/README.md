@@ -63,6 +63,8 @@ The components of the tridiagonal system are stored in length $m$ vectors:
 - `rocsparse_dgtsv_buffer_size`
 - `rocsparse_handle`
 - `rocsparse_int`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 

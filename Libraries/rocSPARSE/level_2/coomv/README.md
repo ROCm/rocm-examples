@@ -69,6 +69,8 @@ The COO matrix is sorted by row indices, and by column indices in the same row.
 - `rocsparse_mat_descr`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 

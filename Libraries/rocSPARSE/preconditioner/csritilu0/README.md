@@ -163,6 +163,8 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_itilu0_alg`
 - `rocsparse_itilu0_alg_default`
 - `rocsparse_mat_descr`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 

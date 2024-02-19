@@ -83,6 +83,7 @@ int main()
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 4. Obtain the required buffer size.
     // This function is non blocking and executed asynchronously with respect to the host.

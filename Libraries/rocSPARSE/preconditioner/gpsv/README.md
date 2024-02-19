@@ -67,6 +67,8 @@
 - `rocsparse_dgpsv_interleaved_batch_buffer_size`
 - `rocsparse_handle`
 - `rocsparse_int`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 

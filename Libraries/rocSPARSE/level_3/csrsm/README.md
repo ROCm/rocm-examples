@@ -182,8 +182,10 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_mat_info`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
 - `rocsparse_set_mat_diag_type`
 - `rocsparse_set_mat_fill_mode`
+- `rocsparse_set_pointer_mode`
 - `rocsparse_solve_policy`
 - `rocsparse_solve_policy_auto`
 - `rocsparse_status`

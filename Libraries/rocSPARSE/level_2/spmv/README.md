@@ -126,6 +126,8 @@ where
 - `rocsparse_int`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 - `rocsparse_spmat_descr`
 - `rocsparse_spmv_alg`
 - `rocsparse_spmv_alg_default`

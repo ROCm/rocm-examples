@@ -239,6 +239,8 @@ Additionally, `bsrx_end_ptr` can be used for column masking, how it is presented
 - `rocsparse_mat_descr`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 
