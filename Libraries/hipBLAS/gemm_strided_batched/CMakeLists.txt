@@ -59,7 +59,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hipblas REQUIRED)
 
-add_executable(${example_name} main.hip)
+add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
@@ -67,7 +67,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 target_link_libraries(${example_name} PRIVATE roc::hipblas)
 
 target_include_directories(${example_name} PRIVATE "../../../Common")
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
 install(TARGETS ${example_name})
 if(CMAKE_SYSTEM_NAME MATCHES Windows)
