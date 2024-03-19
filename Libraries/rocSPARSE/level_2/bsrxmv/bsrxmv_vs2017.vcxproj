@@ -15,7 +15,7 @@
     <VCProjectVersion>15.0</VCProjectVersion>
     <ProjectGuid>{CFA1826D-C202-4F97-92C9-DB019675DCCB}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>bsrmv_vs2017</RootNamespace>
+    <RootNamespace>bsrxmv_vs2017</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>

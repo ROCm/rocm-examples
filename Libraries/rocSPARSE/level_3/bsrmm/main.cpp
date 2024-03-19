@@ -32,7 +32,7 @@
 
 int main()
 {
-    // 1. Setup input data
+    // 1. Set up input data
     // Number of rows and columns of the input matrices.
     constexpr rocsparse_int m = 4;
     constexpr rocsparse_int k = 6;
@@ -149,7 +149,7 @@ int main()
                                      d_C,
                                      ldc));
 
-    // 5. Copy y to host from device
+    // 5. Copy C to host from device
     HIP_CHECK(hipMemcpy(h_C.data(), d_C, size_C, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE

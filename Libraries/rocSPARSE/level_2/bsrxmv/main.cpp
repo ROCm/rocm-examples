@@ -31,7 +31,7 @@
 
 int main()
 {
-    // 1. Setup input data.
+    // 1. Set up input data.
     //
     // unmasked:
     //

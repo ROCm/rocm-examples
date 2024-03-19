@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.33026.149
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "coomv_vs2017", "coomv_vs2017.vcxproj", "{74544EB3-6654-4BDD-8DD5-C28003AB63E5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{74544EB3-6654-4BDD-8DD5-C28003AB63E5}.Debug|x64.ActiveCfg = Debug|x64
+		{74544EB3-6654-4BDD-8DD5-C28003AB63E5}.Debug|x64.Build.0 = Debug|x64
+		{74544EB3-6654-4BDD-8DD5-C28003AB63E5}.Release|x64.ActiveCfg = Release|x64
+		{74544EB3-6654-4BDD-8DD5-C28003AB63E5}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {2417DBCE-0C6A-407C-97BC-A91134C3614C}
+	EndGlobalSection
+EndGlobal
