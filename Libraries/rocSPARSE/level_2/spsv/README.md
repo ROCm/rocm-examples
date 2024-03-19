@@ -22,8 +22,7 @@ where
 - $y$ is a dense vector of size $n$ which contains the unknowns of the system.
 
 ### Application flow
-
-1. Setup input data.
+1. Set up input data.
 2. Allocate device memory and offload input data to device.
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare device for rocSPARSE SpSV invocation.
