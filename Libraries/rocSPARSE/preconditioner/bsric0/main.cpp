@@ -184,7 +184,7 @@ int main()
                                       bsr_dim,
                                       info,
                                       solve_policy,
-                                      temp_buffer))
+                                      temp_buffer));
 
     // 7. Check zero-pivots.
     rocsparse_int    pivot_position;
