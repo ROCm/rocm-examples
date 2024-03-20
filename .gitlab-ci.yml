@@ -255,7 +255,7 @@ build:cmake-cuda:
   extends:
     - .rules:test
   script:
-    - cd $CI_PROJECT_DIR/build && ctest --output-on-failure --parallel 8
+    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 8
 
 test:rocm:
   image: $DOCKER_HIP_LIBRARIES_ROCM
