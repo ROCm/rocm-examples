@@ -24,6 +24,7 @@
 
 #include <hip/hip_runtime.h>
 
+#include <array>
 #include <iostream>
 #include <vector>
 
