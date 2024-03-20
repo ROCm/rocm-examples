@@ -47,6 +47,10 @@ inline const char* rocsparse_status_to_string(rocsparse_status status)
         case rocsparse_status_not_initialized: return "rocsparse_status_not_initialized";
         case rocsparse_status_type_mismatch: return "rocsparse_status_type_mismatch";
         case rocsparse_status_thrown_exception: return "rocsparse_status_thrown_exception";
+// rocSPARSE 3.0 adds new status
+#if ROCSPARSE_VERSION_MAJOR >= 3
+        case rocsparse_status_continue: return "rocsparse_status_continue";
+#endif
         case rocsparse_status_requires_sorted_storage:
             return "rocsparse_status_requires_sorted_storage";
     }
