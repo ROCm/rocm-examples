@@ -28,7 +28,9 @@ EXAMPLES := \
 	csrmv \
 	csrsv \
 	ellmv \
-	gebsrmv
+	gebsrmv \
+	gemvi \
+	spsv
 
 all: $(EXAMPLES)
 

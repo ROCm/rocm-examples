@@ -4,6 +4,7 @@
 This example illustrates the use of the `rocSPARSE` level 2 triangular solver using the BSR storage format.
 
 This triangular solver is used to solve a linear system of the form
+
 $$
 A'y = \alpha x,
 $$
