@@ -1,7 +1,7 @@
 # Example checklist
 
 - Elaboration
-    - [ ] Example concept is decribed and agreed upon
+    - [ ] Example concept is described and agreed upon
 - Implementation
     - [ ] Example is implemented
 - Internal review
