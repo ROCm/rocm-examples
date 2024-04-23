@@ -92,9 +92,10 @@ endforeach()
 # Create an offload-bundle from the assembled object files. This needs the clang-offload-bundler tool.
 find_program(
     OFFLOAD_BUNDLER_COMMAND clang-offload-bundler
-    PATH_SUFFIXES
-        llvm/bin
-        bin
+    PATH_SUFFIXES bin
+    PATHS
+    ${ROCM_ROOT}/llvm
+    ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED)
 
 # Generate object bundle.
@@ -134,9 +135,10 @@ add_custom_command(
 # This needs an assembler.
 find_program(
     LLVM_MC_COMMAND llvm-mc
-    PATH_SUFFIXES
-        llvm/bin
-        bin
+    PATH_SUFFIXES bin
+    PATHS
+    ${ROCM_ROOT}/llvm
+    ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED)
 
 # Invoke llvm-mc to generate an object file containing the offload bundle.
