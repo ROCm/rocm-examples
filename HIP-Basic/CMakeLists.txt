@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,10 +23,54 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Basic LANGUAGES CXX)
 
+# ROCm installation path
+if(WIN32)
+    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+else()
+    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+endif()
+
 # Only supported on HIP (not CUDA)
 if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
-    add_subdirectory(assembly_to_executable)
+
+    # Make sure the dependencies can be found before building.
+    find_program(
+        LLVM_DIS_COMMAND llvm-dis
+        PATH_SUFFIXES bin
+        PATHS
+        ${ROCM_ROOT}/llvm
+        ${CMAKE_INSTALL_PREFIX}/llvm)
+    find_program(
+        OFFLOAD_BUNDLER_COMMAND clang-offload-bundler
+        PATH_SUFFIXES bin
+        PATHS
+        ${ROCM_ROOT}/llvm
+        ${CMAKE_INSTALL_PREFIX}/llvm)
+    find_program(
+        LLVM_MC_COMMAND llvm-mc
+        PATH_SUFFIXES bin
+        PATHS
+        ${ROCM_ROOT}/llvm
+        ${CMAKE_INSTALL_PREFIX}/llvm)
+
+    if(LLVM_DIS_COMMAND AND OFFLOAD_BUNDLER_COMMAND AND LLVM_MC_COMMAND)
     add_subdirectory(llvm_ir_to_executable)
+    else()  
+        message("'llvm-dis', 'llvm-mc', or 'clang-offload-bundler' not found, not building assembly example.")
+        if(NOT WIN32)
+            message("    These tools can be found in the 'rocm-llvm-dev' package.")
+        endif()
+    endif()
+
+    if(OFFLOAD_BUNDLER_COMMAND AND LLVM_MC_COMMAND)
+        add_subdirectory(assembly_to_executable)
+    else()
+        message("'llvm-mc' or 'clang-offload-bundler' not found, not building LLVM IR example.")
+        if(NOT WIN32)
+            message("    These tools can be found in the 'rocm-llvm-dev' package.")
+        endif()
+    endif()
+
     add_subdirectory(module_api)
 endif()
 
