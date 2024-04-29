@@ -55,7 +55,7 @@ int main(const int argc, char* argv[])
     // 3. Generate a random symmetric matrix
     std::default_random_engine             generator;
     std::uniform_real_distribution<double> distribution(0., 2.);
-    auto                                   random_number = std::bind(distribution, generator);
+    auto random_number = [&]() { return distribution(generator); };
 
     for(int i = 0; i < n; i++)
     {

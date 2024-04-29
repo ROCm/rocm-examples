@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "example_utils.hpp"
+
 #include <iostream>
 #include <numeric>
 
@@ -27,8 +29,6 @@
 #include <hip/hip_runtime.h>
 #include <rocprim/block/block_load.hpp>
 #include <rocprim/block/block_reduce.hpp>
-
-#include "example_utils.hpp"
 
 /// \brief Compute the sum of an array on the host CPU
 std::vector<int> reduce_sum_host(const std::vector<int>& data,

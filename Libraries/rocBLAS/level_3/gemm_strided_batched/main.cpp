@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -42,9 +42,9 @@ int main(const int argc, const char** argv)
     parser.set_optional<float>("a", "alpha", 1.f, "Alpha scalar");
     parser.set_optional<float>("b", "beta", 1.f, "Beta scalar");
     parser.set_optional<int>("c", "count", 3, "Batch count");
-    parser.set_optional<int>("m", "m", 5, "Number of rows of matrices f(A_i) and C_i");
-    parser.set_optional<int>("n", "n", 5, "Number of columns of matrices f(B_i) and C_i");
-    parser.set_optional<int>("k", "k", 5, "Number of columns of matrix f(A_i) and rows of f(B_i)");
+    parser.set_optional<int>("m", "m", 5, "Number of rows of matrices A_i and C_i");
+    parser.set_optional<int>("n", "n", 5, "Number of columns of matrices B_i and C_i");
+    parser.set_optional<int>("k", "k", 5, "Number of columns of matrix A_i and rows of B_i");
     parser.run_and_exit_if_error();
 
     // Set sizes of matrices.
@@ -84,7 +84,7 @@ int main(const int argc, const char** argv)
     const rocblas_float h_alpha = parser.get<float>("a");
     const rocblas_float h_beta  = parser.get<float>("b");
 
-    // Set GEMM operation as identity operation: $f(X) = X$.
+    // Set GEMM operation as identity operation: $X' = X$.
     const rocblas_operation trans_a = rocblas_operation_none;
     const rocblas_operation trans_b = rocblas_operation_none;
 
