@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,18 @@
 
 #ifndef COMMON_EXAMPLE_UTILS_HPP
 #define COMMON_EXAMPLE_UTILS_HPP
+
+// Compiling HIP on Windows includes windows.h, and this triggers many silly warnings.
+#if defined(_WIN32) && defined(__NVCC__)
+    #pragma nv_diag_suppress 108 // signed bit field of length 1
+    #pragma nv_diag_suppress 174 // expression has no effect
+    #pragma nv_diag_suppress 1835 // attribute "dllimport" does not apply here
+#endif
+
+// rocPRIM adds a #warning about printf on NAVI.
+#ifdef __clang__
+    #pragma clang diagnostic ignored "-W#warnings"
+#endif
 
 #include <cassert>
 #include <chrono>
