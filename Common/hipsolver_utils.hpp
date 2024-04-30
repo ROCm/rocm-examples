@@ -49,6 +49,9 @@ inline const char* hipsolverStatusToString(hipsolverStatus_t status)
 #if (hipsolverVersionMajor == 1 && hipsolverVersionMinor >= 8) || hipsolverVersionMajor >= 2
         case HIPSOLVER_STATUS_ZERO_PIVOT: return "HIPSOLVER_STATUS_ZERO_PIVOT";
 #endif
+#if (hipsolverVersionMajor >= 2 && hipsolverVersionMinor >= 1)
+        case HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED : return "HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED";
+#endif
     }
     // We don't use default so that the compiler warns if any valid enums are missing from the
     // switch. If the value is not a valid hipsolverStatus_t, we return the following.
