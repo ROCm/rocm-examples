@@ -93,7 +93,7 @@ int main()
     constexpr unsigned int block_size = 256;
 
     // Number of blocks per kernel grid.
-    constexpr unsigned int grid_size = (output_size + block_size - 1) / block_size;
+    constexpr unsigned int grid_size = ceiling_div(output_size, block_size);
 
     // Allocate and initialize input data on the host.
     std::vector<unsigned int> h_input(input_size);

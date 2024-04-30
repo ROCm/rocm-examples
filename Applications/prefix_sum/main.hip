@@ -123,11 +123,11 @@ __global__ void device_prefix_sum(float* buffer, int size, int offset)
 void run_prefix_sum_kernels(float* input, float* output, const int size)
 {
     // 4.1 Define kernel constants
-    constexpr int threads_per_block = 128;
-    dim3          block_dim(threads_per_block);
+    constexpr unsigned int threads_per_block = 128;
+    dim3                   block_dim(threads_per_block);
 
     // Each thread works on 2 elements.
-    constexpr int items_per_block = threads_per_block * 2;
+    constexpr unsigned int items_per_block = threads_per_block * 2;
     // block_prefix_sum uses shared memory dependent on the amount of threads per block.
     constexpr size_t shared_size = sizeof(float) * 2 * threads_per_block;
 
@@ -142,13 +142,12 @@ void run_prefix_sum_kernels(float* input, float* output, const int size)
     // Alternatively, use hipcub::DeviceScan::ExclusiveScan
     for(int offset = 1; offset < size; offset *= items_per_block)
     {
-        const int data_size = size / offset;
+        const unsigned int data_size = size / offset;
 
         if(size / offset > 1)
         {
             unsigned int total_threads = (data_size + 1) / 2;
-            total_threads
-                = ((total_threads + threads_per_block - 1) / threads_per_block) * threads_per_block;
+            total_threads = ceiling_div(total_threads, threads_per_block) * threads_per_block;
             dim3 grid_dim(total_threads / threads_per_block);
 
             block_prefix_sum<<<grid_dim, block_dim, shared_size>>>(d_data, size, offset);
@@ -156,10 +155,9 @@ void run_prefix_sum_kernels(float* input, float* output, const int size)
 
         if(offset > 1)
         {
-            int total_threads = size - offset;
+            unsigned int total_threads = size - offset;
             total_threads -= (total_threads / (offset * items_per_block)) * offset;
-            total_threads
-                = ((total_threads + threads_per_block - 1) / threads_per_block) * threads_per_block;
+            total_threads = ceiling_div(total_threads, threads_per_block) * threads_per_block;
             dim3 grid_dim(total_threads / threads_per_block);
 
             device_prefix_sum<<<grid_dim, block_dim>>>(d_data, size, offset);

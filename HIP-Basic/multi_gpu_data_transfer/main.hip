@@ -24,8 +24,10 @@
 
 #include <hip/hip_runtime.h>
 
+#include <cmath>
 #include <iostream>
 #include <numeric>
+#include <utility>
 #include <vector>
 
 /// \brief Checks whether peer-to-peer is supported or not among the current available devices.
@@ -40,7 +42,7 @@ std::pair<int, int> check_peer_to_peer_support()
     if(gpu_count < 2)
     {
         std::cout << "Peer-to-peer application requires at least 2 GPU devices." << std::endl;
-        exit(hipSuccess);
+        exit(0);
     }
 
     // Check accessibility for each device available.
@@ -59,9 +61,9 @@ std::pair<int, int> check_peer_to_peer_support()
         }
     }
     // No pair of devices supporting peer-to-peer between them has been found.
-    std::cout << "Peer-to-peer application requires at least 2 GPU devices accesible between them."
+    std::cout << "Peer-to-peer application requires at least 2 GPU devices accessible between them."
               << std::endl;
-    exit(hipSuccess);
+    exit(0);
 }
 
 /// \brief Enables (if possible) direct memory access from <tt>current_gpu<\tt> to <tt>peer_gpu<\tt>.
@@ -99,12 +101,12 @@ void disable_peer_to_peer(const unsigned int current_gpu, const unsigned int pee
 }
 
 /// \brief Simple matrix transpose kernel using static shared memory.
-template<const unsigned int Width = 32>
+template<const unsigned int Width = 32, const unsigned int Height = 32>
 __global__ void static_shared_matrix_transpose_kernel(float* out, const float* in)
 {
     // Allocate the necessary amount of shared memory to store the transpose of the matrix.
     // Note that the amount of shared memory needed is known at compile time.
-    constexpr unsigned int size = Width * Width;
+    constexpr unsigned int size = Width * Height;
     __shared__ float       shared_matrix_memory[size];
 
     // Compute the row and column indexes of the matrix element that each thread is going
@@ -112,27 +114,27 @@ __global__ void static_shared_matrix_transpose_kernel(float* out, const float* i
     const unsigned int x = blockDim.x * blockIdx.x + threadIdx.x;
     const unsigned int y = blockDim.y * blockIdx.y + threadIdx.y;
 
-    // If not out of bounds, transpose element (x,y).
-    if(x < Width && y < Width)
+    // If out of bounds, do nothing.
+    if(!(x < Width && y < Height))
     {
-        // Store transposed element in shared memory.
-        shared_matrix_memory[y * Width + x] = in[x * Width + y];
+        return;
     }
+
+    // Store transposed element (x,y) in shared memory.
+    shared_matrix_memory[y * Width + x] = in[x * Height + y];
 
     // Synchronize threads so all writes are done before accessing shared memory again.
     __syncthreads();
 
-    // If not out of bounds, transpose element (x,y).
-    if(x < Width && y < Width)
-    {
-        // Copy transposed element from shared memory to global memory.
-        out[y * Width + x] = shared_matrix_memory[y * Width + x];
-    }
+    // Copy transposed element from shared to global memory (output matrix).
+    out[y * Width + x] = shared_matrix_memory[y * Width + x];
 }
 
 /// \brief Simple matrix transpose kernel using dynamic shared memory.
-__global__ void
-    dynamic_shared_matrix_transpose_kernel(float* out, const float* in, const unsigned int width)
+__global__ void dynamic_shared_matrix_transpose_kernel(float*             out,
+                                                       const float*       in,
+                                                       const unsigned int width,
+                                                       const unsigned int height)
 {
     // Declare that this kernel is using dynamic shared memory to store a number of floats.
     // The unsized array type indicates that the total amount of memory that is going
@@ -145,22 +147,20 @@ __global__ void
     const unsigned int x = blockDim.x * blockIdx.x + threadIdx.x;
     const unsigned int y = blockDim.y * blockIdx.y + threadIdx.y;
 
-    // If not out of bounds, transpose element (x,y).
-    if(x < width && y < width)
+    // If out of bounds, do nothing.
+    if(!(x < width && y < height))
     {
-        // Store transposed element in shared memory.
-        shared_matrix_memory[y * width + x] = in[x * width + y];
+        return;
     }
+
+    // Store transposed element (x,y) in shared memory.
+    shared_matrix_memory[y * width + x] = in[x * height + y];
 
     // Synchronize threads so all writes are done before accessing shared memory again.
     __syncthreads();
 
-    // If not out of bounds, transpose element (x,y).
-    if(x < width && y < width)
-    {
-        // Copy transposed element from shared memory to global memory.
-        out[y * width + x] = shared_matrix_memory[y * width + x];
-    }
+    // Copy transposed element from shared to global memory (output matrix).
+    out[y * width + x] = shared_matrix_memory[y * height + x];
 }
 
 int main()
@@ -174,19 +174,22 @@ int main()
 
     // Number of rows and columns, total number of elements and size in bytes of the matrix
     // to be transposed.
-    constexpr unsigned int width      = 32;
-    constexpr unsigned int size       = width * width;
+    constexpr unsigned int width      = 4;
+    constexpr unsigned int height     = width;
+    constexpr unsigned int size       = width * height;
     constexpr size_t       size_bytes = size * sizeof(float);
 
     // Number of threads in each dimension of the kernel block.
     constexpr unsigned int block_size = 4;
 
-    // Number of blocks in each dimension of the grid. Calculated as ceiling(width/block_size).
-    constexpr unsigned int grid_size = (width + block_size - 1) / block_size;
+    // Number of blocks in each dimension of the grid. Calculated as
+    // ceiling(matrix_dimension/block_size) with matrix_dimension being width or height.
+    constexpr unsigned int grid_size_x = ceiling_div(width, block_size);
+    constexpr unsigned int grid_size_y = ceiling_div(height, block_size);
 
     // Block and grid sizes in 2D.
     const dim3 block_dim(block_size, block_size);
-    const dim3 grid_dim(grid_size, grid_size);
+    const dim3 grid_dim(grid_size_x, grid_size_y);
 
     // Allocate host input matrix and initialize with increasing sequence 1, 2, 3, ....
     std::vector<float> matrix(size);
@@ -213,7 +216,7 @@ int main()
 
     // Launch kernel in current device. Note that, as this kernel uses static shared memory, no
     // bytes of shared memory need to be allocated when launching the kernel.
-    static_shared_matrix_transpose_kernel<width>
+    static_shared_matrix_transpose_kernel<width, height>
         <<<grid_dim, block_dim, 0 /*shared_memory_bytes*/, hipStreamDefault>>>(
             d_transposed_matrix[0],
             d_matrix[0]);
@@ -248,7 +251,8 @@ int main()
                                              size_bytes /*shared_memory_bytes*/,
                                              hipStreamDefault>>>(d_transposed_matrix[1],
                                                                  d_matrix[1],
-                                                                 width);
+                                                                 width,
+                                                                 height);
 
     // Wait on all active streams on the current device.
     HIP_CHECK(hipDeviceSynchronize());
@@ -281,7 +285,7 @@ int main()
     if(errors)
     {
         std::cout << "Validation failed with " << errors << " errors." << std::endl;
-        return hipSuccess;
+        return error_exit_code;
     }
     else
     {
