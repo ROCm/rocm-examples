@@ -30,8 +30,10 @@ include:
       - /rules.yaml
 
 variables:
-  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror --Werror all-warnings"
-  # We require '-Wno-unused-command-line-argument' due to the followiwng warning:
+  # Temporary suppress warnings due to nvidia_hip_runtime_api bug
+  CUDA_WARNING_SUPPRESS_FLAGS: ",-Wno-missing-field-initializers,-Wno-deprecated-declarations,-Wno-sign-compare,-Wno-return-local-addr -diag-suppress=1056"
+  CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror${CUDA_WARNING_SUPPRESS_FLAGS} --Werror all-warnings"
+  # We require '-Wno-unused-command-line-argument' due to the following warning:
   #   argument unused during compilation: '--rtlib=compiler-rt'
   CXX_FLAGS: "-Wno-unused-command-line-argument -Wall -Wextra -Werror"
   HIP_FLAGS: "-Wno-unused-command-line-argument -Wall -Wextra -Werror"
@@ -172,7 +174,7 @@ build:cmake-cuda:
      -D GPU_RUNTIME=CUDA
      -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
      -D CMAKE_CUDA_FLAGS="$CUDA_FLAGS"
-     -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake
+     -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip
      2>&1 | tee cmake_log.txt
    # check if all dependencies were found
    - |-

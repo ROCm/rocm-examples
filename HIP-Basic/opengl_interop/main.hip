@@ -27,6 +27,7 @@
 #include "glad/glad.h"
 
 #include <GLFW/glfw3.h>
+#include <hip/hip_gl_interop.h>
 #include <hip/hip_runtime.h>
 
 #include <chrono>
@@ -101,7 +102,8 @@ int pick_hip_device()
 {
     unsigned int gl_device_count;
     int          hip_device;
-    HIP_CHECK(hipGLGetDevices(&gl_device_count, &hip_device, 1, hipGLDeviceListAll));
+    HIP_CHECK(
+        hipGLGetDevices(&gl_device_count, &hip_device, 1, hipGLDeviceList::hipGLDeviceListAll));
 
     if(gl_device_count == 0)
     {

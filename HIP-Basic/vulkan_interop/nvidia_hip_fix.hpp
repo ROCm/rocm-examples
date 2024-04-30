@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,13 @@
 #define _HIP_BASIC_VULKAN_INTEROP_NVIDIA_HIP_FIX_HPP
 
 #include <hip/hip_runtime.h>
+#include <hip/hip_version.h>
 
 // Currently these HIP symbols are missing when compiling for NVIDIA.
 // TODO: Remove this once HIP supports these symbols.
 // See https://github.com/ROCm-Developer-Tools/hipamd/issues/49.
-#if defined(__HIP_PLATFORM_NVCC__) && !defined(hipExternalMemoryHandleTypeOpaqueFd)
+#if defined(__HIP_PLATFORM_NVIDIA__) && !defined(hipExternalMemoryHandleTypeOpaqueFd) \
+    && HIP_VERSION_MAJOR < 6
     #define hipExternalMemoryHandleType cudaExternalMemoryHandleType
     #define hipExternalMemoryHandleTypeOpaqueFd cudaExternalMemoryHandleTypeOpaqueFd
     #define hipExternalSemaphoreHandleType cudaExternalSemaphoreHandleType

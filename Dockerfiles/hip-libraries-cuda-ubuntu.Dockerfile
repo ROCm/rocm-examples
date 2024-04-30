@@ -1,5 +1,5 @@
 # CUDA based docker image
-FROM nvidia/cuda:11.6.2-devel-ubuntu20.04
+FROM nvidia/cuda:12.0.0-devel-ubuntu20.04
 
 # Base packages that are required for the installation
 RUN export DEBIAN_FRONTEND=noninteractive; \
@@ -27,7 +27,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
 # Install HIP using the installer script
 RUN export DEBIAN_FRONTEND=noninteractive; \
     wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | apt-key add - \
-    && echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/5.7/ ubuntu main' > /etc/apt/sources.list.d/rocm.list \
+    && echo 'deb [arch=amd64] https://repo.radeon.com/rocm/apt/6.0/ ubuntu main' > /etc/apt/sources.list.d/rocm.list \
     && apt-get update -qq \
     && apt-get install -y hip-base hipify-clang rocm-core hipcc hip-dev
 
@@ -45,58 +45,75 @@ RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
     && ldconfig
 
 # Install rocRAND
-RUN wget https://github.com/ROCmSoftwarePlatform/rocRAND/archive/refs/tags/rocm-5.7.0.tar.gz \
-    && tar -xf ./rocm-5.7.0.tar.gz \
-    && rm ./rocm-5.7.0.tar.gz \
-    && cmake -S ./rocRAND-rocm-5.7.0 -B ./rocRAND-rocm-5.7.0/build \
-        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+RUN wget https://github.com/ROCm/rocRAND/archive/refs/tags/rocm-6.0.0.tar.gz \
+    && tar -xf ./rocm-6.0.0.tar.gz \
+    && rm ./rocm-6.0.0.tar.gz \
+    && cmake -S ./rocRAND-rocm-6.0.0 -B ./rocRAND-rocm-6.0.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D BUILD_HIPRAND=OFF \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
-    && cmake --build ./rocRAND-rocm-5.7.0/build --target install \
-    && rm -rf ./rocRAND-rocm-5.7.0
+        -D NVGPU_TARGETS="50" \
+    && cmake --build ./rocRAND-rocm-6.0.0/build --target install \
+    && rm -rf ./rocRAND-rocm-6.0.0
 
 # Install hipCUB
-RUN wget https://github.com/ROCmSoftwarePlatform/hipCUB/archive/refs/tags/rocm-5.7.0.tar.gz \
-    && tar -xf ./rocm-5.7.0.tar.gz \
-    && rm ./rocm-5.7.0.tar.gz \
-    && cmake -S ./hipCUB-rocm-5.7.0 -B ./hipCUB-rocm-5.7.0/build \
-        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+RUN wget https://github.com/ROCm/hipCUB/archive/refs/tags/rocm-6.0.0.tar.gz \
+    && tar -xf ./rocm-6.0.0.tar.gz \
+    && rm ./rocm-6.0.0.tar.gz \
+    && cmake -S ./hipCUB-rocm-6.0.0 -B ./hipCUB-rocm-6.0.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
-    && cmake --build ./hipCUB-rocm-5.7.0/build --target install \
-    && rm -rf ./hipCUB-rocm-5.7.0
+    && cmake --build ./hipCUB-rocm-6.0.0/build --target install \
+    && rm -rf ./hipCUB-rocm-6.0.0
 
 # Install hipBLAS
-RUN wget https://github.com/ROCmSoftwarePlatform/hipBLAS/archive/refs/tags/rocm-5.7.0.tar.gz \
-    && tar -xf ./rocm-5.7.0.tar.gz \
-    && rm ./rocm-5.7.0.tar.gz \
-    && cmake -S ./hipBLAS-rocm-5.7.0 -B ./hipBLAS-rocm-5.7.0/build \
-        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+# hipBLAS cmake for rocm-6.0.0 is broken added CXXFLAGS=-D__HIP_PLATFORM_NVIDIA__ as fix
+RUN wget https://github.com/ROCm/hipBLAS/archive/refs/tags/rocm-6.0.0.tar.gz \
+    && tar -xf ./rocm-6.0.0.tar.gz \
+    && rm ./rocm-6.0.0.tar.gz \
+    && CXXFLAGS=-D__HIP_PLATFORM_NVIDIA__ cmake -S ./hipBLAS-rocm-6.0.0 -B ./hipBLAS-rocm-6.0.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
         -D USE_CUDA=ON \
-    && cmake --build ./hipBLAS-rocm-5.7.0/build --target install \
-    && rm -rf ./hipBLAS-rocm-5.7.0
+    && cmake --build ./hipBLAS-rocm-6.0.0/build --target install \
+    && rm -rf ./hipBLAS-rocm-6.0.0
 
 # Install hipSOLVER
-RUN wget https://github.com/ROCmSoftwarePlatform/hipSOLVER/archive/refs/tags/rocm-5.7.0.tar.gz \
-    && tar -xf ./rocm-5.7.0.tar.gz \
-    && rm ./rocm-5.7.0.tar.gz \
-    && cmake -S ./hipSOLVER-rocm-5.7.0 -B ./hipSOLVER-rocm-5.7.0/build \
-        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+# hipSOLVER cmake for rocm-6.0.0 is broken added CXXFLAGS=-D__HIP_PLATFORM_NVIDIA__ as fix
+RUN wget https://github.com/ROCm/hipSOLVER/archive/refs/tags/rocm-6.0.0.tar.gz \
+    && tar -xf ./rocm-6.0.0.tar.gz \
+    && rm ./rocm-6.0.0.tar.gz \
+    && CXXFLAGS=-D__HIP_PLATFORM_NVIDIA__ cmake -S ./hipSOLVER-rocm-6.0.0 -B ./hipSOLVER-rocm-6.0.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
         -D USE_CUDA=ON \
-    && cmake --build ./hipSOLVER-rocm-5.7.0/build --target install \
-    && rm -rf ./hipSOLVER-rocm-5.7.0
+    && cmake --build ./hipSOLVER-rocm-6.0.0/build --target install \
+    && rm -rf ./hipSOLVER-rocm-6.0.0
 
 # Install hipRAND
-RUN wget https://github.com/ROCmSoftwarePlatform/hipRAND/archive/refs/tags/rocm-5.7.0.tar.gz \
-    && tar -xf ./rocm-5.7.0.tar.gz \
-    && rm ./rocm-5.7.0.tar.gz \
-    && cmake -S ./hipRAND-rocm-5.7.0 -B ./hipRAND-rocm-5.7.0/build \
-        -D CMAKE_MODULE_PATH=/opt/rocm/hip/cmake \
+# Build from commit that removes deprecated macro use
+RUN git clone https://github.com/ROCm/hipRAND.git hipRAND-rocm-6.0.0 \
+    && cd hipRAND-rocm-6.0.0 \
+    && git reset --hard  4925f0da96fad5b9f532ddc79f1f52fc279d329f \
+    && cmake -S . -B ./build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
         -D BUILD_WITH_LIB=CUDA \
-    && cmake --build ./hipRAND-rocm-5.7.0/build --target install \
-    && rm -rf ./hipRAND-rocm-5.7.0
+        -D NVGPU_TARGETS="50" \
+    && cmake --build ./build --target install \
+    && cd .. \
+    && rm -rf ./hipRAND-rocm-6.0.0
+
+# Install hipFFT
+RUN wget https://github.com/ROCm/hipFFT/archive/refs/tags/rocm-6.0.0.tar.gz \
+    && tar -xf ./rocm-6.0.0.tar.gz \
+    && rm ./rocm-6.0.0.tar.gz \
+    && cmake -S ./hipFFT-rocm-6.0.0 -B ./hipFFT-rocm-6.0.0/build \
+        -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
+        -D CMAKE_INSTALL_PREFIX=/opt/rocm \
+        -D BUILD_WITH_LIB=CUDA \
+    && cmake --build ./hipFFT-rocm-6.0.0/build --target install \
+    && rm -rf ./hipFFT-rocm-6.0.0
 
 # Use render group as an argument from user
 ARG GID=109

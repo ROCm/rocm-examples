@@ -31,6 +31,12 @@
 
 int main()
 {
+// 'rocsparse_dbsrmv' is added in rocSPARSE 3.0. In lower versions use
+// 'rocsparse_dbsrmv_ex' instead.
+#if ROCSPARSE_VERSION_MAJOR < 3
+    #define rocsparse_dbsrmv(...) rocsparse_dbsrmv_ex(__VA_ARGS__)
+#endif
+
     // 1. Set up input data
     //
     // alpha *         A         *    x    + beta *    y    =      y
@@ -128,22 +134,23 @@ int main()
     HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
     // 4. Call bsrmv to perform y = alpha * A x + beta * y
-    ROCSPARSE_CHECK(rocsparse_dbsrmv_ex(handle,
-                                        dir,
-                                        trans,
-                                        mb,
-                                        nb,
-                                        nnzb,
-                                        &alpha,
-                                        descr,
-                                        d_bsr_val,
-                                        d_bsr_row_ptr,
-                                        d_bsr_col_ind,
-                                        bsr_dim,
-                                        info,
-                                        d_x,
-                                        &beta,
-                                        d_y));
+    // This function is non blocking and executed asynchronously with respect to the host.
+    ROCSPARSE_CHECK(rocsparse_dbsrmv(handle,
+                                     dir,
+                                     trans,
+                                     mb,
+                                     nb,
+                                     nnzb,
+                                     &alpha,
+                                     descr,
+                                     d_bsr_val,
+                                     d_bsr_row_ptr,
+                                     d_bsr_col_ind,
+                                     bsr_dim,
+                                     info,
+                                     d_x,
+                                     &beta,
+                                     d_y));
 
     // 5. Copy y to host from device
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
