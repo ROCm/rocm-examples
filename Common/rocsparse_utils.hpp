@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,7 +47,6 @@ inline const char* rocsparse_status_to_string(rocsparse_status status)
         case rocsparse_status_not_initialized: return "rocsparse_status_not_initialized";
         case rocsparse_status_type_mismatch: return "rocsparse_status_type_mismatch";
         case rocsparse_status_thrown_exception: return "rocsparse_status_thrown_exception";
-        case rocsparse_status_continue: return "rocsparse_status_continue";
         case rocsparse_status_requires_sorted_storage:
             return "rocsparse_status_requires_sorted_storage";
     }

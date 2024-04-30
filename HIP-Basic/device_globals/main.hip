@@ -75,7 +75,7 @@ int main()
     constexpr unsigned int block_size = size;
 
     // Number of blocks per kernel grid. The expression below calculates ceil(size/block_size).
-    constexpr unsigned int grid_size = (size + block_size - 1) / block_size;
+    constexpr unsigned int grid_size = ceiling_div(size, block_size);
 
     // Allocate host vectors for the input and output.
     std::vector<float> h_in(size);

@@ -56,7 +56,7 @@ int main()
     constexpr unsigned int block_size = 256;
 
     // The number of blocks per kernel grid. The expression below calculates `ceil(size / block_size)`.
-    constexpr unsigned int grid_size = (size + block_size - 1) / block_size;
+    constexpr unsigned int grid_size = ceiling_div(size, block_size);
 
     // Allocate host input vector and fill it with an increasing sequence (i.e. 0, 1, 2, ...).
     std::vector<int> in(size);

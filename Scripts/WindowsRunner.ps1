@@ -2,7 +2,7 @@ param(
     [Parameter(Mandatory)]
     [string]$Path = "Debug",
     [string]$Filter = "*.exe",
-    [int]$Timeout = 10,
+    [int]$Timeout = 60,
     [string[]]$Skip = @()
 )
 $Skip = $Skip | ForEach-Object { $_.Trim() }
