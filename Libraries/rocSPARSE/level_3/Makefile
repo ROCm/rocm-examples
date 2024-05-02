@@ -26,7 +26,9 @@ EXAMPLES := \
 	csrmm \
 	csrsm \
 	gebsrmm \
-	gemmi
+	gemmi \
+	sddmm \
+	spsm
 
 all: $(EXAMPLES)
 

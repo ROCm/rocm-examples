@@ -30,6 +30,7 @@ EXAMPLES := \
 	ellmv \
 	gebsrmv \
 	gemvi \
+	spmv \
 	spsv
 
 all: $(EXAMPLES)
