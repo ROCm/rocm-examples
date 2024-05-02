@@ -20,17 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocSPARSE_level_2_examples LANGUAGES NONE)
+EXAMPLE := rocsparse_spsm
+COMMON_INCLUDE_DIR := ../../../../Common
+GPU_RUNTIME := HIP
 
-add_subdirectory(bsrmv)
-add_subdirectory(bsrsv)
-add_subdirectory(bsrxmv)
-add_subdirectory(coomv)
-add_subdirectory(csrmv)
-add_subdirectory(csrsv)
-add_subdirectory(ellmv)
-add_subdirectory(gebsrmv)
-add_subdirectory(gemvi)
-add_subdirectory(spmv)
-add_subdirectory(spsv)
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
+
+ROCM_INSTALL_DIR := /opt/rocm
+
+HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+ROCSPARSE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+CXX ?= g++
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCSPARSE_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocsparse -lamdhip64
+
+CXXFLAGS ?= -Wall -Wextra
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS += $(LDFLAGS)
+ILDLIBS += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocsparse_utils.hpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
