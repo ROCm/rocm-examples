@@ -31,6 +31,12 @@
 
 int main()
 {
+// 'rocsparse_dspmv' is added in rocSPARSE 3.0. In lower versions use
+// 'rocsparse_dspmv_ex' instead.
+#if ROCSPARSE_VERSION_MAJOR < 3
+    #define rocsparse_spmv(...) rocsparse_spmv_ex(__VA_ARGS__)
+#endif
+
     // 1. Set up input data
     //
     // alpha *         A         *    x    + beta *    y    =      y
@@ -130,21 +136,21 @@ int main()
     // Obtain required buffer size in bytes for preprocess and compute stages.
     // This stage is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
-    ROCSPARSE_CHECK(rocsparse_spmv_ex(handle,
-                                      trans,
-                                      &alpha,
-                                      descr_A,
-                                      descr_x,
-                                      &beta,
-                                      descr_y,
-                                      data_type,
-                                      alg,
-                                      rocsparse_spmv_stage_buffer_size,
-                                      &buffer_size,
-                                      nullptr));
-
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
+    ROCSPARSE_CHECK(rocsparse_spmv(handle,
+                                   trans,
+                                   &alpha,
+                                   descr_A,
+                                   descr_x,
+                                   &beta,
+                                   descr_y,
+                                   data_type,
+                                   alg,
+                                   rocsparse_spmv_stage_buffer_size,
+                                   &buffer_size,
+                                   nullptr));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // 5. Preprocess.
     // Allocate temporary buffer.
@@ -152,33 +158,33 @@ int main()
     HIP_CHECK(hipMalloc(&temp_buffer, buffer_size));
 
     // Perform preprocessing.
-    ROCSPARSE_CHECK(rocsparse_spmv_ex(handle,
-                                      trans,
-                                      &alpha,
-                                      descr_A,
-                                      descr_x,
-                                      &beta,
-                                      descr_y,
-                                      data_type,
-                                      alg,
-                                      rocsparse_spmv_stage_preprocess,
-                                      &buffer_size,
-                                      temp_buffer));
+    ROCSPARSE_CHECK(rocsparse_spmv(handle,
+                                   trans,
+                                   &alpha,
+                                   descr_A,
+                                   descr_x,
+                                   &beta,
+                                   descr_y,
+                                   data_type,
+                                   alg,
+                                   rocsparse_spmv_stage_preprocess,
+                                   &buffer_size,
+                                   temp_buffer));
 
     // 6. Compute matrix-vector multiplication.
     // This stage is non blocking and executed asynchronously with respect to the host.
-    ROCSPARSE_CHECK(rocsparse_spmv_ex(handle,
-                                      trans,
-                                      &alpha,
-                                      descr_A,
-                                      descr_x,
-                                      &beta,
-                                      descr_y,
-                                      data_type,
-                                      alg,
-                                      rocsparse_spmv_stage_compute,
-                                      &buffer_size,
-                                      temp_buffer));
+    ROCSPARSE_CHECK(rocsparse_spmv(handle,
+                                   trans,
+                                   &alpha,
+                                   descr_A,
+                                   descr_x,
+                                   &beta,
+                                   descr_y,
+                                   data_type,
+                                   alg,
+                                   rocsparse_spmv_stage_compute,
+                                   &buffer_size,
+                                   temp_buffer));
 
     // Synchronize threads.
     HIP_CHECK(hipDeviceSynchronize());
