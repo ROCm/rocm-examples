@@ -1,0 +1,11 @@
+# Overall
+* @dgaliffiAMD
+
+# HIP Examples
+HIP-Basics/* @rakesroy
+
+# Documentation files
+docs/* @ROCm/rocm-documentation
+*.md @ROCm/rocm-documentation
+*.rst @ROCm/rocm-documentation
+
