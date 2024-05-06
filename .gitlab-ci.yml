@@ -42,7 +42,7 @@ stages:
   - test
 
 clang-format:
-  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu-5.7
   stage: lint
   needs: []
   tags:
@@ -73,7 +73,7 @@ clang-format:
     - >-
       /kaniko/executor
       --context "${CI_PROJECT_DIR}/Dockerfiles"
-      --dockerfile "${CI_PROJECT_DIR}/Dockerfiles/hip-libraries-${TAG}.Dockerfile"
+      --dockerfile "${CI_PROJECT_DIR}/Dockerfiles/${DOCKERFILE}"
       --destination "docker.io/${DOCKER_TAG_PREFIX}:${TAG}"
       ${NO_PUSH}
   rules:
@@ -88,20 +88,22 @@ build:rocm-ubuntu-dockerfile:
   extends:
     - .build:dockerfiles
   variables:
-    TAG: rocm-ubuntu
+    DOCKERFILE: hip-libraries-rocm-ubuntu.Dockerfile
+    TAG: rocm-ubuntu-5.7
 
 build:cuda-ubuntu-dockerfile:
   extends:
     - .build:dockerfiles
   variables:
-    TAG: cuda-ubuntu
+    DOCKERFILE: hip-libraries-cuda-ubuntu.Dockerfile
+    TAG: cuda-ubuntu-5.7
 
 ########################
 # Ubuntu make          #
 ########################
 
 build:make-rocm:
-  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu-5.7
   stage: build
   extends:
     - .rules:build
@@ -112,7 +114,7 @@ build:make-rocm:
     - cd $CI_PROJECT_DIR && make CXXFLAGS="$HIP_FLAGS" -j $(nproc)
 
 build:make-cuda:
-  image: $DOCKER_TAG_PREFIX:cuda-ubuntu
+  image: $DOCKER_TAG_PREFIX:cuda-ubuntu-5.7
   stage: build
   extends:
     - .rules:build
@@ -136,7 +138,7 @@ build:make-cuda:
       - $CI_PROJECT_DIR/build
 
 build:cmake-rocm:
-  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu-5.7
   extends:
     - .build:cmake
     - .gpus:rocm-gpus
@@ -160,7 +162,7 @@ build:cmake-rocm:
     - cmake --install $CI_PROJECT_DIR/build --prefix $CI_PROJECT_DIR/install
 
 build:cmake-cuda:
- image: $DOCKER_TAG_PREFIX:cuda-ubuntu
+ image: $DOCKER_TAG_PREFIX:cuda-ubuntu-5.7
  extends:
    - .build:cmake
  tags:
@@ -195,7 +197,7 @@ build:cmake-cuda:
     - cd $CI_PROJECT_DIR/build && ctest --output-on-failure
 
 test:rocm:
-  image: $DOCKER_TAG_PREFIX:rocm-ubuntu
+  image: $DOCKER_TAG_PREFIX:rocm-ubuntu-5.7
   extends:
     - .test
     - .gpus:rocm
@@ -203,7 +205,7 @@ test:rocm:
     - build:cmake-rocm
 
 test:cuda:
-  image: $DOCKER_TAG_PREFIX:cuda-ubuntu
+  image: $DOCKER_TAG_PREFIX:cuda-ubuntu-5.7
   extends:
     - .test
     - .gpus:nvcc
