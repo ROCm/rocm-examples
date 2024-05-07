@@ -145,10 +145,12 @@ build:cmake-rocm:
   tags:
     - rocm-build
   script:
+    # ROCm 5.7 does not support gfx942, disable it.
+    - GPU_TARGETS_WITHOUT_GFX942=$(echo "$GPU_TARGETS" | sed -E 's/;gfx942|gfx942;|^gfx942$//')
     - cmake
       -S $CI_PROJECT_DIR
       -B $CI_PROJECT_DIR/build
-      -D CMAKE_HIP_ARCHITECTURES="$GPU_TARGETS"
+      -D CMAKE_HIP_ARCHITECTURES="$GPU_TARGETS_WITHOUT_GFX942"
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
       2>&1 | tee cmake_log.txt
