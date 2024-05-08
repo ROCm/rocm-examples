@@ -106,6 +106,15 @@ The above compilation steps are implemented in Visual Studio through Custom Buil
     Additional Dependencies: $(IntDir)main_device.obj;%(AdditionalDependencies)
     ```
 
+## Dependencies
+
+This example depends on the following tools:
+
+- `clang-offload-bundler`, which is included in the `rocm-llvm` package on Linux.
+- `llvm-mc`, which is included in the `rocm-llvm` package on Linux.
+
+`rocm-llvm` is installed with most ROCm installations.
+
 ## Used API surface
 ### HIP runtime
 - `hipFree`
