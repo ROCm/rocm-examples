@@ -11,7 +11,7 @@ where
 - $\alpha$ and $\beta$ are scalars
 - $A$ and $B$ are dense matrices
 - $C$ is a sparse matrix in CSR format, the result will be in this matrix
-- $sppat(C)$ is the sparsity pattern of C matrix 
+- $sppat(C)$ is the sparsity pattern of C matrix
 - and $A'$ and $B'$ is the result of applying one of the `rocsparse_operation`s to the respective matrices.
 
 ## Application flow
@@ -29,7 +29,7 @@ where
 
 ## Key APIs and Concepts
 ### CSR Matrix Storage Format
-The [Compressed Sparse Row (CSR) storage format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#csr-storage-format) describes an $m \times n$ sparse matrix with three arrays.
+The [Compressed Sparse Row (CSR) storage format](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#csr-storage-format) describes an $m \times n$ sparse matrix with three arrays.
 
 Defining
 - `m`: number of rows

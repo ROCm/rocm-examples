@@ -7,9 +7,9 @@ The examples in this subdirectory showcase the functionality of the [rocPRIM](ht
 ### Linux
 - [CMake](https://cmake.org/download/) (at least version 3.21)
 - OR GNU Make - available via the distribution's package manager
-- [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 5.x.x)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 5.x.x)
 - [rocPRIM](https://github.com/ROCmSoftwarePlatform/rocPRIM)
-    - `rocPRIM-dev` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/How_to_Install_ROCm.html).
+    - `rocPRIM-dev` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
 
 ### Windows
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload

@@ -128,7 +128,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
 ### Linux
 - [CMake](https://cmake.org/download/) (at least version 3.21)
 - A number of examples also support building via  GNU Make - available through the distribution's package manager
-- [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 5.x.x)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 5.x.x)
 - For example-specific prerequisites, see the example subdirectories.
 
 ### Windows

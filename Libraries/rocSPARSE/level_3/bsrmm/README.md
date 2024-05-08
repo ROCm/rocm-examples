@@ -25,7 +25,7 @@ where
 
 ## Key APIs and Concepts
 ### BSR Matrix Storage Format
-The [Block Compressed Sparse Row (BSR) storage format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#bsr-storage-format) describes a sparse matrix using three arrays. The idea behind this storage format is to split the given sparse matrix into equal sized blocks of dimension `bsr_dim` and store those using the [CSR format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#csr-storage-format). Because the CSR format only stores non-zero elements, the BSR format introduces the concept of __non-zero block__: a block that contains at least one non-zero element. Note that all elements of non-zero blocks are stored, even if some of them are equal to zero.
+The [Block Compressed Sparse Row (BSR) storage format](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#bsr-storage-format) describes a sparse matrix using three arrays. The idea behind this storage format is to split the given sparse matrix into equal sized blocks of dimension `bsr_dim` and store those using the [CSR format](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#csr-storage-format). Because the CSR format only stores non-zero elements, the BSR format introduces the concept of __non-zero block__: a block that contains at least one non-zero element. Note that all elements of non-zero blocks are stored, even if some of them are equal to zero.
 
 Therefore, defining
 - `mb`: number of rows of blocks
@@ -164,7 +164,7 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 
    Currently, only `rocsparse_operation_none` is supported.
 - `rocsparse_mat_descr`: descriptor of the sparse BSR matrix.
-    
+
 - `rocsparse_direction` block storage major direction with the following options:
    - `rocsparse_direction_column`
    - `rocsparse_direction_row`

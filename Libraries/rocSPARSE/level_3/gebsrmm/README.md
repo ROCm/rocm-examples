@@ -25,7 +25,7 @@ where
 
 ## Key APIs and Concepts
 ### GEBSR Matrix Storage Format
-The [General Block Compressed Sparse Row (GEBSR) storage format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#gebsr-storage-format) describes a sparse matrix using three arrays. The idea behind this storage format is the same as for the BSR format, but the blocks in which the sparse matrix is split are not squared. All of them are of `bsr_row_dim` $\times$ `bsr_col_dim` size.
+The [General Block Compressed Sparse Row (GEBSR) storage format](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#gebsr-storage-format) describes a sparse matrix using three arrays. The idea behind this storage format is the same as for the BSR format, but the blocks in which the sparse matrix is split are not squared. All of them are of `bsr_row_dim` $\times$ `bsr_col_dim` size.
 
 Therefore, defining
 - `mb`: number of rows of blocks
@@ -61,7 +61,7 @@ Note that, for a given $m\times n$ matrix, if $m$ is not evenly divisible by the
 
    Currently, only `rocsparse_operation_none` is supported.
 - `rocsparse_mat_descr`: descriptor of the sparse BSR matrix.
-    
+
 - `rocsparse_direction` block storage major direction with the following options:
    - `rocsparse_direction_column`
    - `rocsparse_direction_row`

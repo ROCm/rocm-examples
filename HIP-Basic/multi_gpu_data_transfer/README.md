@@ -29,7 +29,7 @@ In this example, the result of a matrix transpose kernel execution on one device
 - With `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`), from device to host (using `hipMemcpyDeviceToHost`) or from device to device (using `hipMemcpyDeviceToDevice`). The latter will only work if P2P communication has been enabled from the destination to the source device.
 - `myKernelName<<<...>>>` queues the execution of a kernel in the current device and `hipDeviceSynchronize` makes the host to wait on all active streams on the current device. In this example `hipDeviceSynchronize` is necessary because the second device needs the results obtained from the previous kernel execution on the first device.
 - `hipDeviceReset` discards the state of the current device and updates it to fresh one. It also frees all the resources (e.g. streams, events, ...) associated with the current device.
-- It's a [known issue with multi-GPU environments](https://community.amd.com/t5/knowledge-base/iommu-advisory-for-multi-gpu-environments/ta-p/477468) that some multi-GPU environments fail due to limitations of the IOMMU enablement, so it may be needed to explicitly enable/disable the IOMMU using the kernel command-line parameter `iommu=pt/off`.
+- It's a [known issue with multi-GPU environments](https://community.amd.com/t5/knowledge-base/iommu-advisory-for-amd-instinct/ta-p/484601) that some multi-GPU environments fail due to limitations of the IOMMU enablement, so it may be needed to explicitly enable/disable the IOMMU using the kernel command-line parameter `iommu=pt/off`.
 
 ## Demonstrated API Calls
 

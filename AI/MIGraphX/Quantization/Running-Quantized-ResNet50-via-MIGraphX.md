@@ -1,5 +1,3 @@
-
-
 # Running quantized ResNet50 via MIGraphX
 
 ## Summary
@@ -7,7 +5,7 @@ This example walks through the dynamo Post Training Quantization (PTQ) workflow 
 
 ## Prerequisites
 
-- You must follow the installation instructions for the torch_migraphx library in [Readme.md](https://github.com/Rmalavally/rocm-examples/blob/develop/AI/MIGraphX/Quantization/Readme.md) before using this example.
+- You must follow the installation instructions for the torch_migraphx library in [AI/MIGraphX/Quantization](https://github.com/ROCm/rocm-examples/tree/develop/AI/MIGraphX/Quantization/) before using this example.
 
 ## Steps for running a quantized model using torch_migraphx
 
@@ -56,7 +54,7 @@ print(f"MIGraphX INT8:\n{mgx_out}")
 ```
 
 3. Performance
-   
+
 Do a quick test to measure the performance gain from using quantization.
 
 ```

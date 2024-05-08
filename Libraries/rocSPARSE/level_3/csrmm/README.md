@@ -25,7 +25,7 @@ where
 
 ## Key APIs and Concepts
 ### CSR Matrix Storage Format
-The [Compressed Sparse Row (CSR) storage format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#csr-storage-format) describes an $m \times n$ sparse matrix with three arrays.
+The [Compressed Sparse Row (CSR) storage format](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#csr-storage-format) describes an $m \times n$ sparse matrix with three arrays.
 
 Defining
 - `m`: number of rows
