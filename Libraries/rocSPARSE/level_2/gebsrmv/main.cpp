@@ -36,7 +36,7 @@ int main()
 {
     // 1. Setup input data.
 
-    //  alpha * A * x
+    //  alpha * op(A) * x
     // + beta * y =
     //            = 1.0 * ( 4.0  0.0  0.0  0.0 ) * ( 1.0 ) - 1.0 * ( 4.0 )
     //                    ( 4.0  3.0  0.0  0.0 )   ( 2.0 )         ( 5.0 )
@@ -80,13 +80,13 @@ int main()
     // clang-format off
     constexpr std::array<double, nnzb * bsr_row_dim * bsr_col_dim>
         h_bsr_val{4.0, 0.0, 0.0,
-                  4.0, 3.0, 0.0,  // A_{00}
+                  4.0, 3.0, 0.0,  // op(A)_{00}
 
                   4.0, 3.0, 2.0,
-                  4.0, 3.0, 2.0,  // A_{10}
+                  4.0, 3.0, 2.0,  // op(A)_{10}
 
                   0.0, 0.0, 0.0,
-                  1.0, 0.0, 0.0}; // A_{11}
+                  1.0, 0.0, 0.0}; // op(A)_{11}
     // clang-format on
 
     // GEBSR row pointers.
@@ -145,7 +145,7 @@ int main()
     rocsparse_mat_descr descr;
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
 
-    // 5. Call gebsrmv to perform y = alpha * A * x + beta * y.
+    // 5. Call gebsrmv to perform y = alpha * op(A) * x + beta * y.
     // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dgebsrmv(handle,
                                        dir,

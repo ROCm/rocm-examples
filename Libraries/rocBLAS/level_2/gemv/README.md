@@ -34,11 +34,9 @@ The application provides the following optional command line arguments:
 - The _pointer mode_ controls whether scalar parameters must be allocated on the host (`rocblas_pointer_mode_host`) or on the device (`rocblas_pointer_mode_device`). It is controlled by `rocblas_set_pointer_mode`.
 
 - `rocblas_Xgemv(handle, trans, m, n, *alpha, *A, lda, *x, incx, *beta, *y, incy)` computes a general matrix-vector product. `m` and `n` specify the dimensions of matrix $A$ _before_ any transpose operation is performed on it. `lda` is the _leading dimension_ of $A$: the number of elements between the starts of columns of $A$. Columns of $A$ are packed in memory. Note that rocBLAS matrices are stored in _column major_ ordering in memory. `x` and `y` specify vectors $x$ and $y$, and `incx` and `incy` denote the increment between consecutive items of the respective vectors in elements. `trans` specifies a matrix operation that may be performed before the matrix-vector product is computed:
-
   - `rocblas_operation_none` specifies that no operation is performed. In this case, $x$ needs to have $n$ elements, and $y$ needs to have $m$ elements.
-  - `rocblas_operation_transpose` specifies that $A$ should be transposed ($A' = A^T$) before the matrix-vector product is performed.
-  - `rocblas_operation_conjugate_tranpose` specifies that $A$ should be conjugate transposed ($A' = A^H$) before the matrix-vector product is performed. In this and the previous case, $x$ needs to have $m$ elements, and $y$ needs to have $n$ elements.
-
+  - `rocblas_operation_transpose` specifies that $A$ should be transposed ($op(A) = A^T$) before the matrix-vector product is performed.
+  - `rocblas_operation_conjugate_tranpose` specifies that $A$ should be conjugate transposed ($op(A) = A^H$) before the matrix-vector product is performed. In this and the previous case, $x$ needs to have $m$ elements, and $y$ needs to have $n$ elements.
 `X` is a placeholder for the data type of the operation and can be either `s` (float: `rocblas_float`) or `d` (double: `rocblas_double`).
 
 ## Demonstrated API Calls

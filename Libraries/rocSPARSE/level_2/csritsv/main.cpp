@@ -35,7 +35,7 @@ int main()
 {
     // 1. Setup input data.
 
-    // alpha  *             A'           *     y       =     x
+    // alpha  *           op(A)          *      y      =     x
     //   1.0  *  ( 1.0  0.0  0.0  0.0 )  *  (   1   )  =  ( 1.0 )
     //           ( 2.0  3.0  0.0  0.0 )  *  (   0   )     ( 2.0 )
     //           ( 4.0  5.0  6.0  0.0 )  *  ( -1/6  )     ( 3.0 )
@@ -161,7 +161,7 @@ int main()
                                                 solve_policy,
                                                 temp_buffer));
 
-    // 6. Perform triangular solve A' y = alpha * x.
+    // 6. Perform triangular solve op(A) * y = alpha * x.
     // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dcsritsv_solve(handle,
                                              &iter_counter,

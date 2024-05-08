@@ -6,14 +6,14 @@ This example illustrates the use of the `rocSPARSE` level 3 sparse matrix-matrix
 
 The operation calculates the following product:
 
-$\hat{C} = \alpha \cdot A' \cdot B' + \beta \cdot C$
+$\hat{C} = \alpha \cdot op_a(A) \cdot op_b(B) + \beta \cdot C$
 
 where
 
 - $\alpha$ and $\beta$ are scalars
 - $A$ is a sparse matrix in BSR format
 - $B$ and $C$ are dense matrices
-- and $A'$ is the result of applying to matrix $A$ one of the `rocsparse_operation` described below.
+- and $op_a(A)$ and $op_b(B)$ are the result of applying to matrices $A$ and $B$, respectively, one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 
 ## Application flow
 
@@ -166,9 +166,9 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
   - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$
 
   Currently, only `rocsparse_operation_none` is supported.
 

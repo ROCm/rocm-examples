@@ -6,13 +6,13 @@ This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector
 
 The operation calculates the following product:
 
-$$\hat{\mathbf{y}} = \alpha \cdot A' \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
+$$\hat{\mathbf{y}} = \alpha \cdot op(A) \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
 
 where
 
 - $\alpha$ and $\beta$ are scalars
 - $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
-- $A'$ is a sparse matrix in CSR format with `rocsparse_operation`, which is described below in more detail.
+- $op(A)$ is a sparse matrix in CSR format with `rocsparse_operation`, which is described below in [Key APIs and Concepts - rocSPARSE](#rocsparse) in more detail.
 
 ## Application flow
 
@@ -87,9 +87,9 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
   - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$
 
 - `rocsparse_mat_descr`: holds all properties of a matrix.
 

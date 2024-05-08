@@ -4,18 +4,17 @@
 
 This example illustrates the use of the rocBLAS Level 3 Strided Batched General Matrix Multiplication. The rocBLAS GEMM STRIDED BATCHED performs a matrix--matrix operation for a _batch_ of matrices as:
 
-$C[i] = \alpha \cdot A[i]' \cdot B[i]' + \beta \cdot (C[i])$
+$C[i] = \alpha \cdot op_a(A[i]) \cdot op_b(B[i]) + \beta \cdot (C[i])$
 
-for each $i \in [0, batch - 1]$, where $X[i] = X + i \cdot strideX$ is the $i$-th element of the correspondent batch and $X'$ is one of the following:
+for each $i \in [0, batch - 1]$, where $X[i] = X + i \cdot strideX$ is the $i$-th element of the correspondent batch and $op_m(M)$ is one of the following:
 
-- $X' = X$ or
-- $X' = X^T$ (transpose $X$: $X_{ij}^T = X_{ji}$) or
-- $X' = X^H$ (Hermitian $X$: $X_{ij}^H = \bar X_{ji} $).
-
+- $op_m(M) = M$ or
+- $op_m(M) = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$) or
+- $op_m(M) = M^H$ (Hermitian $M$: $M_{ij}^H = \bar M_{ji} $).
 In this example the identity is used.
 
 $\alpha$ and $\beta$ are scalars, and $A$, $B$ and $C$ are the batches of matrices. For each $i$, $A[i]$, $B[i]$ and $C[i]$ are matrices such that
-$A_i'$ is an $m \times k$ matrix, $B_i'$ a $k \times n$ matrix and $C_i$ an $m \times n$ matrix.
+$op_a(A[i])$ is an $m \times k$ matrix, $op_b(B[i])$ a $k \times n$ matrix and $C_i$ an $m \times n$ matrix.
 
 ### Application flow
 

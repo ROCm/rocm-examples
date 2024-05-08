@@ -3,16 +3,16 @@
 ## Description
 
 This example illustrates the use of the rocBLAS Level 3 General Matrix Multiplication. The rocBLAS GEMM performs a matrix--matrix operation as:
-$C = \alpha \cdot A' \cdot B' + \beta \cdot C$,
-where $X'$ is one of the following:
+$C = \alpha \cdot op_a(A) \cdot op_b(B) + \beta \cdot C$,
+where $op_m(M)$ is one of the following:
 
-- $X' = X$ or
-- $X' = X^T$ (transpose $X$: $X_{ij}^T = X_{ji}$) or
-- $X' = X^H$ (Hermitian $X$: $X_{ij}^H = \bar{X_{ji}} $),
+- $op_m(M) = M$ or
+- $op_m(M) = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$) or
+- $op_m(M) = M^H$ (Hermitian $M$: $M_{ij}^H = \bar{M_{ji}} $),
 In this example the identity is used.
 
 $\alpha and $\beta$ are scalars, and $A$, $B$ and $C$ are matrices, with
-$A'$ an $m \times k$ matrix, $B'$ a $k \times n$ matrix and $C$ an $m \times n$ matrix.
+$op_a(A)$ an $m \times k$ matrix, $op_b(B)$ a $k \times n$ matrix and $C$ an $m \times n$ matrix.
 
 ### Application flow
 

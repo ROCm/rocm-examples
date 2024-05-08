@@ -32,7 +32,7 @@
 int main()
 {
     // 1. Set up input data.
-    //            A'           *    y    = alpha *     x
+    //           op(A)         *    y    = alpha *     x
     //
     //  ( 1.0  0.0  0.0  0.0 )   ( 1.0 )           (  0.4 )
     //  ( 2.0  3.0  0.0  0.0 ) * ( 2.0 ) =   2.5 * (  3.2 )
@@ -174,7 +174,7 @@ int main()
                                      nullptr,
                                      temp_buffer));
 
-    // 6. Perform triangular solve Ay = alpha * x.
+    // 6. Perform triangular solve op(A) * y = alpha * x.
     // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_spitsv(handle,
                                      &iter_counter,

@@ -191,7 +191,7 @@ int main()
                                               solve_policy,
                                               temp_buffer));
 
-    // 6. Perform triangular solve Ay = alpha * x.
+    // 6. Perform triangular solve op(A) * y = alpha * x.
     ROCSPARSE_CHECK(rocsparse_dbsrsv_solve(handle,
                                            dir,
                                            trans,

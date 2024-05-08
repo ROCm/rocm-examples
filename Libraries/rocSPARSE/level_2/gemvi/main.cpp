@@ -44,7 +44,7 @@ int main()
     // - dense vector : y
     // - dense matrix : A
     // Calculate dense vector y' such that:
-    //    y'    = alpha *             A               *    x    + beta *    y
+    //    y'    = alpha *            op(A)            *    x    + beta *    y
     // Or more concretely with default alpha and beta:
     //                                                  ( 1.0 )
     // (245.7)           (  9.0 10.0 11.0 12.0 13.0 )   ( 2.0 )          ( 4.0 )
@@ -119,7 +119,7 @@ int main()
     void* buffer;
     HIP_CHECK(hipMalloc(&buffer, buffer_size));
 
-    // 4. Call dgemvi to perform y' = alpha * A * x + beta * y
+    // 4. Call dgemvi to perform y' = alpha * op(A) * x + beta * y
     ROCSPARSE_CHECK(rocsparse_dgemvi(handle,
                                      trans,
                                      A_rows,
