@@ -1,6 +1,7 @@
 # HIP-Basic Multi GPU Data Transfer Example
 
 ## Description
+
 Peer-to-peer (P2P) communication allows direct communication over PCIe (or NVLINK, in some NVIDIA configurations) between devices. Given that it is not necessary to access the host in order to transfer data between devices, P2P communications provide a lower latency than traditional communications that do need to access the host.
 
 Because P2P communication is done over PCIe/NVLINK, the availability of this type of communication among devices depends mostly on the PCIe/NVLINK topology existing.
@@ -8,6 +9,7 @@ Because P2P communication is done over PCIe/NVLINK, the availability of this typ
 In this example, the result of a matrix transpose kernel execution on one device is directly copied to the other one, showcasing how to carry out a P2P communication between two GPUs.
 
 ### Application flow
+
 1. P2P communication support is checked among the available devices. In case two of these devices are found to have it between them, they are selected for the example. A trace message informs about the IDs of the devices selected.
 2. The input and output matrices are allocated and initialized in host memory.
 3. The first device selected is set as the current device, device memory for the input and output matrices is allocated on the current device and the input data is copied from the host.
@@ -21,6 +23,7 @@ In this example, the result of a matrix transpose kernel execution on one device
 11. Results are validated and printed to the standard output.
 
 ## Key APIs and Concepts
+
 - `hipGetDeviceCount` gives the number of devices available. In this example it allows to check if there is more than one device available.
 - `hipDeviceCanAccessPeer` queries whether a certain device can directly access the memory of a given peer device. A P2P communication is supported between two devices if this function returns true for those two devices.
 - `hipSetDevice` sets the specified device as the default device for the subsequent API calls. Such a device is then known as _current device_.
@@ -34,16 +37,19 @@ In this example, the result of a matrix transpose kernel execution on one device
 ## Demonstrated API Calls
 
 ### HIP runtime
+
 - `__global__`
 - `__shared__`
 
 #### Device symbols
+
 - `blockDim`
 - `blockIdx`
 - `threadIdx`
 - `__syncthreads`
 
 #### Host symbols
+
 - `hipDeviceCanAccessPeer`
 - `hipDeviceDisablePeerAccess`
 - `hipDeviceEnablePeerAccess`

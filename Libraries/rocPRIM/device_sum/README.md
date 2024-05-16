@@ -1,9 +1,11 @@
 # rocPRIM Device Sum Example
 
 ## Description
+
 This simple program showcases the usage of the device function `rocprim::reduce`.
 
-### Application flow 
+### Application flow
+
 1. Input data is instantiated in a `std::vector<int>` and the values are printed to the standard output.
 2. Device storage for input and output data is allocated using `hipMalloc`.
 3. Input data is copied from the host to the device using `hipMemcpy`.
@@ -15,16 +17,20 @@ This simple program showcases the usage of the device function `rocprim::reduce`
 9. All device memory is freed using `hipFree`.
 
 ## Key APIs and Concepts
+
 - rocPRIM provides HIP parallel primitives on multiple levels of the GPU programming model. This example showcases `rocprim::reduce` which is a device function, thereby it can be called from host code.
 - The `rocprim::reduce` template function performs a generalized reduction, i.e. it combines a vector of values to a single value using the provided binary operator. Since the order of execution is not determined, the provided operator must be associative. In the example, an addition (`rocprim::plus<int>`) is used which fulfils this property.
 - The device functions of `rocPRIM` require a temporary device memory location to store the results of intermediate calculations. The required amount of temporary storage can be calculated by invoking the function with matching argument set, except the first argument `temporary_storage` must be a `nullptr`. In this case, the GPU kernel is not launched.
 
 ## Demonstrated API Calls
+
 ### rocPRIM
+
 - `rocprim::reduce`
 - `rocprim::plus`
 
 ### HIP runtime
+
 - `hipMalloc`
 - `hipMemcpy`
 - `hipFree`

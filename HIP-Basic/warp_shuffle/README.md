@@ -1,6 +1,7 @@
 # HIP-Basic Warp Shuffle Example
 
 ## Description
+
 Kernel code for a particular block is executed in groups of threads known as a _wavefronts_ (AMD) or _warps_ (NVIDIA). Each block is is divided into as many warps as the block's size allows. If the block size is less than the warp size, then part of the warp just stays idle (as happens in this example). AMD GPUs use 64 threads per wavefront for architectures prior to RDNA™ 1. RDNA architectures support both 32 and 64 wavefront sizes.
 
 Warps are executed in _lockstep_, i.e. all the threads in each warp execute the same instruction at the same time but with different data. This type of parallel processing is also known as Single Instruction, Multiple Data (SIMD). A block contains several warps and the warp size is dependent on the architecture, but the block size is not. Blocks and warps also differ in the way they are executed, and thus they may provide different results when used in the same piece of code. For instance, the kernel code of this example would not work as it is with block execution and shared memory access e.g. because some synchronization would be needed to ensure that every thread has written its correspondent value before trying to access it.
@@ -10,6 +11,7 @@ Higher performance in the execution of kernels can be achieved with explicit war
 This example showcases how to use the above-mentioned operations by implementing a simple matrix transpose kernel.
 
 ### Application flow
+
 1. A number of constants are defined for the kernel launch parameters.
 2. The input and output matrices are allocated and initialized in host memory.
 3. The necessary amount of device memory for the input and output matrices is allocated and the input data is copied to the device.
@@ -20,6 +22,7 @@ This example showcases how to use the above-mentioned operations by implementing
 8. The expected transposed matrix is calculated with a CPU version of the transpose kernel and the transposed matrix obtained from the kernel execution is then compared with it. The result of the comparison is printed to the standard output.
 
 ## Key APIs and Concepts
+
 Warp shuffle is a warp-level primitive that allows for the communication between the threads of a warp. Below is a simple example that shows how the value of the thread with index 2 is copied to all other threads within the warp.
 ![warp_shuffle_simple.svg](warp_shuffle_simple.svg)
 
@@ -38,11 +41,13 @@ Warp shuffle is a warp-level primitive that allows for the communication between
 ### HIP runtime
 
 #### Device symbols
+
 - `__global__`
 - `threadIdx`
 - `__shfl`
 
 #### Host symbols
+
 - `hipFree`
 - `hipGetDeviceProperties`
 - `hipGetLastError`

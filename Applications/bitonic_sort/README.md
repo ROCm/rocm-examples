@@ -1,6 +1,7 @@
 # Applications Bitonic Sort Example
 
 ## Description
+
 This example showcases a GPU implementation of the [bitonic sort](https://en.wikipedia.org/wiki/Bitonic_sorter) and uses it to order increasingly (or decreasingly) an array of $n$ elements. Another implementation of the said algorithm exists in rocPRIM and could be used instead. Also, rocPRIM's algorithm would likely offer an improved performance.
 
 A sequence $\{x_n\}_{n=1}^m$ is called bitonic if it possesses one of the following two properties:
@@ -15,6 +16,7 @@ Below is presented an example of how an array of length 8 would be ordered incre
 ![bitonic_sort.svg](bitonic_sort.svg)
 
 ### Application flow
+
 1. Parse user input.
 2. Allocate and initialize host input array and make a copy for the CPU comparison.
 3. Define a number of constants for kernel execution.
@@ -25,26 +27,35 @@ Below is presented an example of how an array of length 8 would be ordered incre
 8. Compare the array obtained with the CPU implementation of the bitonic sort and print to standard output the result.
 
 ### Command line interface
+
 There are three options available:
+
 - `-h` displays information about the available parameters and their default values.
 - `-l <length>` sets `length` as the number of elements of the array that will be sorted. It must be a power of $2$. Its default value is $2^{15}$.
 - `-s <sort>` sets `sort` as the type or sorting that we want our array to have: decreasing ("dec") or increasing ("inc"). The default value is "inc".
 
 ## Key APIs and Concepts
+
 - Device memory is allocated with `hipMalloc` and deallocated with `hipFree`.
+
 - With `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`) or from device to host (using `hipMemcpyDeviceToHost`).
+
 - `hipEventCreate` creates events, which are used in this example to measure the kernels execution time. `hipEventRecord` starts recording an event, `hipEventSynchronize` waits for all the previous work in the stream when the specified event was recorded. With these three functions it can be measured the start and stop times of the kernel and with `hipEventElapsedTime` it can be obtained the kernel execution time in milliseconds. Lastly, `hipEventDestroy` destroys an event.
+
 - `myKernelName<<<...>>>` queues kernel execution on the device. All the kernels are launched on the `hipStreamDefault`, meaning that these executions are performed in order. `hipGetLastError` returns the last error produced by any runtime API call, allowing to check if any kernel launch resulted in error.
 
 ## Demonstrated API Calls
 
 ### HIP runtime
+
 #### Device symbols
+
 - `blockDim`
 - `blockIdx`
 - `threadIdx`
 
 #### Host symbols
+
 - `__global__`
 - `hipEvent_t`
 - `hipEventCreate`

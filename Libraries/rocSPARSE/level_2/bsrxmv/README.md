@@ -1,5 +1,7 @@
 # rocSPARSE Level 2 BSR Matrix-Vector Multiplication with Mask Operation
+
 ## Description
+
 This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector multiplication with mask operation using BSR storage format.
 
 The function returns the BSR matrix-vector product for the masked blocks
@@ -17,6 +19,7 @@ where
 otherwise it returns the identical $\mathbf{y}$ vector elements.
 
 ## Application flow
+
 1. Set up a sparse matrix in BSR format. Allocate an x and a y vector, set up $\alpha$ and $\beta$ scalars and set up the mask.
 2. Set up a handle, a matrix descriptor and a matrix info.
 3. Allocate device memory and copy input matrix and vectors, and mask array from host to device.
@@ -26,23 +29,27 @@ otherwise it returns the identical $\mathbf{y}$ vector elements.
 7. Print result to the standard output.
 
 ## Key APIs and Concepts
+
 ### BSR Matrix Storage Format
+
 The [Block Compressed Sparse Row (BSR) storage format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#bsr-storage-format) describes a sparse matrix using three arrays. The idea behind this storage format is to split the given sparse matrix into equal sized blocks of dimension `bsr_dim` and store those using the [CSR format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#csr-storage-format). Because the CSR format only stores non-zero elements, the BSR format introduces the concept of __non-zero block__: a block that contains at least one non-zero element. Note that all elements of non-zero blocks are stored, even if some of them are equal to zero.
 
 Therefore, defining
+
 - `mb`: number of rows of blocks
 - `nb`: number of columns of blocks
 - `nnzb`: number of non-zero blocks
 - `bsr_dim`: dimension of each block
 
 we can describe a sparse matrix using the following arrays:
+
 - `bsr_val`: contains the elements of the non-zero blocks of the sparse matrix. The elements are stored block by block in column- or row-major order. That is, it is an array of size `nnzb` $\cdot$ `bsr_dim` $\cdot$ `bsr_dim`.
 
 - `bsr_row_ptr`: given $i \in [0, mb]$
-    - if $` 0 \leq i < mb `$, `bsr_row_ptr[i]` stores the index of the first non-zero block in row $i$ of the block matrix
-    - if $i = mb$, `bsr_row_ptr[i]` stores `nnzb`.
+  - if $` 0 \leq i < mb `$, `bsr_row_ptr[i]` stores the index of the first non-zero block in row $i$ of the block matrix
+  - if $i = mb$, `bsr_row_ptr[i]` stores `nnzb`.
 
-    This way, row $j \in [0, mb)$ contains the non-zero blocks of indices from `bsr_row_ptr[j]` to `bsr_row_ptr[j+1]-1`. The corresponding values in `bsr_val` can be accessed from `bsr_row_ptr[j] * bsr_dim * bsr_dim` to `(bsr_row_ptr[j+1]-1) * bsr_dim * bsr_dim`.
+  This way, row $j \in [0, mb)$ contains the non-zero blocks of indices from `bsr_row_ptr[j]` to `bsr_row_ptr[j+1]-1`. The corresponding values in `bsr_val` can be accessed from `bsr_row_ptr[j] * bsr_dim * bsr_dim` to `(bsr_row_ptr[j+1]-1) * bsr_dim * bsr_dim`.
 
 - `bsr_col_ind`: given $i \in [0, nnzb-1]$, `bsr_col_ind[i]` stores the column of the $i^{th}$ non-zero block in the block matrix.
 
@@ -140,7 +147,7 @@ $$
 
 Therefore, the BSR representation of $A$, using column-major ordering, is:
 
-```
+```math
 bsr_val = { 8, 0, 7, 2, 0, 3, 0, 5, 2, 0, 1, 0, 0, 0, 0, 0   // A_{00}
             4, 7, 0, 0, 0, 7, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0   // A_{10}
             0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   // A_{12}
@@ -181,11 +188,13 @@ $$ \mathbf{\bar{m}} = \left(
 \right)$$
 
 The BSRX format is the same as BSR, but the `bsr_row_ptr` is separated into starting and ending indices.
+
 - `bsrx_row_ptr`: the first block of each row that is used for the calculation. This block is typically the first nonzero block.
 - `bsrx_end_ptr`: the position next to the last block (last + 1) that is used for the calculation. This block is typically the last nonzero block.
 
 Therefore:
-```
+
+```math
 bsrx_row_ptr = { 0, 1, 3 }
 
 bsrx_end_ptr = { 1, 3, 4 }
@@ -194,26 +203,30 @@ bsrx_end_ptr = { 1, 3, 4 }
 Additionally, `bsrx_end_ptr` can be used for column masking, how it is presented in the example.
 
 ### rocSPARSE
+
 - `rocsparse_[dscz]bsrxmv(...)` is the solver with four different function signatures depending on the type of the input matrix:
-   - `d` double-precision real (`double`)
-   - `s` single-precision real (`float`)
-   - `c` single-precision complex (`rocsparse_float_complex`)
-   - `z` double-precision complex (`rocsparse_double_complex`)
+  - `d` double-precision real (`double`)
+  - `s` single-precision real (`float`)
+  - `c` single-precision complex (`rocsparse_float_complex`)
+  - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation trans`: matrix operation type with the following options:
-   - `rocsparse_operation_none`: identity operation: $A' = A$
-   - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-   - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $A' = A$
+  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
 
-   Currently, only `rocsparse_operation_none` is supported.
+  Currently, only `rocsparse_operation_none` is supported.
+
 - `rocsparse_mat_descr`: descriptor of the sparse BSR matrix.
-    
+
 - `rocsparse_direction` block storage major direction with the following options:
-   - `rocsparse_direction_column`
-   - `rocsparse_direction_row`
+  - `rocsparse_direction_column`
+  - `rocsparse_direction_row`
 
 ## Demonstrated API Calls
+
 ### rocSPARSE
+
 - `rocsparse_create_handle`
 - `rocsparse_create_mat_descr`
 - `rocsparse_dbsrxmv`
@@ -228,6 +241,7 @@ Additionally, `bsrx_end_ptr` can be used for column masking, how it is presented
 - `rocsparse_operation_none`
 
 ### HIP runtime
+
 - `hipFree`
 - `hipMalloc`
 - `hipMemcpy`

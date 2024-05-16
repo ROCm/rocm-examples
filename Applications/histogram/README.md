@@ -1,6 +1,7 @@
 # Applications: Histogram Example
 
 ## Description
+
 This program showcases a GPU kernel and its invocation of a histogram computation over a byte (`unsigned char`) array. A histogram constructs a table with the counts of each discrete value.
 The diagram below showcases a 4 bin histogram over an 8-element long array:
 
@@ -14,8 +15,8 @@ This is solved by striding over the input such a way that each thread accesses a
 
 ![A diagram illustrating bank conflicts and solution using striding.](bank_conflict_reduction.svg)
 
-
 ### Application flow
+
 1. Define and allocate inputs and outputs on host.
 2. Allocate the memory on device and copy the input.
 3. Launch the histogram kernel.
@@ -24,6 +25,7 @@ This is solved by striding over the input such a way that each thread accesses a
 6. Verify the results on host.
 
 ### Key APIs and concepts
+
 - _Bank conflicts._ Memory is stored across multiple banks. Elements in banks are stored in 4-byte words. Each thread within a wavefront should access different banks to ensure high throughput.
 - `__ffs(int input)` finds the 1-index of the first set least significant bit of the input.
 - `__syncthreads()` halts this thread until all threads within the same block have reached this point.
@@ -34,6 +36,7 @@ This is solved by striding over the input such a way that each thread accesses a
 ### HIP runtime
 
 #### Device symbols
+
 - `blockDim`
 - `blockIdx`
 - `threadIdx`
@@ -42,6 +45,7 @@ This is solved by striding over the input such a way that each thread accesses a
 - `__shared__`
 
 #### Host symbols
+
 - `__global__`
 - `hipEvent_t`
 - `hipEventCreate`
