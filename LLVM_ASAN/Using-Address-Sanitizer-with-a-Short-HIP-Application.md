@@ -91,7 +91,7 @@ This completes the necessary setup.
 Running with `m = 100`, `n1 = 11`, `n2 = 10` and `c = 100` should produce
 a report for an invalid access by the last 10 threads.
 
-```gdb
+```text
 =================================================================
 ==3141==ERROR: AddressSanitizer: heap-buffer-overflow on amdgpu device 0 at pc 0x7fb1410d2cc4
 WRITE of size 4 in workgroup id (10,0,0)
@@ -127,7 +127,7 @@ Shadow byte legend (one shadow byte represents 8 application bytes):
 
 Running with `m = 100`, `n1 = 10`, `n2 = 10` and `c = 99` should produce a report for an invalid copy.
 
-```gdb
+```text
 =================================================================
 ==2817==ERROR: AddressSanitizer: heap-buffer-overflow on address 0x514000150dcc at pc 0x7f5509551aca bp 0x7ffc90a7ae50 sp 0x7ffc90a7a610
 WRITE of size 400 at 0x514000150dcc thread T0
