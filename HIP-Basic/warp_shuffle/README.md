@@ -24,11 +24,11 @@ This example showcases how to use the above-mentioned operations by implementing
 ## Key APIs and Concepts
 
 Warp shuffle is a warp-level primitive that allows for the communication between the threads of a warp. Below is a simple example that shows how the value of the thread with index 2 is copied to all other threads within the warp.
-![warp_shuffle_simple.svg](warp_shuffle_simple.svg)
+![An illustration of a single value being copied to other threads within the warp.](warp_shuffle_simple.svg)
 
 `__shfl(var, src_lane, width = warp_size)` copies the value of a `var` from the thread `src_lane` within the warp. This operation admits a third parameter (not used in this example), `width`, defaulted to the warp size value and which allows restricting the number of threads of the warp from which values are read. Values are copied from threads with an ID in the range $[0, width-1]$. If the ID of the thread specified in the call to `__shfl` is out of that range, then the thread accessed is the one with that ID modulo `width`. The `src_lane` may also vary per thread, as shown below.
 
-![warp_shuffle.svg](warp_shuffle.svg)
+![A more complex illustration of warp shuffle, which includes a variable source.](warp_shuffle.svg)
 
 - `hipGetDeviceProperties` gets the properties of the specified device. In this example, it is used to get the warp size of the device (GPU) used.
 - `hipMalloc` allocates memory in the global memory of the device, and with `hipMemcpy` data bytes can be transferred from host to device (using `hipMemcpyHostToDevice`) or from device to host (using `hipMemcpyDeviceToHost`), among others.

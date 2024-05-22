@@ -13,7 +13,7 @@ Each step $i$ of this bitonic sort implementation yields bitonic subsequences of
 
 Below is presented an example of how an array of length 8 would be ordered increasingly. An arrow from one element to other means that those two elements are compared in the stage and step indicated in the left columns. The resulting order will be such that the lesser element will be placed at the position from which the arrow starts and the greater element will be placed at the position pointed by the end of the arrow. For an easier understanding, black arrows correspond to an increasing order and grey arrows to a decreasing order of the elements.
 
-![bitonic_sort.svg](bitonic_sort.svg)
+![A visual representation of sorting an array.](bitonic_sort.svg)
 
 ### Application flow
 

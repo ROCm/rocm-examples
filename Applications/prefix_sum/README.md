@@ -18,7 +18,7 @@ The algorithm used has two phases which are repeated:
 Below is an example where the threads per block is 2.
 In the first iteration ($\text{offset}=1$) we have 4 threads combining 8 items.
 
-![prefix_sum_diagram.svg](prefix_sum_diagram.svg)
+![A diagram illustrating a GPU implementation of a prefix sum via a scan algorithm](prefix_sum_diagram.svg)
 
 ### Application flow
 

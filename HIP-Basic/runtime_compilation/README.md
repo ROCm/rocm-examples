@@ -28,7 +28,7 @@ The diagram below summarizes the runtime compilation part of the example.
 16. The module is unloaded from the current context and freed.
 17. The first few elements of the result vector $y$ are printed to the standard output.
 
-![hiprtc.svg](hiprtc.svg)
+![A diagram to visualize the runtime compilation and launch of this example](hiprtc.svg)
 
 ## Key APIs and Concepts
 

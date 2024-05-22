@@ -14,7 +14,7 @@ This example showcases the multiplication of two dynamically sized two-dimension
 6. The elements of the resulting matrix $\mathrm{C}$ are copied to the host and all device memory is freed.
 7. The elements of $\mathrm{C}$ are compared with the expected result. The result of the comparison is printed to the standard output.
 
-### Command line interface
+## Command line interface
 
 - If no command line argument is provided, the default matrix sizes are used.
 

@@ -49,7 +49,7 @@ The application provides the following optional command line arguments:
 
     We can apply the same multiplication operator for several matrices if we combine them into batched matrices. Batched matrix multiplication has a performance improvement for a large number of small matrices. For a constant stride between matrices, further acceleration is available by strided batched GEMM.
 
-![strided-matrix-layout.svg](strided-matrix-layout.svg)
+![Layout of two batched matrices, each with 3 x 2 elements, and a stride of 9](strided-matrix-layout.svg)
 
 - rocBLAS is initialized by calling `rocblas_create_handle(rocblas_handle*)` and it is terminated by calling `rocblas_destroy_handle(rocblas_handle)`.
 
