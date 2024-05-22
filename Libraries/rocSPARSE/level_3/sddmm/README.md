@@ -71,7 +71,7 @@ $$
 
 Therefore, the CSR representation of $A$ is:
 
-```math
+```cpp
 m = 3
 
 n = 5

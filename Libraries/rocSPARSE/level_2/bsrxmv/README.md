@@ -147,7 +147,7 @@ $$
 
 Therefore, the BSR representation of $A$, using column-major ordering, is:
 
-```math
+```cpp
 bsr_val = { 8, 0, 7, 2, 0, 3, 0, 5, 2, 0, 1, 0, 0, 0, 0, 0   // A_{00}
             4, 7, 0, 0, 0, 7, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0   // A_{10}
             0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0   // A_{12}
@@ -194,7 +194,7 @@ The BSRX format is the same as BSR, but the `bsr_row_ptr` is separated into star
 
 Therefore:
 
-```math
+```cpp
 bsrx_row_ptr = { 0, 1, 3 }
 
 bsrx_end_ptr = { 1, 3, 4 }
