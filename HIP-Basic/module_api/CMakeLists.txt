@@ -46,31 +46,30 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-set(offload_archs ${CMAKE_HIP_ARCHITECTURES})
-list(TRANSFORM offload_archs PREPEND "--offload-arch=")
-
-set(module ${CMAKE_CURRENT_BINARY_DIR}/module.co)
-set(module_sources ${CMAKE_CURRENT_SOURCE_DIR}/module.hip)
-if(CMAKE_BUILD_TYPE EQUAL "Debug")
-    set(module_flags ${CMAKE_HIP_FLAGS} ${CMAKE_HIP_FLAGS_DEBUG})
-elseif(CMAKE_BUILD_TYPE EQUAL "Release")
-    set(module_flags ${CMAKE_HIP_FLAGS} ${CMAKE_HIP_FLAGS_RELEASE})
-elseif(CMAKE_BUILD_TYPE EQUAL "MinSizeRel")
-    set(module_flags ${CMAKE_HIP_FLAGS} ${CMAKE_HIP_FLAGS_MINSIZEREL})
-elseif(CMAKE_BUILD_TYPE EQUAL "RelWithDebInfo")
-    set(module_flags ${CMAKE_HIP_FLAGS} ${CMAKE_HIP_FLAGS_RELWITHDEBINFO})
-endif()
-
-add_custom_command(
-    OUTPUT ${module}
-    COMMAND ${CMAKE_HIP_COMPILER} ${module_flags} ${module_sources} ${offload_archs} --cuda-device-only -o ${module}
-    DEPENDS ${module_sources}
-    COMMENT "Compiling HIP code object module.co"
-)
-
-add_custom_target(module ALL DEPENDS ${module})
-
 add_executable(${example_name} main.hip)
+
+# This is a mild hack. CMake (like most build systems) don't play well with targeting multiple
+# architectures in the same build. This example builds an executable for the host system and a
+# device code object for potentially multiple device architectures. Code objects need not and
+# _should not_ be linked using the host linker. We're creating an OBJECT library, because in
+# CMake terms, OBJECT libraries don't involve a linking step, but in reality, we'll also add
+# the `--cuda-device-only` compile option, which changes the target triplet of the compiler
+# from host to device code.
+add_library(${example_name}_module OBJECT module.hip)
+
+# Ideally we'd need a non-existent CheckHIPCompilerFlag module before assuming this flag works.
+target_compile_options(${example_name}_module PRIVATE --cuda-device-only)
+
+# Copy the code object next to the executable
+add_custom_command(
+    TARGET ${example_name} 
+    POST_BUILD
+    COMMAND "${CMAKE_COMMAND}"
+    ARGS -E copy $<TARGET_OBJECTS:${example_name}_module> $<TARGET_FILE_DIR:${example_name}>/module.co
+    COMMAND_EXPAND_LISTS
+    COMMENT "Copying HIP code object for ${example_name}")
+
+add_dependencies(${example_name} ${example_name}_module)
 # Make example runnable using ctest
 add_test(${example_name} ${example_name})
 

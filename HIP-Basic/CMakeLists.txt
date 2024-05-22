@@ -74,7 +74,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     add_subdirectory(module_api)
 endif()
 
-if(WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
+if(NOT WIN32)
     add_subdirectory(cooperative_groups)
 endif()
 
