@@ -7,7 +7,7 @@ Each sample describes which environment it can be used with.
 
 From this folder execute
 
-``` bash
+```shell
 docker build . -f <dockerfile> -t <result image name>
 ```
 
