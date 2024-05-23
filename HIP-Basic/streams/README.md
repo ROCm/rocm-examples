@@ -1,9 +1,11 @@
 # HIP-Basic Streams Example
 
 ## Description
+
 A stream encapsulates a queue of tasks that are launched on the GPU device. This example showcases usage of multiple streams, each with their own tasks. These tasks include asynchronous memory copies using `hipMemcpyAsync` and asynchronous kernel launches using `myKernelName<<<...>>>`.
 
 ### Application flow
+
 1. Host side input and output memory is allocated using `hipHostMalloc` as pinned memory. It will ensure that the memory copies will be performed asynchronously when using `hipMemcpyAsync`.
 2. Host input is instantiated.
 3. Device side storage is allocated using `hipMalloc`.
@@ -17,10 +19,13 @@ A stream encapsulates a queue of tasks that are launched on the GPU device. This
 11. Free host side pinned memory using `hipHostFree`.
 
 ## Key APIs and Concepts
+
 A HIP stream allows device tasks to be grouped and launched asynchronously and independently from other tasks, which can be used to hide latencies and increase task completion throughput. When results of a task queued on a particular stream are needed, it can be explicitly synchronized without blocking work queued on other streams. Each HIP stream is tied to a particular device, which enables HIP streams to be used to schedule work across multiple devices simultaneously.
 
 ## Demonstrated API Calls
+
 ### HIP runtime
+
 - `__shared__`
 - `__syncthreads`
 - `hipStream_t`

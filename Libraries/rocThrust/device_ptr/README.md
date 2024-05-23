@@ -1,9 +1,11 @@
 # rocThrust Device Pointer Example
 
 ## Description
+
 This simple program showcases the usage of the `thrust::device_ptr` template.
 
-### Application flow 
+### Application flow
+
 1. A `thrust::device_ptr<int>` is instantiated, and memory for ten elements is allocated.
 2. Two more `thrust::device_ptr<int>` are instantiated and set to the start- and end-point of the allocated memory region.
 3. Normal pointer arithmetic is used on the `thrust::device_ptr<int>`s to calculate the number of elements allocated in step 1.
@@ -15,6 +17,7 @@ This simple program showcases the usage of the `thrust::device_ptr` template.
 9. The device memory is freed using `thrust::device_free`.
 
 ## Key APIs and Concepts
+
 - Thrust's `device_ptr` is a simple and transparent way of handling device memory the same way one would handle host memory with normal pointers.
 - Unlike a normal pointer to device memory `device_ptr` adds type safety, and the underlying device memory is transparently accessible on the host.
 - The `device_ptr` can be used in Thrust algorithms like a normal pointer to device memory.
@@ -22,7 +25,9 @@ This simple program showcases the usage of the `thrust::device_ptr` template.
 - `device_ptr` is not a smart pointer. Allocating and freeing memory lies in the responsibility of the programmer.
 
 ## Demonstrated API Calls
+
 ### rocThrust
+
 - `thrust::device_ptr<T>::operator=`
 - `thrust::device_ptr<T>::operator[]`
 - `thrust::device_malloc<T>`

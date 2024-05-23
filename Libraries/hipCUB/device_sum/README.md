@@ -1,9 +1,11 @@
 # hipCUB Device Sum Example
 
 ## Description
+
 This simple program showcases the usage of the `hipcub::DeviceReduce::Sum()`.
 
-### Application flow 
+### Application flow
+
 1. Host side data is instantiated in a `std::vector<int>`.
 2. Device side storage is allocated using `hipMalloc`.
 3. Data is copied from host to device using `hipMemcpy`.
@@ -14,13 +16,17 @@ This simple program showcases the usage of the `hipcub::DeviceReduce::Sum()`.
 8. Free any device side memory using `hipFree`
 
 ## Key APIs and Concepts
+
 - hipCUB provided device level API is used in this example. It performs global device level operations (in this case a sum reduction using `hipcub::DeviceReduce::Sum`) on the GPU.
 
 ## Demonstrated API Calls
+
 ### hipCUB
+
 - `hipcub::DeviceReduce::Sum`
 
 ### HIP runtime
+
 - `hipGetErrorString`
 - `hipMalloc`
 - `hipMemcpy`

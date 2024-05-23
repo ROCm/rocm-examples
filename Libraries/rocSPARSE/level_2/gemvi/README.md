@@ -70,6 +70,7 @@ $$
 
 The sparse vector is stored in the coordinate (COO) storage format.
 This works by storing the sparse vector $x$ as:
+
 - the values $x_\text{values}$,
 - the coordinates (indices) of said values into $x_\text{indices}$, and
 - the amount of non zero values as $x_\text{non\_zero}$.
@@ -77,22 +78,21 @@ This works by storing the sparse vector $x$ as:
 ### rocSPARSE
 
 - `rocsparse_[dscz]gemvi()`is the solver with four different function signatures depending on the type of the input matrix and vectors:
-   - `d` double-precision real (`double`)
-   - `s` single-precision real (`float`)
-   - `c` single-precision complex (`rocsparse_float_complex`)
-   - `z` double-precision complex (`rocsparse_double_complex`)
+  - `d` double-precision real (`double`)
+  - `s` single-precision real (`float`)
+  - `c` single-precision complex (`rocsparse_float_complex`)
+  - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation trans`: matrix operation type with the following options:
-   - `rocsparse_operation_none`: identity operation: $A' = A$
-   - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-   - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $A' = A$
+  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
 
-   Currently, only `rocsparse_operation_none` is supported.
+  Currently, only `rocsparse_operation_none` is supported.
 
 - `rocsparse_index_base idx_base`: base of indices
-   - `rocsparse_index_base_zero`: zero based indexing
-   - `rocsparse_index_base_one`: one based indexing
-
+  - `rocsparse_index_base_zero`: zero based indexing
+  - `rocsparse_index_base_one`: one based indexing
 
 ## Used API surface
 

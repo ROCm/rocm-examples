@@ -29,11 +29,11 @@ and the eigenvalues as a diagonal matrix:
 $$
 W_i = \mathrm{diag}\left(\mathbf{w_i}\right) = \mathrm{diag}\left([\lambda_{i_0}, \dots, \lambda_{i_j}, \dots, \lambda_{i_{n-1}}]\right) =
 \begin{bmatrix}
-\lambda_{i_0} & & & & & \\ 
- & \lambda_{i_1} & & & & \\ 
- & & \ddots & & & \\ 
- & & & \lambda_{i_j} & & \\ 
- & & & & \ddots & \\ 
+\lambda_{i_0} & & & & & \\
+ & \lambda_{i_1} & & & & \\
+ & & \ddots & & & \\
+ & & & \lambda_{i_j} & & \\
+ & & & & \ddots & \\
  & & & & & \lambda_{i_{n-1}}
 \end{bmatrix}
 $$
@@ -72,6 +72,7 @@ The application provides the following optional command line arguments:
 12. Validate the results
 
 ## Key APIs and Concepts
+
 - The performance of a numerical multi-linear algebra code can be heavily increased by using tensor contractions [ [Y. Shi et al., HiPC, pp 193, 2016.](https://doi.org/10.1109/HiPC.2016.031) ], thereby similarly to other linear algebra libraries like hipBLAS rocSOLVER also has a `_batched` and a `_strided_batched` [ [C. Jhurani and P. Mullowney, JPDP Vol 75, pp 133, 2015.](https://doi.org/10.1016/j.jpdc.2014.09.003) ] extensions.<br/>
 We can apply the same operation for several matrices if we combine them into batched matrices. Batched computation has a performance improvement for a large number of small matrices. For a constant stride between matrices, further acceleration is available by strided batched solvers.
 
@@ -103,6 +104,7 @@ We can apply the same operation for several matrices if we combine them into bat
     - `const rocblas_int batch_count`: Number of matrices in the batch.
 
 ### rocBLAS
+
 - rocBLAS is initialized by calling `rocblas_create_handle(rocblas_handle t*)` and it is terminated by calling `rocblas_destroy_handle(t)`.
 
 ## Used API surface

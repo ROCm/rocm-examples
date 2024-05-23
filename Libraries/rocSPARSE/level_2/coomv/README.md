@@ -1,5 +1,7 @@
 # rocSPARSE Level 2 COO Matrix-Vector Multiplication
+
 ## Description
+
 This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector multiplication using COO storage format.
 
 The operation calculates the following product:
@@ -13,6 +15,7 @@ where
 - $A'$ is a sparse matrix in COO format with `rocsparse_operation` and described below.
 
 ## Application flow
+
 1. Set up a sparse matrix in COO format. Allocate an x and a y vector and set up $\alpha$ and $\beta$ scalars.
 2. Set up a handle, a matrix descriptor and a matrix info.
 3. Allocate device memory and copy input matrix and vectors from host to device.
@@ -23,8 +26,11 @@ where
 8. Print result to the standard output.
 
 ## Key APIs and Concepts
+
 ### COO Matrix Storage Format
+
 The coordinate (COO) storage format represents an $m \times n$ matrix by
+
 - `m`: number of rows
 - `n`: number of columns
 - `nnz`: number of non-zero elements
@@ -35,21 +41,24 @@ The coordinate (COO) storage format represents an $m \times n$ matrix by
 The COO matrix is sorted by row indices, and by column indices in the same row.
 
 ### rocSPARSE
+
 - `rocsparse_[dscz]coomv(...)` is the solver with four different function signatures depending on the type of the input matrix:
-   - `d` double-precision real (`double`)
-   - `s` single-precision real (`float`)
-   - `c` single-precision complex (`rocsparse_float_complex`)
-   - `z` double-precision complex (`rocsparse_double_complex`)
+  - `d` double-precision real (`double`)
+  - `s` single-precision real (`float`)
+  - `c` single-precision complex (`rocsparse_float_complex`)
+  - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation`: matrix operation type with the following options:
-   - `rocsparse_operation_none`: identity operation: $A' = A$
-   - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-   - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $A' = A$
+  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
 
 - `rocsparse_mat_descr`: holds all properties of a matrix.
 
 ## Demonstrated API Calls
+
 ### rocSPARSE
+
 - `rocsparse_create_handle`
 - `rocsparse_create_mat_descr`
 - `rocsparse_dcoomv`
@@ -62,6 +71,7 @@ The COO matrix is sorted by row indices, and by column indices in the same row.
 - `rocsparse_operation_none`
 
 ### HIP runtime
+
 - `hipFree`
 - `hipMalloc`
 - `hipMemcpy`

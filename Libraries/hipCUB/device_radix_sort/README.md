@@ -1,9 +1,11 @@
 # hipCUB Device Radix Sort Example
 
 ## Description
+
 This simple program showcases the usage of the `hipcub::DeviceRadixSort::SortPairs` function.
 
-### Application flow 
+### Application flow
+
 1. Host side data is instantiated in `std::vector<float>` and `std::vector<int>` as key-value pairs.
 2. Device side storage is allocated using `hipMalloc`.
 3. Data is copied from host to device using `hipMemcpy`.
@@ -14,16 +16,19 @@ This simple program showcases the usage of the `hipcub::DeviceRadixSort::SortPai
 8. Free all device side memory using `hipFree`
 
 ## Key APIs and Concepts
+
 - The device-level API provided by hipCUB is used in this example. It performs global device level operations (in this case pair sorting using `hipcub::DeviceRadixSort::SortPairs`) on the GPU.
 
 ## Demonstrated API Calls
+
 ### hipCUB
+
 - `hipcub::DoubleBuffer`
 - `hipcub::DeviceRadixSort::SortPairs`
 
 ### HIP runtime
+
 - `hipGetErrorString`
 - `hipMalloc`
 - `hipMemcpy`
 - `hipFree`
-

@@ -1,7 +1,9 @@
 # rocSOLVER LU Factorization Example
 
 ## Description
+
 This example illustrates the use of the rocSOLVER `getf2` functionality. The rocSOLVER `getf2` computes the [LU decomposition](https://en.wikipedia.org/wiki/LU_decomposition) of an $m \times n$ matrix $A$, with partial pivoting. This factorization is given by $P \cdot A = L \cdot U$, where:
+
 - `getf2()`: This is the unblocked Level-2-BLAS version of the LU factorization algorithm. An optimized internal implementation without rocBLAS calls could be executed with small and mid-size matrices.
 - $A$ is the $m \times n$ input matrix.
 - $P$ is an $m \times m$ [permutation matrix](https://en.wikipedia.org/wiki/Permutation_matrix), in this example stored as an array of row indices `vector<int> Ipiv` of size `min(m, n)`.
@@ -13,6 +15,7 @@ This example illustrates the use of the rocSOLVER `getf2` functionality. The roc
   - an $n \times n$ upper tridiagonal matrix, when $m \geq n$
 
 ### Application flow
+
 1. Parse command line arguments for the dimension of the input matrix.
 2. Declare and initialize a number of constants for the input and output matrices and vectors.
 3. Allocate and initialize the host matrices and vectors.
@@ -25,7 +28,9 @@ This example illustrates the use of the rocSOLVER `getf2` functionality. The roc
 10. Free device memory and the rocBLAS handle.
 
 ## Key APIs and Concepts
+
 ### rocSOLVER
+
 - `rocsolver_[sdcz]getf2` computes the LU factorization of the $m \times n$ input matrix $A$. The correct function signature should be chosen, based on the datatype of the input matrix:
   - `s` (single-precision: `float`)
   - `d` (double-precision: `double`)
@@ -33,6 +38,7 @@ This example illustrates the use of the rocSOLVER `getf2` functionality. The roc
   - `z` (double-precision complex: `rocblas_double_complex`).
 
 Input parameters for the precision used in this example (double-precision):
+
 - `rocblas_handle handle`
 - `const rocblas_int m`: number of rows of $A$
 - `const rocblas_int n`: number of columns of $A$
@@ -44,10 +50,13 @@ Input parameters for the precision used in this example (double-precision):
 Return type: `rocblas_status`
 
 ## Used API surface
+
 ### rocSOLVER
+
 - `rocsolver_dgetf2`
 
 ### rocBLAS
+
 - `rocblas_create_handle`
 - `rocblas_destroy_handle`
 - `rocblas_double`
@@ -55,6 +64,7 @@ Return type: `rocblas_status`
 - `rocblas_int`
 
 ### HIP runtime
+
 - `hipFree`
 - `hipMalloc`
 - `hipMemcpy`
