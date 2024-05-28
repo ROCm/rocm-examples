@@ -1,12 +1,13 @@
 # rocSPARSE Preconditioner Tridiagonal Solver
 
 ## Description
+
 This example illustrates the use of the `rocSPARSE` tridiagonal solver with multiple right hand sides:
 
 $$ A \cdot X = B $$
 
 where
-   
+
 - $A$ is a $m \times n$ tridiagonal matrix:
 
 $$\begin{pmatrix}
@@ -23,6 +24,7 @@ $$\begin{pmatrix}
 - $X$ is the dense solution matrix.
 
 ### Application flow
+
 1. Set up input data.
 2. Allocate device memory and offload input data to the device.
 3. Initialize rocSPARSE by creating a handle.
@@ -34,6 +36,7 @@ $$\begin{pmatrix}
 9. Print result matrix, check errors.
 
 ## Key APIs and Concepts
+
 The components of the tridiagonal system are stored in length $m$ vectors:
 
 - upper diagonal with last elements 0: $\mathbf{u} = (u_0, u_1, \dots, u_{m-1}, 0)$
@@ -41,17 +44,19 @@ The components of the tridiagonal system are stored in length $m$ vectors:
 - lower diagonal with first elements 0: $\mathbf{l} = (0, l_1, \dots, l_{m-1}, l_m)$
 
 ### rocSPARSE
+
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
 - `rocsparse_[sdcz]gtsv` computes the solution for a tridiagonal matrix with multiple right hand side. The correct function signature should be chosen based on the datatype of the input matrix:
-    - `s` single-precision real (`float`)
-    - `d` double-precision real (`double`)
-    - `c` single-precision complex (`rocsparse_float_complex`)
-    - `z` double-precision complex (`rocsparse_double_complex`)
+  - `s` single-precision real (`float`)
+  - `d` double-precision real (`double`)
+  - `c` single-precision complex (`rocsparse_float_complex`)
+  - `z` double-precision complex (`rocsparse_double_complex`)
 - `rocsparse_[sdcz]gtsv_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the calculation. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
 
 ## Demonstrated API Calls
 
 ### rocSPARSE
+
 - `rocsparse_create_handle`
 - `rocsparse_destroy_handle`
 - `rocsparse_dgtsv`
@@ -60,6 +65,7 @@ The components of the tridiagonal system are stored in length $m$ vectors:
 - `rocsparse_int`
 
 ### HIP runtime
+
 - `hipDeviceSynchronize`
 - `hipFree`
 - `hipMalloc`

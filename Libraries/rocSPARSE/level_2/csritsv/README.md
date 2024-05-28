@@ -1,5 +1,7 @@
 # rocSPARSE Level 2 CSR Iterative Triangular Matrix-Vector Multiplication
+
 ## Description
+
 This example illustrates the use of the `rocSPARSE` level 2 iterative triangular solver using the CSR storage format.
 
 This triangular solver is used to find an iterative solution with Jacobi method for a linear system of the form
@@ -12,9 +14,9 @@ with a `tolerance` and a `max_iter` maximal number of iterations where
 
 - $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
 - $A'$ is one of the following:
-    - $A' = A$ (identity)
-    - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
-    - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
+  - $A' = A$ (identity)
+  - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
+  - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
 - $\alpha$ is a scalar,
 - $x$ is a dense vector of size $n$ containing the constant terms of the equations, and
 - $y$ is a dense vector of size $n$ which contains the unknowns of the system.
@@ -22,6 +24,7 @@ with a `tolerance` and a `max_iter` maximal number of iterations where
 Obtaining solution for such a system consists on finding concrete values of all the unknowns such that the above equality holds.
 
 ### Application flow
+
 1. Setup input data.
 2. Allocate device memory and offload input data to device.
 3. Initialize rocSPARSE by creating a handle.
@@ -34,19 +37,23 @@ Obtaining solution for such a system consists on finding concrete values of all 
 10. Print validation result.
 
 ## Key APIs and Concepts
+
 ### CSR Matrix Storage Format
+
 The [Compressed Sparse Row (CSR) storage format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#csr-storage-format) describes an $m \times n$ sparse matrix with three arrays.
 
 Defining
+
 - `m`: number of rows
 - `n`: number of columns
 - `nnz`: number of non-zero elements
 
 we can describe a sparse matrix using the following arrays:
+
 - `csr_val`: array storing the non-zero elements of the matrix.
 - `csr_row_ptr`: given $i \in [0, m]$
-    - if $` 0 \leq i < m `$, `csr_row_ptr[i]` stores the index of the first non-zero element in row $i$ of the matrix
-    - if $i = m$, `csr_row_ptr[i]` stores `nnz`.
+  - if $` 0 \leq i < m `$, `csr_row_ptr[i]` stores the index of the first non-zero element in row $i$ of the matrix
+  - if $i = m$, `csr_row_ptr[i]` stores `nnz`.
 
     This way, row $j \in [0, m)$ contains the non-zero elements of indices from `csr_row_ptr[j]` to `csr_row_ptr[j+1]-1`. Therefore, the corresponding values in `csr_val` can be accessed from `csr_row_ptr[j]` to `csr_row_ptr[j+1]-1`.
 - `csr_col_ind`: given $i \in [0, nnz-1]$, `csr_col_ind[i]` stores the column of the $i^{th}$ non-zero element in the matrix.
@@ -68,7 +75,7 @@ $$
 
 Therefore, the CSR representation of $A$ is:
 
-```
+```c++
 m = 3
 
 n = 5
@@ -83,31 +90,33 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 ```
 
 ### rocSPARSE
+
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
 - `rocsparse_pointer_mode` controls whether scalar parameters must be allocated on the host (`rocsparse_pointer_mode_host`) or on the device (`rocsparse_pointer_mode_device`). It is controlled by `rocsparse_set_pointer_mode`.
 - `rocsparse_operation trans`: matrix operation applied to the given input matrix. The following values are accepted:
-    - `rocsparse_operation_none`: identity operation $A' = A$.
-    - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-    - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
+  - `rocsparse_operation_none`: identity operation $A' = A$.
+  - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
 - `rocsparse_mat_descr descr`: holds all properties of a matrix. The properties set in this example are the following:
-    - `rocsparse_diag_type`: indicates whether the diagonal entries of a matrix are unit elements (`rocsparse_diag_type_unit`) or not (`rocsparse_diag_type_non_unit`).
-    - `rocsparse_fill_mode`: indicates whether a (triangular) matrix is lower (`rocsparse_fill_mode_lower`) or upper (`rocsparse_fill_mode_upper`) triangular.
+  - `rocsparse_diag_type`: indicates whether the diagonal entries of a matrix are unit elements (`rocsparse_diag_type_unit`) or not (`rocsparse_diag_type_non_unit`).
+  - `rocsparse_fill_mode`: indicates whether a (triangular) matrix is lower (`rocsparse_fill_mode_lower`) or upper (`rocsparse_fill_mode_upper`) triangular.
 - `rocsparse_[sdcz]csritsv_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the `rocsparse_[sdcz]csritsv_analysis` and `rocsparse_[sdcz]csritsv_solve` functions. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
 - `rocsparse_solve_policy policy`: specifies the policy to follow for triangular solvers and factorizations. The only value accepted is `rocsparse_solve_policy_auto`.
 - `rocsparse_[sdcz]csritsv_solve` solves a sparse triangular linear system $A' y = \alpha x$. The correct function signature should be chosen based on the datatype of the input matrix:
-    - `s` single-precision real (`float`)
-    - `d` double-precision real (`double`)
-    - `c` single-precision complex (`rocsparse_float_complex`)
-    - `z` double-precision complex (`rocsparse_double_complex`)
+  - `s` single-precision real (`float`)
+  - `d` double-precision real (`double`)
+  - `c` single-precision complex (`rocsparse_float_complex`)
+  - `z` double-precision complex (`rocsparse_double_complex`)
 - `rocsparse_analysis_policy analysis`: specifies the policy to follow for analysis data. The following values are accepted:
-    - `rocsparse_analysis_policy_reuse`: the analysis data gathered is re-used.
-    - `rocsparse_analysis_policy_force`: the analysis data will be re-built.
+  - `rocsparse_analysis_policy_reuse`: the analysis data gathered is re-used.
+  - `rocsparse_analysis_policy_force`: the analysis data will be re-built.
 - `rocsparse_[sdcz]csritsv_analysis` performs the analysis step for `rocsparse_[sdcz]csritsv_solve`. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]csritsv_solve`.
 - `rocsparse_csritsv_zero_pivot(rocsparse_handle, rocsparse_mat_info, rocsparse_int *position)` returns `rocsparse_status_zero_pivot` if either a structural or numerical zero has been found during the execution of `rocsparse_[sbcz]csritsv_solve(....)` and stores in `position` the index $i$ of the first zero pivot $A_{ii}$ found. If no zero pivot is found it returns `rocsparse_status_success`.
 
 ## Demonstrated API Calls
 
 ### rocSPARSE
+
 - `rocsparse_analysis_policy`
 - `rocsparse_analysis_policy_reuse`
 - `rocsparse_create_handle`
@@ -138,6 +147,7 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_status_zero_pivot`
 
 ### HIP runtime
+
 - `hipDeviceSynchronize`
 - `hipFree`
 - `hipMalloc`
