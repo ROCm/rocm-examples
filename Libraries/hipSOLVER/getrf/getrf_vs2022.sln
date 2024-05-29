@@ -2,7 +2,7 @@
 # Visual Studio Version 17
 VisualStudioVersion = 17.3.33027.108
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getrf_vs2022", "getrf_vs2022.sln", "{D1C40C14-2881-43C7-8DAD-72BAAB169325}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "getrf_vs2022", "getrf_vs2022.vcxproj", "{D1C40C14-2881-43C7-8DAD-72BAAB169325}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

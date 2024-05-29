@@ -4,9 +4,9 @@ VisualStudioVersion = 16.0.32630.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_vs2019", "static_host_library_vs2019.vcxproj", "{5F8A7FEE-3A79-4588-9244-8575748026F7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libstatic_host_vs2019", "library\libhip_static_host_vs2019.vcxproj", "{6D3F8F78-225E-490E-ABD3-762857EBF597}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_msvc_vs2019", "static_host_library_msvc\static_host_library_msvc_vs2019.vcxproj", "{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libhip_static_host_vs2019", "library\libhip_static_host_vs2019.vcxproj", "{6D3F8F78-225E-490E-ABD3-762857EBF597}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,14 +18,14 @@ Global
 		{5F8A7FEE-3A79-4588-9244-8575748026F7}.Debug|x64.Build.0 = Debug|x64
 		{5F8A7FEE-3A79-4588-9244-8575748026F7}.Release|x64.ActiveCfg = Release|x64
 		{5F8A7FEE-3A79-4588-9244-8575748026F7}.Release|x64.Build.0 = Release|x64
-		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Debug|x64.ActiveCfg = Debug|x64
-		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Debug|x64.Build.0 = Debug|x64
-		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Release|x64.ActiveCfg = Release|x64
-		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Release|x64.Build.0 = Release|x64
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}.Debug|x64.ActiveCfg = Debug|x64
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}.Debug|x64.Build.0 = Debug|x64
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}.Release|x64.ActiveCfg = Release|x64
 		{547B99C2-CBE3-4E1F-A1D6-26E261D67A3E}.Release|x64.Build.0 = Release|x64
+		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Debug|x64.ActiveCfg = Debug|x64
+		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Debug|x64.Build.0 = Debug|x64
+		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Release|x64.ActiveCfg = Release|x64
+		{6D3F8F78-225E-490E-ABD3-762857EBF597}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

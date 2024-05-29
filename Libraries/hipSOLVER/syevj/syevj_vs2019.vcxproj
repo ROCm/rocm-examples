@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <HIPVersion>6.1</HIPVersion>
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{7139c801-489d-464a-82dc-3abdb706c7a2}</ProjectGuid>
+    <ProjectGuid>{F47E9A34-E716-44C5-B477-052EF490C604}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>syevj_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>

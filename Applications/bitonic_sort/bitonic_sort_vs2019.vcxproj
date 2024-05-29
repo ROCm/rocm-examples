@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <HIPVersion>6.1</HIPVersion>
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{265F7154-A362-45FA-B300-DB74E14BA010}</ProjectGuid>
+    <ProjectGuid>{D0112253-C970-41CA-998B-83F9AA2F0A0B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>bitonic_sort_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
