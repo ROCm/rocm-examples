@@ -23,6 +23,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
   - [events](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
   - [gpu_arch](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/gpu_arch/): Program that showcases how to implement GPU architecture-specific code.
   - [hello_world](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
+  - [hello_world_cuda](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/hello_world_cuda): Simple HIP program that showcases setting up CMake to target the CUDA platform.
   - [hipify](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/hipify): Simple program and build definitions that showcase automatically converting a CUDA `.cu` source into portable HIP `.hip` source.
   - [llvm_ir_to_executable](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/llvm_ir_to_executable): Shows how to create a HIP executable from LLVM IR.
   - [inline_assembly](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/inline_assembly/): Program that showcases how to use inline assembly in a portable manner.

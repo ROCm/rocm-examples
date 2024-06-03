@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -52,10 +52,10 @@ inline const char* hipsolverStatusToString(hipsolverStatus_t status)
 #if (hipsolverVersionMajor >= 2 && hipsolverVersionMinor >= 1)
         case HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED : return "HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED";
 #endif
+        // We do use default because we are not in control of these enumeration values.
+        // Ideally this function is something hipsolver would provide
+        default: return "<unknown hipsolverStatus_t value>";
     }
-    // We don't use default so that the compiler warns if any valid enums are missing from the
-    // switch. If the value is not a valid hipsolverStatus_t, we return the following.
-    return "<undefined hipsolverStatus_t value>";
 }
 
 /// \brief Checks if the provided status code is \p HIPSOLVER_STATUS_SUCCESS and if not,

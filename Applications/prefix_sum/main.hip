@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -182,7 +182,7 @@ int main(int argc, char* argv[])
     if(size <= 0)
     {
         std::cout << "Size must be at least 1." << std::endl;
-        exit(0);
+        return error_exit_code;
     }
 
     // 2. Generate input vector.

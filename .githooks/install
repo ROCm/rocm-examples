@@ -1,0 +1,14 @@
+#!/bin/sh
+
+cd "$(git rev-parse --git-dir)"
+cd hooks
+
+echo "Installing hooks..."
+# Install pre-commit hook if dependencies are satisfied
+if ! [ -x "$(command -v git-clang-format)" ]; then
+  echo 'Error: pre-commit hook depends on git-clang-format, but is not installed.' >&2
+  exit 1
+else
+    ln -s ../../.githooks/pre-commit pre-commit
+fi
+echo "Done!"
