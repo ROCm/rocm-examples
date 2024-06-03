@@ -10,7 +10,7 @@ The examples in this subdirectory showcase the functionality of the HIP runtime.
 
 - [CMake](https://cmake.org/download/) (at least version 3.21)
 - OR GNU Make - available via the distribution's package manager
-- [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 5.x.x)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
 
 ### Windows
 

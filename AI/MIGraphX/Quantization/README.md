@@ -1,7 +1,6 @@
-
 # MIGraphX - Torch Examples
 
-# Summary
+## Summary
 
 The examples in this subdirectory showcase the functionality for executing quantized models using MIGraphX. The Torch-MIGraphX integration library is used to achieve this, where PyTorch is used to quantize models, and MIGraphX is used to execute them on AMD GPUs.
 

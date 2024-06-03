@@ -16,9 +16,9 @@ This example shows how the target platform and compiler can be identified, as we
 
 ## Key APIs and Concepts
 
-- HIP code can target the AMD and the NVIDIA platform, and it can be compiled with different compilers. Compiler-defined macros can be used in HIP code to write code that is specific to a target or a compiler. See [HIP Programming Guide - Distinguishing Compiler Modes](https://docs.amd.com/bundle/HIP-Programming-Guide-v5.2/page/Transitioning_from_CUDA_to_HIP.html#d4438e664) for more details.
+- HIP code can target the AMD and the NVIDIA platform, and it can be compiled with different compilers. Compiler-defined macros can be used in HIP code to write code that is specific to a target or a compiler. See [HIP Programming Guide - Distinguishing Compiler Modes](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_porting_guide.html#distinguishing-compiler-modes) for more details.
 
-- `hipGetDeviceCount` returns the number of devices in the system. Some device management API functions take an identifier for each device, which is a monotonically incrementing number starting from zero. Others require the active device to be set, with `hipSetDevice`. A full overview of the device management API can be found at [HIP API - Device Management](https://docs.amd.com/bundle/HIP_API_Guide/page/group___device.html).
+- `hipGetDeviceCount` returns the number of devices in the system. Some device management API functions take an identifier for each device, which is a monotonically incrementing number starting from zero. Others require the active device to be set, with `hipSetDevice`. A full overview of the device management API can be found at [HIP API - Device Management](https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/group___device.html).
 
 ## Demonstrated API Calls
 

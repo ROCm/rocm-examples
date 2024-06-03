@@ -1,5 +1,13 @@
+# syntax=docker/dockerfile:latest
+# Above is required for substitutions in environment variables
+
 # Ubuntu based docker image
-FROM ubuntu:20.04
+FROM ubuntu:22.04
+
+# The ROCm versions that this image is based of.
+# Always write this down as major.minor.patch
+ENV ROCM_VERSION=6.1.0
+ENV ROCM_VERSION_APT=${ROCM_VERSION%.0}
 
 # Base packages that are required for the installation
 RUN export DEBIAN_FRONTEND=noninteractive; \
@@ -18,18 +26,29 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         libvulkan-dev \
         vulkan-validationlayers \
         libglfw3-dev \
+        gnupg \
+        g++ \
     && rm -rf /var/lib/apt/lists/*
 
 ENV LANG en_US.utf8
 
-# Install ROCM HIP and libraries using the installer script
+# Install the HIP compiler and libraries from the ROCm repositories
 RUN export DEBIAN_FRONTEND=noninteractive; \
-    wget https://repo.radeon.com/amdgpu-install/6.0/ubuntu/focal/amdgpu-install_6.0.60000-1_all.deb \
+    mkdir -p /etc/apt/keyrings \
+    && wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | gpg --dearmor > /etc/apt/keyrings/rocm.gpg \
+    && echo "deb [arch=amd64, signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/$ROCM_VERSION_APT/ jammy main" > /etc/apt/sources.list.d/rocm.list \
+    && printf 'Package: *\nPin: origin "repo.radeon.com"\nPin-Priority: 9001\n' > /etc/apt/preferences.d/radeon.pref \
     && apt-get update -qq \
-    && apt-get install -y ./amdgpu-install_6.0.60000-1_all.deb \
-    && rm ./amdgpu-install_6.0.60000-1_all.deb\
-    && amdgpu-install -y --usecase=hiplibsdk --no-dkms \
-    && apt-get install -y libnuma-dev \
+    && apt-get install --no-install-recommends -y \
+        hip-base hipify-clang rocm-core hipcc \
+        hip-dev rocm-hip-runtime-dev rocm-llvm-dev \
+        rocrand-dev hiprand-dev \
+        rocprim-dev hipcub-dev \
+        rocblas-dev hipblas-dev \
+        rocsolver-dev hipsolver-dev \
+        rocfft-dev hipfft-dev \
+        rocsparse-dev \
+        rocthrust-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install CMake

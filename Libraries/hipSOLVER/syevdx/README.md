@@ -2,7 +2,7 @@
 
 ## Description
 
-This example illustrates how to solve the standard symmetric-definite eigenvalue problem for a symmetric matrix $A$ using hipSOLVER's [Compatibility API](https://hipsolver.readthedocs.io/en/rocm-5.4.4/compat_index.html). This API offers wrapper functions for the ones existing in hipSOLVER (and their equivalents in [cuSolverDN](https://docs.nvidia.com/cuda/cusolver/index.html#cusolverdn-dense-lapack)) and is intended to be used when porting cuSOLVER applications to hipSOLVER ones. The main advantage of this API is that its functions follow the same method signature format as cuSolverDN's, which makes easier the port.
+This example illustrates how to solve the standard symmetric-definite eigenvalue problem for a symmetric matrix $A$ using hipSOLVER's [Compatibility API](https://rocm.docs.amd.com/projects/hipSOLVER/en/latest/reference/compat-api/lapacklike.html). This API offers wrapper functions for the ones existing in hipSOLVER (and their equivalents in [cuSolverDN](https://docs.nvidia.com/cuda/cusolver/index.html#cusolverdn-dense-lapack)) and is intended to be used when porting cuSOLVER applications to hipSOLVER ones. The main advantage of this API is that its functions follow the same method signature format as cuSolverDN's, which makes easier the port.
 
 Given an $n \times n$ symmetric matrix $A$, the said problem consists on solving the following equation:
 

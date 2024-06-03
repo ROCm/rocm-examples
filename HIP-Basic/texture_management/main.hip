@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -47,8 +47,17 @@ __global__ void histogram_kernel(unsigned int*      histogram,
     float u = x / static_cast<float>(size_x) + .5f;
     float v = y / static_cast<float>(size_y) + .5f;
 
-    // Read the value from the texture.
+#if !defined(__HIP_NO_IMAGE_SUPPORT) || !__HIP_NO_IMAGE_SUPPORT
+    // Read the value from the texture, if supported.
     unsigned char val = tex2D<unsigned char>(tex_obj, u, v);
+#else
+    // Prevent compile errors on HIP architectures that do not support
+    // texture instructions.
+    (void)u;
+    (void)v;
+    (void)tex_obj;
+    unsigned char val = 0;
+#endif
 
     // Determine the histogram bin and write to global memory.
     unsigned int bin_range = ceiling_div(256, hist_bin_count);

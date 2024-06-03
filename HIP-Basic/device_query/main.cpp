@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2015-2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2015-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -63,7 +63,7 @@ void print_device_properties(int device_id)
     HIP_CHECK(hipGetDeviceProperties(&props, device_id));
 
     // Print a small set of all available properties. A full list can be found at:
-    // https://docs.amd.com/bundle/HIP_API_Guide/page/structhip_device_prop__t.html
+    // https://rocm.docs.amd.com/projects/HIP/en/latest/doxygen/html/structhip_device_prop__t.html
     std::cout << std::setw(col_w) << "Name: " << props.name << '\n';
     std::cout << std::setw(col_w)
               << "totalGlobalMem: " << double_precision(bytes_to_gib(props.totalGlobalMem), 2, true)
