@@ -146,8 +146,9 @@ printf -- '  - %q\n' "${outdated_copyright[@]}"
 # If we don't need to update, we early exit.
 if ! $update; then
     printf -- \
-"\nRun '\033[33mscripts/copyright-date/check-copyright.sh -u\033[0m' to update the copyright statement(s). See '-h' for more info,
-or set '\033[33mgit config --local hooks.updateCopyright true\033[0m' to automatically update copyrights when committing.\n"
+"\nRun '\033[33m%s -u\033[0m' to update the copyright statement(s). See '-h' for more info,
+or set '\033[33mgit config --local hooks.updateCopyright true\033[0m' to automatically update copyrights when committing.\n" \
+"${BASH_SOURCE[0]}"
     exit 1
 fi
 
