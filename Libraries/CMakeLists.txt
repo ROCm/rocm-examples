@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,7 +25,7 @@ project(Libraries LANGUAGES NONE)
 
 # CMake configuration files for CUDA versions of HIP libraries are not yet
 # included under the HIP SDK for Windows.
-if (NOT (CMAKE_SYSTEM_NAME MATCHES Windows AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
+if(NOT (CMAKE_SYSTEM_NAME MATCHES Windows AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
     add_subdirectory(hipBLAS)
     add_subdirectory(hipCUB)
     add_subdirectory(hipSOLVER)

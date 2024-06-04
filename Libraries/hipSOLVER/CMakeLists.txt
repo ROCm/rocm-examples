@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,16 +24,27 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(hipSOLVER_examples LANGUAGES NONE)
 
 if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hipsolver)
 if(NOT hipsolver_FOUND)
-    message(STATUS "hipSOLVER could not be found, not building hipSOLVER examples")
+    message(
+        STATUS
+        "hipSOLVER could not be found, not building hipSOLVER examples"
+    )
     return()
 endif()
 
@@ -50,6 +61,6 @@ add_subdirectory(sygvd)
 
 # this example currently does not work with CUDA
 # https://github.com/ROCmSoftwarePlatform/hipSOLVER/issues/152
-if (NOT ("${GPU_RUNTIME}" STREQUAL "CUDA"))
+if(NOT ("${GPU_RUNTIME}" STREQUAL "CUDA"))
     add_subdirectory(sygvj)
 endif()

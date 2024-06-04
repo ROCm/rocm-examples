@@ -29,9 +29,17 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CUDA)
 
 if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 add_executable(${example_name} main.hip)
@@ -40,9 +48,10 @@ add_executable(${example_name} main.hip)
 add_test(${example_name} ${example_name})
 
 # Make the HIP runtime headers accessible
-target_include_directories(${example_name} PRIVATE
-    "${ROCM_ROOT}/include"
-    "${CMAKE_CURRENT_SOURCE_DIR}/../../Common")
+target_include_directories(
+    ${example_name}
+    PRIVATE "${ROCM_ROOT}/include" "${CMAKE_CURRENT_SOURCE_DIR}/../../Common"
+)
 
 # Set up the compilation language for the source file.
 # Usually this can be deduced from the file extension, but not in the case of .hip.

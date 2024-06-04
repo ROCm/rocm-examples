@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -38,14 +38,8 @@ find_package(rocprim REQUIRED)
 add_executable(${example_name} main.hip)
 add_test(${example_name} ${example_name})
 
-target_link_libraries(${example_name}
-    PRIVATE
-    roc::rocprim
-)
-target_include_directories(${example_name}
-    PRIVATE
-    "../../../Common"
-)
+target_link_libraries(${example_name} PRIVATE roc::rocprim)
+target_include_directories(${example_name} PRIVATE "../../../Common")
 if(WIN32)
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()

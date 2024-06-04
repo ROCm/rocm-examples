@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,9 @@ set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
 
 # Only supported on HIP (not CUDA)
 if(NOT "${GPU_RUNTIME}" STREQUAL "HIP")
-    set(ERROR_MESSAGE "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be HIP.")
+    set(ERROR_MESSAGE
+        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be HIP."
+    )
     message(FATAL_ERROR ${ERROR_MESSAGE})
 endif()
 
@@ -39,9 +41,17 @@ set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
 if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
@@ -62,12 +72,15 @@ target_compile_options(${example_name}_module PRIVATE --cuda-device-only)
 
 # Copy the code object next to the executable
 add_custom_command(
-    TARGET ${example_name} 
+    TARGET ${example_name}
     POST_BUILD
     COMMAND "${CMAKE_COMMAND}"
-    ARGS -E copy $<TARGET_OBJECTS:${example_name}_module> $<TARGET_FILE_DIR:${example_name}>/module.co
+    ARGS
+        -E copy $<TARGET_OBJECTS:${example_name}_module>
+        $<TARGET_FILE_DIR:${example_name}>/module.co
     COMMAND_EXPAND_LISTS
-    COMMENT "Copying HIP code object for ${example_name}")
+    COMMENT "Copying HIP code object for ${example_name}"
+)
 
 add_dependencies(${example_name} ${example_name}_module)
 # Make example runnable using ctest

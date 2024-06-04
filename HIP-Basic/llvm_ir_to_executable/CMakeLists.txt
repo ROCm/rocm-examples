@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,9 @@ set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
 
 # Only supported on HIP (not CUDA)
 if(NOT "${GPU_RUNTIME}" STREQUAL "HIP")
-    set(ERROR_MESSAGE "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be HIP.")
+    set(ERROR_MESSAGE
+        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be HIP."
+    )
     message(FATAL_ERROR ${ERROR_MESSAGE})
 endif()
 
@@ -39,9 +41,17 @@ set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
 if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
@@ -49,40 +59,55 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
     set(GPU_ARCHITECTURES "all" CACHE STRING "GPU architectures to compile for")
 else()
-    set(GPU_ARCHITECTURES "${CMAKE_HIP_ARCHITECTURES}" CACHE STRING "GPU architectures to compile for")
+    set(GPU_ARCHITECTURES
+        "${CMAKE_HIP_ARCHITECTURES}"
+        CACHE STRING
+        "GPU architectures to compile for"
+    )
 endif()
 
 if(GPU_ARCHITECTURES STREQUAL "all")
-    set(GPU_ARCHITECTURES "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102" CACHE STRING "GPU architectures to compile for" FORCE)
+    set(GPU_ARCHITECTURES
+        "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102"
+        CACHE STRING
+        "GPU architectures to compile for"
+        FORCE
+    )
 endif()
 
 # Remove duplicates
 list(REMOVE_DUPLICATES GPU_ARCHITECTURES)
 message(STATUS "GPU_ARCHITECTURES: ${GPU_ARCHITECTURES}")
 
-set_source_files_properties(main.hip PROPERTIES COMPILE_OPTIONS "--cuda-host-only")
+set_source_files_properties(
+    main.hip
+    PROPERTIES COMPILE_OPTIONS "--cuda-host-only"
+)
 
 find_program(
-        LLVM_DIS_COMMAND llvm-dis
-        PATH_SUFFIXES bin
-        PATHS
-        ${ROCM_ROOT}/llvm
-        ${CMAKE_INSTALL_PREFIX}/llvm
-        REQUIRED)
+    LLVM_DIS_COMMAND
+    llvm-dis
+    PATH_SUFFIXES bin
+    PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    REQUIRED
+)
 
 # Generate the device LLVM IR using the HIP compiler.
 foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
     add_custom_command(
-            OUTPUT main_${HIP_ARCHITECTURE}.ll main_${HIP_ARCHITECTURE}.bc
-            COMMAND
-                ${CMAKE_HIP_COMPILER} --cuda-device-only -c -emit-llvm ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
-                --offload-arch=${HIP_ARCHITECTURE} -o main_${HIP_ARCHITECTURE}.bc
-                -I ${CMAKE_CURRENT_SOURCE_DIR}/../../Common -std=c++17
-            COMMAND
-                ${LLVM_DIS_COMMAND} main_${HIP_ARCHITECTURE}.bc -o main_${HIP_ARCHITECTURE}.ll
-            DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
-            VERBATIM
-            COMMENT "Generating main_${HIP_ARCHITECTURE}.ll")
+        OUTPUT main_${HIP_ARCHITECTURE}.ll main_${HIP_ARCHITECTURE}.bc
+        COMMAND
+            ${CMAKE_HIP_COMPILER} --cuda-device-only -c -emit-llvm
+            ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
+            --offload-arch=${HIP_ARCHITECTURE} -o main_${HIP_ARCHITECTURE}.bc -I
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../Common -std=c++17
+        COMMAND
+            ${LLVM_DIS_COMMAND} main_${HIP_ARCHITECTURE}.bc -o
+            main_${HIP_ARCHITECTURE}.ll
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
+        VERBATIM
+        COMMENT "Generating main_${HIP_ARCHITECTURE}.ll"
+    )
 endforeach()
 
 if(WIN32)
@@ -104,21 +129,23 @@ foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
     add_custom_command(
         OUTPUT main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
         COMMAND
-            ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa -mcpu=${HIP_ARCHITECTURE} main_${HIP_ARCHITECTURE}.ll
-            -o ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
+            ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa
+            -mcpu=${HIP_ARCHITECTURE} main_${HIP_ARCHITECTURE}.ll -o
+            ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
         DEPENDS main_${HIP_ARCHITECTURE}.ll
         VERBATIM
-        COMMENT "Generating main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
+        COMMENT "Generating main_${HIP_ARCHITECTURE}.${OBJ_TYPE}"
+    )
 endforeach()
 
 # Create an offload-bundle from the assembled object files. This needs the clang-offload-bundler tool.
 find_program(
-    OFFLOAD_BUNDLER_COMMAND clang-offload-bundler
+    OFFLOAD_BUNDLER_COMMAND
+    clang-offload-bundler
     PATH_SUFFIXES bin
-    PATHS
-    ${ROCM_ROOT}/llvm
-    ${CMAKE_INSTALL_PREFIX}/llvm
-    REQUIRED)
+    PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    REQUIRED
+)
 
 # Generate object bundle.
 # The invocation to generate is
@@ -132,9 +159,19 @@ set(BUNDLE_INPUTS "-input=${NULDEV}")
 # Generate BUNDLE_OBJECTS as a string of: ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
 set(BUNDLE_OBJECTS "")
 foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
-    set(BUNDLE_TARGETS "${BUNDLE_TARGETS},hipv4-amdgcn-amd-amdhsa--${HIP_ARCHITECTURE}")
-    list(APPEND BUNDLE_INPUTS "-input=${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
-    list(APPEND BUNDLE_OBJECTS "${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}")
+    set(BUNDLE_TARGETS
+        "${BUNDLE_TARGETS},hipv4-amdgcn-amd-amdhsa--${HIP_ARCHITECTURE}"
+    )
+    list(
+        APPEND
+        BUNDLE_INPUTS
+        "-input=${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}"
+    )
+    list(
+        APPEND
+        BUNDLE_OBJECTS
+        "${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}"
+    )
 endforeach()
 
 # Invoke clang-offload-bundler to generate an offload bundle.
@@ -142,44 +179,37 @@ set(BUNDLE "${CMAKE_CURRENT_BINARY_DIR}/offload_bundle.hipfb")
 add_custom_command(
     OUTPUT "${BUNDLE}"
     COMMAND
-        "${OFFLOAD_BUNDLER_COMMAND}"
-        -type=o
-        -bundle-align=4096
-        "${BUNDLE_TARGETS}"
-        ${BUNDLE_INPUTS}
-        "-output=${BUNDLE}"
+        "${OFFLOAD_BUNDLER_COMMAND}" -type=o -bundle-align=4096
+        "${BUNDLE_TARGETS}" ${BUNDLE_INPUTS} "-output=${BUNDLE}"
     DEPENDS ${BUNDLE_OBJECTS}
-    VERBATIM)
+    VERBATIM
+)
 
 # Create the device binary by assembling the template that includes
 # the offload bundle that was just generated using an .incbin directive.
 # This needs an assembler.
 find_program(
-    LLVM_MC_COMMAND llvm-mc
+    LLVM_MC_COMMAND
+    llvm-mc
     PATH_SUFFIXES bin
-    PATHS
-        ${ROCM_ROOT}/llvm
-        ${CMAKE_INSTALL_PREFIX}/llvm
-    REQUIRED)
+    PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    REQUIRED
+)
 
 # Invoke llvm-mc to generate an object file containing the offload bundle.
 set(DEVICE_OBJECT "${CMAKE_CURRENT_BINARY_DIR}/main_device.${OBJ_TYPE}")
 add_custom_command(
     OUTPUT "${DEVICE_OBJECT}"
     COMMAND
-        "${LLVM_MC_COMMAND}"
-        -triple "${HOST_TARGET}"
-        "${CMAKE_CURRENT_SOURCE_DIR}/${HIP_OBJ_GEN_FILE}"
-        -o "${DEVICE_OBJECT}"
+        "${LLVM_MC_COMMAND}" -triple "${HOST_TARGET}"
+        "${CMAKE_CURRENT_SOURCE_DIR}/${HIP_OBJ_GEN_FILE}" -o "${DEVICE_OBJECT}"
         --filetype=obj
     DEPENDS "${BUNDLE}"
-    VERBATIM)
+    VERBATIM
+)
 
 # Finally, create the executable.
-add_executable(
-    ${example_name}
-    main.hip
-    ${DEVICE_OBJECT})
+add_executable(${example_name} main.hip ${DEVICE_OBJECT})
 
 # Make example runnable using ctest
 add_test(${example_name} ${example_name})
