@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,9 @@ set(GPU_RUNTIMES "HIP" "CUDA")
 set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
 
 if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    set(ERROR_MESSAGE "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP or CUDA.")
+    set(ERROR_MESSAGE
+        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP or CUDA."
+    )
     message(FATAL_ERROR ${ERROR_MESSAGE})
 endif()
 
@@ -40,9 +42,17 @@ set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
 if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
@@ -61,19 +71,30 @@ set(SHADER_BINARY_DIR "${CMAKE_CURRENT_BINARY_DIR}")
 
 add_custom_command(
     OUTPUT "${SHADER_BINARY_DIR}/sinewave.vert.spv.h"
-    COMMAND ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE} -V100 --vn sinewave_vert -o "${SHADER_BINARY_DIR}/sinewave.vert.spv.h" "${CMAKE_CURRENT_SOURCE_DIR}/sinewave.vert"
+    COMMAND
+        ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE} -V100 --vn sinewave_vert -o
+        "${SHADER_BINARY_DIR}/sinewave.vert.spv.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sinewave.vert"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/sinewave.vert"
     COMMENT "Compiling vertex shader"
 )
 
 add_custom_command(
     OUTPUT "${SHADER_BINARY_DIR}/sinewave.frag.spv.h"
-    COMMAND ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE} -V100 --vn sinewave_frag -o "${SHADER_BINARY_DIR}/sinewave.frag.spv.h" "${CMAKE_CURRENT_SOURCE_DIR}/sinewave.frag"
+    COMMAND
+        ${Vulkan_GLSLANG_VALIDATOR_EXECUTABLE} -V100 --vn sinewave_frag -o
+        "${SHADER_BINARY_DIR}/sinewave.frag.spv.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/sinewave.frag"
     DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/sinewave.frag"
     COMMENT "Compiling fragment shader"
 )
 
-add_custom_target(shaders DEPENDS "${SHADER_BINARY_DIR}/sinewave.vert.spv.h" "${SHADER_BINARY_DIR}/sinewave.frag.spv.h")
+add_custom_target(
+    shaders
+    DEPENDS
+        "${SHADER_BINARY_DIR}/sinewave.vert.spv.h"
+        "${SHADER_BINARY_DIR}/sinewave.frag.spv.h"
+)
 
 list(APPEND include_dirs ${SHADER_BINARY_DIR})
 add_dependencies(${example_name} shaders)

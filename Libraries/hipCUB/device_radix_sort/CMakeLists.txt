@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,10 @@ set(GPU_RUNTIMES "HIP" "CUDA")
 set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
 
 if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    message(FATAL_ERROR "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}")
+    message(
+        FATAL_ERROR
+        "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}"
+    )
 endif()
 
 enable_language(${GPU_RUNTIME})
@@ -47,14 +50,8 @@ find_package(hipcub REQUIRED)
 add_executable(${example_name} main.hip)
 add_test(${example_name} ${example_name})
 
-target_link_libraries(${example_name}
-    PRIVATE
-    hip::hipcub
-)
-target_include_directories(${example_name}
-    PRIVATE
-    "../../../Common"
-)
+target_link_libraries(${example_name} PRIVATE hip::hipcub)
+target_include_directories(${example_name} PRIVATE "../../../Common")
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
 if(WIN32)
     target_compile_definitions(${example_name} PRIVATE WIN32)

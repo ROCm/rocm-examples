@@ -25,49 +25,64 @@ project(HIP-Basic LANGUAGES CXX)
 
 # ROCm installation path
 if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 # Only supported on HIP (not CUDA)
 if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
-
     # Make sure the dependencies can be found before building.
     find_program(
-        LLVM_DIS_COMMAND llvm-dis
+        LLVM_DIS_COMMAND
+        llvm-dis
         PATH_SUFFIXES bin
-        PATHS
-        ${ROCM_ROOT}/llvm
-        ${CMAKE_INSTALL_PREFIX}/llvm)
+        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    )
     find_program(
-        OFFLOAD_BUNDLER_COMMAND clang-offload-bundler
+        OFFLOAD_BUNDLER_COMMAND
+        clang-offload-bundler
         PATH_SUFFIXES bin
-        PATHS
-        ${ROCM_ROOT}/llvm
-        ${CMAKE_INSTALL_PREFIX}/llvm)
+        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    )
     find_program(
-        LLVM_MC_COMMAND llvm-mc
+        LLVM_MC_COMMAND
+        llvm-mc
         PATH_SUFFIXES bin
-        PATHS
-        ${ROCM_ROOT}/llvm
-        ${CMAKE_INSTALL_PREFIX}/llvm)
+        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    )
 
     if(LLVM_DIS_COMMAND AND OFFLOAD_BUNDLER_COMMAND AND LLVM_MC_COMMAND)
-    add_subdirectory(llvm_ir_to_executable)
-    else()  
-        message("'llvm-dis', 'llvm-mc', or 'clang-offload-bundler' not found, not building assembly example.")
+        add_subdirectory(llvm_ir_to_executable)
+    else()
+        message(
+            "'llvm-dis', 'llvm-mc', or 'clang-offload-bundler' not found, not building assembly example."
+        )
         if(NOT WIN32)
-            message("    These tools can be found in the 'rocm-llvm-dev' package.")
+            message(
+                "    These tools can be found in the 'rocm-llvm-dev' package."
+            )
         endif()
     endif()
 
     if(OFFLOAD_BUNDLER_COMMAND AND LLVM_MC_COMMAND)
         add_subdirectory(assembly_to_executable)
     else()
-        message("'llvm-mc' or 'clang-offload-bundler' not found, not building LLVM IR example.")
+        message(
+            "'llvm-mc' or 'clang-offload-bundler' not found, not building LLVM IR example."
+        )
         if(NOT WIN32)
-            message("    These tools can be found in the 'rocm-llvm-dev' package.")
+            message(
+                "    These tools can be found in the 'rocm-llvm-dev' package."
+            )
         endif()
     endif()
 

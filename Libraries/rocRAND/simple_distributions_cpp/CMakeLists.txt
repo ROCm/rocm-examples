@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,10 @@ set(GPU_RUNTIMES "HIP" "CUDA")
 set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
 
 if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    message(FATAL_ERROR "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}")
+    message(
+        FATAL_ERROR
+        "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}"
+    )
 endif()
 
 if(GPU_RUNTIME STREQUAL "CUDA")

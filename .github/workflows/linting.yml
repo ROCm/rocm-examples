@@ -3,16 +3,35 @@ name: Linting
 on:
   push:
     branches:
-    - develop
-    - main
-    - 'release/rocm-rel*'
+      - develop
+      - main
+      - 'release/rocm-rel*'
   pull_request:
     branches:
-    - develop
-    - main
-    - 'release/roc-rel*'
+      - develop
+      - main
+      - 'release/rocm-rel*'
 
 jobs:
   call-workflow-passing-data:
     name: Documentation
     uses: ROCm/rocm-docs-core/.github/workflows/linting.yml@develop
+
+  cmake-formatting:
+    name: CMake File Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y python3-pip
+          python3 -m pip install gersemi
+      - name: Run gersemi
+        run: |
+          gersemi --check .
+          if [ $? -ne 0 ]; then
+            echo "CMake files are not formatted correctly. Please run gersemi ..."
+            echo "For example: \`gersemi -i .\`"
+            exit 1
+          fi
