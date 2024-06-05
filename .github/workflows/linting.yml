@@ -8,9 +8,9 @@ on:
       - 'release/rocm-rel*'
   pull_request:
     branches:
-    - develop
-    - main
-    - 'release/rocm-rel*'
+      - develop
+      - main
+      - 'release/rocm-rel*'
 
 jobs:
   call-workflow-passing-data:
