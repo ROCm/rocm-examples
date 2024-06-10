@@ -230,15 +230,15 @@ int main()
 
     // Check last residual computed to confirm that convergence was successful.
     HIP_CHECK(hipMemcpy(data.data(), d_data, size_data, hipMemcpyDeviceToHost));
-    const double        last_residual       = data.back();
-    const rocsparse_int csritilu0_converges = last_residual < tol;
+    const double last_residual       = data.back();
+    const bool   csritilu0_converges = last_residual < tol;
 
     int errors{};
 
     if(!csritilu0_converges)
     {
         std::cout << "Residual in last iteration " << last_residual
-                  << "is greater or equal than tolerance " << tol
+                  << " is greater or equal than tolerance " << tol
                   << ". Iterative incomplete LU factorization was unsuccessful." << std::endl;
         errors++;
     }

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,10 +27,12 @@ add_subdirectory(bsrmv)
 add_subdirectory(bsrsv)
 add_subdirectory(bsrxmv)
 add_subdirectory(coomv)
+add_subdirectory(csritsv)
 add_subdirectory(csrmv)
 add_subdirectory(csrsv)
 add_subdirectory(ellmv)
 add_subdirectory(gebsrmv)
 add_subdirectory(gemvi)
+add_subdirectory(spitsv)
 add_subdirectory(spmv)
 add_subdirectory(spsv)
