@@ -35,3 +35,18 @@ jobs:
             echo "For example: \`gersemi -i .\`"
             exit 1
           fi
+
+  source-formatting:
+    name: Source Code Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y clang-format
+      - name: Run clang-format
+        run: |
+          FILES=$(find . -type f ! -path '**/build/*' | egrep '\.(cc|cp|cpp|c++|cxx|cu|cuh|hh|hpp|hxx|hip|vert|frag)$')
+          clang-format -style=file -i $FILES
+          git diff --exit-code
