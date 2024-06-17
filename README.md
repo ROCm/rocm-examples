@@ -225,7 +225,7 @@ A collection of examples to enable new users to start using ROCm. Advanced users
 ### Windows
 
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
-- ROCm toolchain for Windows (No public release yet)
+- [HIP SDK for Windows](https://rocm.docs.amd.com/projects/install-on-windows/en/latest/how-to/install.html)
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
 - [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
 - [Ninja](https://ninja-build.org/) (optional, to build with CMake)
