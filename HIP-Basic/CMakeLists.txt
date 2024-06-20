@@ -127,7 +127,19 @@ if(NOT WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "HIP")
     add_subdirectory(static_host_library)
 endif()
 add_subdirectory(streams)
-add_subdirectory(texture_management)
+
+# This example is not supported on gfx940, gfx941, and gfx942
+# See: __HIP_NO_IMAGE_SUPPORT in hip/amd_detail/amd_device_functions.h
+list(REMOVE_DUPLICATES CMAKE_HIP_ARCHITECTURES)
+if(NOT (CMAKE_HIP_ARCHITECTURES MATCHES "gfx94*"))
+    add_subdirectory(texture_management)
+else()
+    message(
+        WARNING
+        "SKIP: Texture management example not supported on gfx940, gfx941, and gfx942"
+    )
+endif()
+
 add_subdirectory(warp_shuffle)
 
 find_package(glfw3)

@@ -57,23 +57,36 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-add_executable(${example_name} main.hip)
-# Make example runnable using ctest
-add_test(${example_name} ${example_name})
-
-# Temporary workaround: a known bug prevents the example from executing succesfully
-# if multiple GPUs are visible 
-set_tests_properties(
-    ${example_name}
-    PROPERTIES ENVIRONMENT "HIP_VISIBLE_DEVICES=0"
+# Check if GPU architecture is supported
+list(REMOVE_DUPLICATES CMAKE_HIP_ARCHITECTURES)
+message(
+    STATUS
+    "texture_management - CMAKE_HIP_ARCHITECTURES: ${CMAKE_HIP_ARCHITECTURES}"
 )
 
-set(include_dirs "../../Common")
-if(GPU_RUNTIME STREQUAL "CUDA")
-    list(APPEND include_dirs "${ROCM_ROOT}/include")
+if(NOT CMAKE_HIP_ARCHITECTURES MATCHES "gfx94*")
+    add_executable(${example_name} main.hip)
+
+    # Make example runnable using ctest
+    add_test(${example_name} ${example_name})
+
+    # Temporary workaround: a known bug prevents the example from executing succesfully
+    # if multiple GPUs are visible
+    set_tests_properties(
+        ${example_name}
+        PROPERTIES ENVIRONMENT "HIP_VISIBLE_DEVICES=0"
+    )
+
+    set(include_dirs "../../Common")
+    if(GPU_RUNTIME STREQUAL "CUDA")
+        list(APPEND include_dirs "${ROCM_ROOT}/include")
+    endif()
+
+    target_include_directories(${example_name} PRIVATE ${include_dirs})
+    set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+
+    install(TARGETS ${example_name})
+else()
+    # As per hip/amd_detail/amd_device_function.h
+    message(WARNING "This example is not supported on gfx94*, skipping...")
 endif()
-
-target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
-
-install(TARGETS ${example_name})
