@@ -77,7 +77,10 @@ endif()
 
 # Remove duplicates.
 list(REMOVE_DUPLICATES GPU_ARCHITECTURES)
-message(STATUS "GPU_ARCHITECTURES: ${GPU_ARCHITECTURES}")
+message(
+    STATUS
+    "assembly_to_executable - GPU_ARCHITECTURES: ${GPU_ARCHITECTURES}"
+)
 
 set_source_files_properties(
     main.hip
