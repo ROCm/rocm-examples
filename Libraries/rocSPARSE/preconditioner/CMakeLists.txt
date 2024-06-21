@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocSPARSE_preconditioner_examples LANGUAGES NONE)
+project(rocSPARSE_preconditioner_examples LANGUAGES CXX)
 
 add_subdirectory(bsric0)
 add_subdirectory(bsrilu0)

@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocSOLVER_examples LANGUAGES NONE)
+project(rocSOLVER_examples LANGUAGES CXX)
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocSOLVER examples do not support the CUDA runtime")
