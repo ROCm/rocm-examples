@@ -59,7 +59,7 @@ install(
 
 set(CPACK_PACKAGE_NAME "ROCm-SDK-Examples")
 set(CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc.")
-set(CPACK_PACKAGE_CONTACT "Advanced Micro Devices, Inc.")
+set(CPACK_PACKAGE_CONTACT "ROCm Developer Support <rocm-dev.support@amd.com>")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
     "A collection of examples for the ROCm software stack"
 )
