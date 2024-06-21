@@ -64,3 +64,7 @@ This example demonstrates how a kernel may use texture memory through the textur
 - `hipStreamDefault`
 - `hipTextureDesc`
 - `hipTextureObject_t`
+
+## Limitations
+
+This example is not supported on CDNA3 architecture (MI300) and above.

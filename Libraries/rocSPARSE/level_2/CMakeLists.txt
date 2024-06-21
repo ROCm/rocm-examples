@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocSPARSE_level_2_examples LANGUAGES NONE)
+project(rocSPARSE_level_2_examples LANGUAGES CXX)
 
 add_subdirectory(bsrmv)
 add_subdirectory(bsrsv)

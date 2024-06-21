@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries LANGUAGES NONE)
+project(Libraries LANGUAGES CXX)
 
 # CMake configuration files for CUDA versions of HIP libraries are not yet
 # included under the HIP SDK for Windows.

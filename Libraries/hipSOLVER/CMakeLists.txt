@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipSOLVER_examples LANGUAGES NONE)
+project(hipSOLVER_examples LANGUAGES CXX)
 
 if(WIN32)
     set(ROCM_ROOT
