@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,9 +21,85 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
-project(ROCMm-SDK-Examples LANGUAGES CXX)
+project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.2.0)
 enable_testing()
 
 add_subdirectory(Applications)
 add_subdirectory(HIP-Basic)
 add_subdirectory(Libraries)
+
+# Copy source files in root to package
+install(
+    FILES LICENSE.md CMakeLists.txt README.md
+    DESTINATION /opt/rocm/examples
+)
+
+# Copy source directories to package
+install(
+    DIRECTORY
+        AI
+        Applications
+        Common
+        Dockerfiles
+        External
+        HIP-Basic
+        Libraries
+        LLVM_ASAN
+    DESTINATION /opt/rocm/examples
+    PATTERN *
+    PATTERN "**/build" EXCLUDE
+    PATTERN ".gitignore" EXCLUDE
+    PATTERN "*.vcxproj**" EXCLUDE
+    PATTERN "*.sln" EXCLUDE
+)
+
+###
+# Packaging Directives
+###
+
+set(CPACK_PACKAGE_NAME "ROCm-SDK-Examples")
+set(CPACK_PACKAGE_VENDOR "Advanced Micro Devices, Inc.")
+set(CPACK_PACKAGE_CONTACT "Advanced Micro Devices, Inc.")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY
+    "A collection of examples for the ROCm software stack"
+)
+
+set(CPACK_PACKAGE_VERSION_MAJOR ${PROJECT_VERSION_MAJOR})
+set(CPACK_PACKAGE_VERSION_MINOR ${PROJECT_VERSION_MINOR})
+set(CPACK_PACKAGE_VERSION_PATCH ${PROJECT_VERSION_PATCH})
+set(CPACK_PACKAGE_VERSION
+    "${CPACK_PACKAGE_VERSION_MAJOR}.${CPACK_PACKAGE_VERSION_MINOR}.${CPACK_PACKAGE_VERSION_PATCH}"
+)
+
+set(CPACK_RESOURCE_FILE_LICENSE "${CMAKE_CURRENT_SOURCE_DIR}/LICENSE.md")
+set(CPACK_PACKAGING_INSTALL_PREFIX "/opt/rocm/examples")
+
+set(CPACK_GENERATOR "DEB;RPM")
+
+# Generate DEB package
+set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/ROCm/ROCm-examples")
+set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS YES)
+
+# Generate RPM package
+set(CPACK_RPM_PACKAGE_LICENSE "MIT")
+set(CPACK_RPM_FILE_NAME "RPM-DEFAULT")
+set(CPACK_RPM_AUTOREQPROV YES)
+
+## Build system packaging overrides
+if(DEFINED ENV{ROCM_LIBPATCH_VERSION})
+    set(CPACK_PACKAGE_VERSION
+        "${CPACK_PACKAGE_VERSION}.$ENV{ROCM_LIBPATCH_VERSION}"
+    )
+endif()
+
+if(DEFINED ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
+    set(CPACK_DEBIAN_PACKAGE_RELEASE $ENV{CPACK_DEBIAN_PACKAGE_RELEASE})
+endif()
+
+if(DEFINED ENV{CPACK_RPM_PACKAGE_RELEASE})
+    set(CPACK_RPM_PACKAGE_RELEASE $ENV{CPACK_RPM_PACKAGE_RELEASE})
+endif()
+
+# Include CPack
+include(CPack)
