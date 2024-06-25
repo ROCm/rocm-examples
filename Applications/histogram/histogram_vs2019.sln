@@ -1,6 +1,6 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.33214.272
+VisualStudioVersion = 16.0.32630.194
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_vs2019", "histogram_vs2019.vcxproj", "{1CA59049-FCE9-4694-9710-E3C320378521}"
 EndProject
@@ -19,6 +19,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {7748E875-C82A-4406-936C-562C9DFFF9C6}
+		SolutionGuid = {F7C6B93D-5494-4C00-8AA4-2B7F6A4AB1FE}
 	EndGlobalSection
 EndGlobal
