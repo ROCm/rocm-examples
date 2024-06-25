@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{4E28F2B0-CE5D-40F4-9AF5-5BC18A27C59B}</ProjectGuid>
+    <ProjectGuid>{4e28f2b0-ce5d-40f4-9af5-5bc18a27c59b}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>gemm_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
@@ -21,8 +21,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\cmdparser.hpp" />
+    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\rocblas_utils.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
@@ -78,7 +78,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>rocblas_$(ProjectName)</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
@@ -100,6 +100,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
@@ -107,6 +108,8 @@
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>rocblas.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

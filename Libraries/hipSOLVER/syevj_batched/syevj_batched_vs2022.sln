@@ -1,6 +1,6 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.3.33027.108
+VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "syevj_batched_vs2022", "syevj_batched_vs2022.vcxproj", "{88775D9B-45DB-44F0-95B4-3CF373E1D505}"
 EndProject

@@ -3,7 +3,7 @@
   <ItemGroup>
     <Filter Include="Source Files">
       <UniqueIdentifier>{df3378af-4d1d-4f23-9b4e-84bcf66f0c03}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx;hip;cu</Extensions>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx;hip;cu;s</Extensions>
     </Filter>
     <Filter Include="Header Files">
       <UniqueIdentifier>{f8278620-a61f-4e2d-8268-9b7d91594af0}</UniqueIdentifier>
@@ -20,43 +20,42 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Common\example_utils.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <CustomBuild Include="main_gfx90a.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx803.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx900.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx906.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx908.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx90a.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1030.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1100.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1101.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx1102.s">
-      <Filter>Source Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="hip_obj_gen_win.mcin">
       <Filter>Source Files</Filter>
     </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="main_900.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_906.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_908.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_90a.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_942.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_1030.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_1100.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_1101.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="main_1102.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\example_utils.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

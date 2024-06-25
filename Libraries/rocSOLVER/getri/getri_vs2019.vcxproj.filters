@@ -20,7 +20,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Common\dmparser.hpp">
+    <ClInclude Include="..\..\..\Common\cmdparser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\Common\example_utils.hpp">

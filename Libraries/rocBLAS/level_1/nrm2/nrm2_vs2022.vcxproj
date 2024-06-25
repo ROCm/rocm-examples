@@ -21,8 +21,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\cmdparser.hpp" />
+    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\rocblas_utils.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
@@ -78,7 +78,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>rocblas_$(ProjectName)</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>

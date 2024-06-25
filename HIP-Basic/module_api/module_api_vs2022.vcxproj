@@ -17,32 +17,24 @@
     <RootNamespace>module_api_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
-  <PropertyGroup>
-    <!-- This initializes the values in Properties > General > Output Directory; builds will fail without this -->
-    <OutDirWasSpecified Condition=" '$(OutDir)'!='' and '$(OutDirWasSpecified)'=='' ">true</OutDirWasSpecified>
-    <OutDirWasSpecified Condition=" '$(OutDir)'=='' and '$(OutDirWasSpecified)'=='' ">false</OutDirWasSpecified>
-    <IntDir Condition="'$(IntDir)'=='' and '$(IntermediateOutputPath)'!=''">$(IntermediateOutputPath)$(PlatformToolset)\</IntDir>
-    <IntDir Condition="'$(IntDir)'=='' and '$(IntermediateOutputPath)'==''">$(Configuration)\$(PlatformToolset)\</IntDir>
-    <OutDir Condition="'$(OutDir)'=='' and '$(SolutionDir)' != ''">$(SolutionDir)$(Configuration)\$(PlatformToolset)\</OutDir>
-    <OutDir Condition="'$(OutDir)'=='' and '$(SolutionDir)' == ''">$(IntDir)$(PlatformToolset)\</OutDir>
-    <DebuggerFlavor Condition="'$(DebuggerFlavor)'==''">WindowsLocalDebugger</DebuggerFlavor>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+  <ItemGroup>
     <ClCompile Include="main.hip" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\example_utils.hpp" />
+  </ItemGroup>
+  <ItemGroup>
     <CustomBuild Include="module.hip">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o $(OutDir)module.co %(Identity) --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o "$(OutDir)module.co" %(Identity) --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling HIP Code Object module.co</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)module.co</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o $(OutDir)module.co %(Identity) --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o "$(OutDir)module.co" %(Identity) --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling HIP Code Object module.co</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)module.co</Outputs>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(BinDir)module.co</ObjectFileName>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(BinDir)module.co</ObjectFileName>
     </CustomBuild>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\Common\example_utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
@@ -82,15 +74,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>hip_$(ProjectName)</TargetName>
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+    <TargetName>hip_$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>hip_$(ProjectName)</TargetName>
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+    <TargetName>hip_$(ProjectName)</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
@@ -99,8 +91,9 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -112,8 +105,9 @@
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

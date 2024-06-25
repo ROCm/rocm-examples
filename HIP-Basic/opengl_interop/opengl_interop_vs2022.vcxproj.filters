@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.hip">
+    <ClCompile Include="..\..\External\glad\glad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\External\glad\glad.cpp">
+    <ClCompile Include="main.hip">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -26,10 +26,10 @@
     <ClInclude Include="..\..\Common\example_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\External\glad\glad.h">
+    <ClInclude Include="..\..\External\KHR\khrplatform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\External\KHR\khrplatform.h">
+    <ClInclude Include="..\..\External\glad\glad.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

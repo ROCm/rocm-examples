@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{D306FFB0-DD32-4B12-9E48-8AAC5DDF48E4}</ProjectGuid>
+    <ProjectGuid>{d306ffb0-dd32-4b12-9e48-8aac5ddf48e4}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>dot_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
@@ -21,8 +21,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\cmdparser.hpp" />
+    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\rocblas_utils.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
@@ -78,7 +78,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>rocblas_$(ProjectName)</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>

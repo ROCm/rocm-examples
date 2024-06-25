@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.3.33027.108
+VisualStudioVersion = 17.4.33213.308
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_host_library_vs2022", "static_host_library_vs2022.vcxproj", "{27A6F412-BAE5-49FF-B557-C86EE98352C9}"
 EndProject

@@ -28,9 +28,14 @@ include:
       - /gpus-rocm.yaml
       - /gpus-nvcc.yaml
       - /rules.yaml
+  - project: 'amd/libraries/examples-registry'
+    ref: main
+    file:
+      - /.gitlab/setup-pdm.yml
 
 variables:
   # Temporary suppress warnings due to nvidia_hip_runtime_api bug
+  # See https://github.com/ROCm/hipother/issues/2
   CUDA_WARNING_SUPPRESS_FLAGS: ",-Wno-missing-field-initializers,-Wno-deprecated-declarations,-Wno-sign-compare,-Wno-return-local-addr -diag-suppress=1056"
   CUDA_FLAGS: "-Xcompiler -Wall,-Wextra,-Werror${CUDA_WARNING_SUPPRESS_FLAGS} --Werror all-warnings"
   # We require '-Wno-unused-command-line-argument' due to the following warning:
@@ -94,6 +99,24 @@ check-vs-files:
     - sudo apt-get install -y python3-pip
     - python3 -m pip install rich
     - Scripts/VisualStudio/check_vs_files.py
+
+check-registry-consistency:
+  image: python:3.11
+  stage: lint
+  needs: []
+  tags:
+    - build
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+  extends:
+    - .setup-pdm
+  script:
+    - apt-get update -qq
+    - apt-get install -qq git
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/amd/libraries/examples-registry /examples-registry
+    - cd /examples-registry
+    - pdm sync --clean
+    - COLUMNS=1000 FORCE_COLOR=1 pdm run generate --check $CI_PROJECT_DIR
 
 .build:dockerfiles:
   timeout: 60m
@@ -288,6 +311,7 @@ test:cuda:
 .test:windows-vs:
   stage: test
   timeout: 30m
+  needs: []
   extends:
     - .rules:test
   parallel:
@@ -324,7 +348,10 @@ test:cuda:
         "/p:CL_MPCount=8"
         "/verbosity:minimal"
         "/validate"
-        "/warnAsError"
+        # Disable errors caused by warnings
+        # This is required as a workaround for issues in hipother
+        # See https://github.com/ROCm/hipother/issues/2
+        # "/warnAsError"
         # MSBuild cannot properly resolve the `<Content Include=` dependencies, and will sometimes try to copy
         # two or more files at once. This results in a warning before it retries, which is counted towards
         # /warnAsError by default. For this reason, we disable the relevant warning (MSB3026).
@@ -347,19 +374,9 @@ test:windows-rocm-vs:
   variables:
     SOLUTION_PREFIX: ROCm-Examples-VS
     # hip_vulkan_interop: graphical
-    # applications_monte_carlo_pi: broken with new SDK (5.7 v66)
-    # hipfft/rocfft_*: broken with new SDK (5.7 v66)
     SkippedExamples: >
       hip_vulkan_interop_*.exe,
-      applications_monte_carlo_pi_*.exe,
-      hipfft_plan_d2z_*.exe,
-      hipfft_plan_z2z_*.exe,
-      hipfft_plan_many_2d_r2c_*.exe,
-      hipfft_plan_many_2d_z2z_*.exe,
-      hipfft_setworkarea_*.exe,
-      rocfft_complex_complex_*.exe,
-      rocfft_complex_real_*.exe,
-      rocfft_real_complex_*.exe
+      hip_opengl_interop_*.exe,
 test:windows-nvcc-vs:
   extends:
     - .test:windows-nvcc
@@ -368,16 +385,16 @@ test:windows-nvcc-vs:
     - nvcc-windows
   variables:
     SOLUTION_PREFIX: ROCm-Examples-Portable-VS
-    # NVCC examples broken with new SDK (5.7 v66)
+    # hip_cooperative_groups: unsupported on this GPU
     SkippedExamples: >
-      *.exe
+      hip_cooperative_groups_*.exe
   before_script:
-    # To test for NVIDIA, we need to set the platform toolset to HIP_nvcc. This cannot be done with /p:PlatformToolset
+    # To test for NVIDIA, we need to set the platform toolset to HIP nvcc. This cannot be done with /p:PlatformToolset
     # though, as some examples use the regular msvc toolchain.
     - |
       Foreach ($f in (Get-ChildItem -Recurse -Filter "*.vcxproj" "$CI_PROJECT_DIR").FullName) {
         (Get-Content $f) |
-          % { $_ -replace "<PlatformToolset>HIP_clang</PlatformToolset>","<PlatformToolset>HIP_nvcc</PlatformToolset>" } |
+          % { $_ -replace "<PlatformToolset>HIP clang","<PlatformToolset>HIP nvcc" } |
           Set-Content $f
       }
 

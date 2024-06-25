@@ -1,16 +1,16 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{f36b245a-ea37-47ce-a958-b37d104166e1}</UniqueIdentifier>
+      <UniqueIdentifier>{4fc737f1-c7a5-4376-a066-2a32d752a2ff}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx;hip;cu</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{ebf9651c-ade6-4a45-a0c1-b0a733ec66ce}</UniqueIdentifier>
+      <UniqueIdentifier>{93995380-89bd-4b04-88eb-625fbe52ebfb}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cuh</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{44967eea-7946-4c00-86ca-5a46dc4bc494}</UniqueIdentifier>
+      <UniqueIdentifier>{67da6ab6-f800-4c08-8b7a-83bb121aad01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
@@ -20,10 +20,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="library.hpp">
+    <ClInclude Include="..\..\..\Common\example_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Common\example_utils.hpp">
+    <ClInclude Include="library.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

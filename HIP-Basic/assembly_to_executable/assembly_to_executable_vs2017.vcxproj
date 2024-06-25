@@ -26,7 +26,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\Common\example_utils.hpp" />
   </ItemGroup>
-  <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+  <ItemGroup>
     <CustomBuild Include="hip_obj_gen_win.mcin">
       <FileType>Document</FileType>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">copy %(Identity) "$(IntDir)%(Identity)"</Command>
@@ -36,20 +36,10 @@
       <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Copying %(Identity)</Message>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(IntDir)%(Identity)</Outputs>
     </CustomBuild>
-    <CustomBuild Include="main_gfx1030.s">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1030</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1030</Command>
-    </CustomBuild>
-    <CustomBuild Include="main_gfx803.s">
-      <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa  -mcpu=gfx803</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa  -mcpu=gfx803</Command>
-    </CustomBuild>
     <CustomBuild Include="main_gfx900.s">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang+"+ -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx900</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang+"+ -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx900</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx900</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx900</Command>
     </CustomBuild>
     <CustomBuild Include="main_gfx906.s">
       <FileType>Document</FileType>
@@ -63,23 +53,33 @@
     </CustomBuild>
     <CustomBuild Include="main_gfx90a.s">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx90a</Command>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx942.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx942</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx942</Command>
+    </CustomBuild>
+    <CustomBuild Include="main_gfx1030.s">
+      <FileType>Document</FileType>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1030</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1030</Command>
     </CustomBuild>
     <CustomBuild Include="main_gfx1100.s">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1100 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1100 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1100</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1100</Command>
     </CustomBuild>
     <CustomBuild Include="main_gfx1101.s">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1101 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1101 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1101</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1101</Command>
     </CustomBuild>
     <CustomBuild Include="main_gfx1102.s">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102 </Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102</Command>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1102</Command>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -120,15 +120,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <TargetName>hip_$(ProjectName)</TargetName>
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+    <TargetName>hip_$(ProjectName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <TargetName>hip_$(ProjectName)</TargetName>
     <CustomBuildBeforeTargets>ClCompile</CustomBuildBeforeTargets>
+    <TargetName>hip_$(ProjectName)</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
@@ -137,13 +137,14 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>$(IntDir)main_device.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(IntDir)main_device.obj;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuild>
       <Message>Compiling Device Assembly %(Identity)</Message>
@@ -151,7 +152,7 @@
       <Outputs>$(IntDir)%(FileName).o</Outputs>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
+      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx942,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx942.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
 cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
     </CustomBuildStep>
     <CustomBuildStep>
@@ -161,7 +162,7 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <Outputs>$(IntDIr)main_device.obj</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
+      <Inputs>$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx942.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
@@ -169,14 +170,15 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpp17</LanguageStandard>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>$(IntDir)main_device.obj;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>$(IntDir)main_device.obj;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <CustomBuild>
       <Message>Compiling Device Assembly %(Identity)</Message>
@@ -184,7 +186,7 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <Outputs>$(IntDir)%(FileName).o</Outputs>
     </CustomBuild>
     <CustomBuildStep>
-      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx803,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx803.o" "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
+      <Command>"$(ClangToolPath)clang-offload-bundler" -type=o -bundle-align=4096 -targets=host-x86_64-pc-windows-msvc,hipv4-amdgcn-amd-amdhsa--gfx900,hipv4-amdgcn-amd-amdhsa--gfx906,hipv4-amdgcn-amd-amdhsa--gfx908,hipv4-amdgcn-amd-amdhsa--gfx90a,hipv4-amdgcn-amd-amdhsa--gfx942,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-amdgcn-amd-amdhsa--gfx1100,hipv4-amdgcn-amd-amdhsa--gfx1101,hipv4-amdgcn-amd-amdhsa--gfx1102 -input=nul "-input=$(IntDir)main_gfx900.o" "-input=$(IntDir)main_gfx906.o" "-input=$(IntDir)main_gfx908.o" "-input=$(IntDir)main_gfx90a.o" "-input=$(IntDir)main_gfx942.o" "-input=$(IntDir)main_gfx1030.o" "-input=$(IntDir)main_gfx1100.o" "-input=$(IntDir)main_gfx1101.o" "-input=$(IntDir)main_gfx1102.o" "-output=$(IntDir)offload_bundle.hipfb"
 cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows-msvc "hip_obj_gen_win.mcin" -o "main_device.obj" --filetype=obj</Command>
     </CustomBuildStep>
     <CustomBuildStep>
@@ -194,7 +196,7 @@ cd $(IntDir) &amp;&amp; "$(ClangToolPath)llvm-mc" -triple host-x86_64-pc-windows
       <Outputs>$(IntDIr)main_device.obj</Outputs>
     </CustomBuildStep>
     <CustomBuildStep>
-      <Inputs>$(IntDir)main_gfx803.o;$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
+      <Inputs>$(IntDir)main_gfx900.o;$(IntDir)main_gfx906.o;$(IntDir)main_gfx908.o;$(IntDir)main_gfx90a.o;$(IntDir)main_gfx942.o;$(IntDir)main_gfx1030.o;$(IntDir)main_gfx1100.o;$(IntDir)main_gfx1101.o;$(IntDir)main_gfx1102.o;$(IntDir)hip_objgen_win.mcin;%(Inputs)</Inputs>
     </CustomBuildStep>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

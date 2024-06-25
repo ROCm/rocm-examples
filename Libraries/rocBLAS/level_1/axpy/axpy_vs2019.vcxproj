@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{DDC6904E-B174-4F08-908E-0535C3BD5A9A}</ProjectGuid>
+    <ProjectGuid>{ddc6904e-b174-4f08-908e-0535c3bd5a9a}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>axpy_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
@@ -21,8 +21,8 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\cmdparser.hpp" />
+    <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\rocblas_utils.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
@@ -78,7 +78,7 @@
     <LinkIncremental>false</LinkIncremental>
     <TargetName>rocblas_$(ProjectName)</TargetName>
   </PropertyGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+  <ItemDefinitionGroup>
     <ClCompile>
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
