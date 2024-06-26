@@ -6,17 +6,17 @@ This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector
 
 The operation calculates the following product:
 
-$$\hat{y} = \alpha \cdot A' \cdot x + \beta \cdot y$$
+$$\hat{y} = \alpha \cdot op(A) \cdot x + \beta \cdot y$$
 
 where
 
 - $\alpha$ and $\beta$ are scalars,
 - $x$ and $y$ are dense vectors,
 - $A$ is an $m\times n$ sparse matrix, and
-- $A'$ is one of the following:
-  - $A' = A$ (identity)
-  - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
-  - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$).
+- $op(A)$ is one of the following:
+  - $op(A) = A$ (identity)
+  - $op(A) = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
+  - $op(A) = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$).
 
 ## Application flow
 
@@ -61,16 +61,16 @@ Note that, for a given $m\times n$ matrix, if $m$ is not evenly divisible by the
 
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
 
-- `rocsparse_[dscz]gebsrmv(...)` performs the sparse matrix-dense vector multiplication $\hat{y}=\alpha \cdot A' x + \beta \cdot y$ using the GEBSR format. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[dscz]gebsrmv(...)` performs the sparse matrix-dense vector multiplication $\hat{y}=\alpha \cdot op(A) x + \beta \cdot y$ using the GEBSR format. The correct function signature should be chosen based on the datatype of the input matrix:
   - `s` single-precision real (`float`)
   - `d` double-precision real (`double`)
   - `c` single-precision complex (`rocsparse_float_complex`)
   - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation trans`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$
 
   Currently, only `rocsparse_operation_none` is supported for `rocsparse_[dscz]gebsrmv`.
 

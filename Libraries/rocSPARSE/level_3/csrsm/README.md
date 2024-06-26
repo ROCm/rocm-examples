@@ -7,24 +7,24 @@ This example illustrates the use of the `rocSPARSE` level 3 triangular solver us
 This triangular solver is used to solve a linear system of the form
 
 $$
-A' X' = \alpha B'.
+op_a(A) \cdot op_b(X) = \alpha \cdot op_b(B).
 $$
 
 where
 
 - $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
-- given a matrix $M$, $M'$ denotes one of the following:
-  - $M' = M$ (identity)
-  - $M' = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
-  - $M' = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
+- given a matrix $M$, $op_m(M)$ denotes one of the following:
+  - $op_m(M) = M$ (identity)
+  - $op_m(M) = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
+  - $op_m(M) = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
 - $X$ is a dense matrix of size $n \times nrhs$ containing the unknowns of the systems,
 - $\alpha$ is a scalar,
 - $B$ is a dense matrix of size $n \times nrhs$ containing the right hand sides of the equations,
-- the operation performed on $B$ and $X$ must be the same.
+- the operation performed on $B$ and $X$, $op_b$, must be the same.
 
 Obtaining the solution for such a system consists of finding concrete values of all the unknowns such that the above equalities holds.
 
-This is the same as solving the classical system of linear equations $A' x_i = \alpha b_i$ for each $i\in[0, nrhs-1]$, where $x_i$ and $b_i$ are the $i$-th rows or columns of $X$ and $B$, depending on the operation performed on $X$ and $B$. This is showcased in [level 2 example csrsv](../../level_2/csrsv/README.md).
+This is the same as solving the classical system of linear equations $op_a(A) x_i = \alpha b_i$ for each $i\in[0, nrhs-1]$, where $x_i$ and $b_i$ are the $i$-th rows or columns of $X$ and $B$, depending on the operation performed on $X$ and $B$. This is showcased in [level 2 example csrsv](../../level_2/csrsv/README.md).
 
 ### Application flow
 
@@ -100,9 +100,9 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 
 - `rocsparse_operation trans`: matrix operation applied to the given matrix. The following values are accepted:
 
-  - `rocsparse_operation_none`: identity operation $M' = M$.
-  - `rocsparse_operation_transpose`: transpose operation $M' = M^\mathrm{T}$.
-  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $M' = M^\mathrm{H}$.
+  - `rocsparse_operation_none`: identity operation $op(M) = M$.
+  - `rocsparse_operation_transpose`: transpose operation $op(M) = M^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $op(M) = M^\mathrm{H}$.
 
   Currently, only `rocsparse_operation_none` and `rocsparse_operation_transpose` are supported for both $A$ and $B$ matrices.
 

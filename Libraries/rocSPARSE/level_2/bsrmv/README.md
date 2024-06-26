@@ -6,13 +6,13 @@ This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector
 
 The operation calculates the following product:
 
-$$\hat{\mathbf{y}} = \alpha \cdot A' \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
+$$\hat{\mathbf{y}} = \alpha \cdot op(A) \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
 
 where
 
 - $\alpha$ and $\beta$ are scalars
 - $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
-- $A'$ is a sparse matrix in BSR format with `rocsparse_operation` and described below.
+- $op(A)$ is a sparse matrix in BSR format, result of applying one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 
 ## Application flow
 
@@ -158,16 +158,16 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 
 ### rocSPARSE
 
-- `rocsparse_[dscz]bsrmv(...)` performs the sparse matrix-dense vector multiplication $\hat{y}=\alpha \cdot A' x + \beta \cdot y$ using the BSR format. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[dscz]bsrmv(...)` performs the sparse matrix-dense vector multiplication $\hat{y}=\alpha \cdot op(A) x + \beta \cdot y$ using the BSR format. The correct function signature should be chosen based on the datatype of the input matrix:
   - `s` single-precision real (`float`)
   - `d` double-precision real (`double`)
   - `c` single-precision complex (`rocsparse_float_complex`)
   - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation trans`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$
 
    Currently, only `rocsparse_operation_none` is supported.
 - `rocsparse_mat_descr`: descriptor of the sparse BSR matrix.

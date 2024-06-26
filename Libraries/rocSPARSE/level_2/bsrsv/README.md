@@ -7,16 +7,16 @@ This example illustrates the use of the `rocSPARSE` level 2 triangular solver us
 This triangular solver is used to solve a linear system of the form
 
 $$
-A'y = \alpha x,
+op(A) \cdot y = \alpha \cdot x,
 $$
 
 where
 
 - $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
-- $A'$ is one of the following:
-  - $A' = A$ (identity)
-  - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
-  - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
+- $op(A)$ is one of the following:
+  - $op(A) = A$ (identity)
+  - $op(A) = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
+  - $op(A) = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
 - $\alpha$ is a scalar,
 - $x$ is a dense vector of size $m$ containing the constant terms of the equations, and
 - $y$ is a dense vector of size $n$ which contains the unknowns of the system.
@@ -30,7 +30,7 @@ Obtaining the solution for such a system consists of finding concrete values of 
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare utility variables for rocSPARSE bsrsv invocation.
 5. Perform analysis step.
-6. Perform triangular solve $Ay = \alpha x$.
+6. Perform triangular solve $op(A) \cdot y = \alpha \cdot x$.
 7. Check results obtained. If no zero-pivots, copy solution vector $y$ from device to host and compare with expected result.
 8. Free rocSPARSE resources and device memory.
 9. Print validation result.
@@ -177,9 +177,9 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
   - `rocsparse_direction_column`: parse blocks by columns.
 
 - `rocsparse_operation trans`: matrix operation applied to the given input matrix. The following values are accepted:
-  - `rocsparse_operation_none`: identity operation $A' = A$.
-  - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
+  - `rocsparse_operation_none`: identity operation $op(M) = M$.
+  - `rocsparse_operation_transpose`: transpose operation $op(M) = M^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $op(M) = M^\mathrm{H}$. This operation is not yet supported.
 
 - `rocsparse_mat_descr descr`: holds all properties of a matrix. The properties set in this example are the following:
   - `rocsparse_diag_type`: indicates whether the diagonal entries of a matrix are unit elements (`rocsparse_diag_type_unit`) or not (`rocsparse_diag_type_non_unit`).
@@ -189,7 +189,7 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 
 - `rocsparse_solve_policy policy`: specifies the policy to follow for triangular solvers and factorizations. The only value accepted is `rocsparse_solve_policy_auto`.
 
-- `rocsparse_[sdcz]bsrsv_solve` solves a sparse triangular linear system $A'y = \alpha x$. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[sdcz]bsrsv_solve` solves a sparse triangular linear system $op(A) \cdot y = \alpha \cdot x$. The correct function signature should be chosen based on the datatype of the input matrix:
   - `s` single-precision real (`float`)
   - `d` double-precision real (`double`)
   - `c` single-precision complex (`rocsparse_float_complex`)

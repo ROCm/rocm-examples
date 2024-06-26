@@ -36,7 +36,7 @@
 int main()
 {
     // 1. Set up input data.
-    // Solve A' * X' = alpha * B', with triangular sparse matrix A, and a dense
+    // Solve op_a(A) * op_b(X) = alpha * op_b(B), with triangular sparse matrix A, and a dense
     // matrix B containing several right-hand sides (b_1, ..., b_nrhs) as columns.
     //
     //         A       *            X                           = alpha *           B

@@ -39,7 +39,7 @@ int main()
 
     // 1. Set up input data
     //
-    // alpha *         A         *    x    + beta *    y    =      y
+    // alpha *       op(A)       *    x    + beta *    y    =      y
     //
     //   3.7 * ( 1.0  0.0  2.0 ) * ( 1.0 ) +  1.3 * ( 4.0 ) = (  31.1 )
     //         ( 3.0  0.0  4.0 ) * ( 2.0 )          ( 5.0 ) = (  62.0 )

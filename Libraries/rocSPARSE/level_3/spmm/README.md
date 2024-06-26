@@ -6,14 +6,14 @@ This example illustrates the use of the `rocSPARSE` level 3 sparse matrix-dense 
 
 The operation calculates the following product:
 
-$\hat{C} = \alpha \cdot A' \cdot B' + \beta \cdot C$
+$\hat{C} = \alpha \cdot op_a(A) \cdot op_b(B) + \beta \cdot C$
 
 where
 
 - $\alpha$ and $\beta$ are scalars
 - $A$ is a sparse matrix
 - $B$ and $C$ are dense matrices
-- and $A'$ is the result of applying to matrix $A$ one of the `rocsparse_operation` described below.
+- and $op_a(A)$ and $op_b(B)$ are the result of applying to matrices $A$ and $B$, respectively, one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 
 ## Application flow
 
@@ -48,9 +48,9 @@ The following sparse matrix formats are supported: Blocked ELL, COO and CSR.
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
 - `rocsparse_pointer_mode` controls whether scalar parameters must be allocated on the host (`rocsparse_pointer_mode_host`) or on the device (`rocsparse_pointer_mode_device`). It is controlled by `rocsparse_set_pointer_mode`.
 - `rocsparse_operation`: matrix operation applied to the given input matrix. The following values are accepted:
-  - `rocsparse_operation_none`: identity operation $A' = A$.
-  - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
+  - `rocsparse_operation_none`: identity operation $op(M) = M$.
+  - `rocsparse_operation_transpose`: transpose operation $op(M) = M^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $op(M) = M^\mathrm{H}$. This operation is not yet supported.
 
 - `rocsparse_datatype`: data type of rocSPARSE matrix elements.
   - `rocsparse_datatype_f32_r`: real 32-bit floating point type

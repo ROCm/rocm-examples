@@ -36,7 +36,7 @@
 int main()
 {
     // 1. Set up input data.
-    // Solve A' * X' = alpha * B' for X', with triangular sparse matrix A,
+    // Solve op_a(A) * op_b(X) = alpha * op_b(B) for X, with triangular sparse matrix A,
     // and a dense matrix B containing several right-hand sides {b_1, ..., b_nrhs}.
     //
     //         A       *            X                    = alpha *       B
@@ -214,7 +214,7 @@ int main()
                                               solve_policy,
                                               temp_buffer));
 
-    // 6. Call dbsrsm to solve A * X = alpha * B.
+    // 6. Call dbsrsm to solve op_a(A) * op_b(X) = alpha * op_b(B).
     ROCSPARSE_CHECK(rocsparse_dbsrsm_solve(handle,
                                            dir,
                                            trans_A,

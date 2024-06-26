@@ -145,7 +145,7 @@ int main()
     rocsparse_create_dnmat_descr(&mat_B_desc, m, n, m, d_B, data_type, order);
     rocsparse_create_dnmat_descr(&mat_X_desc, m, n, m, d_X, data_type, order);
 
-    // 5. Call spsm to solve A' * C = alpha * B'
+    // 5. Call spsm to solve op_a(A) * C = alpha * op_b(B)
     // Query the necessary temp buffer size
     size_t buffer_size;
     void*  d_temp_buffer{};

@@ -34,7 +34,7 @@ int main()
 {
     // 1. Set up input data
     //
-    // alpha *         A         *    x    + beta *    y    =      y
+    // alpha *      op(A)        *    x    + beta *    y    =      y
     //
     //   3.7 * ( 1.0  0.0  2.0 ) * ( 1.0 ) +  1.3 * ( 4.0 ) = (  31.1 )
     //         ( 3.0  0.0  4.0 ) * ( 2.0 )          ( 5.0 ) = (  62.0 )
@@ -101,8 +101,7 @@ int main()
     HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
-    // 4. Call ellmv to perform y = alpha * A x + beta * y
-    // This function is non blocking and executed asynchronously with respect to the host.
+    // 4. Call ellmv to perform y = alpha * op(A) * x + beta * y    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dellmv(handle,
                                      trans,
                                      m,

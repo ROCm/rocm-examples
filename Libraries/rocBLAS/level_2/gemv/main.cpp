@@ -38,7 +38,7 @@
 #include <vector>
 
 /// \brief Computes a general matrix-vector product:
-/// y := alpha * A * x + beta * y
+/// y := alpha * op(A) * x + beta * y
 /// where A is optionally transposed before the multiplication.
 /// The result is computed in-place, and stored in `y`.
 void gemv_reference(const rocblas_operation    transpose_a,

@@ -6,14 +6,14 @@ This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector
 
 The operation calculates the following product:
 
-$$\hat{\mathbf{y}} = \alpha \cdot A' \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
+$$\hat{\mathbf{y}} = \alpha \cdot op(A) \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
 
 where
 
 - $\alpha$ and $\beta$ are scalars
 - $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
 - $A$ is a sparse matrix
-- $A'$ is the result of applying to matrix $A$ one of the `rocsparse_operation` described below.
+- $op(A)$ is the result of applying to matrix $A$ one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 
 ### Application flow
 
@@ -33,9 +33,9 @@ where
 
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
 - `rocsparse_operation`: matrix operation applied to the given input matrix. The following values are accepted:
-  - `rocsparse_operation_none`: identity operation $A' = A$.
-  - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$.
+  - `rocsparse_operation_none`: identity operation $op(M) = M$.
+  - `rocsparse_operation_transpose`: transpose operation $op(M) = M^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $op(M) = M^\mathrm{H}$.
 
 - `rocsparse_spmv()` solves a sparse matrix-vector product in the following formats: BELL, BSR, COO, COO AoS, CSR, CSC and ELL.
 

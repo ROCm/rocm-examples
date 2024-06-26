@@ -7,24 +7,24 @@ This example illustrates the use of the `rocSPARSE` level 3 triangular solver us
 This triangular solver is used to solve a linear system of the form
 
 $$
-A' X' = \alpha B'.
+op_a(A) \cdot op_b(X) = \alpha \cdot op_b(B).
 $$
 
 where
 
 - $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
-- given a matrix $M$, $M'$ denotes one of the following:
-  - $M' = M$ (identity)
-  - $M' = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
-  - $M' = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
+- given a matrix $M$, $op_m(M)$ denotes one of the following:
+  - $op_m(B) = M$ (identity)
+  - $op_m(B) = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
+  - $op_m(B) = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
 - $X$ is a dense matrix of size $n \times nrhs$ which contains the unknowns of the system, and
 - $\alpha$ is a scalar,
 - $B$ is a dense matrix of size $n \times nrhs$ containing the constant terms of the equations,
-- the performed operation on $B$ and $X$ must be the same.
+- the operation performed on $B$ and $X$, $op_b$, must be the same.
 
 Obtaining the solution for such a system consists of finding concrete values of all the unknowns such that the above equality holds.
 
-This is the same as solving the classical system of linear equations $A' x_i = \alpha b_i$, where $x_i$ and $b_i$ are the $i$-th rows or columns of $X$ and $B$, depending on the operation performed on $X$ and $B$. This is showcased in [level 2 example bsrsv](../../level_2/bsrsv/README.md).
+This is the same as solving the classical system of linear equations $op_a(A) x_i = \alpha b_i$, where $x_i$ and $b_i$ are the $i$-th rows or columns of $X$ and $B$, depending on the operation performed on $X$ and $B$. This is showcased in [level 2 example bsrsv](../../level_2/bsrsv/README.md).
 
 ### Application flow
 
@@ -33,7 +33,7 @@ This is the same as solving the classical system of linear equations $A' x_i = \
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare utility variables for rocSPARSE bsrsm invocation.
 5. Perform analysis step.
-6. Call dbsrsm to solve $A' X' = \alpha B$
+6. Call dbsrsm to solve $op_a(A) op_b(X) = \alpha B$
 7. Check results. If no zero-pivots, copy solution matrix $X$ from device to host and compare with expected result.
 8. Free rocSPARSE resources and device memory.
 9. Print validation result.
@@ -182,9 +182,9 @@ bsr_col_ind = { 0, 0, 2, 0, 1 }
 
 - `rocsparse_operation trans`: matrix operation applied to the given matrix. The following values are accepted:
 
-  - `rocsparse_operation_none`: identity operation $A' = A$.
-  - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
+  - `rocsparse_operation_none`: identity operation $op(M) = M$.
+  - `rocsparse_operation_transpose`: transpose operation $op(M) = M^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $op(M) = M^\mathrm{H}$. This operation is not yet supported.
 
 - `rocsparse_mat_descr descr`: holds all properties of a matrix. The properties set in this example are the following:
 

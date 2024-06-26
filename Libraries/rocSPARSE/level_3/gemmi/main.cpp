@@ -36,7 +36,7 @@
 int main()
 {
     // 1. Set up input data.
-    // Solve C =  alpha * A' * B' + beta * C, with an m x k dense matrix A,
+    // Solve C =  alpha * op_a(A) * op_b(B) + beta * C, with an m x k dense matrix A,
     // a k x n sparse matrix B and  alpha beta scalars.
     // Number of rows and columns of the input matrix.
     constexpr rocsparse_int m = 4;
