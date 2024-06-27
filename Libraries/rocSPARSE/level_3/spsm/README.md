@@ -4,18 +4,18 @@
 
 This example illustrates the use of the `rocSPARSE` level 3 triangular solver with a chosen sparse format.
 
-The operation solves the following equation for $X$:
+The operation solves the following equation for $C$:
 
-$A' \cdot X = \alpha \cdot B'$
+$op_a(A) \cdot C = \alpha \cdot op_b(B)$
 
 where
 
-- given a matrix $M$, $M'$ denotes one of the following:
-  - $M' = M$ (identity)
-  - $M' = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
-  - $M' = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
+- given a matrix $M$, $op_m(M)$ denotes one of the following:
+  - $op_m(M) = M$ (identity)
+  - $op_m(M) = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
+  - $op_m(M) = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
 - $A$ is a sparse triangular matrix of order $m$ in CSR or COO format,
-- $X$ is a dense matrix of size $m\times n$ containing the unknowns of the system,
+- $C$ is a dense matrix of size $m\times n$ containing the unknowns of the system,
 - $B$ is a dense matrix of size $m\times n$ containing the right hand side of the equation,
 - $\alpha$ is a scalar
 
@@ -97,9 +97,9 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
   - `rocsparse_spsm_alg_default`: default SpSM algorithm for the given format (the only available option)
 
 - `rocsparse_operation`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$. This is currently not supported.
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$. This is currently not supported.
 
 - `rocsparse_datatype`: data type of rocSPARSE vector and matrix elements.
   - `rocsparse_datatype_f32_r`: real 32-bit floating point type
@@ -144,6 +144,8 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_operation_none`
 - `rocsparse_order`
 - `rocsparse_order_column`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 - `rocsparse_spmat_descr`
 - `rocsparse_spsm`
 - `rocsparse_spsm_alg`

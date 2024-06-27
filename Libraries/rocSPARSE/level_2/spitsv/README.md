@@ -7,16 +7,16 @@ This example illustrates the use of the `rocSPARSE` level 2 iterative triangular
 This triangular solver is used to solve a linear system of the form
 
 $$
-A'y = \alpha x,
+op(A) \cdot y = \alpha \cdot x,
 $$
 
 where
 
 - $A$ is a sparse triangular matrix of order $n$ whose elements are the coefficients of the equations,
-- $A'$ is one of the following:
-  - $A' = A$ (identity)
-  - $A' = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
-  - $A' = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
+- $op(A)$ is one of the following:
+  - $op(A) = A$ (identity)
+  - $op(A) = A^T$ (transpose $A$: $A_{ij}^T = A_{ji}$)
+  - $op(A) = A^H$ (conjugate transpose/Hermitian $A$: $A_{ij}^H = \bar A_{ji}$),
 - $\alpha$ is a scalar,
 - $x$ is a dense vector of size $n$ containing the constant terms of the equations, and
 - $y$ is a dense vector of size $n$ which contains the unknowns of the system.
@@ -28,7 +28,7 @@ where
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare device for rocSPARSE iterative SpSV invocation.
 5. Perform analysis step.
-6. Perform triangular solve $Ay = \alpha x$.
+6. Perform triangular solve $op(A) \cdot y = \alpha \cdot x$.
 7. Copy solution vector $y$ from device to host.
 8. Free rocSPARSE resources and device memory.
 9. Fetch convergence data.
@@ -42,9 +42,9 @@ where
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
 - `rocsparse_pointer_mode` controls whether scalar parameters must be allocated on the host (`rocsparse_pointer_mode_host`) or on the device (`rocsparse_pointer_mode_device`). It is controlled by `rocsparse_set_pointer_mode`.
 - `rocsparse_operation`: matrix operation applied to the given input matrix. The following values are accepted:
-  - `rocsparse_operation_none`: identity operation $A' = A$.
-  - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$. This operation is not yet supported.
+  - `rocsparse_operation_none`: identity operation $op(M) = M$.
+  - `rocsparse_operation_transpose`: transpose operation $op(M) = M^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $op(M) = M^\mathrm{H}$. This operation is not yet supported.
 
 - `rocsparse_spitsv()` performs a stage of the triangular linear system solver of a sparse matrix in CSR format, iteratively.
 

@@ -73,7 +73,7 @@ int main(const int argc, const char** argv)
     const rocblas_float h_alpha = parser.get<float>("a");
     const rocblas_float h_beta  = parser.get<float>("b");
 
-    // Set GEMM operation as identity operation: $X' = X$
+    // Set GEMM operation as identity operation: $op(X) = X$
     const rocblas_operation trans_a = rocblas_operation_none;
     const rocblas_operation trans_b = rocblas_operation_none;
 

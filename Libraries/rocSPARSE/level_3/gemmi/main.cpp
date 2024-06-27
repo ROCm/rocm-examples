@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 int main()
 {
     // 1. Set up input data.
-    // Solve C =  alpha * A' * B' + beta * C, with an m x k dense matrix A,
+    // Solve C =  alpha * op_a(A) * op_b(B) + beta * C, with an m x k dense matrix A,
     // a k x n sparse matrix B and  alpha beta scalars.
     // Number of rows and columns of the input matrix.
     constexpr rocsparse_int m = 4;
@@ -131,6 +131,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&mat_B_desc));
 
     // 4. Perform the computation.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dgemmi(handle,
                                      trans_A,
                                      trans_B,
@@ -149,10 +150,7 @@ int main()
                                      d_C,
                                      m));
 
-    // Synchronize with device as rocsparse_dgemmi is non-blocking.
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 5. Copy result from device.
+    // 5. Copy result from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_C.data(), d_C, C_size, hipMemcpyDeviceToHost));
 
     // Print solution and compare with expected results.

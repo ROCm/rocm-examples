@@ -7,7 +7,7 @@ This example illustrates the use of the `rocSPARSE` sampled dense-dense matrix m
 The operation solves the following equation for C:
 
 <!-- markdownlint-disable-next-line no-space-in-emphasis -->
-$ C := \alpha (\cdot A' * \cdot B') * sppat(\cdot C) + \beta C $
+$\C := \alpha(\cdot op_a(A) * \cdot op_b(B)) * sppat(\cdot C) + \beta C $
 
 where
 
@@ -15,7 +15,7 @@ where
 - $A$ and $B$ are dense matrices
 - $C$ is a sparse matrix in CSR format, the result will be in this matrix
 - $sppat(C)$ is the sparsity pattern of C matrix
-- and $A'$ and $B'$ is the result of applying one of the `rocsparse_operation`s to the respective matrices.
+- and $op_a(A)$ and $op_b(B)$ are the result of applying to matrices $A$ and $B$, respectively, one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 
 ## Application flow
 
@@ -95,9 +95,9 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
   - The `rocsparse_spsm_stage_buffer_size` and `rocsparse_spsm_stage_compute` stages are asynchronous. It is the callers responsibility to assure that these stages are complete, before using their result. `rocsparse_spsm_stage_preprocess` will run in a blocking manner, no synchronization is necessary.
 
 - `rocsparse_operation`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$. This is currently not supported.
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$. This is currently not supported.
 
 ## Demonstrated API Calls
 
@@ -122,10 +122,12 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_operation_none`
 - `rocsparse_order`
 - `rocsparse_order_row`
+- `rocsparse_pointer_mode_host`
 - `rocsparse_sddmm`
 - `rocsparse_sddmm_alg_default`
 - `rocsparse_sddmm_buffer_size`
 - `rocsparse_sddmm_preprocess`
+- `rocsparse_set_pointer_mode`
 - `rocsparse_spmat_descr`
 
 ### HIP runtime

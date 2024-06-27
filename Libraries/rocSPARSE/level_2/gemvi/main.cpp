@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -28,7 +28,9 @@
 
 #include <hip/hip_runtime.h>
 
+#include <array>
 #include <cstdlib>
+#include <iostream>
 #include <limits>
 #include <numeric>
 
@@ -42,7 +44,7 @@ int main()
     // - dense vector : y
     // - dense matrix : A
     // Calculate dense vector y' such that:
-    //    y'    = alpha *             A               *    x    + beta *    y
+    //    y'    = alpha *            op(A)            *    x    + beta *    y
     // Or more concretely with default alpha and beta:
     //                                                  ( 1.0 )
     // (245.7)           (  9.0 10.0 11.0 12.0 13.0 )   ( 2.0 )          ( 4.0 )
@@ -51,18 +53,20 @@ int main()
     //                                                  ( 0.0 )
 
     // Dense matrix A in column-major
-    constexpr double        A[15]  = {9, 14, 19, 10, 15, 20, 11, 16, 21, 12, 17, 22, 13, 18, 23};
-    constexpr rocsparse_int A_rows = 3;
-    constexpr rocsparse_int A_cols = 5;
-    constexpr rocsparse_int lda    = A_rows;
+    constexpr rocsparse_int                      A_rows = 3;
+    constexpr rocsparse_int                      A_cols = 5;
+    constexpr std::array<double, A_rows* A_cols> A
+        = {9, 14, 19, 10, 15, 20, 11, 16, 21, 12, 17, 22, 13, 18, 23};
+
+    constexpr rocsparse_int lda = A_rows;
 
     // Sparse vector x
-    constexpr double        x_values[3]  = {1, 2, 3};
-    constexpr rocsparse_int x_indices[3] = {0, 1, 3};
-    constexpr rocsparse_int x_non_zero   = 3;
+    constexpr rocsparse_int                         x_non_zero = 3;
+    constexpr std::array<double, x_non_zero>        x_values   = {1, 2, 3};
+    constexpr std::array<rocsparse_int, x_non_zero> x_indices  = {0, 1, 3};
 
     // Dense vector y
-    constexpr double y[A_rows] = {4, 5, 6};
+    constexpr std::array<double, A_rows> y = {4, 5, 6};
 
     constexpr double alpha = 3.7;
     constexpr double beta  = 1.3;
@@ -78,6 +82,7 @@ int main()
     // rocSPARSE handle
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 3. Offload data to device
     double*        d_A;
@@ -90,24 +95,31 @@ int main()
     HIP_CHECK(hipMalloc(&d_x_values, sizeof(*d_x_values) * x_non_zero));
     HIP_CHECK(hipMalloc(&d_y, sizeof(*d_y) * A_rows));
 
-    HIP_CHECK(hipMemcpy(d_A, A, sizeof(*d_A) * A_rows * A_cols, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_A, A.data(), sizeof(*d_A) * A_rows * A_cols, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_x_indices,
-                        x_indices,
+                        x_indices.data(),
                         sizeof(*d_x_indices) * x_non_zero,
                         hipMemcpyHostToDevice));
-    HIP_CHECK(
-        hipMemcpy(d_x_values, x_values, sizeof(*d_x_values) * x_non_zero, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_y, y, sizeof(*d_y) * A_rows, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x_values,
+                        x_values.data(),
+                        sizeof(*d_x_values) * x_non_zero,
+                        hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_y, y.data(), sizeof(*d_y) * A_rows, hipMemcpyHostToDevice));
 
     // Obtain buffer size
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(
         rocsparse_dgemvi_buffer_size(handle, trans, A_rows, A_cols, x_non_zero, &buffer_size));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
+    // Allocate temporary buffer.
     void* buffer;
     HIP_CHECK(hipMalloc(&buffer, buffer_size));
 
-    // 4. Call dgemvi to perform y' = alpha * A * x + beta * y
+    // 4. Call dgemvi to perform y' = alpha * op(A) * x + beta * y
     ROCSPARSE_CHECK(rocsparse_dgemvi(handle,
                                      trans,
                                      A_rows,
@@ -124,8 +136,8 @@ int main()
                                      buffer));
 
     // Copy y' from device to host
-    double y_accent[A_rows];
-    HIP_CHECK(hipMemcpy(y_accent, d_y, sizeof(*d_y) * A_rows, hipMemcpyDeviceToHost));
+    std::array<double, A_rows> y_prime;
+    HIP_CHECK(hipMemcpy(y_prime.data(), d_y, sizeof(*d_y) * A_rows, hipMemcpyDeviceToHost));
 
     // 5. Clear rocSPARSE
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
@@ -138,12 +150,7 @@ int main()
     HIP_CHECK(hipFree(buffer));
 
     // 7. Print results
-    std::cout << "y':";
-    for(int i = 0; i < A_rows; ++i)
-    {
-        std::cout << " " << y_accent[i];
-    }
-    std::cout << std::endl;
+    std::cout << "y = " << format_range(std::begin(y_prime), std::end(y_prime)) << std::endl;
 
     return 0;
 }

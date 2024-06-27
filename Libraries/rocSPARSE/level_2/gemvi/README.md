@@ -4,7 +4,7 @@
 
 This example showcases the usage of `rocsparse_gemvi` which multiplies a dense $m \times n$ matrix $A$ with a sparse vector $x$, scales this with $\alpha$, and adds the result to the dense the $\beta$-scaled vector $y$:
 
-$y' = \alpha \cdot A \cdot x + \beta \cdot y$
+$y' = \alpha \cdot op(A) \cdot x + \beta \cdot y$
 
 The example solves for $y'$ with the following concrete values:
 
@@ -84,9 +84,9 @@ This works by storing the sparse vector $x$ as:
   - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation trans`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$
 
   Currently, only `rocsparse_operation_none` is supported.
 
@@ -104,6 +104,8 @@ This works by storing the sparse vector $x$ as:
 - `rocsparse_dgemvi`
 - `rocsparse_index_base::rocsparse_index_base_zero`
 - `rocsparse_operation::rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 

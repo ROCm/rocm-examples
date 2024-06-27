@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -103,10 +103,6 @@ int main()
     constexpr double alpha = 1.0;
     constexpr double beta  = 1.0;
 
-    // Temporary buffer.
-    size_t buffer_size   = 0;
-    void*  d_temp_buffer = nullptr;
-
     // Index and data type.
     constexpr rocsparse_indextype index_type = rocsparse_indextype_i32;
     constexpr rocsparse_datatype  data_type  = rocsparse_datatype_f64_r;
@@ -118,6 +114,7 @@ int main()
     // rocSPARSE handle
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 3. Allocate device memory and offload data to device.
     double*        d_csr_val;
@@ -168,6 +165,7 @@ int main()
     rocsparse_create_dnmat_descr(&mat_B_desc, k, n, n, d_B, data_type, order);
 
     // 5. Calculate size and allocate temp buffer.
+    size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_sddmm_buffer_size(handle,
                                                 trans_A,
                                                 trans_B,
@@ -179,10 +177,12 @@ int main()
                                                 data_type,
                                                 rocsparse_sddmm_alg::rocsparse_sddmm_alg_default,
                                                 &buffer_size));
-
-    HIP_CHECK(hipDeviceSynchronize());
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate the temp buffer.
+    void* d_temp_buffer{};
     HIP_CHECK(hipMalloc(&d_temp_buffer, buffer_size));
 
     // 6. Do the necessary pre calculations.
@@ -212,9 +212,7 @@ int main()
                                     rocsparse_sddmm_alg::rocsparse_sddmm_alg_default,
                                     d_temp_buffer));
 
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 8. Copy C to host from device.
+    // 8. Copy C to host from device. These calls synchronize with the host.
     HIP_CHECK(hipMemcpy(h_csr_val.data(), d_csr_val, size_val, hipMemcpyDeviceToHost));
     HIP_CHECK(hipMemcpy(h_csr_col_ind.data(), d_csr_col_ind, size_col_ind, hipMemcpyDeviceToHost));
     HIP_CHECK(hipMemcpy(h_csr_row_ptr.data(), d_csr_row_ptr, size_row_ind, hipMemcpyDeviceToHost));

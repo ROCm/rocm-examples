@@ -32,7 +32,7 @@
 int main()
 {
     // 1. Set up input data.
-    //            A'           *    y    = alpha *     x
+    //           op(A)         *    y    = alpha *     x
     //
     //  ( 1.0  0.0  0.0  0.0 )   ( 1.0 )           (  0.4 )
     //  ( 2.0  3.0  0.0  0.0 ) * ( 2.0 ) =   2.5 * (  3.2 )
@@ -174,7 +174,8 @@ int main()
                                      nullptr,
                                      temp_buffer));
 
-    // 6. Perform triangular solve Ay = alpha * x.
+    // 6. Perform triangular solve op(A) * y = alpha * x.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_spitsv(handle,
                                      &iter_counter,
                                      &tolerance,
@@ -189,10 +190,8 @@ int main()
                                      rocsparse_spitsv_stage_compute,
                                      &buffer_size,
                                      temp_buffer));
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
 
-    // 7. Copy result from device to host.
+    // 7. Copy result from device to host. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, sizeof(*d_y) * n, hipMemcpyDeviceToHost));
 
     // 8. Free rocSPARSE resources and device memory.

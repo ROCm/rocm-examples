@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-204 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -84,7 +84,7 @@ int main(const int argc, const char** argv)
     const float h_alpha = parser.get<float>("a");
     const float h_beta  = parser.get<float>("b");
 
-    // Set GEMM operation as identity operation: $X' = X$
+    // Set GEMM operation as identity operation: $op(X) = X$
     const hipblasOperation_t trans_a = HIPBLAS_OP_N;
     const hipblasOperation_t trans_b = HIPBLAS_OP_N;
 

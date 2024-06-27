@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ int main()
 {
     // 1. Setup input data.
 
-    //  alpha * A * x
+    //  alpha * op(A) * x
     // + beta * y =
     //            = 1.0 * ( 4.0  0.0  0.0  0.0 ) * ( 1.0 ) - 1.0 * ( 4.0 )
     //                    ( 4.0  3.0  0.0  0.0 )   ( 2.0 )         ( 5.0 )
@@ -80,13 +80,13 @@ int main()
     // clang-format off
     constexpr std::array<double, nnzb * bsr_row_dim * bsr_col_dim>
         h_bsr_val{4.0, 0.0, 0.0,
-                  4.0, 3.0, 0.0,  // A_{00}
+                  4.0, 3.0, 0.0,  // op(A)_{00}
 
                   4.0, 3.0, 2.0,
-                  4.0, 3.0, 2.0,  // A_{10}
+                  4.0, 3.0, 2.0,  // op(A)_{10}
 
                   0.0, 0.0, 0.0,
-                  1.0, 0.0, 0.0}; // A_{11}
+                  1.0, 0.0, 0.0}; // op(A)_{11}
     // clang-format on
 
     // GEBSR row pointers.
@@ -138,13 +138,15 @@ int main()
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 4. Prepare utility variables for rocSPARSE gebsrmv invocation.
     // Matrix descriptor.
     rocsparse_mat_descr descr;
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
 
-    // 5. Call gebsrmv to perform y = alpha * A * x + beta * y.
+    // 5. Call gebsrmv to perform y = alpha * op(A) * x + beta * y.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dgebsrmv(handle,
                                        dir,
                                        trans,
@@ -162,7 +164,7 @@ int main()
                                        &beta,
                                        d_y));
 
-    // 6. Copy solution to host from device.
+    // 6. Copy solution to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 7. Clear rocSPARSE allocations on device.

@@ -179,8 +179,10 @@ int main()
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 4. Obtain the required buffer size.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dgpsv_interleaved_batch_buffer_size(handle,
                                                                   rocsparse_gpsv_interleaved_alg_qr,
@@ -194,15 +196,16 @@ int main()
                                                                   batch_count,
                                                                   batch_stride,
                                                                   &buffer_size));
-
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate temporary buffer.
     void* temp_buffer{};
     HIP_CHECK(hipMalloc(&temp_buffer, buffer_size));
 
     // 5. Call interleaved batched pentadiagonal solver.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dgpsv_interleaved_batch(handle,
                                                       rocsparse_gpsv_interleaved_alg_qr,
                                                       m,
@@ -216,10 +219,7 @@ int main()
                                                       batch_stride,
                                                       temp_buffer));
 
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 6. Copy result matrix to host.
+    // 6. Copy result matrix to host. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_b.data(), d_b, d_size, hipMemcpyDeviceToHost));
 
     // 7. Free rocSPARSE resources and device memory.

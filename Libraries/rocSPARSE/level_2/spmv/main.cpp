@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ int main()
 
     // 1. Set up input data
     //
-    // alpha *         A         *    x    + beta *    y    =      y
+    // alpha *       op(A)       *    x    + beta *    y    =      y
     //
     //   3.7 * ( 1.0  0.0  2.0 ) * ( 1.0 ) +  1.3 * ( 4.0 ) = (  31.1 )
     //         ( 3.0  0.0  4.0 ) * ( 2.0 )          ( 5.0 ) = (  62.0 )
@@ -112,6 +112,7 @@ int main()
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // Create sparse matrix and dense vector descriptors.
     rocsparse_spmat_descr descr_A{};
@@ -186,10 +187,7 @@ int main()
                                    &buffer_size,
                                    temp_buffer));
 
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // 7. Copy result from device to host.
+    // 7. Copy result from device to host. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, size_y, hipMemcpyDeviceToHost));
 
     // 8. Free rocSPARSE resources and device memory.

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,7 +35,7 @@ int main()
 {
     // 1. Setup input data.
 
-    // alpha  *             A'           *     y       =     x
+    // alpha  *           op(A)          *      y      =     x
     //   1.0  *  ( 1.0  0.0  0.0  0.0 )  *  (   1   )  =  ( 1.0 )
     //           ( 2.0  3.0  0.0  0.0 )  *  (   0   )     ( 2.0 )
     //           ( 4.0  5.0  6.0  0.0 )  *  ( -1/6  )     ( 3.0 )
@@ -115,6 +115,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_info(&info));
 
     // Obtain required buffer size in bytes for analysis and solve stages.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dcsrsv_buffer_size(handle,
                                                  trans,
@@ -126,6 +127,9 @@ int main()
                                                  d_csr_col_ind,
                                                  info,
                                                  &buffer_size));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate temporary buffer.
     void* temp_buffer{};
@@ -145,7 +149,7 @@ int main()
                                               solve_policy,
                                               temp_buffer));
 
-    // 6. Perform triangular solve A' y = alpha * x.
+    // 6. Perform triangular solve op(A) * y = alpha * x.
     ROCSPARSE_CHECK(rocsparse_dcsrsv_solve(handle,
                                            trans,
                                            m,

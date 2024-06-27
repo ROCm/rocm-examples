@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -126,6 +126,7 @@ int main()
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 4. Prepare utility variables for rocSPARSE bsric0 invocation.
     // Matrix descriptor.
@@ -140,6 +141,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_info(&info));
 
     // Obtain the required buffer size in bytes for analysis and solve stages.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dbsric0_buffer_size(handle,
                                                   dir,
@@ -152,6 +154,9 @@ int main()
                                                   bsr_dim,
                                                   info,
                                                   &buffer_size));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate temporary buffer.
     void* temp_buffer{};

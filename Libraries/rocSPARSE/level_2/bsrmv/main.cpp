@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,7 +39,7 @@ int main()
 
     // 1. Set up input data
     //
-    // alpha *         A         *    x    + beta *    y    =      y
+    // alpha *      op(A)        *    x    + beta *    y    =      y
     //
     // alpha * ( 1.0  0.0  2.0 ) * ( 1.0 ) + beta * ( 4.0 ) = (  31.1 )
     //         ( 3.0  0.0  4.0 ) * ( 2.0 )          ( 5.0 ) = (  62.0 )
@@ -99,6 +99,7 @@ int main()
     // rocSPARSE handle
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // Matrix descriptor
     rocsparse_mat_descr descr;
@@ -133,7 +134,7 @@ int main()
     HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
-    // 4. Call bsrmv to perform y = alpha * A x + beta * y
+    // 4. Call bsrmv to perform y = alpha * op(A) * x + beta * y
     // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dbsrmv(handle,
                                      dir,
@@ -152,7 +153,7 @@ int main()
                                      &beta,
                                      d_y));
 
-    // 5. Copy y to host from device
+    // 5. Copy y to host from device. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE

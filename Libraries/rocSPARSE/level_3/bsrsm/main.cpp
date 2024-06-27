@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@
 int main()
 {
     // 1. Set up input data.
-    // Solve A' * X' = alpha * B' for X', with triangular sparse matrix A,
+    // Solve op_a(A) * op_b(X) = alpha * op_b(B) for X, with triangular sparse matrix A,
     // and a dense matrix B containing several right-hand sides {b_1, ..., b_nrhs}.
     //
     //         A       *            X                    = alpha *       B
@@ -172,6 +172,7 @@ int main()
     constexpr rocsparse_solve_policy solve_policy = rocsparse_solve_policy_auto;
 
     // Obtain required buffer size.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dbsrsm_buffer_size(handle,
                                                  dir,
@@ -187,6 +188,9 @@ int main()
                                                  bsr_dim,
                                                  info,
                                                  &buffer_size));
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate temporary buffer.
     void* temp_buffer{};
@@ -210,7 +214,7 @@ int main()
                                               solve_policy,
                                               temp_buffer));
 
-    // 6. Call dbsrsm to solve A * X = alpha * B.
+    // 6. Call dbsrsm to solve op_a(A) * op_b(X) = alpha * op_b(B).
     ROCSPARSE_CHECK(rocsparse_dbsrsm_solve(handle,
                                            dir,
                                            trans_A,

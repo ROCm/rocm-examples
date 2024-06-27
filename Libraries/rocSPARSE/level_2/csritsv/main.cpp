@@ -35,7 +35,7 @@ int main()
 {
     // 1. Setup input data.
 
-    // alpha  *             A'           *     y       =     x
+    // alpha  *           op(A)          *      y      =     x
     //   1.0  *  ( 1.0  0.0  0.0  0.0 )  *  (   1   )  =  ( 1.0 )
     //           ( 2.0  3.0  0.0  0.0 )  *  (   0   )     ( 2.0 )
     //           ( 4.0  5.0  6.0  0.0 )  *  ( -1/6  )     ( 3.0 )
@@ -127,6 +127,7 @@ int main()
     std::array<double, max_iter> history;
 
     // Obtain required buffer size in bytes for analysis and solve stages.
+    // This function is non blocking and executed asynchronously with respect to the host.
     size_t buffer_size;
     ROCSPARSE_CHECK(rocsparse_dcsritsv_buffer_size(handle,
                                                    trans,
@@ -138,9 +139,9 @@ int main()
                                                    d_csr_col_ind,
                                                    info,
                                                    &buffer_size));
-
-    // Synchronize threads.
-    HIP_CHECK(hipDeviceSynchronize());
+    // No synchronization with the device is needed because for scalar results, when using host
+    // pointer mode (the default pointer mode) this function blocks the CPU till the GPU has copied
+    // the results back to the host. See rocsparse_set_pointer_mode.
 
     // Allocate temporary buffer.
     void* temp_buffer{};
@@ -160,7 +161,8 @@ int main()
                                                 solve_policy,
                                                 temp_buffer));
 
-    // 6. Perform triangular solve A' y = alpha * x.
+    // 6. Perform triangular solve op(A) * y = alpha * x.
+    // This function is non blocking and executed asynchronously with respect to the host.
     ROCSPARSE_CHECK(rocsparse_dcsritsv_solve(handle,
                                              &iter_counter,
                                              &tolerance,
@@ -178,7 +180,6 @@ int main()
                                              d_y,
                                              solve_policy,
                                              temp_buffer));
-
     // Synchronize threads.
     HIP_CHECK(hipDeviceSynchronize());
 
@@ -187,8 +188,7 @@ int main()
 
     if(iter_counter >= max_iter)
     {
-        std::cout << "The iteration did not converged in " << iter_counter << " steps."
-                  << std::endl;
+        std::cout << "The iteration did not converge in " << iter_counter << " steps." << std::endl;
         ++errors;
     }
 

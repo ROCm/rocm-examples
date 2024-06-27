@@ -7,16 +7,16 @@ This example illustrates the use of the `rocsparse_gemmi` function, which perfor
 That is, it does the following operation:
 
 $$
-C =  \alpha \cdot A' \cdot B' + \beta \cdot C,
+C =  \alpha \cdot op_a(A) \cdot op_b(B) + \beta \cdot C,
 $$
 
 where
 
-- given a matrix $M$, $M'$ denotes one of the following:
+- given a matrix $M$, $op_m(M)$ denotes one of the following:
 
-  - $M' = M$ (identity)
-  - $M' = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
-  - $M' = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
+  - $op_m(M) = M$ (identity)
+  - $op_m(M) = M^T$ (transpose $M$: $M_{ij}^T = M_{ji}$)
+  - $op_m(M) = M^H$ (conjugate transpose/Hermitian $M$: $M_{ij}^H = \bar M_{ji}$),
 
 - $A$ is a dense matrix $m \times k$,
 - $B$ is a sparse matrix of size $k \times n$,
@@ -92,12 +92,12 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - rocSPARSE is initialized by calling `rocsparse_create_handle(rocsparse_handle*)` and is terminated by calling `rocsparse_destroy_handle(rocsparse_handle)`.
 - `rocsparse_pointer_mode` controls whether scalar parameters must be allocated on the host (`rocsparse_pointer_mode_host`) or on the device (`rocsparse_pointer_mode_device`). It is controlled by `rocsparse_set_pointer_mode`.
 - `rocsparse_operation trans`: matrix operation applied to the given matrix. The following values are accepted:
-  - `rocsparse_operation_none`: identity operation $A' = A$.
-  - `rocsparse_operation_transpose`: transpose operation $A' = A^\mathrm{T}$.
-  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $A' = A^\mathrm{H}$.
+  - `rocsparse_operation_none`: identity operation $op(M) = M$.
+  - `rocsparse_operation_transpose`: transpose operation $op(M) = M^\mathrm{T}$.
+  - `rocsparse_operation_conjugate_transpose`: conjugate transpose operation (Hermitian matrix) $op(M) = M^\mathrm{H}$.
   Currently, operation on $A$ must be `rocsparse_operation_none` and operation on $B$ must be `rocsparse_operation_transpose`. The other options are not yet supported.
 - `rocsparse_mat_descr descr`: holds all properties of a matrix.
-- `rocsparse_[sdcz]gemmi` performs the operation $C =  \alpha \cdot A' \cdot B' + \beta \cdot C$ for $C$. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[sdcz]gemmi` performs the operation $C =  \alpha \cdot op_a(A) \cdot op_b(B) + \beta \cdot C$ for $C$. The correct function signature should be chosen based on the datatype of the input matrix:
   - `s` single-precision real (`float`)
   - `d` double-precision real (`double`)
   - `c` single-precision complex (`rocsparse_float_complex`)

@@ -6,13 +6,13 @@ This example illustrates the use of the `rocSPARSE` level 2 sparse matrix-vector
 
 The function returns the BSR matrix-vector product for the masked blocks
 
-$$\hat{\mathbf{y}} = \alpha \cdot A' \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
+$$\hat{\mathbf{y}} = \alpha \cdot op(A) \cdot \mathbf{x} + \beta \cdot \mathbf{y}$$
 
 where
 
 - $\alpha$ and $\beta$ are scalars
 - $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
-- $A'$ is a sparse matrix in BSR format with `rocsparse_operation` and described below.
+- $op(A)$ is a sparse matrix in BSR format, result of applying one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 - $\textbf{m}$ is the mask vector with elements 0 and 1. Value 1 represents the elements where the function returns with the product, and value 0 represents the identity values.
 - $\mathbf{\bar{m}} = \mathbf{1} - \mathbf{m}$
 
@@ -165,7 +165,7 @@ It is a common case that not all the elements are required from the result. Ther
 
 Mathematically it means we are looking for the following product:
 
-$$\hat{\mathbf{y}} = \mathbf{m} \circ \left( \alpha \cdot A' \cdot \mathbf{x} \right) + \left( \mathbf{m} \cdot \beta + \mathbf{\bar{m}} \right) \circ \mathbf{y}$$
+$$\hat{\mathbf{y}} = \mathbf{m} \circ \left( \alpha \cdot op(A) \cdot \mathbf{x} \right) + \left( \mathbf{m} \cdot \beta + \mathbf{\bar{m}} \right) \circ \mathbf{y}$$
 
 For instance the mask:
 
@@ -211,9 +211,9 @@ Additionally, `bsrx_end_ptr` can be used for column masking, how it is presented
   - `z` double-precision complex (`rocsparse_double_complex`)
 
 - `rocsparse_operation trans`: matrix operation type with the following options:
-  - `rocsparse_operation_none`: identity operation: $A' = A$
-  - `rocsparse_operation_transpose`: transpose operation: $A' = A^\mathrm{T}$
-  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $A' = A^\mathrm{H}$
+  - `rocsparse_operation_none`: identity operation: $op(M) = M$
+  - `rocsparse_operation_transpose`: transpose operation: $op(M) = M^\mathrm{T}$
+  - `rocsparse_operation_conjugate_transpose`: Hermitian operation: $op(M) = M^\mathrm{H}$
 
   Currently, only `rocsparse_operation_none` is supported.
 
@@ -239,6 +239,8 @@ Additionally, `bsrx_end_ptr` can be used for column masking, how it is presented
 - `rocsparse_mat_descr`
 - `rocsparse_operation`
 - `rocsparse_operation_none`
+- `rocsparse_pointer_mode_host`
+- `rocsparse_set_pointer_mode`
 
 ### HIP runtime
 
