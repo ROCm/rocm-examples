@@ -58,7 +58,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:

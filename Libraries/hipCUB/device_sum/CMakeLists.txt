@@ -47,12 +47,12 @@ endif()
 
 find_package(hipcub REQUIRED)
 
-add_executable(${example_name} main.cpp)
+add_executable(${example_name} main.hip)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 target_link_libraries(${example_name} PRIVATE hip::hipcub)
 target_include_directories(${example_name} PRIVATE "../../../Common")
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
 if(WIN32)
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
