@@ -136,7 +136,7 @@ if(NOT (CMAKE_HIP_ARCHITECTURES MATCHES "gfx94*"))
 else()
     message(
         WARNING
-        "SKIP: Texture management example not supported on gfx940, gfx941, and gfx942"
+        "Texture functions not supported on gfx94*, not building texture management example"
     )
 endif()
 
