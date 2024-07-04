@@ -49,18 +49,21 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         llvm-dis
         PATH_SUFFIXES bin
         PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        NO_DEFAULT_PATH
     )
     find_program(
         OFFLOAD_BUNDLER_COMMAND
         clang-offload-bundler
         PATH_SUFFIXES bin
         PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        NO_DEFAULT_PATH
     )
     find_program(
         LLVM_MC_COMMAND
         llvm-mc
         PATH_SUFFIXES bin
         PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        NO_DEFAULT_PATH
     )
 
     if(LLVM_DIS_COMMAND AND OFFLOAD_BUNDLER_COMMAND AND LLVM_MC_COMMAND)
