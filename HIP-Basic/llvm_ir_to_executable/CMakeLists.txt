@@ -90,6 +90,7 @@ find_program(
     PATH_SUFFIXES bin
     PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED
+    NO_DEFAULT_PATH
 )
 
 # Generate the device LLVM IR using the HIP compiler.
@@ -145,6 +146,7 @@ find_program(
     PATH_SUFFIXES bin
     PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED
+    NO_DEFAULT_PATH
 )
 
 # Generate object bundle.
@@ -194,6 +196,7 @@ find_program(
     PATH_SUFFIXES bin
     PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED
+    NO_DEFAULT_PATH
 )
 
 # Invoke llvm-mc to generate an object file containing the offload bundle.
