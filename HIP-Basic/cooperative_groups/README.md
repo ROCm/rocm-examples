@@ -35,7 +35,7 @@ The partitioned threads can reside across multiple devices.
 - `thread_block`
 - `tiled_partition<size>()`
 - `thread_block_tile`
-- All above from the [`cooperative_groups` namespace](https://github.com/ROCm-Developer-Tools/hipamd/blob/develop/include/hip/amd_detail/amd_hip_cooperative_groups.h)
+- All above from the [`cooperative_groups` namespace](https://github.com/ROCm/clr/blob/develop/hipamd/include/hip/amd_detail/amd_hip_cooperative_groups.h)
 
 #### Host symbols
 

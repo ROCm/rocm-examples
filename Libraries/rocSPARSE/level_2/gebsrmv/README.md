@@ -33,7 +33,7 @@ where
 
 ### GEBSR Matrix Storage Format
 
-The [General Block Compressed Sparse Row (GEBSR) storage format](https://rocsparse.readthedocs.io/en/latest/usermanual.html#gebsr-storage-format) describes a sparse matrix using three arrays. The idea behind this storage format is the same as for the BSR format, but the blocks in which the sparse matrix is split are not squared. All of them are of `bsr_row_dim` $\times$ `bsr_col_dim` size.
+The [General Block Compressed Sparse Row (GEBSR) storage format](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/how-to/basics.html#gebsr-storage-format) describes a sparse matrix using three arrays. The idea behind this storage format is the same as for the BSR format, but the blocks in which the sparse matrix is split are not squared. All of them are of `bsr_row_dim` $\times$ `bsr_col_dim` size.
 
 Therefore, defining
 

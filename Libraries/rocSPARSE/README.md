@@ -16,13 +16,13 @@ All rocSPARSE library functions, unless otherwise stated, are non blocking and e
 
   - OR GNU Make - available via the distribution's package manager
 
-- [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 5.x.x) OR the HIP Nvidia runtime (on the CUDA platform)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x) OR the HIP Nvidia runtime (on the CUDA platform)
 
 - [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE)
 
-  - ROCm platform: `rocsparse` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/How_to_Install_ROCm.html).
+  - ROCm platform: `rocsparse` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
 
-  - CUDA platform: Install rocSPARSE from source: [instructions](https://rocsparse.readthedocs.io/en/rocm-5.5.0/usermanual.html#building-rocsparse-from-source).
+  - CUDA platform: Install rocSPARSE from source: [instructions](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/install/Linux_Install_Guide.html).
 
 ### Windows
 
@@ -35,7 +35,7 @@ All rocSPARSE library functions, unless otherwise stated, are non blocking and e
 - [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE)
 
   - ROCm platform: Installed as part of the ROCm SDK on Windows.
-  - CUDA platform: Install rocSPARSE from source: [instructions](https://rocsparse.readthedocs.io/en/rocm-5.5.0/usermanual.html#building-rocsparse-from-source).
+  - CUDA platform: Install rocSPARSE from source: [instructions](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/install/Linux_Install_Guide.html).
 
 - [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
 

@@ -10,9 +10,9 @@ The examples in this subdirectory showcase the functionality of the [rocRAND](ht
 
 - [CMake](https://cmake.org/download/) (at least version 3.21)
   - OR GNU Make - available via the distribution's package manager
-- [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 5.x.x) OR the HIP Nvidia runtime (on the CUDA platform)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x) OR the HIP Nvidia runtime (on the CUDA platform)
 - [rocRAND](https://github.com/rocmSoftwarePlatform/rocRAND)
-  - ROCm platform: `rocrand-dev` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/How_to_Install_ROCm.html).
+  - ROCm platform: `rocrand-dev` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
   - CUDA platform: Install rocRAND from source: [instructions](https://github.com/rocmSoftwarePlatform/rocRAND#build-and-install).
 
 ### Windows

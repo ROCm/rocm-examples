@@ -6,7 +6,7 @@ This example walks through the dynamo Post Training Quantization (PTQ) workflow 
 
 ## Prerequisites
 
-- You must follow the installation instructions for the torch_migraphx library in [README.md](README.md) before using this example.
+- You must follow the installation instructions for the torch_migraphx library in [AI/MIGraphX/Quantization](https://github.com/ROCm/rocm-examples/tree/develop/AI/MIGraphX/Quantization/) before using this example.
 
 ## Steps for running a quantized model using torch_migraphx
 
