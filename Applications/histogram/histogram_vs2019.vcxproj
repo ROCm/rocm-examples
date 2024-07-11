@@ -13,7 +13,7 @@
   <PropertyGroup Label="Globals">
     <HIPVersion>6.1</HIPVersion>
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{D3531843-4D0D-445D-BD8D-2352038D8221}</ProjectGuid>
+    <ProjectGuid>{1CA59049-FCE9-4694-9710-E3C320378521}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>histogram_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>

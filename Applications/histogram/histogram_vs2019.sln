@@ -1,8 +1,8 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
-VisualStudioVersion = 16.0.33214.272
+VisualStudioVersion = 16.0.32630.194
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_vs2019", "histogram_vs2019.vcxproj", "{D3531843-4D0D-445D-BD8D-2352038D8221}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_vs2019", "histogram_vs2019.vcxproj", "{1CA59049-FCE9-4694-9710-E3C320378521}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,15 +10,15 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D3531843-4D0D-445D-BD8D-2352038D8221}.Debug|x64.ActiveCfg = Debug|x64
-		{D3531843-4D0D-445D-BD8D-2352038D8221}.Debug|x64.Build.0 = Debug|x64
-		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.ActiveCfg = Release|x64
-		{D3531843-4D0D-445D-BD8D-2352038D8221}.Release|x64.Build.0 = Release|x64
+		{1CA59049-FCE9-4694-9710-E3C320378521}.Debug|x64.ActiveCfg = Debug|x64
+		{1CA59049-FCE9-4694-9710-E3C320378521}.Debug|x64.Build.0 = Debug|x64
+		{1CA59049-FCE9-4694-9710-E3C320378521}.Release|x64.ActiveCfg = Release|x64
+		{1CA59049-FCE9-4694-9710-E3C320378521}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {7748E875-C82A-4406-936C-562C9DFFF9C6}
+		SolutionGuid = {F7C6B93D-5494-4C00-8AA4-2B7F6A4AB1FE}
 	EndGlobalSection
 EndGlobal
