@@ -45,8 +45,16 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y clang-format
-      - name: Run clang-format
+      - name: Make scripts executable
+        run: chmod +x Scripts/CodeFormat/check_format.sh Scripts/CopyrightDate/check_copyright.sh
+      - name: Run code format check
+        run: ./Scripts/CodeFormat/check_format.sh HEAD
+      - name: Run copyright check
         run: |
-          FILES=$(find . -type f ! -path '**/build/*' | egrep '\.(cc|cp|cpp|c++|cxx|cu|cuh|hh|hpp|hxx|hip|vert|frag)$')
-          clang-format -style=file -i $FILES
-          git diff --exit-code
+          opts="-qc"
+          if [ "$(git config --get --type bool --default false hooks.updateCopyright)" = "true" ]; then
+              opts="-qca"
+          fi
+          ./Scripts/CopyrightDate/check_copyright.sh "$opts"
+      - name: Fail if formatting issues found
+        run: git diff --exit-code
