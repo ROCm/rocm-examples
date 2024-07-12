@@ -1,22 +1,26 @@
 #!/usr/bin/env bash
 
 SOURCE_COMMIT="$1"
+echo "SOURCE_COMMIT: $SOURCE_COMMIT"
 if [ "$#" -gt 0 ]; then
     shift
 fi
 
 # If no source commit is given target the default branch
 if [ "x$SOURCE_COMMIT" = "x" ]; then
-    # If remote is not set use the remote of the current branch or fallback to "origin"
+    echo "No source commit provided, determining default branch..."
     if [ "x$REMOTE" = "x" ]; then
         BRANCH="$(git rev-parse --abbrev-ref HEAD)"
         REMOTE="$(git config --local --get "branch.$BRANCH.remote" || echo 'origin')"
+        echo "BRANCH: $BRANCH, REMOTE: $REMOTE"
     fi
     SOURCE_COMMIT="remotes/$REMOTE/HEAD"
+    echo "SOURCE_COMMIT set to: $SOURCE_COMMIT"
 fi
 
 # Force colored diff output
 DIFF_COLOR_SAVED="$(git config --local --get color.diff)"
+# If remote is not set use the remote of the current branch or fallback to "origin"
 if [ "x$DIFF_COLOR_SAVED" != "x" ]; then
     git config --local --replace-all "color.diff" "always"
 else
@@ -26,6 +30,7 @@ fi
 scratch="$(mktemp -t check-format.XXXXXXXXXX)"
 finish () {
     # Remove temporary file
+    echo "Cleaning up temporary files and restoring git config..."
     rm -rf "$scratch"
     # Restore setting
     if [ "x$DIFF_COLOR_SAVED" != "x" ]; then
@@ -39,6 +44,7 @@ finish () {
 trap finish EXIT
 
 GIT_CLANG_FORMAT="${GIT_CLANG_FORMAT:-git-clang-format}"
+echo "Running $GIT_CLANG_FORMAT --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff $@ $SOURCE_COMMIT"
 "$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff "$@" "$SOURCE_COMMIT" > "$scratch"
 
 # Check for no-ops
