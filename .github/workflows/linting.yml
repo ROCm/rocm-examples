@@ -44,7 +44,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y clang-format
+          sudo apt-get install -y clang-format-14
       - name: Run clang-format
         run: |
           FILES=$(find . -type f ! -path '**/build/*' | egrep '\.(cc|cp|cpp|c++|cxx|cu|cuh|hh|hpp|hxx|hip|vert|frag)$')
