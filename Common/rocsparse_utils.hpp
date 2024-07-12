@@ -46,7 +46,8 @@ inline const char* rocsparse_status_to_string(rocsparse_status status)
         case rocsparse_status_zero_pivot: return "rocsparse_status_zero_pivot";
         case rocsparse_status_not_initialized: return "rocsparse_status_not_initialized";
         case rocsparse_status_type_mismatch: return "rocsparse_status_type_mismatch";
-        case rocsparse_status_thrown_exception: return "rocsparse_status_thrown_exception";
+        case rocsparse_status_thrown_exception:
+            return "rocsparse_status_thrown_exception";
 // rocSPARSE 3.0 adds new status
 #if ROCSPARSE_VERSION_MAJOR >= 3
         case rocsparse_status_continue: return "rocsparse_status_continue";
@@ -64,7 +65,7 @@ inline const char* rocsparse_status_to_string(rocsparse_status status)
 /// with an error code.
 #define ROCSPARSE_CHECK(condition)                                                               \
     {                                                                                            \
-        const rocsparse_status status = (condition);                                               \
+        const rocsparse_status status = (condition);                                             \
         if(status != rocsparse_status_success)                                                   \
         {                                                                                        \
             std::cerr << "rocSPARSE error encountered: \"" << rocsparse_status_to_string(status) \
