@@ -55,6 +55,6 @@ jobs:
           sudo apt-get install -y clang-format-18
       - name: Run clang-format
         run: |
-          FILES=$(find . -type f ! -path '**/build/*' | egrep '\.(cc|cp|cpp|c++|cxx|cu|cuh|hh|hpp|hxx|hip|vert|frag)$')
-          ${{ env.CLANG_FORMAT }} -style=file -i $FILES
-          git diff --exit-code
+          git config --global --add safe.directory $GITHUB_WORKSPACE
+          Scripts/CodeFormat/check_format.sh origin/`if [[ "${{ github.event_name }}" == "push" ]]; then echo "develop"; else echo "${{ github.base_ref }}"; fi` --binary ${{env.CLANG_FORMAT}}
+          
