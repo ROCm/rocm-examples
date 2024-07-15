@@ -53,8 +53,10 @@ jobs:
           sudo echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | sudo tee -a /etc/apt/sources.list.d/llvm-18.list
           sudo apt-get update -qq
           sudo apt-get install -y clang-format-18
+          sudo apt-get install -y clang-tools-18
       - name: Run clang-format
+        env:
+          GIT_CLANG_FORMAT: /usr/lib/llvm-18/bin/git-clang-format
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
           Scripts/CodeFormat/check_format.sh origin/`if [[ "${{ github.event_name }}" == "push" ]]; then echo "develop"; else echo "${{ github.base_ref }}"; fi` --binary ${{env.CLANG_FORMAT}}
-          
