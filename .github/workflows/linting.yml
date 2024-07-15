@@ -53,7 +53,9 @@ jobs:
           sudo echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | sudo tee -a /etc/apt/sources.list.d/llvm-18.list
           sudo apt-get update -qq
           sudo apt-get install -y clang-format-18
-          sudo apt-get install -y clang-tools-18
+          sudo apt-get install -y clang-tools-18  # Install git-clang-format
+      - name: Fetch all branches
+        run: git fetch --all
       - name: Run clang-format
         env:
           GIT_CLANG_FORMAT: /usr/lib/llvm-18/bin/git-clang-format
