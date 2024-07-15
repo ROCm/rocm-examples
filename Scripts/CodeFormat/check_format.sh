@@ -38,30 +38,18 @@ finish () {
 # feature
 trap finish EXIT
 
-CLANG_FORMAT="clang-format"
+GIT_CLANG_FORMAT="${GIT_CLANG_FORMAT:-git-clang-format}"
+"$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff "$@" "$SOURCE_COMMIT" > "$scratch"
 
-# Get all staged files with relevant extensions
-FILES=$(git diff --cached --name-only --diff-filter=ACM | grep -E '\.(cc|cp|cpp|c\+\+|cxx|cu|cuh|hh|hpp|hxx|hip|vert|frag)$')
-if [ -z "$FILES" ]; then
-    echo "No files to format."
-    exit 0
-fi
-
-echo "Running $CLANG_FORMAT --style=file -i $FILES"
-$CLANG_FORMAT --style=file -i $FILES
-
-# Check if any files were modified by clang-format
-MODIFIED_FILES=$(git diff --name-only --diff-filter=M $FILES)
-if [ -z "$MODIFIED_FILES" ]; then
-    echo "No formatting changes needed."
-    exit 0
-fi
+# Check for no-ops
+grep '^no modified files to format$\|^clang-format did not modify any files$' \
+    "$scratch" > /dev/null && exit 0
 
 # Dump formatting diff and signal failure
 printf \
 "\033[31m==== FORMATTING VIOLATIONS DETECTED ====\033[0m
-run '\033[33m%s --style=file -i %s\033[0m' to apply these formatting changes\n\n" \
-"$CLANG_FORMAT" "$FILES"
+run '\033[33m%s --style=file %s %s\033[0m' to apply these formatting changes\n\n" \
+"$GIT_CLANG_FORMAT" "$*" "$SOURCE_COMMIT"
 
-git diff $FILES
+cat "$scratch"
 exit 1
