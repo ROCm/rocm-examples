@@ -53,7 +53,7 @@ int main()
     // ELL values
     constexpr rocsparse_int                    h_ell_length = m * ell_width;
     constexpr std::array<double, h_ell_length> h_ell_val = {1.0, 3.0, 5.0, 7.0, 2.0, 4.0, 6.0, 8.0};
-    constexpr std::array<double, m>            expected_y = {31.1, 62.0, 70.7, 123.8};
+    constexpr std::array<double, m>            expected_y   = {31.1, 62.0, 70.7, 123.8};
 
     // ELL column indices
     constexpr std::array<rocsparse_int, h_ell_length> h_ell_col_ind = {0, 0, 0, 0, 2, 2, 1, 2};
