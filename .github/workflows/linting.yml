@@ -47,7 +47,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update -qq
-          apt-get install -y git wget
+          sudo apt-get install -y git wget
           wget -qO- https://apt.llvm.org/llvm-snapshot.gpg.key | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc
           sudo echo "deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | sudo tee -a /etc/apt/sources.list.d/llvm-18.list
           sudo echo "deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main" | sudo tee -a /etc/apt/sources.list.d/llvm-18.list
