@@ -61,4 +61,4 @@ jobs:
           GIT_CLANG_FORMAT: /usr/lib/llvm-18/bin/git-clang-format
         run: |
           git config --global --add safe.directory $GITHUB_WORKSPACE
-          Scripts/CodeFormat/check_format.sh origin/`if [[ "${{ github.event_name }}" == "push" ]]; then echo "develop"; else echo "${{ github.base_ref }}"; fi` --binary ${{env.CLANG_FORMAT}}
+          Scripts/CodeFormat/check_format.sh --all-files origin/`if [[ "${{ github.event_name }}" == "push" ]]; then echo "develop"; else echo "${{ github.base_ref }}"; fi` --binary ${{env.CLANG_FORMAT}}

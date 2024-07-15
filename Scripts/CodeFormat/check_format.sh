@@ -1,9 +1,20 @@
 #!/usr/bin/env bash
 
-SOURCE_COMMIT="$1"
-if [ "$#" -gt 0 ]; then
-    shift
-fi
+# Parse arguments
+ALL_FILES=false
+SOURCE_COMMIT=""
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --all-files)
+            ALL_FILES=true
+            shift
+            ;;
+        *)
+            SOURCE_COMMIT="$1"
+            shift
+            ;;
+    esac
+done
 
 # If no source commit is given target the default branch
 if [ "x$SOURCE_COMMIT" = "x" ]; then
@@ -39,7 +50,14 @@ finish () {
 trap finish EXIT
 
 GIT_CLANG_FORMAT="${GIT_CLANG_FORMAT:-git-clang-format}"
-"$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff "$@" "$SOURCE_COMMIT" > "$scratch"
+
+if [ "$ALL_FILES" = true ]; then
+    # Format all files
+    "$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff > "$scratch"
+else
+    # Format modified files
+    "$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff "$@" "$SOURCE_COMMIT" > "$scratch"
+fi
 
 # Check for no-ops
 grep '^no modified files to format$\|^clang-format did not modify any files$' \
