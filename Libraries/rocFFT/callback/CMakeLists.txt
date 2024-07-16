@@ -30,11 +30,6 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     return()
 endif()
 
-if(WIN32)
-    message(STATUS "rocFFT examples do not support windows")
-    return()
-endif()
-
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)

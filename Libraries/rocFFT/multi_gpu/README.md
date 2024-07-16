@@ -1,7 +1,7 @@
 # rocFFT Mutli GPU Example (C++)
 
 ## Description
-This example illustrates the use of rocFFT multi-GPU functionality. It shows how to use multiple GPUs with rocFFT by using `rocfft_brick` and `rocfft_field` to divide the work between multiple devices. At least requires rocm version 6.0.0. Does not have Windows support.
+This example illustrates the use of rocFFT multi-GPU functionality. It shows how to use multiple GPUs with rocFFT by using `rocfft_brick` and `rocfft_field` to divide the work between multiple devices. At least requires rocm version 6.0.0.
 
 ### Application flow
 1. Read in command-line parameters.

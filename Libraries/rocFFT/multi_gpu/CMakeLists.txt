@@ -25,11 +25,6 @@ set(example_name rocfft_multi_gpu)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX HIP)
 
-if(WIN32)
-    message(STATUS "rocFFT examples do not support windows")
-    return()
-endif()
-
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
