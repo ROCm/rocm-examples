@@ -1,9 +1,11 @@
 # rocFFT callback Example (C++)
 
 ## Description
+
 This example illustrates the use of rocFFT `callback` functionality. It shows how to use load callback, a user-defined callback function that is run to load input from global memory at the start of the transform, with rocFFT.
 
 ### Application flow
+
 1. Set up rocFFT.
 2. Allocate and initialize the host data and filter.
 3. Allocate device memory.
@@ -23,14 +25,16 @@ This example illustrates the use of rocFFT `callback` functionality. It shows ho
 16. The cleanup of the rocFFT enviroment.
 
 ## Key APIs and Concepts
+
 - rocFFT is initialized by calling `rocfft_setup()` and it is cleaned up by calling `rocfft_cleanup()`.
 - rocFFT creates a plan with `rocfft_plan_create`. This function takes many of the fundamental parameters needed to specify a transform. The plan is then executed with `rocfft_execute` and destroyed with `rocfft_plan_destroy`.
 - rocFFT can add work buffers and can control plan execution with `rocfft_execution_info` from `rocfft_execution_info_create(rocfft_execution_info *info)`. For this example specifically a load callback with `rocfft_execution_info_set_load_callback` and work buffer with `rocfft_execution_info_set_work_buffer`.
 - [Callbacks](https://rocm.docs.amd.com/projects/rocFFT/en/latest/index.html#load-and-store-callbacks) is an experimental functionality in rocFFT. It requires a pointer to the shared memory, but did not support shared memory when this example was created.
 
-
 ## Demonstrated API Calls
+
 ### rocFFT
+
 - `rocfft_cleanup`
 - `rocfft_execute`
 - `rocfft_execution_info_create`
@@ -46,6 +50,7 @@ This example illustrates the use of rocFFT `callback` functionality. It shows ho
 - `rocfft_transform_type_complex_forward`
 
 ### HIP runtime
+
 - `HIP_SYMBOL`
 - `hipCmul`
 - `hipFree`

@@ -1,9 +1,11 @@
 # rocFFT Mutli GPU Example (C++)
 
 ## Description
+
 This example illustrates the use of rocFFT multi-GPU functionality. It shows how to use multiple GPUs with rocFFT by using `rocfft_brick` and `rocfft_field` to divide the work between multiple devices. At least requires rocm version 6.0.0.
 
 ### Application flow
+
 1. Read in command-line parameters.
 2. Check if there are two device with 3-D inputs.
 3. Check if there device ids that do not exist.
@@ -21,20 +23,24 @@ This example illustrates the use of rocFFT multi-GPU functionality. It shows how
 15. Destroy plan and free device memory.
 
 ### Command line interface
+
 The application provides the following optional command line arguments:
+
 - `-l` or `--length`. The 3-D FFT size separated by spaces. It default value is `8 8 8`.
 - `-d` or `--devices`. The list of devices to use separated by spaces. It default value is `0 1`.
 
 ## Key APIs and Concepts
+
 - rocFFT is initialized by calling `rocfft_setup()` and it is cleaned up by calling `rocfft_cleanup()`.
 - rocFFT creates a plan with `rocfft_plan_create`. This function takes many of the fundamental parameters needed to specify a transform. The plan is then executed with `rocfft_execute` and destroyed with `rocfft_plan_destroy`.
 - `rocfft_field` is used to hold data decomposition information which is then passed to a `rocfft_plan` via a `rocfft_plan_description`
 - `rocfft_brick` is used to describe the data decomposition of fields
 - To execute HIP functions on different gpus `hipSetDevice` can be used with the id of the gpu to switch beteen gpus.
 
-
 ## Demonstrated API Calls
+
 ### rocFFT
+
 - `rocfft_array_type_complex_interleaved`
 - `rocfft_brick_create`
 - `rocfft_brick_destroy`
@@ -59,6 +65,7 @@ The application provides the following optional command line arguments:
 - `rocfft_transform_type_complex_forward`
 
 ### HIP runtime
+
 - `hipFree`
 - `hipGetDeviceCount`
 - `hipGetErrorString`
