@@ -32,9 +32,17 @@ if(GPU_RUNTIME STREQUAL "CUDA")
 endif()
 
 if(WIN32)
-    set(ROCM_ROOT "$ENV{HIP_PATH}" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
