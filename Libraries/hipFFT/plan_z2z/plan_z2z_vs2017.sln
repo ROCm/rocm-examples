@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.33026.149
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plan_z2z_vs2017", ".\plan_z2z_vs2017.vcxproj", "{790D456B-B80A-479D-B5D2-145F4363F4F3}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plan_z2z_vs2017", "plan_z2z_vs2017.vcxproj", "{790D456B-B80A-479D-B5D2-145F4363F4F3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -19,6 +19,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {1FF4DC24-9C67-4A78-87D1-C1572BCE909D}
+		SolutionGuid = {19841116-4A06-4AA5-8183-663086C0D08D}
 	EndGlobalSection
 EndGlobal

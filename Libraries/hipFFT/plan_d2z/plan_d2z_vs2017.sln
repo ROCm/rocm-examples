@@ -2,7 +2,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.33026.149
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plan_d2z_vs2017", ".\plan_d2z_vs2017.vcxproj", "{AF790582-9E56-4CAA-BBD0-9C9F5B99FDEE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plan_d2z_vs2017", "plan_d2z_vs2017.vcxproj", "{AF790582-9E56-4CAA-BBD0-9C9F5B99FDEE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
