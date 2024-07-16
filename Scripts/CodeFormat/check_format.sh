@@ -3,18 +3,18 @@
 # Parse arguments
 ALL_FILES=false
 SOURCE_COMMIT=""
-while [[ $# -gt 0 ]]; do
+# Either a base SHA is used or all files are checked
+if [[ $# -gt 0 ]]; then
     case "$1" in
-        --all-files)
+        "--all-files")
             ALL_FILES=true
-            shift
             ;;
         *)
             SOURCE_COMMIT="$1"
-            shift
             ;;
     esac
-done
+    shift
+fi
 
 # If no source commit is given target the default branch
 if [ "x$SOURCE_COMMIT" = "x" ]; then
