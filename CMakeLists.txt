@@ -51,6 +51,9 @@ install(
     PATTERN ".gitignore" EXCLUDE
     PATTERN "*.vcxproj**" EXCLUDE
     PATTERN "*.sln" EXCLUDE
+    PATTERN "bin" EXCLUDE      # Exclude binary directories
+    PATTERN "*.o" EXCLUDE      # Exclude object files
+    PATTERN "*.exe" EXCLUDE    # Exclude executable files
 )
 
 ###
