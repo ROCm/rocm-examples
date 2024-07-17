@@ -30,7 +30,7 @@ PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"
 
-BUILD_DIR="build"
+BUILD_DIR="$(pwd)/build"
 DEB_DIR="$BUILD_DIR/deb"
 RPM_DIR="$BUILD_DIR/rpm"
 RPM_BUILD_DIR="$RPM_DIR/BUILD"
@@ -91,39 +91,54 @@ create_deb_package() {
 create_rpm_package() {
     local package_dir=$1
     local spec_file="$RPM_SPEC_DIR/${PACKAGE_NAME}.spec"
-    mkdir -p "$(dirname $spec_file)"
+    mkdir -p "$RPM_SOURCE_DIR" "$RPM_BUILD_DIR"
 
-    # Create spec file
-    echo "Name: $PACKAGE_NAME" > $spec_file
-    echo "Version: $PACKAGE_VERSION" >> $spec_file
-    echo "Release: 1" >> $spec_file
-    echo "Summary: $PACKAGE_DESCRIPTION_SUMMARY" >> $spec_file
-    echo "Group: Development/Tools" >> $spec_file
-    echo "License: MIT" >> $spec_file
-    echo "URL: https://github.com/ROCm/ROCm-examples" >> $spec_file
-    echo "Source0: %{name}-%{version}.tar.gz" >> $spec_file
-    echo "%description" >> $spec_file
-    echo "$PACKAGE_DESCRIPTION_SUMMARY" >> $spec_file
-    echo "%prep" >> $spec_file
-    echo "%setup -q" >> $spec_file
-    echo "%build" >> $spec_file
-    echo "%install" >> $spec_file
-    echo "mkdir -p %{buildroot}$PACKAGE_INSTALL_PREFIX" >> $spec_file
-    echo "cp -a * %{buildroot}$PACKAGE_INSTALL_PREFIX" >> $spec_file
-    echo "%files" >> $spec_file
-    echo "$PACKAGE_INSTALL_PREFIX" >> $spec_file
+    # Create the spec file
+    cat <<EOF >$spec_file
+Name:           $PACKAGE_NAME
+Version:        $PACKAGE_VERSION
+Release:        1%{?dist}
+Summary:        $PACKAGE_DESCRIPTION_SUMMARY
 
-    # Build RPM package
-    tar -czf $RPM_SOURCE_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz -C $package_dir .
-    rpmbuild -ba $spec_file --define "_topdir $RPM_DIR"
-    mv $RPM_RPMS_DIR/x86_64/${PACKAGE_NAME}-${PACKAGE_VERSION}-1.x86_64.rpm $RPM_DIR/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.rpm
+License:        MIT
+URL:            https://github.com/ROCm/ROCm-examples
+Source0:        %{name}-%{version}.tar.gz
+BuildArch:      x86_64
+
+%description
+$PACKAGE_DESCRIPTION_SUMMARY
+
+%prep
+%setup -q
+
+%build
+
+%install
+mkdir -p %{buildroot}$PACKAGE_INSTALL_PREFIX
+cp -r * %{buildroot}$PACKAGE_INSTALL_PREFIX
+
+%files
+$PACKAGE_INSTALL_PREFIX
+
+%changelog
+EOF
+
+    # Create source tarball
+    tar czf $RPM_SOURCE_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz -C $BUILD_DIR ${PACKAGE_NAME}-${PACKAGE_VERSION}
+
+    # Build the RPM package
+    rpmbuild --define "_topdir $RPM_DIR" -ba $spec_file
+
+    # Move the generated RPM file to RPM_DIR and clean up
+    find $RPM_RPMS_DIR -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} $RPM_DIR \;
+    rm -rf $RPM_BUILD_DIR $RPM_SOURCE_DIR $RPM_SPEC_DIR $RPM_RPMS_DIR $RPM_SRPM_DIR
 }
 
 # Copy sources to build directory
-copy_sources $BUILD_DIR/$PACKAGE_NAME
+copy_sources $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
 
 # Create DEB package
-create_deb_package $BUILD_DIR/$PACKAGE_NAME
+create_deb_package $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
 
 # Create RPM package
-create_rpm_package $BUILD_DIR/$PACKAGE_NAME
+create_rpm_package $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
