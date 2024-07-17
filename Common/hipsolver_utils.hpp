@@ -46,11 +46,12 @@ inline const char* hipsolverStatusToString(hipsolverStatus_t status)
         case HIPSOLVER_STATUS_HANDLE_IS_NULLPTR: return "HIPSOLVER_STATUS_HANDLE_IS_NULLPTR";
         case HIPSOLVER_STATUS_INVALID_ENUM: return "HIPSOLVER_STATUS_INVALID_ENUM";
         case HIPSOLVER_STATUS_UNKNOWN: return "HIPSOLVER_STATUS_UNKNOWN";
-#if (hipsolverVersionMajor == 1 && hipsolverVersionMinor >= 8) || hipsolverVersionMajor >= 2
+#if(hipsolverVersionMajor == 1 && hipsolverVersionMinor >= 8) || hipsolverVersionMajor >= 2
         case HIPSOLVER_STATUS_ZERO_PIVOT: return "HIPSOLVER_STATUS_ZERO_PIVOT";
 #endif
-#if (hipsolverVersionMajor >= 2 && hipsolverVersionMinor >= 1)
-        case HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED : return "HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED";
+#if(hipsolverVersionMajor >= 2 && hipsolverVersionMinor >= 1)
+        case HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED:
+            return "HIPSOLVER_STATUS_MATRIX_TYPE_NOT_SUPPORTED";
 #endif
         // We do use default because we are not in control of these enumeration values.
         // Ideally this function is something hipsolver would provide

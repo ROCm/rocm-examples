@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -159,8 +159,7 @@ int main(const int /*argc*/, char* /*argv*/[])
         int    executed_sweeps{};
 
         HIPSOLVER_CHECK(hipsolverXsyevjGetResidual(hipsolver_handle, syevj_params, &residual));
-        HIPSOLVER_CHECK(
-            hipsolverXsyevjGetSweeps(hipsolver_handle, syevj_params, &executed_sweeps));
+        HIPSOLVER_CHECK(hipsolverXsyevjGetSweeps(hipsolver_handle, syevj_params, &executed_sweeps));
 
         std::cout << "Residual = " << residual << std::endl;
         std::cout << "Number of executed sweeps = " << executed_sweeps << std::endl;

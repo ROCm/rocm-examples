@@ -1,7 +1,18 @@
 #!/usr/bin/env bash
 
-SOURCE_COMMIT="$1"
-if [ "$#" -gt 0 ]; then
+# Parse arguments
+ALL_FILES=false
+SOURCE_COMMIT=""
+# Either a base SHA is used or all files are checked
+if [[ $# -gt 0 ]]; then
+    case "$1" in
+        "--all-files")
+            ALL_FILES=true
+            ;;
+        *)
+            SOURCE_COMMIT="$1"
+            ;;
+    esac
     shift
 fi
 
@@ -39,7 +50,14 @@ finish () {
 trap finish EXIT
 
 GIT_CLANG_FORMAT="${GIT_CLANG_FORMAT:-git-clang-format}"
-"$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff "$@" "$SOURCE_COMMIT" > "$scratch"
+
+if [ "$ALL_FILES" = true ]; then
+    # Format all files
+    "$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff > "$scratch"
+else
+    # Format modified files
+    "$GIT_CLANG_FORMAT" --style=file --extensions=cc,cp,cpp,c++,cxx,cu,cuh,hh,hpp,hxx,hip,vert,frag --diff "$@" "$SOURCE_COMMIT" > "$scratch"
+fi
 
 # Check for no-ops
 grep '^no modified files to format$\|^clang-format did not modify any files$' \
@@ -48,7 +66,7 @@ grep '^no modified files to format$\|^clang-format did not modify any files$' \
 # Dump formatting diff and signal failure
 printf \
 "\033[31m==== FORMATTING VIOLATIONS DETECTED ====\033[0m
-run '\033[33m%s --style=file %s %s\033[0m' to apply these formating changes\n\n" \
+run '\033[33m%s --style=file %s %s\033[0m' to apply these formatting changes\n\n" \
 "$GIT_CLANG_FORMAT" "$*" "$SOURCE_COMMIT"
 
 cat "$scratch"

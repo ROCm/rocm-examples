@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -62,6 +62,7 @@
 #ifndef USE_SIGNAL_SEMAPHORE
     #if defined(__HIP_PLATFORM_AMD__) && defined(_WIN64)
         #define USE_SIGNAL_SEMAPHORE 0
+
     #else
         #define USE_SIGNAL_SEMAPHORE 1
     #endif

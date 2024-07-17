@@ -53,17 +53,18 @@ int main()
     //                                                  ( 0.0 )
 
     // Dense matrix A in column-major
-    constexpr rocsparse_int                      A_rows = 3;
-    constexpr rocsparse_int                      A_cols = 5;
-    constexpr std::array<double, A_rows* A_cols> A
+    constexpr rocsparse_int                       A_rows = 3;
+    constexpr rocsparse_int                       A_cols = 5;
+    constexpr std::array<double, A_rows * A_cols> A
         = {9, 14, 19, 10, 15, 20, 11, 16, 21, 12, 17, 22, 13, 18, 23};
 
     constexpr rocsparse_int lda = A_rows;
 
     // Sparse vector x
-    constexpr rocsparse_int                         x_non_zero = 3;
-    constexpr std::array<double, x_non_zero>        x_values   = {1, 2, 3};
-    constexpr std::array<rocsparse_int, x_non_zero> x_indices  = {0, 1, 3};
+    constexpr rocsparse_int                  x_non_zero = 3;
+    constexpr std::array<double, x_non_zero> x_values   = {1, 2, 3};
+
+    constexpr std::array<rocsparse_int, x_non_zero> x_indices = {0, 1, 3};
 
     // Dense vector y
     constexpr std::array<double, A_rows> y = {4, 5, 6};
