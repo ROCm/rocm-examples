@@ -95,11 +95,11 @@ create_rpm_package() {
 
     # Create the spec file
     cat <<EOF >$spec_file
+%undefine _missing_build_ids_terminate_build
 Name:           $PACKAGE_NAME
 Version:        $PACKAGE_VERSION
 Release:        1%{?dist}
 Summary:        $PACKAGE_DESCRIPTION_SUMMARY
-
 License:        MIT
 URL:            https://github.com/ROCm/ROCm-examples
 Source0:        %{name}-%{version}.tar.gz
