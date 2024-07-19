@@ -93,7 +93,8 @@ create_rpm_package() {
 
     # Create the spec file
     cat <<EOF >$spec_file
-%undefine _missing_build_ids_terminate_build
+%define _build_id_links none
+%global debug_package %{nil}
 Name:           $PACKAGE_NAME
 Version:        $PACKAGE_VERSION
 Release:        1%{?dist}
