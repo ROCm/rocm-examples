@@ -1,7 +1,7 @@
 #!/bin/bash
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,12 @@
 set -e
 
 PACKAGE_NAME="ROCm-SDK-Examples"
-PACKAGE_VERSION="6.2.0"
+PACKAGE_VERSION="${1:-6.2.0}"  # Default to 6.2.0 if not provided
 PACKAGE_VENDOR="Advanced Micro Devices, Inc."
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"
+PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
 
 GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
 BUILD_DIR="$GIT_TOP_LEVEL/build"
@@ -76,7 +77,7 @@ create_deb_package() {
     echo "Architecture: amd64" >> $control_file
     echo "Maintainer: $PACKAGE_CONTACT" >> $control_file
     echo "Description: $PACKAGE_DESCRIPTION_SUMMARY" >> $control_file
-    echo "Homepage: https://github.com/ROCm/ROCm-examples" >> $control_file
+    echo "Homepage: $PACKAGE_HOMEPAGE_URL" >> $control_file
     echo "Depends: " >> $control_file
     echo "Section: devel" >> $control_file
     echo "Priority: optional" >> $control_file
@@ -98,7 +99,7 @@ Version:        $PACKAGE_VERSION
 Release:        1%{?dist}
 Summary:        $PACKAGE_DESCRIPTION_SUMMARY
 License:        MIT
-URL:            https://github.com/ROCm/ROCm-examples
+URL:            $PACKAGE_HOMEPAGE_URL
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      x86_64
 
