@@ -30,7 +30,8 @@ PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"
 
-BUILD_DIR="$(pwd)/build"
+GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
+BUILD_DIR="$GIT_TOP_LEVEL/build"
 DEB_DIR="$BUILD_DIR/deb"
 RPM_DIR="$BUILD_DIR/rpm"
 RPM_BUILD_DIR="$RPM_DIR/BUILD"
@@ -50,10 +51,6 @@ SOURCE_DIRS=(
     "Libraries"
     "LLVM_ASAN"
 )
-
-# Clean up previous build artifacts
-rm -rf $BUILD_DIR
-mkdir -p $DEB_DIR $RPM_BUILD_DIR $RPM_SOURCE_DIR $RPM_SPEC_DIR $RPM_RPMS_DIR $RPM_SRPM_DIR
 
 copy_sources() {
     local dest_dir=$1
@@ -134,6 +131,12 @@ EOF
     rm -rf $RPM_BUILD_DIR $RPM_SOURCE_DIR $RPM_SPEC_DIR $RPM_RPMS_DIR $RPM_SRPM_DIR
 }
 
+# Clean up previous build artifacts
+rm -rf $BUILD_DIR
+mkdir -p $DEB_DIR $RPM_BUILD_DIR $RPM_SOURCE_DIR $RPM_SPEC_DIR $RPM_RPMS_DIR $RPM_SRPM_DIR
+
+pushd $GIT_TOP_LEVEL || exit
+
 # Copy sources to build directory
 copy_sources $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
 
@@ -142,3 +145,5 @@ create_deb_package $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
 
 # Create RPM package
 create_rpm_package $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
+
+popd || exit
