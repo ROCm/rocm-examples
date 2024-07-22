@@ -2,7 +2,7 @@
 
 ## Description
 
-_[This example currently works only on rocSOLVER backend.](https://github.com/ROCmSoftwarePlatform/hipSOLVER/issues/152)_
+_[This example currently works only on rocSOLVER backend.](https://github.com/ROCm/hipSOLVER/issues/152)_
 
 This example illustrates how to calculate the [generalized eigenvalues and eigenvectors](https://en.wikipedia.org/wiki/Eigenvalues_and_eigenvectors) of a pair of [symmetric](https://en.wikipedia.org/wiki/Symmetric_matrix) 3x3 matrices using hipSOLVER.
 

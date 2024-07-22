@@ -64,7 +64,7 @@ add_subdirectory(syevj_batched)
 add_subdirectory(sygvd)
 
 # this example currently does not work with CUDA
-# https://github.com/ROCmSoftwarePlatform/hipSOLVER/issues/152
+# https://github.com/ROCm/hipSOLVER/issues/152
 if(NOT ("${GPU_RUNTIME}" STREQUAL "CUDA"))
     add_subdirectory(sygvj)
 endif()
