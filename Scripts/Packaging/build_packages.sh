@@ -23,16 +23,19 @@
 
 set -e
 
-PACKAGE_NAME="ROCm-SDK-Examples"
-PACKAGE_VERSION="${1:-6.2.0}"  # Default to 6.2.0 if not provided
+GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
+
+PACKAGE_NAME="${1:-ROCm-SDK-Examples}"
+PACKAGE_VERSION="${2:-6.2.0}"
+PACKAGE_INSTALL_PREFIX="${3:-/opt/rocm/examples}"
+BUILD_DIR="${4:-$GIT_TOP_LEVEL/build}"
+
 PACKAGE_VENDOR="Advanced Micro Devices, Inc."
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
-PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
 
 GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
-BUILD_DIR="$GIT_TOP_LEVEL/build"
 DEB_DIR="$BUILD_DIR/deb"
 RPM_DIR="$BUILD_DIR/rpm"
 RPM_BUILD_DIR="$RPM_DIR/BUILD"
