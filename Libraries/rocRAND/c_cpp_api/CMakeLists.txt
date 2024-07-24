@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,33 +21,6 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocRAND_examples LANGUAGES CXX)
-include(CTest)
+project(rocRAND_c_cpp_api_examples LANGUAGES CXX)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
-
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
-
-find_package(rocrand)
-if(NOT rocrand_FOUND)
-    message(STATUS "rocRAND could not be found, not building rocRAND examples")
-    return(1)
-endif()
-
-add_subdirectory(c_cpp_api)
-add_subdirectory(device_api)
+add_subdirectory(simple_distributions_cpp)

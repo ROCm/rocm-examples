@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [rocRAND](https://github.com/ROCm/rocRAND) library. The examples build on both Linux and Windows for both the ROCm (AMD GPU) and CUDA (NVIDIA GPU) backend.
+The examples in this subdirectory showcase the functionality of the [rocRAND](https://github.com/ROCm/rocRAND) library, with each example being inside the folder corresponding to the rocRAND API showcased. The examples build on both Linux and Windows for both the ROCm (AMD GPU) and CUDA (NVIDIA GPU) backend.
 
 ## Prerequisites
 

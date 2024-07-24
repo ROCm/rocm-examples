@@ -2,28 +2,28 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{cf36463d-7636-410f-bb2b-bf28b7bb143c}</UniqueIdentifier>
+      <UniqueIdentifier>{9d1c8a96-8588-4356-be05-1afcdc50438e}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx;hip;cu</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{25ecbc31-b2d0-451e-a463-7643fcd03302}</UniqueIdentifier>
+      <UniqueIdentifier>{4b733c45-8e6e-4dda-88e2-8c220890c1ff}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cuh</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{54e24602-3dc1-4987-bc0a-f0ac8c2248e0}</UniqueIdentifier>
+      <UniqueIdentifier>{226434b4-7797-4074-b87b-5783de5a0718}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
+    <ClCompile Include="main.hip">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Common\cmdparser.hpp">
+    <ClInclude Include="..\..\..\..\Common\example_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\Common\example_utils.hpp">
+    <ClInclude Include="..\..\..\..\Common\rocrand_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

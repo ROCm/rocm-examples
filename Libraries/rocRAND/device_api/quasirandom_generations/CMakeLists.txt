@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,28 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name rocrand_quasirandom_generations)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocRAND_examples LANGUAGES CXX)
-include(CTest)
+project(${example_name} LANGUAGES CXX)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
+set(GPU_RUNTIMES "HIP" "CUDA")
+set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
+    message(
+        FATAL_ERROR
+        "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}"
+    )
+endif()
+
+enable_language(${GPU_RUNTIME})
+set(CMAKE_${LANG}_STANDARD 17)
+set(CMAKE_${LANG}_EXTENSIONS OFF)
+set(CMAKE_${LANG}_STANDARD_REQUIRED ON)
+
+if(WIN32)
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -40,14 +54,26 @@ else()
         "Root directory of the ROCm installation"
     )
 endif()
-
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocrand)
-if(NOT rocrand_FOUND)
-    message(STATUS "rocRAND could not be found, not building rocRAND examples")
-    return(1)
+find_package(rocrand REQUIRED)
+
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE roc::rocrand)
+
+target_include_directories(${example_name} PRIVATE "../../../../Common")
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+
+# Workaround for rocRAND since it relies on definition "WIN32"
+if(WIN32)
+    target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 
-add_subdirectory(c_cpp_api)
-add_subdirectory(device_api)
+install(TARGETS ${example_name})
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+    install(IMPORTED_RUNTIME_ARTIFACTS roc::rocrand)
+endif()
