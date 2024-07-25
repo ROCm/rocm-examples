@@ -25,19 +25,19 @@ set -e
 
 GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
 
+# Inputs and Defaults
 PACKAGE_NAME="${1:-ROCm-SDK-Examples}"
 PACKAGE_VERSION="${2:-6.2.0}"
 PACKAGE_INSTALL_PREFIX="${3:-/opt/rocm/examples}"
 BUILD_DIR="${4:-$GIT_TOP_LEVEL/build}"
+DEB_DIR="${5:-$BUILD_DIR/deb}"
+RPM_DIR="${6:-$BUILD_DIR/rpm}"
 
 PACKAGE_VENDOR="Advanced Micro Devices, Inc."
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
 
-GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
-DEB_DIR="$BUILD_DIR/deb"
-RPM_DIR="$BUILD_DIR/rpm"
 RPM_BUILD_DIR="$RPM_DIR/BUILD"
 RPM_SOURCE_DIR="$RPM_DIR/SOURCES"
 RPM_SPEC_DIR="$RPM_DIR/SPECS"
@@ -135,6 +135,7 @@ EOF
     find $RPM_RPMS_DIR -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} $RPM_DIR \;
     rm -rf $RPM_BUILD_DIR $RPM_SOURCE_DIR $RPM_SPEC_DIR $RPM_RPMS_DIR $RPM_SRPM_DIR
 }
+
 
 # Clean up previous build artifacts
 rm -rf $BUILD_DIR
