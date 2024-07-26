@@ -53,6 +53,21 @@ SOURCE_DIRS=(
     "LLVM_ASAN"
 )
 
+
+print_input_variables() {
+    echo "********** Input Variables **********"
+    echo "PACKAGE_NAME=$PACKAGE_NAME"
+    echo "PACKAGE_VERSION=$PACKAGE_VERSION"
+    echo "PACKAGE_INSTALL_PREFIX=$PACKAGE_INSTALL_PREFIX"
+    echo "BUILD_DIR=$BUILD_DIR"
+    echo "DEB_DIR=$DEB_DIR"
+    echo "RPM_DIR=$RPM_DIR"
+    echo "DEB_PACKAGE_RELEASE=$DEB_PACKAGE_RELEASE"
+    echo "RPM_PACKAGE_RELEASE=$RPM_PACKAGE_RELEASE"
+    echo "************************************"
+}
+
+
 copy_sources() {
     mkdir -p "$STAGING_DIR"
 
@@ -156,6 +171,9 @@ rm -rf $BUILD_DIR
 mkdir -p $STAGING_DIR $DEB_DIR $RPM_DIR
 
 pushd $GIT_TOP_LEVEL || exit
+
+# Print input variables
+print_input_variables
 
 # Copy sources to build directory
 copy_sources
