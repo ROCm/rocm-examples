@@ -172,7 +172,7 @@ EOF
     rpmbuild --define "_topdir $rpm_root" -ba "$spec_file"
 
     # Move the generated RPM file to RPM_DIR
-    find "$rpm_rpms_dir" -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} "$RPM_DIR" \;
+    find "$rpm_rpms_dir" -name "$PACKAGE_NAME-$PACKAGE_VERSION-*.rpm" -exec mv {} "$RPM_DIR" \;
 
     # Clean up
     # rm -rf $rpm_build_dir $rpm_source_dir $rpm_spec_dir $rpm_rpms_dir $rpm_srpm_dir
