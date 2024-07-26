@@ -106,8 +106,8 @@ EOF
     # Build DEB package
     fakeroot dpkg-deb --build "$deb_root" "$DEB_DIR"/"$PACKAGE_NAME"_"$PACKAGE_VERSION"-"$DEB_PACKAGE_RELEASE"_amd64.deb
 
-    # Cleanup temporary deb package directory
-    rm -rf $deb_root
+    # Clean up
+    # rm -rf $deb_root
 }
 
 create_rpm_package() {
@@ -159,9 +159,11 @@ EOF
     # Build the RPM package
     rpmbuild --define "_topdir $rpm_root" -ba $spec_file
 
-    # Move the generated RPM file to RPM_DIR and clean up
+    # Move the generated RPM file to RPM_DIR
     find $rpm_rpms_dir -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} $RPM_DIR \;
-    rm -rf $rpm_build_dir $rpm_source_dir $rpm_spec_dir $rpm_rpms_dir $rpm_srpm_dir
+
+    # Clean up
+    # rm -rf $rpm_build_dir $rpm_source_dir $rpm_spec_dir $rpm_rpms_dir $rpm_srpm_dir
 }
 
 ## Main Program ##
