@@ -35,7 +35,7 @@ RPM_DIR="${6:-$BUILD_DIR/rpm}"
 DEB_PACKAGE_RELEASE="${7:-local.9999}"
 RPM_PACKAGE_RELEASE="${8:-local.9999}"
 
-STAGING_DIR="${BUILD_DIR}"/"${PACKAGE_NAME}"-"${PACKAGE_VERSION}"
+STAGING_DIR="$BUILD_DIR"/"$PACKAGE_NAME"-"$PACKAGE_VERSION"
 
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
@@ -78,7 +78,9 @@ copy_sources() {
 
     # Copy source directories to package
     for dir in "${SOURCE_DIRS[@]}"; do
-        rsync -a --exclude 'build' --exclude '.gitignore' --exclude '*.vcxproj**' --exclude '*.sln' --exclude 'bin' --exclude '*.o' --exclude '*.exe' $dir "$STAGING_DIR"
+        rsync -a --exclude 'build' --exclude '.gitignore' \
+            --exclude '*.vcxproj**' --exclude '*.sln' --exclude 'bin' \
+            --exclude '*.o' --exclude '*.exe' "$dir" "$STAGING_DIR"
     done
 }
 
@@ -93,7 +95,7 @@ create_deb_package() {
     echo "** Creating DEB package in $DEB_DIR **"
 
     # Copy the sources to the install directory
-    cp -r "$STAGING_DIR"/* $deb_install_dir/
+    cp -r "$STAGING_DIR"/* "$deb_install_dir"/
 
     # Create control file
     cat <<EOF >"$deb_control_file"
@@ -109,7 +111,8 @@ Priority: optional
 EOF
 
     # Build DEB package
-    fakeroot dpkg-deb --build "$deb_root" "$DEB_DIR"/"$PACKAGE_NAME"_"$PACKAGE_VERSION"-"$DEB_PACKAGE_RELEASE"_amd64.deb
+    fakeroot dpkg-deb --build "$deb_root" \
+        "$DEB_DIR"/"$PACKAGE_NAME"_"$PACKAGE_VERSION"-"$DEB_PACKAGE_RELEASE"_amd64.deb
 
     # Clean up
     # rm -rf $deb_root
@@ -131,7 +134,7 @@ create_rpm_package() {
     echo "** Creating RPM package in $RPM_DIR **"
 
     # Create the spec file
-    cat <<EOF >$spec_file
+    cat <<EOF > "$spec_file"
 %define _build_id_links none
 %global debug_package %{nil}
 Name:           $PACKAGE_NAME
@@ -162,13 +165,14 @@ $PACKAGE_INSTALL_PREFIX
 EOF
 
     # Create source tarball
-    tar czf $rpm_source_dir/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz -C $BUILD_DIR ${PACKAGE_NAME}-${PACKAGE_VERSION}
+    tar czf "$rpm_source_dir/$PACKAGE_NAME-$PACKAGE_VERSION.tar.gz" \
+        -C "$BUILD_DIR" "$PACKAGE_NAME"-"$PACKAGE_VERSION"
 
     # Build the RPM package
-    rpmbuild --define "_topdir $rpm_root" -ba $spec_file
+    rpmbuild --define "_topdir $rpm_root" -ba "$spec_file"
 
     # Move the generated RPM file to RPM_DIR
-    find $rpm_rpms_dir -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} $RPM_DIR \;
+    find "$rpm_rpms_dir" -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} "$RPM_DIR" \;
 
     # Clean up
     # rm -rf $rpm_build_dir $rpm_source_dir $rpm_spec_dir $rpm_rpms_dir $rpm_srpm_dir
@@ -177,10 +181,10 @@ EOF
 ## Main Program ##
 
 # Clean up previous build artifacts
-rm -rf $BUILD_DIR
-mkdir -p $STAGING_DIR $DEB_DIR $RPM_DIR
+rm -rf "$BUILD_DIR"
+mkdir -p "$STAGING_DIR" "$DEB_DIR" "$RPM_DIR"
 
-pushd $GIT_TOP_LEVEL || exit
+pushd "$GIT_TOP_LEVEL" || exit
 
 # Print input variables
 print_input_variables
