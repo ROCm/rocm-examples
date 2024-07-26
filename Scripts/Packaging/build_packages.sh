@@ -65,23 +65,26 @@ copy_sources() {
 create_deb_package() {
     local package_dir=$1
     local deb_root="$BUILD_DIR/deb_tmp"
-    local install_dir="$deb_root/$PACKAGE_INSTALL_PREFIX"
-    mkdir -p "$deb_root/DEBIAN" "$install_dir"
+    local deb_install_dir="$deb_root/$PACKAGE_INSTALL_PREFIX"
+    local deb_control_file="$deb_root/DEBIAN/control"
+
+    mkdir -p "$deb_root/DEBIAN" "$deb_install_dir"
 
     # Copy the sources to the install directory
-    cp -r $package_dir/* $install_dir/
+    cp -r $package_dir/* $deb_install_dir/
 
     # Create control file
-    local control_file="$deb_root/DEBIAN/control"
-    echo "Package: $PACKAGE_NAME" > $control_file
-    echo "Version: $PACKAGE_VERSION" >> $control_file
-    echo "Architecture: amd64" >> $control_file
-    echo "Maintainer: $PACKAGE_CONTACT" >> $control_file
-    echo "Description: $PACKAGE_DESCRIPTION_SUMMARY" >> $control_file
-    echo "Homepage: $PACKAGE_HOMEPAGE_URL" >> $control_file
-    echo "Depends: " >> $control_file
-    echo "Section: devel" >> $control_file
-    echo "Priority: optional" >> $control_file
+    cat <<EOF >"$deb_control_file"
+Package: $PACKAGE_NAME
+Version: $PACKAGE_VERSION
+Architecture: amd64
+Maintainer: $PACKAGE_CONTACT
+Description: $PACKAGE_DESCRIPTION_SUMMARY
+Homepage: $PACKAGE_HOMEPAGE_URL
+Depends:
+Section: devel
+Priority: optional
+EOF
 
     # Build DEB package
     fakeroot dpkg-deb --build $deb_root $DEB_DIR/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb
