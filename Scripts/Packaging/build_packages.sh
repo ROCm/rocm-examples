@@ -71,10 +71,15 @@ copy_sources() {
 
 create_deb_package() {
     local package_dir=$1
-    local control_file="$package_dir/DEBIAN/control"
-    mkdir -p "$(dirname $control_file)"
+    local deb_root="$BUILD_DIR/deb_tmp"
+    local install_dir="$deb_root/$PACKAGE_INSTALL_PREFIX"
+    mkdir -p "$deb_root/DEBIAN" "$install_dir"
+
+    # Copy the sources to the install directory
+    cp -r $package_dir/* $install_dir/
 
     # Create control file
+    local control_file="$deb_root/DEBIAN/control"
     echo "Package: $PACKAGE_NAME" > $control_file
     echo "Version: $PACKAGE_VERSION" >> $control_file
     echo "Architecture: amd64" >> $control_file
@@ -86,7 +91,10 @@ create_deb_package() {
     echo "Priority: optional" >> $control_file
 
     # Build DEB package
-    fakeroot dpkg-deb --build $package_dir $DEB_DIR/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb
+    fakeroot dpkg-deb --build $deb_root $DEB_DIR/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb
+
+    # Cleanup temporary deb package directory
+    rm -rf $deb_root
 }
 
 create_rpm_package() {
