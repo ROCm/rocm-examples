@@ -37,12 +37,6 @@ PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
 
-RPM_BUILD_DIR="$RPM_DIR/BUILD"
-RPM_SOURCE_DIR="$RPM_DIR/SOURCES"
-RPM_SPEC_DIR="$RPM_DIR/SPECS"
-RPM_RPMS_DIR="$RPM_DIR/RPMS"
-RPM_SRPM_DIR="$RPM_DIR/SRPMS"
-
 # Directories to be included in the package
 SOURCE_DIRS=(
     "AI"
@@ -98,8 +92,17 @@ create_deb_package() {
 
 create_rpm_package() {
     local package_dir=$1
-    local spec_file="$RPM_SPEC_DIR/${PACKAGE_NAME}.spec"
-    mkdir -p "$RPM_SOURCE_DIR" "$RPM_BUILD_DIR"
+
+    local rpm_root="$BUILD_DIR"/rpm_tmp
+    local rpm_build_dir="$rpm_root/BUILD"
+    local rpm_rpms_dir="$rpm_root/RPMS"
+    local rpm_source_dir="$rpm_root/SOURCES"
+    local rpm_spec_dir="$rpm_root/SPECS"
+    local rpm_srpm_dir="$rpm_root/SRPMS"
+
+    local spec_file="$rpm_spec_dir/$PACKAGE_NAME.spec"
+
+    mkdir -p "$rpm_build_dir" "$rpm_rpms_dir" "$rpm_source_dir" "$rpm_spec_dir" "$rpm_srpm_dir"
 
     # Create the spec file
     cat <<EOF >$spec_file
@@ -133,20 +136,20 @@ $PACKAGE_INSTALL_PREFIX
 EOF
 
     # Create source tarball
-    tar czf $RPM_SOURCE_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz -C $BUILD_DIR ${PACKAGE_NAME}-${PACKAGE_VERSION}
+    tar czf $rpm_source_dir/${PACKAGE_NAME}-${PACKAGE_VERSION}.tar.gz -C $BUILD_DIR ${PACKAGE_NAME}-${PACKAGE_VERSION}
 
     # Build the RPM package
-    rpmbuild --define "_topdir $RPM_DIR" -ba $spec_file
+    rpmbuild --define "_topdir $rpm_root" -ba $spec_file
 
     # Move the generated RPM file to RPM_DIR and clean up
-    find $RPM_RPMS_DIR -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} $RPM_DIR \;
-    rm -rf $RPM_BUILD_DIR $RPM_SOURCE_DIR $RPM_SPEC_DIR $RPM_RPMS_DIR $RPM_SRPM_DIR
+    find $rpm_rpms_dir -name "${PACKAGE_NAME}-${PACKAGE_VERSION}-*.rpm" -exec mv {} $RPM_DIR \;
+    rm -rf $rpm_build_dir $rpm_source_dir $rpm_spec_dir $rpm_rpms_dir $rpm_srpm_dir
 }
 
 
 # Clean up previous build artifacts
 rm -rf $BUILD_DIR
-mkdir -p $DEB_DIR $RPM_BUILD_DIR $RPM_SOURCE_DIR $RPM_SPEC_DIR $RPM_RPMS_DIR $RPM_SRPM_DIR
+mkdir -p $DEB_DIR $RPM_DIR
 
 pushd $GIT_TOP_LEVEL || exit
 
