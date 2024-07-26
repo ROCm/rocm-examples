@@ -33,7 +33,6 @@ BUILD_DIR="${4:-$GIT_TOP_LEVEL/build}"
 DEB_DIR="${5:-$BUILD_DIR/deb}"
 RPM_DIR="${6:-$BUILD_DIR/rpm}"
 
-PACKAGE_VENDOR="Advanced Micro Devices, Inc."
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
