@@ -32,6 +32,8 @@ PACKAGE_INSTALL_PREFIX="${3:-/opt/rocm/examples}"
 BUILD_DIR="${4:-$GIT_TOP_LEVEL/build}"
 DEB_DIR="${5:-$BUILD_DIR/deb}"
 RPM_DIR="${6:-$BUILD_DIR/rpm}"
+DEB_PACKAGE_RELEASE="${7:-local.9999}"
+RPM_PACKAGE_RELEASE="${8:-local.9999}"
 
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
@@ -87,7 +89,7 @@ Priority: optional
 EOF
 
     # Build DEB package
-    fakeroot dpkg-deb --build $deb_root $DEB_DIR/${PACKAGE_NAME}_${PACKAGE_VERSION}_amd64.deb
+    fakeroot dpkg-deb --build "$deb_root" "$DEB_DIR"/"$PACKAGE_NAME"_"$PACKAGE_VERSION"-"$DEB_PACKAGE_RELEASE"_amd64.deb
 
     # Cleanup temporary deb package directory
     rm -rf $deb_root
@@ -113,12 +115,12 @@ create_rpm_package() {
 %global debug_package %{nil}
 Name:           $PACKAGE_NAME
 Version:        $PACKAGE_VERSION
-Release:        1%{?dist}
+Release:        $RPM_PACKAGE_RELEASE%{?dist}
 Summary:        $PACKAGE_DESCRIPTION_SUMMARY
 License:        MIT
 URL:            $PACKAGE_HOMEPAGE_URL
 Source0:        %{name}-%{version}.tar.gz
-BuildArch:      x86_64
+BuildArch:      %{_arch}
 
 %description
 $PACKAGE_DESCRIPTION_SUMMARY
@@ -149,6 +151,7 @@ EOF
     rm -rf $rpm_build_dir $rpm_source_dir $rpm_spec_dir $rpm_rpms_dir $rpm_srpm_dir
 }
 
+## Main Program ##
 
 # Clean up previous build artifacts
 rm -rf $BUILD_DIR
