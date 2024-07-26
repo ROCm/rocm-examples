@@ -71,6 +71,8 @@ print_input_variables() {
 copy_sources() {
     mkdir -p "$STAGING_DIR"
 
+    echo "** Copying sources to $STAGING_DIR **"
+
     # Copy source files in root to package
     cp LICENSE.md CMakeLists.txt README.md "$STAGING_DIR"
 
@@ -85,7 +87,10 @@ create_deb_package() {
     local deb_install_dir="$deb_root/$PACKAGE_INSTALL_PREFIX"
     local deb_control_file="$deb_root/DEBIAN/control"
 
+    # Create directories for DEB package artifacts
     mkdir -p "$deb_root/DEBIAN" "$deb_install_dir"
+
+    echo "** Creating DEB package in $DEB_DIR **"
 
     # Copy the sources to the install directory
     cp -r "$STAGING_DIR"/* $deb_install_dir/
@@ -120,7 +125,10 @@ create_rpm_package() {
 
     local spec_file="$rpm_spec_dir/$PACKAGE_NAME.spec"
 
+    # Create directories for all the RPM build artifacts
     mkdir -p "$rpm_build_dir" "$rpm_rpms_dir" "$rpm_source_dir" "$rpm_spec_dir" "$rpm_srpm_dir"
+
+    echo "** Creating RPM package in $RPM_DIR **"
 
     # Create the spec file
     cat <<EOF >$spec_file
