@@ -35,6 +35,8 @@ RPM_DIR="${6:-$BUILD_DIR/rpm}"
 DEB_PACKAGE_RELEASE="${7:-local.9999}"
 RPM_PACKAGE_RELEASE="${8:-local.9999}"
 
+STAGING_DIR="${BUILD_DIR}"/"${PACKAGE_NAME}"-"${PACKAGE_VERSION}"
+
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
@@ -52,20 +54,18 @@ SOURCE_DIRS=(
 )
 
 copy_sources() {
-    local dest_dir=$1
-    mkdir -p $dest_dir
+    mkdir -p "$STAGING_DIR"
 
     # Copy source files in root to package
-    cp LICENSE.md CMakeLists.txt README.md $dest_dir
+    cp LICENSE.md CMakeLists.txt README.md "$STAGING_DIR"
 
     # Copy source directories to package
     for dir in "${SOURCE_DIRS[@]}"; do
-        rsync -a --exclude 'build' --exclude '.gitignore' --exclude '*.vcxproj**' --exclude '*.sln' --exclude 'bin' --exclude '*.o' --exclude '*.exe' $dir $dest_dir
+        rsync -a --exclude 'build' --exclude '.gitignore' --exclude '*.vcxproj**' --exclude '*.sln' --exclude 'bin' --exclude '*.o' --exclude '*.exe' $dir "$STAGING_DIR"
     done
 }
 
 create_deb_package() {
-    local package_dir=$1
     local deb_root="$BUILD_DIR/deb_tmp"
     local deb_install_dir="$deb_root/$PACKAGE_INSTALL_PREFIX"
     local deb_control_file="$deb_root/DEBIAN/control"
@@ -73,7 +73,7 @@ create_deb_package() {
     mkdir -p "$deb_root/DEBIAN" "$deb_install_dir"
 
     # Copy the sources to the install directory
-    cp -r $package_dir/* $deb_install_dir/
+    cp -r "$STAGING_DIR"/* $deb_install_dir/
 
     # Create control file
     cat <<EOF >"$deb_control_file"
@@ -96,8 +96,6 @@ EOF
 }
 
 create_rpm_package() {
-    local package_dir=$1
-
     local rpm_root="$BUILD_DIR"/rpm_tmp
     local rpm_build_dir="$rpm_root/BUILD"
     local rpm_rpms_dir="$rpm_root/RPMS"
@@ -155,17 +153,17 @@ EOF
 
 # Clean up previous build artifacts
 rm -rf $BUILD_DIR
-mkdir -p $DEB_DIR $RPM_DIR
+mkdir -p $STAGING_DIR $DEB_DIR $RPM_DIR
 
 pushd $GIT_TOP_LEVEL || exit
 
 # Copy sources to build directory
-copy_sources $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
+copy_sources
 
 # Create DEB package
-create_deb_package $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
+create_deb_package
 
 # Create RPM package
-create_rpm_package $BUILD_DIR/${PACKAGE_NAME}-${PACKAGE_VERSION}
+create_rpm_package
 
 popd || exit
