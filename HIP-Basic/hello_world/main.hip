@@ -20,6 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+# dummy line
+
 #include "example_utils.hpp"
 
 #include <hip/hip_runtime.h>
