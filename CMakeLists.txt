@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 # dummy line
+# dummy line
 
 cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
 project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.2.0)
