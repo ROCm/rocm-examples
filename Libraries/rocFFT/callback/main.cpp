@@ -39,7 +39,6 @@
 struct load_callback_data
 {
     double2* filter;
-    double   scale;
 };
 
 __device__ double2 load_callback(double2* input,
@@ -49,9 +48,8 @@ __device__ double2 load_callback(double2* input,
 {
     auto data = static_cast<load_callback_data*>(callback_data);
 
-    // multiply each element by filter element and scale
-    return hipCmul(hipCmul(input[offset], data->filter[offset]),
-                   make_hipDoubleComplex(data->scale, data->scale));
+    // multiply each element by filter element
+    return hipCmul(input[offset], data->filter[offset]);
 }
 
 // Can not give __device__ function to HIP_SYMBOL
@@ -92,6 +90,12 @@ int main()
     HIP_CHECK(
         hipMemcpy(callback_filter_dev, callback_filter.data(), Nbytes, hipMemcpyHostToDevice));
 
+    // Set up scaling
+    rocfft_plan_description description  = nullptr;
+    const double            scale_factor = 1.0 / static_cast<double>(N);
+    ROCFFT_CHECK(rocfft_plan_description_create(&description));
+    ROCFFT_CHECK(rocfft_plan_description_set_scale_factor(description, scale_factor));
+
     // Create plan
     rocfft_plan plan = nullptr;
     ROCFFT_CHECK(rocfft_plan_create(&plan,
@@ -101,7 +105,7 @@ int main()
                                     1,
                                     &N,
                                     1,
-                                    nullptr));
+                                    description));
 
     // Check if the plan requires a work buffer
     size_t work_buf_size = 0;
@@ -119,7 +123,6 @@ int main()
     // Prepare callback
     load_callback_data callback_data_host;
     callback_data_host.filter = callback_filter_dev;
-    callback_data_host.scale  = 1.0 / static_cast<double>(N);
 
     void* callback_data_dev;
     HIP_CHECK(hipMalloc(&callback_data_dev, sizeof(load_callback_data)));
@@ -146,6 +149,10 @@ int main()
     {
         HIP_CHECK(hipFree(work_buf));
     }
+
+    // Destroy description
+    ROCFFT_CHECK(rocfft_plan_description_destroy(description));
+    description = nullptr;
 
     // Destroy info
     ROCFFT_CHECK(rocfft_execution_info_destroy(info));
