@@ -20,6 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# dummy line
+
 cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
 project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.2.0)
 enable_testing()
