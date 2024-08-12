@@ -39,7 +39,7 @@ jobs:
                   apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
                   apt-get update -qq &&
                   apt-get install -y \
-                    rocm-dev rocm-llvm rocm-llvm-dev \
+                    rocm-dev rocm-llvm \
                     rocrand-dev hiprand-dev \
                     rocprim-dev hipcub-dev
                   rm -rf /var/lib/apt/lists/*
