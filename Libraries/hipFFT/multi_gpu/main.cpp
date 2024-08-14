@@ -88,8 +88,9 @@ int main(int argc, char* argv[])
     HIPFFT_CHECK(hipfftXtSetGPUs(plan, devices.size(), devices.data()));
 
     // 5. Make the 2D FFT plan.
-    size_t workSize[devices.size()];
-    HIPFFT_CHECK(hipfftMakePlan2d(plan, length[0], length[1], hipfftType::HIPFFT_Z2Z, workSize));
+    std::vector<size_t> work_size(devices.size());
+    HIPFFT_CHECK(
+        hipfftMakePlan2d(plan, length[0], length[1], hipfftType::HIPFFT_Z2Z, work_size.data()));
 
     // 6. Allocate memory on device.
     hipLibXtDesc* input_desc;
