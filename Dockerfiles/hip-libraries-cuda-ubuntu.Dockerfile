@@ -2,11 +2,11 @@
 # Above is required for substitutions in environment variables
 
 # CUDA based docker image
-FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
 
 # The ROCm versions that this image is based of.
 # Always write this down as major.minor.patch
-ENV ROCM_VERSION=6.1.0
+ENV ROCM_VERSION=6.2.0
 ENV ROCM_VERSION_APT=${ROCM_VERSION%.0}
 
 # Base packages that are required for the installation
@@ -53,10 +53,14 @@ RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
 ENV HIP_COMPILER=nvcc HIP_PLATFORM=nvidia HIP_RUNTIME=cuda
 
 # Install rocRAND
+# We need to apply this patch to make it work on Nvidia for ROCm 6.2: https://github.com/ROCm/rocRAND/commit/7ec5fda5243e599d83af841b5c38198a2f7f05fa
 RUN wget https://github.com/ROCm/rocRAND/archive/refs/tags/rocm-${ROCM_VERSION}.tar.gz -O rocrand.tar.gz \
     && mkdir rocrand \
     && tar -xf ./rocrand.tar.gz --strip-components 1 -C rocrand \
     && rm ./rocrand.tar.gz \
+    && wget https://github.com/ROCm/rocRAND/commit/7ec5fda5243e599d83af841b5c38198a2f7f05fa.patch -O rocrand.patch \
+    && patch -p1 -d rocrand < ./rocrand.patch \
+    && rm rocrand.patch \
     && cmake -S ./rocrand -B ./rocrand/build \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D BUILD_HIPRAND=OFF \
@@ -89,12 +93,11 @@ RUN wget https://github.com/ROCm/hipBLAS/archive/refs/tags/rocm-${ROCM_VERSION}.
     && rm -rf ./hipblas
 
 # Install hipSOLVER
-# hipSOLVER cmake for rocm-6.1.0 is broken added CXXFLAGS=-D__HIP_PLATFORM_NVIDIA__ as fix
 RUN wget https://github.com/ROCm/hipSOLVER/archive/refs/tags/rocm-${ROCM_VERSION}.tar.gz -O hipsolver.tar.gz \
     && mkdir hipsolver \
     && tar -xf ./hipsolver.tar.gz --strip-components 1 -C hipsolver \
     && rm ./hipsolver.tar.gz \
-    && CXXFLAGS=-D__HIP_PLATFORM_NVIDIA__ cmake -S ./hipsolver -B ./hipsolver/build \
+    && cmake -S ./hipsolver -B ./hipsolver/build \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
         -D USE_CUDA=ON \
@@ -102,13 +105,10 @@ RUN wget https://github.com/ROCm/hipSOLVER/archive/refs/tags/rocm-${ROCM_VERSION
     && rm -rf ./hipsolver
 
 # Install hipRAND
-# Manually replace usage of __HIP_PLATFORM_NVCC__ with __HIP_PLATFORM_NVIDIA__. See
-# https://github.com/ROCm/hipRAND/commit/4925f0da96fad5b9f532ddc79f1f52fc279d329f
 RUN wget https://github.com/ROCm/hipRAND/archive/refs/tags/rocm-${ROCM_VERSION}.tar.gz -O hiprand.tar.gz \
     && mkdir hiprand \
     && tar -xf ./hiprand.tar.gz --strip-components 1 -C hiprand \
     && rm ./hiprand.tar.gz \
-    && sed -i s/__HIP_PLATFORM_NVCC__/__HIP_PLATFORM_NVIDIA__/ ./hiprand/library/include/hiprand/hiprand.h \
     && cmake -S ./hiprand -B ./hiprand/build \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
