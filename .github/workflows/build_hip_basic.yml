@@ -48,7 +48,8 @@ jobs:
           - name: Configure and Build
             shell: bash
             run: |
-              cd HIP-Basic && mkdir build && cd build
+              cd HIP-Basic
               cmake -DGPU_ARCHITECTURES=all -S ..
               cmake --build . -j 4
               ctest --output-on-failure
+              

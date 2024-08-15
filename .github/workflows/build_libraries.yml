@@ -55,7 +55,7 @@ jobs:
           - name: Configure and Build
             shell: bash
             run: |
-              cd Libraries && mkdir build && cd build
+              cd Libraries
               cmake -DGPU_ARCHITECTURES=all -S ..
               cmake --build . -j 4
               ctest --output-on-failure
