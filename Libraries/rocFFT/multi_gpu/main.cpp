@@ -91,13 +91,16 @@ int main(int argc, char* argv[])
 
     // Define infield geometry
     // First entry of upper dimension is the batch size
+    const size_t              batch_size     = 1;
     const std::vector<size_t> inbrick0_lower = {0, 0, 0, 0};
-    const std::vector<size_t> inbrick0_upper = {1, length[0] / deviceCount, length[1], length[2]};
-    const std::vector<size_t> inbrick1_lower = {0, length[0] / deviceCount, 0, 0};
-    const std::vector<size_t> inbrick1_upper = {1, length[0], length[1], length[2]};
+    const std::vector<size_t> inbrick0_upper
+        = {length[0] / deviceCount, length[1], length[2], batch_size};
+    const std::vector<size_t> inbrick1_lower = {length[0] / deviceCount, 0, 0, 0};
+    const std::vector<size_t> inbrick1_upper = {length[0], length[1], length[2], batch_size};
 
     // Row-major stride for brick data layout in memory
-    std::vector<size_t> brick_stride = {fftSize, length[0] * length[1], length[0], 1};
+    const size_t        idist        = fftSize; // distance between batches
+    std::vector<size_t> brick_stride = {1, length[0] * length[1], length[0], idist};
 
     rocfft_field infield = nullptr;
     ROCFFT_CHECK(rocfft_field_create(&infield));
@@ -145,9 +148,9 @@ int main(int argc, char* argv[])
 
     std::vector<void*>        gpu_out(2);
     const std::vector<size_t> outbrick0_lower = {0, 0, 0, 0};
-    const std::vector<size_t> outbrick0_upper = {1, length[0] / deviceCount, length[1], length[2]};
-    const std::vector<size_t> outbrick1_lower = {0, length[0] / deviceCount, 0, 0};
-    const std::vector<size_t> outbrick1_upper = {1, length[0], length[1], length[2]};
+    const std::vector<size_t> outbrick0_upper = {length[0] / deviceCount, length[1], length[2], 1};
+    const std::vector<size_t> outbrick1_lower = {length[0] / deviceCount, 0, 0, 0};
+    const std::vector<size_t> outbrick1_upper = {length[0], length[1], length[2], 1};
 
     rocfft_brick outbrick0 = nullptr;
     ROCFFT_CHECK(rocfft_brick_create(&outbrick0,
