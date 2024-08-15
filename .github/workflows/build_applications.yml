@@ -53,3 +53,9 @@ jobs:
               cd Applications && mkdir build && cd build
               cmake -DGPU_ARCHITECTURES=all -S ..
               cmake --build . -j 4
+
+          - name: Run Tests
+            shell: bash
+            run: |
+              cd Applications/build
+              ctest --output-on-failure
