@@ -53,11 +53,10 @@ int main()
     // Initialize input data on host
     std::mt19937                           generator{};
     std::uniform_real_distribution<double> distribution{};
-    std::generate(h_data.begin(),
-                  h_data.end(),
-                  [&]() {
-                      return std::complex<double>{distribution(generator), distribution(generator)};
-                  });
+    std::generate(
+        h_data.begin(),
+        h_data.end(),
+        [&]() { return std::complex<double>{distribution(generator), distribution(generator)}; });
 
     // Print input data per batch
     std::cout << "input:\n" << std::setprecision(3);
