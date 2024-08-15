@@ -70,9 +70,7 @@ int main(int argc, char* argv[])
     std::uniform_real_distribution<double> distribution{};
     std::generate(input.begin(),
                   input.end(),
-                  [&]() {
-                      return data_t{distribution(generator), distribution(generator)};
-                  });
+                  [&]() { return data_t{distribution(generator), distribution(generator)}; });
 
     std::cout << "Input:\n" << std::setprecision(3);
     print_nd_data(input, length, 16);
