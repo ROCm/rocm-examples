@@ -29,9 +29,7 @@ jobs:
             run: |
                   apt-get update -qq &&
                   apt-get install -y build-essential g++ glslang-tools \
-                    python3 python3-pip libglfw3-dev libvulkan-dev locales wget
-                  python3 -m pip install --upgrade pip
-                  python3 -m pip install cmake
+                    python3 python3-pip libglfw3-dev libvulkan-dev locales wget cmake
 
           - name: Install ROCm Dev
             run: |
@@ -47,4 +45,4 @@ jobs:
             run: |
               cd HIP-Basic && mkdir build && cd build
               cmake -DGPU_ARCHITECTURES=all -S ..
-              cmake --build . -j 4
+              cmake --build . -j $(nproc)
