@@ -36,6 +36,7 @@ DEB_PACKAGE_RELEASE="${7:-local.9999}"
 RPM_PACKAGE_RELEASE="${8:-local.9999}"
 
 STAGING_DIR="$BUILD_DIR"/"$PACKAGE_NAME"-"$PACKAGE_VERSION"
+TEST_STAGING_DIR="$BUILD_DIR"/"${PACKAGE_NAME}-test-$PACKAGE_VERSION"
 
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
@@ -67,6 +68,14 @@ print_input_variables() {
     echo "************************************"
 }
 
+build_project() {
+    echo "** Building the project **"
+    mkdir -p "$BUILD_DIR"
+    pushd "$BUILD_DIR" || exit
+    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" ..
+    make -j$(nproc)
+    popd || exit
+}
 
 copy_sources() {
     mkdir -p "$STAGING_DIR"
@@ -82,6 +91,15 @@ copy_sources() {
             --exclude '*.vcxproj**' --exclude '*.sln' --exclude 'bin' \
             --exclude '*.o' --exclude '*.exe' "$dir" "$STAGING_DIR"
     done
+}
+
+copy_test_binaries() {
+    mkdir -p "$TEST_STAGING_DIR/bin"
+
+    echo "** Copying test binaries to $TEST_STAGING_DIR/bin **"
+
+    # Copy the built test binaries to the test staging directory
+    cp -r "$BUILD_DIR/bin/"* "$TEST_STAGING_DIR/bin/"
 }
 
 create_deb_package() {
@@ -118,8 +136,42 @@ EOF
     # rm -rf $deb_root
 }
 
+create_deb_test_package() {
+    local deb_test_root="$BUILD_DIR/deb_test_tmp"
+    local deb_test_install_dir="$deb_test_root/$PACKAGE_INSTALL_PREFIX"
+    local deb_test_control_file="$deb_test_root/DEBIAN/control"
+
+    # Create directories for DEB test package artifacts
+    mkdir -p "$deb_test_root/DEBIAN" "$deb_test_install_dir"
+
+    echo "** Creating DEB test package in $DEB_DIR **"
+
+    # Copy the test binaries to the install directory
+    cp -r "$TEST_STAGING_DIR"/* "$deb_test_install_dir"/
+
+    # Create control file for test package
+    cat <<EOF >"$deb_test_control_file"
+Package: ${PACKAGE_NAME}-test
+Version: $PACKAGE_VERSION
+Architecture: amd64
+Maintainer: $PACKAGE_CONTACT
+Description: Test binaries for $PACKAGE_NAME
+Homepage: $PACKAGE_HOMEPAGE_URL
+Depends:
+Section: devel
+Priority: optional
+EOF
+
+    # Build DEB test package
+    fakeroot dpkg-deb --build "$deb_test_root" \
+        "$DEB_DIR"/"${PACKAGE_NAME}-test_${PACKAGE_VERSION}-${DEB_PACKAGE_RELEASE}_amd64.deb"
+
+    # Clean up
+    # rm -rf $deb_test_root
+}
+
 create_rpm_package() {
-    local rpm_root="$BUILD_DIR"/rpm_tmp
+    local rpm_root="$BUILD_DIR/rpm_tmp"
     local rpm_build_dir="$rpm_root/BUILD"
     local rpm_rpms_dir="$rpm_root/RPMS"
     local rpm_source_dir="$rpm_root/SOURCES"
@@ -178,24 +230,92 @@ EOF
     # rm -rf $rpm_build_dir $rpm_source_dir $rpm_spec_dir $rpm_rpms_dir $rpm_srpm_dir
 }
 
+create_rpm_test_package() {
+    local rpm_test_root="$BUILD_DIR/rpm_test_tmp"
+    local rpm_test_build_dir="$rpm_test_root/BUILD"
+    local rpm_test_rpms_dir="$rpm_test_root/RPMS"
+    local rpm_test_source_dir="$rpm_test_root/SOURCES"
+    local rpm_test_spec_dir="$rpm_test_root/SPECS"
+    local rpm_test_srpm_dir="$rpm_test_root/SRPMS"
+
+    local test_spec_file="$rpm_test_spec_dir/${PACKAGE_NAME}-test.spec"
+
+    # Create directories for all the RPM test build artifacts
+    mkdir -p "$rpm_test_build_dir" "$rpm_test_rpms_dir" "$rpm_test_source_dir" "$rpm_test_spec_dir" "$rpm_test_srpm_dir"
+
+    echo "** Creating RPM test package in $RPM_DIR **"
+
+    # Create the spec file for the test package
+    cat <<EOF > "$test_spec_file"
+%define _build_id_links none
+%global debug_package %{nil}
+Name:           ${PACKAGE_NAME}-test
+Version:        $PACKAGE_VERSION
+Release:        $RPM_PACKAGE_RELEASE%{?dist}
+Summary:        Test binaries for $PACKAGE_NAME
+License:        MIT
+URL:            $PACKAGE_HOMEPAGE_URL
+Source0:        %{name}-%{version}.tar.gz
+BuildArch:      %{_arch}
+
+%description
+Test binaries for $PACKAGE_NAME
+
+%prep
+%setup -q
+
+%build
+
+%install
+mkdir -p %{buildroot}$PACKAGE_INSTALL_PREFIX
+cp -r * %{buildroot}$PACKAGE_INSTALL_PREFIX
+
+%files
+$PACKAGE_INSTALL_PREFIX
+
+%changelog
+EOF
+
+    # Create source tarball for the test package
+    tar czf "$rpm_test_source_dir/$PACKAGE_NAME-test-$PACKAGE_VERSION.tar.gz" \
+        -C "$BUILD_DIR" "$PACKAGE_NAME-test-$PACKAGE_VERSION"
+
+    # Build the RPM test package
+    rpmbuild --define "_topdir $rpm_test_root" -ba "$test_spec_file"
+
+    # Move the generated RPM test package file to RPM_DIR
+    find "$rpm_test_rpms_dir" -name "${PACKAGE_NAME}-test-$PACKAGE_VERSION-*.rpm" -exec mv {} "$RPM_DIR" \;
+
+    # Clean up
+    # rm -rf $rpm_test_build_dir $rpm_test_source_dir $rpm_test_spec_dir $rpm_test_rpms_dir $rpm_test_srpm_dir
+}
+
 ## Main Program ##
 
 # Clean up previous build artifacts
 rm -rf "$BUILD_DIR"
-mkdir -p "$STAGING_DIR" "$DEB_DIR" "$RPM_DIR"
+mkdir -p "$STAGING_DIR" "$TEST_STAGING_DIR" "$DEB_DIR" "$RPM_DIR"
 
 pushd "$GIT_TOP_LEVEL" || exit
 
 # Print input variables
 print_input_variables
 
-# Copy sources to build directory
+# Build the project, including tests
+build_project
+
+# Copy sources to the staging directory
 copy_sources
 
-# Create DEB package
-create_deb_package
+# Copy test binaries to the test staging directory
+copy_test_binaries
 
-# Create RPM package
+# Create DEB and RPM packages
+create_deb_package
 create_rpm_package
+
+# Create DEB and RPM test packages
+create_deb_test_package
+create_rpm_test_package
 
 popd || exit
