@@ -40,7 +40,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(rocfft REQUIRED)
 
-add_executable(${example_name} main.cpp)
+add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
@@ -48,6 +48,6 @@ set(include_dirs "../../../Common")
 
 target_link_libraries(${example_name} PRIVATE roc::rocfft)
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE HIP)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE HIP)
 
 install(TARGETS ${example_name})
