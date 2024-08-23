@@ -93,13 +93,19 @@ copy_sources() {
     done
 }
 
-copy_test_binaries() {
-    mkdir -p "$TEST_STAGING_DIR/bin"
+copy_test_files() {
+    mkdir -p "$TEST_STAGING_DIR"
 
-    echo "** Copying test binaries to $TEST_STAGING_DIR/bin **"
+    echo "** Copying CTestTestfile.cmake files to $TEST_STAGING_DIR **"
 
-    # Copy the built test binaries to the test staging directory
-    cp -r "$BUILD_DIR/bin/"* "$TEST_STAGING_DIR/bin/"
+    # Find and copy all CTestTestfile.cmake files to the test staging directory
+    find "$BUILD_DIR" -name "CTestTestfile.cmake" | while read -r cmake_file; do
+        example_dir=$(dirname "$cmake_file")
+        relative_path=$(realpath --relative-to="$BUILD_DIR" "$example_dir")
+        
+        mkdir -p "$TEST_STAGING_DIR/$relative_path"
+        cp "$cmake_file" "$TEST_STAGING_DIR/$relative_path"
+    done
 }
 
 create_deb_package() {
@@ -138,7 +144,7 @@ EOF
 
 create_deb_test_package() {
     local deb_test_root="$BUILD_DIR/deb_test_tmp"
-    local deb_test_install_dir="$deb_test_root/$PACKAGE_INSTALL_PREFIX"
+    local deb_test_install_dir="$deb_test_root/$PACKAGE_INSTALL_PREFIX/bin"
     local deb_test_control_file="$deb_test_root/DEBIAN/control"
 
     # Create directories for DEB test package artifacts
@@ -146,7 +152,7 @@ create_deb_test_package() {
 
     echo "** Creating DEB test package in $DEB_DIR **"
 
-    # Copy the test binaries to the install directory
+    # Copy the test files to the install directory
     cp -r "$TEST_STAGING_DIR"/* "$deb_test_install_dir"/
 
     # Create control file for test package
@@ -155,7 +161,7 @@ Package: ${PACKAGE_NAME}-test
 Version: $PACKAGE_VERSION
 Architecture: amd64
 Maintainer: $PACKAGE_CONTACT
-Description: Test binaries for $PACKAGE_NAME
+Description: CTest files for $PACKAGE_NAME
 Homepage: $PACKAGE_HOMEPAGE_URL
 Depends:
 Section: devel
@@ -252,14 +258,14 @@ create_rpm_test_package() {
 Name:           ${PACKAGE_NAME}-test
 Version:        $PACKAGE_VERSION
 Release:        $RPM_PACKAGE_RELEASE%{?dist}
-Summary:        Test binaries for $PACKAGE_NAME
+Summary:        CTest files for $PACKAGE_NAME
 License:        MIT
 URL:            $PACKAGE_HOMEPAGE_URL
 Source0:        %{name}-%{version}.tar.gz
 BuildArch:      %{_arch}
 
 %description
-Test binaries for $PACKAGE_NAME
+CTest files for $PACKAGE_NAME
 
 %prep
 %setup -q
@@ -267,11 +273,11 @@ Test binaries for $PACKAGE_NAME
 %build
 
 %install
-mkdir -p %{buildroot}$PACKAGE_INSTALL_PREFIX
-cp -r * %{buildroot}$PACKAGE_INSTALL_PREFIX
+mkdir -p %{buildroot}$PACKAGE_INSTALL_PREFIX/bin
+cp -r * %{buildroot}$PACKAGE_INSTALL_PREFIX/bin
 
 %files
-$PACKAGE_INSTALL_PREFIX
+$PACKAGE_INSTALL_PREFIX/bin
 
 %changelog
 EOF
@@ -307,8 +313,8 @@ build_project
 # Copy sources to the staging directory
 copy_sources
 
-# Copy test binaries to the test staging directory
-copy_test_binaries
+# Copy CTest files to the test staging directory
+copy_test_files
 
 # Create DEB and RPM packages
 create_deb_package
