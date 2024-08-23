@@ -72,7 +72,7 @@ build_project() {
     echo "** Building the project **"
     mkdir -p "$BUILD_DIR"
     pushd "$BUILD_DIR" || exit
-    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" ..
+    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all ..
     make -j$(nproc)
     popd || exit
 }
