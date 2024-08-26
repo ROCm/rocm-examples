@@ -23,12 +23,14 @@
 LIBRARIES := \
 	hipBLAS \
 	hipCUB \
+	hipFFT \
 	hipSOLVER \
 	rocRAND
 
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
 	rocBLAS \
+	rocFFT \
 	rocPRIM \
 	rocSOLVER \
 	rocSPARSE \

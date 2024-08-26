@@ -78,9 +78,15 @@ A collection of examples to enable new users to start using ROCm. Advanced users
     - [level_3](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
       - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
+  - [rocFFT](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/)
+    - [callback](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/callback/): Program that showcases the use of rocFFT `callback` functionality.
+    - [multi_gpu](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/multi_gpu/): Program that showcases the use of rocFFT multi-GPU functionality.
   - [rocPRIM](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/)
     - [block_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
     - [device_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
+  - [hipFFT](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/)
+    - [plan_d2z](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/plan_d2z): Forward fast Fourier transform for 1D, 2D, and 3D real input using a simple plan in hipFFT.
+    - [plan_z2z](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/plan_z2z): Forward fast Fourier transform for 1D, 2D, and 3D complex input using a simple plan in hipFFT.
   - [rocRAND](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocRAND/)
     - [simple_distributions_cpp](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocRAND/simple_distributions_cpp/): A command-line app to compare random number generation on the CPU and on the GPU with rocRAND.
   - [rocSOLVER](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocSOLVER/)
