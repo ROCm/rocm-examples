@@ -1,0 +1,393 @@
+{
+	"version": 3,
+	"cmakeMinimumRequired": {
+		"major": 3,
+		"minor": 21,
+		"patch": 3
+	},
+	"configurePresets": [
+		{
+			"name": "layout-ci",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/build",
+			"installDir": "${sourceDir}/install"
+		},
+		{
+			"name": "generator-ninja-multi-config-ci",
+			"hidden": true,
+			"generator": "Ninja Multi-Config",
+			"cacheVariables": {
+				"CMAKE_MAKE_PROGRAM": {
+					"type": "FILEPATH",
+					"value": "ninja"
+				}
+			}
+		},
+		{
+			"name": "toolchain-makefiles-c++/hip-amdclang-ci-windows",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": {
+					"type": "FILEPATH",
+					"value": "$env{HIP_PATH}bin\\clang++.exe"
+				},
+				"CMAKE_HIP_COMPILER": {
+					"type": "FILEPATH",
+					"value": "$env{HIP_PATH}bin\\clang++.exe"
+				},
+				"CMAKE_HIP_LINK_EXECUTABLE": {
+					"type": "FILEPATH",
+					"value": "$env{HIP_PATH}bin\\lld-link.exe"
+				},
+				"CMAKE_AR": {
+					"type": "FILEPATH",
+					"value": "$env{HIP_PATH}bin\\llvm-ar.exe"
+				},
+				"CMAKE_RC_COMPILER": {
+					"type": "FILEPATH",
+					"value": "$env{HIP_PATH}bin\\llvm-rc.exe"
+				},
+				"CMAKE_MT": "mt.exe"
+			}
+		},
+		{
+			"name": "toolchain-makefiles-c++/cuda-nvcc-ci-windows",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": {
+					"type": "FILEPATH",
+					"value": "cl.exe"
+				},
+				"CMAKE_CUDA_COMPILER": {
+					"type": "FILEPATH",
+					"value": "$env{CUDA_PATH}\\bin\\nvcc.exe"
+				},
+				"CMAKE_CUDA_LINK_EXECUTABLE": {
+					"type": "FILEPATH",
+					"value": "$env{CUDA_PATH}bin\\nvlink.exe"
+				}
+			}
+		},
+		{
+			"name": "toolchain-makefiles-c++/hip-amdclang-ci-linux",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": {
+					"type": "FILEPATH",
+					"value": "/opt/rocm/bin/amdclang++"
+				},
+				"CMAKE_HIP_COMPILER": {
+					"type": "FILEPATH",
+					"value": "/opt/rocm/bin/amdclang++"
+				},
+				"CMAKE_AR": {
+					"type": "FILEPATH",
+					"value": "/opt/rocm/llvm/bin/llvm-ar"
+				},
+				"CMAKE_HIP_COMPILER_ROCM_ROOT": {
+					"type": "PATH",
+					"value": "/opt/rocm"
+				},
+				"CMAKE_PREFIX_PATH": {
+					"type": "PATH",
+					"value": "/opt/rocm"
+				}
+			},
+			"environment": {
+				"AMDDeviceLibs_ROOT": "/opt/rocm",
+				"amd_comgr_ROOT": "/opt/rocm"
+			}
+		},
+		{
+			"name": "toolchain-makefiles-c++/cuda-nvcc-ci-linux",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": {
+					"type": "FILEPATH",
+					"value": "/usr/local/cuda/bin/nvcc"
+				},
+				"CMAKE_CUDA_COMPILER": {
+					"type": "FILEPATH",
+					"value": "/usr/local/cuda/bin/nvcc"
+				},
+				"CMAKE_PREFIX_PATH": {
+					"type": "PATH",
+					"value": "/opt/rocm"
+				},
+				"CMAKE_MODULE_PATH": {
+					"type": "PATH",
+					"value": "/opt/rocm/hip/cmake"
+				}
+			},
+			"environment": {
+				"HIP_PLATFORM": "nvidia",
+				"HIP_COMPILER": "nvcc"
+			}
+		},
+		{
+			"name": "clang-c++/hip-high-warn-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "-Wno-unused-command-line-argument -Wall -Wextra -Werror",
+				"CMAKE_HIP_FLAGS": "-Wno-unused-command-line-argument -Wall -Wextra -Werror"
+			}
+		},
+		{
+			"name": "nvcc-c++/cuda-high-warn-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "--Werror all-warnings --Wno-deprecated-declarations",
+				"CMAKE_CUDA_FLAGS": "-Xcompiler -Wall,-Wextra,-Werror --Werror all-warnings --Wno-deprecated-declarations"
+			}
+		},
+		{
+			"name": "msvc-c++-high-warn-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CXX_FLAGS": "/W4 /WX /permissive-"
+			}
+		},
+		{
+			"name": "nvcc-cuda-high-warn-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CUDA_FLAGS": "--Werror all-warnings --Wno-deprecated-declarations"
+			}
+		},
+		{
+			"name": "clang-hip-architectures-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_HIP_ARCHITECTURES": "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102"
+			}
+		},
+		{
+			"name": "nvcc-cuda-architectures-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_CUDA_ARCHITECTURES": "70;86"
+			}
+		},
+		{
+			"name": "tooling-compile-commands-vcpkg-ci",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_EXPORT_COMPILE_COMMANDS": true,
+				"CMAKE_TOOLCHAIN_FILE": {
+					"type": "FILEPATH",
+					"value": "$env{VCPKG_INSTALLATION_ROOT}/scripts/buildsystems/vcpkg.cmake"
+				}
+			}
+		},
+		{
+			"name": "ninja-mc-amd-ci-windows",
+			"displayName": "Ninja Multi-Config & amdclang++",
+			"inherits": [
+				"layout-ci",
+				"generator-ninja-multi-config-ci",
+				"toolchain-makefiles-c++/hip-amdclang-ci-windows",
+				"clang-c++/hip-high-warn-ci",
+				"clang-hip-architectures-ci",
+				"tooling-compile-commands-vcpkg-ci"
+			],
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-windows",
+			"displayName": "Ninja Multi-Config & nvcc",
+			"inherits": [
+				"layout-ci",
+				"generator-ninja-multi-config-ci",
+				"toolchain-makefiles-c++/cuda-nvcc-ci-windows",
+				"msvc-c++-high-warn-ci",
+				"nvcc-cuda-high-warn-ci",
+				"nvcc-cuda-architectures-ci",
+				"tooling-compile-commands-vcpkg-ci"
+			],
+			"cacheVariables": {
+				"GPU_RUNTIME": "CUDA"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "ninja-mc-amd-ci-linux",
+			"displayName": "Ninja Multi-Config & amdclang++",
+			"inherits": [
+				"layout-ci",
+				"generator-ninja-multi-config-ci",
+				"toolchain-makefiles-c++/hip-amdclang-ci-linux",
+				"clang-c++/hip-high-warn-ci",
+				"clang-hip-architectures-ci",
+				"tooling-compile-commands-vcpkg-ci"
+			],
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-linux",
+			"displayName": "Ninja Multi-Config & nvcc",
+			"inherits": [
+				"layout-ci",
+				"generator-ninja-multi-config-ci",
+				"toolchain-makefiles-c++/cuda-nvcc-ci-linux",
+				"nvcc-c++/cuda-high-warn-ci",
+				"nvcc-cuda-architectures-ci",
+				"tooling-compile-commands-vcpkg-ci"
+			],
+			"cacheVariables": {
+				"GPU_RUNTIME": "CUDA"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		}
+	],
+	"buildPresets": [
+		{
+			"name": "ninja-mc-amd-ci-windows-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-amd-ci-windows"
+		},
+		{
+			"name": "ninja-mc-amd-ci-windows-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-amd-ci-windows"
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-windows-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-nvidia-ci-windows"
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-windows-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-nvidia-ci-windows"
+		},
+		{
+			"name": "ninja-mc-amd-ci-linux-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-amd-ci-linux"
+		},
+		{
+			"name": "ninja-mc-amd-ci-linux-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-amd-ci-linux"
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-linux-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-nvidia-ci-linux"
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-linux-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-nvidia-ci-linux"
+		}
+	],
+	"testPresets": [
+		{
+			"name": "execution-behavior-ci",
+			"hidden": true,
+			"execution": {
+				"noTestsAction": "error",
+				"stopOnFailure": true
+			},
+			"output": {
+				"outputOnFailure": true
+			}
+		},
+		{
+			"name": "ninja-mc-amd-ci-windows-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-amd-ci-windows",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-amd-ci-windows-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-amd-ci-windows",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-windows-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-nvidia-ci-windows",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-windows-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-nvidia-ci-windows",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-amd-ci-linux-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-amd-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-amd-ci-linux-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-amd-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-linux-debug",
+			"displayName": "Debug",
+			"configuration": "Debug",
+			"configurePreset": "ninja-mc-nvidia-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		},
+		{
+			"name": "ninja-mc-nvidia-ci-linux-release",
+			"displayName": "Release",
+			"configuration": "Release",
+			"configurePreset": "ninja-mc-nvidia-ci-linux",
+			"inherits": [
+				"execution-behavior-ci"
+			]
+		}
+	]
+}

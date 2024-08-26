@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
-project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.2.0)
-enable_testing()
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(Tutorials LANGUAGES CXX)
 
-add_subdirectory(Applications)
-add_subdirectory(HIP-Basic)
-add_subdirectory(Libraries)
-add_subdirectory(Tutorials)
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
+add_subdirectory(reduction)
