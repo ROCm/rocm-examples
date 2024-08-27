@@ -161,7 +161,7 @@ Package: ${PACKAGE_NAME}-test
 Version: $PACKAGE_VERSION
 Architecture: amd64
 Maintainer: $PACKAGE_CONTACT
-Description: CTest files for $PACKAGE_NAME
+Description: Test Package for ROCm-Examples
 Homepage: $PACKAGE_HOMEPAGE_URL
 Depends:
 Section: devel
@@ -258,7 +258,7 @@ create_rpm_test_package() {
 Name:           ${PACKAGE_NAME}-test
 Version:        $PACKAGE_VERSION
 Release:        $RPM_PACKAGE_RELEASE%{?dist}
-Summary:        CTest files for $PACKAGE_NAME
+Summary:       Test Package for ROCm-Examples
 License:        MIT
 URL:            $PACKAGE_HOMEPAGE_URL
 Source0:        %{name}-%{version}.tar.gz
