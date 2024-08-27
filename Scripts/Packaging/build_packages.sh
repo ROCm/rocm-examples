@@ -52,6 +52,7 @@ SOURCE_DIRS=(
     "HIP-Basic"
     "Libraries"
     "LLVM_ASAN"
+    "Tutorials"
 )
 
 
