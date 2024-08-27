@@ -1,0 +1,55 @@
+name: Build Tutorials
+
+on:
+  push:
+    branches: [ develop, release/** ]
+    paths:
+      - 'Tutorials/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ develop, release/** ]
+    paths:
+      - 'Tutorials/**'
+      - '.github/workflows/**'
+
+env:
+    ROCM_VERSION: 6.2
+    AMDGPU_INSTALLER_VERSION: 6.2.60200-1
+
+jobs:
+    build:
+        name: "Build Tutorial Examples"
+        runs-on: ubuntu-latest
+        container:
+            image: ubuntu:22.04
+        steps:
+          - uses: actions/checkout@v4
+
+          - name: Install dependencies
+            run: |
+                  apt-get update -qq &&
+                  apt-get install -y build-essential g++ glslang-tools \
+                    python3 python3-pip libglfw3-dev libvulkan-dev locales wget cmake
+          - name: Install ROCm Dev
+            run: |
+                  export DEBIAN_FRONTEND=noninteractive
+                  wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
+                  apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
+                  apt-get update -qq &&
+                  apt-get install -y \
+                    rocm-dev rocm-llvm \
+                    rocrand-dev hiprand-dev \
+                    rocprim-dev hipcub-dev \
+                    rocblas-dev hipblas-dev \
+                    rocsolver-dev hipsolver-dev \
+                    rocfft-dev hipfft-dev \
+                    rocsparse-dev \
+                    rocthrust-dev
+                  rm -rf /var/lib/apt/lists/*
+                  apt-get autoclean
+          - name: Configure and Build
+            shell: bash
+            run: |
+              cd Tutorials && mkdir build && cd build
+              cmake -DGPU_ARCHITECTURES=all -S ..
+              cmake --build . -j $(nproc)
