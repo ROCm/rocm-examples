@@ -255,7 +255,10 @@ build:cmake-cuda:
   extends:
     - .rules:test
   script:
-    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 8
+    # Use less parallelism when running the reduction tutotial tests
+    # due to excessive memory usage in some test cases
+    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 8 -E reduction_test_v*
+    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 6 -R reduction_test_v*
 
 test:rocm:
   image: $DOCKER_HIP_LIBRARIES_ROCM
@@ -429,7 +432,10 @@ test:windows-nvcc-vs:
     # So for now, just add the library path here.
     - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
     - cd "$CI_PROJECT_DIR/build"
-    - ctest --output-on-failure --timeout 15 --parallel 8 -E "$SkippedExamples"
+    # Use less parallelism when running the reduction tutotial tests
+    # due to excessive memory usage in some test cases
+    - ctest --output-on-failure --timeout 15 --parallel 8 -E "reduction_test_v*|$SkippedExamples"
+    - ctest --output-on-failure --timeout 15 --parallel 6 -E "$SkippedExamples" -R "reduction_test_v*"
     - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"
   needs: []
 
