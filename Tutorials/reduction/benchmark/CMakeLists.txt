@@ -141,6 +141,7 @@ foreach(VER RANGE 0 10)
             ${Sources}
             PROPERTIES LANGUAGE ${GPU_RUNTIME}
         )
+        SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ROCM_ROOT}/cmake)
         find_package(HIP MODULE REQUIRED)
         target_include_directories(
             ${TargetName}
