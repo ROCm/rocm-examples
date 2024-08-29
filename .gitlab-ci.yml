@@ -255,10 +255,11 @@ build:cmake-cuda:
   extends:
     - .rules:test
   script:
-    # Use less parallelism when running the reduction tutotial tests
-    # due to excessive memory usage in some test cases
-    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 8 -E reduction_test_v*
-    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 6 -R reduction_test_v*
+    # Disable parallel tests for now: RDNA seems to be unstable when multiple processes use the same device,
+    # and currently we test on RX 7900 XTX (gfx1100) on CI. 
+    # - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 8 -E reduction_test_v*
+    # - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 6 -R reduction_test_v*
+    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure
 
 test:rocm:
   image: $DOCKER_HIP_LIBRARIES_ROCM
