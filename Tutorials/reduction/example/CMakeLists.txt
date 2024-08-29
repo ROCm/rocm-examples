@@ -24,6 +24,8 @@ project(reduction_examples LANGUAGES CXX)
 
 if("${GPU_RUNTIME}" STREQUAL "CUDA")
     cmake_minimum_required(VERSION 3.25.2)
+    # Allow __device__ or __host__ annotated lambdas
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")
 else()
     cmake_minimum_required(VERSION 3.21)
     # Add -fPIE flag to compiler.
