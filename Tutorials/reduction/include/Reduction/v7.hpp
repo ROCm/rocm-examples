@@ -49,6 +49,41 @@
 
 namespace reduction
 {
+template<typename T, typename F, uint32_t BlockSize, uint32_t WarpSize>
+__global__ static __launch_bounds__(BlockSize) void kernel(
+    T* front, T* back, F op, T zero_elem, uint32_t front_size)
+{
+    __shared__ T shared[BlockSize];
+
+    auto read_global_safe = [&](const uint32_t i) { return i < front_size ? front[i] : zero_elem; };
+
+    const uint32_t tid = threadIdx.x, bid = blockIdx.x, gid = bid * (blockDim.x * 2) + tid;
+
+    // Read input from front buffer to shared
+    shared[tid] = op(read_global_safe(gid), read_global_safe(gid + blockDim.x));
+    __syncthreads();
+
+    // Shared reduction
+    tmp::static_for<BlockSize / 2, tmp::greater_than<WarpSize>, tmp::divide<2>>(
+        [&]<int I>()
+        {
+            if(tid < I)
+                shared[tid] = op(shared[tid], shared[tid + I]);
+            __syncthreads();
+        });
+    // Warp reduction
+    if(tid < WarpSize)
+    {
+        T res = op(shared[tid], shared[tid + WarpSize]);
+        tmp::static_for<WarpSize / 2, tmp::not_equal<0>, tmp::divide<2>>(
+            [&]<int Delta>() { res = op(res, __shfl_down(res, Delta)); });
+
+        // Write result from shared to back buffer
+        if(tid == 0)
+            back[bid] = res;
+    }
+}
+
 template<typename T, typename F>
 class v7
 {
@@ -100,16 +135,11 @@ public:
                         warp_size,
                         [&]<int WarpSize>() noexcept
                         {
-                            hipLaunchKernelGGL(kernel<BlockSize, WarpSize>,
-                                               dim3(new_size(factor, step_size)),
-                                               dim3(BlockSize),
-                                               0,
-                                               hipStreamDefault,
-                                               front,
-                                               back,
-                                               kernel_op,
-                                               zero_elem,
-                                               step_size);
+                            HIP_KERNEL_NAME(kernel<T, F, BlockSize, WarpSize>)<<<
+                                dim3(new_size(factor, step_size)),
+                                dim3(BlockSize),
+                                0,
+                                hipStreamDefault>>>(front, back, kernel_op, zero_elem, step_size);
                         });
                 });
         };
@@ -160,42 +190,6 @@ private:
     std::size_t new_size(const std::size_t factor, const std::size_t actual)
     {
         return actual / factor + (actual % factor == 0 ? 0 : 1);
-    }
-
-    template<uint32_t BlockSize, uint32_t WarpSize>
-    __global__ static __launch_bounds__(BlockSize) void kernel(
-        T* front, T* back, F op, T zero_elem, uint32_t front_size)
-    {
-        __shared__ T shared[BlockSize];
-
-        auto read_global_safe
-            = [&](const uint32_t i) { return i < front_size ? front[i] : zero_elem; };
-
-        const uint32_t tid = threadIdx.x, bid = blockIdx.x, gid = bid * (blockDim.x * 2) + tid;
-
-        // Read input from front buffer to shared
-        shared[tid] = op(read_global_safe(gid), read_global_safe(gid + blockDim.x));
-        __syncthreads();
-
-        // Shared reduction
-        tmp::static_for<BlockSize / 2, tmp::greater_than<WarpSize>, tmp::divide<2>>(
-            [&]<int I>()
-            {
-                if(tid < I)
-                    shared[tid] = op(shared[tid], shared[tid + I]);
-                __syncthreads();
-            });
-        // Warp reduction
-        if(tid < WarpSize)
-        {
-            T res = op(shared[tid], shared[tid + WarpSize]);
-            tmp::static_for<WarpSize / 2, tmp::not_equal<0>, tmp::divide<2>>(
-                [&]<int Delta>() { res = op(res, __shfl_down(res, Delta)); });
-
-            // Write result from shared to back buffer
-            if(tid == 0)
-                back[bid] = res;
-        }
     }
 };
 } // namespace reduction

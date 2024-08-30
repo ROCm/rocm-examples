@@ -48,6 +48,34 @@
 namespace reduction
 {
 template<typename T, typename F>
+__global__ static void kernel(T* front, T* back, F op, T zero_elem, uint32_t front_size)
+{
+    extern __shared__ T shared[];
+
+    auto read_global_safe = [&](const uint32_t i) { return i < front_size ? front[i] : zero_elem; };
+
+    const uint32_t tid = threadIdx.x, bid = blockIdx.x, gid = bid * blockDim.x + tid;
+
+    // Read input from front buffer to shared
+    shared[tid] = read_global_safe(gid);
+    __syncthreads();
+
+    // Shared reduction
+    for(uint32_t i = 1; i < blockDim.x; i *= 2)
+    {
+        uint32_t index = 2 * i * tid;
+
+        if(index < blockDim.x)
+            shared[index] = op(shared[index], shared[index + i]);
+        __syncthreads();
+    }
+
+    // Write result from shared to back buffer
+    if(tid == 0)
+        back[bid] = shared[0];
+}
+
+template<typename T, typename F>
 class v2
 {
 public:
@@ -89,16 +117,11 @@ public:
         std::size_t curr = input.size();
         while(curr > 1)
         {
-            hipLaunchKernelGGL(kernel,
-                               dim3(new_size(factor, curr)),
-                               dim3(block_size),
-                               factor * sizeof(T),
-                               hipStreamDefault,
-                               front,
-                               back,
-                               kernel_op,
-                               zero_elem,
-                               curr);
+            HIP_KERNEL_NAME(
+                kernel<T, F>)<<<dim3(new_size(factor, curr)),
+                                dim3(block_size),
+                                factor * sizeof(T),
+                                hipStreamDefault>>>(front, back, kernel_op, zero_elem, curr);
             hip::check(hipGetLastError(), "hipKernelLaunchGGL");
 
             curr = new_size(factor, curr);
@@ -135,34 +158,6 @@ private:
     std::size_t new_size(const std::size_t factor, const std::size_t actual)
     {
         return actual / factor + (actual % factor == 0 ? 0 : 1);
-    }
-
-    __global__ static void kernel(T* front, T* back, F op, T zero_elem, uint32_t front_size)
-    {
-        extern __shared__ T shared[];
-
-        auto read_global_safe
-            = [&](const uint32_t i) { return i < front_size ? front[i] : zero_elem; };
-
-        const uint32_t tid = threadIdx.x, bid = blockIdx.x, gid = bid * blockDim.x + tid;
-
-        // Read input from front buffer to shared
-        shared[tid] = read_global_safe(gid);
-        __syncthreads();
-
-        // Shared reduction
-        for(uint32_t i = 1; i < blockDim.x; i *= 2)
-        {
-            uint32_t index = 2 * i * tid;
-
-            if(index < blockDim.x)
-                shared[index] = op(shared[index], shared[index + i]);
-            __syncthreads();
-        }
-
-        // Write result from shared to back buffer
-        if(tid == 0)
-            back[bid] = shared[0];
     }
 };
 } // namespace reduction
