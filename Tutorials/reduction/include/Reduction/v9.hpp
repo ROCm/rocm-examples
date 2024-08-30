@@ -50,6 +50,70 @@
 
 namespace reduction
 {
+template<typename T, typename F, uint32_t BlockSize, uint32_t WarpSize, uint32_t ItemsPerThread>
+__global__ static __launch_bounds__(BlockSize) void kernel(
+    T* front, T* back, F op, T zero_elem, uint32_t front_size)
+{
+    static constexpr uint32_t WarpCount = BlockSize / WarpSize;
+
+    __shared__ T shared[WarpCount];
+
+    auto read_global_safe = [&](const int32_t i)
+    {
+        return [&]<int32_t... I>(std::integer_sequence<int32_t, I...>)
+        {
+            if(i + ItemsPerThread < front_size)
+                return hip::static_array<T, ItemsPerThread>{front[i + I]...};
+            else
+                return hip::static_array<T, ItemsPerThread>{
+                    (i + I < front_size ? front[i + I] : zero_elem)...};
+        }(std::make_integer_sequence<int32_t, ItemsPerThread>());
+    };
+    auto read_shared_safe = [&](const int32_t i) { return i < WarpCount ? shared[i] : zero_elem; };
+
+    const int32_t tid = threadIdx.x, bid = blockIdx.x,
+                  gid = bid * (blockDim.x * ItemsPerThread) + tid * ItemsPerThread,
+                  wid = tid / WarpSize, lid = tid % WarpSize;
+
+    T res = [&]()
+    {
+        // Read input from front buffer to local
+        hip::static_array<T, ItemsPerThread> arr = read_global_safe(gid);
+
+        // Reduce ItemsPerThread to scalar
+        tmp::static_for<1, tmp::less_than<ItemsPerThread>, tmp::increment<1>>(
+            [&]<int I>() { get<0>(arr) = op(get<0>(arr), get<I>(arr)); });
+
+        return get<0>(arr);
+    }();
+
+    // Perform warp reductions and communicate results via shared
+    tmp::static_for<WarpCount,
+                    tmp::not_equal<0>,
+                    tmp::select<tmp::not_equal<1>, tmp::divide_ceil<WarpSize>, tmp::constant<0>>>(
+        [&]<uint32_t ActiveWarps>()
+        {
+            if(wid < ActiveWarps)
+            {
+                // Warp reduction
+                tmp::static_for<WarpSize / 2, tmp::not_equal<0>, tmp::divide<2>>(
+                    [&]<int Delta>() { res = op(res, __shfl_down(res, Delta)); });
+
+                // Write warp result from local to shared
+                if(lid == 0)
+                    shared[wid] = res;
+            }
+            __syncthreads();
+
+            // Read warp result from shared to local
+            res = read_shared_safe(tid);
+        });
+
+    // Write result from local to back buffer
+    if(tid == 0)
+        back[bid] = res;
+}
+
 template<typename T, typename F>
 class v9
 {
@@ -105,16 +169,16 @@ public:
                                 items_per_thread,
                                 [&]<int ItemsPerThread>() noexcept
                                 {
-                                    hipLaunchKernelGGL(kernel<BlockSize, WarpSize, ItemsPerThread>,
-                                                       dim3(new_size(factor, step_size)),
-                                                       dim3(BlockSize),
-                                                       0,
-                                                       hipStreamDefault,
-                                                       front,
-                                                       back,
-                                                       kernel_op,
-                                                       zero_elem,
-                                                       step_size);
+                                    HIP_KERNEL_NAME(
+                                        kernel<T, F, BlockSize, WarpSize, ItemsPerThread>)<<<
+                                        dim3(new_size(factor, step_size)),
+                                        dim3(BlockSize),
+                                        0,
+                                        hipStreamDefault>>>(front,
+                                                            back,
+                                                            kernel_op,
+                                                            zero_elem,
+                                                            step_size);
                                 });
                         });
                 });
@@ -166,72 +230,6 @@ private:
     std::size_t new_size(const std::size_t factor, const std::size_t actual)
     {
         return actual / factor + (actual % factor == 0 ? 0 : 1);
-    }
-
-    template<uint32_t BlockSize, uint32_t WarpSize, uint32_t ItemsPerThread>
-    __global__ static __launch_bounds__(BlockSize) void kernel(
-        T* front, T* back, F op, T zero_elem, uint32_t front_size)
-    {
-        static constexpr uint32_t WarpCount = BlockSize / WarpSize;
-
-        __shared__ T shared[WarpCount];
-
-        auto read_global_safe = [&](const int32_t i)
-        {
-            return [&]<int32_t... I>(std::integer_sequence<int32_t, I...>)
-            {
-                if(i + ItemsPerThread < front_size)
-                    return hip::static_array<T, ItemsPerThread>{front[i + I]...};
-                else
-                    return hip::static_array<T, ItemsPerThread>{
-                        (i + I < front_size ? front[i + I] : zero_elem)...};
-            }(std::make_integer_sequence<int32_t, ItemsPerThread>());
-        };
-        auto read_shared_safe
-            = [&](const int32_t i) { return i < WarpCount ? shared[i] : zero_elem; };
-
-        const int32_t tid = threadIdx.x, bid = blockIdx.x,
-                      gid = bid * (blockDim.x * ItemsPerThread) + tid * ItemsPerThread,
-                      wid = tid / WarpSize, lid = tid % WarpSize;
-
-        T res = [&]()
-        {
-            // Read input from front buffer to local
-            hip::static_array<T, ItemsPerThread> arr = read_global_safe(gid);
-
-            // Reduce ItemsPerThread to scalar
-            tmp::static_for<1, tmp::less_than<ItemsPerThread>, tmp::increment<1>>(
-                [&]<int I>() { get<0>(arr) = op(get<0>(arr), get<I>(arr)); });
-
-            return get<0>(arr);
-        }();
-
-        // Perform warp reductions and communicate results via shared
-        tmp::static_for<
-            WarpCount,
-            tmp::not_equal<0>,
-            tmp::select<tmp::not_equal<1>, tmp::divide_ceil<WarpSize>, tmp::constant<0>>>(
-            [&]<uint32_t ActiveWarps>()
-            {
-                if(wid < ActiveWarps)
-                {
-                    // Warp reduction
-                    tmp::static_for<WarpSize / 2, tmp::not_equal<0>, tmp::divide<2>>(
-                        [&]<int Delta>() { res = op(res, __shfl_down(res, Delta)); });
-
-                    // Write warp result from local to shared
-                    if(lid == 0)
-                        shared[wid] = res;
-                }
-                __syncthreads();
-
-                // Read warp result from shared to local
-                res = read_shared_safe(tid);
-            });
-
-        // Write result from local to back buffer
-        if(tid == 0)
-            back[bid] = res;
     }
 };
 } // namespace reduction
