@@ -26,17 +26,19 @@ set -e
 GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
 
 # Inputs and Defaults
-PACKAGE_NAME="${1:-ROCm-SDK-Examples}"
-PACKAGE_VERSION="${2:-6.2.0}"
-PACKAGE_INSTALL_PREFIX="${3:-/opt/rocm/examples}"
-BUILD_DIR="${4:-$GIT_TOP_LEVEL/build}"
-DEB_DIR="${5:-$BUILD_DIR/deb}"
-RPM_DIR="${6:-$BUILD_DIR/rpm}"
-DEB_PACKAGE_RELEASE="${7:-local.9999}"
-RPM_PACKAGE_RELEASE="${8:-local.9999}"
+ROCM_EXAMPLES_ROOT="${1:-$GIT_TOP_LEVEL}"
+PACKAGE_NAME="${2:-ROCm-SDK-Examples}"
+PACKAGE_VERSION="${3:-6.2.0}"
+PACKAGE_INSTALL_PREFIX="${4:-/opt/rocm/examples}"
+TEST_PACKAGE_INSTALL_PREFIX="${5:-/opt/rocm/examples-test}"
+BUILD_DIR="${6:-$ROCM_EXAMPLES_ROOT/build}"
+DEB_DIR="${7:-$BUILD_DIR/deb}"
+RPM_DIR="${8:-$BUILD_DIR/rpm}"
+DEB_PACKAGE_RELEASE="${9:-local.9999}"
+RPM_PACKAGE_RELEASE="${10:-local.9999}"
 
-STAGING_DIR="$BUILD_DIR"/"$PACKAGE_NAME"-"$PACKAGE_VERSION"
-TEST_STAGING_DIR="$BUILD_DIR"/"${PACKAGE_NAME}-test-$PACKAGE_VERSION"
+STAGING_DIR="$BUILD_DIR/$PACKAGE_NAME-$PACKAGE_VERSION"
+TEST_STAGING_DIR="$BUILD_DIR/${PACKAGE_NAME}-test-$PACKAGE_VERSION"
 
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
@@ -58,9 +60,11 @@ SOURCE_DIRS=(
 
 print_input_variables() {
     echo "********** Input Variables **********"
+    echo "ROCM_EXAMPLES_ROOT=$ROCM_EXAMPLES_ROOT"
     echo "PACKAGE_NAME=$PACKAGE_NAME"
     echo "PACKAGE_VERSION=$PACKAGE_VERSION"
     echo "PACKAGE_INSTALL_PREFIX=$PACKAGE_INSTALL_PREFIX"
+    echo "TEST_PACKAGE_INSTALL_PREFIX=$TEST_PACKAGE_INSTALL_PREFIX"
     echo "BUILD_DIR=$BUILD_DIR"
     echo "DEB_DIR=$DEB_DIR"
     echo "RPM_DIR=$RPM_DIR"
@@ -73,7 +77,7 @@ build_project() {
     echo "** Building the project **"
     mkdir -p "$BUILD_DIR"
     pushd "$BUILD_DIR" || exit
-    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all ..
+    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$ROCM_EXAMPLES_ROOT"
     make -j$(nproc)
     popd || exit
 }
@@ -84,13 +88,13 @@ copy_sources() {
     echo "** Copying sources to $STAGING_DIR **"
 
     # Copy source files in root to package
-    cp LICENSE.md CMakeLists.txt README.md "$STAGING_DIR"
+    cp "$ROCM_EXAMPLES_ROOT/LICENSE.md" "$ROCM_EXAMPLES_ROOT/CMakeLists.txt" "$ROCM_EXAMPLES_ROOT/README.md" "$STAGING_DIR"
 
     # Copy source directories to package
     for dir in "${SOURCE_DIRS[@]}"; do
         rsync -a --exclude 'build' --exclude '.gitignore' \
             --exclude '*.vcxproj**' --exclude '*.sln' --exclude 'bin' \
-            --exclude '*.o' --exclude '*.exe' "$dir" "$STAGING_DIR"
+            --exclude '*.o' --exclude '*.exe' "$ROCM_EXAMPLES_ROOT/$dir" "$STAGING_DIR"
     done
 }
 
@@ -145,7 +149,7 @@ EOF
 
 create_deb_test_package() {
     local deb_test_root="$BUILD_DIR/deb_test_tmp"
-    local deb_test_install_dir="$deb_test_root/$PACKAGE_INSTALL_PREFIX/bin"
+    local deb_test_install_dir="$deb_test_root/$TEST_PACKAGE_INSTALL_PREFIX"
     local deb_test_control_file="$deb_test_root/DEBIAN/control"
 
     # Create directories for DEB test package artifacts
@@ -274,11 +278,11 @@ CTest files for $PACKAGE_NAME
 %build
 
 %install
-mkdir -p %{buildroot}$PACKAGE_INSTALL_PREFIX/bin
-cp -r * %{buildroot}$PACKAGE_INSTALL_PREFIX/bin
+mkdir -p %{buildroot}$TEST_PACKAGE_INSTALL_PREFIX
+cp -r * %{buildroot}$TEST_PACKAGE_INSTALL_PREFIX
 
 %files
-$PACKAGE_INSTALL_PREFIX/bin
+$TEST_PACKAGE_INSTALL_PREFIX
 
 %changelog
 EOF
