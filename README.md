@@ -80,15 +80,15 @@ A collection of examples to enable new users to start using ROCm. Advanced users
       - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
   - [rocFFT](/Libraries/rocFFT/)
       - [callback](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/callback/): Program that showcases the use of rocFFT `callback` functionality.
-      - [complex_complex](/Libraries/rocFFT/complex_complex/): Program that showcases a Fast Fourier Transform from complex to complex numbers.
-      - [complex_real](/Libraries/rocFFT/complex_real/): Program that showcases a Fast Fourier Transform from complex to real numbers.
+      - [complex_complex](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/complex_complex/): Program that showcases a Fast Fourier Transform from complex to complex numbers.
+      - [complex_real](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/complex_real/): Program that showcases a Fast Fourier Transform from complex to real numbers.
       - [multi_gpu](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/multi_gpu/): Program that showcases the use of rocFFT multi-GPU functionality.
-      - [real_complex](/Libraries/rocFFT/real_complex/): Program that showcases a Fast Fourier Transform from real to complex numbers.
+      - [real_complex](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocFFT/real_complex/): Program that showcases a Fast Fourier Transform from real to complex numbers.
   - [rocPRIM](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/)
     - [block_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/block_sum/): Simple program that showcases `rocprim::block_reduce` with an addition operator.
     - [device_sum](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocPRIM/device_sum/): Simple program that showcases `rocprim::reduce` with an addition operator.
   - [hipFFT](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/)
-    - [multi_gpu](/Libraries/hipFFT/multi_gpu/): Program that showcases the use of hipFFT multi-GPU functionality.
+    - [multi_gpu](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/multi_gpu/): Program that showcases the use of hipFFT multi-GPU functionality.
     - [plan_d2z](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/plan_d2z): Forward fast Fourier transform for 1D, 2D, and 3D real input using a simple plan in hipFFT.
     - [plan_z2z](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/hipFFT/plan_z2z): Forward fast Fourier transform for 1D, 2D, and 3D complex input using a simple plan in hipFFT.
   - [rocRAND](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocRAND/)
