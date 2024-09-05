@@ -36,7 +36,7 @@ if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
     )
 endif()
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(
         WARNING
         "hipFFT multi_gpu example is not supported on Windows. Skipping!"

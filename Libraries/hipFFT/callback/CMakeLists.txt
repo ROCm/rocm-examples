@@ -29,7 +29,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     return()
 endif()
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "hipFFT callback example does not support windows")
     return()
 endif()
