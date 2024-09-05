@@ -25,24 +25,24 @@ set -e
 
 # Default values
 GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
-ROCM_EXAMPLES_ROOT="$GIT_TOP_LEVEL"
 PACKAGE_NAME="ROCm-SDK-Examples"
 PACKAGE_VERSION="6.2.0"
-PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"
-TEST_PACKAGE_INSTALL_PREFIX="/opt/rocm/examples-test"
-BUILD_DIR="$ROCM_EXAMPLES_ROOT/build"
-DEB_DIR="$BUILD_DIR/deb"
-RPM_DIR="$BUILD_DIR/rpm"
 DEB_PACKAGE_RELEASE="local.9999"
 RPM_PACKAGE_RELEASE="local.9999"
-CPACKGEN=""
+PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"
+TEST_PACKAGE_INSTALL_PREFIX="/opt/rocm/examples-test"
+SRC_DIR="$GIT_TOP_LEVEL"
+BUILD_DIR="$SRC_DIR/build"
+DEB_DIR="$BUILD_DIR/deb"
+RPM_DIR="$BUILD_DIR/rpm"
+PACKGEN="" # Default is both DEB and RPM
 
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
 
 # Getopt argument parsing
-VALID_ARGS=$(getopt -o hcr --long help,clean,release,root:,pkgname:,version:,install-prefix:,test-install-prefix:,build-dir:,deb-dir:,rpm-dir:,deb-release:,rpm-release:,cpackgen: -- "$@")
+VALID_ARGS=$(getopt -o h --long help,pkgname:,version:,deb-release:,rpm-release:,install-prefix:,test-install-prefix:,src-dir:,build-dir:,deb-dir:,rpm-dir:,packgen: -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Invalid arguments"
     exit 1
@@ -53,24 +53,20 @@ eval set -- "$VALID_ARGS"
 while [ : ]; do
   case "$1" in
     -h | --help)
-      echo "Usage: build_rocm_examples.sh [options]"
+      echo "Usage: build_packages.sh [options]"
       echo "Options:"
-      echo "  --root <path>                    Set the root of the ROCm examples"
       echo "  --pkgname <name>                 Set the package name"
       echo "  --version <version>              Set the package version"
+      echo "  --deb-release <release>          Set the DEB package release info (used to generate filename)"
+      echo "  --rpm-release <release>          Set the RPM package release info (used to generate filename)"
       echo "  --install-prefix <path>          Set the package install prefix"
       echo "  --test-install-prefix <path>     Set the test package install prefix"
+      echo "  --src-dir<path>                  Set the source directory"
       echo "  --build-dir <path>               Set the build directory"
       echo "  --deb-dir <path>                 Set the DEB directory"
       echo "  --rpm-dir <path>                 Set the RPM directory"
-      echo "  --deb-release <release>          Set the DEB package release"
-      echo "  --rpm-release <release>          Set the RPM package release"
-      echo "  --cpackgen <tool>                Specify the CPack tool"
+      echo "  --packgen <format>               Specify the package format. Options 'DEB' or 'RPM'. Default: '', which generates both."      
       exit 0
-      ;;
-    --root)
-      ROCM_EXAMPLES_ROOT="$2"
-      shift 2
       ;;
     --pkgname)
       PACKAGE_NAME="$2"
@@ -80,12 +76,24 @@ while [ : ]; do
       PACKAGE_VERSION="$2"
       shift 2
       ;;
+    --deb-release)
+      DEB_PACKAGE_RELEASE="$2"
+      shift 2
+      ;;
+    --rpm-release)
+      RPM_PACKAGE_RELEASE="$2"
+      shift 2
+      ;;
     --install-prefix)
       PACKAGE_INSTALL_PREFIX="$2"
       shift 2
       ;;
     --test-install-prefix)
       TEST_PACKAGE_INSTALL_PREFIX="$2"
+      shift 2
+      ;;
+    --src-dir)
+      SRC_DIR="$2"
       shift 2
       ;;
     --build-dir)
@@ -100,16 +108,8 @@ while [ : ]; do
       RPM_DIR="$2"
       shift 2
       ;;
-    --deb-release)
-      DEB_PACKAGE_RELEASE="$2"
-      shift 2
-      ;;
-    --rpm-release)
-      RPM_PACKAGE_RELEASE="$2"
-      shift 2
-      ;;
-    --cpackgen)
-      CPACKGEN="$2"
+    --packgen)
+      PACKGEN="$2"
       shift 2
       ;;
     --)
@@ -142,17 +142,17 @@ SOURCE_DIRS=(
 
 print_input_variables() {
     echo "********** Input Variables **********"
-    echo "ROCM_EXAMPLES_ROOT=$ROCM_EXAMPLES_ROOT"
     echo "PACKAGE_NAME=$PACKAGE_NAME"
     echo "PACKAGE_VERSION=$PACKAGE_VERSION"
+    echo "DEB_PACKAGE_RELEASE=$DEB_PACKAGE_RELEASE"
+    echo "RPM_PACKAGE_RELEASE=$RPM_PACKAGE_RELEASE"
     echo "PACKAGE_INSTALL_PREFIX=$PACKAGE_INSTALL_PREFIX"
     echo "TEST_PACKAGE_INSTALL_PREFIX=$TEST_PACKAGE_INSTALL_PREFIX"
+    echo "SRC_DIR=$SRC_DIR"
     echo "BUILD_DIR=$BUILD_DIR"
     echo "DEB_DIR=$DEB_DIR"
     echo "RPM_DIR=$RPM_DIR"
-    echo "DEB_PACKAGE_RELEASE=$DEB_PACKAGE_RELEASE"
-    echo "RPM_PACKAGE_RELEASE=$RPM_PACKAGE_RELEASE"
-    echo "CPACKGEN=$CPACKGEN"
+    echo "PACKGEN=$PACKGEN"
     echo "************************************"
 }
 
@@ -160,7 +160,7 @@ build_project() {
     echo "** Building the project **"
     mkdir -p "$BUILD_DIR"
     pushd "$BUILD_DIR" || exit
-    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$ROCM_EXAMPLES_ROOT"
+    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$SRC_DIR"
     make -j$(nproc)
     popd || exit
 }
@@ -171,13 +171,13 @@ copy_sources() {
     echo "** Copying sources to $STAGING_DIR **"
 
     # Copy source files in root to package
-    cp "$ROCM_EXAMPLES_ROOT/LICENSE.md" "$ROCM_EXAMPLES_ROOT/CMakeLists.txt" "$ROCM_EXAMPLES_ROOT/README.md" "$STAGING_DIR"
+    cp "$SRC_DIR/LICENSE.md" "$SRC_DIR/CMakeLists.txt" "$SRC_DIR/README.md" "$STAGING_DIR"
 
     # Copy source directories to package
     for dir in "${SOURCE_DIRS[@]}"; do
         rsync -a --exclude 'build' --exclude '.gitignore' \
             --exclude '*.vcxproj**' --exclude '*.sln' --exclude 'bin' \
-            --exclude '*.o' --exclude '*.exe' "$ROCM_EXAMPLES_ROOT/$dir" "$STAGING_DIR"
+            --exclude '*.o' --exclude '*.exe' "$SRC_DIR/$dir" "$STAGING_DIR"
     done
 }
 
@@ -404,13 +404,13 @@ copy_sources
 # Copy CTest files to the test staging directory
 copy_test_files
 
-# Conditionally create DEB and RPM packages based on CPACKGEN
-if [ -z "$CPACKGEN" ] || [ "$CPACKGEN" == "DEB" ]; then
+# Conditionally create DEB and RPM packages based on PACKGEN
+if [ -z "$PACKGEN" ] || [ "$PACKGEN" == "DEB" ]; then
     create_deb_package
     create_deb_test_package
 fi
 
-if [ -z "$CPACKGEN" ] || [ "$CPACKGEN" == "RPM" ]; then
+if [ -z "$PACKGEN" ] || [ "$PACKGEN" == "RPM" ]; then
     create_rpm_package
     create_rpm_test_package
 fi
