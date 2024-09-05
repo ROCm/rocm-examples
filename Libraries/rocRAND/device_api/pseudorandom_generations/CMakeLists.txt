@@ -41,7 +41,7 @@ set(CMAKE_${LANG}_STANDARD 17)
 set(CMAKE_${LANG}_EXTENSIONS OFF)
 set(CMAKE_${LANG}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -75,7 +75,7 @@ set_source_files_properties(
 )
 
 # Workaround for rocRAND since it relies on definition "WIN32"
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 
