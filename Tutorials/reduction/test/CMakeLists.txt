@@ -72,7 +72,7 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 
     # Some CUDA versions have issues when compiling for C++20 on Windows, check if we are using those
-    if(WIN32)
+    if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         find_package(CUDA)
         if(CUDA_FOUND)
             set(FAULTY_CUDA_VERSION "12.5")

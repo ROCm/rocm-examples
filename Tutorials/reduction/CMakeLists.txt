@@ -31,7 +31,7 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
     cmake_minimum_required(VERSION 3.25.2)
 else()
     cmake_minimum_required(VERSION 3.21)
-    if(WIN32)
+    if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         message(
             STATUS
             "The reduction tutorial is not supported on Windows. Not building."
