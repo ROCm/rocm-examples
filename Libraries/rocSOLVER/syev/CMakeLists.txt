@@ -36,7 +36,7 @@ set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -63,6 +63,6 @@ target_link_libraries(${example_name} PRIVATE roc::rocsolver)
 target_include_directories(${example_name} PRIVATE "../../../Common")
 
 install(TARGETS ${example_name})
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::rocsolver)
 endif()

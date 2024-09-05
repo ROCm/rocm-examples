@@ -28,7 +28,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 # resort to the CUDA language mode.
 project(${example_name} LANGUAGES CUDA)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH

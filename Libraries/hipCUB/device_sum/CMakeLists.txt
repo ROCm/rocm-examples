@@ -53,7 +53,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 target_link_libraries(${example_name} PRIVATE hip::hipcub)
 target_include_directories(${example_name} PRIVATE "../../../Common")
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 

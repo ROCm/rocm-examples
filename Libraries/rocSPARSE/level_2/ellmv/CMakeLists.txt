@@ -36,7 +36,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -65,6 +65,6 @@ target_include_directories(${example_name} PRIVATE "../../../../Common")
 
 install(TARGETS ${example_name})
 
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::rocsparse)
 endif()

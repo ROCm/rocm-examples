@@ -40,7 +40,7 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -84,7 +84,7 @@ set_source_files_properties(
     PROPERTIES COMPILE_OPTIONS "--cuda-host-only;-fuse-cuid=none"
 )
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(OBJ_TYPE obj)
     set(NULDEV NUL)
     set(HOST_TARGET x86_64-pc-windows-msvc)
