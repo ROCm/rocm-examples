@@ -4,7 +4,7 @@
 
 This example showcases how to execute a 2-dimensional complex-to-complex fast Fourier
 transform (FFT) with multiple GPUs. Note that the API used is experimental and requires
-at least ROCm 6.0. 
+at least ROCm 6.0.
 
 ### Application flow
 
@@ -22,6 +22,7 @@ at least ROCm 6.0.
 ### Command line interface
 
 The application provides the following optional command line arguments:
+
 - `-l` or `--length`. The 3-D FFT size separated by spaces. It default value is `8 8 8`.
 - `-d` or `--devices`. The list of devices to use separated by spaces. It default value is `0 1`.
 
@@ -32,11 +33,11 @@ The application provides the following optional command line arguments:
 - `hipfftXtSetGPUs` instructs a plan to use multiple GPUs.
 - `hipfhipfftMakePlan2dftPlan2d` is used to create a plan for a 2-dimensional FFT.
 - `hipfftXtExecDescriptor` can execute a multi GPU plan.
--  Device memory management:
-    - `hipfftXtMalloc` allocates device memory for a plan associated with multiple devices.
-    - `hipLibXtDesc` holds the handles to device memory on multiple devices.
-    - `hipfftXtMemcpy` can copy data between a contiguous host buffer and `hipLibXtDesc`, or between two `hipLibXtDesc`.
-    - The memory allocated on device can be freed with `hipfftXtFree`.
+- Device memory management:
+  - `hipfftXtMalloc` allocates device memory for a plan associated with multiple devices.
+  - `hipLibXtDesc` holds the handles to device memory on multiple devices.
+  - `hipfftXtMemcpy` can copy data between a contiguous host buffer and `hipLibXtDesc`, or between two `hipLibXtDesc`.
+  - The memory allocated on device can be freed with `hipfftXtFree`.
 
 ## Demonstrated API Calls
 
