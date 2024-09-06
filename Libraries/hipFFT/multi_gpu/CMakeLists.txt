@@ -30,11 +30,17 @@ set(GPU_RUNTIMES "HIP" "CUDA")
 set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
 
 if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    message(FATAL_ERROR "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}")
+    message(
+        FATAL_ERROR
+        "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}"
+    )
 endif()
 
 if(WIN32)
-    message(WARNING "hipFFT multi_gpu example is not supported on Windows. Skipping!")
+    message(
+        WARNING
+        "hipFFT multi_gpu example is not supported on Windows. Skipping!"
+    )
     return()
 endif()
 
