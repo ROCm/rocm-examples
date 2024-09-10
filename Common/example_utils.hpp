@@ -246,13 +246,17 @@ void multiply_matrices(T        alpha,
 
 /// \brief Prints an {1,2,3}-dimensional array. The last dimension (fastest-index) specified in
 /// \p n will be printed horizontally.
+///
+/// By default a row-major layout of the data is assumed. When printing data in column-major
+/// layout, the \p column_major parameter must be set to \p true for a correct interpretation
+/// of the dimensions' sizes.
 template<class Tdata, class Tsize>
-void print_nd_data(const std::vector<Tdata> data,
-                   std::vector<Tsize>       np,
-                   const int                column_width     = 4,
-                   const bool               reverse_indexing = false)
+void print_nd_data(const std::vector<Tdata>& data,
+                   std::vector<Tsize>        np,
+                   const int                 column_width = 4,
+                   const bool                column_major = false)
 {
-    if(reverse_indexing)
+    if(column_major)
     {
         std::reverse(np.begin(), np.end());
     }
