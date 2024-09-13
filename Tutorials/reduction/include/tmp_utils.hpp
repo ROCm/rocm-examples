@@ -149,9 +149,8 @@ struct divide_ceil
     template<int I>
     FUNC_QUALIFIER constexpr int operator()()
     {
-        static_assert(
-            std::is_signed_v<decltype(I)> && std::is_signed_v<decltype(J)>, 
-            "Invalid type.");
+        static_assert(std::is_signed_v<decltype(I)> && std::is_signed_v<decltype(J)>,
+                      "Invalid type.");
         return (I + J - 1) / J;
     }
 };
