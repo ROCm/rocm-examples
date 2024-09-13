@@ -142,41 +142,20 @@ struct multiply
         return I * J;
     }
 };
-// Based on https://stackoverflow.com/a/63436491/1476661 by @jan-schultke
+
 template<int J>
 struct divide_ceil
 {
     template<int I>
     FUNC_QUALIFIER constexpr int operator()()
     {
-        using Dividend          = decltype(I);
-        using Divisor           = decltype(J);
-        static constexpr auto x = I;
-        static constexpr auto y = J;
-        if constexpr(std::is_unsigned_v<Dividend> && std::is_unsigned_v<Divisor>)
-        {
-            // quotient is always positive
-            return x / y + (x % y != 0); // uint / uint
-        }
-        else if constexpr(std::is_signed_v<Dividend> && std::is_unsigned_v<Divisor>)
-        {
-            auto sy               = static_cast<std::make_signed_t<Divisor>>(y);
-            bool quotientPositive = x >= 0;
-            return x / sy + (x % sy != 0 && quotientPositive); // int / uint
-        }
-        else if constexpr(std::is_unsigned_v<Dividend> && std::is_signed_v<Divisor>)
-        {
-            auto sx               = static_cast<std::make_signed_t<Dividend>>(x);
-            bool quotientPositive = y >= 0;
-            return sx / y + (sx % y != 0 && quotientPositive); // uint / int
-        }
-        else
-        {
-            bool quotientPositive = (y >= 0) == (x >= 0);
-            return x / y + (x % y != 0 && quotientPositive); // int / int
-        }
+        static_assert(
+            std::is_signed_v<decltype(I)> && std::is_signed_v<decltype(J)>, 
+            "Invalid type.");
+        return (I + J - 1) / J;
     }
 };
+
 template<typename Pred, typename TruePath, typename FalsePath>
 struct select
 {
