@@ -6,7 +6,7 @@ FROM nvidia/cuda:12.2.0-devel-ubuntu22.04
 
 # The ROCm versions that this image is based of.
 # Always write this down as major.minor.patch
-ENV ROCM_VERSION=6.1.0
+ENV ROCM_VERSION=6.2.0
 ENV ROCM_VERSION_APT=${ROCM_VERSION%.0}
 
 # Base packages that are required for the installation
