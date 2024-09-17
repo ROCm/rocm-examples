@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -253,8 +253,7 @@ int main(const int argc, const char** argv)
 
     if(number_of_devies <= 0)
     {
-        std::cerr << "HIP supported devices not found!"
-                  << "\n";
+        std::cerr << "HIP supported devices not found!\n";
         exit(error_exit_code);
     }
 

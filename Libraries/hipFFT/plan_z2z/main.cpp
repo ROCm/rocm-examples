@@ -56,9 +56,7 @@ void fft_example(const int dimension, const int size = 4, const int direction = 
     std::uniform_real_distribution<double> distribution{};
     std::generate(input.begin(),
                   input.end(),
-                  [&]() {
-                      return input_t{distribution(generator), distribution(generator)};
-                  });
+                  [&]() { return input_t{distribution(generator), distribution(generator)}; });
 
     std::cout << "Input:\n" << std::setprecision(3);
     print_nd_data(input, n, 16);
