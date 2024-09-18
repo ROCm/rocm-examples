@@ -77,11 +77,17 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
         if(CUDA_FOUND)
             set(FAULTY_CUDA_VERSION "12.5")
             if(CUDA_VERSION VERSION_LESS_EQUAL ${FAULTY_CUDA_VERSION})
-                message(WARNING "CUDA version ${CUDA_VERSION} has issues when compiling for C++20. Not building reduction examples.")
+                message(
+                    WARNING
+                    "CUDA version ${CUDA_VERSION} has issues when compiling for C++20. Not building reduction examples."
+                )
                 return()
             endif()
         else()
-            message(STATUS "CUDA Toolkit not found. Not building reduction examples.")
+            message(
+                STATUS
+                "CUDA Toolkit not found. Not building reduction examples."
+            )
             return()
         endif()
     endif()

@@ -70,18 +70,24 @@ list(APPEND include_dirs "${PROJECT_SOURCE_DIR}")
 if("${GPU_RUNTIME}" STREQUAL "CUDA")
     # For examples targeting NVIDIA, include the HIP header directory.
     list(APPEND include_dirs "${ROCM_ROOT}/include")
-    
+
     # Some CUDA versions have issues when compiling for C++20 on Windows, check if we are using those
     if(WIN32)
         find_package(CUDA)
         if(CUDA_FOUND)
             set(FAULTY_CUDA_VERSION "12.5")
             if(CUDA_VERSION VERSION_LESS_EQUAL ${FAULTY_CUDA_VERSION})
-                message(WARNING "CUDA version ${CUDA_VERSION} has issues when compiling for C++20. Not building reduction benchmarks.")
+                message(
+                    WARNING
+                    "CUDA version ${CUDA_VERSION} has issues when compiling for C++20. Not building reduction benchmarks."
+                )
                 return()
             endif()
         else()
-            message(STATUS "CUDA Toolkit not found. Not building reduction benchmarks.")
+            message(
+                STATUS
+                "CUDA Toolkit not found. Not building reduction benchmarks."
+            )
             return()
         endif()
     endif()
@@ -158,7 +164,7 @@ foreach(VER RANGE 0 10)
             ${Sources}
             PROPERTIES LANGUAGE ${GPU_RUNTIME}
         )
-        SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ROCM_ROOT}/cmake)
+        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ROCM_ROOT}/cmake)
         find_package(HIP MODULE REQUIRED)
         target_include_directories(
             ${TargetName}

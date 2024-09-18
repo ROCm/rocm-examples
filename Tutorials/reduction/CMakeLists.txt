@@ -32,13 +32,15 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
 else()
     cmake_minimum_required(VERSION 3.21)
     if(WIN32)
-        message(STATUS "The reduction tutorial is not supported on Windows. Not building.")
+        message(
+            STATUS
+            "The reduction tutorial is not supported on Windows. Not building."
+        )
         return()
     endif()
 endif()
 
 project(Reduction LANGUAGES CXX)
-
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
