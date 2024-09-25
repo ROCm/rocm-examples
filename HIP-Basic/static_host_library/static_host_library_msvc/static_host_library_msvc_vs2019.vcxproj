@@ -31,6 +31,12 @@
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP clang `))'">
+    <HIPVersion>$(PlatformToolset.Replace(`HIP clang `, ``))</HIPVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP nvcc `))'">
+    <HIPVersion>$(PlatformToolset.Replace(`HIP nvcc `, ``))</HIPVersion>
+  </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
