@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <HIPVersion>6.1</HIPVersion>
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{20C6A5F7-8EC0-4FAC-9BF7-8AC37AA79AC6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -45,14 +44,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.1</PlatformToolset>
+    <PlatformToolset>HIP clang 6.2</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.1</PlatformToolset>
+    <PlatformToolset>HIP clang 6.2</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP clang `))'">
+    <HIPVersion>$(PlatformToolset.Replace(`HIP clang `, ``))</HIPVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP nvcc `))'">
+    <HIPVersion>$(PlatformToolset.Replace(`HIP nvcc `, ``))</HIPVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
