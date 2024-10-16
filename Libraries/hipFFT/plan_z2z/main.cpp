@@ -71,13 +71,10 @@ void fft_example(const int dimension, const int size = 4, const int direction = 
     // 4. Copy host to device
     HIP_CHECK(hipMemcpy(d_input, input.data(), n_total * sizeof(*d_input), hipMemcpyHostToDevice));
 
-    // 5. Create FFT plan
-
-    // 5a. Allocate plan handle
+    // 5. Define FFT plan
     hipfftHandle plan;
-    HIPFFT_CHECK(hipfftCreate(&plan));
 
-    // 5b. Create {1, 2, 3}-dimensional plan
+    // 5a. Create {1, 2, 3}-dimensional plan
     switch(dimension)
     {
         case 1: HIPFFT_CHECK(hipfftPlan1d(&plan, n[0], hipfftType::HIPFFT_Z2Z, 1)); break;
