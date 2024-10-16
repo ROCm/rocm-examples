@@ -31,11 +31,6 @@
     #pragma nv_diag_suppress 1835 // attribute "dllimport" does not apply here
 #endif
 
-// rocPRIM adds a #warning about printf on NAVI.
-#ifdef __clang__
-    #pragma clang diagnostic ignored "-W#warnings"
-#endif
-
 #include <algorithm>
 #include <cassert>
 #include <chrono>
