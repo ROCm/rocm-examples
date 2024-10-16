@@ -179,6 +179,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_x));
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_y));
 
+    HIP_CHECK(hipFree(temp_buffer));
     HIP_CHECK(hipFree(d_x));
     HIP_CHECK(hipFree(d_y));
     HIP_CHECK(hipFree(d_coo_val));
