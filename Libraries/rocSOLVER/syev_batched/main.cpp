@@ -154,6 +154,7 @@ int main(const int argc, char* argv[])
 
     // 10. Clean up device allocations.
     ROCBLAS_CHECK(rocblas_destroy_handle(handle));
+    HIP_CHECK(hipFree(array_dA));
     HIP_CHECK(hipFree(d_A));
     HIP_CHECK(hipFree(d_W));
     HIP_CHECK(hipFree(d_work));
