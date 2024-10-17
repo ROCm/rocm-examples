@@ -24,6 +24,8 @@ project(reduction_benchmarks LANGUAGES CXX)
 
 if("${GPU_RUNTIME}" STREQUAL "CUDA")
     cmake_minimum_required(VERSION 3.25.2)
+    # Allow __device__ or __host__ annotated lambdas
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")
 else()
     cmake_minimum_required(VERSION 3.21)
     # Add -fPIE flag to compiler.
@@ -65,9 +67,30 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 set(include_dirs "../../Common")
 list(APPEND include_dirs "${PROJECT_SOURCE_DIR}")
 
-# For examples targeting NVIDIA, include the HIP header directory.
 if("${GPU_RUNTIME}" STREQUAL "CUDA")
+    # For examples targeting NVIDIA, include the HIP header directory.
     list(APPEND include_dirs "${ROCM_ROOT}/include")
+
+    # Some CUDA versions have issues when compiling for C++20 on Windows, check if we are using those
+    if(WIN32)
+        find_package(CUDA)
+        if(CUDA_FOUND)
+            set(FAULTY_CUDA_VERSION "12.5")
+            if(CUDA_VERSION VERSION_LESS_EQUAL ${FAULTY_CUDA_VERSION})
+                message(
+                    WARNING
+                    "CUDA version ${CUDA_VERSION} has issues when compiling for C++20. Not building reduction benchmarks."
+                )
+                return()
+            endif()
+        else()
+            message(
+                STATUS
+                "CUDA Toolkit not found. Not building reduction benchmarks."
+            )
+            return()
+        endif()
+    endif()
 endif()
 
 # libstdc++ Parallel STL on Ubuntu 20.04 requires explicit linking to TBB
@@ -141,6 +164,7 @@ foreach(VER RANGE 0 10)
             ${Sources}
             PROPERTIES LANGUAGE ${GPU_RUNTIME}
         )
+        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ROCM_ROOT}/cmake)
         find_package(HIP MODULE REQUIRED)
         target_include_directories(
             ${TargetName}
