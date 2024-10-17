@@ -25,7 +25,6 @@
 
 #include <hipfft/hipfft.h>
 
-#include <iomanip>
 #include <iostream>
 
 /// \brief Converts a \p hipfftResult_t variable to its correspondent string.
@@ -69,33 +68,5 @@ inline const char* hipfftResultToString(hipfftResult_t status)
             std::exit(error_exit_code);                                                 \
         }                                                                               \
     }
-
-/// \brief Prints an {1,2,3}-dimensional array. The last dimension (fastest-index) specified in
-/// \p n will be printed horizontally.
-template<class T>
-void print_nd_data(const std::vector<T> data, const std::vector<int> n, const int column_width = 4)
-{
-    // Note: we want to print the last dimension horizontally (on the x-axis)!
-    int size_x = n[n.size() - 1];
-    int size_y = n.size() > 1 ? n[n.size() - 2] : 1;
-    int size_z = n.size() > 2 ? n[n.size() - 3] : 1;
-    for(int z = 0; z < size_z; ++z)
-    {
-        for(int y = 0; y < size_y; ++y)
-        {
-            for(int x = 0; x < size_x; ++x)
-            {
-                auto index = (z * size_y + y) * size_x + x;
-                std::cout << std::setfill(' ') << std::setw(column_width) << data[index] << " ";
-            }
-            std::cout << "\n";
-        }
-        if(z != size_z - 1)
-        {
-            std::cout << "\n";
-        }
-    }
-    std::cout << std::flush;
-}
 
 #endif // COMMON_HIPFFT_UTILS_HPP
