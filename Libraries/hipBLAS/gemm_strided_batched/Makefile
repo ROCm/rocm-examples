@@ -22,6 +22,7 @@
 
 EXAMPLE := hipblas_gemm_strided_batched
 COMMON_INCLUDE_DIR := ../../../Common
+EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -35,7 +36,7 @@ HIPCXX  ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(HIPBLAS_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ICPPFLAGS := -isystem $(HIPBLAS_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lhipblas
 
@@ -54,7 +55,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipblas_utils.hpp
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipblas_utils.hpp $(EXTERNAL_DIR)/CmdParser/cmdparser.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:

@@ -68,7 +68,7 @@ set_tests_properties(
     PROPERTIES ENVIRONMENT "HIP_VISIBLE_DEVICES=0"
 )
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()

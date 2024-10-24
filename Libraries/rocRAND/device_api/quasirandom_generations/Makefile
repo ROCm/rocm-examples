@@ -22,6 +22,7 @@
 
 EXAMPLE := rocrand_quasirandom_generations
 COMMON_INCLUDE_DIR := ../../../../Common
+EXTERNAL_DIR := ../../../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -38,7 +39,7 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
-ICPPFLAGS := -isystem $(ROCRAND_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR)
+ICPPFLAGS := -isystem $(ROCRAND_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -isystem $(HIP_INCLUDE_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lrocrand
 
@@ -62,7 +63,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocrand_utils.hpp
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocrand_utils.hpp $(EXTERNAL_DIR)/CmdParser/cmdparser.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:

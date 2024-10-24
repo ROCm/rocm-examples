@@ -59,7 +59,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_executable(${example_name} main.hip vulkan_utils.hip)
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()

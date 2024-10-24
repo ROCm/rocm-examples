@@ -64,7 +64,7 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 list(APPEND include_dirs "${PROJECT_SOURCE_DIR}")
 
 if("${GPU_RUNTIME}" STREQUAL "CUDA")

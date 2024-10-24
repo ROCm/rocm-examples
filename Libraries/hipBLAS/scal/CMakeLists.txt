@@ -66,7 +66,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::hipblas)
 
-target_include_directories(${example_name} PRIVATE "../../../Common")
+target_include_directories(${example_name} PRIVATE "../../../Common" "../../../External")
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
 install(TARGETS ${example_name})

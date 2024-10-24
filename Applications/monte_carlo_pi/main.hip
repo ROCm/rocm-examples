@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "hiprand_utils.hpp"
 

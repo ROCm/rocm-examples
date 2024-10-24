@@ -62,7 +62,7 @@ add_executable(${example_name} main.hip)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 set(link_libs "")
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 
 if(GPU_RUNTIME STREQUAL "HIP")
     # Link hiprtc library

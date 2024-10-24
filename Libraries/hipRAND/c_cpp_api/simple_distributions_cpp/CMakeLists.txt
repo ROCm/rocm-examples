@@ -83,7 +83,7 @@ else()
     target_link_libraries(${example_name} PRIVATE roc::rocrand)
 endif()
 
-target_include_directories(${example_name} PRIVATE "../../../../Common")
+target_include_directories(${example_name} PRIVATE "../../../../Common" "../../../../External")
 
 ## Workaround for rocRAND since it relies on definition "WIN32".
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")

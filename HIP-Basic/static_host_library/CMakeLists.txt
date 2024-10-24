@@ -60,7 +60,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 set(library_name hip_static_host)
 set(example_name_cxx ${example_name}_cxx)
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()

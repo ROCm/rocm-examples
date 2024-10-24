@@ -86,7 +86,7 @@ add_dependencies(${example_name} ${example_name}_module)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
