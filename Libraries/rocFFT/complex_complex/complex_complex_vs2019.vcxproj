@@ -21,9 +21,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Common\cmdparser.hpp" />
     <ClInclude Include="..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\Common\rocfft_utils.hpp" />
+    <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <Content Include="$(HIPExecutablePath)\rocfft.dll">
@@ -82,6 +82,7 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;$(MSBuildProjectDirectory)\..\..\..\External;$(MSBuildProjectDirectory)\..\..\..\External\CmdParser;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -97,6 +98,7 @@
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>__clang__;__HIP__;WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;$(MSBuildProjectDirectory)\..\..\..\External;$(MSBuildProjectDirectory)\..\..\..\External\CmdParser;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
