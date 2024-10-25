@@ -21,25 +21,40 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries LANGUAGES CXX)
-include(CTest)
+project(hipRAND_examples LANGUAGES CXX)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-# CMake configuration files for CUDA versions of HIP libraries are not yet
-# included under the HIP SDK for Windows.
-if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
-    add_subdirectory(hipBLAS)
-    add_subdirectory(hipCUB)
-    add_subdirectory(hipFFT)
-    add_subdirectory(hipRAND)
-    add_subdirectory(hipSOLVER)
-    add_subdirectory(rocBLAS)
-    add_subdirectory(rocFFT)
-    add_subdirectory(rocPRIM)
-    add_subdirectory(rocRAND)
-    add_subdirectory(rocSOLVER)
-    add_subdirectory(rocSPARSE)
-    add_subdirectory(rocThrust)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+   set(ROCM_ROOT
+       "$ENV{HIP_PATH}"
+       CACHE PATH
+       "Root directory of the ROCm installation"
+   )
+else()
+   set(ROCM_ROOT
+       "/opt/rocm"
+       CACHE PATH
+       "Root directory of the ROCm installation"
+   )
 endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+find_package(hiprand)
+
+#Workaround for hipRAND, requires manual linking with backend.
+if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
+    find_package(CUDAToolkit REQUIRED)
+else()
+    find_package(rocrand REQUIRED)
+endif()
+
+if(NOT hiprand_FOUND)
+   message(STATUS "hipRAND could not be found, not building hipRAND examples")
+   return()
+endif()
+
+add_subdirectory(device_api)
+add_subdirectory(c_cpp_api)
