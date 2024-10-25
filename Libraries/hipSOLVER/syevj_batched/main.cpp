@@ -168,7 +168,9 @@ int main(const int argc, char* argv[])
         const double h_one       = 1;
         const double h_minus_one = -1;
         double*      d_accum{}; /* cumulative device matrix */
+        double*      d_X{};
         HIP_CHECK(hipMalloc(&d_accum, sizeof(double) * size_matrix));
+        HIP_CHECK(hipMalloc(&d_X, sizeof(double) * size_matrix));
 
         // Create a handle and enable passing scalar parameters from a pointer to host memory.
         hipblasHandle_t hipblas_handle;
@@ -187,8 +189,6 @@ int main(const int argc, char* argv[])
 
             // 10b. Check the solution by seeing if A_i * X_i - X_i * diag(W_i) is the zero matrix.
             // Firstly, make accum = X_i * diag(W_i).
-            double* d_X{};
-            HIP_CHECK(hipMalloc(&d_X, sizeof(double) * size_matrix));
             HIP_CHECK(hipMemcpy(d_X,
                                 X.data() + eigvect_offset,
                                 sizeof(double) * size_matrix,
@@ -226,6 +226,7 @@ int main(const int argc, char* argv[])
                                 hipMemcpyDeviceToHost));
         }
         // Free resources.
+        HIP_CHECK(hipFree(d_X));
         HIP_CHECK(hipFree(d_accum));
         HIPBLAS_CHECK(hipblasDestroy(hipblas_handle));
 
