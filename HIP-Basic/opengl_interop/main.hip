@@ -379,6 +379,7 @@ struct renderer
     }
 };
 
+/// [Sphinx sinewave kernel start]
 /// \brief The main HIP kernel for this example - computes a simple sine wave over a
 /// 2-dimensional grid of points.
 /// \param height_map - the grid of points to compute a sine wave for. It is expected to be
@@ -397,6 +398,7 @@ __global__ void sinewave_kernel(float* height_map, const float time)
         height_map[x * grid_width + y] = sinf(u * freq + time) * cosf(v * freq + time);
     }
 }
+/// [Sphinx sinewave kernel end]
 
 /// \brief This structure contains the HIP state and functionality used to advance the simulation.
 /// Initializing a \p simulator fetches the OpenGL height buffer from the corresponding <tt>renderer</tt>,
@@ -425,6 +427,7 @@ struct simulator
         HIP_CHECK(hipSetDevice(hip_device));
         HIP_CHECK(hipStreamCreate(&this->hip_stream));
 
+        // [Sphinx buffer register and get start]
         // Import the OpenGL height buffer into a HIP graphics resource.
         HIP_CHECK(hipGraphicsGLRegisterBuffer(
             &this->hip_height_buffer,
@@ -447,6 +450,7 @@ struct simulator
             hipGraphicsResourceGetMappedPointer(reinterpret_cast<void**>(&this->hip_height_ptr),
                                                 &size,
                                                 this->hip_height_buffer));
+        // [Sphinx buffer register and get end]
 
         this->start_time = std::chrono::high_resolution_clock::now();
     }
@@ -459,10 +463,12 @@ struct simulator
 
     ~simulator()
     {
+        // [Sphinx unregister start]
         HIP_CHECK(hipStreamSynchronize(this->hip_stream));
         HIP_CHECK(hipGraphicsUnmapResources(1, &this->hip_height_buffer, this->hip_stream));
         HIP_CHECK(hipGraphicsUnregisterResource(this->hip_height_buffer));
         HIP_CHECK(hipStreamDestroy(this->hip_stream));
+        // [Sphinx unregister end]
     }
 
     /// \brief Advance the simulation one step.
@@ -473,6 +479,7 @@ struct simulator
             = std::chrono::duration<float, std::chrono::seconds::period>(now - this->start_time)
                   .count();
 
+        // [Sphinx buffer use in kernel start]
         // The tile size to be used for each block of the computation. A tile is
         // tile_size by tile_size threads in this case, since we are invoking the
         // computation over a 2D-grid.
@@ -487,6 +494,7 @@ struct simulator
 
         // Check that no errors occured while launching the kernel.
         HIP_CHECK(hipGetLastError());
+        // [Sphinx buffer use in kernel end]
     }
 };
 
@@ -523,6 +531,7 @@ int main()
     // Ensure that we are using the OpenGL context associated to the Window.
     glfwMakeContextCurrent(window);
 
+    // [Sphinx opengl functions load start]
     // Make GLFW use a custom loader - we need this for the more recent OpenGL functions,
     // as these are not loaded by default on all platforms.
     if(!gladLoadGLLoader(reinterpret_cast<GLADloadproc>(glfwGetProcAddress)))
@@ -530,6 +539,7 @@ int main()
         std::cerr << "Failed to load OpenGL function pointers" << std::endl;
         return error_exit_code;
     }
+    // [Sphinx opengl functions load end]
 
     // Disable vsync.
     glfwSwapInterval(0);
