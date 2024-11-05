@@ -26,7 +26,7 @@ set -e
 # Default values
 GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
 PACKAGE_NAME="ROCm-SDK-Examples"
-PACKAGE_VERSION="6.2.0"
+PACKAGE_VERSION="6.3.0"
 DEB_PACKAGE_RELEASE="local.9999"
 RPM_PACKAGE_RELEASE="local.9999"
 PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"

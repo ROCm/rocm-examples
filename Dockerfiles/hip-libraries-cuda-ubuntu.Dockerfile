@@ -6,7 +6,7 @@ FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
 
 # The ROCm versions that this image is based of.
 # Always write this down as major.minor.patch
-ENV ROCM_VERSION=6.2.0
+ENV ROCM_VERSION=6.3.0
 ENV ROCM_VERSION_APT=${ROCM_VERSION%.0}
 
 # Base packages that are required for the installation
@@ -53,14 +53,10 @@ RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
 ENV HIP_COMPILER=nvcc HIP_PLATFORM=nvidia HIP_RUNTIME=cuda
 
 # Install rocRAND
-# We need to apply this patch to make it work on Nvidia for ROCm 6.2: https://github.com/ROCm/rocRAND/commit/7ec5fda5243e599d83af841b5c38198a2f7f05fa
 RUN wget https://github.com/ROCm/rocRAND/archive/refs/tags/rocm-${ROCM_VERSION}.tar.gz -O rocrand.tar.gz \
     && mkdir rocrand \
     && tar -xf ./rocrand.tar.gz --strip-components 1 -C rocrand \
     && rm ./rocrand.tar.gz \
-    && wget https://github.com/ROCm/rocRAND/commit/7ec5fda5243e599d83af841b5c38198a2f7f05fa.patch -O rocrand.patch \
-    && patch -p1 -d rocrand < ./rocrand.patch \
-    && rm rocrand.patch \
     && cmake -S ./rocrand -B ./rocrand/build \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D BUILD_HIPRAND=OFF \
@@ -80,6 +76,14 @@ RUN wget https://github.com/ROCm/hipCUB/archive/refs/tags/rocm-${ROCM_VERSION}.t
     && cmake --build ./hipcub/build --target install \
     && rm -rf ./hipcub
 
+# Install hipblas-common
+RUN wget https://github.com/ROCm/hipBLAS-common/archive/refs/tags/rocm-${ROCM_VERSION}.tar.gz -O hipblas-common.tar.gz \
+    && mkdir hipblas-common \
+    && tar -xf ./hipblas-common.tar.gz --strip-components 1 -C hipblas-common \
+    && rm ./hipblas-common.tar.gz \
+    && cmake -S ./hipblas-common -B ./hipblas-common/build \
+    && cmake --build ./hipblas-common/build --target install
+
 # Install hipBLAS
 RUN wget https://github.com/ROCm/hipBLAS/archive/refs/tags/rocm-${ROCM_VERSION}.tar.gz -O hipblas.tar.gz \
     && mkdir hipblas \
@@ -88,7 +92,7 @@ RUN wget https://github.com/ROCm/hipBLAS/archive/refs/tags/rocm-${ROCM_VERSION}.
     && CXXFLAGS=-D__HIP_PLATFORM_NVIDIA__ cmake -S ./hipblas -B ./hipblas/build \
         -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip \
         -D CMAKE_INSTALL_PREFIX=/opt/rocm \
-        -D USE_CUDA=ON \
+        -D HIP_PLATFORM=nvidia \
     && cmake --build ./hipblas/build --target install \
     && rm -rf ./hipblas
 

@@ -44,7 +44,7 @@ variables:
   HIP_FLAGS: "-Wno-unused-command-line-argument -Wall -Wextra -Werror"
   # Keep in sync with ROCM_VERSION in Dockerfiles/hip-libraries-cuda-ubuntu.Dockerfile
   # and Dockerfiles/hip-libraries-rocm-ubuntu.Dockerfile
-  DOCKER_ROCM_VERSION: 6.2.0
+  DOCKER_ROCM_VERSION: 6.3.0
   DOCKER_HIP_LIBRARIES_ROCM_TAG: rocm-ubuntu-${DOCKER_ROCM_VERSION}
   DOCKER_HIP_LIBRARIES_CUDA_TAG: cuda-ubuntu-${DOCKER_ROCM_VERSION}
   DOCKER_HIP_LIBRARIES_ROCM: $DOCKER_TAG_PREFIX:$DOCKER_HIP_LIBRARIES_ROCM_TAG
