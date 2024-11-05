@@ -9,12 +9,17 @@
 # Input: Bundled Object file .hipfb file
 # Output: Host Bundled Object File .o
 
+    .section .hip_gpubin_handle,"dw"
+    .globl __hip_gpubin_handle_
+    .p2align 12
+__hip_gpubin_handle_:
+    .zero 8
     # Tell the assembler to place the offload bundle in the appropriate section.
     .section .hip_fatbin,"dw"
     # Make the symbol that addresses the binary public.
-    .globl __hip_fatbin
+    .globl __hip_fatbin_
     # Give the bundle the required alignment of 4096 (2 ^ 12).
     .p2align 12
-__hip_fatbin:
+__hip_fatbin_:
     # Include the offload bundle.
     .incbin "offload_bundle.hipfb"
