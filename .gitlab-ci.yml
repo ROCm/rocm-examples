@@ -286,23 +286,6 @@ test:cuda:
     - windows
     - shell
     - rx6900
-  variables:
-    SOLUTION_PREFIX: ROCm-Examples-VS
-    # hip_vulkant_interop: graphical
-    # hip_texture_management: does not work
-    # rocsparse_*: broken with new SDK
-    SkippedExamples: >
-      hip_vulkan_interop_*.exe,
-      hip_texture_management_*.exe,
-      rocsparse_bsric0_*.exe,
-      rocsparse_bsrilu0_*.exe,
-      rocsparse_bsrsm_*.exe,
-      rocsparse_bsrsv_*.exe,
-      rocsparse_csric0_*.exe,
-      rocsparse_csrilu0_*.exe,
-      rocsparse_csrsv_*.exe,
-      rocsparse_spsv_*.exe,
-      rocsparse_spsm_*.exe
 
 .test:windows-nvcc:
   tags:
@@ -326,6 +309,7 @@ test:cuda:
   variables:
     Timeout: 60
     Filter: "*_vs$VS_VERSION.exe"
+
   script:
     - |
       & ${env:HIP_PATH}/bin/clang++ --version
@@ -374,9 +358,24 @@ test:windows-rocm-vs:
   variables:
     SOLUTION_PREFIX: ROCm-Examples-VS
     # hip_vulkan_interop: graphical
+    # broken with new SDK (6.2):
+    # - applications_prefix_sum
+    # - hip_dynamic_shared
+    # - hipsolver_*
+    # - rocsolver_*
     SkippedExamples: >
-      hip_vulkan_interop_*.exe,
+      applications_prefix_sum_*.exe,
+      hip_dynamic_shared_*.exe,
       hip_opengl_interop_*.exe,
+      hip_vulkan_interop_*.exe,
+      hipsolver_gels_*.exe,
+      hipsolver_getrf_*.exe,
+      hipsolver_potrf_*.exe,
+      hipsolver_sygvd_*.exe,
+      hipsolver_sygvj_*.exe,
+      rocsolver_getf2_*.exe,
+      rocsolver_getri_*.exe
+
 test:windows-nvcc-vs:
   extends:
     - .test:windows-nvcc
@@ -408,6 +407,8 @@ test:windows-nvcc-vs:
   variables:
     VS_VERSION: 2022
     BUILD_TYPE: Release
+    SkippedExamples: applications_prefix_sum_*|hip_dynamic_shared_*|hip_opengl_interop_*|hip_vulkan_interop_*|hipsolver_gels_*|hipsolver_getrf_*|hipsolver_potrf_*|hipsolver_sygvd_*|hipsolver_sygvj_*|rocsolver_getf2_*|rocsolver_getri_*
+
   before_script:
     - | # Find VS installation
       $VS_PATH = (
@@ -428,7 +429,7 @@ test:windows-nvcc-vs:
     # So for now, just add the library path here.
     - $env:PATH = "${env:HIP_PATH}\bin;" + $env:PATH
     - cd "$CI_PROJECT_DIR/build"
-    - ctest --output-on-failure --timeout 15 --parallel 8
+    - ctest --output-on-failure --timeout 15 --parallel 8 -E "$SkippedExamples"
     - cmake --install "$CI_PROJECT_DIR/build" --prefix "$CI_PROJECT_DIR/install"
   needs: []
 
