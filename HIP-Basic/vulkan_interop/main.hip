@@ -430,6 +430,7 @@ VkBuffer create_buffer(const graphics_context&  ctx,
 hipExternalMemory_t
     memory_to_hip(const graphics_context& ctx, const VkDeviceMemory memory, const VkDeviceSize size)
 {
+    // [Sphinx external descriptor start]
     // Prepare the HIP external semaphore descriptor with the platform-specific
     // handle type that we wish to import. This value should correspond to the
     // handleTypes field set in VkExportMemoryAllocateInfoKHR while creating the
@@ -467,6 +468,7 @@ hipExternalMemory_t
     hipExternalMemory_t hip_memory;
     HIP_CHECK(hipImportExternalMemory(&hip_memory, &desc));
     return hip_memory;
+    // [Sphinx external descriptor end]
 }
 
 /// \brief Utility function to create a Vulkan semaphore.
@@ -509,6 +511,7 @@ VkSemaphore create_semaphore(const graphics_context& ctx, const bool external = 
 ///   \see create_semaphore for creating such a semaphore.
 hipExternalSemaphore_t semaphore_to_hip(const graphics_context& ctx, const VkSemaphore sema)
 {
+    // [Sphinx semaphore use in kernel start]
     // Prepare the HIP external semaphore descriptor with the platform-specific handle type
     // that we wish to import. This value should correspond to the handleTypes field set in
     // the VkExportSemaphoreCreateInfoKHR structure that was passed to Vulkan when creating
@@ -544,6 +547,7 @@ hipExternalSemaphore_t semaphore_to_hip(const graphics_context& ctx, const VkSem
     // Import the native semaphore to HIP to create a HIP external semaphore.
     hipExternalSemaphore_t hip_sema;
     HIP_CHECK(hipImportExternalSemaphore(&hip_sema, &desc));
+    // [Sphinx semaphore use in kernel end]
     return hip_sema;
 }
 
@@ -552,6 +556,7 @@ hipExternalSemaphore_t semaphore_to_hip(const graphics_context& ctx, const VkSem
 /// so that we may pass it to the kernel so that it can be read from and written to.
 void* map_hip_external_memory(const hipExternalMemory_t mem, const VkDeviceSize size)
 {
+    // [Sphinx external memory use in kernel start]
     hipExternalMemoryBufferDesc desc = {};
     desc.offset                      = 0;
     desc.size                        = size;
@@ -559,6 +564,7 @@ void* map_hip_external_memory(const hipExternalMemory_t mem, const VkDeviceSize 
 
     void* ptr;
     HIP_CHECK(hipExternalMemoryGetMappedBuffer(&ptr, mem, &desc));
+    // [Sphinx external memory use in kernel end]
     return ptr;
 }
 
