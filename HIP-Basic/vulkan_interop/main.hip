@@ -430,7 +430,7 @@ VkBuffer create_buffer(const graphics_context&  ctx,
 hipExternalMemory_t
     memory_to_hip(const graphics_context& ctx, const VkDeviceMemory memory, const VkDeviceSize size)
 {
-    // [Sphinx external descriptor start]
+    // [Sphinx vulkan memory to hip start]
     // Prepare the HIP external semaphore descriptor with the platform-specific
     // handle type that we wish to import. This value should correspond to the
     // handleTypes field set in VkExportMemoryAllocateInfoKHR while creating the
@@ -468,7 +468,7 @@ hipExternalMemory_t
     hipExternalMemory_t hip_memory;
     HIP_CHECK(hipImportExternalMemory(&hip_memory, &desc));
     return hip_memory;
-    // [Sphinx external descriptor end]
+    // [Sphinx vulkan memory to hip end]
 }
 
 /// \brief Utility function to create a Vulkan semaphore.
@@ -511,7 +511,7 @@ VkSemaphore create_semaphore(const graphics_context& ctx, const bool external = 
 ///   \see create_semaphore for creating such a semaphore.
 hipExternalSemaphore_t semaphore_to_hip(const graphics_context& ctx, const VkSemaphore sema)
 {
-    // [Sphinx semaphore use in kernel start]
+    // [Sphinx semaphore import start]
     // Prepare the HIP external semaphore descriptor with the platform-specific handle type
     // that we wish to import. This value should correspond to the handleTypes field set in
     // the VkExportSemaphoreCreateInfoKHR structure that was passed to Vulkan when creating
@@ -547,7 +547,7 @@ hipExternalSemaphore_t semaphore_to_hip(const graphics_context& ctx, const VkSem
     // Import the native semaphore to HIP to create a HIP external semaphore.
     hipExternalSemaphore_t hip_sema;
     HIP_CHECK(hipImportExternalSemaphore(&hip_sema, &desc));
-    // [Sphinx semaphore use in kernel end]
+    // [Sphinx semaphore import end]
     return hip_sema;
 }
 
@@ -556,7 +556,7 @@ hipExternalSemaphore_t semaphore_to_hip(const graphics_context& ctx, const VkSem
 /// so that we may pass it to the kernel so that it can be read from and written to.
 void* map_hip_external_memory(const hipExternalMemory_t mem, const VkDeviceSize size)
 {
-    // [Sphinx external memory use in kernel start]
+    // [Sphinx map external memory start]
     hipExternalMemoryBufferDesc desc = {};
     desc.offset                      = 0;
     desc.size                        = size;
@@ -564,10 +564,11 @@ void* map_hip_external_memory(const hipExternalMemory_t mem, const VkDeviceSize 
 
     void* ptr;
     HIP_CHECK(hipExternalMemoryGetMappedBuffer(&ptr, mem, &desc));
-    // [Sphinx external memory use in kernel end]
+    // [Sphinx map external memory end]
     return ptr;
 }
 
+// [Sphinx sinewave kernel start]
 /// \brief The main HIP kernel for this example - computes a simple sine wave over a
 /// 2-dimensional grid of points.
 /// \param height_map - the grid of points to compute a sine wave for. It is expected to be
@@ -586,6 +587,7 @@ __global__ void sinewave_kernel(float* height_map, const float time)
         height_map[x * grid_width + y] = sinf(u * freq + time) * cosf(v * freq + time);
     }
 }
+// [Sphinx sinewave kernel end]
 
 /// \brief In order to increase efficiency, we pipeline the rendering process. This allows us to render
 /// the next frame already while another frame is being presented by Vulkan. The \p frame structure
@@ -1147,11 +1149,13 @@ struct renderer
         // on it then.
         if(this->frame_index != 0)
         {
+            // [Sphinx wait semaphore start]
             hipExternalSemaphoreWaitParams wait_params = {};
             HIP_CHECK(hipWaitExternalSemaphoresAsync(&this->hip_buffer_ready,
                                                      &wait_params,
                                                      1,
                                                      this->hip_stream));
+            // [Sphinx wait semaphore end]
         }
 #else
         // If semaphores are not supported or not used, then we need to perform a full queue
@@ -1169,6 +1173,7 @@ struct renderer
         // computation over a 2D-grid.
         constexpr size_t tile_size = 8;
 
+        // [Sphinx kernel call start]
         // Launch the HIP kernel to advance the simulation.
         sinewave_kernel<<<dim3(ceiling_div(grid_width, tile_size),
                                ceiling_div(grid_height, tile_size)),
@@ -1176,17 +1181,20 @@ struct renderer
                           0,
                           this->hip_stream>>>(this->hip_height_buffer, time);
         HIP_CHECK(hipGetLastError());
+        // [Sphinx kernel call end]
 
         // Signal to Vulkan that we are done with the buffer and that it can proceed
         // with rendering.
 #if USE_EXTERNAL_SEMAPHORES == 1 && USE_SIGNAL_SEMAPHORE == 1
         // If semaphores are supported and used, signal the semaphore that indicates
         // that the simulation has finished.
+        // [Sphinx signal semaphore start]
         hipExternalSemaphoreSignalParams signal_params = {};
         HIP_CHECK(hipSignalExternalSemaphoresAsync(&this->hip_simulation_finished,
                                                    &signal_params,
                                                    1,
                                                    this->hip_stream));
+        // [Sphinx signal semaphore end]
 #else
         // If semaphores are not used or not supported, we need to again perform a full
         // queue sync from the HIP side this time.
