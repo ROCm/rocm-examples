@@ -92,7 +92,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         endif()
     endif()
 
-    if (CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "10.4")
+    if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL "10.4")
         add_subdirectory(module_api)
     endif()
 endif()
