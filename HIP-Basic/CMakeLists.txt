@@ -92,8 +92,11 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         endif()
     endif()
 
-    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.4")
-    # g++ < 10.4 does not support all required C++17 features
+    if(
+        CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.4"
+    )
+        # g++ < 10.4 does not support all required C++17 features
     else()
         add_subdirectory(module_api)
     endif()

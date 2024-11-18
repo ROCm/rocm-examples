@@ -26,8 +26,11 @@ project(Tutorials LANGUAGES CXX)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.4")
-# g++ < 10.4 does not support all required C++17 features
+if(
+    CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
+    AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.4"
+)
+    # g++ < 10.4 does not support all required C++17 features
 else()
     add_subdirectory(reduction)
 endif()
