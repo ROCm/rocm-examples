@@ -131,7 +131,7 @@ int main()
     constexpr double tolerance = 1e-4;
 
     // Set up convergence history.
-    std::array<double, max_iter> residual_history;
+    std::array<double, max_iter> residual_history{};
 
     // 4. Prepare device for rocSPARSE iterative SpSV invocation.
     // Obtain required buffer size in bytes for analysis and solve stages.
@@ -211,7 +211,7 @@ int main()
     std::cout << "Iterations performed: " << iter_counter << std::endl;
 
     // Check last residual computed to confirm that convergence was successful.
-    const double last_residual = residual_history.back();
+    const double last_residual = residual_history[iter_counter];
     const bool   is_converged  = last_residual < tolerance;
 
     int errors{};
