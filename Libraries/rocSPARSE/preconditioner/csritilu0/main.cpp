@@ -83,26 +83,26 @@ int main()
     double*        d_LU{};
     double*        d_data{};
 
-    constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (n + 1);
-    constexpr size_t size_csr_col_ind = sizeof(*d_csr_col_ind) * nnz;
-    constexpr size_t size_csr_val     = sizeof(*d_csr_val) * nnz;
+    constexpr size_t csr_row_ptr_size = sizeof(*d_csr_row_ptr) * (n + 1);
+    constexpr size_t csr_col_ind_size = sizeof(*d_csr_col_ind) * nnz;
+    constexpr size_t csr_val_size     = sizeof(*d_csr_val) * nnz;
     constexpr size_t length_LU        = n * n;
-    constexpr size_t size_LU          = sizeof(*d_LU) * length_LU;
+    constexpr size_t LU_size          = sizeof(*d_LU) * length_LU;
     rocsparse_int    max_iter         = 100; /*maximum number of iterations*/
     const size_t     length_data      = 2 * max_iter;
-    const size_t     size_data        = sizeof(*d_data) * length_data;
+    const size_t     data_size        = sizeof(*d_data) * length_data;
 
-    HIP_CHECK(hipMalloc(&d_csr_row_ptr, size_csr_row_ptr));
-    HIP_CHECK(hipMalloc(&d_csr_col_ind, size_csr_col_ind));
-    HIP_CHECK(hipMalloc(&d_csr_val, size_csr_val));
-    HIP_CHECK(hipMalloc(&d_LU, size_LU));
-    HIP_CHECK(hipMalloc(&d_data, size_data));
+    HIP_CHECK(hipMalloc(&d_csr_row_ptr, csr_row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_csr_col_ind, csr_col_ind_size));
+    HIP_CHECK(hipMalloc(&d_csr_val, csr_val_size));
+    HIP_CHECK(hipMalloc(&d_LU, LU_size));
+    HIP_CHECK(hipMalloc(&d_data, data_size));
 
     HIP_CHECK(
-        hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), size_csr_row_ptr, hipMemcpyHostToDevice));
+        hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), csr_row_ptr_size, hipMemcpyHostToDevice));
     HIP_CHECK(
-        hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), size_csr_col_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), size_csr_val, hipMemcpyHostToDevice));
+        hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), csr_col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), csr_val_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE and prepare utility variables for csritilu0 invocation.
     // Initialize rocSPARSE by creating a handle.
@@ -134,7 +134,7 @@ int main()
 
     // 4. Sort CSR matrix before calling any of the iterative-ILU0-related functions.
     rocsparse_int* perm;
-    HIP_CHECK(hipMalloc(&perm, size_csr_col_ind));
+    HIP_CHECK(hipMalloc(&perm, csr_col_ind_size));
     ROCSPARSE_CHECK(rocsparse_create_identity_permutation(handle, nnz, perm));
 
     // Query the required buffer size in bytes and allocate a temporary buffer for sorting.
@@ -233,7 +233,7 @@ int main()
     std::vector<double> data(length_data);
 
     // Check last residual computed to confirm that convergence was successful.
-    HIP_CHECK(hipMemcpy(data.data(), d_data, size_data, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(data.data(), d_data, data_size, hipMemcpyDeviceToHost));
     const double last_residual       = data.back();
     const bool   csritilu0_converges = last_residual < tol;
 
@@ -250,7 +250,7 @@ int main()
     {
         // 9. Check errors and print the resulting matrices.
         std::vector<double> LU(length_LU);
-        HIP_CHECK(hipMemcpy(LU.data(), d_LU, size_LU, hipMemcpyDeviceToHost));
+        HIP_CHECK(hipMemcpy(LU.data(), d_LU, LU_size, hipMemcpyDeviceToHost));
 
         // Expected L and U matrices in dense format (row major).
         constexpr std::array<double, length_LU> L_expected
