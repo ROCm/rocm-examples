@@ -81,9 +81,9 @@ int main(const int argc, const char** argv)
     std::cout << "Input Vector x: " << format_range(h_x.begin(), h_x.end()) << std::endl;
     std::cout << "Input Vector y: " << format_range(h_y.begin(), h_y.end()) << std::endl;
 
-    // Compute reference result on host.
-    std::vector<float> h_x_gold(h_x);
-    std::vector<float> h_y_gold(h_y);
+    // Calculate expected result on CPU.
+    std::vector<float> h_x_expected(h_x);
+    std::vector<float> h_y_expected(h_y);
     for(int i = 0; i < n; ++i)
     {
         std::swap(h_x[i * incx], h_y[i * incy]);
@@ -129,8 +129,8 @@ int main(const int argc, const char** argv)
     unsigned int    errors = 0;
     for(int i = 0; i < n; i++)
     {
-        errors += std::fabs(h_x[i] - h_x_gold[i]) > eps;
-        errors += std::fabs(h_y[i] - h_y_gold[i]) > eps;
+        errors += std::fabs(h_x[i] - h_x_expected[i]) > eps;
+        errors += std::fabs(h_y[i] - h_y_expected[i]) > eps;
     }
     return report_validation_result(errors);
 }

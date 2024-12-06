@@ -133,7 +133,7 @@ int main(const int argc, const char** argv)
     std::vector<float> h_a(size_a, 1);
     std::vector<float> h_b(size_b);
     std::vector<float> h_c(size_c, 1);
-    std::vector<float> h_gold(size_c);
+    std::vector<float> h_expected(size_c);
 
     // Set B_i matrix.
     for(int i = 0; i < batch_count; ++i)
@@ -141,10 +141,8 @@ int main(const int argc, const char** argv)
         generate_identity_matrix(h_b.data() + i * stride_b, k, n, ldb);
     }
 
-    // Initialize gold standard matrix.
-    h_gold = h_c;
-
-    // Calculate gold standard on CPU.
+    // Calculate expected result on CPU.
+    h_expected = h_c;
     for(int i = 0; i < batch_count; ++i)
     {
         multiply_matrices<float>(h_alpha,
@@ -158,7 +156,7 @@ int main(const int argc, const char** argv)
                                  h_b.data() + i * stride_b,
                                  stride1_b,
                                  stride2_b,
-                                 h_gold.data() + i * stride_c,
+                                 h_expected.data() + i * stride_c,
                                  ldc);
     }
 
@@ -229,7 +227,7 @@ int main(const int argc, const char** argv)
 
     for(size_t i = 0; i < size_c; ++i)
     {
-        errors += std::fabs(h_c[i] - h_gold[i]) > eps;
+        errors += std::fabs(h_c[i] - h_expected[i]) > eps;
     }
     return report_validation_result(errors);
 }

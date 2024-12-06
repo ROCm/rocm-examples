@@ -143,9 +143,9 @@ int main(const int argc, const char** argv)
         }
     }
 
-    // Compute reference on CPU.
-    std::vector<hipFloatComplex> h_a_gold(h_a);
-    cher_reference(n, alpha, incx, h_x.data(), incy, h_y.data(), h_a_gold.data(), lda);
+    // Calculate expected result on CPU.
+    std::vector<hipFloatComplex> h_a_expected(h_a);
+    cher_reference(n, alpha, incx, h_x.data(), incy, h_y.data(), h_a_expected.data(), lda);
 
     // Initialize a hipBLAS API handle.
     hipblasHandle_t handle;
@@ -192,7 +192,7 @@ int main(const int argc, const char** argv)
                 continue;
             }
 
-            const hipFloatComplex diff = hipCsubf(h_a[i * lda + j], h_a_gold[i * lda + j]);
+            const hipFloatComplex diff = hipCsubf(h_a[i * lda + j], h_a_expected[i * lda + j]);
             errors += diff.x > eps;
             errors += diff.y > eps;
         }

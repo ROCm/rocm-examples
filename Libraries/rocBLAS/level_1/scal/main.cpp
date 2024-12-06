@@ -74,14 +74,11 @@ int main(const int argc, const char** argv)
 
     std::cout << "Input Vector x: " << format_range(h_x.begin(), h_x.end()) << std::endl;
 
-    // Initialize the values for vector h_x_gold, this vector will be used as a
-    // Gold Standard to compare our results from rocBLAS SCAL function.
-    std::vector<float> h_x_gold(h_x);
-
-    // CPU function for SCAL.
+    // Calculate expected result on CPU.
+    std::vector<float> h_x_expected(h_x);
     for(int i = 0; i < n; i++)
     {
-        h_x_gold[i * incx] = h_alpha * h_x[i * incx];
+        h_x_expected[i * incx] = h_alpha * h_x[i * incx];
     }
 
     // Use the rocBLAS API to create a handle.
@@ -114,7 +111,7 @@ int main(const int argc, const char** argv)
     unsigned int    errors = 0;
     for(size_t i = 0; i < size_x; i++)
     {
-        errors += std::fabs(h_x[i] - h_x_gold[i]) > eps;
+        errors += std::fabs(h_x[i] - h_x_expected[i]) > eps;
     }
     return report_validation_result(errors);
 }
