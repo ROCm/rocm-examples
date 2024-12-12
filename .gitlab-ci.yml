@@ -212,6 +212,7 @@ build:cmake-rocm:
       -D CMAKE_HIP_ARCHITECTURES="$GPU_TARGETS"
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_HIP_FLAGS="$HIP_FLAGS"
+      -D REDUCTION_DISABLE_LARGE_TESTS=ON
       2>&1 | tee cmake_log.txt
     # check if all dependencies were found
     - |-
