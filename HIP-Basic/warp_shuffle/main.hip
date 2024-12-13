@@ -45,11 +45,21 @@ __global__ void matrix_transpose_kernel(float* out, const float* in, const unsig
         // the thread with global id x * width + y will transpose.
         const float val = in[y * width + x];
 
-        // Transpose element reading it from the correspondent thread with a shuffle operation (__shfl).
-        // __shfl does not require all threads to be active, so it can be inside the if block.
+        // Transpose element reading it from the correspondent thread with a shuffle operation:
+        // * when targeting AMD devices, __shfl is used.
+        // * with targeting NVIDIA devices, __shfl is deprecated from CUDA 9 and __shfl_sync must
+        //   be used instead.
+        // __shfl/___shfl_sync do not require all threads to be active, so they can be inside the
+        // if block.
         // Note that, since the matrix in this example has less elements than the warp size value,
         // the ID within the warp of each thread matches its global ID.
+        // Also note that __shfl_sync needs the mask of active threads to be explicitly passed as
+        // argument. It can be retrieved with the warp intrinsic __activemask().
+#if defined(__HIP_PLATFORM_AMD__)
         out[x * width + y] = __shfl(val, y * width + x);
+#elif defined(__HIP_PLATFORM_NVIDIA__)
+        out[x * width + y] = __shfl_sync(__activemask(), val, y * width + x);
+#endif
     }
 }
 
