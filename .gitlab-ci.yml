@@ -260,7 +260,8 @@ build:cmake-cuda:
     # and currently we test on RX 7900 XTX (gfx1100) on CI. 
     # - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 8 -E reduction_test_v*
     # - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure --parallel 6 -R reduction_test_v*
-    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure
+    # Disable callback-related runs. There are known issues in rocFFT causing the examples to fail.
+    - cd $CI_PROJECT_DIR/build && HSA_XNACK=0 ctest --output-on-failure -E "callback"
 
 test:rocm:
   image: $DOCKER_HIP_LIBRARIES_ROCM
