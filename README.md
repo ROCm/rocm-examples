@@ -1,6 +1,131 @@
 # ROCm Examples
 
-A collection of examples to enable new users to start using ROCm. Advanced users may learn about new functionality through our advanced examples.
+This repository is a collection of examples to enable new users to start using
+ROCm, as well as provide more advanced examples for experienced users.
+
+The examples are structured in several categories:
+
+- [HIP-Basic](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/) showcases some basic functionality without any additional dependencies
+- [Libraries](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/) contains examples for ROCm-libraries, that provide higher-level functionality
+- [Applications](https://github.com/ROCm/rocm-examples/tree/develop/Applications/) showcases some common applications, using HIP to accelerate them
+
+- [AI](https://github.com/ROCm/rocm-examples/tree/develop/AI/) contains instructions on how to use ROCm for AI
+- [Tutorials](https://github.com/ROCm/rocm-examples/tree/develop/Tutorials/) contains the code accompanying the HIP Tutorials that can be found in [the HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/tutorial/saxpy.html).
+
+For a full overview over the examples see the section [repository contents](#repository-contents).
+
+## Prerequisites
+
+### Linux
+
+- [CMake](https://cmake.org/download/) (at least version 3.21)
+- A number of examples also support building via  GNU Make - available through the distribution's package manager
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
+- For example-specific prerequisites, see the example subdirectories.
+
+### Windows
+
+- [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
+- [HIP SDK for Windows](https://rocm.docs.amd.com/projects/install-on-windows/en/latest/how-to/install.html)
+  - The Visual Studio ROCm extension needs to be installed to build with the solution files.
+- [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
+- [Ninja](https://ninja-build.org/) (optional, to build with CMake)
+
+## Building the example suite
+
+### Linux
+
+These instructions assume that the prerequisites for every example are installed on the system.
+
+#### CMake
+
+See [CMake build options](#cmake-build-options) for an overview of build options.
+
+- `$ git clone https://github.com/ROCm/rocm-examples.git`
+- `$ cd rocm-examples`
+- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
+- `$ cmake --build build`
+- `$ cmake --install build --prefix install`
+
+#### Make
+
+Beware that only a subset of the examples support building via Make.
+
+- `$ git clone https://github.com/ROCm/rocm-examples.git`
+- `$ cd rocm-examples`
+- `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
+
+### Linux with Docker
+
+Alternatively, instead of installing the prerequisites on the system, the [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/develop/Dockerfiles/) in this repository can be used to build images that provide all required prerequisites. Note, that the ROCm kernel GPU driver still needs to be installed on the host system.
+
+The following instructions showcase building the Docker image and full example suite inside the container using CMake:
+
+- `$ git clone https://github.com/ROCm/rocm-examples.git`
+- `$ cd rocm-examples/Dockerfiles`
+- `$ docker build . -t rocm-examples -f hip-libraries-rocm-ubuntu.Dockerfile --build-arg GID="$(getent group render | cut -d':' -f 3)"` (on ROCm) or `$ docker build . -t rocm-examples -f hip-libraries-cuda-ubuntu.Dockerfile` (on CUDA)
+- `$ docker run -it --device /dev/kfd --device /dev/dri rocm-examples bash` (on ROCm) or `$ docker run -it --gpus=all rocm-examples bash` (on CUDA)
+- `# git clone https://github.com/ROCm/rocm-examples.git`
+- `# cd rocm-examples`
+- `# cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
+- `# cmake --build build`
+
+The built executables can be found and run in the `build` directory:
+
+- `# ./build/Libraries/rocRAND/simple_distributions_cpp/simple_distributions_cpp`
+
+### Windows
+
+#### Visual Studio
+
+The repository has Visual Studio project files for all examples and individually for each example.
+
+- Project files for Visual Studio are named as the example with `_vs<Visual Studio Version>` suffix added e.g. `device_sum_vs2019.sln` for the device sum example.
+- The project files can be built from Visual Studio or from the command line using MSBuild.
+  - Use the build solution command in Visual Studio to build.
+  - To build from the command line execute `C:\Program Files (x86)\Microsoft Visual Studio\<Visual Studio Version>\<Edition>\MSBuild\Current\Bin\MSBuild.exe <path to project folder>`.
+    - To build in Release mode pass the `/p:Configuration=Release` option to MSBuild.
+    - The executables will be created in a subfolder named "Debug" or "Release" inside the project folder.
+- The HIP specific project settings like the GPU architectures targeted can be set on the `General [AMD HIP C++]` tab of project properties.
+- The top level solution files come in two flavors: `ROCm-Examples-VS<Visual Studio Verson>.sln` and `ROCm-Examples-Portable-VS<Visual Studio Version>.sln`. The former contains all examples, while the latter contains the examples that support both ROCm and CUDA.
+
+#### CMake
+
+First, clone the repository and go to the source directory.
+
+```shell
+git clone https://github.com/ROCm/rocm-examples.git
+cd rocm-examples
+```
+
+There are two ways to build the project using CMake: with the Visual Studio Developer Command Prompt (recommended) or with a standard Command Prompt. See [CMake build options](#cmake-build-options) for an overview of build options.
+
+##### Visual Studio Developer Command Prompt
+
+Select Start, search for "x64 Native Tools Command Prompt for VS 2019", and the resulting Command Prompt. Ninja must be selected as generator, and Clang as C++ compiler.
+
+```shell
+cmake -S . -B build -G Ninja -D CMAKE_CXX_COMPILER=clang
+cmake --build build
+```
+
+##### Standard Command Prompt
+
+Run the standard Command Prompt. When using the standard Command Prompt to build the project, the Resource Compiler (RC) path must be specified. The RC is a tool used to build Windows-based applications, its default path is `C:/Program Files (x86)/Windows Kits/10/bin/<Windows version>/x64/rc.exe`. Finally, the generator must be set to Ninja.
+
+```shell
+cmake -S . -B build -G Ninja -D CMAKE_RC_COMPILER="<path to rc compiler>"
+cmake --build build
+```
+
+### CMake build options
+
+The following options are available when building with CMake.
+| Option                     | Relevant to | Default value    | Description                                                                                             |
+|:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
+| `GPU_RUNTIME`              | HIP / CUDA  | `"HIP"`          | GPU runtime to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.     |
+| `CMAKE_HIP_ARCHITECTURES`  | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
+| `CMAKE_CUDA_ARCHITECTURES` | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capibility 50 and 72.                 |
 
 ## Repository Contents
 
@@ -137,116 +262,3 @@ A collection of examples to enable new users to start using ROCm. Advanced users
     - [vectors](https://github.com/ROCm/rocm-examples/tree/develop/Libraries/rocThrust/vectors/): Simple program that showcases the `host_vector` and the `device_vector` of rocThrust.
 - [Tutorials](https://github.com/ROCm/rocm-examples/tree/develop/Tutorials/): Showcases HIP Documentation Tutorials.
   - [reduction](https://github.com/ROCm/rocm-examples/tree/develop/Tutorials/reduction/): Showcases a reduction tutorial for HIP Documentation.
-
-## Prerequisites
-
-### Linux
-
-- [CMake](https://cmake.org/download/) (at least version 3.21)
-- A number of examples also support building via  GNU Make - available through the distribution's package manager
-- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
-- For example-specific prerequisites, see the example subdirectories.
-
-### Windows
-
-- [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
-- [HIP SDK for Windows](https://rocm.docs.amd.com/projects/install-on-windows/en/latest/how-to/install.html)
-  - The Visual Studio ROCm extension needs to be installed to build with the solution files.
-- [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
-- [Ninja](https://ninja-build.org/) (optional, to build with CMake)
-
-## Building the example suite
-
-### Linux
-
-These instructions assume that the prerequisites for every example are installed on the system.
-
-#### CMake
-
-See [CMake build options](#cmake-build-options) for an overview of build options.
-
-- `$ git clone https://github.com/ROCm/rocm-examples.git`
-- `$ cd rocm-examples`
-- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
-- `$ cmake --build build`
-- `$ cmake --install build --prefix install`
-
-#### Make
-
-Beware that only a subset of the examples support building via Make.
-
-- `$ git clone https://github.com/ROCm/rocm-examples.git`
-- `$ cd rocm-examples`
-- `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
-
-### Linux with Docker
-
-Alternatively, instead of installing the prerequisites on the system, the [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/develop/Dockerfiles/) in this repository can be used to build images that provide all required prerequisites. Note, that the ROCm kernel GPU driver still needs to be installed on the host system.
-
-The following instructions showcase building the Docker image and full example suite inside the container using CMake:
-
-- `$ git clone https://github.com/ROCm/rocm-examples.git`
-- `$ cd rocm-examples/Dockerfiles`
-- `$ docker build . -t rocm-examples -f hip-libraries-rocm-ubuntu.Dockerfile --build-arg GID="$(getent group render | cut -d':' -f 3)"` (on ROCm) or `$ docker build . -t rocm-examples -f hip-libraries-cuda-ubuntu.Dockerfile` (on CUDA)
-- `$ docker run -it --device /dev/kfd --device /dev/dri rocm-examples bash` (on ROCm) or `$ docker run -it --gpus=all rocm-examples bash` (on CUDA)
-- `# git clone https://github.com/ROCm/rocm-examples.git`
-- `# cd rocm-examples`
-- `# cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
-- `# cmake --build build`
-
-The built executables can be found and run in the `build` directory:
-
-- `# ./build/Libraries/rocRAND/simple_distributions_cpp/simple_distributions_cpp`
-
-### Windows
-
-#### Visual Studio
-
-The repository has Visual Studio project files for all examples and individually for each example.
-
-- Project files for Visual Studio are named as the example with `_vs<Visual Studio Version>` suffix added e.g. `device_sum_vs2019.sln` for the device sum example.
-- The project files can be built from Visual Studio or from the command line using MSBuild.
-  - Use the build solution command in Visual Studio to build.
-  - To build from the command line execute `C:\Program Files (x86)\Microsoft Visual Studio\<Visual Studio Version>\<Edition>\MSBuild\Current\Bin\MSBuild.exe <path to project folder>`.
-    - To build in Release mode pass the `/p:Configuration=Release` option to MSBuild.
-    - The executables will be created in a subfolder named "Debug" or "Release" inside the project folder.
-- The HIP specific project settings like the GPU architectures targeted can be set on the `General [AMD HIP C++]` tab of project properties.
-- The top level solution files come in two flavors: `ROCm-Examples-VS<Visual Studio Verson>.sln` and `ROCm-Examples-Portable-VS<Visual Studio Version>.sln`. The former contains all examples, while the latter contains the examples that support both ROCm and CUDA.
-
-#### CMake
-
-First, clone the repository and go to the source directory.
-
-```shell
-git clone https://github.com/ROCm/rocm-examples.git
-cd rocm-examples
-```
-
-There are two ways to build the project using CMake: with the Visual Studio Developer Command Prompt (recommended) or with a standard Command Prompt. See [CMake build options](#cmake-build-options) for an overview of build options.
-
-##### Visual Studio Developer Command Prompt
-
-Select Start, search for "x64 Native Tools Command Prompt for VS 2019", and the resulting Command Prompt. Ninja must be selected as generator, and Clang as C++ compiler.
-
-```shell
-cmake -S . -B build -G Ninja -D CMAKE_CXX_COMPILER=clang
-cmake --build build
-```
-
-##### Standard Command Prompt
-
-Run the standard Command Prompt. When using the standard Command Prompt to build the project, the Resource Compiler (RC) path must be specified. The RC is a tool used to build Windows-based applications, its default path is `C:/Program Files (x86)/Windows Kits/10/bin/<Windows version>/x64/rc.exe`. Finally, the generator must be set to Ninja.
-
-```shell
-cmake -S . -B build -G Ninja -D CMAKE_RC_COMPILER="<path to rc compiler>"
-cmake --build build
-```
-
-### CMake build options
-
-The following options are available when building with CMake.
-| Option                     | Relevant to | Default value    | Description                                                                                             |
-|:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
-| `GPU_RUNTIME`              | HIP / CUDA  | `"HIP"`          | GPU runtime to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.     |
-| `CMAKE_HIP_ARCHITECTURES`  | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
-| `CMAKE_CUDA_ARCHITECTURES` | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capibility 50 and 72.                 |
