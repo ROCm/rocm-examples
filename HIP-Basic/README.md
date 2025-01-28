@@ -30,7 +30,7 @@ Make sure that the dependencies are installed, or use one of the [provided Docke
 
 All examples in the `HIP-Basic` subdirectory can either be built by a single CMake project or be built independently.
 
-- `$ cd Libraries/HIP-Basic`
+- `$ cd HIP-Basic`
 - `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA, when supported)
 - `$ cmake --build build`
 
@@ -38,7 +38,7 @@ All examples in the `HIP-Basic` subdirectory can either be built by a single CMa
 
 All examples can be built by a single invocation to Make or be built independently.
 
-- `$ cd Libraries/HIP-Basic`
+- `$ cd HIP-Basic`
 - `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA, when supported)
 
 ### Windows
