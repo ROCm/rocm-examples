@@ -11,7 +11,7 @@ LLVM IR is the intermediary language used by the LLVM compiler, which hipcc is b
 - Build with Makefile: to compile for specific GPU architectures, optionally provide the HIP_ARCHITECTURES variable. Provide the architectures separated by comma.
 
     ```shell
-    make HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102
+    make HIP_ARCHITECTURES="gfx803;gfx900;gfx906;gfx908;gfx90a;gfx1030;gfx1100;gfx1101;gfx1102"
     ```
 
 - Build with CMake:
@@ -54,11 +54,11 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
     ...
     ```
 
-3. The device object files are combined into an offload bundle using `clang-offload-bundler`. This requires specifying the target as well as the offload kind for each device, in the form `<offload-kind>-<target>-<arch>`. For HIP device code, `<offload-kind>` is `hipv4`. Note that this command requires an (empty) entry for the host to also be present, with `<offload-kind>` `host`. The order of targets and inputs must match. `<target>` is an LLVM target triple, which is specified as `<isa>-<vendor>-<os>-<abi>`. `<abi>` is left empty for AMD targets.
+3. The device object files are combined into an offload bundle using `clang-offload-bundler`. This requires specifying the target as well as the offload kind for each device, in the form `<offload-kind>-<target>[-<target id>[:<target features>]]`. For HIP device code, `<offload-kind>` is `hipv4`. Note that this command requires an (empty) entry for the host to also be present, with `<offload-kind>` `host`. The order of targets and inputs must match. `<target>` is an LLVM target 4-tuple, which is specified as `<arch>-<vendor>-<os>-<env>`.
 
     ```shell
     $ROCM_INSTALL_DIR/llvm/bin/clang-offload-bundler -type=o -bundle-align=4096 \
-            -targets=host-x86_64-unknown-linux,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-... \
+            -targets=host-x86_64-unknown-linux-gnu,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-... \
             -input=/dev/null \
             -input=main_gfx1030.o -input=... \
             -output=offload_bundle.hipfb

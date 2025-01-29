@@ -69,7 +69,7 @@ main_device.o: hip_obj_gen.mcin offload_bundle.hipfb
 
 offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 	$(CLANG_OFFLOAD_BUNDLER) -type=o -bundle-align=4096 \
-		-targets=host-x86_64-unknown-linux,$(GPU_ARCH_TRIPLES) \
+		-targets=host-x86_64-unknown-linux-gnu,$(GPU_ARCH_TRIPLES) \
 		-input=/dev/null \
 		$(^:%=-input=%) \
 		-output=$@

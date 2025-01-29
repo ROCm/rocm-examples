@@ -92,7 +92,7 @@ if(WIN32)
 else()
     set(OBJ_TYPE o)
     set(NULDEV /dev/null)
-    set(HOST_TARGET x86_64-unknown-linux)
+    set(HOST_TARGET x86_64-unknown-linux-gnu)
     set(HIP_OBJ_GEN_FILE hip_obj_gen.mcin)
 endif()
 
