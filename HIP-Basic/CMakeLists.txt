@@ -22,6 +22,7 @@
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Basic LANGUAGES CXX)
+include(CTest)
 
 # ROCm installation path
 if(WIN32)
