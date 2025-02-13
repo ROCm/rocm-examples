@@ -16,13 +16,11 @@ All rocSPARSE library functions, unless otherwise stated, are non blocking and e
 
   - OR GNU Make - available via the distribution's package manager
 
-- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x) OR the HIP Nvidia runtime (on the CUDA platform)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
 
 - [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE)
 
   - ROCm platform: `rocsparse` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
-
-  - CUDA platform: Install rocSPARSE from source: [instructions](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/install/Linux_Install_Guide.html).
 
 ### Windows
 
@@ -35,7 +33,6 @@ All rocSPARSE library functions, unless otherwise stated, are non blocking and e
 - [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE)
 
   - ROCm platform: Installed as part of the ROCm SDK on Windows.
-  - CUDA platform: Install rocSPARSE from source: [instructions](https://rocm.docs.amd.com/projects/rocSPARSE/en/latest/install/Linux_Install_Guide.html).
 
 - [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
 
@@ -52,7 +49,7 @@ Make sure that the dependencies are installed, or use the [provided Dockerfiles]
 All examples in the `rocSPARSE` subdirectory can either be built by a single CMake project or be built independently.
 
 - `$ cd Libraries/rocSPARSE`
-- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
+- `$ cmake -S . -B build` (on ROCm)
 - `$ cmake --build build`
 
 #### Using Make
@@ -60,7 +57,7 @@ All examples in the `rocSPARSE` subdirectory can either be built by a single CMa
 All examples can be built by a single invocation to Make or be built independently.
 
 - `$ cd Libraries/rocSPARSE`
-- `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
+- `$ make`
 
 ### Windows
 
