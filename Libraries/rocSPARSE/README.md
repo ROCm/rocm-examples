@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE) library. The examples build on both Linux and Windows for both the ROCm (AMD GPU) and CUDA (NVIDIA GPU) backend.
+The examples in this subdirectory showcase the functionality of the [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE) library. The examples build on both Linux and Windows for the ROCm (AMD GPU) backend.
 
 ## Note on asynchronous execution
 
