@@ -76,6 +76,15 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     # In this example we also need to link nvrtc CUDA library
     find_package(CUDAToolkit)
     list(APPEND link_libs "CUDA::nvrtc")
+
+    find_library(CUDA_DRIVER_LIB cuda)
+    if(NOT CUDA_DRIVER_LIB)
+        message(
+            FATAL_ERROR
+            "Could not find CUDA Driver library (libcuda.so). Please ensure that the NVIDIA drivers are installed."
+        )
+    endif()
+    list(APPEND link_libs "${CUDA_DRIVER_LIB}")
 endif()
 
 target_link_libraries(${example_name} ${link_libs})
