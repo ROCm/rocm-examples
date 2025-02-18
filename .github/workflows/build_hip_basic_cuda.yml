@@ -1,0 +1,49 @@
+name: Build HIP-Basic CUDA
+
+on:
+  push:
+    branches: [ develop, release/** ]
+    paths:
+      - 'HIP-Basic/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ develop, release/** ]
+    paths:
+      - 'HIP-Basic/**'
+      - '.github/workflows/**'
+
+env:
+    ROCM_VERSION: 6.3
+    AMDGPU_INSTALLER_VERSION: 6.3.60300-1
+
+jobs:
+    build:
+        name: "Build HIP Examples"
+        runs-on: ubuntu-latest
+        container:
+            image: nvidia/cuda:12.8.0-cudnn-devel-ubuntu22.04
+        steps:
+          - uses: actions/checkout@v4
+
+          - name: Install dependencies
+            run: |
+                  apt-get update -qq &&
+                  apt-get install -y build-essential g++ glslang-tools \
+                    python3 python3-pip locales wget
+                  python3 -m pip install --upgrade pip
+                  python3 -m pip install cmake
+
+          - name: Install Hip for CUDA
+            run: |
+              export DEBIAN_FRONTEND=noninteractive
+              wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
+              apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
+              apt-get update -qq &&
+              apt-get install -y hip-dev hipify-clang hip-runtime-nvidia
+
+          - name: Configure and Build
+            shell: bash
+            run: |
+              cd HIP-Basic && mkdir build && cd build
+              cmake -DGPU_RUNTIME=CUDA ..
+              cmake --build . -j4
