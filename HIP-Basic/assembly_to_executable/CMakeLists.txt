@@ -81,7 +81,7 @@ message(STATUS "GPU_ARCHITECTURES: ${GPU_ARCHITECTURES}")
 
 set_source_files_properties(
     main.hip
-    PROPERTIES COMPILE_OPTIONS "--cuda-host-only"
+    PROPERTIES COMPILE_OPTIONS "--cuda-host-only;-fuse-cuid=none"
 )
 
 if(WIN32)
