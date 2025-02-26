@@ -69,8 +69,6 @@
   <ImportGroup Label="ExtensionSettings">
     <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPPathVersion)\AMD.HIP.Clang.Common.props" />
     <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPPathVersion)\AMD.HIP.Nvcc.Common.props" />
-    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPPathVersion)\AMD.HIP.Clang.Common.props" />
-    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPPathVersion)\AMD.HIP.Nvcc.Common.props" />
     <Import Condition="'$(PlatformToolset)'=='HIP clang 6.2'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 6.2\AMD.HIP.Clang.Common.props" />
     <Import Condition="'$(PlatformToolset)'=='HIP nvcc 6.2'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc 6.2\AMD.HIP.Nvcc.Common.props" />
     <Import Condition="'$(PlatformToolset)'=='HIP clang 6.1'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 6.1\AMD.HIP.Clang.Common.props" />
@@ -138,8 +136,6 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPPathVersion)\AMD.HIP.Clang.Common.targets" />
-    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPPathVersion)\AMD.HIP.Nvcc.Common.targets" />
     <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPPathVersion)\AMD.HIP.Clang.Common.targets" />
     <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPPathVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPPathVersion)\AMD.HIP.Nvcc.Common.targets" />
     <Import Condition="'$(PlatformToolset)'=='HIP clang 6.2'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 6.2\AMD.HIP.Clang.Common.targets" />
