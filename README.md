@@ -87,7 +87,10 @@ The repository has Visual Studio project files for all examples and individually
     - To build in Release mode pass the `/p:Configuration=Release` option to MSBuild.
     - The executables will be created in a subfolder named "Debug" or "Release" inside the project folder.
 - The HIP specific project settings like the GPU architectures targeted can be set on the `General [AMD HIP C++]` tab of project properties.
-- If multiple HIP SDK versions are installed, the HIP_PATH environment variable must be set to point to the location of the desired version before launching Visual Studio.
+- If multiple HIP SDK versions are installed, the HIP_PATH environment variable must be set to point to the location of the desired version.
+  - This must be done before launching Visual Studio (or the command line interface if using MSBuild); changes made while the process is open will not be reflected.
+  - The Visual Studio platform toolset will automatically be set to match the HIP SDK version located by HIP_PATH.
+    - Selecting a platform toolset in the Visual Studio property pages to one that doesn't match the HIP SDK version set in HIP_PATH will result in an unsupported toolset error.
 - The top level solution files come in two flavors: `ROCm-Examples-VS<Visual Studio Verson>.sln` and `ROCm-Examples-Portable-VS<Visual Studio Version>.sln`. The former contains all examples, while the latter contains the examples that support both ROCm and CUDA.
 
 #### CMake
