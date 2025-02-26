@@ -17,6 +17,12 @@
     <RootNamespace>nrm2_vs2017</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <HIPVersionFileContents>$([System.IO.File]::ReadAllText('$(HIP_PATH)bin\.hipversion'))</HIPVersionFileContents>
+    <HIPVersionMajor>$(HIPVersionFileContents.Substring($([MSBuild]::Add($(HIPVersionFileContents.LastIndexOf("HIP_VERSION_MAJOR")),18)),2).Trim())</HIPVersionMajor>
+    <HIPVersionMinor>$(HIPVersionFileContents.Substring($([MSBuild]::Add($(HIPVersionFileContents.LastIndexOf("HIP_VERSION_MINOR")),18)),2).Trim())</HIPVersionMinor>
+    <HIPPathVersion>$(HIPVersionMajor).$(HIPVersionMinor)</HIPPathVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
   </ItemGroup>
@@ -25,7 +31,7 @@
     <ClInclude Include="..\..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\..\Common\rocblas_utils.hpp" />
   </ItemGroup>
-  <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+  <ItemGroup Condition="$(PlatformToolset.Contains('HIP clang'))">
     <Content Include="$(HIPExecutablePath)\rocblas.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -38,25 +44,23 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.2</PlatformToolset>
+    <PlatformToolset>HIP clang $(HIPPathVersion)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.2</PlatformToolset>
+    <PlatformToolset>HIP clang $(HIPPathVersion)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP clang `))'">
-    <HIPVersion>$(PlatformToolset.Replace(`HIP clang `, ``))</HIPVersion>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP nvcc `))'">
-    <HIPVersion>$(PlatformToolset.Replace(`HIP nvcc `, ``))</HIPVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
-    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPVersion)\AMD.HIP.Clang.Common.props" />
-    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPVersion)\AMD.HIP.Nvcc.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang 6.2'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 6.2\AMD.HIP.Clang.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc 6.2'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc 6.2\AMD.HIP.Nvcc.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang 6.1'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 6.1\AMD.HIP.Clang.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc 6.1'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc 6.1\AMD.HIP.Nvcc.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang 5.7'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 5.7\AMD.HIP.Clang.Common.props" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc 5.7'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc 5.7\AMD.HIP.Nvcc.Common.props" />
   </ImportGroup>
   <ImportGroup Label="Shared">
   </ImportGroup>
@@ -66,7 +70,10 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="HIP nvcc $(HIPVersion)" Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'">
+  <PropertyGroup Label="HIP nvcc $(HIPVersion)" Condition="$(PlatformToolset.Contains('HIP nvcc'))">
+    <ProjectExcludedFromBuild>true</ProjectExcludedFromBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset)'!='HIP nvcc $(HIPPathVersion)' and '$(PlatformToolset)'!='HIP clang $(HIPPathVersion)'">
     <ProjectExcludedFromBuild>true</ProjectExcludedFromBuild>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" />
@@ -83,7 +90,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and $(PlatformToolset.Contains('HIP clang'))">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -97,7 +104,7 @@
       <AdditionalDependencies>rocblas.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and $(PlatformToolset.Contains('HIP clang'))">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -115,7 +122,11 @@
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
-    <Import Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang $(HIPVersion)\AMD.HIP.Clang.Common.targets" />
-    <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPVersion)\AMD.HIP.Nvcc.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang 6.2'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 6.2\AMD.HIP.Clang.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc 6.2'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc 6.2\AMD.HIP.Nvcc.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang 6.1'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 6.1\AMD.HIP.Clang.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc 6.1'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc 6.1\AMD.HIP.Nvcc.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP clang 5.7'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP clang 5.7\AMD.HIP.Clang.Common.targets" />
+    <Import Condition="'$(PlatformToolset)'=='HIP nvcc 5.7'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc 5.7\AMD.HIP.Nvcc.Common.targets" />
   </ImportGroup>
 </Project>
