@@ -1,0 +1,50 @@
+# Promotion is triggered weekly on Saturdays at 14:00 UTC.
+
+name: Promotion Workflow
+
+permissions:
+  contents: write
+
+on:
+  schedule:
+    - cron: '0 14 * * 6'
+  workflow_dispatch:
+
+jobs:
+  Promotion:
+    runs-on: self-hosted
+    if: github.actor == 'sohaibnd'
+    env:  
+      staging_branch: amd-staging
+      mainline_branch: amd-mainline
+      
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4.2.2
+        with: 
+          fetch-depth: 0
+        
+      - name: Checkout staging and mainline branches
+        run: |
+          git pull
+          git checkout $staging_branch
+          git checkout $mainline_branch
+          
+      - name: Sync mainline with staging locally
+        run: |
+          # Skip sync if staging matches mainline already
+          if [[ -z $(git log $staging_branch...$mainline_branch) ]]; then
+            echo "mainline is already synced with staging"
+            exit 1
+          fi
+          # sync branches with fast-forward merge
+          git merge $staging_branch --ff-only
+          # Compare histories to check if they match after sync
+          if [[ -n $(git log $staging_branch...$mainline_branch) ]]; then
+            echo "branches don't match after sync!"
+            exit 1
+          fi         
+          
+      - name: Push mainline
+        run: git push -u origin $mainline_branch
+      
