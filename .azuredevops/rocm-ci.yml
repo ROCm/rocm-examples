@@ -13,7 +13,8 @@ trigger:
   batch: true
   branches:
     include:
-    - develop
+    - amd-staging
+    - amd-mainline
   paths:
     exclude:
     - .githooks
@@ -30,7 +31,8 @@ pr:
   autoCancel: true
   branches:
     include:
-    - develop
+    - amd-staging
+    - amd-mainline
   paths:
     exclude:
     - .githooks
