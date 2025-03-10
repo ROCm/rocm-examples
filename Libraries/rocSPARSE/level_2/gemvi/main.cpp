@@ -23,7 +23,6 @@
 #include "example_utils.hpp"
 #include "rocsparse_utils.hpp"
 
-#include <rocsolver/rocsolver.h>
 #include <rocsparse/rocsparse.h>
 
 #include <hip/hip_runtime.h>

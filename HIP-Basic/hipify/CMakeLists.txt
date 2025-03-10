@@ -66,12 +66,18 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
+# find hipify-perl
+if(EXISTS "${ROCM_ROOT}/libexec/hipify/hipify-perl")
+    set(HIPIFY_PERL ${ROCM_ROOT}/libexec/hipify/hipify-perl)
+else()
+    set(HIPIFY_PERL ${ROCM_ROOT}/bin/hipify-perl)
+endif()
+
 # create main.hip
 add_custom_command(
     OUTPUT main.hip
     COMMAND
-        ${PERL_EXECUTABLE} ${ROCM_ROOT}/bin/hipify-perl
-        ${CMAKE_CURRENT_SOURCE_DIR}/main.cu -o
+        ${PERL_EXECUTABLE} ${HIPIFY_PERL} ${CMAKE_CURRENT_SOURCE_DIR}/main.cu -o
         ${CMAKE_CURRENT_BINARY_DIR}/main.hip
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.cu
     VERBATIM
