@@ -53,7 +53,7 @@ template<typename T, typename F, uint32_t BlockSize, uint32_t WarpSize>
 __global__ static __launch_bounds__(BlockSize) void kernel(
     T* front, T* back, F op, T zero_elem, uint32_t front_size)
 {
-    static constexpr uint32_t WarpCount = BlockSize / WarpSize;
+    static constexpr uint32_t WarpCount = (BlockSize + WarpSize - 1) / WarpSize;
     __shared__ T              shared[WarpCount];
 
     auto read_global_safe = [&](const uint32_t i) { return i < front_size ? front[i] : zero_elem; };
