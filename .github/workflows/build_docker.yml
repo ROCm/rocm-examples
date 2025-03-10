@@ -1,12 +1,13 @@
 name: Build Docker
+
 on:
   push:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Dockerfiles/**'
       - '.github/workflows/**'
   pull_request:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Dockerfiles/**'
       - '.github/workflows/**'

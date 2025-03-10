@@ -3,13 +3,13 @@ name: Linting
 on:
   push:
     branches:
-      - develop
-      - main
+      - amd-staging
+      - amd-mainline
       - 'release/rocm-rel*'
   pull_request:
     branches:
-      - develop
-      - main
+      - amd-staging
+      - amd-mainline
       - 'release/rocm-rel*'
 
 env:

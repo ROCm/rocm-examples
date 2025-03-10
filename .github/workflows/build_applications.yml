@@ -2,19 +2,19 @@ name: Build Applications
 
 on:
   push:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Applications/**'
       - '.github/workflows/**'
   pull_request:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Applications/**'
       - '.github/workflows/**'
 
 env:
-    ROCM_VERSION: 6.3
-    AMDGPU_INSTALLER_VERSION: 6.3.60300-1
+    ROCM_VERSION: 6.3.3
+    AMDGPU_INSTALLER_VERSION: 6.3.60303-1
 
 jobs:
     build:
