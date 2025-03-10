@@ -13,7 +13,7 @@
     .globl __hip_gpubin_handle_
     .p2align 12
 __hip_gpubin_handle_:
-     .zero 8
+    .zero 8
 
     # Tell the assembler to place the offload bundle in the appropriate section.
     .section .hip_fatbin,"dw"
