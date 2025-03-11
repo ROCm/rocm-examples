@@ -140,6 +140,17 @@ add_subdirectory(shared_memory)
 if(NOT WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "HIP")
     add_subdirectory(static_host_library)
 endif()
+
+if(NOT WIN32 AND "${GPU_RUNTIME}" STREQUAL "HIP" AND ${CMAKE_MAKE_PROGRAM} STREQUAL "make")
+    set(static_device_library_example hip_static_device_library)
+    add_custom_target(
+        ${static_device_library_example} ALL
+        COMMAND make
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/static_device_library
+    )
+    install(PROGRAMS ${CMAKE_CURRENT_SOURCE_DIR}/static_device_library/${static_device_library_example} TYPE BIN)
+endif()
+
 add_subdirectory(streams)
 add_subdirectory(texture_management)
 add_subdirectory(warp_shuffle)
