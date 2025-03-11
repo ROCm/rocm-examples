@@ -205,7 +205,6 @@ int main()
                                                    temp_buffer));
 
     // 7. Perform the iterative incomplete LU factorization.
-    HIP_CHECK(hipMemset(&d_LU, 0, size_LU));
     ROCSPARSE_CHECK(rocsparse_dcsritilu0_compute(handle,
                                                  alg,
                                                  option,
