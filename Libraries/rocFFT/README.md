@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [rocFFT](https://github.com/ROCm/rocFFT/) library. The examples build on Linux for ROCm (AMD GPU).
+The examples in this subdirectory showcase the functionality of the [rocFFT](https://github.com/ROCm/rocFFT/) library. The examples can be built on Linux and Windows for ROCm (AMD GPU).
 
 ## Prerequisites
 

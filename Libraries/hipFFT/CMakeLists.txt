@@ -49,5 +49,6 @@ if(NOT hipfft_FOUND)
     return()
 endif()
 
+add_subdirectory(multi_gpu)
 add_subdirectory(plan_d2z)
 add_subdirectory(plan_z2z)
