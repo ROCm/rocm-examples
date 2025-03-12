@@ -20,22 +20,48 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+EXAMPLE := hipfft_multi_gpu
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
+
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
+CUDA_INSTALL_DIR := /usr/local/cuda
 
-EXAMPLES := \
-	callback \
-	complex_complex \
-	complex_real \
-	multi_gpu \
-	real_complex
+HIP_INCLUDE_DIR    := $(ROCM_INSTALL_DIR)/include
+HIPCUB_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-all: $(EXAMPLES)
+HIPCXX  ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
-clean: TARGET=clean
-clean: all
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(HIPCUB_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lhipfft
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+ifeq ($(GPU_RUNTIME), CUDA)
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
+	COMPILER := $(CUDACXX)
+else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS ?= -Wall -Wextra
+	ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+	COMPILER := $(HIPCXX)
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
 
-.PHONY: all clean $(EXAMPLES)
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
