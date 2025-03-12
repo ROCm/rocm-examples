@@ -160,7 +160,7 @@ build_project() {
     echo "** Building the project **"
     mkdir -p "$BUILD_DIR"
     pushd "$BUILD_DIR" || exit
-    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$SRC_DIR"
+    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all -DCMAKE_PREFIX_PATH="${ROCM_PATH}" "$SRC_DIR" --trace-expand
     make -j$(nproc)
     popd || exit
 }
