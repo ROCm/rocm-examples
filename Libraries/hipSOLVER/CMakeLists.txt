@@ -49,7 +49,7 @@ if(NOT hipsolver_FOUND)
         STATUS
         "hipSOLVER could not be found, not building hipSOLVER examples"
     )
-    return()
+    return(1)
 endif()
 
 add_subdirectory(gels)
