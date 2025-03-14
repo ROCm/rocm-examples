@@ -54,7 +54,7 @@ if(NOT rocsparse_FOUND)
         STATUS
         "rocSPARSE could not be found, not building rocSPARSE examples"
     )
-    return()
+    return(1)
 endif()
 
 add_subdirectory(level_2)

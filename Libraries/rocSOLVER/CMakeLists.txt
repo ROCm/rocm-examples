@@ -54,7 +54,7 @@ if(NOT rocblas_FOUND)
         STATUS
         "rocBLAS could not be found, not building rocSOLVER examples"
     )
-    return()
+    return(1)
 endif()
 
 find_package(rocsolver)
@@ -63,7 +63,7 @@ if(NOT rocsolver_FOUND)
         STATUS
         "rocSOLVER could not be found, not building rocSOLVER examples"
     )
-    return()
+    return(1)
 endif()
 
 add_subdirectory(getf2)

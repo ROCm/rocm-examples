@@ -46,7 +46,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(hipblas)
 if(NOT hipblas_FOUND)
     message(STATUS "hipBLAS could not be found, not building hipBLAS examples")
-    return()
+    return(1)
 endif()
 
 add_subdirectory(gemm_strided_batched)
