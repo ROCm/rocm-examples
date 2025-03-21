@@ -8,7 +8,7 @@
 #
 # Input: Bundled Object file .hipfb file
 # Output: Host Bundled Object File .o
-    
+
     .section .hip_gpubin_handle,"dw"
     .globl __hip_gpubin_handle_
     .p2align 12
