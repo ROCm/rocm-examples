@@ -94,7 +94,7 @@ int main()
     HIP_CHECK(hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), val_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemset(d_y, 0, y_size));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
