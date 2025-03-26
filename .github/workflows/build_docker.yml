@@ -33,6 +33,11 @@ jobs:
             echo "JSON_ARRAY is"
             echo $JSON_ARRAY
             echo "files=$JSON_ARRAY"  >> $GITHUB_OUTPUT 
+
+        # Clean the workspace here since other jobs may not have the permissions to do so later
+        # (needed for self-hosted runners)
+        - name: Clean the workspace
+          run: find $GITHUB_WORKSPACE -mindepth 1 -delete
     build:  
       name: Build Docker Images
       runs-on: self-hosted  
@@ -53,5 +58,10 @@ jobs:
             context: Dockerfiles/ 
             file: Dockerfiles/${{matrix.file}} 
             push: false          
-            tags: rocm-examples/dockerci:latest  
+            tags: rocm-examples/dockerci:latest
+
+        # Clean the workspace here since other jobs may not have the permissions to do so later
+        # (needed for self-hosted runners)
+        - name: Clean the workspace
+          run: find $GITHUB_WORKSPACE -mindepth 1 -delete  
 
