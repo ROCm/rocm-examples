@@ -35,6 +35,7 @@ select_hip_platform()
 
 add_subdirectory(bitonic_sort)
 add_subdirectory(convolution)
+add_subdirectory(fdtd)
 add_subdirectory(floyd_warshall)
 add_subdirectory(histogram)
 if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"))
