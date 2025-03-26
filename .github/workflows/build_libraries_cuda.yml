@@ -19,14 +19,13 @@ env:
 jobs:  
   build:  
     name: "Build Libraries with CUDA"  
-    runs-on: ubuntu-latest  
+    runs-on: self-hosted  
     container:  
       image:  nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
   
     steps:  
       - name: Checkout Repository  
         uses: actions/checkout@v4  
-  
       - name: Install System Dependencies  
         run: |
           apt-get update -qq && 
@@ -89,4 +88,9 @@ jobs:
         run: |  
           cd Libraries/rocRAND
           make GPU_RUNTIME=CUDA -j4
+
+      # Clean the workspace here since other jobs may not have the permissions to do so later
+      # (needed for self-hosted runners)
+      - name: Clean the workspace
+        run: find $GITHUB_WORKSPACE -mindepth 1 -delete
       

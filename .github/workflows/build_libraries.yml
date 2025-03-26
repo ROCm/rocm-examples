@@ -19,12 +19,11 @@ env:
 jobs:
     build:
         name: "Build Libraries Examples"
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         container:
             image: ubuntu:22.04
         steps:
           - uses: actions/checkout@v4
-
           - name: Install dependencies
             run: |
                   apt-get update -qq &&
@@ -58,3 +57,8 @@ jobs:
               cd Libraries && mkdir build && cd build
               cmake -DGPU_ARCHITECTURES=all -S ..
               cmake --build . -j 4
+          
+          # Clean the workspace here since other jobs may not have the permissions to do so later
+          # (needed for self-hosted runners)
+          - name: Clean the workspace
+            run: find $GITHUB_WORKSPACE -mindepth 1 -delete
