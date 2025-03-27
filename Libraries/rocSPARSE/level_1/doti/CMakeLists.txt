@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocSPARSE_examples LANGUAGES CXX)
-include(CTest)
+set(example_name rocsparse_doti)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocSPARSE examples do not support the CUDA runtime")
     return()
 endif()
+
+# This example does not contain device code, thereby it can be compiled with any conforming C++ compiler.
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32)
     set(ROCM_ROOT
@@ -48,16 +52,19 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocsparse)
-if(NOT rocsparse_FOUND)
-    message(
-        STATUS
-        "rocSPARSE could not be found, not building rocSPARSE examples"
-    )
-    return(1)
-endif()
+find_package(rocsparse REQUIRED)
 
-add_subdirectory(level_1)
-add_subdirectory(level_2)
-add_subdirectory(level_3)
-add_subdirectory(preconditioner)
+add_executable(${example_name} main.cpp)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE roc::rocsparse hip::host)
+
+target_include_directories(${example_name} PRIVATE "../../../../Common")
+
+install(TARGETS ${example_name})
+
+if(CMAKE_SYSTEM_NAME MATCHES Windows)
+    install(IMPORTED_RUNTIME_ARTIFACTS roc::rocsparse)
+endif()
