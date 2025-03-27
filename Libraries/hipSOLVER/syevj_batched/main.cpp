@@ -89,7 +89,7 @@ int main(const int argc, char* argv[])
 
     HIP_CHECK(hipMalloc(&d_A, sizeof(double) * A.size()));
     HIP_CHECK(hipMalloc(&d_W, sizeof(double) * W.size()));
-    HIP_CHECK(hipMalloc(&d_info, sizeof(int)));
+    HIP_CHECK(hipMalloc(&d_info, batch_count * sizeof(int)));
     HIP_CHECK(hipMemcpy(d_A, A.data(), sizeof(double) * A.size(), hipMemcpyHostToDevice));
 
     // 4. Initialize hipSOLVER by creating a handle.
