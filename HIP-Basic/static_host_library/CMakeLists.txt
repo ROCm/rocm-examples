@@ -82,9 +82,12 @@ target_link_libraries(${example_name} PRIVATE ${library_name})
 # We are creating a regular, non-HIP, executable, and so we don't need to pass
 # a list of devices for this target.
 set_target_properties(${example_name} PROPERTIES HIP_ARCHITECTURES FALSE)
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
+# Copy main.cpp so we don't use the same source file properties as above target
+file(COPY_FILE main.cpp ${CMAKE_CURRENT_BINARY_DIR}/main_copy.cpp)
 # Create a driver executable using the host c++ compiler.
-add_executable(${example_name_cxx} main.cpp)
+add_executable(${example_name_cxx} ${CMAKE_CURRENT_BINARY_DIR}/main_copy.cpp)
 
 # Link the static host library we have just created.
 target_link_libraries(${example_name_cxx} PRIVATE ${library_name})
