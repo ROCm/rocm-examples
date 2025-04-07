@@ -100,7 +100,7 @@ int main()
                                                ldb,
                                                d_W,
                                                &lwork));
-    HIP_CHECK(hipMalloc(&d_work, lwork));
+    HIP_CHECK(hipMalloc(&d_work, sizeof(double) * lwork));
 
     // Compute the eigenvalues (written to d_W) and eigenvectors (written to d_A) of the pair (A, B).
     HIPSOLVER_CHECK(hipsolverDsygvd(hipsolver_handle,

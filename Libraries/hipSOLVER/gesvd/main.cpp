@@ -120,7 +120,7 @@ int main(const int argc, char* argv[])
     // Query working space.
     HIPSOLVER_CHECK(
         hipsolverDgesvd_bufferSize(hipsolver_handle, left_svect, right_svect, m, n, &lwork));
-    HIP_CHECK(hipMalloc(&d_work, lwork));
+    HIP_CHECK(hipMalloc(&d_work, sizeof(double) * lwork));
 
     // Compute the singular values (vector S) and singular vectors (matrices U and V_H) of A.
     HIPSOLVER_CHECK(hipsolverDgesvd(hipsolver_handle,

@@ -102,7 +102,7 @@ int main(const int /*argc*/, char* /*argv*/[])
                                                d_W,
                                                &lwork,
                                                syevj_params));
-    HIP_CHECK(hipMalloc(&d_work, lwork));
+    HIP_CHECK(hipMalloc(&d_work, sizeof(double) * lwork));
 
     // Compute spectrum (written to d_W) and eigenvectors (writtten to d_A).
     HIPSOLVER_CHECK(hipsolverDsygvj(hipsolver_handle,
