@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -75,16 +75,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
     # In this example we also need to link nvrtc CUDA library
     find_package(CUDAToolkit)
-    list(APPEND link_libs "CUDA::nvrtc")
-
-    find_library(CUDA_DRIVER_LIB cuda)
-    if(NOT CUDA_DRIVER_LIB)
-        message(
-            FATAL_ERROR
-            "Could not find CUDA Driver library (libcuda.so). Please ensure that the NVIDIA drivers are installed."
-        )
-    endif()
-    list(APPEND link_libs "${CUDA_DRIVER_LIB}")
+    list(APPEND link_libs "CUDA::nvrtc" "CUDA::cuda_driver")
 endif()
 
 target_link_libraries(${example_name} ${link_libs})

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -205,7 +205,7 @@ int main()
                                                    temp_buffer));
 
     // 7. Perform the iterative incomplete LU factorization.
-    HIP_CHECK(hipMemset(d_LU, 0, size_LU));
+    HIP_CHECK(hipMemset(d_LU, 0, LU_size));
     ROCSPARSE_CHECK(rocsparse_dcsritilu0_compute(handle,
                                                  alg,
                                                  option,

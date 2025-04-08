@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -277,19 +277,6 @@ void print_nd_data(const std::vector<Tdata>& data,
         }
     }
     std::cout << std::flush;
-}
-
-/// \brief Returns a string from the double \p value with specified \p precision .
-inline std::string
-    double_precision(const double value, const int precision, const bool fixed = false)
-{
-    std::stringstream ss;
-    if(fixed)
-    {
-        ss << std::fixed;
-    }
-    ss << std::setprecision(precision) << value;
-    return ss.str();
 }
 
 #endif // COMMON_EXAMPLE_UTILS_HPP
