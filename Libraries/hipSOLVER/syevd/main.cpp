@@ -72,7 +72,7 @@ int main(const int /*argc*/, char* /*argv*/[])
                                                lda,
                                                d_W,
                                                &lwork));
-    HIP_CHECK(hipMalloc(&d_work, lwork));
+    HIP_CHECK(hipMalloc(&d_work, sizeof(double) * lwork));
 
     // Compute the eigenvalues (written to d_W).
     HIPSOLVER_CHECK(hipsolverDsyevd(hipsolver_handle,
