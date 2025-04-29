@@ -165,7 +165,8 @@ The following options are available when building with CMake.
   - [static_host_library](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/static_host_library): Shows how to create a static library containing HIP host functions, and how to link it with an executable.
   - [streams](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/streams/): Program that showcases usage of multiple streams each with their own tasks.
   - [texture_management](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/texture_management/): Shows the usage of texture memory.
-  - [vulkan_interop](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan.
+  - [vulkan_interop](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan via buffer memory.
+  - [vulkan_interop_mipmap](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/vulkan_interop): Showcases how to share resources and computation between HIP and Vulkan via mipmapped memory (Only available in Windows).
   - [warp_shuffle](https://github.com/ROCm/rocm-examples/tree/develop/HIP-Basic/warp_shuffle/): Uses a simple matrix transpose kernel to showcase how to use warp shuffle operations.
 - [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/develop/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](https://github.com/ROCm/rocm-examples/tree/develop/Dockerfiles/README.md) for details.
 - [Docs](https://github.com/ROCm/rocm-examples/tree/develop/Docs/)

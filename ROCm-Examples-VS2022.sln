@@ -272,6 +272,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "roti_vs2022", "Libraries\ro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sctr_vs2022", "Libraries\rocSPARSE\level_1\sctr\sctr_vs2022.vcxproj", "{EE9B5CAD-B5FE-48D7-BD24-7129E29E18C4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_mipmap_vs2022", "HIP-Basic\vulkan_interop_mipmap\vulkan_interop_mipmap_vs2022.vcxproj", "{F528177F-5900-3820-537D-FDD8E03FE9E1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -734,6 +736,10 @@ Global
 		{EE9B5CAD-B5FE-48D7-BD24-7129E29E18C4}.Debug|x64.Build.0 = Debug|x64
 		{EE9B5CAD-B5FE-48D7-BD24-7129E29E18C4}.Release|x64.ActiveCfg = Release|x64
 		{EE9B5CAD-B5FE-48D7-BD24-7129E29E18C4}.Release|x64.Build.0 = Release|x64
+		{F528177F-5900-3820-537D-FDD8E03FE9E1}.Debug|x64.ActiveCfg = Debug|x64
+		{F528177F-5900-3820-537D-FDD8E03FE9E1}.Debug|x64.Build.0 = Debug|x64
+		{F528177F-5900-3820-537D-FDD8E03FE9E1}.Release|x64.ActiveCfg = Release|x64
+		{F528177F-5900-3820-537D-FDD8E03FE9E1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -871,6 +877,7 @@ Global
 		{26D953A9-7034-4441-A9B3-4F085EDCD37C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{E3BCAC27-E5A3-4BB5-83A6-27BE3C75C452} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{EE9B5CAD-B5FE-48D7-BD24-7129E29E18C4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{F528177F-5900-3820-537D-FDD8E03FE9E1} = {94393B51-B70E-4111-A22C-6A752D41E454}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}
