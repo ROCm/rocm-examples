@@ -24,7 +24,11 @@
 #include "example_utils.hpp"
 #include "hipblas_utils.hpp"
 
-#define ROCM_MATHLIBS_API_USE_HIP_COMPLEX
+#if hipblasVersionMajor >= 3
+#define HIPBLAS_CHER2 hipblasCher2
+#else
+#define HIPBLAS_CHER2 hipblasCher2_v2
+#endif
 #include <hipblas/hipblas.h>
 
 #include <hip/hip_complex.h>
@@ -98,7 +102,7 @@ int main(const int argc, const char** argv)
 
     // Scalar multiplier.
     const float          alpha   = parser.get<float>("a");
-    const hipblasComplex h_alpha = hipblasComplex(alpha, 0.0f);
+    const hipComplex h_alpha = hipComplex(alpha, 0.0f);
 
     // The leading dimension (the stride between column starts) of the matrix A.
     // The matrix is packed into memory, so the leading dimension is equal to
@@ -149,12 +153,12 @@ int main(const int argc, const char** argv)
     HIPBLAS_CHECK(hipblasSetPointerMode(handle, HIPBLAS_POINTER_MODE_HOST));
 
     // Allocate device memory using hipMalloc.
-    hipblasComplex* d_a{};
-    hipblasComplex* d_x{};
-    hipblasComplex* d_y{};
-    HIP_CHECK(hipMalloc(&d_a, size_a * sizeof(hipblasComplex)));
-    HIP_CHECK(hipMalloc(&d_x, size_x * sizeof(hipblasComplex)));
-    HIP_CHECK(hipMalloc(&d_y, size_y * sizeof(hipblasComplex)));
+    hipComplex* d_a{};
+    hipComplex* d_x{};
+    hipComplex* d_y{};
+    HIP_CHECK(hipMalloc(&d_a, size_a * sizeof(hipComplex)));
+    HIP_CHECK(hipMalloc(&d_x, size_x * sizeof(hipComplex)));
+    HIP_CHECK(hipMalloc(&d_y, size_y * sizeof(hipComplex)));
 
     // Copy the input vectors from the host to the device. The layout of std::complex<float> is
     // compatible with that of hipFloatComplex.
@@ -164,7 +168,7 @@ int main(const int argc, const char** argv)
     // Copy the input matrix from the host to the device, invoke hipBLAS HER2 function and
     // fetch the results from the device to the host.
     HIPBLAS_CHECK(hipblasSetMatrix(n, n, sizeof(hipFloatComplex), h_a.data(), lda, d_a, lda));
-    HIPBLAS_CHECK(hipblasCher2(handle, fill, n, &h_alpha, d_x, incx, d_y, incy, d_a, lda));
+    HIPBLAS_CHECK(HIPBLAS_CHER2(handle, fill, n, &h_alpha, d_x, incx, d_y, incy, d_a, lda));
     HIPBLAS_CHECK(hipblasGetMatrix(n, n, sizeof(hipFloatComplex), d_a, lda, h_a.data(), lda));
 
     // Destroy the hipBLAS handle.
