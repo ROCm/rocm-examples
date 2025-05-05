@@ -116,8 +116,8 @@ $A x_i = \lambda_i x_i$  for $i = 0, \dots, n-1$.
 
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
-    - `C` (single-precision complex: `hipblasComplex`)
-    - `Z` (double-precision complex: `hipblasDoubleComplex`).
+    - `C` (single-precision complex: `hipComplex`)
+    - `Z` (double-precision complex: `hipDoubleComplex`).
 
     Return type: `hipblasStatus_t`.
 
