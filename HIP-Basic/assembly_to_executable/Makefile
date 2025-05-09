@@ -74,7 +74,7 @@ offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 		-output=$@
 
 main.o: main.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c --cuda-host-only $<
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c --cuda-host-only -fuse-cuid=none $<
 
 main_%.o: main_%.s
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<
