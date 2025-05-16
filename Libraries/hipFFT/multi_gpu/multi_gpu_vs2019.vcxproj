@@ -11,7 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <HIPVersion>6.1</HIPVersion>
     <VCProjectVersion>16.0</VCProjectVersion>
     <ProjectGuid>{a7e1617f-10a7-4b26-ad1e-234b0fd2315f}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
@@ -22,9 +21,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\cmdparser.hpp" />
-    <ClInclude Include="Common\example_utils.hpp" />
-    <ClInclude Include="Common\hipfft_utils.hpp" />
+    <ClInclude Include="..\..\..\Common\cmdparser.hpp" />
+    <ClInclude Include="..\..\..\Common\example_utils.hpp" />
+    <ClInclude Include="..\..\..\Common\hipfft_utils.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <Content Include="$(HIPExecutablePath)\hipfft.dll">
@@ -47,14 +46,20 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.1</PlatformToolset>
+    <PlatformToolset>HIP clang 6.2</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.1</PlatformToolset>
+    <PlatformToolset>HIP clang 6.2</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP clang `))'">
+    <HIPVersion>$(PlatformToolset.Replace(`HIP clang `, ``))</HIPVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP nvcc `))'">
+    <HIPVersion>$(PlatformToolset.Replace(`HIP nvcc `, ``))</HIPVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -90,7 +95,7 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
@@ -105,7 +110,7 @@
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
