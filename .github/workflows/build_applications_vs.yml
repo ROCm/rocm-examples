@@ -1,0 +1,63 @@
+name: Build Applications VS
+
+on:
+  push:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Applications/**'
+      - '.github/workflows/**'
+      - 'Scripts/VisualStudio/**'
+  pull_request:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Applications/**'
+      - '.github/workflows/**'
+      - 'Scripts/VisualStudio/**'
+
+env:
+    PLATFORM_TOOLSET_VERSION: 6.2
+    HIP_PATH: C:\Program Files\AMD\ROCm\6.2\
+    HIPSDK_INSTALLER_VERSION: 24.Q4
+
+jobs:
+    build:
+        name: "Build Applications Examples"
+        strategy:
+          matrix:
+            config: [Debug, Release]
+        runs-on: windows-latest
+        steps:
+          - uses: actions/checkout@v4
+          - uses: microsoft/setup-msbuild@v2
+          - name: Install HIP SDK
+            shell: pwsh
+            run: |
+                  $PSVersionTable
+                  $ProgressPreference = 'SilentlyContinue'
+                  Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe"
+                  Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe -OutFile Setup.exe
+                  Write-Host "Installing HIP SDK"
+                  Start-Process Setup.exe -ArgumentList '-install','-log',"installer_log.txt" -NoNewWindow -Wait
+                  if (Test-Path -Path "${{ env.HIP_PATH }}") {
+                      Write-Host "HIP_PATH directory exists: ${{ env.HIP_PATH }}"
+                      Write-Host "HIP SDK installed successfully"
+                  } else {
+                      Write-Host "HIP_PATH directory DOES NOT exist: ${{ env.HIP_PATH }}"
+                      Write-Host "HIP SDK installation failed"
+                      Exit 1
+                  }
+                  msbuild -version
+          - name: Install dependencies
+            shell: pwsh
+            run: |
+                  python3 -m pip install rich
+          - name: Check GUID
+            shell: pwsh
+            run: |
+                  python3 Scripts/VisualStudio/check_vs_files.py
+          - name: Build ${{ matrix.config }} x64
+            shell: pwsh
+            run: |
+                  msbuild Scripts\VisualStudio\build.proj -maxCpuCount -detailedSummary -property:"Category=Applications;Configuration=${{ matrix.config }};Platform=x64"
+                  Write-Host "msbuild returned: $LastExitCode"
+                  Exit $LastExitCode
