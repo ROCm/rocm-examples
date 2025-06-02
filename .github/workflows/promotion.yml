@@ -13,7 +13,6 @@ on:
 jobs:
   Promotion:
     runs-on: self-hosted
-    if: github.actor == 'sohaibnd'
     env:  
       staging_branch: amd-staging
       mainline_branch: amd-mainline
