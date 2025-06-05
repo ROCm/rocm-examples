@@ -17,6 +17,12 @@
     <RootNamespace>reduce_sum_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
+  <PropertyGroup>
+    <HIPVersionFileContents>$([System.IO.File]::ReadAllText('$(HIP_PATH)bin\.hipversion'))</HIPVersionFileContents>
+    <HIPVersionMajor>$(HIPVersionFileContents.Substring($([MSBuild]::Add($(HIPVersionFileContents.LastIndexOf("HIP_VERSION_MAJOR")),18)),2).Trim())</HIPVersionMajor>
+    <HIPVersionMinor>$(HIPVersionFileContents.Substring($([MSBuild]::Add($(HIPVersionFileContents.LastIndexOf("HIP_VERSION_MINOR")),18)),2).Trim())</HIPVersionMinor>
+    <HIPPathVersion>$(HIPVersionMajor).$(HIPVersionMinor)</HIPPathVersion>
+  </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip" />
   </ItemGroup>
@@ -27,13 +33,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.2</PlatformToolset>
+    <PlatformToolset>HIP clang $(HIPPathVersion)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.2</PlatformToolset>
+    <PlatformToolset>HIP clang $(HIPPathVersion)</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP clang `))'">
@@ -55,7 +61,10 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
-  <PropertyGroup Label="HIP nvcc $(HIPVersion)" Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'">
+  <PropertyGroup Label="HIP nvcc $(HIPVersion)" Condition="$(PlatformToolset.Contains('HIP nvcc'))">
+    <ProjectExcludedFromBuild>true</ProjectExcludedFromBuild>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(PlatformToolset)'!='HIP nvcc $(HIPPathVersion)' and '$(PlatformToolset)'!='HIP clang $(HIPPathVersion)'">
     <ProjectExcludedFromBuild>true</ProjectExcludedFromBuild>
   </PropertyGroup>
   <PropertyGroup Label="UserMacros" />
@@ -72,7 +81,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
     </ClCompile>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and $(PlatformToolset.Contains('HIP clang'))">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -85,7 +94,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
-  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64' and $(PlatformToolset.Contains('HIP clang'))">
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
