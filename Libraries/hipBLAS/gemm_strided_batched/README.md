@@ -59,8 +59,8 @@ We can apply the same multiplication operator for several matrices if we combine
   - `H`(half-precision: `hipblasHalf`)
   - `S` (single-precision: `float`)
   - `D` (double-precision: `double`)
-  - `C` (single-precision complex: `hipblasComplex`)
-  - `Z` (double-precision complex: `hipblasDoubleComplex`).
+  - `C` (single-precision complex: `hipComplex`)
+  - `Z` (double-precision complex: `hipDoubleComplex`).
 
     Input parameters for `hipblasSgemmStridedBatched`:
     - `hipblasHandle_t handle`

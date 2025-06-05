@@ -138,7 +138,7 @@ class SlnChecker(GuidTools):
                     list_of_configurations.remove([config, mode])
                 except ValueError:
                     print(f'[red]Incorrect configuration in [yellow]{sln_file_path}[/yellow]:[/red]')
-                    print(f'    {config} = {mode}')
+                    print(f'    {guid}: {config} = {mode}')
                     self.error_counter += 1
         if len(list_of_configurations):
             print(f'[red]Missing configuration(s) in [yellow]{sln_file_path}[/yellow] for [yellow]{reference_guid}[/yellow]:[/red]')

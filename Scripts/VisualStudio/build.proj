@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+     <Configuration Condition="'$(Configuration)' == ''">Debug</Configuration>
+     <Platform Condition="'$(Platform)' == ''">x64</Platform>
+  </PropertyGroup>
+  <ItemGroup>
+    <Solution Condition="'$(Category)'=='All'" Include="..\..\*\**\*.sln" Exclude="..\..\HIP-Basic\vulkan_interop\**\*.sln;..\..\HIP-Basic\opengl_interop\**\*.sln;..\..\HIP-Basic\static_host_library\**\*.sln">
+      <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
+    </Solution>
+    <Solution Condition="'$(Category)'=='Applications'" Include="..\..\Applications\**\*.sln">
+      <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
+    </Solution>
+    <Solution Condition="'$(Category)'=='HIP-Basic'" Include="..\..\HIP-Basic\**\*.sln" Exclude="..\..\HIP-Basic\vulkan_interop\**\*.sln;..\..\HIP-Basic\opengl_interop\**\*.sln;..\..\HIP-Basic\static_host_library\**\*.sln">
+      <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
+    </Solution>
+    <Solution Condition="'$(Category)'=='Libraries' and '$(VSVersion)'=='2017'" Include="..\..\Libraries\**\*_vs2017.sln">
+      <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
+    </Solution>
+    <Solution Condition="'$(Category)'=='Libraries' and '$(VSVersion)'=='2019'" Include="..\..\Libraries\**\*_vs2019.sln">
+      <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
+    </Solution>
+    <Solution Condition="'$(Category)'=='Libraries' and '$(VSVersion)'=='2022'" Include="..\..\Libraries\**\*_vs2022.sln">
+      <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
+    </Solution>
+  </ItemGroup>
+  <Target Name="Build">
+    <MSBuild Projects="@(Solution)" BuildInParallel="true" Targets="Build" />
+    <Message Text="%(Solution.Identity) -> $(Configuration)|$(Platform)" Importance="High"/>
+  </Target>
+  <Target Name="Clean">
+    <MSBuild Projects="@(Solution)" BuildInParallel="true" Targets="Clean" />
+  </Target>
+  <Target Name="Rebuild">
+    <MSBuild Projects="@(Solution)" BuildInParallel="true" Targets="Rebuild" />
+  </Target>
+</Project>

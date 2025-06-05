@@ -32,8 +32,8 @@ The application provides the following optional command line arguments:
 - `hipblas[SDCZ]scal` multiplies each element of the vector by a scalar. Depending on the character matched in `[SDCZ]`, the scaling can be obtained with different precisions:
   - `S` (single-precision: `float`)
   - `D` (double-precision: `double`)
-  - `C` (single-precision complex: `hipblasComplex`)
-  - `Z` (double-precision complex: `hipblasDoubleComplex`).
+  - `C` (single-precision complex: `hipComplex`)
+  - `Z` (double-precision complex: `hipDoubleComplex`).
 
 ## Demonstrated API Calls
 

@@ -1,46 +1,46 @@
-name: Build Libraries CUDA  
-  
-on:  
-  push:  
-    branches: [ amd-staging, amd-mainline, release/** ]  
-    paths:  
-      - 'Libraries/**'  
-      - '.github/workflows/**'  
-  pull_request:  
-    branches: [ amd-staging, amd-mainline, release/** ]  
-    paths:  
-      - 'Libraries/**'  
-      - '.github/workflows/**'  
-  
+name: Build Libraries CUDA
+
+on:
+  push:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Libraries/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Libraries/**'
+      - '.github/workflows/**'
+
 env:
-    ROCM_VERSION: 6.3.3
-    AMDGPU_INSTALLER_VERSION: 6.3.60303-1
-  
-jobs:  
-  build:  
-    name: "Build Libraries with CUDA"  
-    runs-on: self-hosted  
-    container:  
+    ROCM_VERSION: 6.4
+    AMDGPU_INSTALLER_VERSION: 6.4.60400-1
+
+jobs:
+  build:
+    name: "Build Libraries with CUDA"
+    runs-on: self-hosted
+    container:
       image:  nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
-  
-    steps:  
-      - name: Checkout Repository  
-        uses: actions/checkout@v4  
-      - name: Install System Dependencies  
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Install System Dependencies
         run: |
-          apt-get update -qq && 
+          apt-get update -qq &&
           apt-get install -y build-essential g++ glslang-tools python3 python3-pip libglfw3-dev libvulkan-dev locales wget git
-          python3 -m pip install --upgrade pip  
-          python3 -m pip install cmake  
-      
+          python3 -m pip install --upgrade pip
+          python3 -m pip install cmake
+
       - name: Install Hip for CUDA
         run: |
           export DEBIAN_FRONTEND=noninteractive
           wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
           apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
           apt-get update -qq &&
-          apt-get install -y hip-runtime-nvidia hip-dev
-      
+          apt-get install -y cuda hip-dev
+
       - name: Build and install hipCUB
         run: |
           mkdir tmp && cd tmp
@@ -50,13 +50,13 @@ jobs:
           make -j4
           make install
           cd ../ && rm -rf tmp
-      
+
       - name: Build hipCUB example
-        shell: bash  
-        run: |  
+        shell: bash
+        run: |
           cd Libraries/hipCUB
           make GPU_RUNTIME=CUDA -j4
-      
+
       - name: Build and install hipFFT
         run: |
           mkdir tmp && cd tmp
@@ -66,10 +66,10 @@ jobs:
           make -j4
           make install
           cd ../ && rm -rf tmp
-      
+
       - name: Build hipFFT example
-        shell: bash  
-        run: |  
+        shell: bash
+        run: |
           cd Libraries/hipFFT
           make GPU_RUNTIME=CUDA -j4
 
@@ -85,7 +85,7 @@ jobs:
 
       - name: Build rocRAND example
         shell: bash
-        run: |  
+        run: |
           cd Libraries/rocRAND
           make GPU_RUNTIME=CUDA -j4
 
@@ -93,4 +93,4 @@ jobs:
       # (needed for self-hosted runners)
       - name: Clean the workspace
         run: find $GITHUB_WORKSPACE -mindepth 1 -delete
-      
+

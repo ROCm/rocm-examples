@@ -111,8 +111,8 @@ The application provides the following command line arguments:
     The correct function signature should be chosen based on the datatype of the input matrices:
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
-    - `C` (single-precision complex: `hipblasComplex`)
-    - `Z` (double-precision complex: `hipblasDoubleComplex`).
+    - `C` (single-precision complex: `hipComplex`)
+    - `Z` (double-precision complex: `hipDoubleComplex`).
 
     Return type: `hipblasStatus_t`.
 - The `hipblasPointerMode_t` type controls whether scalar parameters must be allocated on the host (`HIPBLAS_POINTER_MODE_HOST`) or on the device (`HIPBLAS_POINTER_MODE_DEVICE`). It is set by using `hipblasSetPointerMode`.

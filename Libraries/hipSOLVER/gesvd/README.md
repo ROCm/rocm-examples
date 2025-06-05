@@ -96,8 +96,8 @@ The application provides the following optional command line arguments:
 
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
-    - `C` (single-precision complex: `hipblasComplex`)
-    - `Z` (double-precision complex: `hipblasDoubleComplex`).
+    - `C` (single-precision complex: `hipComplex`)
+    - `Z` (double-precision complex: `hipDoubleComplex`).
 
     Return type: `hipblasStatus_t`.
 

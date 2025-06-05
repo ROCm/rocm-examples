@@ -114,8 +114,8 @@ $(A - \lambda_i B)x_i = 0$  for $i = 0, \dots, n-1$.
 
     - `S` (single-precision real: `float`)
     - `D` (double-precision real: `double`)
-    - `C` (single-precision complex: `hipblasComplex`)
-    - `Z` (double-precision complex: `hipblasDoubleComplex`).
+    - `C` (single-precision complex: `hipComplex`)
+    - `Z` (double-precision complex: `hipDoubleComplex`).
 
     Return type: `hipblasStatus_t`.
 
