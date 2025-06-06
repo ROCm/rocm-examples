@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,18 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	level_1 \
-	level_2 \
-	level_3 \
-	preconditioner
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocSPARSE_level_1_examples LANGUAGES CXX)
 
-all: $(EXAMPLES)
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-clean: TARGET=clean
-clean: all
-
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(EXAMPLES)
+add_subdirectory(axpyi)
+add_subdirectory(doti)
+add_subdirectory(gthr)
+add_subdirectory(roti)
+add_subdirectory(sctr)
