@@ -100,66 +100,74 @@ int main()
     // Total amount of shared memory that each block is going to use.
     // Exactly one matrix will be stored in shared memory.
     constexpr size_t shared_memory_bytes = size_bytes;
+    std::cout << "Run transpose continuously" << std::endl;
 
-    // Allocate host vectors.
-    std::vector<float> h_matrix(size);
-    std::vector<float> h_transposed_matrix(size);
-
-    // Set up input data.
-    for(unsigned int i = 0; i < size; i++)
+    // Set a timer to 30 seconds for rocprofv3 preparation
+    std::this_thread::sleep_for(std::chrono::seconds(30));
+    
+    while (true) 
     {
-        h_matrix[i] = i * 10.0f;
-    }
+        std::this_thread::sleep_for(std::chrono::seconds(5));
+        // Allocate host vectors.
+        std::vector<float> h_matrix(size);
+        std::vector<float> h_transposed_matrix(size);
 
-    // Allocate device memory for the input and output matrices.
-    float* d_matrix{};
-    float* d_transposed_matrix{};
-    HIP_CHECK(hipMalloc(&d_matrix, size_bytes));
-    HIP_CHECK(hipMalloc(&d_transposed_matrix, size_bytes));
-
-    // Transfer the input matrix to the device memory.
-    HIP_CHECK(hipMemcpy(d_matrix, h_matrix.data(), size_bytes, hipMemcpyHostToDevice));
-
-    // Lauching kernel from host.
-    matrix_transpose_kernel<<<dim3(width / threads_per_block_x, width / threads_per_block_y),
-                              dim3(threads_per_block_x, threads_per_block_y),
-                              shared_memory_bytes,
-                              hipStreamDefault>>>(d_transposed_matrix, d_matrix, width);
-
-    // Check if the kernel launch was successful.
-    HIP_CHECK(hipGetLastError());
-
-    // Transfer the result back to the host.
-    HIP_CHECK(hipMemcpy(h_transposed_matrix.data(),
-                        d_transposed_matrix,
-                        size_bytes,
-                        hipMemcpyDeviceToHost));
-
-    // Free the resources on the device.
-    HIP_CHECK(hipFree(d_matrix));
-    HIP_CHECK(hipFree(d_transposed_matrix));
-
-    // Perform the reference (CPU) calculation.
-    std::vector<float> ref_transposed_matrix = matrix_transpose_reference(h_matrix, width);
-
-    // Check the results' validity.
-    constexpr float eps = 1.0E-6f;
-    unsigned int    errors{};
-    for(unsigned int i = 0; i < size; i++)
-    {
-        if(std::fabs(h_transposed_matrix[i] - ref_transposed_matrix[i]) > eps)
+        // Set up input data.
+        for(unsigned int i = 0; i < size; i++)
         {
-            errors++;
+            h_matrix[i] = i * 10.0f;
         }
-    }
 
-    if(errors != 0)
-    {
-        std::cout << "Validation failed. Errors: " << errors << std::endl;
-        return error_exit_code;
-    }
-    else
-    {
-        std::cout << "Validation passed." << std::endl;
+        // Allocate device memory for the input and output matrices.
+        float* d_matrix{};
+        float* d_transposed_matrix{};
+        HIP_CHECK(hipMalloc(&d_matrix, size_bytes));
+        HIP_CHECK(hipMalloc(&d_transposed_matrix, size_bytes));
+
+        // Transfer the input matrix to the device memory.
+        HIP_CHECK(hipMemcpy(d_matrix, h_matrix.data(), size_bytes, hipMemcpyHostToDevice));
+
+        // Lauching kernel from host.
+        matrix_transpose_kernel<<<dim3(width / threads_per_block_x, width / threads_per_block_y),
+                                dim3(threads_per_block_x, threads_per_block_y),
+                                shared_memory_bytes,
+                                hipStreamDefault>>>(d_transposed_matrix, d_matrix, width);
+
+        // Check if the kernel launch was successful.
+        HIP_CHECK(hipGetLastError());
+
+        // Transfer the result back to the host.
+        HIP_CHECK(hipMemcpy(h_transposed_matrix.data(),
+                            d_transposed_matrix,
+                            size_bytes,
+                            hipMemcpyDeviceToHost));
+
+        // Free the resources on the device.
+        HIP_CHECK(hipFree(d_matrix));
+        HIP_CHECK(hipFree(d_transposed_matrix));
+
+        // Perform the reference (CPU) calculation.
+        std::vector<float> ref_transposed_matrix = matrix_transpose_reference(h_matrix, width);
+
+        // Check the results' validity.
+        constexpr float eps = 1.0E-6f;
+        unsigned int    errors{};
+        for(unsigned int i = 0; i < size; i++)
+        {
+            if(std::fabs(h_transposed_matrix[i] - ref_transposed_matrix[i]) > eps)
+            {
+                errors++;
+            }
+        }
+
+        if(errors != 0)
+        {
+            std::cout << "Validation failed. Errors: " << errors << std::endl;
+            return error_exit_code;
+        }
+        else
+        {
+            std::cout << "Validation passed." << std::endl;
+        }
     }
 }
