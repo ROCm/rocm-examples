@@ -38,6 +38,7 @@ The following pseudo-random number generators are available in rocRAND:
 ThreeFry 2x64-20 and 4x64-20 produce 64-bit pseudo-random values within the range $[0, 2^{64} - 1]$, while all the others produce 32-bit pseudo-random values within the range $[0, 2^{32} - 1]$.
 
 All of them provide API entries for the initialization of their internal state and for values generation:
+
 - `rocrand_init`: for initializing the generator state from a `seed`, skipping `subsequence` subsequences and `offset` values, and
 - `rocrand`,  for generating a uniformly distributed random value in the corresponding range.
 
@@ -62,7 +63,7 @@ These are present for MRG31K3P, MRG32K3A, Philox 4X32-10 and XORWOW.
 
 This example showcases a simple kernel implementation for generating a sequence of pseudo-random values cooperatively among all the threads in the grid. Each thread generates as many values of the sequence as needed, with a stride equal to the size of the grid (in number of threads). For generating a number of values that is a multiple of the size of the grid, the load among the threads will be balanced as each of them will generate the same amount of values. On the other hand, when the size is not a multiple of the total amount of threads available, some threads will generate one more value than others.
 
-Separate kernels are provided for MTGP32 and LFSR113 because of their APIs particularities. 
+Separate kernels are provided for MTGP32 and LFSR113 because of their APIs particularities.
 For MTGP32, the kernel implemented assumes that each thread block is going to generate values for only one of the sequences. For LFSR113, the initialization call uses a 4-dimensional seed with default seeds for each LFSR sequence.
 
 ## Demonstrated API Calls

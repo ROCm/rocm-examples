@@ -35,6 +35,7 @@ The following quasi-random number generators are available in rocRAND:
 Both Sobol and Scramble Sobol generators produce low-discrepancy sequences of numbers of 32 or 64 bits in the range $[0, 2^{32}-1]$ or $[0, 2^{64}-1]$, respectively.
 
 Both of them provide API entries for the initialization of their states and for values generation:
+
 - `rocrand_init`: for initializing the generator state from some `direction vectors` (32 or 64, one for each bit of the generated numbers) skipping `offset` values, and
 - `rocrand`,  for generating a uniformly distributed random value in the corresponding range.
 
