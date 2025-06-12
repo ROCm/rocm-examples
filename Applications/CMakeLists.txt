@@ -37,7 +37,12 @@ add_subdirectory(bitonic_sort)
 add_subdirectory(convolution)
 add_subdirectory(floyd_warshall)
 add_subdirectory(histogram)
-if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"))
+if(
+    NOT (
+        CMAKE_SYSTEM_NAME MATCHES "Windows"
+        AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"
+    )
+)
     add_subdirectory(monte_carlo_pi)
 endif()
 add_subdirectory(prefix_sum)

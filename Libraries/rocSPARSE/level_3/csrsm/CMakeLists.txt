@@ -60,7 +60,10 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::rocsparse hip::host)
 
-target_include_directories(${example_name} PRIVATE "../../../../Common" "../../../../External")
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../../Common" "../../../../External"
+)
 
 install(TARGETS ${example_name})
 

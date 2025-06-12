@@ -52,7 +52,13 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hiprand REQUIRED)
 
-message([STATUS] "${CMAKE_SYSTEM_NAME}" "${ROCM_EXAMPLES_HIP_PLATFORM}" "${GPU_RUNTIME}" "${ROCM_EXAMPLES_GPU_LANGUAGE}")
+message(
+    [STATUS]
+    "${CMAKE_SYSTEM_NAME}"
+    "${ROCM_EXAMPLES_HIP_PLATFORM}"
+    "${GPU_RUNTIME}"
+    "${ROCM_EXAMPLES_GPU_LANGUAGE}"
+)
 
 #Workaround for hipRAND, requires manual linking with backend.
 if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
@@ -65,7 +71,10 @@ add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(
+    main.hip
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
 
 target_link_libraries(${example_name} PRIVATE hip::hiprand)
 

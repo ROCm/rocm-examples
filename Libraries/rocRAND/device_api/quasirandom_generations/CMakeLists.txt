@@ -65,8 +65,14 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::rocrand)
 
-target_include_directories(${example_name} PRIVATE "../../../../Common" "../../../../External")
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../../Common" "../../../../External"
+)
+set_source_files_properties(
+    main.hip
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
 
 # Workaround for rocRAND since it relies on definition "WIN32"
 if(WIN32)

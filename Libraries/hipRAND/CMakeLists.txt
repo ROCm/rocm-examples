@@ -27,17 +27,17 @@ file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-   set(ROCM_ROOT
-       "$ENV{HIP_PATH}"
-       CACHE PATH
-       "Root directory of the ROCm installation"
-   )
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-   set(ROCM_ROOT
-       "/opt/rocm"
-       CACHE PATH
-       "Root directory of the ROCm installation"
-   )
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
@@ -52,8 +52,8 @@ else()
 endif()
 
 if(NOT hiprand_FOUND)
-   message(STATUS "hipRAND could not be found, not building hipRAND examples")
-   return()
+    message(STATUS "hipRAND could not be found, not building hipRAND examples")
+    return()
 endif()
 
 add_subdirectory(device_api)

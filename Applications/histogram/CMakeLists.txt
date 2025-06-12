@@ -61,6 +61,9 @@ if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
 endif()
 
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(
+    main.hip
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
 
 install(TARGETS ${example_name})

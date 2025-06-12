@@ -39,7 +39,10 @@ add_executable(${example_name} main.hip)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 target_link_libraries(${example_name} PRIVATE roc::rocprim)
-target_include_directories(${example_name} PRIVATE "../../../Common" "../../../External")
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../Common" "../../../External"
+)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()

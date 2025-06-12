@@ -52,7 +52,13 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hiprand REQUIRED)
 
-message([STATUS] "${CMAKE_SYSTEM_NAME}" "${ROCM_EXAMPLES_HIP_PLATFORM}" "${GPU_RUNTIME}" "${ROCM_EXAMPLES_GPU_LANGUAGE}")
+message(
+    [STATUS]
+    "${CMAKE_SYSTEM_NAME}"
+    "${ROCM_EXAMPLES_HIP_PLATFORM}"
+    "${GPU_RUNTIME}"
+    "${ROCM_EXAMPLES_GPU_LANGUAGE}"
+)
 
 #Workaround for hipRAND, requires manual linking with backend.
 if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
@@ -76,7 +82,10 @@ else()
     target_link_libraries(${example_name} PRIVATE roc::rocrand)
 endif()
 
-target_include_directories(${example_name} PRIVATE "../../../../Common" "../../../../External")
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../../Common" "../../../../External"
+)
 
 ## Workaround for rocRAND since it relies on definition "WIN32".
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")

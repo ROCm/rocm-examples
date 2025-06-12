@@ -62,7 +62,10 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 target_link_libraries(${example_name} PRIVATE hip::hipfft)
 
-target_include_directories(${example_name} PRIVATE "../../../Common" "../../../External")
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../Common" "../../../External"
+)
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
 if(WIN32)
