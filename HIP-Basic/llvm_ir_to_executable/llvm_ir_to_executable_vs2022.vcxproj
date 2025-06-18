@@ -19,8 +19,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--cuda-host-only</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--cuda-host-only</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--cuda-host-only -fuse-cuid=none</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--cuda-host-only -fuse-cuid=none</AdditionalOptions>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
