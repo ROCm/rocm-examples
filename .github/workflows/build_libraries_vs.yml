@@ -30,6 +30,14 @@ jobs:
         steps:
           - uses: actions/checkout@v4
           - uses: microsoft/setup-msbuild@v2
+          - name: Install dependencies
+            shell: pwsh
+            run: |
+                  python3 -m pip install rich
+          - name: Check GUID
+            shell: pwsh
+            run: |
+                  python3 Scripts/VisualStudio/check_vs_files.py
           - name: Install HIP SDK
             shell: pwsh
             run: |
@@ -48,17 +56,13 @@ jobs:
                       Exit 1
                   }
                   msbuild -version
-          - name: Install dependencies
-            shell: pwsh
-            run: |
-                  python3 -m pip install rich
-          - name: Check GUID
-            shell: pwsh
-            run: |
-                  python3 Scripts/VisualStudio/check_vs_files.py
           - name: Build ${{ matrix.config }} x64 ${{ matrix.vsversion }}
             shell: pwsh
             run: |
+                  Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang 6\..' | Select-Object -First 1).Matches.Value) with HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}"
+                  Get-ChildItem -Recurse -File | Where-Object { Select-String -Pattern 'HIP clang 6\..' -Path $_ } | ForEach-Object {
+                    (Get-Content -Path $_.FullName) -replace 'HIP clang 6\..', "HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}" | Set-Content -Path $_.FullName
+                  }
                   msbuild Scripts\VisualStudio\build.proj -maxCpuCount -detailedSummary -property:"Category=Libraries;Configuration=${{ matrix.config }};Platform=x64;VSVersion=${{ matrix.vsversion }}" -target:"Build"
                   Write-Host "msbuild returned: $LastExitCode"
                   Exit $LastExitCode
