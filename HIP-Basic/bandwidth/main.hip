@@ -29,6 +29,7 @@
 #include <map>
 #include <numeric>
 #include <vector>
+#include <cstring>
 
 // Paged or pinned host memory
 enum class MemoryMode : unsigned int
@@ -150,7 +151,7 @@ std::vector<double>
                 HIP_CHECK(hipMemcpy(dst, src, size_in_bytes, hip_memcpy_kind));
 
                 // Flush the buffer
-                memset(flush_buffer.data(), i, flush_buffer.size());
+                std::memset(flush_buffer.data(), i, flush_buffer.size());
             }
 
             // Perform memory transfers for trails number of times
@@ -164,7 +165,7 @@ std::vector<double>
                 host_clock.stop_timer();
 
                 // Flush the buffer
-                memset(flush_buffer.data(), i, flush_buffer.size());
+                std::memset(flush_buffer.data(), i, flush_buffer.size());
             }
             // Calculate the bandwith in GB/s
             const double bandwidth_achieved
