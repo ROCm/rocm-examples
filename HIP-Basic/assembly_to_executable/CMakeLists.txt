@@ -102,7 +102,8 @@ foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
         OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
         COMMAND
             ${CMAKE_HIP_COMPILER} -S --cuda-device-only
-            --offload-arch=${HIP_ARCHITECTURE} -I ../../../Common
+            --offload-arch=${HIP_ARCHITECTURE} -I
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../Common
             ${CMAKE_CURRENT_SOURCE_DIR}/main.hip -o
             ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
