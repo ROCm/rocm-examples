@@ -39,7 +39,7 @@ CXX ?= g++
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib -Wl,-rpath,$(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lrocblas
 
 CXXFLAGS ?= -Wall -Wextra
