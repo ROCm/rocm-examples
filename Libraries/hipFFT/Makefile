@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
+	multi_gpu \
 	plan_d2z \
 	plan_z2z
 
