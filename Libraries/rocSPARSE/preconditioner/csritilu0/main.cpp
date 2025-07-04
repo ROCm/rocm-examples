@@ -234,7 +234,8 @@ int main()
 
     // Check last residual computed to confirm that convergence was successful.
     HIP_CHECK(hipMemcpy(data.data(), d_data, size_data, hipMemcpyDeviceToHost));
-    const double last_residual       = data.back();
+
+    const double last_residual       = data[2 * max_iter - 1];
     const bool   csritilu0_converges = last_residual < tol;
 
     int errors{};
