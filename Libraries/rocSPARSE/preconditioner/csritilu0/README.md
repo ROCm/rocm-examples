@@ -123,7 +123,7 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_csrsort_buffer_size` provides the size of the temporary storage buffer required by `rocsparse_csrsort`.
 - `rocsparse_create_identity_permutation` initializes a given permutation vector of size $n$ as the identity permutation $`\begin{pmatrix} 0 & 1 & 2 & \cdots & n-1 \end{pmatrix}`$.
 
-- `rocsparse_[sdcz]csritilu0_compute` computes iteratively the incomplete LU factorization of a sparse CSR matrix $A$, such that $A \approx L \cdot U$. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[sdcz]csritilu0_compute_ex` computes iteratively the incomplete LU factorization of a sparse CSR matrix $A$, such that $A \approx L \cdot U$. The correct function signature should be chosen based on the datatype of the input matrix:
 
   - `s` single-precision real (`float`)
   - `d` double-precision real (`double`)
@@ -132,11 +132,11 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 
     The matrix $A$ must be sorted beforehand.
 
-- `rocsparse_csritilu0_buffer_size` computes the size in bytes of the buffer needed by `rocsparse_csritilu0_preprocess`, `rocsparse_[sdcz]csritilu0_compute` and `rocsparse_csritilu0_history`. The matrix $A$ must be sorted beforehand.
+- `rocsparse_csritilu0_buffer_size` computes the size in bytes of the buffer needed by `rocsparse_csritilu0_preprocess`, `rocsparse_[sdcz]csritilu0_compute_ex` and `rocsparse_csritilu0_history`. The matrix $A$ must be sorted beforehand.
 
-- `rocsparse_csritilu0_preprocess` computes the information required to run `rocsparse_[sdcz]csritilu0_compute` and stores it in the buffer. The matrix $A$ must be sorted beforehand.
+- `rocsparse_csritilu0_preprocess` computes the information required to run `rocsparse_[sdcz]csritilu0_compute_ex` and stores it in the buffer. The matrix $A$ must be sorted beforehand.
 
-- `rocsparse_[sdcz]csritilu0_history` fetches the convergence history data. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]csritilu0_compute`. The matrix $A$ must be sorted beforehand.
+- `rocsparse_[sdcz]csritilu0_history` fetches the convergence history data. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]csritilu0_compute_ex`. The matrix $A$ must be sorted beforehand.
 
 ## Demonstrated API Calls
 
@@ -151,7 +151,7 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_csrsort_buffer_size`
 - `rocsparse_datatype`
 - `rocsparse_datatype_f64_r`
-- `rocsparse_dcsritilu0_compute`
+- `rocsparse_dcsritilu0_compute_ex`
 - `rocsparse_dcsritilu0_history`
 - `rocsparse_destroy_handle`
 - `rocsparse_destroy_mat_descr`

@@ -100,9 +100,9 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_mat_descr descr`: holds all properties of a matrix. The properties set in this example are the following:
   - `rocsparse_diag_type`: indicates whether the diagonal entries of a matrix are unit elements (`rocsparse_diag_type_unit`) or not (`rocsparse_diag_type_non_unit`).
   - `rocsparse_fill_mode`: indicates whether a (triangular) matrix is lower (`rocsparse_fill_mode_lower`) or upper (`rocsparse_fill_mode_upper`) triangular.
-- `rocsparse_[sdcz]csritsv_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the `rocsparse_[sdcz]csritsv_analysis` and `rocsparse_[sdcz]csritsv_solve` functions. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
+- `rocsparse_[sdcz]csritsv_buffer_size` allows to obtain the size (in bytes) of the temporary storage buffer required for the `rocsparse_[sdcz]csritsv_analysis` and `rocsparse_[sdcz]csritsv_solve_ex` functions. The character matched in `[sdcz]` coincides with the one matched in any of the mentioned functions.
 - `rocsparse_solve_policy policy`: specifies the policy to follow for triangular solvers and factorizations. The only value accepted is `rocsparse_solve_policy_auto`.
-- `rocsparse_[sdcz]csritsv_solve` solves a sparse triangular linear system $op(A) \cdot y = \alpha \cdot x$. The correct function signature should be chosen based on the datatype of the input matrix:
+- `rocsparse_[sdcz]csritsv_solve_ex` solves a sparse triangular linear system $op(A) \cdot y = \alpha \cdot x$. The correct function signature should be chosen based on the datatype of the input matrix:
   - `s` single-precision real (`float`)
   - `d` double-precision real (`double`)
   - `c` single-precision complex (`rocsparse_float_complex`)
@@ -110,8 +110,8 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_analysis_policy analysis`: specifies the policy to follow for analysis data. The following values are accepted:
   - `rocsparse_analysis_policy_reuse`: the analysis data gathered is re-used.
   - `rocsparse_analysis_policy_force`: the analysis data will be re-built.
-- `rocsparse_[sdcz]csritsv_analysis` performs the analysis step for `rocsparse_[sdcz]csritsv_solve`. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]csritsv_solve`.
-- `rocsparse_csritsv_zero_pivot(rocsparse_handle, rocsparse_mat_info, rocsparse_int *position)` returns `rocsparse_status_zero_pivot` if either a structural or numerical zero has been found during the execution of `rocsparse_[sbcz]csritsv_solve(....)` and stores in `position` the index $i$ of the first zero pivot $A_{ii}$ found. If no zero pivot is found it returns `rocsparse_status_success`.
+- `rocsparse_[sdcz]csritsv_analysis` performs the analysis step for `rocsparse_[sdcz]csritsv_solve_ex`. The character matched in `[sdcz]` coincides with the one matched in `rocsparse_[sdcz]csritsv_solve_ex`.
+- `rocsparse_csritsv_zero_pivot(rocsparse_handle, rocsparse_mat_info, rocsparse_int *position)` returns `rocsparse_status_zero_pivot` if either a structural or numerical zero has been found during the execution of `rocsparse_[sbcz]csritsv_solve_ex(....)` and stores in `position` the index $i$ of the first zero pivot $A_{ii}$ found. If no zero pivot is found it returns `rocsparse_status_success`.
 
 ## Demonstrated API Calls
 
@@ -125,7 +125,7 @@ csr_col_ind = { 0, 1, 3, 1, 2, 0, 3, 4 }
 - `rocsparse_csritsv_zero_pivot`
 - `rocsparse_dcsritsv_analysis`
 - `rocsparse_dcsritsv_buffer_size`
-- `rocsparse_dcsritsv_solve`
+- `rocsparse_dcsritsv_solve_ex`
 - `rocsparse_destroy_handle`
 - `rocsparse_destroy_mat_descr`
 - `rocsparse_destroy_mat_info`
