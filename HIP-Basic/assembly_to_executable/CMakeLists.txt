@@ -63,7 +63,7 @@ endif()
 
 if(GPU_ARCHITECTURES STREQUAL "all")
     set(GPU_ARCHITECTURES
-        "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx950;gfx1030;gfx1100;gfx1101;gfx1102;gfx1201"
+        "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx950;gfx1030;gfx1100;gfx1101;gfx1102;gfx1151;gfx1201"
         CACHE STRING
         "GPU architectures to compile for"
         FORCE
@@ -90,6 +90,22 @@ else()
     set(HOST_TARGET x86_64-unknown-linux-gnu)
     set(HIP_OBJ_GEN_FILE hip_obj_gen.mcin)
 endif()
+
+# Generate device assemblies
+foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
+        COMMAND
+            ${CMAKE_HIP_COMPILER} -S --cuda-device-only
+            --offload-arch=${HIP_ARCHITECTURE} -I
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../Common
+            ${CMAKE_CURRENT_SOURCE_DIR}/main.hip -o
+            ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
+        VERBATIM
+        COMMENT "Generating ASM main_${HIP_ARCHITECTURE}.s"
+    )
+endforeach()
 
 # Assemble the device assemblies to object files using the HIP compiler.
 # The compiler needs -target amdgcn-amd-amdhsa -mcpu=gfx* in order to assemble the object file
