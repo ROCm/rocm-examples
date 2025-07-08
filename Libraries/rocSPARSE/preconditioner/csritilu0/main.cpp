@@ -81,7 +81,6 @@ int main()
     rocsparse_int* d_csr_col_ind{};
     double*        d_csr_val{};
     double*        d_LU{};
-    double*        d_data{};
 
     constexpr size_t csr_row_ptr_size = sizeof(*d_csr_row_ptr) * (n + 1);
     constexpr size_t csr_col_ind_size = sizeof(*d_csr_col_ind) * nnz;
@@ -90,13 +89,11 @@ int main()
     constexpr size_t LU_size          = sizeof(*d_LU) * length_LU;
     rocsparse_int    max_iter         = 100; /*maximum number of iterations*/
     const size_t     length_data      = 2 * max_iter;
-    const size_t     data_size        = sizeof(*d_data) * length_data;
 
     HIP_CHECK(hipMalloc(&d_csr_row_ptr, csr_row_ptr_size));
     HIP_CHECK(hipMalloc(&d_csr_col_ind, csr_col_ind_size));
     HIP_CHECK(hipMalloc(&d_csr_val, csr_val_size));
     HIP_CHECK(hipMalloc(&d_LU, LU_size));
-    HIP_CHECK(hipMalloc(&d_data, data_size));
 
     HIP_CHECK(
         hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), csr_row_ptr_size, hipMemcpyHostToDevice));
@@ -224,18 +221,15 @@ int main()
     // 8. Fetch the convergence data.
     std::cout << "Iterations performed: " << max_iter << std::endl;
 
-    ROCSPARSE_CHECK(
-        rocsparse_dcsritilu0_history(handle, alg, &max_iter, d_data, buffer_size, temp_buffer));
-
     // The history vector has space for the corrections and the residual of each iteration (whether
     // they are computed or not).
     // Therefore, the size of the data collected is twice the number of iterations needed.
-    std::vector<double> data(length_data);
+    std::vector<double> history(2 * max_iter);
+    ROCSPARSE_CHECK(
+        rocsparse_dcsritilu0_history(handle, alg, &max_iter, history.data(), buffer_size, temp_buffer));
 
-    // Check last residual computed to confirm that convergence was successful.
-    HIP_CHECK(hipMemcpy(data.data(), d_data, data_size, hipMemcpyDeviceToHost));
-    const double last_residual       = data.back();
-    const bool   csritilu0_converges = last_residual < tol;
+    const double last_residual       = history[2 * max_iter - 1];
+    const bool   csritilu0_converges = last_residual <= tol;
 
     int errors{};
 
@@ -302,7 +296,6 @@ int main()
     HIP_CHECK(hipFree(d_csr_col_ind));
     HIP_CHECK(hipFree(d_csr_val));
     HIP_CHECK(hipFree(d_LU));
-    HIP_CHECK(hipFree(d_data));
     HIP_CHECK(hipFree(perm));
     HIP_CHECK(hipFree(sort_temp_buffer));
     HIP_CHECK(hipFree(temp_buffer));
