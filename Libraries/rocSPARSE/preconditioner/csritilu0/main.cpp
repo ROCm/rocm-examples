@@ -228,7 +228,7 @@ int main()
     ROCSPARSE_CHECK(
         rocsparse_dcsritilu0_history(handle, alg, &max_iter, history.data(), buffer_size, temp_buffer));
 
-    const double last_residual       = history.back();
+    const double last_residual       = history[2 * max_iter - 1];
     const bool   csritilu0_converges = last_residual <= tol;
 
     int errors{};
