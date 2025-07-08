@@ -45,6 +45,26 @@ jobs:
               echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
               echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
+          - name: Build and install hipCUB
+            run: |
+              mkdir tmp && cd tmp
+              git clone https://github.com/ROCm/hipCUB.git
+              cd hipCUB; mkdir build; cd build
+              HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
+              make -j4
+              make install
+              cd ../ && rm -rf tmp
+
+          - name: Build and install hipRAND
+            run: |
+              mkdir tmp && cd tmp
+              git clone https://github.com/ROCm/hipRAND.git
+              cd hipRAND; mkdir build; cd build
+              CXX=g++ cmake -DBUILD_WITH_LIB=CUDA ..
+              make -j4
+              make install
+              cd ../ && rm -rf tmp
+
           - name: Configure and Build
             shell: bash
             run: |
