@@ -5,13 +5,13 @@
      <Platform Condition="'$(Platform)' == ''">x64</Platform>
   </PropertyGroup>
   <ItemGroup>
-    <Solution Condition="'$(Category)'=='All'" Include="..\..\*\**\*.sln" Exclude="..\..\HIP-Basic\vulkan_interop\**\*.sln;..\..\HIP-Basic\opengl_interop\**\*.sln;..\..\HIP-Basic\static_host_library\**\*.sln">
+    <Solution Condition="'$(Category)'=='All'" Include="..\..\*\**\*.sln" Exclude="..\..\HIP-Basic\static_host_library\**\*.sln">
       <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
     </Solution>
     <Solution Condition="'$(Category)'=='Applications'" Include="..\..\Applications\**\*.sln">
       <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
     </Solution>
-    <Solution Condition="'$(Category)'=='HIP-Basic'" Include="..\..\HIP-Basic\**\*.sln" Exclude="..\..\HIP-Basic\vulkan_interop\**\*.sln;..\..\HIP-Basic\opengl_interop\**\*.sln;..\..\HIP-Basic\static_host_library\**\*.sln">
+    <Solution Condition="'$(Category)'=='HIP-Basic'" Include="..\..\HIP-Basic\**\*.sln" Exclude="..\..\HIP-Basic\static_host_library\**\*.sln">
       <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
     </Solution>
     <Solution Condition="'$(Category)'=='Libraries' and '$(VSVersion)'=='2017'" Include="..\..\Libraries\**\*_vs2017.sln">
