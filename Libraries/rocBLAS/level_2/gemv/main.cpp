@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "rocblas_utils.hpp"
 
@@ -170,8 +170,8 @@ int main(const int argc, const char** argv)
     std::iota(h_y.begin(), h_y.end(), 1.0f);
     std::transform(h_y.begin(), h_y.end(), h_y.begin(), std::negate<float>());
 
-    // Compute reference on CPU.
-    std::vector<float> h_y_gold(h_y);
+    // Calculate expected result on CPU.
+    std::vector<float> h_y_expected(h_y);
     gemv_reference(transpose_a,
                    rows,
                    cols,
@@ -181,7 +181,7 @@ int main(const int argc, const char** argv)
                    h_x.data(),
                    incx,
                    h_beta,
-                   h_y_gold.data(),
+                   h_y_expected.data(),
                    incy);
 
     // Allocate device memory using hipMalloc.
@@ -233,7 +233,7 @@ int main(const int argc, const char** argv)
     unsigned int    errors = 0;
     for(size_t i = 0; i < size_y; i++)
     {
-        errors += std::fabs(h_y[i] - h_y_gold[i]) > eps;
+        errors += std::fabs(h_y[i] - h_y_expected[i]) > eps;
     }
 
     if(errors)

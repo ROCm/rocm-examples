@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "rocfft_utils.hpp"
 
@@ -76,7 +76,7 @@ int main(int argc, char* argv[])
     }
 
     std::cout << "input:\n";
-    print_nd_data(h_input, length, 1, true);
+    print_nd_data(h_input, length, 1, 3, true);
     std::cout << "\n";
 
     ROCFFT_CHECK(rocfft_setup());
@@ -163,7 +163,7 @@ int main(int argc, char* argv[])
     std::vector<hipDoubleComplex> h_output(size);
     HIP_CHECK(hipMemcpy(h_output.data(), d_output, size_bytes, hipMemcpyDeviceToHost));
 
-    print_nd_data(h_output, length, 1, true);
+    print_nd_data(h_output, length, 1, 3, true);
 
     // Clean up: free device memory
     HIP_CHECK(hipFree(d_input));

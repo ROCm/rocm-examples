@@ -27,7 +27,7 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -64,7 +64,7 @@ add_subdirectory(syevj_batched)
 add_subdirectory(sygvd)
 
 # this example currently does not work with CUDA
-# https://github.com/ROCmSoftwarePlatform/hipSOLVER/issues/152
+# https://github.com/ROCm/hipSOLVER/issues/152
 if(NOT ("${GPU_RUNTIME}" STREQUAL "CUDA"))
     add_subdirectory(sygvj)
 endif()

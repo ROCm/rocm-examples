@@ -27,11 +27,22 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+include("${CMAKE_CURRENT_LIST_DIR}/../Common/HipPlatform.cmake")
+select_gpu_language()
+# select_hip_platform requires the language to be enabled
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
+
 add_subdirectory(bitonic_sort)
 add_subdirectory(convolution)
 add_subdirectory(floyd_warshall)
 add_subdirectory(histogram)
-if(NOT WIN32 AND GPU_RUNTIME STREQUAL "HIP")
+if(
+    NOT (
+        CMAKE_SYSTEM_NAME MATCHES "Windows"
+        AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"
+    )
+)
     add_subdirectory(monte_carlo_pi)
 endif()
 add_subdirectory(prefix_sum)

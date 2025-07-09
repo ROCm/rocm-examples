@@ -112,32 +112,29 @@ int main()
     double*        d_x{};
     double*        d_y{};
 
-    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, sizeof(*d_bsr_row_ptr) * (mb + 1)));
-    HIP_CHECK(hipMalloc(&d_bsr_col_ind, sizeof(*d_bsr_col_ind) * nnzb));
-    HIP_CHECK(hipMalloc(&d_bsr_val, sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim));
-    HIP_CHECK(hipMalloc(&d_x, sizeof(*d_x) * m));
-    HIP_CHECK(hipMalloc(&d_y, sizeof(*d_y) * n));
+    constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
+    constexpr size_t val_size     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
+    constexpr size_t x_size       = sizeof(*d_x) * m;
+    constexpr size_t y_size       = sizeof(*d_y) * n;
 
-    HIP_CHECK(hipMemcpy(d_bsr_row_ptr,
-                        h_bsr_row_ptr.data(),
-                        sizeof(*d_bsr_row_ptr) * (mb + 1),
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_col_ind,
-                        h_bsr_col_ind.data(),
-                        sizeof(*d_bsr_col_ind) * nnzb,
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_val,
-                        h_bsr_val.data(),
-                        sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim,
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_x, h_x.data(), sizeof(*d_x) * m, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_bsr_col_ind, col_ind_size));
+    HIP_CHECK(hipMalloc(&d_bsr_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, x_size));
+    HIP_CHECK(hipMalloc(&d_y, y_size));
+
+    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
     ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
     ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
-    // 4. Prepare utility variables for rocSPARSE bsrmv invocation.
+    // 4. Prepare utility variables for rocSPARSE bsrsv invocation.
     // Matrix descriptor.
     rocsparse_mat_descr descr;
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
@@ -227,7 +224,8 @@ int main()
 
     std::cout << "Solution successfully computed: ";
 
-    HIP_CHECK(hipMemcpy(h_y.data(), d_y, sizeof(*d_y) * n, hipMemcpyDeviceToHost));
+    // 8. Copy y from device to host. This call synchronizes with the host.
+    HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     std::cout << "y = " << format_range(h_y.begin(), h_y.end()) << std::endl;
 
@@ -238,7 +236,7 @@ int main()
         errors += std::fabs(h_y[i] - expected_y[i]) > eps;
     }
 
-    // 8. Free rocSPARSE resources and device memory.
+    // 9. Free rocSPARSE resources and device memory.
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
     ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(descr));
     ROCSPARSE_CHECK(rocsparse_destroy_mat_info(info));
@@ -250,6 +248,6 @@ int main()
     HIP_CHECK(hipFree(d_y));
     HIP_CHECK(hipFree(temp_buffer));
 
-    // 9. Print validation result.
+    // 10. Print validation result.
     return report_validation_result(errors);
 }

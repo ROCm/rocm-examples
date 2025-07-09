@@ -94,11 +94,15 @@ std::vector<std::size_t> create_input_sizes()
                                     500'000,
                                     1'000'000,
                                     5'000'000,
-                                    10'000'000,
+                                    10'000'000
+#ifndef REDUCTION_DISABLE_LARGE_TESTS
+                                    ,
                                     50'000'000,
                                     100'000'000,
                                     500'000'000,
-                                    1'000'000'000};
+                                    1'000'000'000
+#endif
+    };
 }
 
 enum block_size_strategy

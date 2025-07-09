@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "rocblas_utils.hpp"
 
@@ -119,9 +119,9 @@ int main(const int argc, const char** argv)
                                      static_cast<float>(size_x - i) * -0.2f);
     }
 
-    // Compute reference on CPU.
-    std::vector<hipFloatComplex> h_a_gold(h_a);
-    cher_reference(n, h_alpha, incx, h_x.data(), h_a_gold.data(), lda);
+    // Calculate expected result on CPU.
+    std::vector<hipFloatComplex> h_a_expected(h_a);
+    cher_reference(n, h_alpha, incx, h_x.data(), h_a_expected.data(), lda);
 
     // Allocate device memory using hipMalloc.
     rocblas_float_complex* d_a{};
@@ -164,7 +164,7 @@ int main(const int argc, const char** argv)
                 continue;
             }
 
-            const hipFloatComplex diff = h_a[i * lda + j] - h_a_gold[i * lda + j];
+            const hipFloatComplex diff = h_a[i * lda + j] - h_a_expected[i * lda + j];
             errors += diff.x > eps;
             errors += diff.y > eps;
         }

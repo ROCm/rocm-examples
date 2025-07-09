@@ -21,9 +21,9 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\Common\cmdparser.hpp" />
     <ClInclude Include="..\..\..\Common\example_utils.hpp" />
     <ClInclude Include="..\..\..\Common\hipfft_utils.hpp" />
+    <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
     <Content Include="$(HIPExecutablePath)\hipfft.dll">
@@ -95,7 +95,7 @@
     <ClCompile>
       <WarningLevel>Level2</WarningLevel>
       <PreprocessorDefinitions>__clang__;__HIP__;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;$(MSBuildProjectDirectory)\..\..\..\External;$(MSBuildProjectDirectory)\..\..\..\External\CmdParser;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>
@@ -110,7 +110,7 @@
       <WarningLevel>Level2</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <PreprocessorDefinitions>__clang__;__HIP__;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\..\Common;$(MSBuildProjectDirectory)\..\..\..\External;$(MSBuildProjectDirectory)\..\..\..\External\CmdParser;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
     </ClCompile>

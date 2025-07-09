@@ -22,6 +22,7 @@
 
 EXAMPLE := hipfft_plan_d2z
 COMMON_INCLUDE_DIR := ../../../Common
+EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -37,7 +38,7 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(HIPCUB_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ICPPFLAGS := -isystem $(HIPCUB_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lhipfft
 
@@ -58,7 +59,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(EXTERNAL_DIR)/CmdParser/cmdparser.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:

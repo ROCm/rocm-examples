@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [hipCUB](https://github.com/ROCmSoftwarePlatform/hipCUB) library. The examples build on both Linux and Windows for both the ROCm (AMD GPU) and CUDA (NVIDIA GPU) backend.
+The examples in this subdirectory showcase the functionality of the [hipCUB](https://github.com/ROCm/hipCUB) library. The examples build on both Linux and Windows for both the ROCm (AMD GPU) and CUDA (NVIDIA GPU) backend.
 
 ## Prerequisites
 
@@ -11,9 +11,9 @@ The examples in this subdirectory showcase the functionality of the [hipCUB](htt
 - [CMake](https://cmake.org/download/) (at least version 3.21)
 - OR GNU Make - available via the distribution's package manager
 - [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
-- [hipCUB](https://github.com/ROCmSoftwarePlatform/hipCUB)
+- [hipCUB](https://github.com/ROCm/hipCUB)
   - ROCm platform: `hipCUB-dev` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
-  - CUDA platform: Install hipCUB from source: [instructions](https://github.com/ROCmSoftwarePlatform/hipCUB#build-and-install).
+  - CUDA platform: Install hipCUB from source: [instructions](https://github.com/ROCm/hipCUB#build-and-install).
     - [CUB](https://github.com/NVIDIA/cub) is a dependency of hipCUB for NVIDIA platforms. CUB is part of the NVIDIA CUDA Toolkit.
 
 ### Windows
@@ -21,9 +21,9 @@ The examples in this subdirectory showcase the functionality of the [hipCUB](htt
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
 - ROCm toolchain for Windows (No public release yet)
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
-- [hipCUB](https://github.com/ROCmSoftwarePlatform/hipCUB)
+- [hipCUB](https://github.com/ROCm/hipCUB)
   - ROCm platform: Installed as part of the ROCm SDK on Windows for ROCm platform.
-  - CUDA platform: Install hipCUB from source: [instructions](https://github.com/ROCmSoftwarePlatform/hipCUB#build-and-install).
+  - CUDA platform: Install hipCUB from source: [instructions](https://github.com/ROCm/hipCUB#build-and-install).
     - [CUB](https://github.com/NVIDIA/cub) is a dependency of hipCUB for NVIDIA platforms. CUB is part of the NVIDIA CUDA Toolkit.
 - [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
 - [Ninja](https://ninja-build.org/) (optional, to build with CMake)
