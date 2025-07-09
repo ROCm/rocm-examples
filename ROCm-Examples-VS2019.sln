@@ -292,6 +292,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "roti_vs2019", "Libraries\ro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sctr_vs2019", "Libraries\rocSPARSE\level_1\sctr\sctr_vs2019.vcxproj", "{E0C0BDC3-C714-46F0-A73B-48107C89810F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_mipmap_vs2019", "HIP-Basic\vulkan_interop_mipmap\vulkan_interop_mipmap_vs2019.vcxproj", "{D4C880CB-6024-4019-8A45-16B3DF53CAF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -774,6 +776,10 @@ Global
 		{E0C0BDC3-C714-46F0-A73B-48107C89810F}.Debug|x64.Build.0 = Debug|x64
 		{E0C0BDC3-C714-46F0-A73B-48107C89810F}.Release|x64.ActiveCfg = Release|x64
 		{E0C0BDC3-C714-46F0-A73B-48107C89810F}.Release|x64.Build.0 = Release|x64
+		{D4C880CB-6024-4019-8A45-16B3DF53CAF8}.Debug|x64.ActiveCfg = Debug|x64
+		{D4C880CB-6024-4019-8A45-16B3DF53CAF8}.Debug|x64.Build.0 = Debug|x64
+		{D4C880CB-6024-4019-8A45-16B3DF53CAF8}.Release|x64.ActiveCfg = Release|x64
+		{D4C880CB-6024-4019-8A45-16B3DF53CAF8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -921,6 +927,7 @@ Global
 		{69161DE1-FF80-4B68-B925-39ECDB4BF03E} = {CE636F28-4B6E-4FEA-B487-30575357BEC9}
 		{625C0C79-FC86-4F87-BCD0-094FC352377D} = {CE636F28-4B6E-4FEA-B487-30575357BEC9}
 		{E0C0BDC3-C714-46F0-A73B-48107C89810F} = {CE636F28-4B6E-4FEA-B487-30575357BEC9}
+		{D4C880CB-6024-4019-8A45-16B3DF53CAF8} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
