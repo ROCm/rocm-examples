@@ -21,7 +21,7 @@ env:
 
 jobs:
     build:
-        name: "Build Applications Examples"
+        name: "Build Applications VS"
         strategy:
           matrix:
             config: [Debug, Release]
@@ -29,7 +29,7 @@ jobs:
         steps:
           - uses: actions/checkout@v4
           - uses: microsoft/setup-msbuild@v2
-          - name: Install dependencies
+          - name: Install Python dependencies
             shell: pwsh
             run: |
                   python3 -m pip install rich
@@ -40,7 +40,6 @@ jobs:
           - name: Install HIP SDK
             shell: pwsh
             run: |
-                  $PSVersionTable
                   $ProgressPreference = 'SilentlyContinue'
                   Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe"
                   Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe -OutFile Setup.exe
