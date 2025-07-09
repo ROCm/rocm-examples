@@ -171,11 +171,11 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
     ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(mat_B_desc));
 
-    HIP_CHECK(hipFree(d_C));
-    HIP_CHECK(hipFree(d_A));
-    HIP_CHECK(hipFree(d_csr_val));
-    HIP_CHECK(hipFree(d_csr_col_ind));
     HIP_CHECK(hipFree(d_csr_row_ptr));
+    HIP_CHECK(hipFree(d_csr_col_ind));
+    HIP_CHECK(hipFree(d_csr_val));
+    HIP_CHECK(hipFree(d_A));
+    HIP_CHECK(hipFree(d_C));
 
     return 0;
 }

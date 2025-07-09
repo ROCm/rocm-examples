@@ -74,26 +74,26 @@ int main()
     constexpr rocsparse_spsv_alg alg = rocsparse_spsv_alg_default;
 
     // 2. Allocate device memory and offload input data to device.
-    double*        d_x{};
-    double*        d_y{};
-    double*        d_coo_val{};
     rocsparse_int* d_coo_row_ind{};
     rocsparse_int* d_coo_col_ind{};
+    double*        d_coo_val{};
+    double*        d_x{};
+    double*        d_y{};
 
-    constexpr size_t size_val    = sizeof(*d_coo_val) * nnz;
-    constexpr size_t size_ind    = sizeof(*d_coo_row_ind) * nnz;
-    constexpr size_t size_vector = sizeof(*d_x) * n;
+    constexpr size_t ind_size    = sizeof(*d_coo_row_ind) * nnz;
+    constexpr size_t val_size    = sizeof(*d_coo_val) * nnz;
+    constexpr size_t vector_size = sizeof(*d_x) * n;
 
-    HIP_CHECK(hipMalloc(&d_x, size_vector));
-    HIP_CHECK(hipMalloc(&d_y, size_vector));
-    HIP_CHECK(hipMalloc(&d_coo_val, size_val));
-    HIP_CHECK(hipMalloc(&d_coo_row_ind, size_ind));
-    HIP_CHECK(hipMalloc(&d_coo_col_ind, size_ind));
+    HIP_CHECK(hipMalloc(&d_coo_row_ind, ind_size));
+    HIP_CHECK(hipMalloc(&d_coo_col_ind, ind_size));
+    HIP_CHECK(hipMalloc(&d_coo_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, vector_size));
+    HIP_CHECK(hipMalloc(&d_y, vector_size));
 
-    HIP_CHECK(hipMemcpy(d_x, h_x.data(), size_vector, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_val, h_coo_val.data(), size_val, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_row_ind, h_coo_row_ind.data(), size_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_col_ind, h_coo_col_ind.data(), size_ind, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_coo_row_ind, h_coo_row_ind.data(), ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_coo_col_ind, h_coo_col_ind.data(), ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_coo_val, h_coo_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x.data(), vector_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
@@ -179,12 +179,12 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_x));
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_y));
 
-    HIP_CHECK(hipFree(temp_buffer));
-    HIP_CHECK(hipFree(d_x));
-    HIP_CHECK(hipFree(d_y));
-    HIP_CHECK(hipFree(d_coo_val));
     HIP_CHECK(hipFree(d_coo_row_ind));
     HIP_CHECK(hipFree(d_coo_col_ind));
+    HIP_CHECK(hipFree(d_coo_val));
+    HIP_CHECK(hipFree(d_x));
+    HIP_CHECK(hipFree(d_y));
+    HIP_CHECK(hipFree(temp_buffer));
 
     // 9. Print result: (1, 2, 3, 4).
     std::cout << "y = " << format_range(h_y.begin(), h_y.end()) << std::endl;

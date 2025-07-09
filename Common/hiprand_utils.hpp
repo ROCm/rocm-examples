@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,5 +43,22 @@
         }                                                                              \
     }                                                                                  \
     while(0)
+
+/// \brief Checks whether the values in \p output are uniformly distributed.
+/// \return 0 if they are, the mean value obtained otherwise.
+double is_not_uniform_dist(const std::vector<unsigned int>& output)
+{
+    double           mean = 0;
+    constexpr double tol  = 0.1;
+
+    // Compute mean normalized to [0, 1], as values are generated in [0, 2**32 - 1] = [0, UINT_MAX].
+    for(const auto v : output)
+    {
+        mean += static_cast<double>(v) / UINT_MAX;
+    }
+    mean = mean / output.size();
+
+    return (std::abs(mean - 0.5) > tol) ? mean : 0;
+}
 
 #endif // COMMON_HIPRAND_UTILS_HPP

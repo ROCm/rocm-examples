@@ -78,11 +78,11 @@ int main()
     double*        d_x;
     double*        d_y;
 
-    constexpr size_t x_size       = sizeof(*d_x) * n;
-    constexpr size_t y_size       = sizeof(*d_y) * m;
-    constexpr size_t val_size     = sizeof(*d_csr_val) * nnz;
     constexpr size_t row_ptr_size = sizeof(*d_csr_row_ptr) * (m + 1);
     constexpr size_t col_ind_size = sizeof(*d_csr_col_ind) * nnz;
+    constexpr size_t val_size     = sizeof(*d_csr_val) * nnz;
+    constexpr size_t x_size       = sizeof(*d_x) * n;
+    constexpr size_t y_size       = sizeof(*d_y) * m;
 
     HIP_CHECK(hipMalloc(&d_csr_row_ptr, row_ptr_size));
     HIP_CHECK(hipMalloc(&d_csr_col_ind, col_ind_size));

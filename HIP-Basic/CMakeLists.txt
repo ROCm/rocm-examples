@@ -25,7 +25,7 @@ project(HIP-Basic LANGUAGES CXX)
 include(CTest)
 
 # ROCm installation path
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -73,7 +73,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         message(
             "'llvm-dis', 'llvm-mc', or 'clang-offload-bundler' not found, not building assembly example."
         )
-        if(NOT WIN32)
+        if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
             message(
                 "    These tools can be found in the 'rocm-llvm-dev' package."
             )
@@ -86,7 +86,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         message(
             "'llvm-mc' or 'clang-offload-bundler' not found, not building LLVM IR example."
         )
-        if(NOT WIN32)
+        if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
             message(
                 "    These tools can be found in the 'rocm-llvm-dev' package."
             )
@@ -103,7 +103,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     endif()
 endif()
 
-if(NOT WIN32)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_subdirectory(cooperative_groups)
 endif()
 
@@ -115,7 +115,7 @@ add_subdirectory(dynamic_shared)
 add_subdirectory(events)
 add_subdirectory(gpu_arch)
 add_subdirectory(hello_world)
-if(NOT WIN32)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     find_package(Perl)
 
     if(Perl_FOUND)
@@ -137,7 +137,10 @@ add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
 # We cannot build the static library on Windows as the HIP SDK does not include CMAKE_AR.
-if(NOT WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "HIP")
+if(
+    NOT CMAKE_SYSTEM_NAME MATCHES "Windows"
+    AND NOT "${GPU_RUNTIME}" STREQUAL "HIP"
+)
     add_subdirectory(static_host_library)
 endif()
 add_subdirectory(streams)
@@ -147,7 +150,7 @@ add_subdirectory(warp_shuffle)
 find_package(glfw3)
 find_package(Vulkan COMPONENTS glslangValidator)
 
-if(NOT WIN32)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     if(NOT glfw3_FOUND)
         message("GLFW not found, not building OpenGL interop example")
     else()

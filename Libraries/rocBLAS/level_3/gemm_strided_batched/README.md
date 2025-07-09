@@ -21,7 +21,7 @@ $op_a(A[i])$ is an $m \times k$ matrix, $op_b(B[i])$ a $k \times n$ matrix and $
 1. Read in command-line parameters.
 2. Set dimension variables of the matrices and get batch count and stride.
 3. Allocate and initialize the host matrices. Set up $B$ matrix as an identity matrix.
-4. Initialize gold standard matrix.
+4. Initialize expected matrix.
 5. Compute CPU reference result with strided batched subvectors.
 6. Allocate device memory.
 7. Copy data from host to device.

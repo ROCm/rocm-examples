@@ -4,7 +4,7 @@
 
 The examples in this subdirectory showcase the functionality for executing quantized models using MIGraphX. The Torch-MIGraphX integration library is used to achieve this, where PyTorch is used to quantize models, and MIGraphX is used to execute them on AMD GPUs.
 
-For more information, refer to the [Torch-MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/tree/master) library.
+For more information, refer to the [Torch-MIGraphX](https://github.com/ROCm/torch_migraphx/tree/master) library.
 
 ## Introduction
 
@@ -34,7 +34,7 @@ There are three main methods for computing quantization parameters:
 
 ### Converting and executing the quantized model
 
-As of the latest PyTorch release, there is no support for executing quantized models on GPUs directly through the framework. To execute these quantized models, use AMD's graph optimizer, MIGraphX, which is built using the ROCm stack. The [torch_migraphx](https://github.com/ROCmSoftwarePlatform/torch_migraphx) library provides a friendly interface for optimizing PyTorch models using the MIGraphX graph optimizer.
+As of the latest PyTorch release, there is no support for executing quantized models on GPUs directly through the framework. To execute these quantized models, use AMD's graph optimizer, MIGraphX, which is built using the ROCm stack. The [torch_migraphx](https://github.com/ROCm/torch_migraphx) library provides a friendly interface for optimizing PyTorch models using the MIGraphX graph optimizer.
 
 The examples show how to use this library to convert and execute PyTorch quantized models on GPUs using MIGraphX.
 
@@ -50,4 +50,4 @@ This library currently supports two paths for lowering:
 
 ### Installation instructions
 
-Refer to the [Torch_MIGraphX](https://github.com/ROCmSoftwarePlatform/torch_migraphx/blob/master/README.md) page for Docker and source installation instructions.
+Refer to the [Torch_MIGraphX](https://github.com/ROCm/torch_migraphx/blob/master/README.md) page for Docker and source installation instructions.

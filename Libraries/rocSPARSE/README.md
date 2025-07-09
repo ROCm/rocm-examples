@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE) library. The examples build on both Linux and Windows for the ROCm (AMD GPU) backend.
+The examples in this subdirectory showcase the functionality of the [rocSPARSE](https://github.com/ROCm/rocSPARSE) library. The examples build on both Linux and Windows for both the ROCm (AMD GPU) and CUDA (NVIDIA GPU) backend.
 
 ## Note on asynchronous execution
 
@@ -18,7 +18,7 @@ All rocSPARSE library functions, unless otherwise stated, are non blocking and e
 
 - [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
 
-- [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE)
+- [rocSPARSE](https://github.com/ROCm/rocSPARSE)
 
   - ROCm platform: `rocsparse` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
 
@@ -30,7 +30,7 @@ All rocSPARSE library functions, unless otherwise stated, are non blocking and e
 
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
 
-- [rocSPARSE](https://github.com/rocmSoftwarePlatform/rocSPARSE)
+- [rocSPARSE](https://github.com/ROCm/rocSPARSE)
 
   - ROCm platform: Installed as part of the ROCm SDK on Windows.
 

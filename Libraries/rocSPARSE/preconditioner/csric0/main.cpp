@@ -80,21 +80,21 @@ int main()
            0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5};
 
     // 2. Allocate device memory and offload input data to the device.
-    double*        d_csr_val{};
     rocsparse_int* d_csr_row_ptr{};
     rocsparse_int* d_csr_col_ind{};
+    double*        d_csr_val{};
 
-    constexpr size_t val_size     = sizeof(*d_csr_val) * nnz;
     constexpr size_t row_ptr_size = sizeof(*d_csr_row_ptr) * (m + 1);
     constexpr size_t col_ind_size = sizeof(*d_csr_col_ind) * nnz;
+    constexpr size_t val_size     = sizeof(*d_csr_val) * nnz;
 
-    HIP_CHECK(hipMalloc(&d_csr_val, val_size));
     HIP_CHECK(hipMalloc(&d_csr_row_ptr, row_ptr_size));
     HIP_CHECK(hipMalloc(&d_csr_col_ind, col_ind_size));
+    HIP_CHECK(hipMalloc(&d_csr_val, val_size));
 
-    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), val_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), val_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
@@ -180,11 +180,11 @@ int main()
 
     // 8. Convert the resulting CSR sparse matrix to a dense matrix. Check and print the resulting matrix.
     // Host and device allocations of the result matrix for conversion routines.
-    constexpr size_t           size_A = n * m;
-    std::array<double, size_A> A;
+    constexpr size_t           A_size = n * m;
+    std::array<double, A_size> A;
 
     double*          d_A{};
-    constexpr size_t size_bytes_A = sizeof(*d_A) * size_A;
+    constexpr size_t size_bytes_A = sizeof(*d_A) * A_size;
     HIP_CHECK(hipMalloc(&d_A, size_bytes_A));
 
     ROCSPARSE_CHECK(
@@ -194,7 +194,7 @@ int main()
 
     // Print the resulting L matrix and compare it with the expected result.
     // Expected L matrix in dense format.
-    constexpr std::array<double, size_A> expected
+    constexpr std::array<double, A_size> expected
         = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
            0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
 
@@ -219,11 +219,11 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(descr));
     ROCSPARSE_CHECK(rocsparse_destroy_mat_info(info));
 
-    HIP_CHECK(hipFree(d_csr_val));
     HIP_CHECK(hipFree(d_csr_row_ptr));
     HIP_CHECK(hipFree(d_csr_col_ind));
-    HIP_CHECK(hipFree(temp_buffer));
+    HIP_CHECK(hipFree(d_csr_val));
     HIP_CHECK(hipFree(d_A));
+    HIP_CHECK(hipFree(temp_buffer));
 
     // 10. Print validation result.
     return report_validation_result(errors);

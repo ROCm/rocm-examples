@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "hipfft_utils.hpp"
 
@@ -63,8 +63,8 @@ void fft_example(const int dimension, const int size = 8)
     std::uniform_real_distribution<double> distribution{};
     std::generate(input.begin(), input.end(), [&]() { return distribution(generator); });
 
-    std::cout << "Input:\n" << std::setprecision(3);
-    print_nd_data(input, n, 6);
+    std::cout << "Input:\n";
+    print_nd_data(input, n, 6, 3);
 
     // 3. Alocate device memory
     input_t*             d_input;
@@ -98,8 +98,8 @@ void fft_example(const int dimension, const int size = 8)
         hipMemcpy(output.data(), d_output, m_total * sizeof(*d_output), hipMemcpyDeviceToHost));
 
     // 9. Print output
-    std::cout << "Output:\n" << std::setprecision(3);
-    print_nd_data(output, m, 16);
+    std::cout << "Output:\n";
+    print_nd_data(output, m, 16, 3);
 
     // 10. Clean up
     HIPFFT_CHECK(hipfftDestroy(plan));

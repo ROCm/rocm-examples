@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -45,7 +45,7 @@ ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
 
 # Compile for these GPU architectures
-HIP_ARCHITECTURES ?= gfx803;gfx900;gfx906;gfx908;gfx90a;gfx950;gfx1030;gfx1100;gfx1101;gfx1102;gfx1201
+HIP_ARCHITECTURES ?= gfx803;gfx900;gfx906;gfx908;gfx90a;gfx950;gfx1030;gfx1100;gfx1101;gfx1102;gfx1151;gfx1201
 
 # If white-space is given as a literal the `subst` cannot recognize it.
 # There this `empty` `space` hack is used in the tokenizing of GPU_TARGETS
@@ -75,6 +75,9 @@ offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 
 main.o: main.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c --cuda-host-only -fuse-cuid=none $<
+
+main_%.s: main.hip
+	$(HIPCXX) -I $(COMMON_INCLUDE_DIR) -S --cuda-device-only $(patsubst main_%.s,--offload-arch=%, $@) $< -o $@
 
 main_%.o: main_%.s
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<

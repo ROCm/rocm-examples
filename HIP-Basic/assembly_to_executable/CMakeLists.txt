@@ -25,22 +25,17 @@ set(example_name hip_assembly_to_executable)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+select_gpu_language()
 
-# Only supported on HIP (not CUDA)
-if(NOT "${GPU_RUNTIME}" STREQUAL "HIP")
-    set(ERROR_MESSAGE
-        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be HIP."
-    )
-    message(FATAL_ERROR ${ERROR_MESSAGE})
-endif()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+select_hip_platform()
+verify_hip_platform(PLATFORMS "amd")
 
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
-
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -68,7 +63,7 @@ endif()
 
 if(GPU_ARCHITECTURES STREQUAL "all")
     set(GPU_ARCHITECTURES
-        "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx950;gfx1030;gfx1100;gfx1101;gfx1102;gfx1201"
+        "gfx803;gfx900;gfx906;gfx908;gfx90a;gfx950;gfx1030;gfx1100;gfx1101;gfx1102;gfx1151;gfx1201"
         CACHE STRING
         "GPU architectures to compile for"
         FORCE
@@ -84,7 +79,7 @@ set_source_files_properties(
     PROPERTIES COMPILE_OPTIONS "--cuda-host-only;-fuse-cuid=none"
 )
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(OBJ_TYPE obj)
     set(NULDEV NUL)
     set(HOST_TARGET x86_64-pc-windows-msvc)
@@ -95,6 +90,22 @@ else()
     set(HOST_TARGET x86_64-unknown-linux-gnu)
     set(HIP_OBJ_GEN_FILE hip_obj_gen.mcin)
 endif()
+
+# Generate device assemblies
+foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
+    add_custom_command(
+        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
+        COMMAND
+            ${CMAKE_HIP_COMPILER} -S --cuda-device-only
+            --offload-arch=${HIP_ARCHITECTURE} -I
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../Common
+            ${CMAKE_CURRENT_SOURCE_DIR}/main.hip -o
+            ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
+        VERBATIM
+        COMMENT "Generating ASM main_${HIP_ARCHITECTURE}.s"
+    )
+endforeach()
 
 # Assemble the device assemblies to object files using the HIP compiler.
 # The compiler needs -target amdgcn-amd-amdhsa -mcpu=gfx* in order to assemble the object file
@@ -193,8 +204,11 @@ add_executable(${example_name} main.hip ${DEVICE_OBJECT})
 # Make example runnable using ctest.
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(
+    main.hip
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
 
 install(TARGETS ${example_name})

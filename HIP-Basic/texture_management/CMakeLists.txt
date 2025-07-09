@@ -41,7 +41,7 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -68,7 +68,7 @@ set_tests_properties(
     PROPERTIES ENVIRONMENT "HIP_VISIBLE_DEVICES=0"
 )
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()

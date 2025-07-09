@@ -19,7 +19,7 @@ $op_a(A)$ an $m \times k$ matrix, $op_b(B)$ a $k \times n$ matrix and $C$ an $m 
 1. Read in command-line parameters.
 2. Set dimension variables of the matrices.
 3. Allocate and initialize the host matrices. Set up $B$ matrix as an identity matrix.
-4. Initialize gold standard matrix.
+4. Initialize expected matrix.
 5. Compute CPU reference result.
 6. Allocate device memory.
 7. Copy data from host to device.

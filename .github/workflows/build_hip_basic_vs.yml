@@ -18,10 +18,12 @@ env:
     PLATFORM_TOOLSET_VERSION: 6.2
     HIP_PATH: C:\Program Files\AMD\ROCm\6.2\
     HIPSDK_INSTALLER_VERSION: 24.Q4
+    VULKAN_SDK: C:\VulkanSDK\1.4.313.2\
+    GLFW_DIR: C:\glfw-3.4.bin.WIN64\
 
 jobs:
     build:
-        name: "Build HIP Examples"
+        name: "Build HIP Basic VS"
         strategy:
           matrix:
             config: [Debug, Release]
@@ -29,10 +31,28 @@ jobs:
         steps:
           - uses: actions/checkout@v4
           - uses: microsoft/setup-msbuild@v2
+          - name: Install Python dependencies
+            shell: pwsh
+            run: |
+                  python3 -m pip install rich
+          - name: Check GUID
+            shell: pwsh
+            run: |
+                  python3 Scripts/VisualStudio/check_vs_files.py
+          - name: Install additional dependencies
+            shell: pwsh
+            run: |
+                  $ProgressPreference = 'SilentlyContinue'
+                  Write-Host "Downloading GLFW 3.4"
+                  Invoke-WebRequest -Uri https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.bin.WIN64.zip -OutFile glfw-3.4.bin.WIN64.zip
+                  Expand-Archive -Path glfw-3.4.bin.WIN64.zip -DestinationPath C:\ -PassThru
+                  Write-Host "Downloading Vulkan SDK 1.4.313.2"
+                  Invoke-WebRequest -Uri https://sdk.lunarg.com/sdk/download/1.4.313.2/windows/vulkansdk-windows-X64-1.4.313.2.exe -OutFile vulkansdk-windows-X64-1.4.313.2.exe
+                  Write-Host "Installing Vulkan SDK"
+                  Start-Process vulkansdk-windows-X64-1.4.313.2.exe -ArgumentList '--accept-licenses','--default-answer','--confirm-command','install' -NoNewWindow -Wait
           - name: Install HIP SDK
             shell: pwsh
             run: |
-                  $PSVersionTable
                   $ProgressPreference = 'SilentlyContinue'
                   Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe"
                   Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe -OutFile Setup.exe
@@ -47,17 +67,13 @@ jobs:
                       Exit 1
                   }
                   msbuild -version
-          - name: Install dependencies
-            shell: pwsh
-            run: |
-                  python3 -m pip install rich
-          - name: Check GUID
-            shell: pwsh
-            run: |
-                  python3 Scripts/VisualStudio/check_vs_files.py
           - name: Build ${{ matrix.config }} x64
             shell: pwsh
             run: |
+                  Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang 6\..' | Select-Object -First 1).Matches.Value) with HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}"
+                  Get-ChildItem -Recurse -File | Where-Object { Select-String -Pattern 'HIP clang 6\..' -Path $_ } | ForEach-Object {
+                    (Get-Content -Path $_.FullName) -replace 'HIP clang 6\..', "HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}" | Set-Content -Path $_.FullName
+                  }
                   msbuild Scripts\VisualStudio\build.proj -maxCpuCount -detailedSummary -property:"Category=HIP-Basic;Configuration=${{ matrix.config }};Platform=x64"
                   Write-Host "msbuild returned: $LastExitCode"
                   Exit $LastExitCode

@@ -2,15 +2,15 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
     <Filter Include="Source Files">
-      <UniqueIdentifier>{3d19606c-9142-4e9e-ad69-20ffdf51d16c}</UniqueIdentifier>
+      <UniqueIdentifier>{30d4d20a-9875-4fdb-8af5-783fd44e8969}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx;hip;cu</Extensions>
     </Filter>
     <Filter Include="Header Files">
-      <UniqueIdentifier>{297bc50a-3e98-43bc-9a23-03f6a4919b37}</UniqueIdentifier>
+      <UniqueIdentifier>{2efca64b-0c31-420e-97f7-221c8b270d34}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cuh</Extensions>
     </Filter>
     <Filter Include="Resource Files">
-      <UniqueIdentifier>{688ee47c-24e1-4733-9773-dcb8000af0fc}</UniqueIdentifier>
+      <UniqueIdentifier>{ef967f0b-ce56-4b46-9502-cba31c8c5720}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
   </ItemGroup>
@@ -20,13 +20,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Common\cmdparser.hpp">
+    <ClInclude Include="..\..\..\Common\example_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\example_utils.hpp">
+    <ClInclude Include="..\..\..\Common\hipfft_utils.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Common\hipfft_utils.hpp">
+    <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

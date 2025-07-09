@@ -86,28 +86,28 @@ int main()
     constexpr rocsparse_spmv_alg alg = rocsparse_spmv_alg_default;
 
     // 2. Allocate device memory and offload input data to device.
-    double*        d_x{};
-    double*        d_y{};
-    double*        d_coo_val{};
     rocsparse_int* d_coo_row_ind{};
     rocsparse_int* d_coo_col_ind{};
+    double*        d_coo_val{};
+    double*        d_x{};
+    double*        d_y{};
 
-    constexpr size_t size_val = sizeof(*d_coo_val) * nnz;
-    constexpr size_t size_ind = sizeof(*d_coo_row_ind) * nnz;
-    constexpr size_t size_x   = sizeof(*d_x) * n;
-    constexpr size_t size_y   = sizeof(*d_y) * m;
+    constexpr size_t ind_size = sizeof(*d_coo_row_ind) * nnz;
+    constexpr size_t val_size = sizeof(*d_coo_val) * nnz;
+    constexpr size_t x_size   = sizeof(*d_x) * n;
+    constexpr size_t y_size   = sizeof(*d_y) * m;
 
-    HIP_CHECK(hipMalloc(&d_x, size_x));
-    HIP_CHECK(hipMalloc(&d_y, size_y));
-    HIP_CHECK(hipMalloc(&d_coo_val, size_val));
-    HIP_CHECK(hipMalloc(&d_coo_row_ind, size_ind));
-    HIP_CHECK(hipMalloc(&d_coo_col_ind, size_ind));
+    HIP_CHECK(hipMalloc(&d_coo_row_ind, ind_size));
+    HIP_CHECK(hipMalloc(&d_coo_col_ind, ind_size));
+    HIP_CHECK(hipMalloc(&d_coo_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, x_size));
+    HIP_CHECK(hipMalloc(&d_y, y_size));
 
-    HIP_CHECK(hipMemcpy(d_x, h_x.data(), size_x, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_y, h_y.data(), size_y, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_val, h_coo_val.data(), size_val, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_row_ind, h_coo_row_ind.data(), size_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_coo_col_ind, h_coo_col_ind.data(), size_ind, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_coo_row_ind, h_coo_row_ind.data(), ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_coo_col_ind, h_coo_col_ind.data(), ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_coo_val, h_coo_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x.data(), x_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_y, h_y.data(), y_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
@@ -188,7 +188,7 @@ int main()
                                    temp_buffer));
 
     // 7. Copy result from device to host. This call synchronizes with the host.
-    HIP_CHECK(hipMemcpy(h_y.data(), d_y, size_y, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 8. Free rocSPARSE resources and device memory.
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
@@ -196,11 +196,11 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_x));
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_y));
 
-    HIP_CHECK(hipFree(d_x));
-    HIP_CHECK(hipFree(d_y));
-    HIP_CHECK(hipFree(d_coo_val));
     HIP_CHECK(hipFree(d_coo_row_ind));
     HIP_CHECK(hipFree(d_coo_col_ind));
+    HIP_CHECK(hipFree(d_coo_val));
+    HIP_CHECK(hipFree(d_x));
+    HIP_CHECK(hipFree(d_y));
     HIP_CHECK(hipFree(temp_buffer));
 
     // 9. Print result.

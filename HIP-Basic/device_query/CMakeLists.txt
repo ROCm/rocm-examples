@@ -48,7 +48,7 @@ set(CMAKE_${USED_LANGUAGE}_STANDARD 17)
 set(CMAKE_${USED_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${USED_LANGUAGE}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -68,7 +68,7 @@ add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 # For examples targeting NVIDIA, include the HIP header directory.
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
