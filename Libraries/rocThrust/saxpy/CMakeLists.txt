@@ -39,6 +39,9 @@ add_executable(${example_name} main.hip)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 target_link_libraries(${example_name} PRIVATE roc::rocthrust)
-target_include_directories(${example_name} PRIVATE "../../../Common")
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../Common" "../../../External"
+)
 
 install(TARGETS ${example_name})

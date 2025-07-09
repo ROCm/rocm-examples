@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2023 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -51,7 +51,7 @@ void saxpy_slow(float A, thrust::device_vector<float>& X, thrust::device_vector<
 // The saxpy_fast function implements the operation with a single transformation
 // and represents "best practice". The saxpy_functor makes use of fast and accurate
 // Fused Multiply-Add (FMA) operation (see README.md).
-struct saxpy_functor : public thrust::binary_function<float, float, float>
+struct saxpy_functor
 {
     float a;
 

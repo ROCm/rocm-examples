@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "hiprand_utils.hpp"
 
@@ -145,7 +145,7 @@ int main(int argc, char* argv[])
 
     HIP_CHECK(hipEventRecord(start, hipStreamDefault));
     {
-        // 3. Initialize hipRAND's default pseudorandom generator and generate 2 * n samples.
+        // 3. Initialize hipRAND's default pseudo-random generator and generate 2 * n samples.
         hiprandGenerator_t gen;
         HIPRAND_CHECK(hiprandCreateGenerator(&gen, HIPRAND_RNG_PSEUDO_DEFAULT));
         HIPRAND_CHECK(hiprandSetPseudoRandomGeneratorSeed(gen, 42));

@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "hipfft_utils.hpp"
 
@@ -72,8 +72,8 @@ int main(int argc, char* argv[])
                   input.end(),
                   [&]() { return data_t{distribution(generator), distribution(generator)}; });
 
-    std::cout << "Input:\n" << std::setprecision(3);
-    print_nd_data(input, length, 16);
+    std::cout << "Input:\n";
+    print_nd_data(input, length, 16, 3);
 
     // 3. Initialize the FFT plan handle.
     hipfftHandle plan{};
@@ -112,8 +112,8 @@ int main(int argc, char* argv[])
                                 output_desc,
                                 hipfftXtCopyType::HIPFFT_COPY_DEVICE_TO_HOST));
 
-    std::cout << "Output:\n" << std::setprecision(3);
-    print_nd_data(output, length, 16);
+    std::cout << "Output:\n";
+    print_nd_data(output, length, 16, 3);
 
     // 10. Clean up.
     HIPFFT_CHECK(hipfftXtFree(input_desc));

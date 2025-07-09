@@ -86,10 +86,10 @@ int main()
     double*        d_x{};
     double*        d_y{};
 
+    constexpr size_t ind_size = sizeof(*d_ell_col_ind) * h_ell_length;
+    constexpr size_t val_size = sizeof(*d_ell_val) * h_ell_length;
     constexpr size_t x_size   = sizeof(*d_x) * n;
     constexpr size_t y_size   = sizeof(*d_y) * m;
-    constexpr size_t val_size = sizeof(*d_ell_val) * h_ell_length;
-    constexpr size_t ind_size = sizeof(*d_ell_col_ind) * h_ell_length;
 
     HIP_CHECK(hipMalloc(&d_ell_col_ind, ind_size));
     HIP_CHECK(hipMalloc(&d_ell_val, val_size));
@@ -115,7 +115,7 @@ int main()
                                      &beta,
                                      d_y));
 
-    // 5. Copy y to host from device. This call synchronizes with the host.
+    // 5. Copy y from device to host. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(h_y.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE

@@ -30,7 +30,7 @@ jobs:
             run: |
                   apt-get update -qq &&
                   apt-get install -y build-essential g++ glslang-tools \
-                    python3 python3-pip libglfw3-dev libvulkan-dev locales wget
+                    python3 python3-pip libglfw3-dev libvulkan-dev locales wget git
                   python3 -m pip install --upgrade pip
                   python3 -m pip install cmake
 
@@ -44,6 +44,26 @@ jobs:
               echo "/opt/rocm/bin" >> $GITHUB_PATH
               echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
               echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+
+          - name: Build and install hipCUB
+            shell: bash
+            run: |
+              git clone https://github.com/ROCm/hipCUB.git
+              pushd hipCUB; mkdir build; cd build
+              HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
+              make -j4
+              make install
+              popd && rm -rf hipCUB
+
+          - name: Build and install hipRAND
+            shell: bash
+            run: |
+              git clone https://github.com/ROCm/hipRAND.git
+              pushd hipRAND; mkdir build; cd build
+              HIP_PLATFORM=nvidia CXX=g++ cmake -DBUILD_WITH_LIB=CUDA -DHIP_CUDA_lowest_cc=60 ..
+              make -j4
+              make install
+              popd && rm -rf hipRAND
 
           - name: Configure and Build
             shell: bash

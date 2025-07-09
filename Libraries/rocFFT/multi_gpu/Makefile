@@ -22,6 +22,7 @@
 
 EXAMPLE := rocfft_multi_gpu
 COMMON_INCLUDE_DIR := ../../../Common
+EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
@@ -38,7 +39,7 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(ROCFFT_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ICPPFLAGS := -isystem $(ROCFFT_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lrocfft
 

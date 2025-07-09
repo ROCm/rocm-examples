@@ -31,7 +31,7 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
     cmake_minimum_required(VERSION 3.25.2)
 else()
     cmake_minimum_required(VERSION 3.21)
-    if(WIN32)
+    if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         message(
             STATUS
             "The reduction tutorial is not supported on Windows. Not building."
@@ -46,12 +46,17 @@ file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 option(REDUCTION_BUILD_TESTING "Build Reduction tests" ON)
+option(REDUCTION_DISABLE_LARGE_TESTS "Disable Large Reduction tests" OFF)
 option(REDUCTION_BUILD_BENCHMARKS "Build Reduction benchmarks" ON)
 option(REDUCTION_BUILD_EXAMPLES "Build Reduction examples" ON)
 
 add_library(Reduction IMPORTED INTERFACE)
 
 target_include_directories(Reduction INTERFACE include)
+
+if(REDUCTION_DISABLE_LARGE_TESTS)
+    add_compile_definitions(REDUCTION_DISABLE_LARGE_TESTS)
+endif()
 
 if(REDUCTION_BUILD_TESTING)
     enable_testing()

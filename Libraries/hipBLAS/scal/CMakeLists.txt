@@ -41,7 +41,7 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -59,18 +59,21 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hipblas REQUIRED)
 
-add_executable(${example_name} main.hip)
+add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::hipblas)
 
-target_include_directories(${example_name} PRIVATE "../../../Common")
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../Common" "../../../External"
+)
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
 install(TARGETS ${example_name})
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::hipblas)
     if(GPU_RUNTIME STREQUAL "HIP")
         find_package(rocblas REQUIRED)

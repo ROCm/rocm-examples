@@ -112,22 +112,22 @@ int main()
     double*        d_csr_val{};
     double*        d_B{};
 
-    constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (n + 1);
-    constexpr size_t size_csr_col_ind = sizeof(*d_csr_col_ind) * nnz;
-    constexpr size_t size_csr_val     = sizeof(*d_csr_val) * nnz;
-    constexpr size_t size_B           = sizeof(*d_B) * ldb * nrhs;
+    constexpr size_t csr_row_ptr_size = sizeof(*d_csr_row_ptr) * (n + 1);
+    constexpr size_t csr_col_ind_size = sizeof(*d_csr_col_ind) * nnz;
+    constexpr size_t csr_val_size     = sizeof(*d_csr_val) * nnz;
+    constexpr size_t B_size           = sizeof(*d_B) * ldb * nrhs;
 
-    HIP_CHECK(hipMalloc(&d_csr_row_ptr, size_csr_row_ptr));
-    HIP_CHECK(hipMalloc(&d_csr_col_ind, size_csr_col_ind));
-    HIP_CHECK(hipMalloc(&d_csr_val, size_csr_val));
-    HIP_CHECK(hipMalloc(&d_B, size_B));
+    HIP_CHECK(hipMalloc(&d_csr_row_ptr, csr_row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_csr_col_ind, csr_col_ind_size));
+    HIP_CHECK(hipMalloc(&d_csr_val, csr_val_size));
+    HIP_CHECK(hipMalloc(&d_B, B_size));
 
     HIP_CHECK(
-        hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), size_csr_row_ptr, hipMemcpyHostToDevice));
+        hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), csr_row_ptr_size, hipMemcpyHostToDevice));
     HIP_CHECK(
-        hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), size_csr_col_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), size_csr_val, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_B, h_B.data(), size_B, hipMemcpyHostToDevice));
+        hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), csr_col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), csr_val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_B, h_B.data(), B_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     // Create rocSPARSE handle.
@@ -207,7 +207,7 @@ int main()
 
     // 6. Sort CSR matrix before calling the csrsm_solve function.
     rocsparse_int* perm;
-    HIP_CHECK(hipMalloc(&perm, size_csr_col_ind));
+    HIP_CHECK(hipMalloc(&perm, csr_col_ind_size));
     ROCSPARSE_CHECK(rocsparse_create_identity_permutation(handle, nnz, perm));
 
     // Query the required buffer size in bytes and allocate a temporary buffer for sorting.
@@ -293,7 +293,7 @@ int main()
 
     // Allocate array for solution on host and copy result from device.
     std::array<double, ldb * nrhs> h_X{};
-    HIP_CHECK(hipMemcpy(h_X.data(), d_B, size_B, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_X.data(), d_B, B_size, hipMemcpyDeviceToHost));
 
     // Print solution and compare with expected results.
     std::cout << "Solution successfully computed: " << std::endl;
@@ -315,13 +315,13 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_mat_info(info));
     ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(descr));
 
+    HIP_CHECK(hipFree(d_csr_col_ind));
+    HIP_CHECK(hipFree(d_csr_row_ptr));
+    HIP_CHECK(hipFree(d_csr_val));
+    HIP_CHECK(hipFree(d_B));
     HIP_CHECK(hipFree(perm));
     HIP_CHECK(hipFree(sort_temp_buffer));
     HIP_CHECK(hipFree(temp_buffer));
-    HIP_CHECK(hipFree(d_B));
-    HIP_CHECK(hipFree(d_csr_val));
-    HIP_CHECK(hipFree(d_csr_col_ind));
-    HIP_CHECK(hipFree(d_csr_row_ptr));
 
     // 10. Print validation result.
     return report_validation_result(errors);

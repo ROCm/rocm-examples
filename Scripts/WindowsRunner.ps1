@@ -62,7 +62,7 @@ function Run-Example {
         
         # Otherwise, fail!
         $Status = "`e[31m`e[1mFail`e[0m"
-        $FailureCount += 1
+        $script:FailureCount += 1
     }
 
     # Clean up!
