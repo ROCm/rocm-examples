@@ -1,0 +1,24 @@
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.36123.18
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_mipmap_vs2017", "vulkan_interop_mipmap_vs2017.vcxproj", "{E8EB63EE-6F1D-42F2-821E-452260D1B489}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8EB63EE-6F1D-42F2-821E-452260D1B489}.Debug|x64.ActiveCfg = Debug|x64
+		{E8EB63EE-6F1D-42F2-821E-452260D1B489}.Debug|x64.Build.0 = Debug|x64
+		{E8EB63EE-6F1D-42F2-821E-452260D1B489}.Release|x64.ActiveCfg = Release|x64
+		{E8EB63EE-6F1D-42F2-821E-452260D1B489}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D53996D7-273E-451E-86B3-22EF5B973EC9}
+	EndGlobalSection
+EndGlobal
