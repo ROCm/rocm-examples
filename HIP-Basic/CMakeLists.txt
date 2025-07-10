@@ -111,6 +111,7 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_subdirectory(cooperative_groups)
 endif()
 
+add_subdirectory(add_kernel)
 add_subdirectory(bandwidth)
 add_subdirectory(bit_extract)
 add_subdirectory(device_query)
