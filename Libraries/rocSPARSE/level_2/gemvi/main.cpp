@@ -24,7 +24,6 @@
 #include "rocsparse_utils.hpp"
 
 #include <cstddef>
-#include <rocsolver/rocsolver.h>
 #include <rocsparse/rocsparse.h>
 
 #include <hip/hip_runtime.h>
