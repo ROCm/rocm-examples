@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,50 +20,44 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	add_kernel \
-	bandwidth \
-	bit_extract \
-	cooperative_groups \
-	device_query \
-	device_globals \
-	dynamic_shared \
-	events \
-	gpu_arch \
-	hello_world \
-	hipify \
-	inline_assembly \
-	matrix_multiplication \
-	moving_average \
-	multi_gpu_data_transfer \
-	occupancy \
-	opengl_interop \
-	runtime_compilation \
-	saxpy \
-	shared_memory \
-	simple_device_query \
-	streams \
-	static_host_library \
-	texture_management \
-	vulkan_interop \
-	vulkan_interop_mipmap \
-	warp_shuffle
+EXAMPLE := hip_simple_device_query
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME := HIP
 
-# Only supported on HIP (not CUDA).
-ifneq ($(GPU_RUNTIME), CUDA)
-	EXAMPLES += \
-		assembly_to_executable \
-		llvm_ir_to_executable \
-		module_api \
-		static_device_library
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
+
+ifeq ($(GPU_RUNTIME), CUDA)
+	ICXXFLAGS += -x cu
+else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS  ?= -Wall -Wextra
+	HIPCXX    := $(CXX)
+	ICXXFLAGS += -D__HIP_PLATFORM_AMD__
+	ILDFLAGS  += -L $(ROCM_INSTALL_DIR)/lib
+	ILDLIBS   += -lamdhip64
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
-all: $(EXAMPLES)
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
-clean: TARGET=clean
-clean: all
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+clean:
+	$(RM) $(EXAMPLE)
 
-.PHONY: all clean $(EXAMPLES)
+.PHONY: clean

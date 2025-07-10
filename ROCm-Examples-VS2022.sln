@@ -306,6 +306,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_mipmap_vs202
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2022", "HIP-Basic\add_kernel\add_kernel_vs2022.vcxproj", "{BE5B422D-4989-8066-F842-3B735DEE53FD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2022", "HIP-Basic\simple_device_query\simple_device_query_vs2022.vcxproj", "{3DEC0AEA-B20B-0560-C3F5-951BD56810D2}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -816,6 +818,10 @@ Global
 		{BE5B422D-4989-8066-F842-3B735DEE53FD}.Debug|x64.Build.0 = Debug|x64
 		{BE5B422D-4989-8066-F842-3B735DEE53FD}.Release|x64.ActiveCfg = Release|x64
 		{BE5B422D-4989-8066-F842-3B735DEE53FD}.Release|x64.Build.0 = Release|x64
+		{3DEC0AEA-B20B-0560-C3F5-951BD56810D2}.Debug|x64.ActiveCfg = Debug|x64
+		{3DEC0AEA-B20B-0560-C3F5-951BD56810D2}.Debug|x64.Build.0 = Debug|x64
+		{3DEC0AEA-B20B-0560-C3F5-951BD56810D2}.Release|x64.ActiveCfg = Release|x64
+		{3DEC0AEA-B20B-0560-C3F5-951BD56810D2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -970,6 +976,7 @@ Global
 		{EE9B5CAD-B5FE-48D7-BD24-7129E29E18C4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{F528177F-5900-3820-537D-FDD8E03FE9E1} = {94393B51-B70E-4111-A22C-6A752D41E454}
 		{BE5B422D-4989-8066-F842-3B735DEE53FD} = {94393B51-B70E-4111-A22C-6A752D41E454}
+		{3DEC0AEA-B20B-0560-C3F5-951BD56810D2} = {94393B51-B70E-4111-A22C-6A752D41E454}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

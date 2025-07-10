@@ -76,6 +76,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_sum_vs2017", "Librar
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2017", "HIP-Basic\add_kernel\add_kernel_vs2017.vcxproj", "{9AAB2AC9-D152-4C42-B00F-3E1175C75511}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2017", "HIP-Basic\simple_device_query\simple_device_query_vs2017.vcxproj", "{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -214,6 +216,10 @@ Global
 		{9AAB2AC9-D152-4C42-B00F-3E1175C75511}.Debug|x64.Build.0 = Debug|x64
 		{9AAB2AC9-D152-4C42-B00F-3E1175C75511}.Release|x64.ActiveCfg = Release|x64
 		{9AAB2AC9-D152-4C42-B00F-3E1175C75511}.Release|x64.Build.0 = Release|x64
+		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}.Debug|x64.ActiveCfg = Debug|x64
+		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}.Debug|x64.Build.0 = Debug|x64
+		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}.Release|x64.ActiveCfg = Release|x64
+		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -253,6 +259,7 @@ Global
 		{C8EDEFF9-36B0-4942-B6DD-2548911D0677} = {2C11736F-89FF-46AA-8CD7-F744080B3681}
 		{48AF1513-2732-45C2-A1AC-28A551A9DE79} = {2C11736F-89FF-46AA-8CD7-F744080B3681}
 		{9AAB2AC9-D152-4C42-B00F-3E1175C75511} = {E5901D63-D81F-411A-90CF-3842EB121A6D}
+		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9} = {E5901D63-D81F-411A-90CF-3842EB121A6D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20E1D613-A9A0-4471-B029-8528325AE9EC}

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36301.6 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2022", "simple_device_query_vs2022.vcxproj", "{DCC7F4CC-F561-4331-990B-E2760B269D7A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DCC7F4CC-F561-4331-990B-E2760B269D7A}.Debug|x64.ActiveCfg = Debug|x64
+		{DCC7F4CC-F561-4331-990B-E2760B269D7A}.Debug|x64.Build.0 = Debug|x64
+		{DCC7F4CC-F561-4331-990B-E2760B269D7A}.Release|x64.ActiveCfg = Release|x64
+		{DCC7F4CC-F561-4331-990B-E2760B269D7A}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4320F984-F544-4597-A400-074D6B47AC18}
+	EndGlobalSection
+EndGlobal

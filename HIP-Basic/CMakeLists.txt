@@ -141,6 +141,7 @@ add_subdirectory(occupancy)
 add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
+add_subdirectory(simple_device_query)
 # We cannot build the static library on Windows as the HIP SDK does not include CMAKE_AR.
 if(
     NOT CMAKE_SYSTEM_NAME MATCHES "Windows"
