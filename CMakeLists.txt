@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
-project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.4.1)
+project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.4.0)
 include(CTest)
 
 include("${CMAKE_CURRENT_LIST_DIR}/Common/HipPlatform.cmake")

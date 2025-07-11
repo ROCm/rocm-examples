@@ -89,7 +89,6 @@ int main()
     constexpr size_t LU_size          = sizeof(*d_LU) * length_LU;
     rocsparse_int    max_iter         = 100; /*maximum number of iterations*/
     rocsparse_int    free_iter        = 20;
-    const size_t     length_data      = 2 * max_iter;
 
     HIP_CHECK(hipMalloc(&d_csr_row_ptr, csr_row_ptr_size));
     HIP_CHECK(hipMalloc(&d_csr_col_ind, csr_col_ind_size));
