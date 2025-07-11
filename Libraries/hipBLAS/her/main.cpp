@@ -101,8 +101,8 @@ int main(const int argc, const char** argv)
     }
 
     // Scalar multiplier.
-    const float          alpha   = parser.get<float>("a");
-    const hipComplex h_alpha = hipComplex(alpha, 0.0f);
+    const float           alpha   = parser.get<float>("a");
+    const hipFloatComplex h_alpha = make_hipFloatComplex(alpha, 0.0f);
 
     // The leading dimension (the stride between column starts) of the matrix A.
     // The matrix is packed into memory, so the leading dimension is equal to
