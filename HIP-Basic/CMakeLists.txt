@@ -134,6 +134,8 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
 endif()
 
 add_subdirectory(inline_assembly)
+add_subdirectory(low_precision_float_fp8)
+add_subdirectory(low_precision_float_fp16)
 add_subdirectory(matrix_multiplication)
 add_subdirectory(moving_average)
 add_subdirectory(multi_gpu_data_transfer)

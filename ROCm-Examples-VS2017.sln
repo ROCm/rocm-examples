@@ -308,6 +308,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2017", "HIP-Ba
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2017", "HIP-Basic\simple_device_query\simple_device_query_vs2017.vcxproj", "{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "low_precision_float_fp8_vs2017", "HIP-Basic\low_precision_float_fp8\low_precision_float_fp8_vs2017.vcxproj", "{BB466EAB-A443-471B-91E5-4409BD5C6D7F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "low_precision_float_fp16_vs2017", "HIP-Basic\low_precision_float_fp16\low_precision_float_fp16_vs2017.vcxproj", "{3A7225F1-4AF1-4BD9-A792-1621ADC593CF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -822,6 +826,14 @@ Global
 		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}.Debug|x64.Build.0 = Debug|x64
 		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}.Release|x64.ActiveCfg = Release|x64
 		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9}.Release|x64.Build.0 = Release|x64
+		{BB466EAB-A443-471B-91E5-4409BD5C6D7F}.Debug|x64.ActiveCfg = Debug|x64
+		{BB466EAB-A443-471B-91E5-4409BD5C6D7F}.Debug|x64.Build.0 = Debug|x64
+		{BB466EAB-A443-471B-91E5-4409BD5C6D7F}.Release|x64.ActiveCfg = Release|x64
+		{BB466EAB-A443-471B-91E5-4409BD5C6D7F}.Release|x64.Build.0 = Release|x64
+		{3A7225F1-4AF1-4BD9-A792-1621ADC593CF}.Debug|x64.ActiveCfg = Debug|x64
+		{3A7225F1-4AF1-4BD9-A792-1621ADC593CF}.Debug|x64.Build.0 = Debug|x64
+		{3A7225F1-4AF1-4BD9-A792-1621ADC593CF}.Release|x64.ActiveCfg = Release|x64
+		{3A7225F1-4AF1-4BD9-A792-1621ADC593CF}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -977,6 +989,8 @@ Global
 		{E8EB63EE-6F1D-42F2-821E-452260D1B489} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{9AAB2AC9-D152-4C42-B00F-3E1175C75511} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 		{57D2AF49-8C30-4ABC-9809-A92E7E529DD9} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
+		{BB466EAB-A443-471B-91E5-4409BD5C6D7F} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
+		{3A7225F1-4AF1-4BD9-A792-1621ADC593CF} = {8DF2222B-5CDB-44DE-AC5D-D24C6C0B0B49}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
