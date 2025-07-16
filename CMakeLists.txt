@@ -26,6 +26,11 @@ include(CTest)
 
 include("${CMAKE_CURRENT_LIST_DIR}/Common/HipPlatform.cmake")
 
+# Set default build type to Release
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 add_subdirectory(Applications)
 add_subdirectory(HIP-Basic)
 add_subdirectory(Libraries)
