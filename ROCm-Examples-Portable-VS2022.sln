@@ -86,6 +86,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2022"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complex_math_vs2022", "HIP-Programming-Guide\complex_math\complex_math_vs2022.vcxproj", "{9B164E0F-DFD0-EE46-C406-5E62D3B24CBE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2022", "HIP-Programming-Guide\pageable_host_memory\pageable_host_memory_vs2022.vcxproj", "{C2A7C4F0-161D-F52B-B4BA-AF8034C4C898}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -240,6 +242,10 @@ Global
 		{9B164E0F-DFD0-EE46-C406-5E62D3B24CBE}.Debug|x64.Build.0 = Debug|x64
 		{9B164E0F-DFD0-EE46-C406-5E62D3B24CBE}.Release|x64.ActiveCfg = Release|x64
 		{9B164E0F-DFD0-EE46-C406-5E62D3B24CBE}.Release|x64.Build.0 = Release|x64
+		{C2A7C4F0-161D-F52B-B4BA-AF8034C4C898}.Debug|x64.ActiveCfg = Debug|x64
+		{C2A7C4F0-161D-F52B-B4BA-AF8034C4C898}.Debug|x64.Build.0 = Debug|x64
+		{C2A7C4F0-161D-F52B-B4BA-AF8034C4C898}.Release|x64.ActiveCfg = Release|x64
+		{C2A7C4F0-161D-F52B-B4BA-AF8034C4C898}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -283,6 +289,7 @@ Global
 		{E5F3F006-A244-43F2-905F-4B6E496E3AE4} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{DCC7F4CC-F561-4331-990B-E2760B269D7A} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{9B164E0F-DFD0-EE46-C406-5E62D3B24CBE} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{C2A7C4F0-161D-F52B-B4BA-AF8034C4C898} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A39869B7-4813-4EE4-B059-C79B5CA433E7}
