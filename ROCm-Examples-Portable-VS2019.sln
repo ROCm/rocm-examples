@@ -84,6 +84,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "low_precision_float_fp16_vs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2019", "HIP-Programming-Guide\simple_device_query\simple_device_query_vs2019.vcxproj", "{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complex_math_vs2019", "HIP-Programming-Guide\complex_math\complex_math_vs2019.vcxproj", "{F003271F-5951-4341-AEFA-DD38E5BCAAB7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -234,6 +236,10 @@ Global
 		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Debug|x64.Build.0 = Debug|x64
 		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.ActiveCfg = Release|x64
 		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.Build.0 = Release|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Debug|x64.ActiveCfg = Debug|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Debug|x64.Build.0 = Debug|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Release|x64.ActiveCfg = Release|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -276,6 +282,7 @@ Global
 		{284FBB1E-86AE-4481-81F4-EE635A453E7D} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{7DB27A14-3FE4-4BB9-9F8E-9F8E1519CAFD} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6EBF9134-2D3A-4C31-84F3-BB9A729317C0}
