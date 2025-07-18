@@ -1,4 +1,4 @@
-# HIP-Basic Low-Precision Floating Point Example
+# HIP-Programming-Guide Half-Precision Floating-Point Example
 
 ## Description
 

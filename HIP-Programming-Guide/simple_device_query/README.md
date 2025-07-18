@@ -1,4 +1,4 @@
-# HIP-Basic Simple Device Query Example
+# HIP-Programming-Guide Simple Device Query Example
 
 ## Description
 

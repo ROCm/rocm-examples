@@ -111,7 +111,6 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_subdirectory(cooperative_groups)
 endif()
 
-add_subdirectory(add_kernel)
 add_subdirectory(bandwidth)
 add_subdirectory(bit_extract)
 add_subdirectory(device_query)
@@ -134,8 +133,6 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
 endif()
 
 add_subdirectory(inline_assembly)
-add_subdirectory(low_precision_float_fp8)
-add_subdirectory(low_precision_float_fp16)
 add_subdirectory(matrix_multiplication)
 add_subdirectory(moving_average)
 add_subdirectory(multi_gpu_data_transfer)
@@ -143,7 +140,6 @@ add_subdirectory(occupancy)
 add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
-add_subdirectory(simple_device_query)
 # We cannot build the static library on Windows as the HIP SDK does not include CMAKE_AR.
 if(
     NOT CMAKE_SYSTEM_NAME MATCHES "Windows"

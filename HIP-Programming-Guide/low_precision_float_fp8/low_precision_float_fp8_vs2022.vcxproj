@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{DFF7D0F2-772D-F692-7AF5-9DBF699A2439}</ProjectGuid>
+    <ProjectGuid>{16ABAD46-8AE4-43B8-810F-96B681ADF244}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>low_precision_float_fp8_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>

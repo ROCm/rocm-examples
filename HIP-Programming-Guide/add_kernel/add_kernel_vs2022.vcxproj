@@ -12,13 +12,16 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{3DEC0AEA-B20B-0560-C3F5-951BD56810D2}</ProjectGuid>
+    <ProjectGuid>{65BD676A-D5C6-455B-A8D1-B3354FD5B22F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>simple_device_query_vs2022</RootNamespace>
+    <RootNamespace>add_kernel_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp" />
+    <ClCompile Include="main.hip" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Common\example_utils.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">

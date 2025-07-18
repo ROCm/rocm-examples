@@ -134,6 +134,7 @@ SOURCE_DIRS=(
     "Dockerfiles"
     "External"
     "HIP-Basic"
+    "HIP-Programming-Guide"
     "Libraries"
     "LLVM_ASAN"
     "Tutorials"

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,48 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	bandwidth \
-	bit_extract \
-	cooperative_groups \
-	device_query \
-	device_globals \
-	dynamic_shared \
-	events \
-	gpu_arch \
-	hello_world \
-	hipify \
-	inline_assembly \
-	matrix_multiplication \
-	moving_average \
-	multi_gpu_data_transfer \
-	occupancy \
-	opengl_interop \
-	runtime_compilation \
-	saxpy \
-	shared_memory \
-	streams \
-	static_host_library \
-	texture_management \
-	vulkan_interop \
-	vulkan_interop_mipmap \
-	warp_shuffle
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(HIP-Programming-Guide LANGUAGES CXX)
+include(CTest)
 
-# Only supported on HIP (not CUDA).
-ifneq ($(GPU_RUNTIME), CUDA)
-	EXAMPLES += \
-		assembly_to_executable \
-		llvm_ir_to_executable \
-		module_api \
-		static_device_library
-endif
-
-all: $(EXAMPLES)
-
-clean: TARGET=clean
-clean: all
-
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(EXAMPLES)
+add_subdirectory(add_kernel)
+add_subdirectory(low_precision_float_fp8)
+add_subdirectory(low_precision_float_fp16)
+add_subdirectory(simple_device_query)

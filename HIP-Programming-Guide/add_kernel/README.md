@@ -1,4 +1,4 @@
-# HIP-Basic "add_kernel" Example
+# HIP-Programming-Guide AddKernel Example
 
 ## Description
 
