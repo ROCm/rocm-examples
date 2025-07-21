@@ -318,6 +318,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complex_math_vs2019", "HIP-
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2019", "HIP-Programming-Guide\pageable_host_memory\pageable_host_memory_vs2019.vcxproj", "{60ECA336-F57E-4F7C-B215-EB29E2A74406}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pinned_host_memory_vs2019", "HIP-Programming-Guide\pinned_host_memory\pinned_host_memory_vs2019.vcxproj", "{B958C227-0996-4E33-B614-34C1220EA059}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -848,6 +850,10 @@ Global
 		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Debug|x64.Build.0 = Debug|x64
 		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.ActiveCfg = Release|x64
 		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.Build.0 = Release|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Debug|x64.ActiveCfg = Debug|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Debug|x64.Build.0 = Debug|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Release|x64.ActiveCfg = Release|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1007,6 +1013,7 @@ Global
 		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
 		{F003271F-5951-4341-AEFA-DD38E5BCAAB7} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
 		{60ECA336-F57E-4F7C-B215-EB29E2A74406} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
+		{B958C227-0996-4E33-B614-34C1220EA059} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

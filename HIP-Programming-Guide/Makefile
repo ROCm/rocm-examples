@@ -25,6 +25,7 @@ EXAMPLES := \
     hip_low_precision_float_fp8 \
     hip_low_precision_float_fp16 \
     pageable_host_memory \
+    pinned_host_memory \
     simple_device_query
 
 all: $(EXAMPLES)

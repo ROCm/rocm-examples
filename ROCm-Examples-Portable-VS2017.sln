@@ -86,6 +86,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2017"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2017", "HIP-Programming-Guide\pageable_host_memory\pageable_host_memory_vs2017.vcxproj", "{D9E4CB73-4695-4DCF-A537-78701CE78927}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pinned_host_memory_vs2017", "HIP-Programming-Guide\pinned_host_memory\pinned_host_memory_vs2017.vcxproj", "{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -240,6 +242,10 @@ Global
 		{D9E4CB73-4695-4DCF-A537-78701CE78927}.Debug|x64.Build.0 = Debug|x64
 		{D9E4CB73-4695-4DCF-A537-78701CE78927}.Release|x64.ActiveCfg = Release|x64
 		{D9E4CB73-4695-4DCF-A537-78701CE78927}.Release|x64.Build.0 = Release|x64
+		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}.Debug|x64.ActiveCfg = Debug|x64
+		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}.Debug|x64.Build.0 = Debug|x64
+		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}.Release|x64.ActiveCfg = Release|x64
+		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -283,6 +289,7 @@ Global
 		{2DE69C2B-B0E4-4D87-A25D-8B53DFEED9DF} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
 		{132E404C-D6C9-4740-849D-AE40497BB30B} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
 		{D9E4CB73-4695-4DCF-A537-78701CE78927} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
+		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20E1D613-A9A0-4471-B029-8528325AE9EC}
