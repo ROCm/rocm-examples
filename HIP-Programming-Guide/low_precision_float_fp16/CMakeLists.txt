@@ -25,30 +25,17 @@ set(example_name hip_low_precision_float_fp16)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(FATAL_ERROR "This example is not supported on Windows.")
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 select_hip_platform()
 
-find_package(hip REQUIRED)
-
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
+set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
@@ -57,13 +44,11 @@ add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-if(GPU_RUNTIME STREQUAL "CUDA")
-    set(include_dirs "${ROCM_ROOT}/include")
-endif()
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-target_include_directories(${example_name} PRIVATE ${include_dirs})
-target_link_libraries(${example_name} PRIVATE hip::host)
-
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                 $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
+target_include_directories(${example_name} PRIVATE ${include_dirs} $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 
 install(TARGETS ${example_name})

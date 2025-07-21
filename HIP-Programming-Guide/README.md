@@ -4,7 +4,7 @@
 
 The examples in this subdirectory are the code samples found in the
 [HIP Programming Guide](https://rocm.docs.amd.com/projects/HIP/en/latest/index.html). They are primarily intended for
-testing and continuous integration (CI) purposes but also serve as standalone examples. All of them build for both
+testing and continuous integration (CI) purposes but also serve as standalone examples. Most of them build for both
 Linux and Windows and should also work with the CUDA (NVIDIA GPU) backend.
 
 ## Prerequisites
