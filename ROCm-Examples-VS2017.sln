@@ -322,6 +322,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel_memory_allocation_vs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_copy_vs2017", "HIP-Programming-Guide\explicit_copy\explicit_copy_vs2017.vcxproj", "{7CBD6563-38D3-4EED-A6F2-062E784E857F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "constant_memory_vs2017", "HIP-Programming-Guide\constant_memory\constant_memory_vs2017.vcxproj", "{119213EE-509A-41F2-8C87-B0872D68E41A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -860,6 +862,10 @@ Global
 		{7CBD6563-38D3-4EED-A6F2-062E784E857F}.Debug|x64.Build.0 = Debug|x64
 		{7CBD6563-38D3-4EED-A6F2-062E784E857F}.Release|x64.ActiveCfg = Release|x64
 		{7CBD6563-38D3-4EED-A6F2-062E784E857F}.Release|x64.Build.0 = Release|x64
+		{119213EE-509A-41F2-8C87-B0872D68E41A}.Debug|x64.ActiveCfg = Debug|x64
+		{119213EE-509A-41F2-8C87-B0872D68E41A}.Debug|x64.Build.0 = Debug|x64
+		{119213EE-509A-41F2-8C87-B0872D68E41A}.Release|x64.ActiveCfg = Release|x64
+		{119213EE-509A-41F2-8C87-B0872D68E41A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1021,6 +1027,7 @@ Global
 		{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{5908D0EE-EF77-4A41-8C76-2F3F816A8488} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{7CBD6563-38D3-4EED-A6F2-062E784E857F} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
+		{119213EE-509A-41F2-8C87-B0872D68E41A} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
