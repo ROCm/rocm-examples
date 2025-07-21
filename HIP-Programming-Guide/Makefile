@@ -23,6 +23,7 @@
 EXAMPLES := \
     add_kernel \
     complex_math \
+    explicit_copy \
     kernel_memory_allocation \
     low_precision_float_fp8 \
     low_precision_float_fp16 \

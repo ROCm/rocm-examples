@@ -324,6 +324,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math_vs2019", "HIP-Programm
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel_memory_allocation_vs2019", "HIP-Programming-Guide\kernel_memory_allocation\kernel_memory_allocation_vs2019.vcxproj", "{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_copy_vs2019", "HIP-Programming-Guide\explicit_copy\explicit_copy_vs2019.vcxproj", "{DF268002-9DA0-43A0-B4FD-2F130F928B71}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -866,6 +868,10 @@ Global
 		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Debug|x64.Build.0 = Debug|x64
 		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Release|x64.ActiveCfg = Release|x64
 		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Release|x64.Build.0 = Release|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Debug|x64.ActiveCfg = Debug|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Debug|x64.Build.0 = Debug|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Release|x64.ActiveCfg = Release|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1028,6 +1034,7 @@ Global
 		{B958C227-0996-4E33-B614-34C1220EA059} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
 		{D612AF5A-8486-4485-AC6D-A9A2797AD389} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
 		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}
