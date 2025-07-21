@@ -22,8 +22,10 @@
 
 EXAMPLES := \
     add_kernel \
-    hip_low_precision_float_fp8 \
-    hip_low_precision_float_fp16 \
+    complex_math \
+    low_precision_float_fp8 \
+    low_precision_float_fp16 \
+    math \
     pageable_host_memory \
     pinned_host_memory \
     simple_device_query

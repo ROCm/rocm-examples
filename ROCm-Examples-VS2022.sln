@@ -320,6 +320,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2022
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pinned_host_memory_vs2022", "HIP-Programming-Guide\pinned_host_memory\pinned_host_memory_vs2022.vcxproj", "{7627BA31-A58D-A253-5145-DB0B63FF376A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math_vs2022", "HIP-Programming-Guide\math\math_vs2022.vcxproj", "{F0FBAA1E-0C09-523C-EFD6-A5BE19D12C5E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -854,6 +856,10 @@ Global
 		{7627BA31-A58D-A253-5145-DB0B63FF376A}.Debug|x64.Build.0 = Debug|x64
 		{7627BA31-A58D-A253-5145-DB0B63FF376A}.Release|x64.ActiveCfg = Release|x64
 		{7627BA31-A58D-A253-5145-DB0B63FF376A}.Release|x64.Build.0 = Release|x64
+		{F0FBAA1E-0C09-523C-EFD6-A5BE19D12C5E}.Debug|x64.ActiveCfg = Debug|x64
+		{F0FBAA1E-0C09-523C-EFD6-A5BE19D12C5E}.Debug|x64.Build.0 = Debug|x64
+		{F0FBAA1E-0C09-523C-EFD6-A5BE19D12C5E}.Release|x64.ActiveCfg = Release|x64
+		{F0FBAA1E-0C09-523C-EFD6-A5BE19D12C5E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1014,6 +1020,7 @@ Global
 		{9B164E0F-DFD0-EE46-C406-5E62D3B24CBE} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
 		{C2A7C4F0-161D-F52B-B4BA-AF8034C4C898} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
 		{7627BA31-A58D-A253-5145-DB0B63FF376A} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
+		{F0FBAA1E-0C09-523C-EFD6-A5BE19D12C5E} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

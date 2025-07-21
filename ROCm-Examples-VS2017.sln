@@ -318,6 +318,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2017
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pinned_host_memory_vs2017", "HIP-Programming-Guide\pinned_host_memory\pinned_host_memory_vs2017.vcxproj", "{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math_vs2017", "HIP-Programming-Guide\math\math_vs2017.vcxproj", "{C27C1497-55CC-47D4-9F22-35AADED427FD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complex_math_vs2017", "HIP-Programming-Guide\complex_math\complex_math_vs2017.vcxproj", "{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -848,6 +852,14 @@ Global
 		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}.Debug|x64.Build.0 = Debug|x64
 		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}.Release|x64.ActiveCfg = Release|x64
 		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA}.Release|x64.Build.0 = Release|x64
+		{C27C1497-55CC-47D4-9F22-35AADED427FD}.Debug|x64.ActiveCfg = Debug|x64
+		{C27C1497-55CC-47D4-9F22-35AADED427FD}.Debug|x64.Build.0 = Debug|x64
+		{C27C1497-55CC-47D4-9F22-35AADED427FD}.Release|x64.ActiveCfg = Release|x64
+		{C27C1497-55CC-47D4-9F22-35AADED427FD}.Release|x64.Build.0 = Release|x64
+		{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F}.Debug|x64.ActiveCfg = Debug|x64
+		{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F}.Debug|x64.Build.0 = Debug|x64
+		{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F}.Release|x64.ActiveCfg = Release|x64
+		{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1007,6 +1019,8 @@ Global
 		{132E404C-D6C9-4740-849D-AE40497BB30B} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{D9E4CB73-4695-4DCF-A537-78701CE78927} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{9FE9E857-AF1F-4BE8-B256-0C43C860C2CA} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
+		{C27C1497-55CC-47D4-9F22-35AADED427FD} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
+		{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
