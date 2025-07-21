@@ -18,6 +18,7 @@ env:
     PLATFORM_TOOLSET_VERSION: 6.2
     HIP_PATH: C:\Program Files\AMD\ROCm\6.2\
     HIPSDK_INSTALLER_VERSION: 24.Q4
+    GLFW_DIR: C:\glfw-3.4.bin.WIN64\
 
 jobs:
     build:
@@ -37,6 +38,13 @@ jobs:
             shell: pwsh
             run: |
                   python3 Scripts/VisualStudio/check_vs_files.py
+          - name: Install additional dependencies
+            shell: pwsh
+            run: |
+                  $ProgressPreference = 'SilentlyContinue'
+                  Write-Host "Downloading GLFW 3.4"
+                  Invoke-WebRequest -Uri https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.bin.WIN64.zip -OutFile glfw-3.4.bin.WIN64.zip
+                  Expand-Archive -Path glfw-3.4.bin.WIN64.zip -DestinationPath C:\ -PassThru
           - name: Install HIP SDK
             shell: pwsh
             run: |
