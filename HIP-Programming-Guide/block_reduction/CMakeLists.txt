@@ -20,27 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-    add_kernel \
-    complex_math \
-    low_precision_float_fp8 \
-    low_precision_float_fp16 \
-    math \
-    pageable_host_memory \
-    pinned_host_memory \
-    simple_device_query
+set(example_name cuda_block_reduction)
 
-ifeq ($(GPU_RUNTIME), CUDA) # Only supported on CUDA
-    EXAMPLES += \
-        block_reduction
-endif
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CUDA)
 
-all: $(EXAMPLES)
+add_executable(${example_name} main.cu)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
 
-clean: TARGET=clean
-clean: all
+set_target_properties(${example_name} PROPERTIES CUDA_EXTENSIONS OFF)
+target_compile_features(${example_name} PRIVATE cuda_std_17)
 
-$(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(EXAMPLES)
+install(TARGETS ${example_name})
