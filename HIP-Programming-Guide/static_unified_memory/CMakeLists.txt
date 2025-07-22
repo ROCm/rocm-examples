@@ -20,41 +20,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Programming-Guide LANGUAGES CXX)
-include(CTest)
+set(example_name hip_static_unified_memory)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/HipPlatform.cmake")
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-add_subdirectory(add_kernel)
-if(NOT ${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
-    message(STATUS "CUDA not in use, not building block reduction example.")
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    add_subdirectory(block_reduction)
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
-add_subdirectory(complex_math)
-add_subdirectory(constant_memory)
-add_subdirectory(dynamic_shared_memory)
-add_subdirectory(dynamic_unified_memory)
-add_subdirectory(explicit_copy)
-add_subdirectory(kernel_memory_allocation)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "Low-precision floating-point examples are available only on Linux.")
-elseif(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
-    message(STATUS "Low-precision floating-point examples are available only for the HIP runtime.")
-else()
-    add_subdirectory(low_precision_float_fp8)
-    add_subdirectory(low_precision_float_fp16)
-else()
-    message(STATUS "Not building on Linux, not building low-precision floating-point examples.")
-endif()
-add_subdirectory(math)
-add_subdirectory(pageable_host_memory)
-add_subdirectory(pinned_host_memory)
-add_subdirectory(simple_device_query)
-add_subdirectory(static_shared_memory)
-add_subdirectory(static_unified_memory)
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+
+set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                 $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
+target_include_directories(${example_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
+
+install(TARGETS ${example_name})
