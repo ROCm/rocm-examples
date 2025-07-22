@@ -94,6 +94,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_copy_vs2019", "HIP
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "constant_memory_vs2019", "HIP-Programming-Guide\constant_memory\constant_memory_vs2019.vcxproj", "{66930369-1BDE-4BAD-8632-4CCB32D4BACD}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_memory_vs2019", "HIP-Programming-Guide\dynamic_shared_memory\dynamic_shared_memory_vs2019.vcxproj", "{625C70D7-AF76-40DC-9E46-325C9537D2D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -264,6 +266,10 @@ Global
 		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Debug|x64.Build.0 = Debug|x64
 		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Release|x64.ActiveCfg = Release|x64
 		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Release|x64.Build.0 = Release|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Debug|x64.ActiveCfg = Debug|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Debug|x64.Build.0 = Debug|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Release|x64.ActiveCfg = Release|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -311,6 +317,7 @@ Global
 		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{DF268002-9DA0-43A0-B4FD-2F130F928B71} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{66930369-1BDE-4BAD-8632-4CCB32D4BACD} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6EBF9134-2D3A-4C31-84F3-BB9A729317C0}
