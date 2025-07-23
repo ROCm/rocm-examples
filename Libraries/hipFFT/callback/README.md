@@ -8,17 +8,18 @@ This example illustrates the use of hipFFT `callback` functionality. It shows ho
 
 1. Allocate and initialize the host input data and filter.
 2. Allocate device memory and copy host input data and filter from host to device.
-4. Create an 1D FFT plan.
-5. Allocate and initialize callback data on host.
-6. Copy callback data from host to device.
-7. Set the callback with the callback data and device function.
-8. Execute FFT plan which multiplies each element by filter element and scales.
-9. Copy the results from device to host and print it.
-10. Destroy plan and free device memory.
+3. Create an 1D FFT plan.
+4. Allocate and initialize callback data on host.
+5. Copy callback data from host to device.
+6. Set the callback with the callback data and device function.
+7. Execute FFT plan which multiplies each element by filter element and scales.
+8. Copy the results from device to host and print it.
+9. Destroy plan and free device memory.
 
 ## Key APIs and Concepts
 
 ### hipFFT
+
 - The `hipfftHandle` needs to be created with `hipfftCreate(...)` before use and destroyed with `hipfftDestroy(...)` after use.
 - The callback needs to be set with `hipfftXtSetCallback` which is set on the `hipfftHandle`, with a pointer to the function, the callback type and the callback data.
 - The type `hipfftDoubleComplex` is used to have double-precision for single-precision `hipfftComplex` can be used.

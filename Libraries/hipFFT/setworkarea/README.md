@@ -19,10 +19,11 @@ This example showcases the set work area feature with a simple 1-dimensional rea
 ## Key APIs and Concepts
 
 ### hipFFT
+
 - `hipfftSetAutoAllocation` is used to set the auto-allocation flag, it is in this example set to zero to be able to create our own work area.
 - `hipfftEstimate[n]d` is used to estimate the work size for a $n \in \{ 1, 2, 3 \}$-dimensional FFT.
 - `hipfftMakePlan[n]d` is used to modify an already existing plan for a $n \in \{ 1, 2, 3 \}$-dimensional FFT.
-- `hipfftSetWorkArea` is used to set the work area for a plan after allocating the work area on the device. 
+- `hipfftSetWorkArea` is used to set the work area for a plan after allocating the work area on the device.
 
 ## Used API surface
 

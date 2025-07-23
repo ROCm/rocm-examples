@@ -39,6 +39,7 @@ A frame is rendered as follows:
 ## Key APIs and Concepts
 
 To share memory allocated by Vulkan with HIP, the `VkDeviceMemory` must be created by passing the `VkExportMemoryAllocateInfoKHR` structure to `vkAllocateDeviceMemory`. This structure needs the appropriate `handleTypes` set to a type that can be shared with HIP for the current platform; `VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR` for Linux and `VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR` or `VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT_KHR` for Windows. Any Vulkan buffer that is to be associated with this device memory must similarly be created by passing `VkExternalMemoryBufferCreateInfoKHR` to `vkCreateBuffer`, of which the `handleTypes` member must be initialized to the same value. The `VkDeviceMemory` handle can then be exported to a native file descriptor or `HANDLE` using `vkGetMemoryFdKHR` or `vkGetMemoryWin32HandleKHR` respectively on Linux and Windows. A `hipExternalMemory_t` can then be imported from a native handle through `hipImportExternalMemory`. This function must be passed an instance of `hipExternalmemoryHandleDesc`, of which `type` is initialized with a handle type compatible with the Vulkan `handleTypes`. This mapping is as follows:
+
 | Vulkan memory handle type                                 | HIP memory handle type                      |
 | --------------------------------------------------------- | ------------------------------------------- |
 | `VK_EXTERNAL_MEMORY_HANDLE_TYPE_OPAQUE_FD_BIT_KHR`        | `hipExternalMemoryHandleTypeOpaqueFd`       |
@@ -48,6 +49,7 @@ To share memory allocated by Vulkan with HIP, the `VkDeviceMemory` must be creat
 To actually use this external memory handle in HIP the corresponding HIP device memory pointer should first be obtained. This can be done with the `hipExternalMemoryGetMappedBuffer` function.
 
 Sharing semaphores follows a similar process: The `VkSemaphore` must be created by passing `VkExportSemaphoreCreateInfoKHR`, of which `handleTypes` must be initialized to `VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR` for Linux, or `VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_BIT_KHR` or `VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_WIN32_KMT_BIT_KHR` for Windows. The `VkSemaphore` handle can then be exported to a native Linux file descriptor or Windows `HANDLE` using `vkGetSemaphoreFdKHR` or `vkGetSemaphoreWin32HandleKHR` on Linux and Windows respectively. The `hipExternalSemaphore_t` can then be created using `hipImportExternalSemaphore`. It must be passed an instance of `hipExternalSemaphoreHandleDesc`, of which `type` is again initialized with a compatible HIP-version of the Vulkan `handleTypes`. This mapping is as follows:
+
 | Vulkan semaphore handle type                                 | HIP semaphore handle type                      |
 | ------------------------------------------------------------ | ---------------------------------------------- |
 | `VK_EXTERNAL_SEMAPHORE_HANDLE_TYPE_OPAQUE_FD_BIT_KHR`        | `hipExternalSemaphoreHandleTypeOpaqueFd`       |
