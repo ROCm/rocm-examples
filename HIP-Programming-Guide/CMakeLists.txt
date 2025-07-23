@@ -62,6 +62,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 else()
     add_subdirectory(memory_pool)
     add_subdirectory(memory_pool_threshold)
+    add_subdirectory(memory_pool_trim)
 endif()
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
