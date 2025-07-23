@@ -40,6 +40,7 @@ add_subdirectory(constant_memory)
 add_subdirectory(dynamic_shared_memory)
 add_subdirectory(dynamic_unified_memory)
 add_subdirectory(explicit_copy)
+add_subdirectory(explicit_memory)
 add_subdirectory(kernel_memory_allocation)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
