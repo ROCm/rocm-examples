@@ -108,6 +108,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "data_prefetching_vs2019", "
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unified_memory_advice_vs2019", "HIP-Programming-Guide\unified_memory_advice\unified_memory_advice_vs2019.vcxproj", "{92D0FEFE-D431-4289-B104-8D9FD4628883}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ordinary_memory_allocation_vs2019", "HIP-Programming-Guide\ordinary_memory_allocation\ordinary_memory_allocation_vs2019.vcxproj", "{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -306,6 +308,10 @@ Global
 		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Debug|x64.Build.0 = Debug|x64
 		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Release|x64.ActiveCfg = Release|x64
 		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Release|x64.Build.0 = Release|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Debug|x64.ActiveCfg = Debug|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Debug|x64.Build.0 = Debug|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Release|x64.ActiveCfg = Release|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -360,6 +366,7 @@ Global
 		{27987255-2C04-4C8A-8A69-A8E01508C0B0} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{92D0FEFE-D431-4289-B104-8D9FD4628883} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6EBF9134-2D3A-4C31-84F3-BB9A729317C0}
