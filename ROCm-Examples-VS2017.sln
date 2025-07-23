@@ -334,6 +334,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_unified_memory_vs201
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_memory_vs2017", "HIP-Programming-Guide\explicit_memory\explicit_memory_vs2017.vcxproj", "{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "data_prefetching_vs2017", "HIP-Programming-Guide\data_prefetching\data_prefetching_vs2017.vcxproj", "{757426E0-0AF6-4898-A4C3-42E9F03BAEC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -896,6 +898,10 @@ Global
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Debug|x64.Build.0 = Debug|x64
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Release|x64.ActiveCfg = Release|x64
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Release|x64.Build.0 = Release|x64
+		{757426E0-0AF6-4898-A4C3-42E9F03BAEC6}.Debug|x64.ActiveCfg = Debug|x64
+		{757426E0-0AF6-4898-A4C3-42E9F03BAEC6}.Debug|x64.Build.0 = Debug|x64
+		{757426E0-0AF6-4898-A4C3-42E9F03BAEC6}.Release|x64.ActiveCfg = Release|x64
+		{757426E0-0AF6-4898-A4C3-42E9F03BAEC6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1063,6 +1069,7 @@ Global
 		{25C30A61-AB4A-474C-8DA1-55B7D04177B0} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{73842647-DCEE-4834-B938-33F10A9427F9} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
+		{757426E0-0AF6-4898-A4C3-42E9F03BAEC6} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
