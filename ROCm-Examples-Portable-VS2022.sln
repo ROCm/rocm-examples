@@ -114,6 +114,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "error_handling_vs2022", "HI
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "call_stack_management_vs2022", "HIP-Programming-Guide\call_stack_management\call_stack_management_vs2022.vcxproj", "{6B4192B0-F0F6-0C2B-A9FA-AF225585B3DB}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_recursion_vs2022", "HIP-Programming-Guide\device_recursion\device_recursion_vs2022.vcxproj", "{9A91BE16-5019-A3E0-F050-D0433F07279C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -324,6 +326,10 @@ Global
 		{6B4192B0-F0F6-0C2B-A9FA-AF225585B3DB}.Debug|x64.Build.0 = Debug|x64
 		{6B4192B0-F0F6-0C2B-A9FA-AF225585B3DB}.Release|x64.ActiveCfg = Release|x64
 		{6B4192B0-F0F6-0C2B-A9FA-AF225585B3DB}.Release|x64.Build.0 = Release|x64
+		{9A91BE16-5019-A3E0-F050-D0433F07279C}.Debug|x64.ActiveCfg = Debug|x64
+		{9A91BE16-5019-A3E0-F050-D0433F07279C}.Debug|x64.Build.0 = Debug|x64
+		{9A91BE16-5019-A3E0-F050-D0433F07279C}.Release|x64.ActiveCfg = Release|x64
+		{9A91BE16-5019-A3E0-F050-D0433F07279C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -381,6 +387,7 @@ Global
 		{5576D5E7-2087-EE03-074D-29E4C5048472} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{52C69B70-F7DB-9CB9-5545-BE48FE13DB91} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 		{6B4192B0-F0F6-0C2B-A9FA-AF225585B3DB} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
+		{9A91BE16-5019-A3E0-F050-D0433F07279C} = {02EA681E-C7D8-13C7-8484-4AC65E1B71E8}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A39869B7-4813-4EE4-B059-C79B5CA433E7}
