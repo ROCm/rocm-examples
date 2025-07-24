@@ -37,6 +37,7 @@ else()
     add_subdirectory(block_reduction)
 endif()
 
+add_subdirectory(call_stack_management)
 add_subdirectory(complex_math)
 add_subdirectory(constant_memory)
 add_subdirectory(data_prefetching)

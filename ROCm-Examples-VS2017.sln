@@ -342,6 +342,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ordinary_memory_allocation_
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "error_handling_vs2017", "HIP-Programming-Guide\error_handling\error_handling_vs2017.vcxproj", "{5520D016-19C0-4F3E-B742-EF508EAD3AC9}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "call_stack_management_vs2017", "HIP-Programming-Guide\call_stack_management\call_stack_management_vs2017.vcxproj", "{896BFA10-F3C5-4F78-913B-BD85AAC2596A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -920,6 +922,10 @@ Global
 		{5520D016-19C0-4F3E-B742-EF508EAD3AC9}.Debug|x64.Build.0 = Debug|x64
 		{5520D016-19C0-4F3E-B742-EF508EAD3AC9}.Release|x64.ActiveCfg = Release|x64
 		{5520D016-19C0-4F3E-B742-EF508EAD3AC9}.Release|x64.Build.0 = Release|x64
+		{896BFA10-F3C5-4F78-913B-BD85AAC2596A}.Debug|x64.ActiveCfg = Debug|x64
+		{896BFA10-F3C5-4F78-913B-BD85AAC2596A}.Debug|x64.Build.0 = Debug|x64
+		{896BFA10-F3C5-4F78-913B-BD85AAC2596A}.Release|x64.ActiveCfg = Release|x64
+		{896BFA10-F3C5-4F78-913B-BD85AAC2596A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1091,6 +1097,7 @@ Global
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{D42186F5-700C-485C-85E6-8168710EC240} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{5520D016-19C0-4F3E-B742-EF508EAD3AC9} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
+		{896BFA10-F3C5-4F78-913B-BD85AAC2596A} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}
