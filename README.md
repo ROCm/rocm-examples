@@ -121,6 +121,7 @@ cmake --build build
 ### CMake build options
 
 The following options are available when building with CMake.
+
 | Option                     | Relevant to | Default value    | Description                                                                                             |
 |:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
 | `GPU_RUNTIME`              | HIP / CUDA  | `"HIP"`          | GPU runtime to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.     |

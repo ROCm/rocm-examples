@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -35,14 +35,11 @@ select_hip_platform()
 
 add_subdirectory(bitonic_sort)
 add_subdirectory(convolution)
+add_subdirectory(fdtd)
 add_subdirectory(floyd_warshall)
 add_subdirectory(histogram)
-if(
-    NOT (
-        CMAKE_SYSTEM_NAME MATCHES "Windows"
-        AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"
-    )
-)
+if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"))
     add_subdirectory(monte_carlo_pi)
 endif()
 add_subdirectory(prefix_sum)
+add_subdirectory(sobel_filter)

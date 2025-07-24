@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -41,7 +41,7 @@ set(CMAKE_${LANG}_STANDARD 17)
 set(CMAKE_${LANG}_EXTENSIONS OFF)
 set(CMAKE_${LANG}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -75,7 +75,7 @@ set_source_files_properties(
 )
 
 # Workaround for rocRAND since it relies on definition "WIN32"
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 

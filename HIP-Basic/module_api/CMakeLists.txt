@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -83,9 +83,6 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 set(include_dirs "../../Common" "../../External")
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(
-    main.hip
-    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
-)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -101,8 +101,8 @@ int main(const int argc, const char** argv)
     }
 
     // Scalar multiplier.
-    const float          alpha   = parser.get<float>("a");
-    const hipComplex h_alpha = hipComplex(alpha, 0.0f);
+    const float           alpha   = parser.get<float>("a");
+    const hipFloatComplex h_alpha = make_hipFloatComplex(alpha, 0.0f);
 
     // The leading dimension (the stride between column starts) of the matrix A.
     // The matrix is packed into memory, so the leading dimension is equal to

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -36,7 +36,7 @@ if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
     )
 endif()
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(
         WARNING
         "hipFFT multi_gpu example is not supported on Windows. Skipping!"

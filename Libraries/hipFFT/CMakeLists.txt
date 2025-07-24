@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -49,6 +49,10 @@ if(NOT hipfft_FOUND)
     return(1)
 endif()
 
+add_subdirectory(callback)
 add_subdirectory(multi_gpu)
 add_subdirectory(plan_d2z)
+add_subdirectory(plan_many_2d_r2c)
+add_subdirectory(plan_many_2d_z2z)
 add_subdirectory(plan_z2z)
+add_subdirectory(setworkarea)

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -77,9 +77,6 @@ target_include_directories(
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
-set_source_files_properties(
-    main.hip
-    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
-)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})

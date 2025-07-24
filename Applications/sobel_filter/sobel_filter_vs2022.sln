@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sobel_filter_vs2022", "sobel_filter_vs2022.vcxproj", "{F0108B95-E4EC-4344-989C-0BDC2107C36B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F0108B95-E4EC-4344-989C-0BDC2107C36B}.Debug|x64.ActiveCfg = Debug|x64
+		{F0108B95-E4EC-4344-989C-0BDC2107C36B}.Debug|x64.Build.0 = Debug|x64
+		{F0108B95-E4EC-4344-989C-0BDC2107C36B}.Release|x64.ActiveCfg = Release|x64
+		{F0108B95-E4EC-4344-989C-0BDC2107C36B}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DBA86A7A-D8D6-4121-AFD4-D6FC44428FD9}
+	EndGlobalSection
+EndGlobal

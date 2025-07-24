@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,15 @@
 EXAMPLES := \
 	multi_gpu \
 	plan_d2z \
-	plan_z2z
+	plan_many_2d_r2c \
+	plan_many_2d_z2z \
+	plan_z2z \
+	setworkarea
+
+ifneq ($(GPU_RUNTIME), CUDA)
+	EXAMPLES += \
+		callback
+endif
 
 all: $(EXAMPLES)
 

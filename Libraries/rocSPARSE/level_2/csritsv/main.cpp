@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -118,6 +118,7 @@ int main()
 
     // Set maximum iteration number.
     constexpr rocsparse_int max_iter     = 200;
+    constexpr rocsparse_int free_iter    = 20;
     rocsparse_int           iter_counter = max_iter;
 
     // Set tolerance.
@@ -163,23 +164,24 @@ int main()
 
     // 6. Perform triangular solve op(A) * y = alpha * x.
     // This function is non blocking and executed asynchronously with respect to the host.
-    ROCSPARSE_CHECK(rocsparse_dcsritsv_solve(handle,
-                                             &iter_counter,
-                                             &tolerance,
-                                             history.data(),
-                                             trans,
-                                             m,
-                                             nnz,
-                                             &alpha,
-                                             descr,
-                                             d_csr_val,
-                                             d_csr_row_ptr,
-                                             d_csr_col_ind,
-                                             info,
-                                             d_x,
-                                             d_y,
-                                             solve_policy,
-                                             temp_buffer));
+    ROCSPARSE_CHECK(rocsparse_dcsritsv_solve_ex(handle,
+                                                &iter_counter,
+                                                free_iter,
+                                                &tolerance,
+                                                history.data(),
+                                                trans,
+                                                m,
+                                                nnz,
+                                                &alpha,
+                                                descr,
+                                                d_csr_val,
+                                                d_csr_row_ptr,
+                                                d_csr_col_ind,
+                                                info,
+                                                d_x,
+                                                d_y,
+                                                solve_policy,
+                                                temp_buffer));
     // Synchronize threads.
     HIP_CHECK(hipDeviceSynchronize());
 

@@ -88,7 +88,7 @@ int main()
     constexpr size_t length_LU        = n * n;
     constexpr size_t LU_size          = sizeof(*d_LU) * length_LU;
     rocsparse_int    max_iter         = 100; /*maximum number of iterations*/
-    const size_t     length_data      = 2 * max_iter;
+    rocsparse_int    free_iter        = 20;
 
     HIP_CHECK(hipMalloc(&d_csr_row_ptr, csr_row_ptr_size));
     HIP_CHECK(hipMalloc(&d_csr_col_ind, csr_col_ind_size));
@@ -121,7 +121,7 @@ int main()
                                      | rocsparse_itilu0_option_convergence_history;
 
     // Tolerance.
-    constexpr double tol = 1.0e5 * std::numeric_limits<double>::epsilon(); /*2.22045e-11*/
+    double tol = 1.0e5 * std::numeric_limits<double>::epsilon(); /*2.22045e-11*/
 
     // Indexing: zero based.
     constexpr rocsparse_index_base idx_base = rocsparse_index_base_zero;
@@ -203,20 +203,21 @@ int main()
 
     // 7. Perform the iterative incomplete LU factorization.
     HIP_CHECK(hipMemset(d_LU, 0, LU_size));
-    ROCSPARSE_CHECK(rocsparse_dcsritilu0_compute(handle,
-                                                 alg,
-                                                 option,
-                                                 &max_iter,
-                                                 tol,
-                                                 n,
-                                                 nnz,
-                                                 d_csr_row_ptr,
-                                                 d_csr_col_ind,
-                                                 d_csr_val,
-                                                 d_LU,
-                                                 idx_base,
-                                                 buffer_size,
-                                                 temp_buffer));
+    ROCSPARSE_CHECK(rocsparse_dcsritilu0_compute_ex(handle,
+                                                    alg,
+                                                    option,
+                                                    &max_iter,
+                                                    free_iter,
+                                                    tol,
+                                                    n,
+                                                    nnz,
+                                                    d_csr_row_ptr,
+                                                    d_csr_col_ind,
+                                                    d_csr_val,
+                                                    d_LU,
+                                                    idx_base,
+                                                    buffer_size,
+                                                    temp_buffer));
 
     // 8. Fetch the convergence data.
     std::cout << "Iterations performed: " << max_iter << std::endl;
