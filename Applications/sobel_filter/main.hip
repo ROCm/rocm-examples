@@ -119,6 +119,12 @@ __global__ void sobel_filter_kernel(const uint8_t* input, uint8_t* output, int w
         // Store the computed magnitude in the output image
         output[y * width + x] = static_cast<uint8_t>(magnitude);
     }
+
+    if((x == 0 || x == width - 1) && y >= 0 && y <= height - 1
+       || (y == 0 || y == height - 1) && x >= 0 && x <= width - 1)
+    {
+        output[y * width + x] = 0;
+    }
 }
 
 void sobel_filter(int                         width,
