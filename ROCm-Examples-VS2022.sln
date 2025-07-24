@@ -346,6 +346,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "call_stack_management_vs202
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_recursion_vs2022", "HIP-Programming-Guide\device_recursion\device_recursion_vs2022.vcxproj", "{9A91BE16-5019-A3E0-F050-D0433F07279C}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequential_kernel_execution_vs2022", "HIP-Programming-Guide\sequential_kernel_execution\sequential_kernel_execution_vs2022.vcxproj", "{FCB56B5C-8AD3-2576-2244-89A0A780054D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_execution_vs2022", "HIP-Programming-Guide\asynchronous_kernel_execution\asynchronous_kernel_execution_vs2022.vcxproj", "{912F7811-9390-1686-4F7F-042864D2D1E1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_asynchronous_kernel_execution_vs2022", "HIP-Programming-Guide\event_based_asynchronous_kernel_execution\event_based_asynchronous_kernel_execution_vs2022.vcxproj", "{305B9C39-075A-A0D0-451C-B5E1371F6D1E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -932,6 +938,18 @@ Global
 		{9A91BE16-5019-A3E0-F050-D0433F07279C}.Debug|x64.Build.0 = Debug|x64
 		{9A91BE16-5019-A3E0-F050-D0433F07279C}.Release|x64.ActiveCfg = Release|x64
 		{9A91BE16-5019-A3E0-F050-D0433F07279C}.Release|x64.Build.0 = Release|x64
+		{FCB56B5C-8AD3-2576-2244-89A0A780054D}.Debug|x64.ActiveCfg = Debug|x64
+		{FCB56B5C-8AD3-2576-2244-89A0A780054D}.Debug|x64.Build.0 = Debug|x64
+		{FCB56B5C-8AD3-2576-2244-89A0A780054D}.Release|x64.ActiveCfg = Release|x64
+		{FCB56B5C-8AD3-2576-2244-89A0A780054D}.Release|x64.Build.0 = Release|x64
+		{912F7811-9390-1686-4F7F-042864D2D1E1}.Debug|x64.ActiveCfg = Debug|x64
+		{912F7811-9390-1686-4F7F-042864D2D1E1}.Debug|x64.Build.0 = Debug|x64
+		{912F7811-9390-1686-4F7F-042864D2D1E1}.Release|x64.ActiveCfg = Release|x64
+		{912F7811-9390-1686-4F7F-042864D2D1E1}.Release|x64.Build.0 = Release|x64
+		{305B9C39-075A-A0D0-451C-B5E1371F6D1E}.Debug|x64.ActiveCfg = Debug|x64
+		{305B9C39-075A-A0D0-451C-B5E1371F6D1E}.Debug|x64.Build.0 = Debug|x64
+		{305B9C39-075A-A0D0-451C-B5E1371F6D1E}.Release|x64.ActiveCfg = Release|x64
+		{305B9C39-075A-A0D0-451C-B5E1371F6D1E}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1105,6 +1123,9 @@ Global
 		{52C69B70-F7DB-9CB9-5545-BE48FE13DB91} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
 		{6B4192B0-F0F6-0C2B-A9FA-AF225585B3DB} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
 		{9A91BE16-5019-A3E0-F050-D0433F07279C} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
+		{FCB56B5C-8AD3-2576-2244-89A0A780054D} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
+		{912F7811-9390-1686-4F7F-042864D2D1E1} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
+		{305B9C39-075A-A0D0-451C-B5E1371F6D1E} = {CA3BE8D4-26A0-42FA-8922-1AB7572CDC7A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

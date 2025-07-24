@@ -22,6 +22,7 @@
 
 EXAMPLES := \
     add_kernel \
+    asynchronous_kernel_execution \
     call_stack_management \
     complex_math \
     constant_memory \
@@ -30,6 +31,7 @@ EXAMPLES := \
     dynamic_shared_memory \
     dynamic_unified_memory \
     error_handling \
+    event_based_asynchronous_kernel_execution \
     explicit_copy \
     explicit_memory \
     kernel_memory_allocation \
@@ -46,6 +48,7 @@ EXAMPLES := \
     ordinary_memory_allocation \
     pageable_host_memory \
     pinned_host_memory \
+    sequential_kernel_execution \
     simple_device_query \
     standard_unified_memory \
     static_shared_memory \
