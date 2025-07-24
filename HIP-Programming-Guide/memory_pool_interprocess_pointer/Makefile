@@ -20,48 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-    add_kernel \
-    complex_math \
-    constant_memory \
-    data_prefetching \
-    dynamic_shared_memory \
-    dynamic_unified_memory \
-    explicit_copy \
-    explicit_memory \
-    kernel_memory_allocation \
-    low_precision_float_fp8 \
-    low_precision_float_fp16 \
-    math \
-    memory_range_attributes \
-    memory_pool \
-    memory_pool_interprocess_handle \
-    memory_pool_interprocess_pointer \
-    memory_pool_resource_usage_statistics \
-    memory_pool_treshold \
-    memory_pool_trim \
-    ordinary_memory_allocation \
-    pageable_host_memory \
-    pinned_host_memory \
-    simple_device_query \
-    standard_unified_memory \
-    static_shared_memory \
-    static_unified_memory \
-    stream_ordered_memory_allocation \
-    unified_memory_advice \
-    virtual_memory
+EXAMPLE := hip_memory_pool_interprocess_pointer
+GPU_RUNTIME := HIP
 
-ifeq ($(GPU_RUNTIME), CUDA) # Only supported on CUDA
-    EXAMPLES += \
-        block_reduction
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
+
+ifeq ($(GPU_RUNTIME), CUDA)
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS ?= -Wall -Wextra
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
-all: $(EXAMPLES)
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
-clean: TARGET=clean
-clean: all
+$(EXAMPLE)_exporter: exporter.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-$(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+$(EXAMPLE)_importer: importer.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-.PHONY: all clean $(EXAMPLES)
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
