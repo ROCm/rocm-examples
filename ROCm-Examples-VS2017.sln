@@ -352,6 +352,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_executi
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_asynchronous_kernel_execution_vs2017", "HIP-Programming-Guide\event_based_asynchronous_kernel_execution\event_based_asynchronous_kernel_execution_vs2017.vcxproj", "{54C05E77-0E5D-449E-B048-8166D2EE97E7}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_enumeration_vs2017", "HIP-Programming-Guide\device_enumeration\device_enumeration_vs2017.vcxproj", "{C31535EF-37D5-4261-810C-E7F9D1950B23}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -950,6 +952,10 @@ Global
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7}.Debug|x64.Build.0 = Debug|x64
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7}.Release|x64.ActiveCfg = Release|x64
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7}.Release|x64.Build.0 = Release|x64
+		{C31535EF-37D5-4261-810C-E7F9D1950B23}.Debug|x64.ActiveCfg = Debug|x64
+		{C31535EF-37D5-4261-810C-E7F9D1950B23}.Debug|x64.Build.0 = Debug|x64
+		{C31535EF-37D5-4261-810C-E7F9D1950B23}.Release|x64.ActiveCfg = Release|x64
+		{C31535EF-37D5-4261-810C-E7F9D1950B23}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1126,6 +1132,7 @@ Global
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
+		{C31535EF-37D5-4261-810C-E7F9D1950B23} = {3B40C3AF-D291-4365-AAC0-B12E3FCC7000}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

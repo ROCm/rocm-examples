@@ -27,6 +27,7 @@ EXAMPLES := \
     complex_math \
     constant_memory \
     data_prefetching \
+    device_enumeration \
     device_recursion \
     dynamic_shared_memory \
     dynamic_unified_memory \
