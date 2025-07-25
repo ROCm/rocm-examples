@@ -29,6 +29,7 @@ EXAMPLES := \
     data_prefetching \
     device_enumeration \
     device_recursion \
+    device_selection \
     dynamic_shared_memory \
     dynamic_unified_memory \
     error_handling \
