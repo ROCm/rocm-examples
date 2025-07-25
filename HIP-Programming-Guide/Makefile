@@ -49,6 +49,7 @@ EXAMPLES := \
     memory_pool_trim \
     multi_device_synchronization \
     ordinary_memory_allocation \
+    p2p_memory_access \
     pageable_host_memory \
     pinned_host_memory \
     sequential_kernel_execution \

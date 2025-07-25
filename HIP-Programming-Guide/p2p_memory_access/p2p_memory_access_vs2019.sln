@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.36227.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2019", "p2p_memory_access_vs2019.vcxproj", "{FF016D78-9E62-48A9-907D-DFE1BD457D79}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FF016D78-9E62-48A9-907D-DFE1BD457D79}.Debug|x64.ActiveCfg = Debug|x64
+		{FF016D78-9E62-48A9-907D-DFE1BD457D79}.Debug|x64.Build.0 = Debug|x64
+		{FF016D78-9E62-48A9-907D-DFE1BD457D79}.Release|x64.ActiveCfg = Release|x64
+		{FF016D78-9E62-48A9-907D-DFE1BD457D79}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {05B58A6D-983B-49DC-92B9-DE1BE977BE3A}
+	EndGlobalSection
+EndGlobal

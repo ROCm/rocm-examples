@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2022", "p2p_memory_access_vs2022.vcxproj", "{013CD1DA-F147-40DD-B407-C5519E985459}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{013CD1DA-F147-40DD-B407-C5519E985459}.Debug|x64.ActiveCfg = Debug|x64
+		{013CD1DA-F147-40DD-B407-C5519E985459}.Debug|x64.Build.0 = Debug|x64
+		{013CD1DA-F147-40DD-B407-C5519E985459}.Release|x64.ActiveCfg = Release|x64
+		{013CD1DA-F147-40DD-B407-C5519E985459}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DCC141CF-3EA3-4C97-84C8-B60F273125E1}
+	EndGlobalSection
+EndGlobal
