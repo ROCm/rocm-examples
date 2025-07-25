@@ -130,6 +130,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multi_device_synchronizatio
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2017", "HIP-Programming-Guide\p2p_memory_access\p2p_memory_access_vs2017.vcxproj", "{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs2017", "HIP-Programming-Guide\p2p_memory_access_failed\p2p_memory_access_failed_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -372,6 +374,10 @@ Global
 		{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20}.Debug|x64.Build.0 = Debug|x64
 		{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20}.Release|x64.ActiveCfg = Release|x64
 		{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20}.Release|x64.Build.0 = Release|x64
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Debug|x64.ActiveCfg = Debug|x64
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Debug|x64.Build.0 = Debug|x64
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Release|x64.ActiveCfg = Release|x64
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -437,6 +443,7 @@ Global
 		{16C9D204-07DE-4777-ACA3-42D17922AD9A} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
 		{799BC522-3B34-4C4F-8B9F-CEE82D286414} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
 		{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4} = {B6147D96-5C59-4889-A008-6D2ABFBC23F5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20E1D613-A9A0-4471-B029-8528325AE9EC}

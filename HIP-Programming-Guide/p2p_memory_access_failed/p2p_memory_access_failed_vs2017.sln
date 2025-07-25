@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.36217.24
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs2017", "p2p_memory_access_failed_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Debug|x64.ActiveCfg = Debug|x64
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Debug|x64.Build.0 = Debug|x64
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Release|x64.ActiveCfg = Release|x64
+		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {4E69857E-DC1B-4F73-8C80-D50578A9C8D9}
+	EndGlobalSection
+EndGlobal
