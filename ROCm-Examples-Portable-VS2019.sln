@@ -126,6 +126,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_enumeration_vs2019",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_selection_vs2019", "HIP-Programming-Guide\device_selection\device_selection_vs2019.vcxproj", "{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multi_device_synchronization_vs2019", "HIP-Programming-Guide\multi_device_synchronization\multi_device_synchronization_vs2019.vcxproj", "{45E74105-8989-48A2-AB45-DF9633128E34}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -360,6 +362,10 @@ Global
 		{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F}.Debug|x64.Build.0 = Debug|x64
 		{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F}.Release|x64.ActiveCfg = Release|x64
 		{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F}.Release|x64.Build.0 = Release|x64
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Debug|x64.ActiveCfg = Debug|x64
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Debug|x64.Build.0 = Debug|x64
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Release|x64.ActiveCfg = Release|x64
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -423,6 +429,7 @@ Global
 		{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{18587C1E-4579-46EC-A014-04B5152E9A8F} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 		{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
+		{45E74105-8989-48A2-AB45-DF9633128E34} = {B3ACC80A-70C3-4261-AA7A-3D4CB90D78D7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {6EBF9134-2D3A-4C31-84F3-BB9A729317C0}

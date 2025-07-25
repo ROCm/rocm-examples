@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.36227.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multi_device_synchronization_vs2019", "multi_device_synchronization_vs2019.vcxproj", "{45E74105-8989-48A2-AB45-DF9633128E34}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Debug|x64.ActiveCfg = Debug|x64
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Debug|x64.Build.0 = Debug|x64
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Release|x64.ActiveCfg = Release|x64
+		{45E74105-8989-48A2-AB45-DF9633128E34}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {96CA3203-DCD5-4915-9D1C-C15B13D9C92E}
+	EndGlobalSection
+EndGlobal

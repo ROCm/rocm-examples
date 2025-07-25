@@ -81,6 +81,7 @@ else()
     add_subdirectory(memory_range_attributes)
 endif()
 
+add_subdirectory(multi_device_synchronization)
 add_subdirectory(ordinary_memory_allocation)
 add_subdirectory(pageable_host_memory)
 add_subdirectory(pinned_host_memory)

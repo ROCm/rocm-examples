@@ -47,6 +47,7 @@ EXAMPLES := \
     memory_pool_resource_usage_statistics \
     memory_pool_treshold \
     memory_pool_trim \
+    multi_device_synchronization \
     ordinary_memory_allocation \
     pageable_host_memory \
     pinned_host_memory \
