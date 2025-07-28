@@ -30,6 +30,7 @@ For a full overview over the examples see the section [repository contents](#rep
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
 - [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
 - [Ninja](https://ninja-build.org/) (optional, to build with CMake)
+- [Perl](https://www.perl.org/get.html) (for hipify related scripts)
 
 ## Building the example suite
 
