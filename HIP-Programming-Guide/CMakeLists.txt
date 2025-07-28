@@ -51,6 +51,14 @@ add_subdirectory(error_handling)
 add_subdirectory(event_based_asynchronous_kernel_execution)
 add_subdirectory(explicit_copy)
 add_subdirectory(explicit_memory)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(STATUS "The graph API examples are available only on Linux.")
+else()
+    add_subdirectory(graph_capture)
+    add_subdirectory(graph_creation)
+endif()
+
 add_subdirectory(kernel_memory_allocation)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")

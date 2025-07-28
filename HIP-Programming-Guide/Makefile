@@ -36,6 +36,8 @@ EXAMPLES := \
     event_based_asynchronous_kernel_execution \
     explicit_copy \
     explicit_memory \
+    graph_capture \
+    graph_creation \
     kernel_memory_allocation \
     low_precision_float_fp8 \
     low_precision_float_fp16 \
