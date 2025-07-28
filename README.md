@@ -230,12 +230,18 @@ The following options are available when building with CMake.
     - [syev_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSOLVER/syev_batched): Shows how to compute the eigenvalues and eigenvectors for each matrix in a batch of real symmetric matrices.
     - [syev_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSOLVER/syev_strided_batched): Shows how to compute the eigenvalues and eigenvectors for multiple symmetrical real matrices, that are stored with an arbitrary stride.
   - [rocSPARSE](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/)
+    - [level_1](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_1/): Operations between sparse vectors and dense vectors.
+      - [axpyi](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_1/axpyi/): Showcases how to scale a sparse vector and add it to a dense vector.
+      - [doti](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_1/doti/): Showcases a dot product of a sparse vector with a dense vector.
+      - [gthr](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_1/gthr/): Showcases how to gather elements from a dense vector and store them into a sparse vector.
+      - [roti](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_1/roti/): Showcases a Givens rotation to a dense and a sparse vector.
+      - [sctr](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_1/sctr/): Showcases how to scatter elements in a sparse vector into a dense vector.
     - [level_2](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/): Operations between sparse matrices and dense vectors.
       - [bsrmv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/bsrmv/): Showcases a sparse matrix-vector multiplication using BSR storage format.
       - [bsrxmv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/bsrxmv/): Showcases a masked sparse matrix-vector multiplication using BSR storage format.
       - [bsrsv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/bsrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a BSR sparse triangular matrix.
       - [coomv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/coomv/): Showcases a sparse matrix-vector multiplication using COO storage format.
-      - [csritsv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/csritsv/): Showcases how find an iterative solution with the Jacobi method for a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
+      - [csritsv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/csritsv/): Showcases how to find an iterative solution with the Jacobi method for a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
       - [csrmv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/csrmv/): Showcases a sparse matrix-vector multiplication using CSR storage format.
       - [csrsv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/csrsv/): Showcases how to solve a linear system of equations whose coefficients are stored in a CSR sparse triangular matrix.
       - [ellmv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocSPARSE/level_2/ellmv/): Showcases a sparse matrix-vector multiplication using ELL storage format.
