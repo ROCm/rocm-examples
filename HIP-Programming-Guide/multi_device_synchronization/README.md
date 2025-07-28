@@ -11,6 +11,10 @@ execution, load balancing, and effective resource utilization across heterogeneo
 
 This example demonstrates how to synchronize multiple devices using HIP events and streams.
 
+### Prerequisites
+
+This example only works on systems containing two or more GPUs.
+
 ### Application flow
 
 1. The number of HIP devices is queried and an error printed if there are less than two in the system.

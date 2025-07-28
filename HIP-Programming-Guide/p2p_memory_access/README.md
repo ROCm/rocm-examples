@@ -3,12 +3,11 @@
 ## Description
 
 In multi-GPU systems, peer-to-peer memory access enables one GPU to directly read or write to the memory of another GPU.
-This capability reduces data transfer times by allowing GPUs to communicate directly without involving the host.
 Enabling peer-to-peer access can significantly improve the performance of applications that require frequent data
 exchange between GPUs, as it eliminates the need to transfer data through the host memory.
 
 This example demonstrates how to copy data between devices by adding peer-to-peer accesses to the
-[device selection example](../device_selection/). 
+[device selection example](../device_selection/).
 
 ### Application flow
 

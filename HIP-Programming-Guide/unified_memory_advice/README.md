@@ -2,10 +2,12 @@
 
 ## Description
 
-Unified Memory is a single memory address space accessible from any processor within a system. This setup simplifies
-memory management and enables applications to allocate data that can be read or written on both CPUs and GPUs without
-explicitly copying it to a specific CPU or GPU. This example demonstrates how to set unified memory runtime hints; this
-is a technique that can be used to improve an application's performance.
+Unified Memory is a single memory address space accessible from any processor within a system. This single address space
+is a virtual address space that abstracts the physical memory locations, enabling both the CPU and GPU to access the
+same memory addresses without needing explicit data transfers. This setup simplifies memory management and enables
+applications to allocate data that can be read or written on both CPUs and GPUs without explicitly copying it to a
+specific CPU or GPU. This example demonstrates how to set unified memory runtime hints; this is a technique that can be
+used to improve an application's performance.
 
 ### Application flow
 

@@ -11,8 +11,11 @@ This example demonstrates how to hit the stack limit.
 
 ### Prerequisites
 
-To trigger a stack overflow, uncomment the marked section in `main.hip` and compile without optimizations, i.e. the
-`-O0` compiler flag.
+To trigger a stack overflow, uncomment the marked section in `main.hip` and compile without optimizations:
+
+```bash
+> hipcc -O0 main.hip # Add other compiler or linker flags as needed
+```
 
 ### Application flow
 

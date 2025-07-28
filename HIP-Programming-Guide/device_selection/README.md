@@ -19,7 +19,7 @@ This example demonstrates how to switch between the different devices in the sys
 5. The second device is set as active device.
 6. Memory is allocated.
 7. A kernel is launched.
-8. The host and the first device are synchronized.
+8. The host and the second device are synchronized.
 9. The first device is set as active device.
 10. The kernel's results are copied from the first device to the host.
 11. The second device is set as active device.

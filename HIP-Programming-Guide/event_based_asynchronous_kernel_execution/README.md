@@ -2,9 +2,9 @@
 
 ## Description
 
-Asynchronous concurrent execution is important for efficient parallelism and resource utilization, with techniques such
-as overlapping computation and data transfer, managing concurrent kernel execution with streams on single or multiple
-devices, or using HIP graphs.
+Asynchronous concurrent execution is important for efficient parallelism and resource utilization. This includes
+techniques such as overlapping computation and data transfer, managing concurrent kernel execution with streams on
+single or multiple devices, or using HIP graphs.
 
 This example demonstrates how to execute kernels asynchronously by utilizing HIP streams and events. It should be
 compared to the [sequential kernel execution example](../sequential_kernel_execution) and the
@@ -12,24 +12,24 @@ compared to the [sequential kernel execution example](../sequential_kernel_execu
 
 ### Application flow
 
-1. Two data vectors are created both on the host and on the device.
+1. Two data vectors are created, both on the host and on the device.
 2. Two streams are created.
 3. Three events are created.
-4. Loop for a fixed number of iterations:
-   1. Copy the vector contents from the host to the device. The first vector is copied in the first stream and the
-      second vector in the second stream.
-   2. Launch the first GPU kernel on the first stream which operates on the first vector and writes the result back to
-      the same vector.
-   3. Add an event to the first stream which will be reached after the kernel completes.
-   4. Wait for the first stream's event in the second stream before continuing.
-   5. Launch the second GPU kernel on the second stream which operates on both vectors and writes the result back to
-      the second vector.
-   6. Copy the results back to the corresponding host vectors. The first vector is copied in the first stream and the
-      second vector in the second stream.
-   7. Add events to both streams. These will be reached after the copy operations finish.
-   8. Both streams wait for the other stream's event before continuing.
+4. A loop is executed for a fixed number of iterations:
+   1. The vector contents are copied from the host to the device. The first vector is copied in the first stream, and
+      the second vector is copied in the second stream.
+   2. The first GPU kernel is launched on the first stream, which operates on the first vector and writes the result
+      back to the same vector.
+   3. An event is added to the first stream that will be reached after the kernel completes.
+   4. The first stream's event is waited for in the second stream before continuing.
+   5. The second GPU kernel is launched on the second stream, which operates on both vectors and writes the result back
+      to the second vector.
+   6. The results are copied back to the corresponding host vectors. The first vector is copied in the first stream, and
+      the second vector is copied in the second stream.
+   7. Events are added to both streams. These will be reached after the copy operations finish.
+   8. Both events are waited for by the respective other stream before continuing.
 5. The results are verified.
-6. The events and streams are destroyed and the device memory is freed.
+6. The events and streams are destroyed, and the device memory is freed.
 
 ## Key APIs and Concepts
 

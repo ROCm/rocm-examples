@@ -1,4 +1,4 @@
-# HIP-Programmin-Guide 8-bit Floating-Point Example
+# HIP-Programming-Guide 8-bit Floating-Point Example
 
 ## Description
 

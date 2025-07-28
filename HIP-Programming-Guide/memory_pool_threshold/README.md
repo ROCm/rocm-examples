@@ -7,7 +7,7 @@ avoiding memory access errors. Division of a single memory system into separate 
 path properties for each partition. Memory pools are used for host memory, device memory, and unified memory.
 
 This example demonstrates how to use the stream ordered memory allocation (SOMA) API to set up and manage a memory
-pool. In addition, a threshold is defined which specifies the amount of reserved memory to hold onto.
+pool, while defining a threshold to specify an amount of memory to reserve.
 
 ### Prerequisites
 

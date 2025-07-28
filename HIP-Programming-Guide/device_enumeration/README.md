@@ -9,7 +9,7 @@ ensuring that the application can leverage the full computational power availabl
 and their properties for deployment planning, and also make dynamic selections during runtime to ensure optimal
 performance.
 
-If the application does not define a specific GPU, device 0 is selected.
+If the application does not define a specific GPU, device 0 is selected by default.
 
 This example demonstrates how to query the number of devices in the system and how to access them.
 

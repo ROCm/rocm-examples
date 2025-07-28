@@ -5,7 +5,9 @@
 Unified Memory is a single memory address space accessible from any processor within a system. This setup simplifies
 memory management and enables applications to allocate data that can be read or written on both CPUs and GPUs without
 explicitly copying it to a specific CPU or GPU. This example demonstrates how to prefetch data in the unified memory
-space before it is actually needed; this is a technique that can be used to improve an application's performance.
+space before it is actually needed; this is a technique that can be used to improve an application's performance. See
+also the
+[documentation on data prefetching](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html#data-prefetching).
 
 ### Application flow
 

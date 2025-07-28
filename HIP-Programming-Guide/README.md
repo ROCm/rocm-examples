@@ -5,7 +5,7 @@
 The examples in this subdirectory are the code samples found in the
 [HIP Programming Guide](https://rocm.docs.amd.com/projects/HIP/en/latest/index.html). They are primarily intended for
 testing and continuous integration (CI) purposes but also serve as standalone examples. Most of them build for both
-Linux and Windows and should also work with the CUDA (NVIDIA GPU) backend.
+Linux and Windows.
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ Linux and Windows and should also work with the CUDA (NVIDIA GPU) backend.
 
 ### Linux
 
-Make sure that the dependencies are installed, or use one of the [provided Dockerfiles](../../Dockerfiles/) to build and run the examples in a containerized environment.
+Make sure that the dependencies are installed, or use one of the [provided Dockerfiles](../Dockerfiles/) to build and run the examples in a containerized environment.
 
 #### Using CMake
 
@@ -51,9 +51,9 @@ pointing to HIP SDK's installation directory.
 
 #### Visual Studio
 
-Visual Studio solution files are available for the individual examples. To build all supported HIP runtime examples open the top level solution file [ROCm-Examples-VS2019.sln](../../ROCm-Examples-VS2019.sln) and filter for HIP-Programming-Guide.
+Visual Studio solution files are available for the individual examples. To build all supported HIP runtime examples open the top level solution file [ROCm-Examples-VS2022.sln](../ROCm-Examples-VS2022.sln) and filter for HIP-Programming-Guide.
 
-For more detailed build instructions refer to the top level [README.md](../../README.md#visual-studio).
+For more detailed build instructions refer to the top level [README.md](../README.md#visual-studio).
 
 #### CMake
 

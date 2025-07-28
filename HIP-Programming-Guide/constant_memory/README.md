@@ -21,7 +21,8 @@ how to transfer bytes between the host and the device.
 
 * `hipMalloc` is used to allocate memory on the device.
 * `hipMemcpy` is used to copy memory from the host to the device and vice versa.
-* `hipMemcpyToSymbol`
+* `hipMemcpyToSymbol` is used to copy data from host memory to a symbol on the device, which can be defined in constant
+  or device memory space. The symbol name must be enclosed in the HIP_SYMBOL macro.
 * `hipFree` is used to free memory on the device.
 
 ## Demonstrated API Calls

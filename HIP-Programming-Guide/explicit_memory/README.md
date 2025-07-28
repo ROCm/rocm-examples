@@ -2,10 +2,8 @@
 
 ## Description
 
-Unified Memory is a single memory address space accessible from any processor within a system. This setup simplifies
-memory management and enables applications to allocate data that can be read or written on both CPUs and GPUs without
-explicitly copying it to a specific CPU or GPU. For comparison, this example demonstrates how to perform explicit
-memory management by allocating memory on the device and transferring bytes between the host and the device.
+This example demonstrates how to perform explicit memory management by allocating memory on the device and transferring
+bytes between the host and the device.
 
 ### Application flow
 

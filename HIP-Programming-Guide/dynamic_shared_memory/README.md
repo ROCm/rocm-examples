@@ -2,9 +2,11 @@
 
 ## Description
 
-Memory can be dynamically allocated by declaring an `extern __shared__` array, whose size can be set during kernel
-launch, which can then be accessed in the kernel. This example demonstrates how to declare such an array and how to
-allocate the required memory on the host.
+Shared memory is read-write memory, that is only visible to the threads within a block. It is allocated per thread
+block, and needs to be either statically allocated at compile time, or can be dynamically allocated when launching the
+kernel, but not during kernel execution. Shared memory can be dynamically allocated by declaring an `extern __shared__`
+array, whose size can be set during kernel launch, which can then be accessed in the kernel. This example demonstrates
+how to declare such an array and how to allocate the required memory on the host.
 
 ### Application flow
 

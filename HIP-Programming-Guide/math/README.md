@@ -2,9 +2,9 @@
 
 ## Description
 
-HIP provides device-callable math operations, supporting most functions available in NVIDIA CUDA. This example shows a
-simplified method for computing ULP (units in the last place) differences between HIP and standard C++ math functions
-by first finding where the maximum absolute error occurs.
+HIP provides device-callable math operations, supporting most math functions available in standard C++. This example
+shows a simplified method for computing ULP (units in the last place) differences between HIP and standard C++ math
+functions by first finding where the maximum absolute error occurs.
 
 ### Application flow
 
