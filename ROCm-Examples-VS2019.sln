@@ -304,63 +304,95 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sctr_vs2019", "Libraries\ro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vulkan_interop_mipmap_vs2019", "HIP-Basic\vulkan_interop_mipmap\vulkan_interop_mipmap_vs2019.vcxproj", "{D4C880CB-6024-4019-8A45-16B3DF53CAF8}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Programming-Guide", "HIP-Programming-Guide", "{48F9A686-650C-4E0F-A28E-829AE32F04CE}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Documentation", "HIP-Documentation", "{48F9A686-650C-4E0F-A28E-829AE32F04CE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2019", "HIP-Programming-Guide\add_kernel\add_kernel_vs2019.vcxproj", "{F52C901C-4B7A-481A-ACB0-42743AB8D255}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Programming-Guide", "Programming-Guide", "{DBB29969-AEFB-4915-8854-C8765AB71663}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2019", "HIP-Programming-Guide\simple_device_query\simple_device_query_vs2019.vcxproj", "{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Introduction-to-the-HIP-Programming-Model", "Introduction-to-the-HIP-Programming-Model", "{F39AB74F-4EB4-4A51-9371-8BE75723D9DD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complex_math_vs2019", "HIP-Programming-Guide\complex_math\complex_math_vs2019.vcxproj", "{F003271F-5951-4341-AEFA-DD38E5BCAAB7}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Using-HIP-Runtime-API", "Using-HIP-Runtime-API", "{93DC1849-A5F3-4B18-88C7-3DFD4783FFC0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2019", "HIP-Programming-Guide\pageable_host_memory\pageable_host_memory_vs2019.vcxproj", "{60ECA336-F57E-4F7C-B215-EB29E2A74406}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Asynchronous-Concurrent-Execution", "Asynchronous-Concurrent-Execution", "{D1E9EEDF-C548-4118-B917-7CB12AEE8692}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pinned_host_memory_vs2019", "HIP-Programming-Guide\pinned_host_memory\pinned_host_memory_vs2019.vcxproj", "{B958C227-0996-4E33-B614-34C1220EA059}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Call-Stack", "Call-Stack", "{C5C45AF9-4EE4-4F66-B0F9-5E466DFA5DFE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math_vs2019", "HIP-Programming-Guide\math\math_vs2019.vcxproj", "{D612AF5A-8486-4485-AC6D-A9A2797AD389}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Error-Handling", "Error-Handling", "{000277B1-81D9-43F8-A09D-B46E3DD3ECBB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel_memory_allocation_vs2019", "HIP-Programming-Guide\kernel_memory_allocation\kernel_memory_allocation_vs2019.vcxproj", "{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Initialization", "Initialization", "{1DC024B5-0F2B-4EEC-95F1-01B4C9BC4764}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_copy_vs2019", "HIP-Programming-Guide\explicit_copy\explicit_copy_vs2019.vcxproj", "{DF268002-9DA0-43A0-B4FD-2F130F928B71}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Memory-Management", "Memory-Management", "{2BDCAD7D-1131-4EE1-9C69-EDB8D0A007BA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "constant_memory_vs2019", "HIP-Programming-Guide\constant_memory\constant_memory_vs2019.vcxproj", "{66930369-1BDE-4BAD-8632-4CCB32D4BACD}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Device-Memory", "Device-Memory", "{BBE0E5CB-C208-44D9-9F42-7FB1D02934B5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_memory_vs2019", "HIP-Programming-Guide\dynamic_shared_memory\dynamic_shared_memory_vs2019.vcxproj", "{625C70D7-AF76-40DC-9E46-325C9537D2D5}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Host-Memory", "Host-Memory", "{BFB3B918-DCA4-423B-AD20-919A742AA818}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_shared_memory_vs2019", "HIP-Programming-Guide\static_shared_memory\static_shared_memory_vs2019.vcxproj", "{C972A858-C83E-47DE-A92D-936919922A70}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SOMA", "SOMA", "{5D003C9D-F03D-4BEA-B58A-9E225ECB0E2C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_unified_memory_vs2019", "HIP-Programming-Guide\dynamic_unified_memory\dynamic_unified_memory_vs2019.vcxproj", "{2F09D030-1722-473B-9FA4-511310E8C361}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Unified-Memory-Management", "Unified-Memory-Management", "{04EF8648-7D8C-437E-85E9-B38B93C49CFD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_unified_memory_vs2019", "HIP-Programming-Guide\static_unified_memory\static_unified_memory_vs2019.vcxproj", "{F66D01FF-0919-479F-8B11-6CC744271A8F}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Multi-Device-Management", "Multi-Device-Management", "{0FE22A41-3B3E-415E-8E74-DCACA0D4788D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_memory_vs2019", "HIP-Programming-Guide\explicit_memory\explicit_memory_vs2019.vcxproj", "{27987255-2C04-4C8A-8A69-A8E01508C0B0}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Reference", "Reference", "{A9331406-51A9-49FE-A738-F9A845800984}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "data_prefetching_vs2019", "HIP-Programming-Guide\data_prefetching\data_prefetching_vs2019.vcxproj", "{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Math-API", "HIP-Math-API", "{EB345287-5554-45CC-BB44-37B0520DA9EA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unified_memory_advice_vs2019", "HIP-Programming-Guide\unified_memory_advice\unified_memory_advice_vs2019.vcxproj", "{92D0FEFE-D431-4289-B104-8D9FD4628883}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Complex-Math-API", "HIP-Complex-Math-API", "{7852C715-8E0C-439A-8E53-EADCF66AA629}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ordinary_memory_allocation_vs2019", "HIP-Programming-Guide\ordinary_memory_allocation\ordinary_memory_allocation_vs2019.vcxproj", "{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2019", "HIP-Documentation\Programming-Guide\Introduction-to-the-HIP-Programming-Model\add_kernel\add_kernel_vs2019.vcxproj", "{F52C901C-4B7A-481A-ACB0-42743AB8D255}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "error_handling_vs2019", "HIP-Programming-Guide\error_handling\error_handling_vs2019.vcxproj", "{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_execution_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\asynchronous_kernel_execution\asynchronous_kernel_execution_vs2019.vcxproj", "{78714A91-411A-459E-9322-78C66B8D369F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "call_stack_management_vs2019", "HIP-Programming-Guide\call_stack_management\call_stack_management_vs2019.vcxproj", "{C75FB02C-19F7-496A-9868-C451B56E6A59}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\event_based_synchronization\event_based_synchronization_vs2019.vcxproj", "{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_recursion_vs2019", "HIP-Programming-Guide\device_recursion\device_recursion_vs2019.vcxproj", "{44347A88-59B5-47C3-9E09-9BB9B0C430AD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequential_kernel_execution_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\sequential_kernel_execution\sequential_kernel_execution_vs2019.vcxproj", "{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequential_kernel_execution_vs2019", "HIP-Programming-Guide\sequential_kernel_execution\sequential_kernel_execution_vs2019.vcxproj", "{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "call_stack_management_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Call-Stack\call_stack_management\call_stack_management_vs2019.vcxproj", "{C75FB02C-19F7-496A-9868-C451B56E6A59}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_execution_vs2019", "HIP-Programming-Guide\asynchronous_kernel_execution\asynchronous_kernel_execution_vs2019.vcxproj", "{78714A91-411A-459E-9322-78C66B8D369F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_recursion_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Call-Stack\device_recursion\device_recursion_vs2019.vcxproj", "{44347A88-59B5-47C3-9E09-9BB9B0C430AD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_asynchronous_kernel_execution_vs2019", "HIP-Programming-Guide\event_based_asynchronous_kernel_execution\event_based_asynchronous_kernel_execution_vs2019.vcxproj", "{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "error_handling_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Error-Handling\error_handling\error_handling_vs2019.vcxproj", "{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_enumeration_vs2019", "HIP-Programming-Guide\device_enumeration\device_enumeration_vs2019.vcxproj", "{18587C1E-4579-46EC-A014-04B5152E9A8F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Initialization\simple_device_query\simple_device_query_vs2019.vcxproj", "{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_selection_vs2019", "HIP-Programming-Guide\device_selection\device_selection_vs2019.vcxproj", "{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "constant_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\constant_memory\constant_memory_vs2019.vcxproj", "{66930369-1BDE-4BAD-8632-4CCB32D4BACD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multi_device_synchronization_vs2019", "HIP-Programming-Guide\multi_device_synchronization\multi_device_synchronization_vs2019.vcxproj", "{45E74105-8989-48A2-AB45-DF9633128E34}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\dynamic_shared_memory\dynamic_shared_memory_vs2019.vcxproj", "{625C70D7-AF76-40DC-9E46-325C9537D2D5}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2019", "HIP-Programming-Guide\p2p_memory_access\p2p_memory_access_vs2019.vcxproj", "{FF016D78-9E62-48A9-907D-DFE1BD457D79}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_copy_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\explicit_copy\explicit_copy_vs2019.vcxproj", "{DF268002-9DA0-43A0-B4FD-2F130F928B71}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs2019", "HIP-Programming-Guide\p2p_memory_access_failed\p2p_memory_access_failed_vs2019.vcxproj", "{B3E07519-B78C-4B79-BF96-947669B984F1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kernel_memory_allocation_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\kernel_memory_allocation\kernel_memory_allocation_vs2019.vcxproj", "{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_shared_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\static_shared_memory\static_shared_memory_vs2019.vcxproj", "{C972A858-C83E-47DE-A92D-936919922A70}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Host-Memory\pageable_host_memory\pageable_host_memory_vs2019.vcxproj", "{60ECA336-F57E-4F7C-B215-EB29E2A74406}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pinned_host_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Host-Memory\pinned_host_memory\pinned_host_memory_vs2019.vcxproj", "{B958C227-0996-4E33-B614-34C1220EA059}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "data_prefetching_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\data_prefetching\data_prefetching_vs2019.vcxproj", "{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_unified_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\dynamic_unified_memory\dynamic_unified_memory_vs2019.vcxproj", "{2F09D030-1722-473B-9FA4-511310E8C361}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\explicit_memory\explicit_memory_vs2019.vcxproj", "{27987255-2C04-4C8A-8A69-A8E01508C0B0}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_unified_memory_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\static_unified_memory\static_unified_memory_vs2019.vcxproj", "{F66D01FF-0919-479F-8B11-6CC744271A8F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unified_memory_advice_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\unified_memory_advice\unified_memory_advice_vs2019.vcxproj", "{92D0FEFE-D431-4289-B104-8D9FD4628883}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_enumeration_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\device_enumeration\device_enumeration_vs2019.vcxproj", "{18587C1E-4579-46EC-A014-04B5152E9A8F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_selection_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\device_selection\device_selection_vs2019.vcxproj", "{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multi_device_synchronization_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\multi_device_synchronization\multi_device_synchronization_vs2019.vcxproj", "{45E74105-8989-48A2-AB45-DF9633128E34}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access\p2p_memory_access_vs2019.vcxproj", "{FF016D78-9E62-48A9-907D-DFE1BD457D79}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access_failed\p2p_memory_access_failed_vs2019.vcxproj", "{B3E07519-B78C-4B79-BF96-947669B984F1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complex_math_vs2019", "HIP-Documentation\Reference\HIP-Complex-Math-API\complex_math\complex_math_vs2019.vcxproj", "{F003271F-5951-4341-AEFA-DD38E5BCAAB7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "math_vs2019", "HIP-Documentation\Reference\HIP-Math-API\math\math_vs2019.vcxproj", "{D612AF5A-8486-4485-AC6D-A9A2797AD389}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ordinary_memory_allocation_vs2019", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\SOMA\ordinary_memory_allocation\ordinary_memory_allocation_vs2019.vcxproj", "{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -872,86 +904,6 @@ Global
 		{F52C901C-4B7A-481A-ACB0-42743AB8D255}.Debug|x64.Build.0 = Debug|x64
 		{F52C901C-4B7A-481A-ACB0-42743AB8D255}.Release|x64.ActiveCfg = Release|x64
 		{F52C901C-4B7A-481A-ACB0-42743AB8D255}.Release|x64.Build.0 = Release|x64
-		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Debug|x64.ActiveCfg = Debug|x64
-		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Debug|x64.Build.0 = Debug|x64
-		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.ActiveCfg = Release|x64
-		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.Build.0 = Release|x64
-		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Debug|x64.ActiveCfg = Debug|x64
-		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Debug|x64.Build.0 = Debug|x64
-		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Release|x64.ActiveCfg = Release|x64
-		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Release|x64.Build.0 = Release|x64
-		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Debug|x64.ActiveCfg = Debug|x64
-		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Debug|x64.Build.0 = Debug|x64
-		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.ActiveCfg = Release|x64
-		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.Build.0 = Release|x64
-		{B958C227-0996-4E33-B614-34C1220EA059}.Debug|x64.ActiveCfg = Debug|x64
-		{B958C227-0996-4E33-B614-34C1220EA059}.Debug|x64.Build.0 = Debug|x64
-		{B958C227-0996-4E33-B614-34C1220EA059}.Release|x64.ActiveCfg = Release|x64
-		{B958C227-0996-4E33-B614-34C1220EA059}.Release|x64.Build.0 = Release|x64
-		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Debug|x64.ActiveCfg = Debug|x64
-		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Debug|x64.Build.0 = Debug|x64
-		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Release|x64.ActiveCfg = Release|x64
-		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Release|x64.Build.0 = Release|x64
-		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Debug|x64.ActiveCfg = Debug|x64
-		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Debug|x64.Build.0 = Debug|x64
-		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Release|x64.ActiveCfg = Release|x64
-		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Release|x64.Build.0 = Release|x64
-		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Debug|x64.ActiveCfg = Debug|x64
-		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Debug|x64.Build.0 = Debug|x64
-		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Release|x64.ActiveCfg = Release|x64
-		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Release|x64.Build.0 = Release|x64
-		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Debug|x64.ActiveCfg = Debug|x64
-		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Debug|x64.Build.0 = Debug|x64
-		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Release|x64.ActiveCfg = Release|x64
-		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Release|x64.Build.0 = Release|x64
-		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Debug|x64.ActiveCfg = Debug|x64
-		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Debug|x64.Build.0 = Debug|x64
-		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Release|x64.ActiveCfg = Release|x64
-		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Release|x64.Build.0 = Release|x64
-		{C972A858-C83E-47DE-A92D-936919922A70}.Debug|x64.ActiveCfg = Debug|x64
-		{C972A858-C83E-47DE-A92D-936919922A70}.Debug|x64.Build.0 = Debug|x64
-		{C972A858-C83E-47DE-A92D-936919922A70}.Release|x64.ActiveCfg = Release|x64
-		{C972A858-C83E-47DE-A92D-936919922A70}.Release|x64.Build.0 = Release|x64
-		{2F09D030-1722-473B-9FA4-511310E8C361}.Debug|x64.ActiveCfg = Debug|x64
-		{2F09D030-1722-473B-9FA4-511310E8C361}.Debug|x64.Build.0 = Debug|x64
-		{2F09D030-1722-473B-9FA4-511310E8C361}.Release|x64.ActiveCfg = Release|x64
-		{2F09D030-1722-473B-9FA4-511310E8C361}.Release|x64.Build.0 = Release|x64
-		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Debug|x64.ActiveCfg = Debug|x64
-		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Debug|x64.Build.0 = Debug|x64
-		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Release|x64.ActiveCfg = Release|x64
-		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Release|x64.Build.0 = Release|x64
-		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Debug|x64.ActiveCfg = Debug|x64
-		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Debug|x64.Build.0 = Debug|x64
-		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Release|x64.ActiveCfg = Release|x64
-		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Release|x64.Build.0 = Release|x64
-		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Debug|x64.ActiveCfg = Debug|x64
-		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Debug|x64.Build.0 = Debug|x64
-		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Release|x64.ActiveCfg = Release|x64
-		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Release|x64.Build.0 = Release|x64
-		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Debug|x64.ActiveCfg = Debug|x64
-		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Debug|x64.Build.0 = Debug|x64
-		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Release|x64.ActiveCfg = Release|x64
-		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Release|x64.Build.0 = Release|x64
-		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Debug|x64.ActiveCfg = Debug|x64
-		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Debug|x64.Build.0 = Debug|x64
-		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Release|x64.ActiveCfg = Release|x64
-		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Release|x64.Build.0 = Release|x64
-		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Debug|x64.ActiveCfg = Debug|x64
-		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Debug|x64.Build.0 = Debug|x64
-		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Release|x64.ActiveCfg = Release|x64
-		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Release|x64.Build.0 = Release|x64
-		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Debug|x64.ActiveCfg = Debug|x64
-		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Debug|x64.Build.0 = Debug|x64
-		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Release|x64.ActiveCfg = Release|x64
-		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Release|x64.Build.0 = Release|x64
-		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Debug|x64.ActiveCfg = Debug|x64
-		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Debug|x64.Build.0 = Debug|x64
-		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Release|x64.ActiveCfg = Release|x64
-		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Release|x64.Build.0 = Release|x64
-		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Debug|x64.ActiveCfg = Debug|x64
-		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Debug|x64.Build.0 = Debug|x64
-		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Release|x64.ActiveCfg = Release|x64
-		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Release|x64.Build.0 = Release|x64
 		{78714A91-411A-459E-9322-78C66B8D369F}.Debug|x64.ActiveCfg = Debug|x64
 		{78714A91-411A-459E-9322-78C66B8D369F}.Debug|x64.Build.0 = Debug|x64
 		{78714A91-411A-459E-9322-78C66B8D369F}.Release|x64.ActiveCfg = Release|x64
@@ -960,6 +912,74 @@ Global
 		{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92}.Debug|x64.Build.0 = Debug|x64
 		{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92}.Release|x64.ActiveCfg = Release|x64
 		{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92}.Release|x64.Build.0 = Release|x64
+		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Debug|x64.ActiveCfg = Debug|x64
+		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Debug|x64.Build.0 = Debug|x64
+		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Release|x64.ActiveCfg = Release|x64
+		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E}.Release|x64.Build.0 = Release|x64
+		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Debug|x64.ActiveCfg = Debug|x64
+		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Debug|x64.Build.0 = Debug|x64
+		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Release|x64.ActiveCfg = Release|x64
+		{C75FB02C-19F7-496A-9868-C451B56E6A59}.Release|x64.Build.0 = Release|x64
+		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Debug|x64.ActiveCfg = Debug|x64
+		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Debug|x64.Build.0 = Debug|x64
+		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Release|x64.ActiveCfg = Release|x64
+		{44347A88-59B5-47C3-9E09-9BB9B0C430AD}.Release|x64.Build.0 = Release|x64
+		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Debug|x64.ActiveCfg = Debug|x64
+		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Debug|x64.Build.0 = Debug|x64
+		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Release|x64.ActiveCfg = Release|x64
+		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03}.Release|x64.Build.0 = Release|x64
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Debug|x64.ActiveCfg = Debug|x64
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Debug|x64.Build.0 = Debug|x64
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.ActiveCfg = Release|x64
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.Build.0 = Release|x64
+		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Debug|x64.ActiveCfg = Debug|x64
+		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Debug|x64.Build.0 = Debug|x64
+		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Release|x64.ActiveCfg = Release|x64
+		{66930369-1BDE-4BAD-8632-4CCB32D4BACD}.Release|x64.Build.0 = Release|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Debug|x64.ActiveCfg = Debug|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Debug|x64.Build.0 = Debug|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Release|x64.ActiveCfg = Release|x64
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5}.Release|x64.Build.0 = Release|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Debug|x64.ActiveCfg = Debug|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Debug|x64.Build.0 = Debug|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Release|x64.ActiveCfg = Release|x64
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71}.Release|x64.Build.0 = Release|x64
+		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Debug|x64.ActiveCfg = Debug|x64
+		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Debug|x64.Build.0 = Debug|x64
+		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Release|x64.ActiveCfg = Release|x64
+		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82}.Release|x64.Build.0 = Release|x64
+		{C972A858-C83E-47DE-A92D-936919922A70}.Debug|x64.ActiveCfg = Debug|x64
+		{C972A858-C83E-47DE-A92D-936919922A70}.Debug|x64.Build.0 = Debug|x64
+		{C972A858-C83E-47DE-A92D-936919922A70}.Release|x64.ActiveCfg = Release|x64
+		{C972A858-C83E-47DE-A92D-936919922A70}.Release|x64.Build.0 = Release|x64
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Debug|x64.ActiveCfg = Debug|x64
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Debug|x64.Build.0 = Debug|x64
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.ActiveCfg = Release|x64
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.Build.0 = Release|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Debug|x64.ActiveCfg = Debug|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Debug|x64.Build.0 = Debug|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Release|x64.ActiveCfg = Release|x64
+		{B958C227-0996-4E33-B614-34C1220EA059}.Release|x64.Build.0 = Release|x64
+		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Debug|x64.ActiveCfg = Debug|x64
+		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Debug|x64.Build.0 = Debug|x64
+		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Release|x64.ActiveCfg = Release|x64
+		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870}.Release|x64.Build.0 = Release|x64
+		{2F09D030-1722-473B-9FA4-511310E8C361}.Debug|x64.ActiveCfg = Debug|x64
+		{2F09D030-1722-473B-9FA4-511310E8C361}.Debug|x64.Build.0 = Debug|x64
+		{2F09D030-1722-473B-9FA4-511310E8C361}.Release|x64.ActiveCfg = Release|x64
+		{2F09D030-1722-473B-9FA4-511310E8C361}.Release|x64.Build.0 = Release|x64
+		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Debug|x64.ActiveCfg = Debug|x64
+		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Debug|x64.Build.0 = Debug|x64
+		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Release|x64.ActiveCfg = Release|x64
+		{27987255-2C04-4C8A-8A69-A8E01508C0B0}.Release|x64.Build.0 = Release|x64
+		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Debug|x64.ActiveCfg = Debug|x64
+		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Debug|x64.Build.0 = Debug|x64
+		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Release|x64.ActiveCfg = Release|x64
+		{F66D01FF-0919-479F-8B11-6CC744271A8F}.Release|x64.Build.0 = Release|x64
+		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Debug|x64.ActiveCfg = Debug|x64
+		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Debug|x64.Build.0 = Debug|x64
+		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Release|x64.ActiveCfg = Release|x64
+		{92D0FEFE-D431-4289-B104-8D9FD4628883}.Release|x64.Build.0 = Release|x64
 		{18587C1E-4579-46EC-A014-04B5152E9A8F}.Debug|x64.ActiveCfg = Debug|x64
 		{18587C1E-4579-46EC-A014-04B5152E9A8F}.Debug|x64.Build.0 = Debug|x64
 		{18587C1E-4579-46EC-A014-04B5152E9A8F}.Release|x64.ActiveCfg = Release|x64
@@ -980,6 +1000,18 @@ Global
 		{B3E07519-B78C-4B79-BF96-947669B984F1}.Debug|x64.Build.0 = Debug|x64
 		{B3E07519-B78C-4B79-BF96-947669B984F1}.Release|x64.ActiveCfg = Release|x64
 		{B3E07519-B78C-4B79-BF96-947669B984F1}.Release|x64.Build.0 = Release|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Debug|x64.ActiveCfg = Debug|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Debug|x64.Build.0 = Debug|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Release|x64.ActiveCfg = Release|x64
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7}.Release|x64.Build.0 = Release|x64
+		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Debug|x64.ActiveCfg = Debug|x64
+		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Debug|x64.Build.0 = Debug|x64
+		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Release|x64.ActiveCfg = Release|x64
+		{D612AF5A-8486-4485-AC6D-A9A2797AD389}.Release|x64.Build.0 = Release|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Debug|x64.ActiveCfg = Debug|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Debug|x64.Build.0 = Debug|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Release|x64.ActiveCfg = Release|x64
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1133,34 +1165,50 @@ Global
 		{625C0C79-FC86-4F87-BCD0-094FC352377D} = {CE636F28-4B6E-4FEA-B487-30575357BEC9}
 		{E0C0BDC3-C714-46F0-A73B-48107C89810F} = {CE636F28-4B6E-4FEA-B487-30575357BEC9}
 		{D4C880CB-6024-4019-8A45-16B3DF53CAF8} = {6EB7144D-2707-489E-A043-D59B7BE006D1}
-		{F52C901C-4B7A-481A-ACB0-42743AB8D255} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{F003271F-5951-4341-AEFA-DD38E5BCAAB7} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{60ECA336-F57E-4F7C-B215-EB29E2A74406} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{B958C227-0996-4E33-B614-34C1220EA059} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{D612AF5A-8486-4485-AC6D-A9A2797AD389} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{DF268002-9DA0-43A0-B4FD-2F130F928B71} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{66930369-1BDE-4BAD-8632-4CCB32D4BACD} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{625C70D7-AF76-40DC-9E46-325C9537D2D5} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{C972A858-C83E-47DE-A92D-936919922A70} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{2F09D030-1722-473B-9FA4-511310E8C361} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{F66D01FF-0919-479F-8B11-6CC744271A8F} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{27987255-2C04-4C8A-8A69-A8E01508C0B0} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{92D0FEFE-D431-4289-B104-8D9FD4628883} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{C75FB02C-19F7-496A-9868-C451B56E6A59} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{44347A88-59B5-47C3-9E09-9BB9B0C430AD} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{78714A91-411A-459E-9322-78C66B8D369F} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{18587C1E-4579-46EC-A014-04B5152E9A8F} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{45E74105-8989-48A2-AB45-DF9633128E34} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{FF016D78-9E62-48A9-907D-DFE1BD457D79} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
-		{B3E07519-B78C-4B79-BF96-947669B984F1} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
+		{DBB29969-AEFB-4915-8854-C8765AB71663} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
+		{F39AB74F-4EB4-4A51-9371-8BE75723D9DD} = {DBB29969-AEFB-4915-8854-C8765AB71663}
+		{93DC1849-A5F3-4B18-88C7-3DFD4783FFC0} = {DBB29969-AEFB-4915-8854-C8765AB71663}
+		{D1E9EEDF-C548-4118-B917-7CB12AEE8692} = {93DC1849-A5F3-4B18-88C7-3DFD4783FFC0}
+		{C5C45AF9-4EE4-4F66-B0F9-5E466DFA5DFE} = {93DC1849-A5F3-4B18-88C7-3DFD4783FFC0}
+		{000277B1-81D9-43F8-A09D-B46E3DD3ECBB} = {93DC1849-A5F3-4B18-88C7-3DFD4783FFC0}
+		{1DC024B5-0F2B-4EEC-95F1-01B4C9BC4764} = {93DC1849-A5F3-4B18-88C7-3DFD4783FFC0}
+		{2BDCAD7D-1131-4EE1-9C69-EDB8D0A007BA} = {93DC1849-A5F3-4B18-88C7-3DFD4783FFC0}
+		{BBE0E5CB-C208-44D9-9F42-7FB1D02934B5} = {2BDCAD7D-1131-4EE1-9C69-EDB8D0A007BA}
+		{BFB3B918-DCA4-423B-AD20-919A742AA818} = {2BDCAD7D-1131-4EE1-9C69-EDB8D0A007BA}
+		{5D003C9D-F03D-4BEA-B58A-9E225ECB0E2C} = {2BDCAD7D-1131-4EE1-9C69-EDB8D0A007BA}
+		{04EF8648-7D8C-437E-85E9-B38B93C49CFD} = {2BDCAD7D-1131-4EE1-9C69-EDB8D0A007BA}
+		{0FE22A41-3B3E-415E-8E74-DCACA0D4788D} = {93DC1849-A5F3-4B18-88C7-3DFD4783FFC0}
+		{A9331406-51A9-49FE-A738-F9A845800984} = {48F9A686-650C-4E0F-A28E-829AE32F04CE}
+		{EB345287-5554-45CC-BB44-37B0520DA9EA} = {A9331406-51A9-49FE-A738-F9A845800984}
+		{7852C715-8E0C-439A-8E53-EADCF66AA629} = {A9331406-51A9-49FE-A738-F9A845800984}
+		{F52C901C-4B7A-481A-ACB0-42743AB8D255} = {F39AB74F-4EB4-4A51-9371-8BE75723D9DD}
+		{78714A91-411A-459E-9322-78C66B8D369F} = {D1E9EEDF-C548-4118-B917-7CB12AEE8692}
+		{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92} = {D1E9EEDF-C548-4118-B917-7CB12AEE8692}
+		{84241CF9-45D0-4F5A-9153-50D9B5EB7A1E} = {D1E9EEDF-C548-4118-B917-7CB12AEE8692}
+		{C75FB02C-19F7-496A-9868-C451B56E6A59} = {C5C45AF9-4EE4-4F66-B0F9-5E466DFA5DFE}
+		{44347A88-59B5-47C3-9E09-9BB9B0C430AD} = {C5C45AF9-4EE4-4F66-B0F9-5E466DFA5DFE}
+		{50C85F17-9E67-4C1E-B45D-0544AB7C0F03} = {000277B1-81D9-43F8-A09D-B46E3DD3ECBB}
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8} = {1DC024B5-0F2B-4EEC-95F1-01B4C9BC4764}
+		{66930369-1BDE-4BAD-8632-4CCB32D4BACD} = {BBE0E5CB-C208-44D9-9F42-7FB1D02934B5}
+		{625C70D7-AF76-40DC-9E46-325C9537D2D5} = {BBE0E5CB-C208-44D9-9F42-7FB1D02934B5}
+		{DF268002-9DA0-43A0-B4FD-2F130F928B71} = {BBE0E5CB-C208-44D9-9F42-7FB1D02934B5}
+		{6713B27C-DF8B-497D-8048-CC9D3F9DDA82} = {BBE0E5CB-C208-44D9-9F42-7FB1D02934B5}
+		{C972A858-C83E-47DE-A92D-936919922A70} = {BBE0E5CB-C208-44D9-9F42-7FB1D02934B5}
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406} = {BFB3B918-DCA4-423B-AD20-919A742AA818}
+		{B958C227-0996-4E33-B614-34C1220EA059} = {BFB3B918-DCA4-423B-AD20-919A742AA818}
+		{627B71FA-D7D0-48A2-AF6F-F779D9BA0870} = {04EF8648-7D8C-437E-85E9-B38B93C49CFD}
+		{2F09D030-1722-473B-9FA4-511310E8C361} = {04EF8648-7D8C-437E-85E9-B38B93C49CFD}
+		{27987255-2C04-4C8A-8A69-A8E01508C0B0} = {04EF8648-7D8C-437E-85E9-B38B93C49CFD}
+		{F66D01FF-0919-479F-8B11-6CC744271A8F} = {04EF8648-7D8C-437E-85E9-B38B93C49CFD}
+		{92D0FEFE-D431-4289-B104-8D9FD4628883} = {04EF8648-7D8C-437E-85E9-B38B93C49CFD}
+		{18587C1E-4579-46EC-A014-04B5152E9A8F} = {0FE22A41-3B3E-415E-8E74-DCACA0D4788D}
+		{46B34EFA-9DF3-4A78-8C76-BD7C5BB4489F} = {0FE22A41-3B3E-415E-8E74-DCACA0D4788D}
+		{45E74105-8989-48A2-AB45-DF9633128E34} = {0FE22A41-3B3E-415E-8E74-DCACA0D4788D}
+		{FF016D78-9E62-48A9-907D-DFE1BD457D79} = {0FE22A41-3B3E-415E-8E74-DCACA0D4788D}
+		{B3E07519-B78C-4B79-BF96-947669B984F1} = {0FE22A41-3B3E-415E-8E74-DCACA0D4788D}
+		{F003271F-5951-4341-AEFA-DD38E5BCAAB7} = {7852C715-8E0C-439A-8E53-EADCF66AA629}
+		{D612AF5A-8486-4485-AC6D-A9A2797AD389} = {EB345287-5554-45CC-BB44-37B0520DA9EA}
+		{81D5ABB2-7F9B-429B-887E-281BCBAB3E15} = {5D003C9D-F03D-4BEA-B58A-9E225ECB0E2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

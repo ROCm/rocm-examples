@@ -23,7 +23,7 @@
 SUB_PROJECTS := \
 	Applications \
 	HIP-Basic \
-	HIP-Programming-Guide \
+	HIP-Documentation \
 	Libraries
 
 all: $(SUB_PROJECTS)
