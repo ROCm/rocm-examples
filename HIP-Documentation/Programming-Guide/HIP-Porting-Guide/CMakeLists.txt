@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Documentation-Programming-Guide LANGUAGES CXX)
+project(HIP-Documentation-Programming-Guide-HIP-Porting-Guide LANGUAGES CXX)
 
-add_subdirectory(HIP-C++-Language-Extensions)
-add_subdirectory(HIP-Porting-Guide)
-add_subdirectory(Introduction-to-the-HIP-Programming-Model)
-add_subdirectory(Using-HIP-Runtime-API)
+add_subdirectory(device_code_feature_identification)
+add_subdirectory(host_code_feature_identification)
+add_subdirectory(identifying_compilation_target_platform)
+add_subdirectory(identifying_host_device_compilation_pass)

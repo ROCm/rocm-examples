@@ -20,10 +20,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Documentation-Programming-Guide LANGUAGES CXX)
+EXAMPLES := \
+    device_code_feature_identification \
+    host_code_feature_identification \
+    identifying_compilation_target_platform \
+    identifying_host_device_compilation_pass
 
-add_subdirectory(HIP-C++-Language-Extensions)
-add_subdirectory(HIP-Porting-Guide)
-add_subdirectory(Introduction-to-the-HIP-Programming-Model)
-add_subdirectory(Using-HIP-Runtime-API)
+all: $(EXAMPLES)
+
+clean: TARGET=clean
+clean: all
+
+$(EXAMPLES):
+    $(MAKE) -C $@ $(TARGET)
+
+.PHONY: all clean $(EXAMPLES)

@@ -410,6 +410,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "warp_size_reduction_vs2022"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\timer\timer_vs2022.vcxproj", "{C1957D25-4652-01D7-463A-086B05C9B9C5}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Porting-Guide", "HIP-Porting-Guide", "{C74FDF2D-7421-4680-9940-32FC63E96B96}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_compilation_target_platform_vs2022", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\identifying_compilation_target_platform\identifying_compilation_target_platform_vs2022.vcxproj", "{608D4B4B-6629-74E9-034A-D069EF2A68A6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_host_device_compilation_pass_vs2022", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\identifying_host_device_compilation_pass\identifying_host_device_compilation_pass_vs2022.vcxproj", "{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_code_feature_identification_vs2022", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\device_code_feature_identification\device_code_feature_identification_vs2022.vcxproj", "{4942D042-9F8C-CF96-DF5D-D09E463256DD}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "host_code_feature_identification_vs2022", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\host_code_feature_identification\host_code_feature_identification_vs2022.vcxproj", "{301FBAD3-7738-8CFD-014B-BE314C8573DD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1056,6 +1066,22 @@ Global
 		{C1957D25-4652-01D7-463A-086B05C9B9C5}.Debug|x64.Build.0 = Debug|x64
 		{C1957D25-4652-01D7-463A-086B05C9B9C5}.Release|x64.ActiveCfg = Release|x64
 		{C1957D25-4652-01D7-463A-086B05C9B9C5}.Release|x64.Build.0 = Release|x64
+		{608D4B4B-6629-74E9-034A-D069EF2A68A6}.Debug|x64.ActiveCfg = Debug|x64
+		{608D4B4B-6629-74E9-034A-D069EF2A68A6}.Debug|x64.Build.0 = Debug|x64
+		{608D4B4B-6629-74E9-034A-D069EF2A68A6}.Release|x64.ActiveCfg = Release|x64
+		{608D4B4B-6629-74E9-034A-D069EF2A68A6}.Release|x64.Build.0 = Release|x64
+		{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7}.Debug|x64.ActiveCfg = Debug|x64
+		{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7}.Debug|x64.Build.0 = Debug|x64
+		{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7}.Release|x64.ActiveCfg = Release|x64
+		{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7}.Release|x64.Build.0 = Release|x64
+		{4942D042-9F8C-CF96-DF5D-D09E463256DD}.Debug|x64.ActiveCfg = Debug|x64
+		{4942D042-9F8C-CF96-DF5D-D09E463256DD}.Debug|x64.Build.0 = Debug|x64
+		{4942D042-9F8C-CF96-DF5D-D09E463256DD}.Release|x64.ActiveCfg = Release|x64
+		{4942D042-9F8C-CF96-DF5D-D09E463256DD}.Release|x64.Build.0 = Release|x64
+		{301FBAD3-7738-8CFD-014B-BE314C8573DD}.Debug|x64.ActiveCfg = Debug|x64
+		{301FBAD3-7738-8CFD-014B-BE314C8573DD}.Debug|x64.Build.0 = Debug|x64
+		{301FBAD3-7738-8CFD-014B-BE314C8573DD}.Release|x64.ActiveCfg = Release|x64
+		{301FBAD3-7738-8CFD-014B-BE314C8573DD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1261,6 +1287,11 @@ Global
 		{8C91BCE4-7972-5257-EA2F-F3606BC54AAC} = {852373CC-5780-4EC8-94EA-B82C170D659E}
 		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884} = {852373CC-5780-4EC8-94EA-B82C170D659E}
 		{C1957D25-4652-01D7-463A-086B05C9B9C5} = {852373CC-5780-4EC8-94EA-B82C170D659E}
+		{C74FDF2D-7421-4680-9940-32FC63E96B96} = {0D14E46B-FEBB-4A92-95E3-C46C9FD2A8F4}
+		{608D4B4B-6629-74E9-034A-D069EF2A68A6} = {C74FDF2D-7421-4680-9940-32FC63E96B96}
+		{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7} = {C74FDF2D-7421-4680-9940-32FC63E96B96}
+		{4942D042-9F8C-CF96-DF5D-D09E463256DD} = {C74FDF2D-7421-4680-9940-32FC63E96B96}
+		{301FBAD3-7738-8CFD-014B-BE314C8573DD} = {C74FDF2D-7421-4680-9940-32FC63E96B96}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

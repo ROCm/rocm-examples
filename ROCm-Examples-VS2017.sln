@@ -410,6 +410,16 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "extern_shared_memory_vs2017
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer_vs2017", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\timer\timer_vs2017.vcxproj", "{FAD05E9E-E29B-47BD-B136-4B39B583FCF6}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Porting-Guide", "HIP-Porting-Guide", "{D9C2946B-AE0F-4123-B842-C6E658FFB7F1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_compilation_target_platform_vs2017", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\identifying_compilation_target_platform\identifying_compilation_target_platform_vs2017.vcxproj", "{9EF24773-61DD-448C-8CF3-1A7BE4F6D779}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_host_device_compilation_pass_vs2017", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\identifying_host_device_compilation_pass\identifying_host_device_compilation_pass_vs2017.vcxproj", "{99361613-0C5F-41F6-889A-86CD3352DF02}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_code_feature_identification_vs2017", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\device_code_feature_identification\device_code_feature_identification_vs2017.vcxproj", "{16A6CA98-768D-45D7-932E-04B42AD8A19F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "host_code_feature_identification_vs2017", "HIP-Documentation\Programming-Guide\HIP-Porting-Guide\host_code_feature_identification\host_code_feature_identification_vs2017.vcxproj", "{11967426-7BAC-4129-AD17-82C5DCE5AC9D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1056,6 +1066,22 @@ Global
 		{FAD05E9E-E29B-47BD-B136-4B39B583FCF6}.Debug|x64.Build.0 = Debug|x64
 		{FAD05E9E-E29B-47BD-B136-4B39B583FCF6}.Release|x64.ActiveCfg = Release|x64
 		{FAD05E9E-E29B-47BD-B136-4B39B583FCF6}.Release|x64.Build.0 = Release|x64
+		{9EF24773-61DD-448C-8CF3-1A7BE4F6D779}.Debug|x64.ActiveCfg = Debug|x64
+		{9EF24773-61DD-448C-8CF3-1A7BE4F6D779}.Debug|x64.Build.0 = Debug|x64
+		{9EF24773-61DD-448C-8CF3-1A7BE4F6D779}.Release|x64.ActiveCfg = Release|x64
+		{9EF24773-61DD-448C-8CF3-1A7BE4F6D779}.Release|x64.Build.0 = Release|x64
+		{99361613-0C5F-41F6-889A-86CD3352DF02}.Debug|x64.ActiveCfg = Debug|x64
+		{99361613-0C5F-41F6-889A-86CD3352DF02}.Debug|x64.Build.0 = Debug|x64
+		{99361613-0C5F-41F6-889A-86CD3352DF02}.Release|x64.ActiveCfg = Release|x64
+		{99361613-0C5F-41F6-889A-86CD3352DF02}.Release|x64.Build.0 = Release|x64
+		{16A6CA98-768D-45D7-932E-04B42AD8A19F}.Debug|x64.ActiveCfg = Debug|x64
+		{16A6CA98-768D-45D7-932E-04B42AD8A19F}.Debug|x64.Build.0 = Debug|x64
+		{16A6CA98-768D-45D7-932E-04B42AD8A19F}.Release|x64.ActiveCfg = Release|x64
+		{16A6CA98-768D-45D7-932E-04B42AD8A19F}.Release|x64.Build.0 = Release|x64
+		{11967426-7BAC-4129-AD17-82C5DCE5AC9D}.Debug|x64.ActiveCfg = Debug|x64
+		{11967426-7BAC-4129-AD17-82C5DCE5AC9D}.Debug|x64.Build.0 = Debug|x64
+		{11967426-7BAC-4129-AD17-82C5DCE5AC9D}.Release|x64.ActiveCfg = Release|x64
+		{11967426-7BAC-4129-AD17-82C5DCE5AC9D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1261,6 +1287,11 @@ Global
 		{328E4455-5F63-4050-A03A-5B572858C6F7} = {9B9B8E13-7EC2-41DF-BD00-17E3BF69B1C1}
 		{29A87235-CCCE-4AA3-A67B-F40AD438E730} = {9B9B8E13-7EC2-41DF-BD00-17E3BF69B1C1}
 		{FAD05E9E-E29B-47BD-B136-4B39B583FCF6} = {9B9B8E13-7EC2-41DF-BD00-17E3BF69B1C1}
+		{D9C2946B-AE0F-4123-B842-C6E658FFB7F1} = {AF224CE6-A4AF-45C3-BCC0-23C3B619350A}
+		{9EF24773-61DD-448C-8CF3-1A7BE4F6D779} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
+		{99361613-0C5F-41F6-889A-86CD3352DF02} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
+		{16A6CA98-768D-45D7-932E-04B42AD8A19F} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
+		{11967426-7BAC-4129-AD17-82C5DCE5AC9D} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

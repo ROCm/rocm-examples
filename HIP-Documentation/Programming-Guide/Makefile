@@ -22,6 +22,7 @@
 
 SUBDIRECTORIES := \
     HIP-C++-Language-Extensions \
+    HIP-Porting-Guide \
     Introduction-to-the-HIP-Programming-Model \
     Using-HIP-Runtime-API
 
