@@ -33,6 +33,8 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
+find_package(glfw3)
+
 add_subdirectory(bitonic_sort)
 add_subdirectory(convolution)
 add_subdirectory(fdtd)
@@ -42,4 +44,8 @@ if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQ
     add_subdirectory(monte_carlo_pi)
 endif()
 add_subdirectory(prefix_sum)
-add_subdirectory(sobel_filter)
+if(NOT glfw3_FOUND)
+    message("GLFW not found, not building sobel filter example")
+else()
+    add_subdirectory(sobel_filter)
+endif()
