@@ -31,12 +31,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         CACHE PATH
         "Root directory of the ROCm installation"
     )
+    set(ROCM_LLVM_ROOT ${ROCM_ROOT})
+    set(PREFIX_LLVM_ROOT ${CMAKE_INSTALL_PREFIX})
 else()
     set(ROCM_ROOT
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
+    set(ROCM_LLVM_ROOT "${ROCM_ROOT}/llvm")
+    set(PREFIX_LLVM_ROOT "${CMAKE_INSTALL_PREFIX}/llvm")
 endif()
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -49,21 +53,21 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         LLVM_DIS_COMMAND
         llvm-dis
         PATH_SUFFIXES bin
-        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        PATHS ${ROCM_LLVM_ROOT} ${PREFIX_LLVM_ROOT}
         NO_DEFAULT_PATH
     )
     find_program(
         OFFLOAD_BUNDLER_COMMAND
         clang-offload-bundler
         PATH_SUFFIXES bin
-        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        PATHS ${ROCM_LLVM_ROOT} ${PREFIX_LLVM_ROOT}
         NO_DEFAULT_PATH
     )
     find_program(
         LLVM_MC_COMMAND
         llvm-mc
         PATH_SUFFIXES bin
-        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        PATHS ${ROCM_LLVM_ROOT} ${PREFIX_LLVM_ROOT}
         NO_DEFAULT_PATH
     )
 
