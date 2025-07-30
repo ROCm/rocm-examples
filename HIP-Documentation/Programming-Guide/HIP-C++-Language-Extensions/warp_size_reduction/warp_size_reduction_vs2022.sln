@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36327.8 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "warp_size_reduction_vs2022", "warp_size_reduction_vs2022.vcxproj", "{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Debug|x64.ActiveCfg = Debug|x64
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Debug|x64.Build.0 = Debug|x64
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Release|x64.ActiveCfg = Release|x64
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E3660FD8-9FB2-414D-8ED1-59BC274B5AD5}
+	EndGlobalSection
+EndGlobal

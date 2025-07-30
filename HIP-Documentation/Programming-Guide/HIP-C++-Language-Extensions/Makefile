@@ -20,17 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-    HIP-C++-Language-Extensions \
-    Introduction-to-the-HIP-Programming-Model \
-    Using-HIP-Runtime-API
+EXAMPLES := \
+    calling_global_functions \
+    extern_shared_memory \
+    launch_bounds \
+    set_constant_memory \
+    template_warp_size_reduction \
+    timer \
+    warp_size_reduction
 
-all: $(SUBDIRECTORIES)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(SUBDIRECTORIES):
+$(EXAMPLES):
     $(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(SUBDIRECTORIES)
+.PHONY: all clean $(EXAMPLES)

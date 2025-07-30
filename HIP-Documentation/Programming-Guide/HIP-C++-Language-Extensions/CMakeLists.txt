@@ -20,17 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-    HIP-C++-Language-Extensions \
-    Introduction-to-the-HIP-Programming-Model \
-    Using-HIP-Runtime-API
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(HIP-Documentation-Programming-Guide-HIP-C++-Language-Extensions LANGUAGES CXX)
 
-all: $(SUBDIRECTORIES)
-
-clean: TARGET=clean
-clean: all
-
-$(SUBDIRECTORIES):
-    $(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(SUBDIRECTORIES)
+add_subdirectory(calling_global_functions)
+add_subdirectory(extern_shared_memory)
+add_subdirectory(launch_bounds)
+add_subdirectory(set_constant_memory)
+add_subdirectory(template_warp_size_reduction)
+add_subdirectory(timer)
+add_subdirectory(warp_size_reduction)

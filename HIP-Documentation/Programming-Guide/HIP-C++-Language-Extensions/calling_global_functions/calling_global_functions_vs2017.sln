@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.36217.24
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "calling_global_functions_vs2017", "calling_global_functions_vs2017.vcxproj", "{67EF330D-B8D8-4A07-971E-80E7A0AB32D5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{67EF330D-B8D8-4A07-971E-80E7A0AB32D5}.Debug|x64.ActiveCfg = Debug|x64
+		{67EF330D-B8D8-4A07-971E-80E7A0AB32D5}.Debug|x64.Build.0 = Debug|x64
+		{67EF330D-B8D8-4A07-971E-80E7A0AB32D5}.Release|x64.ActiveCfg = Release|x64
+		{67EF330D-B8D8-4A07-971E-80E7A0AB32D5}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7BE6F2B0-A03B-4031-BEB4-0BC0444E750D}
+	EndGlobalSection
+EndGlobal

@@ -394,6 +394,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ordinary_memory_allocation_vs2022", "HIP-Documentation\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\SOMA\ordinary_memory_allocation\ordinary_memory_allocation_vs2022.vcxproj", "{5576D5E7-2087-EE03-074D-29E4C5048472}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-C++-Language-Extensions", "HIP-C++-Language-Extensions", "{852373CC-5780-4EC8-94EA-B82C170D659E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "calling_global_functions_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\calling_global_functions\calling_global_functions_vs2022.vcxproj", "{1ED6BA5C-8307-372D-3B7F-CF52BDE264B8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "launch_bounds_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\launch_bounds\launch_bounds_vs2022.vcxproj", "{B487B067-65E9-F332-B6B8-477784429F68}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "set_constant_memory_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\set_constant_memory\set_constant_memory_vs2022.vcxproj", "{338FFED4-F7AB-7D96-25AE-1FD75ECF4B07}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "template_warp_size_reduction_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\template_warp_size_reduction\template_warp_size_reduction_vs2022.vcxproj", "{EB8686FB-6896-D27D-D7F7-1D700AF4DEDC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "extern_shared_memory_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\extern_shared_memory\extern_shared_memory_vs2022.vcxproj", "{8C91BCE4-7972-5257-EA2F-F3606BC54AAC}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "warp_size_reduction_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\warp_size_reduction\warp_size_reduction_vs2022.vcxproj", "{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer_vs2022", "HIP-Documentation\Programming-Guide\HIP-C++-Language-Extensions\timer\timer_vs2022.vcxproj", "{C1957D25-4652-01D7-463A-086B05C9B9C5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1012,6 +1028,34 @@ Global
 		{5576D5E7-2087-EE03-074D-29E4C5048472}.Debug|x64.Build.0 = Debug|x64
 		{5576D5E7-2087-EE03-074D-29E4C5048472}.Release|x64.ActiveCfg = Release|x64
 		{5576D5E7-2087-EE03-074D-29E4C5048472}.Release|x64.Build.0 = Release|x64
+		{1ED6BA5C-8307-372D-3B7F-CF52BDE264B8}.Debug|x64.ActiveCfg = Debug|x64
+		{1ED6BA5C-8307-372D-3B7F-CF52BDE264B8}.Debug|x64.Build.0 = Debug|x64
+		{1ED6BA5C-8307-372D-3B7F-CF52BDE264B8}.Release|x64.ActiveCfg = Release|x64
+		{1ED6BA5C-8307-372D-3B7F-CF52BDE264B8}.Release|x64.Build.0 = Release|x64
+		{B487B067-65E9-F332-B6B8-477784429F68}.Debug|x64.ActiveCfg = Debug|x64
+		{B487B067-65E9-F332-B6B8-477784429F68}.Debug|x64.Build.0 = Debug|x64
+		{B487B067-65E9-F332-B6B8-477784429F68}.Release|x64.ActiveCfg = Release|x64
+		{B487B067-65E9-F332-B6B8-477784429F68}.Release|x64.Build.0 = Release|x64
+		{338FFED4-F7AB-7D96-25AE-1FD75ECF4B07}.Debug|x64.ActiveCfg = Debug|x64
+		{338FFED4-F7AB-7D96-25AE-1FD75ECF4B07}.Debug|x64.Build.0 = Debug|x64
+		{338FFED4-F7AB-7D96-25AE-1FD75ECF4B07}.Release|x64.ActiveCfg = Release|x64
+		{338FFED4-F7AB-7D96-25AE-1FD75ECF4B07}.Release|x64.Build.0 = Release|x64
+		{EB8686FB-6896-D27D-D7F7-1D700AF4DEDC}.Debug|x64.ActiveCfg = Debug|x64
+		{EB8686FB-6896-D27D-D7F7-1D700AF4DEDC}.Debug|x64.Build.0 = Debug|x64
+		{EB8686FB-6896-D27D-D7F7-1D700AF4DEDC}.Release|x64.ActiveCfg = Release|x64
+		{EB8686FB-6896-D27D-D7F7-1D700AF4DEDC}.Release|x64.Build.0 = Release|x64
+		{8C91BCE4-7972-5257-EA2F-F3606BC54AAC}.Debug|x64.ActiveCfg = Debug|x64
+		{8C91BCE4-7972-5257-EA2F-F3606BC54AAC}.Debug|x64.Build.0 = Debug|x64
+		{8C91BCE4-7972-5257-EA2F-F3606BC54AAC}.Release|x64.ActiveCfg = Release|x64
+		{8C91BCE4-7972-5257-EA2F-F3606BC54AAC}.Release|x64.Build.0 = Release|x64
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Debug|x64.ActiveCfg = Debug|x64
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Debug|x64.Build.0 = Debug|x64
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Release|x64.ActiveCfg = Release|x64
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884}.Release|x64.Build.0 = Release|x64
+		{C1957D25-4652-01D7-463A-086B05C9B9C5}.Debug|x64.ActiveCfg = Debug|x64
+		{C1957D25-4652-01D7-463A-086B05C9B9C5}.Debug|x64.Build.0 = Debug|x64
+		{C1957D25-4652-01D7-463A-086B05C9B9C5}.Release|x64.ActiveCfg = Release|x64
+		{C1957D25-4652-01D7-463A-086B05C9B9C5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1209,6 +1253,14 @@ Global
 		{013CD1DA-F147-40DD-B407-C5519E985459} = {C6731F09-236E-4915-9CC4-CFE59CD78667}
 		{9F2D18B0-E80B-DBA5-BE33-48E79E5868A6} = {C6731F09-236E-4915-9CC4-CFE59CD78667}
 		{5576D5E7-2087-EE03-074D-29E4C5048472} = {333062A3-0E2B-47B8-9679-78C06BE60462}
+		{852373CC-5780-4EC8-94EA-B82C170D659E} = {0D14E46B-FEBB-4A92-95E3-C46C9FD2A8F4}
+		{1ED6BA5C-8307-372D-3B7F-CF52BDE264B8} = {852373CC-5780-4EC8-94EA-B82C170D659E}
+		{B487B067-65E9-F332-B6B8-477784429F68} = {852373CC-5780-4EC8-94EA-B82C170D659E}
+		{338FFED4-F7AB-7D96-25AE-1FD75ECF4B07} = {852373CC-5780-4EC8-94EA-B82C170D659E}
+		{EB8686FB-6896-D27D-D7F7-1D700AF4DEDC} = {852373CC-5780-4EC8-94EA-B82C170D659E}
+		{8C91BCE4-7972-5257-EA2F-F3606BC54AAC} = {852373CC-5780-4EC8-94EA-B82C170D659E}
+		{46AFE6A7-6314-6CCE-9FDE-D8D6F8E2E884} = {852373CC-5780-4EC8-94EA-B82C170D659E}
+		{C1957D25-4652-01D7-463A-086B05C9B9C5} = {852373CC-5780-4EC8-94EA-B82C170D659E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}
