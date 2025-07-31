@@ -43,6 +43,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
 	ILDLIBS   += -l nvrtc
 else ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
+	ILDLIBS   += -l hiprtc
 else
 	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
