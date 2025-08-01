@@ -14,7 +14,7 @@
     <Solution Condition="'$(Category)'=='HIP-Basic'" Include="..\..\HIP-Basic\**\*.sln" Exclude="..\..\HIP-Basic\static_host_library\**\*.sln">
       <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
     </Solution>
-    <Solution Condition="'$(Category)'=='HIP-Documentation'" Include="..\..\HIP-Documentation\**\*.sln" Exclude="..\..\HIP-Basic\static_host_library\**\*.sln">
+    <Solution Condition="'$(Category)'=='HIP-Doc'" Include="..\..\HIP-Doc\**\*.sln" Exclude="..\..\HIP-Basic\static_host_library\**\*.sln">
       <Properties>IntDir=Build\$(Configuration)\%(Solution.Filename)\tmp\;OutDir=Build\$(Configuration)\%(Solution.Filename)\</Properties>
     </Solution>
     <Solution Condition="'$(Category)'=='Libraries' and '$(VSVersion)'=='2017'" Include="..\..\Libraries\**\*_vs2017.sln" Exclude="..\..\Libraries\rocSPARSE\preconditioner\csritilu0\**\*.sln;..\..\Libraries\rocSPARSE\level_2\csritsv\**\*.sln">

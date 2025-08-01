@@ -1,16 +1,16 @@
-name: Build HIP-Documentation VS
+name: Build HIP-Doc VS
 
 on:
   push:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
-      - 'HIP-Documentation/**'
+      - 'HIP-Doc/**'
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
-      - 'HIP-Documentation/**'
+      - 'HIP-Doc/**'
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
 
@@ -74,6 +74,6 @@ jobs:
                   Get-ChildItem -Recurse -File | Where-Object { Select-String -Pattern 'HIP clang 6\..' -Path $_ } | ForEach-Object {
                     (Get-Content -Path $_.FullName) -replace 'HIP clang 6\..', "HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}" | Set-Content -Path $_.FullName
                   }
-                  msbuild Scripts\VisualStudio\build.proj -maxCpuCount -detailedSummary -property:"Category=HIP-Documentation;Configuration=${{ matrix.config }};Platform=x64"
+                  msbuild Scripts\VisualStudio\build.proj -maxCpuCount -detailedSummary -property:"Category=HIP-Doc;Configuration=${{ matrix.config }};Platform=x64"
                   Write-Host "msbuild returned: $LastExitCode"
                   Exit $LastExitCode

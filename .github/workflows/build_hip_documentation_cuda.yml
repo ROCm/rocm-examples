@@ -1,15 +1,15 @@
-name: Build HIP-Documentation CUDA
+name: Build HIP-Doc CUDA
 
 on:
   push:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
-      - 'HIP-Documentation/**'
+      - 'HIP-Doc/**'
       - '.github/workflows/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
-      - 'HIP-Documentation/**'
+      - 'HIP-Doc/**'
       - '.github/workflows/**'
 
 env:
@@ -45,6 +45,6 @@ jobs:
           - name: Configure and Build
             shell: bash
             run: |
-              cd HIP-Documentation && mkdir build && cd build
+              cd HIP-Doc && mkdir build && cd build
               cmake -DGPU_RUNTIME=CUDA ..
               cmake --build . -j4

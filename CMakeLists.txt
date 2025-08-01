@@ -33,6 +33,6 @@ endif()
 
 add_subdirectory(Applications)
 add_subdirectory(HIP-Basic)
-add_subdirectory(HIP-Documentation)
+add_subdirectory(HIP-Doc)
 add_subdirectory(Libraries)
 add_subdirectory(Tutorials)

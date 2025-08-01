@@ -1,10 +1,10 @@
-name: Build HIP-Documentation
+name: Build HIP-Doc
 
 on:
   push:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
-      - 'HIP-Documentation/**'
+      - 'HIP-Doc/**'
       - '.github/workflows/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
@@ -46,6 +46,6 @@ jobs:
           - name: Configure and Build
             shell: bash
             run: |
-              cd HIP-Documentation && mkdir build && cd build
+              cd HIP-Doc && mkdir build && cd build
               cmake -DGPU_TARGETS="${GPU_TARGETS}" -S ..
               cmake --build . -j 4
