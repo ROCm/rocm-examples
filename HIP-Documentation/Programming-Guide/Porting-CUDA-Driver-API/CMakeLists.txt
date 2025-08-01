@@ -20,19 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-    HIP-C++-Language-Extensions \
-    HIP-Porting-Guide \
-    Introduction-to-the-HIP-Programming-Model \
-    Porting-CUDA-Driver-API \
-    Using-HIP-Runtime-API
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(HIP-Documentation-Programming-Guide-HIP-Porting-CUDA-Driver-API LANGUAGES CXX)
 
-all: $(SUBDIRECTORIES)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+select_gpu_language()
 
-clean: TARGET=clean
-clean: all
+add_subdirectory(address_retrieval)
+add_subdirectory(load_module)
+add_subdirectory(load_module_ex)
 
-$(SUBDIRECTORIES):
-    $(MAKE) -C $@ $(TARGET)
+if(NOT ${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
+    message(STATUS "The load_module_ex_cuda example is available only for CUDA.")
+else()
+    add_subdirectory(load_module_ex_cuda)
+endif()
 
-.PHONY: all clean $(SUBDIRECTORIES)
+add_subdirectory(per_thread_default_stream)
+add_subdirectory(pointer_memory_type)

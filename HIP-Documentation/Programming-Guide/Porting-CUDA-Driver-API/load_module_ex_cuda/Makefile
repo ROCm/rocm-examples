@@ -20,19 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-    HIP-C++-Language-Extensions \
-    HIP-Porting-Guide \
-    Introduction-to-the-HIP-Programming-Model \
-    Porting-CUDA-Driver-API \
-    Using-HIP-Runtime-API
+EXAMPLE := cuda_load_module_ex
+GPU_RUNTIME := CUDA
 
-all: $(SUBDIRECTORIES)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-clean: TARGET=clean
-clean: all
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-$(SUBDIRECTORIES):
-    $(MAKE) -C $@ $(TARGET)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
 
-.PHONY: all clean $(SUBDIRECTORIES)
+ifeq ($(GPU_RUNTIME), CUDA)
+    ICXXFLAGS += -x cu
+    ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+    ILDLIBS += -lcudadevrt -lcudart_static -lrt
+else
+    $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be CUDA)
+endif
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.cpp myKernel.ptx
+    $(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+myKernel.ptx: myKernel.cu
+    $(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
+
+clean:
+    $(RM) $(EXAMPLE) myKernel.ptx
+
+.PHONY: clean

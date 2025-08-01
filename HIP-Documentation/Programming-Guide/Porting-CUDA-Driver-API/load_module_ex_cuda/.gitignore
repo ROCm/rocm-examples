@@ -1,0 +1,2 @@
+cuda_load_module_ex
+myKernel.ptx

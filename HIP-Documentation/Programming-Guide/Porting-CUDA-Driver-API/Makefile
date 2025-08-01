@@ -20,19 +20,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-    HIP-C++-Language-Extensions \
-    HIP-Porting-Guide \
-    Introduction-to-the-HIP-Programming-Model \
-    Porting-CUDA-Driver-API \
-    Using-HIP-Runtime-API
+EXAMPLES := \
+    address_retrieval \
+    load_module \
+    load_module_ex \
+    per_thread_default_stream \
+    pointer_memory_type
 
-all: $(SUBDIRECTORIES)
+ifeq ($(GPU_RUNTIME), CUDA)
+    EXAMPLES += load_module_ex_cuda
+endif
+
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(SUBDIRECTORIES):
+$(EXAMPLES):
     $(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(SUBDIRECTORIES)
+.PHONY: all clean $(EXAMPLES)
