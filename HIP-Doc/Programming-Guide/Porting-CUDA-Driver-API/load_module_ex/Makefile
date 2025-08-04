@@ -24,7 +24,7 @@ EXAMPLE := hip_load_module_ex
 GPU_RUNTIME := HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-    $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
 # HIP variables

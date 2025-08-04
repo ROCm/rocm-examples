@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    constant_memory \
-    dynamic_shared_memory \
-    explicit_copy \
-    kernel_memory_allocation \
-    static_shared_memory
+	constant_memory \
+	dynamic_shared_memory \
+	explicit_copy \
+	kernel_memory_allocation \
+	static_shared_memory
 
 all: $(EXAMPLES)
 
@@ -33,6 +33,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

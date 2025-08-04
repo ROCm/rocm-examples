@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    asynchronous_kernel_execution \
-    event_based_synchronization \
+	asynchronous_kernel_execution \
+	event_based_synchronization \
 	sequential_kernel_execution
 
 all: $(EXAMPLES)
@@ -31,6 +31,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

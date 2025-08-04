@@ -21,14 +21,14 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    address_retrieval \
-    load_module \
-    load_module_ex \
-    per_thread_default_stream \
-    pointer_memory_type
+	address_retrieval \
+	load_module \
+	load_module_ex \
+	per_thread_default_stream \
+	pointer_memory_type
 
 ifeq ($(GPU_RUNTIME), CUDA)
-    EXAMPLES += load_module_ex_cuda
+	EXAMPLES += load_module_ex_cuda
 endif
 
 all: $(EXAMPLES)
@@ -37,6 +37,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

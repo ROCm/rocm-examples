@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    call_stack_management \
-    device_recursion
+	call_stack_management \
+	device_recursion
 
 all: $(EXAMPLES)
 
@@ -30,6 +30,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

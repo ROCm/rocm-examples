@@ -35,6 +35,6 @@ clean: TARGET=clean
 clean: all
 
 $(SUBDIRECTORIES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(SUBDIRECTORIES)

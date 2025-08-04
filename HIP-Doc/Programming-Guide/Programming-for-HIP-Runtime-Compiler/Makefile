@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    compilation_apis \
-    compilation_apis_bitcode \
-    linker_apis \
-    linker_apis_file \
-    linker_apis_options \
-    lowered_names \
-    rtc_error_handling
+	compilation_apis \
+	compilation_apis_bitcode \
+	linker_apis \
+	linker_apis_file \
+	linker_apis_options \
+	lowered_names \
+	rtc_error_handling
 
 all: $(EXAMPLES)
 
@@ -35,6 +35,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

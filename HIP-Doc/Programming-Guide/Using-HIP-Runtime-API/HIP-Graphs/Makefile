@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    graph_capture \
-    graph_creation   
+	graph_capture \
+	graph_creation   
 
 all: $(EXAMPLES)
 
@@ -30,6 +30,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

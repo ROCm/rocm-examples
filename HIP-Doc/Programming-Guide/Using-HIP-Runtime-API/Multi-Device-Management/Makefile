@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    device_enumeration \
-    device_selection \
-    multi_device_synchronization \
-    p2p_memory_access \
-    p2p_memory_access_failed
+	device_enumeration \
+	device_selection \
+	multi_device_synchronization \
+	p2p_memory_access \
+	p2p_memory_access_failed
 
 all: $(EXAMPLES)
 
@@ -33,6 +33,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

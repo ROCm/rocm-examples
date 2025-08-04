@@ -22,8 +22,8 @@
 
 ifeq ($(GPU_RUNTIME), HIP) # Only supported on HIP
 	EXAMPLES := \
-        low_precision_float_fp8 \
-        low_precision_float_fp16
+		low_precision_float_fp8 \
+		low_precision_float_fp16
 endif
 
 all: $(EXAMPLES)
@@ -32,6 +32,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

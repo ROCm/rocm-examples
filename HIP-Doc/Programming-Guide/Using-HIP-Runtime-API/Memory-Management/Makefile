@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-    Device-Memory \
-    Host-Memory \
-    SOMA \
-    Unified-Memory-Management \
-    Virtual-Memory-Management
+	Device-Memory \
+	Host-Memory \
+	SOMA \
+	Unified-Memory-Management \
+	Virtual-Memory-Management
 
 all: $(SUBDIRECTORIES)
 
@@ -33,6 +33,6 @@ clean: TARGET=clean
 clean: all
 
 $(SUBDIRECTORIES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(SUBDIRECTORIES)

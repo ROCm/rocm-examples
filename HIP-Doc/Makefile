@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-    Programming-Guide \
-    Reference
+	Programming-Guide \
+	Reference
 
 all: $(SUBDIRECTORIES)
 
@@ -30,6 +30,6 @@ clean: TARGET=clean
 clean: all
 
 $(SUBDIRECTORIES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(SUBDIRECTORIES)

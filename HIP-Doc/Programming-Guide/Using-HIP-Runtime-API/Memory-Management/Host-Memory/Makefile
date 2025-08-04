@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    pageable_host_memory \
-    pinned_host_memory
+	pageable_host_memory \
+	pinned_host_memory
 
 all: $(EXAMPLES)
 
@@ -30,6 +30,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

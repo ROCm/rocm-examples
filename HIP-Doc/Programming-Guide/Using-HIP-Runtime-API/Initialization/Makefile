@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-    simple_device_query
+	simple_device_query
 
 all: $(EXAMPLES)
 
@@ -29,6 +29,6 @@ clean: TARGET=clean
 clean: all
 
 $(EXAMPLES):
-    $(MAKE) -C $@ $(TARGET)
+	$(MAKE) -C $@ $(TARGET)
 
 .PHONY: all clean $(EXAMPLES)

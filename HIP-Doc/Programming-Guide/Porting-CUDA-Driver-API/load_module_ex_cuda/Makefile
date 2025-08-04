@@ -37,11 +37,11 @@ ILDFLAGS  :=
 ILDLIBS   :=
 
 ifeq ($(GPU_RUNTIME), CUDA)
-    ICXXFLAGS += -x cu
-    ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
-    ILDLIBS += -lcudadevrt -lcudart_static -lrt
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+	ILDLIBS += -lcudadevrt -lcudart_static -lrt
 else
-    $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be CUDA)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be CUDA)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)
@@ -50,12 +50,12 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 $(EXAMPLE): main.cpp myKernel.ptx
-    $(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 myKernel.ptx: myKernel.cu
-    $(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
 clean:
-    $(RM) $(EXAMPLE) myKernel.ptx
+	$(RM) $(EXAMPLE) myKernel.ptx
 
 .PHONY: clean
