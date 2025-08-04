@@ -68,7 +68,6 @@ add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../Common" "../../External")
 # For examples targeting NVIDIA, include the HIP header directory.
 if(GPU_RUNTIME STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")

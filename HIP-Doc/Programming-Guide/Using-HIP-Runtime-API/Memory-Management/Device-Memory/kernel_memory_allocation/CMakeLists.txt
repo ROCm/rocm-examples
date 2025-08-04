@@ -57,7 +57,6 @@ set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA
 target_compile_definitions(${example_name} PRIVATE $<$<PLATFORM_ID:Windows>:_USE_MATH_DEFINES>)
 target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
 target_include_directories(${example_name} PRIVATE ../../../../../../Common
-                                                   ../../../../../../External
                                                    $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 
 install(TARGETS ${example_name})

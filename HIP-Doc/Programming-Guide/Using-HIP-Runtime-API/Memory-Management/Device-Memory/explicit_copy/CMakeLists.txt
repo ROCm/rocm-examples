@@ -62,7 +62,6 @@ set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${USED_LANGUAGE})
 
 target_compile_features(${example_name} PRIVATE cxx_std_17 cuda_std_17)
 target_include_directories(${example_name} PRIVATE ../../../../../../Common
-                                                   ../../../../../../External
                                                    $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_name} PRIVATE $<$<NOT:$<LINK_LANGUAGE:CUDA>>:hip::host>)
 set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CXX>:CXX_EXTENSIONS OFF>

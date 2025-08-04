@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 EXAMPLE := hip_simple_device_query
-COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -33,7 +32,7 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR)
 ILDFLAGS  :=
 ILDLIBS   :=
 

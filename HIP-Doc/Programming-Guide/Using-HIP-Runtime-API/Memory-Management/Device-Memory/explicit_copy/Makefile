@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLE := hip_explicit_copy
-COMMON_INCLUDE_DIR := ../../Common
+COMMON_INCLUDE_DIR := ../../../../../../Common
 GPU_RUNTIME := HIP
 
 # HIP variables

@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 EXAMPLE := hip_extern_shared_memory
-COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -33,7 +32,6 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -I $(COMMON_INCLUDE_DIR)
 ILDFLAGS  :=
 ILDLIBS   :=
 

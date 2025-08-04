@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLE := hip_dynamic_shared_memory
-COMMON_INCLUDE_DIR := ../../Common
+COMMON_INCLUDE_DIR := ../../../../../../Common
 GPU_RUNTIME := HIP
 
 # HIP variables
