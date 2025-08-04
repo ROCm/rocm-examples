@@ -202,6 +202,22 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequential_kernel_execution_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\sequential_kernel_execution\sequential_kernel_execution_vs2017.vcxproj", "{FEE9F556-803D-43D9-BB9F-92D1465D86BE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Programming-for-HIP-Runtime-Compiler", "Programming-for-HIP-Runtime-Compiler", "{2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compilation_apis_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\compilation_apis\compilation_apis_vs2017.vcxproj", "{A41A41EE-9D9C-4131-AA27-531660CD85A4}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "compilation_apis_bitcode_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\compilation_apis_bitcode\compilation_apis_bitcode_vs2017.vcxproj", "{90F76935-2CB9-4981-B24E-952100681E00}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_apis_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\linker_apis\linker_apis_vs2017.vcxproj", "{1DF27E91-74C1-43E8-9443-09296169D55F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_apis_file_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\linker_apis_file\linker_apis_file_vs2017.vcxproj", "{67489C46-E97E-4C91-9636-79854DC5EAD1}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_apis_options_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\linker_apis_options\linker_apis_options_vs2017.vcxproj", "{1DC058BF-4C29-46EC-A856-D0707D772445}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtc_error_handling_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\rtc_error_handling\rtc_error_handling_vs2017.vcxproj", "{DCF80A40-6BC2-4629-BF87-11699A465E3D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lowered_names_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\lowered_names\lowered_names_vs2017.vcxproj", "{B514436C-B525-48DE-A82C-0110FE55943B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -512,6 +528,34 @@ Global
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE}.Debug|x64.Build.0 = Debug|x64
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE}.Release|x64.ActiveCfg = Release|x64
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE}.Release|x64.Build.0 = Release|x64
+		{A41A41EE-9D9C-4131-AA27-531660CD85A4}.Debug|x64.ActiveCfg = Debug|x64
+		{A41A41EE-9D9C-4131-AA27-531660CD85A4}.Debug|x64.Build.0 = Debug|x64
+		{A41A41EE-9D9C-4131-AA27-531660CD85A4}.Release|x64.ActiveCfg = Release|x64
+		{A41A41EE-9D9C-4131-AA27-531660CD85A4}.Release|x64.Build.0 = Release|x64
+		{90F76935-2CB9-4981-B24E-952100681E00}.Debug|x64.ActiveCfg = Debug|x64
+		{90F76935-2CB9-4981-B24E-952100681E00}.Debug|x64.Build.0 = Debug|x64
+		{90F76935-2CB9-4981-B24E-952100681E00}.Release|x64.ActiveCfg = Release|x64
+		{90F76935-2CB9-4981-B24E-952100681E00}.Release|x64.Build.0 = Release|x64
+		{1DF27E91-74C1-43E8-9443-09296169D55F}.Debug|x64.ActiveCfg = Debug|x64
+		{1DF27E91-74C1-43E8-9443-09296169D55F}.Debug|x64.Build.0 = Debug|x64
+		{1DF27E91-74C1-43E8-9443-09296169D55F}.Release|x64.ActiveCfg = Release|x64
+		{1DF27E91-74C1-43E8-9443-09296169D55F}.Release|x64.Build.0 = Release|x64
+		{67489C46-E97E-4C91-9636-79854DC5EAD1}.Debug|x64.ActiveCfg = Debug|x64
+		{67489C46-E97E-4C91-9636-79854DC5EAD1}.Debug|x64.Build.0 = Debug|x64
+		{67489C46-E97E-4C91-9636-79854DC5EAD1}.Release|x64.ActiveCfg = Release|x64
+		{67489C46-E97E-4C91-9636-79854DC5EAD1}.Release|x64.Build.0 = Release|x64
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Debug|x64.ActiveCfg = Debug|x64
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Debug|x64.Build.0 = Debug|x64
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Release|x64.ActiveCfg = Release|x64
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Release|x64.Build.0 = Release|x64
+		{DCF80A40-6BC2-4629-BF87-11699A465E3D}.Debug|x64.ActiveCfg = Debug|x64
+		{DCF80A40-6BC2-4629-BF87-11699A465E3D}.Debug|x64.Build.0 = Debug|x64
+		{DCF80A40-6BC2-4629-BF87-11699A465E3D}.Release|x64.ActiveCfg = Release|x64
+		{DCF80A40-6BC2-4629-BF87-11699A465E3D}.Release|x64.Build.0 = Release|x64
+		{B514436C-B525-48DE-A82C-0110FE55943B}.Debug|x64.ActiveCfg = Debug|x64
+		{B514436C-B525-48DE-A82C-0110FE55943B}.Debug|x64.Build.0 = Debug|x64
+		{B514436C-B525-48DE-A82C-0110FE55943B}.Release|x64.ActiveCfg = Release|x64
+		{B514436C-B525-48DE-A82C-0110FE55943B}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -613,6 +657,14 @@ Global
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
+		{2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347} = {23D01721-DB47-4545-AD6C-B0DF786308C8}
+		{A41A41EE-9D9C-4131-AA27-531660CD85A4} = {2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}
+		{90F76935-2CB9-4981-B24E-952100681E00} = {2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}
+		{1DF27E91-74C1-43E8-9443-09296169D55F} = {2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}
+		{67489C46-E97E-4C91-9636-79854DC5EAD1} = {2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}
+		{1DC058BF-4C29-46EC-A856-D0707D772445} = {2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}
+		{DCF80A40-6BC2-4629-BF87-11699A465E3D} = {2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}
+		{B514436C-B525-48DE-A82C-0110FE55943B} = {2AAACE0F-C246-4FBE-83D6-9DB1B0D3F347}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20E1D613-A9A0-4471-B029-8528325AE9EC}
