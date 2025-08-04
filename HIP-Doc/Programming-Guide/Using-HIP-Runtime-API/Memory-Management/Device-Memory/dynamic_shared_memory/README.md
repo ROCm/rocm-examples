@@ -2,11 +2,9 @@
 
 ## Description
 
-Shared memory is read-write memory, that is only visible to the threads within a block. It is allocated per thread
-block, and needs to be either statically allocated at compile time, or can be dynamically allocated when launching the
-kernel, but not during kernel execution. Shared memory can be dynamically allocated by declaring an `extern __shared__`
-array, whose size can be set during kernel launch, which can then be accessed in the kernel. This example demonstrates
-how to declare such an array and how to allocate the required memory on the host.
+This example demonstrates dynamically allocate shared memory on the host. For more information on this topic, please
+refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/device_memory.html#shared-memory).
 
 ### Application flow
 

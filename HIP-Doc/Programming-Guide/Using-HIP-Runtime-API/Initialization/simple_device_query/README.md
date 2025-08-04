@@ -3,7 +3,8 @@
 ## Description
 
 This example shows how the number of HIP-capable devices in the system can be determined, as well as how properties from
-the device may be queried.
+the device may be queried. For more information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/initialization.html#querying-and-setting-gpus).
 
 ### Application flow
 

@@ -2,10 +2,8 @@
 
 ## Description
 
-HIP provides built-in support for complex number operations through specialized types and functions, available for both
-single-precision (float) and double-precision (double) calculations. All complex types and functions are accessible on
-both the host and the device. This example demonstrates how to use complex numbers to compute the Discrete Fourier
-Transform (DFT) of a simple signal on the GPU.
+This example demonstrates how to use the HIP complex math API. For more information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/complex_math_api.html#hip-complex-math-api).
 
 ### Application flow
 

@@ -3,7 +3,8 @@
 ## Description
 
 This example demonstrates how to perform explicit memory management by allocating memory on the device and transferring
-bytes between the host and the device.
+bytes between the host and the device. It should be compared to the various unified memory examples in this example's
+[parent folder](..).
 
 ### Application flow
 

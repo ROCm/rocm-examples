@@ -2,7 +2,9 @@
 
 ## Description
 
-This example demonstrates how to query attributes of a given memory range.
+This example demonstrates how to query attributes of a given memory range. For more information on this topic, please
+refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html#memory-range-attributes).
 
 ### Prerequisites
 

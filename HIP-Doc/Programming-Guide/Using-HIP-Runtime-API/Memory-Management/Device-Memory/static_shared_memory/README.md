@@ -2,7 +2,9 @@
 
 ## Description
 
-To statically allocate shared memory, just declare it in the kernel. This example demonstrates how this is achieved.
+This example demonstrates how to statically allocate shared memory inside a kernel. For more information on this topic,
+please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/device_memory.html#shared-memory).
 
 ### Application flow
 

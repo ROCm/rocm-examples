@@ -2,9 +2,8 @@
 
 ## Description
 
-HIP provides device-callable math operations, supporting most math functions available in standard C++. This example
-shows a simplified method for computing ULP (units in the last place) differences between HIP and standard C++ math
-functions by first finding where the maximum absolute error occurs.
+This example demonstrates how to use the HIP math API. For more information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/math_api.html#hip-math-api).
 
 ### Application flow
 

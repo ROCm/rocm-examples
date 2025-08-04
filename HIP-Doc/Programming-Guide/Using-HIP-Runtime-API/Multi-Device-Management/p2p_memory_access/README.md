@@ -2,12 +2,12 @@
 
 ## Description
 
-In multi-GPU systems, peer-to-peer memory access enables one GPU to directly read or write to the memory of another GPU.
-Enabling peer-to-peer access can significantly improve the performance of applications that require frequent data
-exchange between GPUs, as it eliminates the need to transfer data through the host memory.
-
 This example demonstrates how to copy data between devices by adding peer-to-peer accesses to the
-[device selection example](../device_selection/).
+[device selection example](../device_selection/). For more information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/multi_device.html#peer-to-peer-memory-access).
+
+This example is intended for comparison with the
+[failed peer-to-peer memory access example](../p2p_memory_access_failed).
 
 ### Application flow
 

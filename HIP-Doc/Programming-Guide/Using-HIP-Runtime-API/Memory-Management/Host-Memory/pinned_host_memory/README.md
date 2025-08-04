@@ -2,16 +2,9 @@
 
 ## Description
 
-Pinned memory or page-locked memory is stored in pages that are locked in specific sectors in RAM and cannot be
-migrated. The pointer can be used on both host and device. Accessing host-resident pinned memory in device kernels is
-generally not recommended for performance, as it can force the data to traverse the host-device interconnect such as
-PCIe, which is much slower than the on-device bandwidth.
-
-The advantage of pinned memory is the improved transfer time between host and device. The disadvantage of pinned memory
-is the reduced availability of RAM for other processes, which can negatively impact the overall performance of the
-host.
-
-This example demonstrates how to allocate pinned memory on the host and transfer its contents to the device.
+This example demonstrates how to allocate pinned memory on the host and transfer its contents to the device. For more
+information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/host_memory.html#pinned-memory).
 
 ### Application flow
 

@@ -2,16 +2,9 @@
 
 ## Description
 
-Device enumeration involves identifying all the available GPUs connected to the host system. A single host machine can
-have multiple GPUs, each with its own unique identifier. By listing these devices, you can decide which GPU to use for
-computation. The host queries the system to count and list all connected GPUs that support the chosen `HIP_PLATFORM`,
-ensuring that the application can leverage the full computational power available. Typically, applications list devices
-and their properties for deployment planning, and also make dynamic selections during runtime to ensure optimal
-performance.
-
-If the application does not define a specific GPU, device 0 is selected by default.
-
-This example demonstrates how to query the number of devices in the system and how to access them.
+This example demonstrates how to query the number of devices in the system and how to access them. For more information
+on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/multi_device.html#device-enumeration).
 
 ### Application flow
 

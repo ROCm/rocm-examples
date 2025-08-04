@@ -2,12 +2,9 @@
 
 ## Description
 
-Similar to CPU programming, recursive functions and deeply nested function calls are supported. However, developers
-must ensure that these functions do not exceed the available stack memory, considering the huge amount of memory needed
-for the call stack due to the GPUs inherent parallelism. This can be achieved by increasing stack size or optimizing
-code to reduce stack usage. To detect stack overflow add proper error handling or use debugging tools.
-
-This example demonstrates how to hit the stack limit.
+This example demonstrates how to hit the device's stack limit on purpose. For more information on this topic, please
+refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/call_stack.html#handling-recursion-and-deep-function-calls).
 
 ### Prerequisites
 

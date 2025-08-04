@@ -2,11 +2,9 @@
 
 ## Description
 
-Memory pools provide a way to manage memory with stream-ordered behavior while ensuring proper synchronization and
-avoiding memory access errors. Division of a single memory system into separate pools facilitates querying the access
-path properties for each partition. Memory pools are used for host memory, device memory, and unified memory.
-
-Resource usage statistics help in optimization. This example demonstrates how to query them for a memory pool.
+This example demonstrates how to query resource usage statistics for a memory pool. For more information on this topic,
+please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html#resource-usage-statistics).
 
 ### Prerequisites
 

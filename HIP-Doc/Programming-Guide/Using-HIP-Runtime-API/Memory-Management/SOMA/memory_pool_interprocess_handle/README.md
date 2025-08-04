@@ -2,12 +2,9 @@
 
 ## Description
 
-Interprocess capable (IPC) memory pools facilitate efficient and secure sharing of GPU memory between processes.
-
-To achieve interprocess memory sharing, you can use either [device pointers](../memory_pool_interprocess_pointer/) or
-shareable handles. Both provide allocator (export) and consumer (import) interfaces.
-
-This example demonstrates how to share handles between two processes.
+This example demonstrates how to share memory handles between two processes. For more information on this topic, please
+refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html#interprocess-memory-handling).
 
 ### Prerequisites
 

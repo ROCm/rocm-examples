@@ -2,15 +2,9 @@
 
 ## Description
 
-HIP provides functionality to detect, report, and manage errors that occur during the execution of HIP runtime
-functions or when launching kernels. Every HIP runtime function, except for launching kernels, has `hipError_t` as its
-return type. `hipGetLastError()` and `hipPeekAtLastError()` can be used to catch errors from kernel launches, as these
-launches do not return an error directly. HIP maintains an internal state that includes the last error code.
-`hipGetLastError()` returns and resets that error to `hipSuccess`, while `hipPeekAtLastError()` simply returns the
-error without changing it. To obtain a human-readable version of the errors, you can use `hipGetErrorString()` and
-`hipGetErrorName()`.
-
-This example demonstrates how to handle HIP runtime errors without creating too much code overhead.
+This example demonstrates how to handle HIP runtime errors without creating too much code overhead. For more information
+on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/error_handling.html).
 
 ### Application flow
 

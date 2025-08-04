@@ -2,10 +2,9 @@
 
 ## Description
 
-Pageable memory exists in memory blocks known as "pages" that can be migrated to other storage. For example, memory can
-be migrated between CPU sockets on a motherboard or in a system where the RAM runs out of space, causing it to dump
-pages into the swap partition of the hard drive. This example demonstrates how to allocate pageable memory on the host
-and transfer its contents to the device.
+This example demonstrates how to allocate pageable memory on the host and transfer its contents to the device. For more
+information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/host_memory.html#pageable-memory).
 
 ### Application flow
 

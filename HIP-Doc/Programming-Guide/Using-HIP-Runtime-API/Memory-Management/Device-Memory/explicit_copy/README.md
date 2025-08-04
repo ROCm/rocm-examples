@@ -2,10 +2,9 @@
 
 ## Description
 
-When not using
-[unified memory management](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html),
-memory has to be explicitly copied between the device and the host, using the HIP runtime API. This example demonstrates
-how to transfer bytes between the host and the device.
+This example demonstrates how to transfer bytes between the host and the device's global memory space. For more
+information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/device_memory.html#global-memory).
 
 ### Application flow
 

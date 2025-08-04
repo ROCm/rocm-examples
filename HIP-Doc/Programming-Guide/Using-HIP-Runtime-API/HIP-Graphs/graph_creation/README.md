@@ -2,16 +2,10 @@
 
 ## Description
 
-HIP graphs are an alternative way of executing tasks on a GPU that can provide performance benefits over launching
-kernels using the standard method via streams. A HIP graph is made up of nodes and edges. The nodes of a HIP graph
-represent the operations performed, while the edges mark dependencies between those operations.
+This example demonstrates how to explicitly create HIP graphs. For more information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/hipgraph.html).
 
-Graphs can be created directly using the HIP graph API, giving fine-grained control over the graph. In this case, the
-graph nodes are created explicitly, together with their parameters and dependencies, which specify the edges of the
-graph, thereby forming the graph structure.
-
-This example demonstrates how to explicitly create HIP graphs.. It should be compared to the
-[graph capture example](../graph_capture).
+This example should be compared to the [graph capture example](../graph_capture).
 
 ### Application flow
 

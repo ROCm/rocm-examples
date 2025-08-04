@@ -2,13 +2,12 @@
 
 ## Description
 
-Asynchronous concurrent execution is important for efficient parallelism and resource utilization, with techniques such
-as overlapping computation and data transfer, managing concurrent kernel execution with streams on single or multiple
-devices, or using HIP graphs.
+This example demonstrates how to execute HIP operations and kernels sequentially. For more
+information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/asynchronous.html#asynchronous-concurrent-execution).
 
-This example demonstrates how to execute kernels sequentially, i.e. without any overlap with other kernels or device
-operations. It should be compared to the [asynchronous kernel execution example](../asynchronous_kernel_execution) and
-the [event-based synchronization example](../event_based_synchronization).
+This example should be compared to the [asynchronous kernel execution example](../asynchronous_kernel_execution) and the
+[event-based synchronization example](../event_based_synchronization).
 
 ### Application flow
 

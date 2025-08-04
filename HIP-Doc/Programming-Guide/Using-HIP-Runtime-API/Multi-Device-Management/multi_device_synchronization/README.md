@@ -2,14 +2,9 @@
 
 ## Description
 
-In a multi-device system, streams and events are essential for efficient parallel computation and synchronization.
-Streams enable asynchronous task execution, allowing multiple devices to process data concurrently without blocking one
-another. Events provide a mechanism for synchronizing operations across streams and devices, ensuring that tasks on one
-device are completed before dependent tasks on another device begin. This coordination prevents race conditions and
-optimizes data flow in multi-GPU systems. Together, streams and events maximize performance by enabling parallel
-execution, load balancing, and effective resource utilization across heterogeneous hardware.
-
-This example demonstrates how to synchronize multiple devices using HIP events and streams.
+This example demonstrates how to synchronize multiple devices using HIP events and streams. For more information on this
+topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/multi_device.html#stream-and-event-behavior).
 
 ### Prerequisites
 

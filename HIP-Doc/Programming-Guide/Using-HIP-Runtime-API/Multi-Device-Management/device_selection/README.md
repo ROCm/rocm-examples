@@ -2,13 +2,9 @@
 
 ## Description
 
-Once you have [enumerated the available GPUs](../device_enumeration/), the next step is to select a specific device for
-computation. This involves setting the active GPU that will execute subsequent operations. This step is crucial in
-multi-GPU systems where different GPUs might have different capabilities or workloads. By selecting the appropriate
-device, you ensure that the computational tasks are directed to the correct GPU, optimizing performance and resource
-utilization.
-
-This example demonstrates how to switch between the different devices in the system and assign work to them.
+This example demonstrates how to switch between the different devices in the system and assign work to them. For more
+information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/multi_device.html#device-selection).
 
 ### Application flow
 

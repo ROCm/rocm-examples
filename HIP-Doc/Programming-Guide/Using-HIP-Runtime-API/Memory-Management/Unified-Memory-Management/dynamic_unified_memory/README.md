@@ -2,12 +2,9 @@
 
 ## Description
 
-Unified Memory is a single memory address space accessible from any processor within a system. This single address space
-is a virtual address space that abstracts the physical memory locations, enabling both the CPU and GPU to access the
-same memory addresses without needing explicit data transfers. This setup simplifies memory management and enables
-applications to allocate data that can be read or written on both CPUs and GPUs without explicitly copying it to a
-specific CPU or GPU. This example demonstrates how to dynamically allocate unified memory and use it from both the host
-and the device.
+This example demonstrates how to dynamically allocate unified memory and use it from both the host and the device. For
+more information on this topic, please refer to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html).
 
 ### Application flow
 

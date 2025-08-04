@@ -2,11 +2,9 @@
 
 ## Description
 
-Modern computing tasks often require a balance between numerical precision, hardware resources, and processing speed.
-Low-precision floating-point formats in HIP, such as FP8 (Quarter Precision) and FP16 (Half Precision), reduce memory
-and bandwidth requirements compared to traditional 32-bit and 64-bit formats. This example illustrates a subset of HIP's
-functionality for 8-bit floating-point numbers. The programming approach reflects the common theme of converting
-low-precision types to 32-bit floating-point numbers and back.
+This example demonstrates how to use 8-bit floating-point numbers. For more information on this topic, please refer to
+the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/low_fp_types.html#fp8-quarter-precision).
 
 ### Application flow
 
