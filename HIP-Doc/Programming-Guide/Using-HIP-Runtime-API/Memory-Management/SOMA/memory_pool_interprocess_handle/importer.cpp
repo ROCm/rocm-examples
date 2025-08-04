@@ -27,6 +27,19 @@
 #include <fstream>
 #include <iostream>
 
+#define HIP_CHECK(expression)                        \
+{                                                    \
+    const hipError_t status = expression;            \
+    if (status != hipSuccess)                        \
+    {                                                \
+        std::cerr << "HIP error " << status          \
+                << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":"         \
+                << __LINE__ << std::endl;            \
+        std::exit(EXIT_FAILURE);                     \
+    }                                                \
+}
+
 int main()
 {
     // Considering that you have exported the memory pool pointer already.
@@ -62,13 +75,13 @@ int main()
 
     // Allocate memory from the imported memory pool.
     void* importedDevPtr;
-    hipMallocFromPoolAsync(&importedDevPtr, sizeof(int), memPool, 0);
+    HIP_CHECK(hipMallocFromPoolAsync(&importedDevPtr, sizeof(int), memPool, 0));
 
     // Now you can use the importedDevPtr for your computations.
 
     // Clean up (free the memory).
-    hipFree(importedDevPtr);
-    hipMemPoolDestroy(memPool);
+    HIP_CHECK(hipFree(importedDevPtr));
+    HIP_CHECK(hipMemPoolDestroy(memPool));
 
     return EXIT_SUCCESS;
 }

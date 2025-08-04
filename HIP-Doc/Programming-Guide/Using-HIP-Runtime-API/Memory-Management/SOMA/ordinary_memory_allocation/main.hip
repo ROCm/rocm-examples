@@ -26,6 +26,19 @@
 #include <cstddef>
 #include <iostream>
 
+#define HIP_CHECK(expression)                        \
+{                                                    \
+    const hipError_t status = expression;            \
+    if (status != hipSuccess)                        \
+    {                                                \
+        std::cerr << "HIP error " << status          \
+                << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":"         \
+                << __LINE__ << std::endl;            \
+        std::exit(EXIT_FAILURE);                     \
+    }                                                \
+}
+
 // Kernel to perform some computation on allocated memory.
 __global__ void myKernel(int* data, std::size_t numElements)
 {
@@ -39,12 +52,12 @@ __global__ void myKernel(int* data, std::size_t numElements)
 int main()
 {
     // Initialize HIP.
-    hipInit(0);
+    HIP_CHECK(hipInit(0));
 
     // Allocate memory.
     constexpr std::size_t numElements = 1024;
     int* devData;
-    hipMalloc(&devData, numElements * sizeof(*devData));
+    HIP_CHECK(hipMalloc(&devData, numElements * sizeof(*devData)));
 
     // Launch the kernel to perform computation.
     dim3 blockSize(256);
@@ -53,21 +66,19 @@ int main()
 
     // Copy data back to host.
     int* hostData = new int[numElements];
-    hipMemcpy(hostData, devData, numElements * sizeof(*devData), hipMemcpyDeviceToHost);
+    HIP_CHECK(hipMemcpy(hostData, devData, numElements * sizeof(*devData), hipMemcpyDeviceToHost));
 
     // Print the array.
     for (std::size_t i = 0; i < numElements; ++i)
-    {
         std::cout << "Element " << i << ": " << hostData[i] << std::endl;
-    }
 
     // Free memory.
-    hipFree(devData);
+    HIP_CHECK(hipFree(devData));
     delete[] hostData;
 
     // Synchronize to ensure completion.
-    hipDeviceSynchronize();
+    HIP_CHECK(hipDeviceSynchronize());
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

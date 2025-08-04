@@ -25,7 +25,21 @@
 
 #include <cstddef>
 #include <cstdint>
+#include <cstdlib>
 #include <iostream>
+
+#define HIP_CHECK(expression)                        \
+{                                                    \
+    const hipError_t status = expression;            \
+    if (status != hipSuccess)                        \
+    {                                                \
+        std::cerr << "HIP error " << status          \
+                << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":"         \
+                << __LINE__ << std::endl;            \
+        std::exit(EXIT_FAILURE);                     \
+    }                                                \
+}
 
 // Sample helper functions for getting the usage statistics in bulk.
 struct usageStatistics
@@ -38,18 +52,18 @@ struct usageStatistics
 
 void getUsageStatistics(hipMemPool_t memPool, struct usageStatistics *statistics)
 {
-    hipMemPoolGetAttribute(memPool, hipMemPoolAttrReservedMemCurrent, &statistics->reservedMemCurrent);
-    hipMemPoolGetAttribute(memPool, hipMemPoolAttrReservedMemHigh, &statistics->reservedMemHigh);
-    hipMemPoolGetAttribute(memPool, hipMemPoolAttrUsedMemCurrent, &statistics->usedMemCurrent);
-    hipMemPoolGetAttribute(memPool, hipMemPoolAttrUsedMemHigh, &statistics->usedMemHigh);
+    HIP_CHECK(hipMemPoolGetAttribute(memPool, hipMemPoolAttrReservedMemCurrent, &statistics->reservedMemCurrent));
+    HIP_CHECK(hipMemPoolGetAttribute(memPool, hipMemPoolAttrReservedMemHigh, &statistics->reservedMemHigh));
+    HIP_CHECK(hipMemPoolGetAttribute(memPool, hipMemPoolAttrUsedMemCurrent, &statistics->usedMemCurrent));
+    HIP_CHECK(hipMemPoolGetAttribute(memPool, hipMemPoolAttrUsedMemHigh, &statistics->usedMemHigh));
 }
 
 // Resetting the watermarks resets them to the current value.
 void resetStatistics(hipMemPool_t memPool)
 {
     std::uint64_t value = 0;
-    hipMemPoolSetAttribute(memPool, hipMemPoolAttrReservedMemHigh, &value);
-    hipMemPoolSetAttribute(memPool, hipMemPoolAttrUsedMemHigh, &value);
+    HIP_CHECK(hipMemPoolSetAttribute(memPool, hipMemPoolAttrReservedMemHigh, &value));
+    HIP_CHECK(hipMemPoolSetAttribute(memPool, hipMemPoolAttrUsedMemHigh, &value));
 }
 
 int main()
@@ -58,22 +72,22 @@ int main()
     hipDevice_t device = 0; // Specify the device index.
 
     // Initialize the device.
-    hipSetDevice(device);
+    HIP_CHECK(hipSetDevice(device));
 
     // Get the default memory pool for the device.
-    hipDeviceGetDefaultMemPool(&memPool, device);
+    HIP_CHECK(hipDeviceGetDefaultMemPool(&memPool, device));
 
     // Allocate memory from the pool (e.g., 1 MB).
     std::size_t allocSize = 1 * 1024 * 1024;
     void* ptr;
-    hipMalloc(&ptr, allocSize);
+    HIP_CHECK(hipMalloc(&ptr, allocSize));
 
     // Free the allocated memory.
-    hipFree(ptr);
+    HIP_CHECK(hipFree(ptr));
 
     // Trim the memory pool to a specific size (e.g., 512 KB).
     std::size_t newSize = 512 * 1024;
-    hipMemPoolTrimTo(memPool, newSize);
+    HIP_CHECK(hipMemPoolTrimTo(memPool, newSize));
 
     // Get and print usage statistics before resetting.
     usageStatistics statsBefore;
@@ -97,8 +111,8 @@ int main()
     std::cout << "Used Memory High: " << statsAfter.usedMemHigh << " bytes" << std::endl;
 
     // Clean up.
-    hipMemPoolDestroy(memPool);
+    HIP_CHECK(hipMemPoolDestroy(memPool));
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

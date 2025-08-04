@@ -54,7 +54,7 @@ int main()
 
     // [sphinx-query-start]
     int wallClkRate = 0; //in kilohertz
-    hipDeviceGetAttribute(&wallClkRate, hipDeviceAttributeWallClockRate, deviceId);
+    HIP_CHECK(hipDeviceGetAttribute(&wallClkRate, hipDeviceAttributeWallClockRate, deviceId));
     // [sphinx-query-end]
 
     kernel<<<dim3{1, 1, 1}, dim3{32,1,1}>>>();

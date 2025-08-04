@@ -24,7 +24,21 @@
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
+
+#define HIP_CHECK(expression)                        \
+{                                                    \
+    const hipError_t status = expression;            \
+    if (status != hipSuccess)                        \
+    {                                                \
+        std::cerr << "HIP error " << status          \
+                << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":"         \
+                << __LINE__ << std::endl;            \
+        std::exit(EXIT_FAILURE);                     \
+    }                                                \
+}
 
 int main()
 {
@@ -32,27 +46,27 @@ int main()
     hipDevice_t device = 0; // Specify the device index.
 
     // Initialize the device.
-    hipSetDevice(device);
+    HIP_CHECK(hipSetDevice(device));
 
     // Get the default memory pool for the device.
-    hipDeviceGetDefaultMemPool(&memPool, device);
+    HIP_CHECK(hipDeviceGetDefaultMemPool(&memPool, device));
 
     // Allocate memory from the pool (e.g., 1 MB).
     std::size_t allocSize = 1 * 1024 * 1024;
     void* ptr;
-    hipMalloc(&ptr, allocSize);
+    HIP_CHECK(hipMalloc(&ptr, allocSize));
 
     // Free the allocated memory.
-    hipFree(ptr);
+    HIP_CHECK(hipFree(ptr));
 
     // Trim the memory pool to a specific size (e.g., 512 KB).
     std::size_t newSize = 512 * 1024;
-    hipMemPoolTrimTo(memPool, newSize);
+    HIP_CHECK(hipMemPoolTrimTo(memPool, newSize));
 
     // Clean up.
-    hipMemPoolDestroy(memPool);
+    HIP_CHECK(hipMemPoolDestroy(memPool));
 
     std::cout << "Memory pool trimmed to " << newSize << " bytes." << std::endl;
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

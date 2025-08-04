@@ -32,7 +32,8 @@ void set_constant_memory()
 {
     int host_data[8] {1,2,3,4,5,6,7,8};
 
-    hipMemcpyToSymbol(const_array, host_data, sizeof(int) * 8);
+    if(auto err = hipMemcpyToSymbol(const_array, host_data, sizeof(int) * 8); err != hipSuccess)
+        std::cerr << "HIP error " << err << ": " << hipGetErrorString(err) << std::endl;
 
     // call kernel that accesses const_array
 }

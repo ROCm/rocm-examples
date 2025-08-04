@@ -26,16 +26,29 @@
 #include <cstdlib>
 #include <iostream>
 
+#define HIP_CHECK(expression)                        \
+{                                                    \
+    const hipError_t status = expression;            \
+    if (status != hipSuccess)                        \
+    {                                                \
+        std::cerr << "HIP error " << status          \
+                << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":"         \
+                << __LINE__ << std::endl;            \
+        std::exit(EXIT_FAILURE);                     \
+    }                                                \
+}
+
 int main()
 {
     int deviceCount;
-    hipGetDeviceCount(&deviceCount);
+    HIP_CHECK(hipGetDeviceCount(&deviceCount));
     std::cout << "Number of devices: " << deviceCount << std::endl;
 
     for (int deviceId = 0; deviceId < deviceCount; ++deviceId)
     {
         hipDeviceProp_t deviceProp;
-        hipGetDeviceProperties(&deviceProp, deviceId);
+        HIP_CHECK(hipGetDeviceProperties(&deviceProp, deviceId));
         std::cout << "Device " << deviceId << std::endl << " Properties:" << std::endl;
         std::cout << "  Name: " << deviceProp.name << std::endl;
         std::cout << "  Total Global Memory: " << deviceProp.totalGlobalMem / (1024 * 1024) << " MiB" << std::endl;

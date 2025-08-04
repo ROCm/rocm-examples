@@ -57,11 +57,11 @@ int main()
 
     // Enable peer access to the memory (allocated and future) on the peer device.
     // Ensure the device is active before enabling peer access.
-    hipSetDevice(deviceId0);
-    hipDeviceEnablePeerAccess(deviceId1, 0);
+    HIP_CHECK(hipSetDevice(deviceId0));
+    HIP_CHECK(hipDeviceEnablePeerAccess(deviceId1, 0));
 
-    hipSetDevice(deviceId1);
-    hipDeviceEnablePeerAccess(deviceId0, 0);
+    HIP_CHECK(hipSetDevice(deviceId1));
+    HIP_CHECK(hipDeviceEnablePeerAccess(deviceId0, 0));
 
     // Set device 0 and perform operations
     HIP_CHECK(hipSetDevice(deviceId0)); // Set device 0 as current
@@ -76,10 +76,10 @@ int main()
     HIP_CHECK(hipDeviceSynchronize());
 
     // Use peer-to-peer access
-    hipSetDevice(deviceId0);
+    HIP_CHECK(hipSetDevice(deviceId0));
 
     // Now device 0 can access memory allocated on device 1
-    hipMemcpy(deviceData0, deviceData1, size, hipMemcpyDeviceToDevice);
+    HIP_CHECK(hipMemcpy(deviceData0, deviceData1, size, hipMemcpyDeviceToDevice));
 
     // Copy result from device 0
     double hostData0[1024];
@@ -99,6 +99,6 @@ int main()
     HIP_CHECK(hipFree(deviceData0));
     HIP_CHECK(hipFree(deviceData1));
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

@@ -29,11 +29,24 @@
 
 #include <sys/stat.h>
 
+#define HIP_CHECK(expression)                        \
+{                                                    \
+    const hipError_t status = expression;            \
+    if (status != hipSuccess)                        \
+    {                                                \
+        std::cerr << "HIP error " << status          \
+                << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":"         \
+                << __LINE__ << std::endl;            \
+        std::exit(EXIT_FAILURE);                     \
+    }                                                \
+}
+
 int main()
 {
     // Allocate memory.
     void* devPtr;
-    hipMalloc(&devPtr, sizeof(int));
+    HIP_CHECK(hipMalloc(&devPtr, sizeof(int)));
 
     // Export the memory pool pointer.
     hipMemPoolPtrExportData exportData;
@@ -54,7 +67,7 @@ int main()
     fifoStream.close();
 
     // Clean up.
-    hipFree(devPtr);
+    HIP_CHECK(hipFree(devPtr));
 
     return EXIT_SUCCESS;
 }

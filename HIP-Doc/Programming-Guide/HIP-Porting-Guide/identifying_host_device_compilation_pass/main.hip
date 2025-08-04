@@ -43,7 +43,8 @@ __global__ void test_kernel()
 int main()
 {
     test_kernel<<<1, 1, 0, 0>>>();
-    hipDeviceSynchronize();
+    if(auto err = hipDeviceSynchronize(); err != hipSuccess)
+        std::cerr << "HIP error " << err << ": " << hipGetErrorString(err) << std::endl;
 
     call_func();
     return EXIT_SUCCESS;

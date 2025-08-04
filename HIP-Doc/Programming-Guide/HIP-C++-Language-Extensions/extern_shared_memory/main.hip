@@ -24,6 +24,7 @@
 #include <hip/hip_runtime.h>
 
 #include <cstdlib>
+#include <iostream>
 
 extern __shared__ int shared_array[];
 
@@ -44,7 +45,8 @@ int main()
     constexpr int gridSize = 2;
 
     kernel<<<dim3(gridSize), dim3(blockSize), sharedMemSize, 0>>>();
-    hipDeviceSynchronize();
+    if(auto err = hipDeviceSynchronize(); err != hipSuccess)
+        std::cerr << "HIP error " << err << ": " << hipGetErrorString(err) << std::endl;
 
     return EXIT_SUCCESS;
 }

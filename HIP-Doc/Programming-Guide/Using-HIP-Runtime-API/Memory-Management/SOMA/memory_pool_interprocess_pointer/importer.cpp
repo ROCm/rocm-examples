@@ -27,6 +27,19 @@
 #include <fstream>
 #include <iostream>
 
+#define HIP_CHECK(expression)                        \
+{                                                    \
+    const hipError_t status = expression;            \
+    if (status != hipSuccess)                        \
+    {                                                \
+        std::cerr << "HIP error " << status          \
+                << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":"         \
+                << __LINE__ << std::endl;            \
+        std::exit(EXIT_FAILURE);                     \
+    }                                                \
+}
+
 int main()
 {
     // Considering that you have exported the memory pool pointer already.
@@ -59,7 +72,7 @@ int main()
     poolProps.location.id = 0; // Assuming device 0.
 
     hipMemPool_t memPool;
-    hipMemPoolCreate(&memPool, &poolProps);
+    HIP_CHECK(hipMemPoolCreate(&memPool, &poolProps));
 
     // Import the memory pool pointer.
     void* importedDevPtr;
@@ -73,8 +86,8 @@ int main()
     // Now you can use the importedDevPtr for your computations.
 
     // Clean up (free the memory).
-    hipFree(importedDevPtr);
-    hipMemPoolDestroy(memPool);
+    HIP_CHECK(hipFree(importedDevPtr));
+    HIP_CHECK(hipMemPoolDestroy(memPool));
 
     return EXIT_SUCCESS;
 }
