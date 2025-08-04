@@ -39,7 +39,7 @@ else()
     set(USED_LANGUAGE "CUDA")
 endif()
 
-enable_language(${USED_LANGUAGE})
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")

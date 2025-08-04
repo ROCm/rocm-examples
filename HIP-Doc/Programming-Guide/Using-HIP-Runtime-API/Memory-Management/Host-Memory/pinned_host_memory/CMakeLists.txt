@@ -35,7 +35,7 @@ else()
     set(USED_LANGUAGE "CUDA")
 endif()
 
-enable_language(${USED_LANGUAGE})
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -58,17 +58,14 @@ add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-# For examples targeting NVIDIA, include the HIP header directory.
-if(GPU_RUNTIME STREQUAL "CUDA")
-    list(APPEND include_dirs "${ROCM_ROOT}/include")
-endif()
-
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${USED_LANGUAGE})
 
-target_compile_features(${example_name} PRIVATE cxx_std_17 cuda_std_17)
-target_include_directories(${example_name} PRIVATE ${include_dirs})
-target_link_libraries(${example_name} PRIVATE $<$<NOT:$<LINK_LANGUAGE:CUDA>>:hip::host>)
 set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CXX>:CXX_EXTENSIONS OFF>
                                                  $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>)
+target_compile_features(${example_name} PRIVATE cxx_std_17 cuda_std_17)
+target_include_directories(${example_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
+if(USED_LANGUAGE STREQUAL "CXX")
+    target_link_libraries(${example_name} PRIVATE hip::host)
+endif()
 
 install(TARGETS ${example_name})

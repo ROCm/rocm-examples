@@ -35,7 +35,7 @@ else()
     set(USED_LANGUAGE "CUDA")
 endif()
 
-enable_language(${USED_LANGUAGE})
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
