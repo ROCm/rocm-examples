@@ -37,30 +37,30 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
-ICPPFLAGS := -I $(CPPFLAGS)
+ICPPFLAGS := $(CPPFLAGS)
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
 
 ifeq ($(GPU_RUNTIME), HIP)
-	$(EXAMPLE): main.cpp vcpy_isa.hsaco
-		$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+$(EXAMPLE): main.cpp vcpy_isa.hsaco
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-	vcpy_isa.hsaco: vcpy.hip
-		$(HIPCXX) -x hip $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
+vcpy_isa.hsaco: vcpy.hip
+	$(HIPCXX) -x hip $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -c --genco -o $@ $< $(ILDLIBS)
 
-	clean:
-		$(RM) $(EXAMPLE) vcpy_isa.hsaco
+clean:
+	$(RM) $(EXAMPLE) vcpy_isa.hsaco
 endif
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	$(EXAMPLE): main.cpp vcpy_isa.ptx
-		$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+$(EXAMPLE): main.cpp vcpy_isa.ptx
+	$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) -lcudadevrt -lcudart_static -lrt $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-	vcpy_isa.ptx: vcpy.hip
-		$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) -lcudadevrt -lcudart_static -lrt $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
+vcpy_isa.ptx: vcpy.hip
+	$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
-	clean:
-		$(RM) $(EXAMPLE) vcpy_isa.ptx
+clean:
+	$(RM) $(EXAMPLE) vcpy_isa.ptx
 endif
 
 .PHONY: clean

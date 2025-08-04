@@ -32,23 +32,23 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -I $(COMMON_INCLUDE_DIR)
+ICPPFLAGS :=
 ILDFLAGS  :=
 ILDLIBS   :=
 
 ifndef HSA_XNACK
-	$(error Environment variable HSA_XNACK must be set for this example!)
+    $(error Environment variable HSA_XNACK must be set for this example!)
 else ifneq ($(HSA_XNACK), 1)
-	$(error Environment variable HSA_XNACK must be set to 1 for this example!)
+    $(error Environment variable HSA_XNACK must be set to 1 for this example!)
 endif
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	ICXXFLAGS += -x cu
-	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+    ICXXFLAGS += -x cu
+    ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
 else ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
+    CXXFLAGS ?= -Wall -Wextra
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+    $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)
@@ -57,9 +57,9 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 $(EXAMPLE): main.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+    $(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:
-	$(RM) $(EXAMPLE)
+    $(RM) $(EXAMPLE)
 
 .PHONY: clean
