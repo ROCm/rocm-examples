@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -28,6 +28,12 @@ project(${example_name} LANGUAGES CXX HIP)
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocFFT examples do not support the CUDA runtime")
     return()
+endif()
+
+# Set default build type to Release
+# to workaround a compiler issue when building with -O0
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
 endif()
 
 set(CMAKE_HIP_STANDARD 17)
