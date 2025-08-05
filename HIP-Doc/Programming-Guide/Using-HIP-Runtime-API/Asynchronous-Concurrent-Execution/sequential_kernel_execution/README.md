@@ -6,7 +6,7 @@ This example demonstrates how to execute HIP operations and kernels sequentially
 information on this topic, please refer to the
 [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/asynchronous.html#asynchronous-concurrent-execution).
 
-This example should be compared to the [asynchronous kernel execution example](../asynchronous_kernel_execution) and the
+This example should be compared to the [asynchronous kernel execution example](../async_kernel_execution) and the
 [event-based synchronization example](../event_based_synchronization).
 
 ### Application flow

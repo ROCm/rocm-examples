@@ -23,6 +23,6 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Asynchronous-Concurrent-Execution LANGUAGES CXX)
 
-add_subdirectory(asynchronous_kernel_execution)
+add_subdirectory(async_kernel_execution)
 add_subdirectory(event_based_synchronization)
 add_subdirectory(sequential_kernel_execution)

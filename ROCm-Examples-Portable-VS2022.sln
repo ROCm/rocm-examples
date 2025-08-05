@@ -110,7 +110,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SOMA", "SOMA", "{6C3630E0-F
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2022", "HIP-Doc\Programming-Guide\Introduction-to-the-HIP-Programming-Model\add_kernel\add_kernel_vs2022.vcxproj", "{65BD676A-D5C6-455B-A8D1-B3354FD5B22F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_execution_vs2022", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\asynchronous_kernel_execution\asynchronous_kernel_execution_vs2022.vcxproj", "{912F7811-9390-1686-4F7F-042864D2D1E1}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "async_kernel_execution_vs2022", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\async_kernel_execution\async_kernel_execution_vs2022.vcxproj", "{912F7811-9390-1686-4F7F-042864D2D1E1}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization_vs2022", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\event_based_synchronization\event_based_synchronization_vs2022.vcxproj", "{305B9C39-075A-A0D0-451C-B5E1371F6D1E}"
 EndProject

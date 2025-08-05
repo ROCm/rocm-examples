@@ -8,7 +8,7 @@ information on this topic, please refer to the
 [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/asynchronous.html#asynchronous-concurrent-execution).
 
 This example should be compared to the [sequential kernel execution example](../sequential_kernel_execution) and the
-[asynchronous kernel execution example](../asynchronous_kernel_execution).
+[asynchronous kernel execution example](../async_kernel_execution).
 
 ### Application flow
 

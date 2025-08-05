@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.36227.6
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_execution_vs2019", "asynchronous_kernel_execution_vs2019.vcxproj", "{78714A91-411A-459E-9322-78C66B8D369F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "async_kernel_execution_vs2019", "async_kernel_execution_vs2019.vcxproj", "{78714A91-411A-459E-9322-78C66B8D369F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

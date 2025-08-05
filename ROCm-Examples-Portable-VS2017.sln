@@ -196,7 +196,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "per_thread_default_stream_v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointer_memory_type_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\pointer_memory_type\pointer_memory_type_vs2017.vcxproj", "{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_execution_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\asynchronous_kernel_execution\asynchronous_kernel_execution_vs2017.vcxproj", "{97295C91-A455-4B78-89C9-BB6EA1791BBE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "async_kernel_execution_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\async_kernel_execution\async_kernel_execution_vs2017.vcxproj", "{97295C91-A455-4B78-89C9-BB6EA1791BBE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\event_based_synchronization\event_based_synchronization_vs2017.vcxproj", "{54C05E77-0E5D-449E-B048-8166D2EE97E7}"
 EndProject

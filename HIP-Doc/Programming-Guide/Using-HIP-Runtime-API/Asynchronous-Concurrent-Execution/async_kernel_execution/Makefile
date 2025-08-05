@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hip_asynchronous_kernel_execution
+EXAMPLE := hip_async_kernel_execution
 GPU_RUNTIME := HIP
 
 # HIP variables

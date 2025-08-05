@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <PropertyGroup Label="Globals">
-    <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{912F7811-9390-1686-4F7F-042864D2D1E1}</ProjectGuid>
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <ProjectGuid>{78714A91-411A-459E-9322-78C66B8D369F}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>asynchronous_kernel_execution_vs2022</RootNamespace>
+    <RootNamespace>async_kernel_execution_vs2019</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>

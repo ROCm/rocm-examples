@@ -340,7 +340,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Complex-Math-API", "HIP
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2019", "HIP-Doc\Programming-Guide\Introduction-to-the-HIP-Programming-Model\add_kernel\add_kernel_vs2019.vcxproj", "{F52C901C-4B7A-481A-ACB0-42743AB8D255}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "asynchronous_kernel_execution_vs2019", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\asynchronous_kernel_execution\asynchronous_kernel_execution_vs2019.vcxproj", "{78714A91-411A-459E-9322-78C66B8D369F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "async_kernel_execution_vs2019", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\async_kernel_execution\async_kernel_execution_vs2019.vcxproj", "{78714A91-411A-459E-9322-78C66B8D369F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization_vs2019", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\event_based_synchronization\event_based_synchronization_vs2019.vcxproj", "{B49CED08-CA9A-4FD1-8BC5-5347E1BB9C92}"
 EndProject
