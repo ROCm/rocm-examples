@@ -54,6 +54,8 @@ set(include_dirs "../../../Common" "../../../External")
 
 target_link_libraries(${example_name} PRIVATE hip::hipfft)
 target_include_directories(${example_name} PRIVATE ${include_dirs})
+target_compile_options(${example_name} PRIVATE -fgpu-rdc)
+target_link_options(${example_name} PRIVATE -fgpu-rdc)
 set_source_files_properties(main.hip PROPERTIES LANGUAGE HIP)
 
 install(TARGETS ${example_name})
