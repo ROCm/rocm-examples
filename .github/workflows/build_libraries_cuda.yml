@@ -19,7 +19,7 @@ env:
 jobs:
   build:
     name: "Build Libraries CUDA"
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     container:
       image:  nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
 
@@ -39,58 +39,52 @@ jobs:
           wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
           apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
           apt-get update -qq &&
-          apt-get install -y cuda hip-dev
+          apt-get install -y hip-dev rocm-cmake
 
       - name: Build and install hipCUB
+        shell: bash
         run: |
-          mkdir tmp && cd tmp
           git clone https://github.com/ROCm/hipCUB.git
-          cd hipCUB; mkdir build; cd build
+          pushd hipCUB; mkdir build; cd build
           HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
-          make -j4
+          make -j
           make install
-          cd ../ && rm -rf tmp
+          popd && rm -rf hipCUB
 
       - name: Build hipCUB example
         shell: bash
         run: |
           cd Libraries/hipCUB
-          make GPU_RUNTIME=CUDA -j4
+          make GPU_RUNTIME=CUDA -j
 
       - name: Build and install hipFFT
+        shell: bash
         run: |
-          mkdir tmp && cd tmp
           git clone https://github.com/ROCm/hipFFT.git
-          cd hipFFT; mkdir build; cd build
+          pushd hipFFT; mkdir build; cd build
           HIP_PLATFORM=nvidia ROCM_PATH=/opt/rocm cmake -LH -DBUILD_WITH_LIB=cuda ..
-          make -j4
+          make -j
           make install
-          cd ../ && rm -rf tmp
+          popd && rm -rf hipFFT
 
       - name: Build hipFFT example
         shell: bash
         run: |
           cd Libraries/hipFFT
-          make GPU_RUNTIME=CUDA -j4
+          make GPU_RUNTIME=CUDA -j
 
       - name: Build and install rocRAND
+        shell: bash
         run: |
-          mkdir tmp && cd tmp
           git clone https://github.com/ROCm/rocRAND.git
-          cd rocRAND; mkdir build; cd build
+          pushd rocRAND; mkdir build; cd build
           HIP_PLATFORM=nvidia CXX=g++ cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_PREFIX_PATH=/opt/rocm -DCMAKE_MODULE_PATH=/opt/rocm/hip/cmake -DHIP_CUDA_lowest_cc=60 ..
-          make -j4
+          make -j
           make install
-          cd ../ && rm -rf tmp
+          popd && rm -rf rocRAND
 
       - name: Build rocRAND example
         shell: bash
         run: |
           cd Libraries/rocRAND
-          make GPU_RUNTIME=CUDA -j4
-
-      # Clean the workspace here since other jobs may not have the permissions to do so later
-      # (needed for self-hosted runners)
-      - name: Clean the workspace
-        run: find $GITHUB_WORKSPACE -mindepth 1 -delete
-
+          make GPU_RUNTIME=CUDA -j
