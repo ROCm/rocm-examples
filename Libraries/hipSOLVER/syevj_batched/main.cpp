@@ -20,7 +20,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 #include "hipblas_utils.hpp"
 #include "hipsolver_utils.hpp"
@@ -89,7 +89,7 @@ int main(const int argc, char* argv[])
 
     HIP_CHECK(hipMalloc(&d_A, sizeof(double) * A.size()));
     HIP_CHECK(hipMalloc(&d_W, sizeof(double) * W.size()));
-    HIP_CHECK(hipMalloc(&d_info, sizeof(int)));
+    HIP_CHECK(hipMalloc(&d_info, batch_count * sizeof(int)));
     HIP_CHECK(hipMemcpy(d_A, A.data(), sizeof(double) * A.size(), hipMemcpyHostToDevice));
 
     // 4. Initialize hipSOLVER by creating a handle.
@@ -119,7 +119,7 @@ int main(const int argc, char* argv[])
                                                       &lwork,
                                                       params,
                                                       batch_count));
-    HIP_CHECK(hipMalloc(&d_work, lwork));
+    HIP_CHECK(hipMalloc(&d_work, sizeof(double) * lwork));
 
     // 7. Invoke hipsolverDsyevjBatched to compute the eigenvalues (written to d_W) and
     // eigenvectors (written to d_A) of the matrices in the batch.

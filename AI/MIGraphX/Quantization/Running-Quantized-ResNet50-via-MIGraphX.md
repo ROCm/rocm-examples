@@ -55,7 +55,7 @@ This example walks through the dynamo Post Training Quantization (PTQ) workflow 
     mgx_mod = torch.compile(q_m, backend='migraphx').cuda()
     mgx_out = mgx_mod(input_fp32.cuda())
 
-    print(f"PyTorch FP32 (Gold Value):\n{torch_fp32_out}")
+    print(f"PyTorch FP32 (Expected Value):\n{torch_fp32_out}")
     print(f"PyTorch INT8 (Fake Quantized):\n{torch_qout}")
     print(f"MIGraphX INT8:\n{mgx_out}")
     ```

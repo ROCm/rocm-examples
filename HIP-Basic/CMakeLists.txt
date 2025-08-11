@@ -25,18 +25,22 @@ project(HIP-Basic LANGUAGES CXX)
 include(CTest)
 
 # ROCm installation path
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
+    set(ROCM_LLVM_ROOT ${ROCM_ROOT})
+    set(PREFIX_LLVM_ROOT ${CMAKE_INSTALL_PREFIX})
 else()
     set(ROCM_ROOT
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
+    set(ROCM_LLVM_ROOT "${ROCM_ROOT}/llvm")
+    set(PREFIX_LLVM_ROOT "${CMAKE_INSTALL_PREFIX}/llvm")
 endif()
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -49,21 +53,21 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         LLVM_DIS_COMMAND
         llvm-dis
         PATH_SUFFIXES bin
-        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        PATHS ${ROCM_LLVM_ROOT} ${PREFIX_LLVM_ROOT}
         NO_DEFAULT_PATH
     )
     find_program(
         OFFLOAD_BUNDLER_COMMAND
         clang-offload-bundler
         PATH_SUFFIXES bin
-        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        PATHS ${ROCM_LLVM_ROOT} ${PREFIX_LLVM_ROOT}
         NO_DEFAULT_PATH
     )
     find_program(
         LLVM_MC_COMMAND
         llvm-mc
         PATH_SUFFIXES bin
-        PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+        PATHS ${ROCM_LLVM_ROOT} ${PREFIX_LLVM_ROOT}
         NO_DEFAULT_PATH
     )
 
@@ -73,7 +77,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         message(
             "'llvm-dis', 'llvm-mc', or 'clang-offload-bundler' not found, not building assembly example."
         )
-        if(NOT WIN32)
+        if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
             message(
                 "    These tools can be found in the 'rocm-llvm-dev' package."
             )
@@ -86,7 +90,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         message(
             "'llvm-mc' or 'clang-offload-bundler' not found, not building LLVM IR example."
         )
-        if(NOT WIN32)
+        if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
             message(
                 "    These tools can be found in the 'rocm-llvm-dev' package."
             )
@@ -103,7 +107,7 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
     endif()
 endif()
 
-if(NOT WIN32)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_subdirectory(cooperative_groups)
 endif()
 
@@ -115,7 +119,7 @@ add_subdirectory(dynamic_shared)
 add_subdirectory(events)
 add_subdirectory(gpu_arch)
 add_subdirectory(hello_world)
-if(NOT WIN32)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     find_package(Perl)
 
     if(Perl_FOUND)
@@ -137,7 +141,10 @@ add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
 # We cannot build the static library on Windows as the HIP SDK does not include CMAKE_AR.
-if(NOT WIN32 AND NOT "${GPU_RUNTIME}" STREQUAL "HIP")
+if(
+    NOT CMAKE_SYSTEM_NAME MATCHES "Windows"
+    AND NOT "${GPU_RUNTIME}" STREQUAL "HIP"
+)
     add_subdirectory(static_host_library)
 endif()
 add_subdirectory(streams)
@@ -147,7 +154,7 @@ add_subdirectory(warp_shuffle)
 find_package(glfw3)
 find_package(Vulkan COMPONENTS glslangValidator)
 
-if(NOT WIN32)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     if(NOT glfw3_FOUND)
         message("GLFW not found, not building OpenGL interop example")
     else()
@@ -163,4 +170,7 @@ elseif(NOT Vulkan_GLSLANG_VALIDATOR_EXECUTABLE)
     message("GlslangValidator not found, not building Vulkan interop example")
 else()
     add_subdirectory(vulkan_interop)
+    if(WIN32)
+        add_subdirectory(vulkan_interop_mipmap)
+    endif()
 endif()

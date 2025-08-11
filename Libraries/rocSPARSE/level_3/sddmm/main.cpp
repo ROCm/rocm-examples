@@ -117,29 +117,29 @@ int main()
     ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
     // 3. Allocate device memory and offload data to device.
-    double*        d_csr_val;
     rocsparse_int* d_csr_col_ind;
     rocsparse_int* d_csr_row_ptr;
+    double*        d_csr_val;
     double*        d_A;
     double*        d_B;
 
-    constexpr size_t size_val     = sizeof(*d_csr_val) * nnz;
-    constexpr size_t size_col_ind = sizeof(*d_csr_col_ind) * nnz;
-    constexpr size_t size_row_ind = sizeof(*d_csr_row_ptr) * (m + 1);
-    constexpr size_t size_A       = sizeof(*d_A) * m * k;
-    constexpr size_t size_B       = sizeof(*d_B) * k * n;
+    constexpr size_t col_ind_size = sizeof(*d_csr_col_ind) * nnz;
+    constexpr size_t row_ptr_size = sizeof(*d_csr_row_ptr) * (m + 1);
+    constexpr size_t val_size     = sizeof(*d_csr_val) * nnz;
+    constexpr size_t A_size       = sizeof(*d_A) * m * k;
+    constexpr size_t B_size       = sizeof(*d_B) * k * n;
 
-    HIP_CHECK(hipMalloc(&d_csr_val, size_val));
-    HIP_CHECK(hipMalloc(&d_csr_col_ind, size_col_ind));
-    HIP_CHECK(hipMalloc(&d_csr_row_ptr, size_row_ind));
-    HIP_CHECK(hipMalloc(&d_A, size_A));
-    HIP_CHECK(hipMalloc(&d_B, size_B));
+    HIP_CHECK(hipMalloc(&d_csr_col_ind, col_ind_size));
+    HIP_CHECK(hipMalloc(&d_csr_row_ptr, row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_csr_val, val_size));
+    HIP_CHECK(hipMalloc(&d_A, A_size));
+    HIP_CHECK(hipMalloc(&d_B, B_size));
 
-    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), size_val, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), size_col_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), size_row_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_A, h_A.data(), size_A, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_B, h_B.data(), size_B, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_A, h_A.data(), A_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_B, h_B.data(), B_size, hipMemcpyHostToDevice));
 
     // 4. Create matrix descriptors.
     // Matrix descriptor.
@@ -212,10 +212,10 @@ int main()
                                     rocsparse_sddmm_alg::rocsparse_sddmm_alg_default,
                                     d_temp_buffer));
 
-    // 8. Copy C to host from device. These calls synchronize with the host.
-    HIP_CHECK(hipMemcpy(h_csr_val.data(), d_csr_val, size_val, hipMemcpyDeviceToHost));
-    HIP_CHECK(hipMemcpy(h_csr_col_ind.data(), d_csr_col_ind, size_col_ind, hipMemcpyDeviceToHost));
-    HIP_CHECK(hipMemcpy(h_csr_row_ptr.data(), d_csr_row_ptr, size_row_ind, hipMemcpyDeviceToHost));
+    // 8. Copy C from device to host. These calls synchronize with the host.
+    HIP_CHECK(hipMemcpy(h_csr_val.data(), d_csr_val, val_size, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_csr_col_ind.data(), d_csr_col_ind, col_ind_size, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(h_csr_row_ptr.data(), d_csr_row_ptr, row_ptr_size, hipMemcpyDeviceToHost));
 
     // 9. Clear rocSPARSE.
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
@@ -224,12 +224,12 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_spmat_descr(mat_C_desc));
 
     // 10. Clear device memory.
-    HIP_CHECK(hipFree(d_temp_buffer));
-    HIP_CHECK(hipFree(d_csr_val));
-    HIP_CHECK(hipFree(d_csr_col_ind));
     HIP_CHECK(hipFree(d_csr_row_ptr));
+    HIP_CHECK(hipFree(d_csr_col_ind));
+    HIP_CHECK(hipFree(d_csr_val));
     HIP_CHECK(hipFree(d_A));
     HIP_CHECK(hipFree(d_B));
+    HIP_CHECK(hipFree(d_temp_buffer));
 
     // 11. Print result.
     std::cout << "C =" << std::endl;

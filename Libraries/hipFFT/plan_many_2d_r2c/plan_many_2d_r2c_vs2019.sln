@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.32630.194
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "plan_many_2d_r2c_vs2019", "plan_many_2d_r2c_vs2019.vcxproj", "{26BC8BEA-FED5-4EF2-A27A-B8DD4F307E06}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26BC8BEA-FED5-4EF2-A27A-B8DD4F307E06}.Debug|x64.ActiveCfg = Debug|x64
+		{26BC8BEA-FED5-4EF2-A27A-B8DD4F307E06}.Debug|x64.Build.0 = Debug|x64
+		{26BC8BEA-FED5-4EF2-A27A-B8DD4F307E06}.Release|x64.ActiveCfg = Release|x64
+		{26BC8BEA-FED5-4EF2-A27A-B8DD4F307E06}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BA388AB3-4C18-48BE-8C2C-FD57763A1E55}
+	EndGlobalSection
+EndGlobal

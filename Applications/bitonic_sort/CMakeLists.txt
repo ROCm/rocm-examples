@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,23 +25,16 @@ set(example_name applications_bitonic_sort)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
-set(GPU_RUNTIMES "HIP" "CUDA")
-set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+select_gpu_language()
 
-if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    set(ERROR_MESSAGE
-        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP or CUDA."
-    )
-    message(FATAL_ERROR ${ERROR_MESSAGE})
-endif()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+select_hip_platform()
 
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
-
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -61,13 +54,13 @@ add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 # For examples targeting NVIDIA, include the HIP header directory.
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()
 
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})

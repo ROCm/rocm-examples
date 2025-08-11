@@ -21,7 +21,7 @@ $op_a(A[i])$ is an $m \times k$ matrix, $op_b(B[i])$ a $k \times n$ matrix and $
 1. Read in command-line parameters.
 2. Set dimension variables of the matrices and get the batch count.
 3. Allocate and initialize the host matrices. Set up $B$ matrix as an identity matrix.
-4. Initialize gold standard matrix.
+4. Initialize expected matrix.
 5. Compute CPU reference result with strided batched subvectors.
 6. Allocate device memory.
 7. Copy data from host to device.
@@ -59,8 +59,8 @@ We can apply the same multiplication operator for several matrices if we combine
   - `H`(half-precision: `hipblasHalf`)
   - `S` (single-precision: `float`)
   - `D` (double-precision: `double`)
-  - `C` (single-precision complex: `hipblasComplex`)
-  - `Z` (double-precision complex: `hipblasDoubleComplex`).
+  - `C` (single-precision complex: `hipComplex`)
+  - `Z` (double-precision complex: `hipDoubleComplex`).
 
     Input parameters for `hipblasSgemmStridedBatched`:
     - `hipblasHandle_t handle`

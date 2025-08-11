@@ -32,7 +32,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     return()
 endif()
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -54,7 +54,7 @@ if(NOT rocthrust_FOUND)
         STATUS
         "rocThrust could not be found, not building rocThrust examples"
     )
-    return()
+    return(1)
 endif()
 
 add_subdirectory(device_ptr)

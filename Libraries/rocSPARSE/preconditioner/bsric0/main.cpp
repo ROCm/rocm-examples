@@ -106,22 +106,19 @@ int main()
     rocsparse_int* d_bsr_col_ind{};
     double*        d_bsr_val{};
 
-    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, sizeof(*d_bsr_row_ptr) * (mb + 1)));
-    HIP_CHECK(hipMalloc(&d_bsr_col_ind, sizeof(*d_bsr_col_ind) * nnzb));
-    HIP_CHECK(hipMalloc(&d_bsr_val, sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim));
+    constexpr size_t bsr_row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t bsr_col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
+    constexpr size_t bsr_val_size     = sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim;
 
-    HIP_CHECK(hipMemcpy(d_bsr_row_ptr,
-                        h_bsr_row_ptr.data(),
-                        sizeof(*d_bsr_row_ptr) * (mb + 1),
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_col_ind,
-                        h_bsr_col_ind.data(),
-                        sizeof(*d_bsr_col_ind) * nnzb,
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_val,
-                        h_bsr_val.data(),
-                        sizeof(*d_bsr_val) * nnzb * bsr_dim * bsr_dim,
-                        hipMemcpyHostToDevice));
+    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, bsr_row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_bsr_col_ind, bsr_col_ind_size));
+    HIP_CHECK(hipMalloc(&d_bsr_val, bsr_val_size));
+
+    HIP_CHECK(
+        hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), bsr_row_ptr_size, hipMemcpyHostToDevice));
+    HIP_CHECK(
+        hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), bsr_col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), bsr_val_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
@@ -209,11 +206,11 @@ int main()
 
     // 8. Convert the resulting BSR sparse matrix to a dense matrix. Check and print the resulting matrix.
     // Host and device allocations of the result matrix for conversion routines.
-    constexpr size_t           size_A = n * n;
-    std::array<double, size_A> A;
+    constexpr size_t           A_size = n * n;
+    std::array<double, A_size> A;
 
     double*          d_A{};
-    constexpr size_t size_bytes_A = sizeof(*d_A) * size_A;
+    constexpr size_t size_bytes_A = sizeof(*d_A) * A_size;
     HIP_CHECK(hipMalloc(&d_A, size_bytes_A));
 
     // 8a. Convert BSR sparse matrix to CSR format.
@@ -221,7 +218,7 @@ int main()
     ROCSPARSE_CHECK(rocsparse_create_mat_descr(&csr_descr));
     ROCSPARSE_CHECK(rocsparse_set_mat_type(csr_descr, rocsparse_matrix_type_general));
 
-    constexpr rocsparse_int nnze = size_A; /*non-zero elements*/
+    constexpr rocsparse_int nnze = A_size; /*non-zero elements*/
 
     rocsparse_int* d_csr_row_ptr{};
     rocsparse_int* d_csr_col_ind{};
@@ -260,7 +257,7 @@ int main()
 
     // 8c. Print the resulting L matrix and compare it with the expected result.
     // Expected L matrix in dense format.
-    constexpr std::array<double, size_A> expected
+    constexpr std::array<double, A_size> expected
         = {1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 0, 0, 1, 2, 3, 4,
            0, 0, 0, 1, 2, 3, 0, 0, 0, 0, 1, 2, 0, 0, 0, 0, 0, 1};
 
@@ -292,8 +289,8 @@ int main()
     HIP_CHECK(hipFree(d_csr_row_ptr));
     HIP_CHECK(hipFree(d_csr_col_ind));
     HIP_CHECK(hipFree(d_csr_val));
-    HIP_CHECK(hipFree(temp_buffer));
     HIP_CHECK(hipFree(d_A));
+    HIP_CHECK(hipFree(temp_buffer));
 
     // 10. Print validation result.
     return report_validation_result(errors);

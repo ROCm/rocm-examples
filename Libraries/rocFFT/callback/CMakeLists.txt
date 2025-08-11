@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -30,6 +30,12 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     return()
 endif()
 
+# Set default build type to Release
+# to workaround a compiler issue when building with -O0
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
@@ -44,7 +50,7 @@ add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../../Common")
+set(include_dirs "../../../Common" "../../../External")
 
 target_link_libraries(${example_name} PRIVATE roc::rocfft)
 target_include_directories(${example_name} PRIVATE ${include_dirs})

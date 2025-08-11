@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -81,28 +81,25 @@ int main()
     rocsparse_int* d_csr_col_ind{};
     double*        d_csr_val{};
     double*        d_LU{};
-    double*        d_data{};
 
-    constexpr size_t size_csr_row_ptr = sizeof(*d_csr_row_ptr) * (n + 1);
-    constexpr size_t size_csr_col_ind = sizeof(*d_csr_col_ind) * nnz;
-    constexpr size_t size_csr_val     = sizeof(*d_csr_val) * nnz;
+    constexpr size_t csr_row_ptr_size = sizeof(*d_csr_row_ptr) * (n + 1);
+    constexpr size_t csr_col_ind_size = sizeof(*d_csr_col_ind) * nnz;
+    constexpr size_t csr_val_size     = sizeof(*d_csr_val) * nnz;
     constexpr size_t length_LU        = n * n;
-    constexpr size_t size_LU          = sizeof(*d_LU) * length_LU;
+    constexpr size_t LU_size          = sizeof(*d_LU) * length_LU;
     rocsparse_int    max_iter         = 100; /*maximum number of iterations*/
-    const size_t     length_data      = 2 * max_iter;
-    const size_t     size_data        = sizeof(*d_data) * length_data;
+    rocsparse_int    free_iter        = 20;
 
-    HIP_CHECK(hipMalloc(&d_csr_row_ptr, size_csr_row_ptr));
-    HIP_CHECK(hipMalloc(&d_csr_col_ind, size_csr_col_ind));
-    HIP_CHECK(hipMalloc(&d_csr_val, size_csr_val));
-    HIP_CHECK(hipMalloc(&d_LU, size_LU));
-    HIP_CHECK(hipMalloc(&d_data, size_data));
+    HIP_CHECK(hipMalloc(&d_csr_row_ptr, csr_row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_csr_col_ind, csr_col_ind_size));
+    HIP_CHECK(hipMalloc(&d_csr_val, csr_val_size));
+    HIP_CHECK(hipMalloc(&d_LU, LU_size));
 
     HIP_CHECK(
-        hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), size_csr_row_ptr, hipMemcpyHostToDevice));
+        hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), csr_row_ptr_size, hipMemcpyHostToDevice));
     HIP_CHECK(
-        hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), size_csr_col_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), size_csr_val, hipMemcpyHostToDevice));
+        hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), csr_col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), csr_val_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE and prepare utility variables for csritilu0 invocation.
     // Initialize rocSPARSE by creating a handle.
@@ -124,7 +121,7 @@ int main()
                                      | rocsparse_itilu0_option_convergence_history;
 
     // Tolerance.
-    constexpr double tol = 1.0e5 * std::numeric_limits<double>::epsilon(); /*2.22045e-11*/
+    double tol = 1.0e5 * std::numeric_limits<double>::epsilon(); /*2.22045e-11*/
 
     // Indexing: zero based.
     constexpr rocsparse_index_base idx_base = rocsparse_index_base_zero;
@@ -134,7 +131,7 @@ int main()
 
     // 4. Sort CSR matrix before calling any of the iterative-ILU0-related functions.
     rocsparse_int* perm;
-    HIP_CHECK(hipMalloc(&perm, size_csr_col_ind));
+    HIP_CHECK(hipMalloc(&perm, csr_col_ind_size));
     ROCSPARSE_CHECK(rocsparse_create_identity_permutation(handle, nnz, perm));
 
     // Query the required buffer size in bytes and allocate a temporary buffer for sorting.
@@ -205,36 +202,35 @@ int main()
                                                    temp_buffer));
 
     // 7. Perform the iterative incomplete LU factorization.
-    ROCSPARSE_CHECK(rocsparse_dcsritilu0_compute(handle,
-                                                 alg,
-                                                 option,
-                                                 &max_iter,
-                                                 tol,
-                                                 n,
-                                                 nnz,
-                                                 d_csr_row_ptr,
-                                                 d_csr_col_ind,
-                                                 d_csr_val,
-                                                 d_LU,
-                                                 idx_base,
-                                                 buffer_size,
-                                                 temp_buffer));
+    HIP_CHECK(hipMemset(d_LU, 0, LU_size));
+    ROCSPARSE_CHECK(rocsparse_dcsritilu0_compute_ex(handle,
+                                                    alg,
+                                                    option,
+                                                    &max_iter,
+                                                    free_iter,
+                                                    tol,
+                                                    n,
+                                                    nnz,
+                                                    d_csr_row_ptr,
+                                                    d_csr_col_ind,
+                                                    d_csr_val,
+                                                    d_LU,
+                                                    idx_base,
+                                                    buffer_size,
+                                                    temp_buffer));
 
     // 8. Fetch the convergence data.
     std::cout << "Iterations performed: " << max_iter << std::endl;
 
-    ROCSPARSE_CHECK(
-        rocsparse_dcsritilu0_history(handle, alg, &max_iter, d_data, buffer_size, temp_buffer));
-
     // The history vector has space for the corrections and the residual of each iteration (whether
     // they are computed or not).
     // Therefore, the size of the data collected is twice the number of iterations needed.
-    std::vector<double> data(length_data);
+    std::vector<double> history(2 * max_iter);
+    ROCSPARSE_CHECK(
+        rocsparse_dcsritilu0_history(handle, alg, &max_iter, history.data(), buffer_size, temp_buffer));
 
-    // Check last residual computed to confirm that convergence was successful.
-    HIP_CHECK(hipMemcpy(data.data(), d_data, size_data, hipMemcpyDeviceToHost));
-    const double last_residual       = data.back();
-    const bool   csritilu0_converges = last_residual < tol;
+    const double last_residual       = history[2 * max_iter - 1];
+    const bool   csritilu0_converges = last_residual <= tol;
 
     int errors{};
 
@@ -249,7 +245,7 @@ int main()
     {
         // 9. Check errors and print the resulting matrices.
         std::vector<double> LU(length_LU);
-        HIP_CHECK(hipMemcpy(LU.data(), d_LU, size_LU, hipMemcpyDeviceToHost));
+        HIP_CHECK(hipMemcpy(LU.data(), d_LU, LU_size, hipMemcpyDeviceToHost));
 
         // Expected L and U matrices in dense format (row major).
         constexpr std::array<double, length_LU> L_expected
@@ -301,7 +297,6 @@ int main()
     HIP_CHECK(hipFree(d_csr_col_ind));
     HIP_CHECK(hipFree(d_csr_val));
     HIP_CHECK(hipFree(d_LU));
-    HIP_CHECK(hipFree(d_data));
     HIP_CHECK(hipFree(perm));
     HIP_CHECK(hipFree(sort_temp_buffer));
     HIP_CHECK(hipFree(temp_buffer));

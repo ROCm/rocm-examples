@@ -133,23 +133,23 @@ int main()
     double*        d_B{};
     double*        d_C{};
 
-    constexpr size_t size_B       = sizeof(*d_B) * elements_of_B;
-    constexpr size_t size_C       = sizeof(*d_C) * elements_of_C;
-    constexpr size_t size_val     = sizeof(*d_bsr_val) * elements_of_val;
-    constexpr size_t size_row_ptr = sizeof(*d_bsr_row_ptr) * (mb + 1);
-    constexpr size_t size_col_ind = sizeof(*d_bsr_col_ind) * nnzb;
+    constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
+    constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
+    constexpr size_t val_size     = sizeof(*d_bsr_val) * elements_of_val;
+    constexpr size_t B_size       = sizeof(*d_B) * elements_of_B;
+    constexpr size_t C_size       = sizeof(*d_C) * elements_of_C;
 
-    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, size_row_ptr));
-    HIP_CHECK(hipMalloc(&d_bsr_col_ind, size_col_ind));
-    HIP_CHECK(hipMalloc(&d_bsr_val, size_val));
-    HIP_CHECK(hipMalloc(&d_B, size_B));
-    HIP_CHECK(hipMalloc(&d_C, size_C));
+    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, row_ptr_size));
+    HIP_CHECK(hipMalloc(&d_bsr_col_ind, col_ind_size));
+    HIP_CHECK(hipMalloc(&d_bsr_val, val_size));
+    HIP_CHECK(hipMalloc(&d_B, B_size));
+    HIP_CHECK(hipMalloc(&d_C, C_size));
 
-    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), size_row_ptr, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), size_col_ind, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), size_val, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_B, h_B.data(), size_B, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_C, h_C.data(), size_C, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_B, h_B.data(), B_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_C, h_C.data(), C_size, hipMemcpyHostToDevice));
 
     // 4. Call gebsrmm to perform C = alpha * op_a(A) * op_b(B) + beta * C
     // This function is non blocking and executed asynchronously with respect to the host.
@@ -174,8 +174,8 @@ int main()
                                        d_C,
                                        m_padded));
 
-    // 5. Copy C to host from device. This call synchronizes with the host.
-    HIP_CHECK(hipMemcpy(h_C.data(), d_C, size_C, hipMemcpyDeviceToHost));
+    // 5. Copy C from device to host. This call synchronizes with the host.
+    HIP_CHECK(hipMemcpy(h_C.data(), d_C, C_size, hipMemcpyDeviceToHost));
 
     // 6. Clear rocSPARSE
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));

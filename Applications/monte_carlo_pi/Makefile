@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 EXAMPLE := applications_monte_carlo_pi
 COMMON_INCLUDE_DIR := ../../Common
+EXTERNAL_DIR := ../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -39,7 +40,7 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(HIPCUB_INCLUDE_DIR) -isystem $(HIPRAND_INCLUDE_DIR) \
-	-I $(COMMON_INCLUDE_DIR)
+	-I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lhiprand
 
@@ -60,7 +61,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hiprand_utils.hpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hiprand_utils.hpp $(EXTERNAL_DIR)/CmdParser/cmdparser.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:

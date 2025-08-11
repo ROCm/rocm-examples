@@ -25,7 +25,7 @@ where
 3. Initialize rocSPARSE by creating a handle.
 4. Prepare utility variables for rocSPARSE gebsrmv invocation.
 5. Call gebsrmv to perform $y = \alpha * A * x + beta * y$. <!-- markdownlint-disable-line no-space-in-emphasis -->
-6. Copy solution to host from device.
+6. Copy solution from device to host.
 7. Clear rocSPARSE allocations on device and device arrays.
 8. Print results to standard output.
 

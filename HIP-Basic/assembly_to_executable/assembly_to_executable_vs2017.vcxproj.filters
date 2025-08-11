@@ -52,6 +52,9 @@
     <CustomBuild Include="main_1102.s">
       <Filter>Source Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="main_1201.s">
+      <Filter>Source Files</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\Common\example_utils.hpp">

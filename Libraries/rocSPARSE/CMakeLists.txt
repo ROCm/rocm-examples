@@ -32,7 +32,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     return()
 endif()
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -54,9 +54,10 @@ if(NOT rocsparse_FOUND)
         STATUS
         "rocSPARSE could not be found, not building rocSPARSE examples"
     )
-    return()
+    return(1)
 endif()
 
+add_subdirectory(level_1)
 add_subdirectory(level_2)
 add_subdirectory(level_3)
 add_subdirectory(preconditioner)

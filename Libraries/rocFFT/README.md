@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [rocFFT](https://github.com/ROCm/rocFFT/) library. The examples build on Linux for ROCm (AMD GPU).
+The examples in this subdirectory showcase the functionality of the [rocFFT](https://github.com/ROCm/rocFFT/) library. The examples can be built on Linux and Windows for ROCm (AMD GPU).
 
 ## Prerequisites
 
@@ -10,7 +10,7 @@ The examples in this subdirectory showcase the functionality of the [rocFFT](htt
 
 - [CMake](https://cmake.org/download/) (at least version 3.21)
 - OR GNU Make - available via the distribution's package manager
-- [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 5.x.x)
+- [ROCm](https://docs.amd.com/bundle/ROCm-Installation-Guide-v5.1.3/page/Overview_of_ROCm_Installation_Methods.html) (at least version 6.x.x)
 - [rocFFT](https://github.com/ROCm/rocFFT/)
   - `rocfft` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/).
 

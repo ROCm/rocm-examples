@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,7 +27,7 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -46,8 +46,13 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(hipfft)
 if(NOT hipfft_FOUND)
     message(STATUS "hipFFT could not be found, not building hipFFT examples")
-    return()
+    return(1)
 endif()
 
+add_subdirectory(callback)
+add_subdirectory(multi_gpu)
 add_subdirectory(plan_d2z)
+add_subdirectory(plan_many_2d_r2c)
+add_subdirectory(plan_many_2d_z2z)
 add_subdirectory(plan_z2z)
+add_subdirectory(setworkarea)

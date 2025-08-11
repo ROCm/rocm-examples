@@ -2,26 +2,27 @@ name: Build HIP-Basic CUDA
 
 on:
   push:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'HIP-Basic/**'
       - '.github/workflows/**'
   pull_request:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'HIP-Basic/**'
       - '.github/workflows/**'
 
 env:
-    ROCM_VERSION: 6.3.3
-    AMDGPU_INSTALLER_VERSION: 6.3.60303-1
+    ROCM_VERSION: 6.4
+    AMDGPU_INSTALLER_VERSION: 6.4.60400-1
 
 jobs:
     build:
-        name: "Build HIP Examples"
-        runs-on: ubuntu-latest
+        name: "Build HIP Basic CUDA"
+        runs-on: self-hosted
         container:
-            image: nvidia/cuda:12.8.0-cudnn-devel-ubuntu22.04
+            image: nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
+
         steps:
           - uses: actions/checkout@v4
 
@@ -39,7 +40,7 @@ jobs:
               wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
               apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
               apt-get update -qq &&
-              apt-get install -y hip-dev hipify-clang hip-runtime-nvidia
+              apt-get install -y cuda hip-dev hipify-clang
 
           - name: Configure and Build
             shell: bash

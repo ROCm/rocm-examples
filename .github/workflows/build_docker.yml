@@ -1,12 +1,13 @@
 name: Build Docker
+
 on:
   push:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Dockerfiles/**'
       - '.github/workflows/**'
   pull_request:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Dockerfiles/**'
       - '.github/workflows/**'
@@ -19,7 +20,7 @@ jobs:
         files: ${{ steps.find-files.outputs.files }}  
       steps:  
         - name: Checkout repository  
-          uses: actions/checkout@v3  
+          uses: actions/checkout@v4  
         - name: Find Dockerfiles  
           id: find-files  
           run: |  
@@ -32,6 +33,11 @@ jobs:
             echo "JSON_ARRAY is"
             echo $JSON_ARRAY
             echo "files=$JSON_ARRAY"  >> $GITHUB_OUTPUT 
+
+        # Clean the workspace here since other jobs may not have the permissions to do so later
+        # (needed for self-hosted runners)
+        - name: Clean the workspace
+          run: find $GITHUB_WORKSPACE -mindepth 1 -delete
     build:  
       name: Build Docker Images
       runs-on: self-hosted  
@@ -41,10 +47,10 @@ jobs:
           file: ${{fromJson(needs.find-dockerfiles.outputs.files)}}
       steps:
         - name: Checkout repository  
-          uses: actions/checkout@v3  
+          uses: actions/checkout@v4  
 
         - name: Set up Docker Buildx  
-          uses: docker/setup-buildx-action@v2  
+          uses: docker/setup-buildx-action@v3  
 
         - name: Build Docker image for ${{matrix.file}}  
           uses: docker/build-push-action@v4  
@@ -52,5 +58,10 @@ jobs:
             context: Dockerfiles/ 
             file: Dockerfiles/${{matrix.file}} 
             push: false          
-            tags: rocm-examples/dockerci:latest  
+            tags: rocm-examples/dockerci:latest
+
+        # Clean the workspace here since other jobs may not have the permissions to do so later
+        # (needed for self-hosted runners)
+        - name: Clean the workspace
+          run: find $GITHUB_WORKSPACE -mindepth 1 -delete  
 

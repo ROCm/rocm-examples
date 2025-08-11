@@ -36,7 +36,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -61,10 +61,13 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::rocblas)
 
-target_include_directories(${example_name} PRIVATE "../../../../Common")
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../../Common" "../../../../External"
+)
 
 install(TARGETS ${example_name})
 
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::rocblas)
 endif()

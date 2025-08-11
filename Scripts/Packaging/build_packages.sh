@@ -1,7 +1,7 @@
 #!/bin/bash
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,7 +26,7 @@ set -e
 # Default values
 GIT_TOP_LEVEL=$(git rev-parse --show-toplevel)
 PACKAGE_NAME="ROCm-SDK-Examples"
-PACKAGE_VERSION="6.3.0"
+PACKAGE_VERSION="6.4.0"
 DEB_PACKAGE_RELEASE="local.9999"
 RPM_PACKAGE_RELEASE="local.9999"
 PACKAGE_INSTALL_PREFIX="/opt/rocm/examples"

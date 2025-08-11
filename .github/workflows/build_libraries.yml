@@ -2,29 +2,29 @@ name: Build Libraries
 
 on:
   push:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
       - '.github/workflows/**'
   pull_request:
-    branches: [ develop, release/** ]
+    branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
       - '.github/workflows/**'
 
 env:
-    ROCM_VERSION: 6.3.3
-    AMDGPU_INSTALLER_VERSION: 6.3.60303-1
+    ROCM_VERSION: 6.4
+    AMDGPU_INSTALLER_VERSION: 6.4.60400-1
+    GPU_TARGETS: gfx803;gfx900;gfx906;gfx908;gfx90a;gfx942;gfx1030;gfx1100;gfx1101;gfx1102;gfx1201
 
 jobs:
     build:
         name: "Build Libraries Examples"
-        runs-on: ubuntu-latest
+        runs-on: self-hosted
         container:
             image: ubuntu:22.04
         steps:
           - uses: actions/checkout@v4
-
           - name: Install dependencies
             run: |
                   apt-get update -qq &&
@@ -56,5 +56,10 @@ jobs:
             shell: bash
             run: |
               cd Libraries && mkdir build && cd build
-              cmake -DGPU_ARCHITECTURES=all -S ..
+              cmake -DGPU_TARGETS="${GPU_TARGETS}" -S ..
               cmake --build . -j 4
+
+          # Clean the workspace here since other jobs may not have the permissions to do so later
+          # (needed for self-hosted runners)
+          - name: Clean the workspace
+            run: find $GITHUB_WORKSPACE -mindepth 1 -delete

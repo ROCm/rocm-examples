@@ -32,7 +32,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     return()
 endif()
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -51,8 +51,11 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocFFT)
 if(NOT rocFFT_FOUND)
     message(STATUS "rocFFT could not be found, not building rocFFT examples")
-    return()
+    return(1)
 endif()
 
 add_subdirectory(callback)
+add_subdirectory(complex_complex)
+add_subdirectory(complex_real)
 add_subdirectory(multi_gpu)
+add_subdirectory(real_complex)

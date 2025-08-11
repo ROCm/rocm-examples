@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2023 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -22,6 +22,7 @@
 
 EXAMPLE := rocsolver_syev
 COMMON_INCLUDE_DIR := ../../../Common
+EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
@@ -40,8 +41,8 @@ CXX ?= g++
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(ROCSOLVER_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(ROCSOLVER_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib -Wl,-rpath,$(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lrocblas -lrocsolver -lamdhip64
 
 CXXFLAGS  ?= -Wall -Wextra
@@ -52,7 +53,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/cmdparser.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocblas_utils.hpp
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocblas_utils.hpp $(EXTERNAL_DIR)/CmdParser/cmdparser.hpp
 	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:

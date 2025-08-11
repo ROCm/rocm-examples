@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -24,11 +24,18 @@ set(example_name hip_hello_world_cuda)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
-# CMake's HIP language mode does not yet support compiling with CUDA, thereby we must
-# resort to the CUDA language mode.
-project(${example_name} LANGUAGES CUDA)
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+select_gpu_language()
 
-if(WIN32)
+project(${example_name} LANGUAGES ${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
+verify_hip_platform(PLATFORMS "nvidia")
+
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -55,6 +62,6 @@ target_include_directories(
 
 # Set up the compilation language for the source file.
 # Usually this can be deduced from the file extension, but not in the case of .hip.
-set_source_files_properties(main.hip PROPERTIES LANGUAGE CUDA)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})

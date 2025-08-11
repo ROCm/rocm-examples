@@ -23,7 +23,7 @@
 #include "example_utils.hpp"
 #include "rocsparse_utils.hpp"
 
-#include <rocsolver/rocsolver.h>
+#include <cstddef>
 #include <rocsparse/rocsparse.h>
 
 #include <hip/hip_runtime.h>
@@ -91,21 +91,20 @@ int main()
     double*        d_x_values;
     double*        d_y;
 
-    HIP_CHECK(hipMalloc(&d_A, sizeof(*d_A) * A_rows * A_cols));
-    HIP_CHECK(hipMalloc(&d_x_indices, sizeof(*d_x_indices) * x_non_zero));
-    HIP_CHECK(hipMalloc(&d_x_values, sizeof(*d_x_values) * x_non_zero));
-    HIP_CHECK(hipMalloc(&d_y, sizeof(*d_y) * A_rows));
+    constexpr size_t A_size     = sizeof(*d_A) * A_rows * A_cols;
+    constexpr size_t x_ind_size = sizeof(*d_x_indices) * x_non_zero;
+    constexpr size_t x_val_size = sizeof(*d_x_values) * x_non_zero;
+    constexpr size_t y_size     = sizeof(*d_y) * A_rows;
 
-    HIP_CHECK(hipMemcpy(d_A, A.data(), sizeof(*d_A) * A_rows * A_cols, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_x_indices,
-                        x_indices.data(),
-                        sizeof(*d_x_indices) * x_non_zero,
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_x_values,
-                        x_values.data(),
-                        sizeof(*d_x_values) * x_non_zero,
-                        hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_y, y.data(), sizeof(*d_y) * A_rows, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMalloc(&d_A, A_size));
+    HIP_CHECK(hipMalloc(&d_x_indices, x_ind_size));
+    HIP_CHECK(hipMalloc(&d_x_values, x_val_size));
+    HIP_CHECK(hipMalloc(&d_y, y_size));
+
+    HIP_CHECK(hipMemcpy(d_A, A.data(), A_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x_indices, x_indices.data(), x_ind_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x_values, x_values.data(), x_val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_y, y.data(), y_size, hipMemcpyHostToDevice));
 
     // Obtain buffer size
     // This function is non blocking and executed asynchronously with respect to the host.
@@ -138,7 +137,7 @@ int main()
 
     // Copy y' from device to host
     std::array<double, A_rows> y_prime;
-    HIP_CHECK(hipMemcpy(y_prime.data(), d_y, sizeof(*d_y) * A_rows, hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(y_prime.data(), d_y, y_size, hipMemcpyDeviceToHost));
 
     // 5. Clear rocSPARSE
     ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));

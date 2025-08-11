@@ -48,7 +48,7 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 20)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -64,7 +64,7 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-set(include_dirs "../../Common")
+set(include_dirs "../../Common" "../../External")
 list(APPEND include_dirs "${PROJECT_SOURCE_DIR}")
 
 if("${GPU_RUNTIME}" STREQUAL "CUDA")
@@ -72,7 +72,7 @@ if("${GPU_RUNTIME}" STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 
     # Some CUDA versions have issues when compiling for C++20 on Windows, check if we are using those
-    if(WIN32)
+    if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         find_package(CUDA)
         if(CUDA_FOUND)
             set(FAULTY_CUDA_VERSION "12.5")

@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [hipBLAS](https://github.com/ROCmSoftwarePlatform/hipBLAS) library. The examples build on both Linux and Windows for the ROCm (AMD GPU) backend.
+The examples in this subdirectory showcase the functionality of the [hipBLAS](https://github.com/ROCm/hipBLAS) library. The examples build on both Linux and Windows for the ROCm (AMD GPU) backend.
 
 ## Prerequisites
 
@@ -11,14 +11,14 @@ The examples in this subdirectory showcase the functionality of the [hipBLAS](ht
 - [CMake](https://cmake.org/download/) (at least version 3.21)
 - OR GNU Make - available via the distribution's package manager
 - [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
-- [hipBLAS](https://github.com/ROCmSoftwarePlatform/hipBLAS): `hipblas` package available from [repo.radeon.com](https://repo.radeon.com/rocm/).
+- [hipBLAS](https://github.com/ROCm/hipBLAS): `hipblas` package available from [repo.radeon.com](https://repo.radeon.com/rocm/).
 
 ### Windows
 
 - [Visual Studio](https://visualstudio.microsoft.com/) 2019 or 2022 with the "Desktop Development with C++" workload
 - ROCm toolchain for Windows (No public release yet)
   - The Visual Studio ROCm extension needs to be installed to build with the solution files.
-- [hipBLAS](https://github.com/ROCmSoftwarePlatform/hipBLAS)
+- [hipBLAS](https://github.com/ROCm/hipBLAS)
   - Installed as part of the ROCm SDK on Windows for ROCm platform.
 - [CMake](https://cmake.org/download/) (optional, to build with CMake. Requires at least version 3.21)
 - [Ninja](https://ninja-build.org/) (optional, to build with CMake)

@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,11 +29,6 @@
     #pragma nv_diag_suppress 108 // signed bit field of length 1
     #pragma nv_diag_suppress 174 // expression has no effect
     #pragma nv_diag_suppress 1835 // attribute "dllimport" does not apply here
-#endif
-
-// rocPRIM adds a #warning about printf on NAVI.
-#ifdef __clang__
-    #pragma clang diagnostic ignored "-W#warnings"
 #endif
 
 #include <algorithm>
@@ -242,6 +237,51 @@ void multiply_matrices(T        alpha,
             C[i1 + i2 * stride_c] = beta * C[i1 + i2 * stride_c] + alpha * t;
         }
     }
+}
+
+/// \brief Prints an {1,2,3}-dimensional array. The last dimension (fastest-index) specified in
+/// \p n will be printed horizontally.
+///
+/// By default a row-major layout of the data is assumed. When printing data in column-major
+/// layout, the \p column_major parameter must be set to \p true for a correct interpretation
+/// of the dimensions' sizes.
+template<class Tdata, class Tsize>
+void print_nd_data(const std::vector<Tdata>& data,
+                   std::vector<Tsize>        np,
+                   const int                 column_width = 4,
+                   const int                 precision    = 3,
+                   const bool                column_major = false)
+{
+    if(column_major)
+    {
+        std::reverse(np.begin(), np.end());
+    }
+    const std::vector<Tsize> n(np);
+    // Note: we want to print the last dimension horizontally (on the x-axis)!
+    int size_x = n[n.size() - 1];
+    int size_y = n.size() > 1 ? n[n.size() - 2] : 1;
+    int size_z = n.size() > 2 ? n[n.size() - 3] : 1;
+
+    std::stringstream ss;
+    ss << std::setprecision(precision);
+    for(int z = 0; z < size_z; ++z)
+    {
+        for(int y = 0; y < size_y; ++y)
+        {
+            for(int x = 0; x < size_x; ++x)
+            {
+                auto index = (z * size_y + y) * size_x + x;
+                ss << std::setfill(' ') << std::setw(column_width) << data[index] << " ";
+            }
+            ss << "\n";
+        }
+        if(z != size_z - 1)
+        {
+            ss << "\n";
+        }
+    }
+    ss << std::flush;
+    std::cout << ss.str() << std::flush;
 }
 
 /// \brief Returns a string from the double \p value with specified \p precision .

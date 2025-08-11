@@ -27,7 +27,7 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -46,7 +46,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(hipblas)
 if(NOT hipblas_FOUND)
     message(STATUS "hipBLAS could not be found, not building hipBLAS examples")
-    return()
+    return(1)
 endif()
 
 add_subdirectory(gemm_strided_batched)

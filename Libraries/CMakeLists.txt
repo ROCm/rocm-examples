@@ -29,10 +29,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 # CMake configuration files for CUDA versions of HIP libraries are not yet
 # included under the HIP SDK for Windows.
-if(NOT (CMAKE_SYSTEM_NAME MATCHES Windows AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
+if(
+    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
+)
     add_subdirectory(hipBLAS)
     add_subdirectory(hipCUB)
     add_subdirectory(hipFFT)
+    add_subdirectory(hipRAND)
     add_subdirectory(hipSOLVER)
     add_subdirectory(rocBLAS)
     add_subdirectory(rocFFT)

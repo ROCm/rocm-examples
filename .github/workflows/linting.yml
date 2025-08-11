@@ -3,13 +3,13 @@ name: Linting
 on:
   push:
     branches:
-      - develop
-      - main
+      - amd-staging
+      - amd-mainline
       - 'release/rocm-rel*'
   pull_request:
     branches:
-      - develop
-      - main
+      - amd-staging
+      - amd-mainline
       - 'release/rocm-rel*'
 
 env:
@@ -32,7 +32,7 @@ jobs:
           python3 -m pip install gersemi
       - name: Run gersemi
         run: |
-          gersemi --check .
+          gersemi --check --definitions Common/HipPlatform.cmake .
           if [ $? -ne 0 ]; then
             echo "CMake files are not formatted correctly. Please run gersemi ..."
             echo "For example: \`gersemi -i .\`"

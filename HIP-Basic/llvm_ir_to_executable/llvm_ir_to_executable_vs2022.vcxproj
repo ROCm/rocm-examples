@@ -19,8 +19,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--cuda-host-only</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--cuda-host-only</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--cuda-host-only -fuse-cuid=none</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--cuda-host-only -fuse-cuid=none</AdditionalOptions>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,13 +41,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.2</PlatformToolset>
+    <PlatformToolset>HIP clang 6.4</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>HIP clang 6.2</PlatformToolset>
+    <PlatformToolset>HIP clang 6.4</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(PlatformToolset.Contains(`HIP clang `))'">

@@ -41,7 +41,7 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -67,15 +67,18 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 target_link_libraries(${example_name} PRIVATE hip::hipfft)
 
-target_include_directories(${example_name} PRIVATE "../../../Common")
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../Common" "../../../External"
+)
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 
 install(TARGETS ${example_name})
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS hip::hipfft)
     if(GPU_RUNTIME STREQUAL "HIP")
         find_package(rocfft REQUIRED)

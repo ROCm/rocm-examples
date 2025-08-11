@@ -39,7 +39,7 @@ add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../../Common")
+set(include_dirs "../../../Common" "../../../External")
 
 target_link_libraries(${example_name} PRIVATE roc::rocfft)
 target_include_directories(${example_name} PRIVATE ${include_dirs})

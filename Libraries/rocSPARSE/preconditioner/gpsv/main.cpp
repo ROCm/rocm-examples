@@ -223,14 +223,14 @@ int main()
     HIP_CHECK(hipMemcpy(h_b.data(), d_b, d_size, hipMemcpyDeviceToHost));
 
     // 7. Free rocSPARSE resources and device memory.
-    ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
-    HIP_CHECK(hipFree(temp_buffer));
     HIP_CHECK(hipFree(d_w));
     HIP_CHECK(hipFree(d_u));
     HIP_CHECK(hipFree(d_d));
     HIP_CHECK(hipFree(d_l));
     HIP_CHECK(hipFree(d_s));
     HIP_CHECK(hipFree(d_b));
+    ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
+    HIP_CHECK(hipFree(temp_buffer));
 
     // 8. Check convergence.
     if(std::isnan(h_b[0]))

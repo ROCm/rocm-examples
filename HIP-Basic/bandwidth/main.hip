@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,11 +20,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "cmdparser.hpp"
+#include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 
 #include <hip/hip_runtime.h>
 
+#include <cstring>
 #include <iostream>
 #include <map>
 #include <numeric>
@@ -150,7 +151,7 @@ std::vector<double>
                 HIP_CHECK(hipMemcpy(dst, src, size_in_bytes, hip_memcpy_kind));
 
                 // Flush the buffer
-                memset(flush_buffer.data(), i, flush_buffer.size());
+                std::memset(flush_buffer.data(), i, flush_buffer.size());
             }
 
             // Perform memory transfers for trails number of times
@@ -164,7 +165,7 @@ std::vector<double>
                 host_clock.stop_timer();
 
                 // Flush the buffer
-                memset(flush_buffer.data(), i, flush_buffer.size());
+                std::memset(flush_buffer.data(), i, flush_buffer.size());
             }
             // Calculate the bandwith in GB/s
             const double bandwidth_achieved

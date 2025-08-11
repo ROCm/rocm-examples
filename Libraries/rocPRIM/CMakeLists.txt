@@ -32,7 +32,7 @@ if(GPU_RUNTIME STREQUAL "CUDA")
     return()
 endif()
 
-if(WIN32)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
         CACHE PATH
@@ -51,7 +51,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocprim)
 if(NOT rocprim_FOUND)
     message(STATUS "rocPRIM could not be found, not building rocPRIM examples")
-    return()
+    return(1)
 endif()
 
 add_subdirectory(block_sum)

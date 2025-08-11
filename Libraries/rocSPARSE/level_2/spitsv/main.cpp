@@ -76,27 +76,27 @@ int main()
     constexpr rocsparse_spitsv_alg alg = rocsparse_spitsv_alg_default;
 
     // 2. Allocate device memory and offload input data to device.
-    double*        d_x{};
-    double*        d_y{};
-    double*        d_csr_val{};
     rocsparse_int* d_csr_row_ptr{};
     rocsparse_int* d_csr_col_ind{};
+    double*        d_csr_val{};
+    double*        d_x{};
+    double*        d_y{};
 
-    constexpr size_t val_size     = sizeof(*d_csr_val) * nnz;
     constexpr size_t row_ptr_size = sizeof(*d_csr_row_ptr) * (m + 1);
     constexpr size_t col_ind_size = sizeof(*d_csr_col_ind) * nnz;
-    constexpr size_t size_vector  = sizeof(*d_x) * n;
+    constexpr size_t val_size     = sizeof(*d_csr_val) * nnz;
+    constexpr size_t vector_size  = sizeof(*d_x) * n;
 
-    HIP_CHECK(hipMalloc(&d_x, size_vector));
-    HIP_CHECK(hipMalloc(&d_y, size_vector));
     HIP_CHECK(hipMalloc(&d_csr_row_ptr, row_ptr_size));
     HIP_CHECK(hipMalloc(&d_csr_col_ind, col_ind_size));
     HIP_CHECK(hipMalloc(&d_csr_val, val_size));
+    HIP_CHECK(hipMalloc(&d_x, vector_size));
+    HIP_CHECK(hipMalloc(&d_y, vector_size));
 
-    HIP_CHECK(hipMemcpy(d_x, h_x.data(), size_vector, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_csr_row_ptr, h_csr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_csr_col_ind, h_csr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_csr_val, h_csr_val.data(), val_size, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_x, h_x.data(), vector_size, hipMemcpyHostToDevice));
 
     // 3. Initialize rocSPARSE by creating a handle.
     rocsparse_handle handle;
@@ -200,11 +200,11 @@ int main()
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_x));
     ROCSPARSE_CHECK(rocsparse_destroy_dnvec_descr(descr_y));
 
-    HIP_CHECK(hipFree(d_x));
-    HIP_CHECK(hipFree(d_y));
-    HIP_CHECK(hipFree(d_csr_val));
     HIP_CHECK(hipFree(d_csr_row_ptr));
     HIP_CHECK(hipFree(d_csr_col_ind));
+    HIP_CHECK(hipFree(d_csr_val));
+    HIP_CHECK(hipFree(d_x));
+    HIP_CHECK(hipFree(d_y));
     HIP_CHECK(hipFree(temp_buffer));
 
     // 9. Fetch the convergence data.
