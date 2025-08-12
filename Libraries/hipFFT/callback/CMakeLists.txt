@@ -36,6 +36,12 @@ endif()
 
 project(hipfft_callback LANGUAGES CXX HIP)
 
+# Set default build type to Release
+# to workaround a compiler issue when building with -O0
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
