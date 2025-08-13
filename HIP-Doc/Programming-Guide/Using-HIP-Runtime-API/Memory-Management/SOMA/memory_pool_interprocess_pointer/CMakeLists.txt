@@ -51,8 +51,6 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 ###############################################################################
 
 add_executable(${example_name}_exporter exporter.cpp)
-# Make example runnable using ctest
-add_test(NAME ${example_name}_exporter COMMAND ${example_name}_exporter)
 
 set_source_files_properties(exporter.cpp PROPERTIES LANGUAGE ${USED_LANGUAGE})
 
@@ -67,8 +65,6 @@ target_link_libraries(${example_name}_exporter PRIVATE $<$<NOT:$<LINK_LANGUAGE:C
 ###############################################################################
 
 add_executable(${example_name}_importer importer.cpp)
-# Make example runnable using ctest
-add_test(NAME ${example_name}_importer COMMAND ${example_name}_importer)
 
 set_source_files_properties(importer.cpp PROPERTIES LANGUAGE ${USED_LANGUAGE})
 
@@ -78,7 +74,13 @@ target_compile_features(${example_name}_importer PRIVATE cuda_std_17 cxx_std_17)
 target_include_directories(${example_name}_importer PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_name}_importer PRIVATE $<$<NOT:$<LINK_LANGUAGE:CUDA>>:hip::host>)
 
-# Tell CTest that these tests belong to the same group and hope that they will execute concurrently.
-set_tests_properties(${example_name}_exporter ${example_name}_importer PROPERTIES FIXTURES_REQUIRED ${example_name})
+###############################################################################
+# Test setup
+###############################################################################
+add_test(NAME ${example_name}
+         COMMAND ${CMAKE_COMMAND}
+                 -DFIRST=$<TARGET_FILE:${example_name}_exporter>
+                 -DSECOND=$<TARGET_FILE:${example_name}_importer>
+                 -P ${CMAKE_CURRENT_SOURCE_DIR}/run_test.cmake)
 
 install(TARGETS ${example_name}_exporter ${example_name}_importer)
