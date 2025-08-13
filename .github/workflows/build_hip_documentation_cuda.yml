@@ -19,7 +19,7 @@ env:
 jobs:
     build:
         name: "Build HIP Documentation CUDA"
-        runs-on: self-hosted
+        runs-on: ubuntu-latest
         container:
             image: nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
 
@@ -40,7 +40,7 @@ jobs:
               wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
               apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
               apt-get update -qq &&
-              apt-get install -y cuda hip-dev hipify-clang
+              apt-get install -y hip-dev hipify-clang
 
           - name: Configure and Build
             shell: bash
@@ -49,4 +49,4 @@ jobs:
               cd HIP-Doc && mkdir build && cd build
               export CMAKE_POLICY_VERSION_MINIMUM="3.5"
               cmake -DGPU_RUNTIME=CUDA ..
-              cmake --build . -j4
+              cmake --build . -j
