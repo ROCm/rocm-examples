@@ -66,23 +66,23 @@ int main()
     std::fill(b.begin(), b.end(), 2);
 
     // Allocate device copies of a, b and c.
-    HIP_CHECK(hipMalloc(&d_a, arraySize * sizeof(*d_a)));
-    HIP_CHECK(hipMalloc(&d_b, arraySize * sizeof(*d_b)));
-    HIP_CHECK(hipMalloc(&d_c, arraySize * sizeof(*d_c)));
+    HIP_CHECK(hipMalloc(&d_a, arraySize * sizeof(int)));
+    HIP_CHECK(hipMalloc(&d_b, arraySize * sizeof(int)));
+    HIP_CHECK(hipMalloc(&d_c, arraySize * sizeof(int)));
 
     // Copy input values to device.
-    HIP_CHECK(hipMemcpy(d_a, &a, arraySize * sizeof(*d_a), hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_b, &b, arraySize * sizeof(*d_b), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_a, a.data(), arraySize * sizeof(int), hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(d_b, b.data(), arraySize * sizeof(int), hipMemcpyHostToDevice));
 
     // Launch add() kernel on GPU.
-    hipLaunchKernelGGL(add, dim3(numOfBlocks), dim3(threadsPerBlock), 0, 0, d_a, d_b, d_c, arraySize);
+    add<<<numOfBlocks, threadsPerBlock>>>(d_a, d_b, d_c, arraySize);
     // Check the kernel launch
     HIP_CHECK(hipGetLastError());
     // Check for kernel execution error
     HIP_CHECK(hipDeviceSynchronize());
 
     // Copy the result back to the host.
-    HIP_CHECK(hipMemcpy(&c, d_c, arraySize * sizeof(*d_c), hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(c.data(), d_c, arraySize * sizeof(int), hipMemcpyDeviceToHost));
 
     // Cleanup allocated memory.
     HIP_CHECK(hipFree(d_a));
