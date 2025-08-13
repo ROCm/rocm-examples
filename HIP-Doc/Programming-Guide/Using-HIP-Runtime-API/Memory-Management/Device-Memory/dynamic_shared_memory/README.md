@@ -2,8 +2,8 @@
 
 ## Description
 
-This example demonstrates dynamically allocate shared memory on the host. For more information on this topic, please
-refer to the
+This example demonstrates how to dynamically allocate shared memory on the host. For more information on this topic,
+please refer to the
 [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/device_memory.html#shared-memory).
 
 ### Application flow

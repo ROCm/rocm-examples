@@ -2,7 +2,7 @@
 
 ## Description
 
-This example demonstrates how to load precomcpiled code objects from memory and execute the contained kernel(s). For more
+This example demonstrates how to load precompiled code objects from memory and execute the contained kernel(s). For more
 information on this topic, please refer to the
 [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_porting_driver_api.html#hipmodule-api).
 

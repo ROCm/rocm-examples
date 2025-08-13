@@ -2,13 +2,9 @@
 
 ## Description
 
-The Stream Ordered Memory Allocator (SOMA) is part of the HIP runtime API. SOMA provides an asynchronous memory
-allocation mechanism with stream-ordering semantics. You can use SOMA to allocate and free memory in stream order,
-which ensures that all asynchronous accesses occur between the stream executions of allocation and deallocation.
-Compliance with stream order prevents use-before-allocation or use-after-free errors, which helps to avoid an undefined
-behavior.
-
-This example demonstrates how to use stream ordered memory allocations.
+This example demonstrates how to use stream ordered memory allocations. For more information on this topic, please refer
+to the
+[HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html#using-soma).
 
 ### Prerequisites
 
