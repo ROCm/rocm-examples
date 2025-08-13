@@ -29,12 +29,6 @@ select_gpu_language()
 add_subdirectory(compilation_apis)
 
 if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
-    message(STATUS "The bitcode compilation example is available only for AMD targets.")
-else()
-    add_subdirectory(compilation_apis_bitcode)
-endif()
-
-if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
     message(STATUS "The HIPRTC linker examples are available only for AMD targets.")
 else()
     add_subdirectory(linker_apis)

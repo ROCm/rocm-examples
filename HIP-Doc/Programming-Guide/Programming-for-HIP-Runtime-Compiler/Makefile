@@ -22,7 +22,6 @@
 
 EXAMPLES := \
 	compilation_apis \
-	compilation_apis_bitcode \
 	linker_apis \
 	linker_apis_file \
 	linker_apis_options \
