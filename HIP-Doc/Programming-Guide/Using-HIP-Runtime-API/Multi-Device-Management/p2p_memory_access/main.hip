@@ -48,6 +48,14 @@ __global__ void simpleKernel(double *data)
 
 int main()
 {
+    int deviceCount;
+    HIP_CHECK(hipGetDeviceCount(&deviceCount));
+    if(deviceCount < 2)
+    {
+        std::cout << "This example requires at least two HIP devices." << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     double* deviceData0;
     double* deviceData1;
     std::size_t size = 1024 * sizeof(*deviceData0);

@@ -54,6 +54,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
+set_tests_properties(${example_name} PROPERTIES WILL_FAIL TRUE)
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 

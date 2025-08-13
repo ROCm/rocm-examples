@@ -53,8 +53,8 @@ int main()
 
     if (numDevices < 2)
     {
-        std::cerr << "This example requires at least two GPUs." << std::endl;
-        return EXIT_FAILURE;
+        std::cout << "This example requires at least two HIP devices." << std::endl;
+        return EXIT_SUCCESS;
     }
 
     double *deviceData0, *deviceData1;
