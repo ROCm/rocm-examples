@@ -45,8 +45,8 @@ int main()
 
     int *host_input, *host_output;
     // Host allocation
-    HIP_CHECK(hipHostMalloc((int **)&host_input, element_number * sizeof(int)));
-    HIP_CHECK(hipHostMalloc((int **)&host_output, element_number * sizeof(int)));
+    HIP_CHECK(hipHostMalloc(&host_input, element_number * sizeof(int)));
+    HIP_CHECK(hipHostMalloc(&host_output, element_number * sizeof(int)));
 
     // Host data preparation
     for (int i = 0; i < element_number; i++)
@@ -58,8 +58,8 @@ int main()
     int *device_input, *device_output;
 
     // Device allocation
-    HIP_CHECK(hipMalloc((int **)&device_input,  element_number * sizeof(int)));
-    HIP_CHECK(hipMalloc((int **)&device_output, element_number * sizeof(int)));
+    HIP_CHECK(hipMalloc(&device_input,  element_number * sizeof(int)));
+    HIP_CHECK(hipMalloc(&device_output, element_number * sizeof(int)));
 
     // Device data preparation
     HIP_CHECK(hipMemcpy(device_input, host_input, element_number * sizeof(int), hipMemcpyHostToDevice));
@@ -71,8 +71,8 @@ int main()
     HIP_CHECK(hipMemcpy(device_input, host_input, element_number * sizeof(int), hipMemcpyHostToDevice));
 
     // Free host memory
-    delete[] host_input;
-    delete[] host_output;
+    HIP_CHECK(hipFreeHost(host_input));
+    HIP_CHECK(hipFreeHost(host_output));
 
     // Free device memory
     HIP_CHECK(hipFree(device_input));
