@@ -116,12 +116,13 @@ int main()
     // [sphinx-end]
 
     // Create buffer for kernel arguments
-    std::vector<void*> argBuffer{&d_A, &d_B};
+    std::vector<void*> argBuffer{reinterpret_cast<void*>(d_A), reinterpret_cast<void*>(d_B)};
     std::size_t arg_size_bytes = argBuffer.size() * sizeof(void*);
 
     // Create configuration passed to the kernel as arguments
     void* config[] = {HIP_LAUNCH_PARAM_BUFFER_POINTER, argBuffer.data(),
-                      HIP_LAUNCH_PARAM_BUFFER_SIZE, &arg_size_bytes, HIP_LAUNCH_PARAM_END};
+                      HIP_LAUNCH_PARAM_BUFFER_SIZE, &arg_size_bytes,
+                      HIP_LAUNCH_PARAM_END};
 
     int threads_per_block = 128;
     int blocks = (elements + threads_per_block - 1) / threads_per_block;
