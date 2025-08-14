@@ -20,20 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+// [sphinx-start]
 #include <hip/hip_fp8.h>
 #include <hip/hip_runtime.h>
+
+#include <cstdlib>
 #include <iostream>
 #include <vector>
 
-#define hip_check(hip_call)                                                    \
-{                                                                              \
-    auto hip_res = hip_call;                                                   \
-    if (hip_res != hipSuccess) {                                               \
-    std::cerr << "Failed in HIP call: " << #hip_call                           \
-                << " at " << __FILE__ << ":" << __LINE__                       \
-                << " with error: " << hipGetErrorString(hip_res) << std::endl; \
-    std::abort();                                                              \
-    }                                                                          \
+#define hip_check(hip_call)                                                      \
+{                                                                                \
+    auto hip_res = hip_call;                                                     \
+    if (hip_res != hipSuccess)                                                   \
+    {                                                                            \
+        std::cerr << "Failed in HIP call: " << #hip_call                         \
+                  << " at " << __FILE__ << ":" << __LINE__                       \
+                  << " with error: " << hipGetErrorString(hip_res) << std::endl; \
+        std::exit(EXIT_FAILURE);                                                 \
+    }                                                                            \
 }
 
 __device__ __hip_fp8_storage_t d_convert_float_to_fp8(float in, __hip_fp8_interpretation_t interpret, __hip_saturation_t sat)
@@ -70,7 +74,7 @@ int main()
     {
         std::cerr << "Need a gfx94x, but found: " << prop.gcnArchName << std::endl;
         std::cerr << "No device conversions are supported, only host conversions are supported." << std::endl;
-        return -1;
+        return EXIT_SUCCESS;
     }
 
     const __hip_fp8_interpretation_t interpret = (std::string(prop.gcnArchName).find("gfx94") != std::string::npos)
@@ -116,8 +120,11 @@ int main()
         {
             std::cerr << "cpu round trip result: " << cpu_out[i]
                       << " - gpu round trip result: " << gpu_out[i] << std::endl;
-            std::abort();
+            return EXIT_FAILURE;
         }
     }
     std::cout << "...CPU and GPU round trip convert matches." << std::endl;
+
+    return EXIT_SUCCESS;
 }
+// [sphinx-end]

@@ -100,7 +100,7 @@ int main()
     #ifdef __HIP_PLATFORM_NVIDIA__
     HIP_CHECK(hipCtxDestroy(context));
     #endif
-
+    
     return EXIT_SUCCESS;
 }
 // [sphinx-end]

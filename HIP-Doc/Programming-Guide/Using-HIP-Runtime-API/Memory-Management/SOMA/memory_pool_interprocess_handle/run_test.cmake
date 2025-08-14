@@ -20,12 +20,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-macro(exec_cmd cmd)
-    execute_process(COMMAND ${cmd} RESULT_VARIABLE cmd_result)
-    if(cmd_result)
-        message(FATAL_ERROR "Error running ${cmd}")
-    endif()
-endmacro()
-
-exec_cmd(${FIRST})
-exec_cmd(${SECOND})
+execute_process(COMMAND ${FIRST}
+                COMMAND ${SECOND}
+                COMMAND_ERROR_IS_FATAL ANY)

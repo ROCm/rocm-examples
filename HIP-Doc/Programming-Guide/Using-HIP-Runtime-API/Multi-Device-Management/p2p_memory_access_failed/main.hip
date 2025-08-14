@@ -53,7 +53,7 @@ int main()
     if(deviceCount < 2)
     {
         std::cout << "This example requires at least two HIP devices." << std::endl;
-        return EXIT_SUCCESS;
+        return EXIT_FAILURE;
     }
     
     double* deviceData0;

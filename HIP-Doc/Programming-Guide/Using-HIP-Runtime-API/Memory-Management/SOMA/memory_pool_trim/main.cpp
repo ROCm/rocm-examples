@@ -63,9 +63,6 @@ int main()
     std::size_t newSize = 512 * 1024;
     HIP_CHECK(hipMemPoolTrimTo(memPool, newSize));
 
-    // Clean up.
-    HIP_CHECK(hipMemPoolDestroy(memPool));
-
     std::cout << "Memory pool trimmed to " << newSize << " bytes." << std::endl;
     return EXIT_SUCCESS;
 }

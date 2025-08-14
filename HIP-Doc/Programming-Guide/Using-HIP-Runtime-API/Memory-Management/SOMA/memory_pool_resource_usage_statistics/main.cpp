@@ -110,9 +110,6 @@ int main()
     std::cout << "Used Memory Current: " << statsAfter.usedMemCurrent << " bytes" << std::endl;
     std::cout << "Used Memory High: " << statsAfter.usedMemHigh << " bytes" << std::endl;
 
-    // Clean up.
-    HIP_CHECK(hipMemPoolDestroy(memPool));
-
     return EXIT_SUCCESS;
 }
 // [sphinx-end]
