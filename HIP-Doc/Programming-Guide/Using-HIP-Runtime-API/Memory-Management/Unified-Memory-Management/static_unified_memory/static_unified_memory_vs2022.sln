@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.36310.24 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_unified_memory_vs2022", "static_unified_memory_vs2022.vcxproj", "{218ABFE6-6B5A-E00C-56D8-1B2652BC45F6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{218ABFE6-6B5A-E00C-56D8-1B2652BC45F6}.Debug|x64.ActiveCfg = Debug|x64
+		{218ABFE6-6B5A-E00C-56D8-1B2652BC45F6}.Debug|x64.Build.0 = Debug|x64
+		{218ABFE6-6B5A-E00C-56D8-1B2652BC45F6}.Release|x64.ActiveCfg = Release|x64
+		{218ABFE6-6B5A-E00C-56D8-1B2652BC45F6}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BD9C7D2F-1D6A-43B2-BE98-73109E2E232A}
+	EndGlobalSection
+EndGlobal

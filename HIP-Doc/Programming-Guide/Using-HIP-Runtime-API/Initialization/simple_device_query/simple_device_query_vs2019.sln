@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.36227.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "simple_device_query_vs2019", "simple_device_query_vs2019.vcxproj", "{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Debug|x64.ActiveCfg = Debug|x64
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Debug|x64.Build.0 = Debug|x64
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.ActiveCfg = Release|x64
+		{66CE87DF-0D14-4C55-86EA-A83EFC87F5C8}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C2DB8AD7-5A22-47E1-BA39-CD50AD97BE8A}
+	EndGlobalSection
+EndGlobal

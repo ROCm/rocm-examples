@@ -1,0 +1,27 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.36217.24
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "linker_apis_options_vs2017", "linker_apis_options_vs2017.vcxproj", "{1DC058BF-4C29-46EC-A856-D0707D772445}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Debug|x64.ActiveCfg = Debug|x64
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Debug|x64.Build.0 = Debug|x64
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Release|x64.ActiveCfg = Release|x64
+		{1DC058BF-4C29-46EC-A856-D0707D772445}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B6E7C107-AB7B-4B4B-871B-029BB1C56594}
+	EndGlobalSection
+EndGlobal

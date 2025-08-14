@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.36227.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pageable_host_memory_vs2019", "pageable_host_memory_vs2019.vcxproj", "{60ECA336-F57E-4F7C-B215-EB29E2A74406}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Debug|x64.ActiveCfg = Debug|x64
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Debug|x64.Build.0 = Debug|x64
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.ActiveCfg = Release|x64
+		{60ECA336-F57E-4F7C-B215-EB29E2A74406}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {394A2C72-1EA2-46A3-890B-15B47F0F5480}
+	EndGlobalSection
+EndGlobal
