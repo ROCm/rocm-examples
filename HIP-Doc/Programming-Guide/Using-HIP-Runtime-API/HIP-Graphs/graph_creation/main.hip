@@ -128,9 +128,9 @@ int main()
 
     // Add memory copy node, that copies the initialized host array to the device.
     // It has to wait for the host array to be initialized and the device memory to be allocated
-    hipGraphNode_t cpyNodeDependencies[] = {allocNodeA/*, hostNode*/};
+    hipGraphNode_t cpyNodeDependencies[] = {allocNodeA, hostNode};
     hipGraphNode_t cpyToDevNode;
-    HIP_CHECK(hipGraphAddMemcpyNode1D(&cpyToDevNode, graph, cpyNodeDependencies, 1, allocArrayAParams.dptr, h_array.data(), arraySize * sizeof(double), hipMemcpyHostToDevice));
+    HIP_CHECK(hipGraphAddMemcpyNode1D(&cpyToDevNode, graph, cpyNodeDependencies, 2, allocArrayAParams.dptr, h_array.data(), arraySize * sizeof(double), hipMemcpyHostToDevice));
 
     // Parameters for kernelA
     hipKernelNodeParams kernelAParams;
@@ -173,7 +173,7 @@ int main()
     // Add the node for kernelC. It has to wait on both kernelA and kernelB to finish, as it depends on their results.
     hipGraphNode_t kernelCNode;
     hipGraphNode_t kernelCDependencies[] = {kernelANode, kernelBNode};
-    HIP_CHECK(hipGraphAddKernelNode(&kernelCNode, graph, kernelCDependencies, 1, &kernelCParams));
+    HIP_CHECK(hipGraphAddKernelNode(&kernelCNode, graph, kernelCDependencies, 2, &kernelCParams));
 
     // Copy the results back to the host. Has to wait for kernelC to finish.
     hipGraphNode_t cpyToHostNode;
