@@ -23,7 +23,6 @@
 // [sphinx-start]
 #include <hip/hip_runtime.h>
 
-#include <algorithm>
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
@@ -98,8 +97,6 @@ int main()
     int* d_arrayB;
     std::vector<double> h_array(arraySize);
     constexpr double initValue = 2.0;
-
-    std::fill(std::begin(h_array), std::end(h_array), 42.0);
 
     hipStream_t captureStream;
     HIP_CHECK(hipStreamCreate(&captureStream));
