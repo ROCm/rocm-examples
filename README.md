@@ -332,6 +332,31 @@ The following options are available when building with CMake.
     - [syevj](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/syevj): Calculates the eigenvalues and eigenvectors from a real symmetric matrix using the Jacobi method.
     - [syevj_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/syevj_batched): Showcases how to compute the eigenvalues and eigenvectors (via Jacobi method) of each matrix in a batch of real symmetric matrices.
     - [sygvj](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/sygvj): Calculates the generalized eigenvalues and eigenvectors from a pair of real symmetric matrices using the Jacobi method.
+  - [hipTensor](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/)
+    - [contraction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction): Tensor contraction operations that compute products over shared dimensions
+      - [bilinear](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear): Bilinear contractions with accumulation support for combining tensor products with existing output data
+        - [bf16_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/bf16_f32): Demonstrates bilinear tensor contraction using BFloat16 data with FP32 computation.
+        - [cf32_cf32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/cf32_cf32): Shows bilinear tensor contraction with single-precision complex floating-point data.
+        - [f16_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/f16_f32): Demonstrates mixed precision bilinear contraction with FP16 data and FP32 computation.
+        - [f32_bf16](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/f32_bf16): Shows inverse mixed precision with FP32 data and BFloat16 computation.
+        - [f32_f16](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/f32_f16): Demonstrates FP32 data storage with FP16 computational precision.
+        - [f32_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/f32_f32): Standard single-precision bilinear tensor contraction implementation.
+        - [f64_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/f64_f32): Shows mixed precision with FP64 data and FP32 computation.
+        - [f64_f64](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear/f64_f64): Demonstrates maximum precision bilinear contraction using double-precision arithmetic.
+      - [scale](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale): Scale contractions that compute tensor products from scratch without accumulation for cleaner numerical behavior
+        - [bf16_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/bf16_f32): Shows scale tensor contraction using BFloat16 data with FP32 computation.
+        - [cf32_cf32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/cf32_cf32): Demonstrates scale contraction with single-precision complex floating-point data.
+        - [f16_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/f16_f32): Shows mixed precision scale contraction with FP16 data and FP32 computation.
+        - [f32_bf16](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/f32_bf16): Demonstrates inverse mixed precision scale contraction with FP32 data and BFloat16 computation.
+        - [f32_f16](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/f32_f16): Shows FP32 data storage with FP16 computational precision for scale contractions.
+        - [f32_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/f32_f32): Standard single-precision scale tensor contraction implementation.
+        - [f64_f32](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/f64_f32): Demonstrates mixed precision scale contraction with FP64 data and FP32 computation.
+        - [f64_f64](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/scale/f64_f64): Shows maximum precision scale contraction using double-precision arithmetic.
+    - [elementwise](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise): Element-by-element tensor operations including arithmetic, permutation, and multi-tensor combinations
+      - [binary](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/binary): Program that demonstrates elementwise binary operations with tensor permutation.
+      - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/permute): Shows how to perform tensor dimension reordering operations.
+      - [trinary](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/trinary): Shows how to combine three tensors using nested binary operations with permutation.
+    - [reduction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/reduction): Program that showcases tensor reduction operations using hipTensor.
   - [rocBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/)
     - [level_1](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
       - [axpy](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.
