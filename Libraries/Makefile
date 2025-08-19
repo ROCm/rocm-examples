@@ -31,6 +31,7 @@ LIBRARIES := \
 
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
+	hipTensor \
 	rocBLAS \
 	rocFFT \
 	rocPRIM \
