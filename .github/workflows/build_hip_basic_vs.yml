@@ -15,9 +15,9 @@ on:
       - 'Scripts/VisualStudio/**'
 
 env:
-    PLATFORM_TOOLSET_VERSION: 6.2
-    HIP_PATH: C:\Program Files\AMD\ROCm\6.2\
-    HIPSDK_INSTALLER_VERSION: 24.Q4
+    PLATFORM_TOOLSET_VERSION: 6.4
+    HIP_PATH: C:\Program Files\AMD\ROCm\6.4\
+    HIPSDK_INSTALLER_VERSION: 25.Q3
     VULKAN_SDK: C:\VulkanSDK\1.4.313.2\
     GLFW_DIR: C:\glfw-3.4.bin.WIN64\
 
@@ -67,6 +67,13 @@ jobs:
                       Exit 1
                   }
                   msbuild -version
+          - name: Apply patch
+            shell: pwsh
+            run: |
+                  Write-Host "Applying patches $(Get-ChildItem -File Scripts\VisualStudio\*.patch)"
+                  git apply (Get-ChildItem -File Scripts\VisualStudio\*.patch).FullName
+                  Write-Host "Patches applied. Showing diff"
+                  git diff
           - name: Build ${{ matrix.config }} x64
             shell: pwsh
             run: |

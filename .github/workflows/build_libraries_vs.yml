@@ -15,9 +15,9 @@ on:
       - 'Scripts/VisualStudio/**'
 
 env:
-    PLATFORM_TOOLSET_VERSION: 6.2
-    HIP_PATH: C:\Program Files\AMD\ROCm\6.2\
-    HIPSDK_INSTALLER_VERSION: 24.Q4
+    PLATFORM_TOOLSET_VERSION: 6.4
+    HIP_PATH: C:\Program Files\AMD\ROCm\6.4\
+    HIPSDK_INSTALLER_VERSION: 25.Q3
 
 jobs:
     build:
