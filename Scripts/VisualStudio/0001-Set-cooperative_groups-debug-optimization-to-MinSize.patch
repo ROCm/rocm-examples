@@ -1,0 +1,53 @@
+From b4a91a5d5c6a2dea9bcca9bba029d44cc4a96b66 Mon Sep 17 00:00:00 2001
+From: zichguan-amd <zichuan.guan@amd.com>
+Date: Tue, 19 Aug 2025 11:41:59 -0400
+Subject: [PATCH] Set cooperative_groups debug optimization to MinSize
+
+Workaround cooperative_groups O0 compilation issue until HIP SDK 7
+
+Signed-off-by: zichguan-amd <zichuan.guan@amd.com>
+---
+ HIP-Basic/cooperative_groups/cooperative_groups_vs2017.vcxproj | 1 +
+ HIP-Basic/cooperative_groups/cooperative_groups_vs2019.vcxproj | 1 +
+ HIP-Basic/cooperative_groups/cooperative_groups_vs2022.vcxproj | 1 +
+ 3 files changed, 3 insertions(+)
+
+diff --git a/HIP-Basic/cooperative_groups/cooperative_groups_vs2017.vcxproj b/HIP-Basic/cooperative_groups/cooperative_groups_vs2017.vcxproj
+index 69d07721..4d85f7b4 100644
+--- a/HIP-Basic/cooperative_groups/cooperative_groups_vs2017.vcxproj
++++ b/HIP-Basic/cooperative_groups/cooperative_groups_vs2017.vcxproj
+@@ -76,6 +76,7 @@
+       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <LanguageStandard>stdcpp17</LanguageStandard>
+       <RuntimeTypeInfo>true</RuntimeTypeInfo>
++      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MinSize</Optimization>
+     </ClCompile>
+     <Link>
+       <SubSystem>Console</SubSystem>
+diff --git a/HIP-Basic/cooperative_groups/cooperative_groups_vs2019.vcxproj b/HIP-Basic/cooperative_groups/cooperative_groups_vs2019.vcxproj
+index 10e1156b..eb45b707 100644
+--- a/HIP-Basic/cooperative_groups/cooperative_groups_vs2019.vcxproj
++++ b/HIP-Basic/cooperative_groups/cooperative_groups_vs2019.vcxproj
+@@ -76,6 +76,7 @@
+       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <LanguageStandard>stdcpp17</LanguageStandard>
+       <RuntimeTypeInfo>true</RuntimeTypeInfo>
++      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MinSize</Optimization>
+     </ClCompile>
+     <Link>
+       <SubSystem>Console</SubSystem>
+diff --git a/HIP-Basic/cooperative_groups/cooperative_groups_vs2022.vcxproj b/HIP-Basic/cooperative_groups/cooperative_groups_vs2022.vcxproj
+index 7447dfa2..65e2e352 100644
+--- a/HIP-Basic/cooperative_groups/cooperative_groups_vs2022.vcxproj
++++ b/HIP-Basic/cooperative_groups/cooperative_groups_vs2022.vcxproj
+@@ -76,6 +76,7 @@
+       <AdditionalIncludeDirectories>$(MSBuildProjectDirectory)\..\..\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+       <LanguageStandard>stdcpp17</LanguageStandard>
+       <RuntimeTypeInfo>true</RuntimeTypeInfo>
++      <Optimization Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">MinSize</Optimization>
+     </ClCompile>
+     <Link>
+       <SubSystem>Console</SubSystem>
+-- 
+2.43.0
+
