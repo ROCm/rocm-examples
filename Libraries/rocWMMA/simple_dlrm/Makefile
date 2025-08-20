@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,31 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries LANGUAGES CXX)
-include(CTest)
+EXAMPLE := rocwmma_simple_dlrm
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME := HIP
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
 
-# CMake configuration files for CUDA versions of HIP libraries are not yet
-# included under the HIP SDK for Windows.
-if(
-    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
-)
-    add_subdirectory(hipBLAS)
-    add_subdirectory(hipBLASLt)
-    add_subdirectory(hipCUB)
-    add_subdirectory(hipFFT)
-    add_subdirectory(hipRAND)
-    add_subdirectory(hipSOLVER)
-    add_subdirectory(hipTensor)
-    add_subdirectory(rocBLAS)
-    add_subdirectory(rocFFT)
-    add_subdirectory(rocPRIM)
-    add_subdirectory(rocRAND)
-    add_subdirectory(rocSOLVER)
-    add_subdirectory(rocSPARSE)
-    add_subdirectory(rocThrust)
-    add_subdirectory(rocWMMA)
-endif()
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+
+HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+ROCWMMA_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+CXXFLAGS  ?= -Wall -Wextra
+ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCWMMA_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS)
+ILDFLAGS  := $(LDFLAGS)
+ILDLIBS   := $(LDLIBS)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
