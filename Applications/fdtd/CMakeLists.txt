@@ -63,7 +63,7 @@ endif()
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 
 if(UNIX)
-    target_link_libraries(${example_name} PRIVATE ${CMAKE_DL_LIBS})
+    target_link_libraries(${example_name} PRIVATE ${CMAKE_DL_LIBS} $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>)
 endif()
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})

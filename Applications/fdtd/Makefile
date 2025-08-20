@@ -36,7 +36,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  :=
-ILDLIBS   :=
+ILDLIBS   := -lstdc++fs
 
 ifeq ($(GPU_RUNTIME), CUDA)
 	ICXXFLAGS += -x cu
