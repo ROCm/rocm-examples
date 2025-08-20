@@ -37,7 +37,8 @@ LIBRARIES += \
 	rocPRIM \
 	rocSOLVER \
 	rocSPARSE \
-	rocThrust
+	rocThrust \
+	rocWMMA
 endif
 
 all: $(LIBRARIES)

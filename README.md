@@ -440,5 +440,16 @@ The following options are available when building with CMake.
     - [remove_points](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocThrust/remove_points/): Simple program that demonstrates the usage of the `thrust` random number generation, host vector, generation, tuple, zip iterator, and conditional removal templates. It generates a number of random points in a unit square and then removes all of them outside the unit circle.
     - [saxpy](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocThrust/saxpy/): Simple program that implements the SAXPY operation (`y[i] = a * x[i] + y[i]`) using rocThrust and showcases the usage of the vector and functor templates and of `thrust::fill` and `thrust::transform` operations.
     - [vectors](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocThrust/vectors/): Simple program that showcases the `host_vector` and the `device_vector` of rocThrust.
+  - [rocWMMA](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/)
+    - [hiprtc_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/hiprtc_gemm/) : Showcases a simple matrix-matrix multiplication via hipRTC.
+    - [perf_dgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/perf_dgemm/) : Showcases a performant double-precision matrix-matrix multiplication.
+    - [perf_hgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/perf_hgemm/) : Showcases a performant half-precision matrix-matrix multiplication.
+    - [perf_sgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/perf_sgemm/) : Showcases a performant single-precision matrix-matrix multiplication.
+    - [simple_dgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_dgemm/) : Showcases a simple double-precision matrix-matrix multiplication.
+    - [simple_dgemv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_dgemv/) : Showcases a simple double-precision matrix-vector multiplication.
+    - [simple_dlrm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_dlrm/) : Showcases a simple deep learning recommendation model (DLRM) computation.
+    - [simple_hgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_hgemm/) : Showcases a simple half-precision matrix-matrix multiplication.
+    - [simple_sgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_sgemm/) : Showcases a simple single-precision matrix-matrix multiplication.
+    - [simple_sgemv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_sgemv/) : Showcases a simple single-precision matrix-vector multiplication.
 - [Tutorials](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tutorials/): Showcases HIP Documentation Tutorials.
   - [reduction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tutorials/reduction/): Showcases a reduction tutorial for HIP Documentation.
