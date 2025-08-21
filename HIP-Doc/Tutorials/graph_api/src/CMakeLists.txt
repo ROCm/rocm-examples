@@ -20,17 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-	Programming-Guide \
-	Reference \
-	Tutorials
+set(example_streams ${PROJECT_NAME}_streams)
 
-all: $(SUBDIRECTORIES)
+add_executable(${example_streams} backprojection.hip
+                                  filtering.hip
+                                  main_streams.hip
+                                  normalization.hip
+                                  projection.cpp
+                                  shifting.hip
+                                  volume.cpp
+                                  weighting.hip)
 
-clean: TARGET=clean
-clean: all
+set_target_properties(${example_streams} PROPERTIES CXX_EXTENSIONS OFF
+                                                    CXX_SCAN_FOR_MODULES OFF
+                                                    HIP_EXTENSIONS OFF)
 
-$(SUBDIRECTORIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(SUBDIRECTORIES)
+target_compile_definitions(${example_streams} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\""
+                                                      $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+target_compile_features(${example_streams} PRIVATE cxx_std_20 hip_std_20)
+target_link_libraries(${example_streams} PRIVATE hip::hipfft TIFF::tiff TIFF::CXX)

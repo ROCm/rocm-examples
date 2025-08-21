@@ -21,9 +21,7 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-	Programming-Guide \
-	Reference \
-	Tutorials
+	Graph-API
 
 all: $(SUBDIRECTORIES)
 
