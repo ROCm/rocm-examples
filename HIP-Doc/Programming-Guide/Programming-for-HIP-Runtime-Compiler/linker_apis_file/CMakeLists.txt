@@ -30,15 +30,6 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
-    set(USED_LANGUAGE "CXX")
-    find_package(hip REQUIRED)
-    find_package(hiprtc REQUIRED)
-else()
-    set(USED_LANGUAGE "CUDA")
-    find_package(CUDAToolkit REQUIRED) # We must explicitly link the CUDA driver library and NVRTC.
-endif()
-
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
@@ -54,6 +45,15 @@ else()
 endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
+    set(USED_LANGUAGE "CXX")
+    find_package(hip REQUIRED)
+    find_package(hiprtc REQUIRED)
+else()
+    set(USED_LANGUAGE "CUDA")
+    find_package(CUDAToolkit REQUIRED) # We must explicitly link the CUDA driver library and NVRTC.
+endif()
 
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${USED_LANGUAGE})
 
