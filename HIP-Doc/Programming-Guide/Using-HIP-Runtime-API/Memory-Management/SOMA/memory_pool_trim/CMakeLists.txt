@@ -31,6 +31,12 @@ endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/HipPlatform.cmake")
 select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
+
+set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
     set(USED_LANGUAGE "CXX")
@@ -38,13 +44,6 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
 else()
     set(USED_LANGUAGE "CUDA")
 endif()
-
-enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
-select_hip_platform()
-
-set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest

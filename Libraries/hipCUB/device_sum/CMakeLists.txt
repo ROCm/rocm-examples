@@ -41,9 +41,21 @@ set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
 set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
 set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
 
-if(NOT CMAKE_PREFIX_PATH)
-    set(CMAKE_PREFIX_PATH "/opt/rocm")
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hipcub REQUIRED)
 
