@@ -55,7 +55,7 @@ ILDLIBS   += $(LDLIBS)
 SRCS := main.hip $(EXTERNAL_DIR)/glad/glad.cpp
 
 $(EXAMPLE): $(SRCS) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(EXTERNAL_DIR)/CmdParser/cmdparser.hpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SRCS) $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(abspath $(SRCS)) $(ILDLIBS)
 
 $(EXTERNAL_DIR)/glad/glad.cpp: $(EXTERNAL_DIR)/glad/glad.h
 

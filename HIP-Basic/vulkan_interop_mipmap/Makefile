@@ -59,16 +59,16 @@ ILDFLAGS   += $(LDFLAGS)
 ILDLIBS    += $(LDLIBS)
 IGLSLFLAGS += $(GLSLFLAGS)
 
-$(EXAMPLE): main.hip vulkan_utils.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp sinewave.frag.spv.h sinewave.vert.spv.h
+$(EXAMPLE): main.hip vulkan_utils.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp texture.frag.spv.h texture.vert.spv.h
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip vulkan_utils.hip $(ILDLIBS)
 
-sinewave.vert.spv.h: sinewave.vert
-	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn sinewave_vert
+texture.vert.spv.h: texture.vert
+	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn texture_vert
 
-sinewave.frag.spv.h: sinewave.frag
-	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn sinewave_frag
+texture.frag.spv.h: texture.frag
+	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn texture_frag
 
 clean:
-	$(RM) $(EXAMPLE) sinewave.frag.spv.h sinewave.vert.spv.h
+	$(RM) $(EXAMPLE) texture.frag.spv.h texture.vert.spv.h
 
 .PHONY: clean
