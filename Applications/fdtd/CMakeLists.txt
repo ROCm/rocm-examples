@@ -25,6 +25,7 @@ set(example_name applications_fdtd)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/FindFilesystem.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()
 
@@ -63,7 +64,7 @@ endif()
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 
 if(UNIX)
-    target_link_libraries(${example_name} PRIVATE ${CMAKE_DL_LIBS} $<$<AND:$<CXX_COMPILER_ID:GNU>,$<VERSION_LESS:$<CXX_COMPILER_VERSION>,9.0>>:stdc++fs>)
+    target_link_libraries(${example_name} PRIVATE ${CMAKE_DL_LIBS} ${CXX_FS_LIBRARY})
 endif()
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})

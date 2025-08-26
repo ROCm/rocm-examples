@@ -20,42 +20,48 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hip_linker_apis_file
-GPU_RUNTIME := HIP
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
-# HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
-HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+include(CMakePushCheckState)
+include(CheckCXXSourceCompiles)
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-# Common variables and flags
-CXX_STD   := c++17
-ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS :=
-ILDFLAGS  :=
-ILDLIBS   := -lstdc++fs
+cmake_push_check_state()
 
-ifeq ($(GPU_RUNTIME), CUDA)
-	ICXXFLAGS += -x cu
-	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
-	ILDLIBS += -lnvrtc -lcuda
-else ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
-	ILDLIBS += -lhiprtc
-else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
-endif
+set(test_code
+[[
+#include <filesystem>
+#include <iostream>
 
-ICXXFLAGS += $(CXXFLAGS)
-ICPPFLAGS += $(CPPFLAGS)
-ILDFLAGS  += $(LDFLAGS)
-ILDLIBS   += $(LDLIBS)
+namespace fs = std::filesystem;
 
-$(EXAMPLE): main.cpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+int main()
+{
+    std::cout << fs::current_path() << std::endl;
+    return 0;
+}
+]]
+)
+# Check if std::filesystem works without additional libraries
+check_cxx_source_compiles("${test_code}" CXX_FS_NO_LINK)
 
-clean:
-	$(RM) $(EXAMPLE)
+if (CXX_FS_NO_LINK)
+    message(STATUS "No extra linking required to use std::filesystem")
+else()
+    # Check if we can link stdc++fs
+	set(CMAKE_REQUIRED_LIBRARIES stdc++fs)
+	check_cxx_source_compiles("${test_code}" CXX_FS_CAN_LINK)
+    if (CXX_FS_CAN_LINK)
+        set(CXX_FS_LIBRARY stdc++fs CACHE STRING "Additional library required to use std::filesystem" FORCE)
+        message(STATUS "Need explicite linking to stdc++fs")
+    endif()
+endif()
 
-.PHONY: clean
+unset(test_code)
+cmake_pop_check_state()
+
+if(NOT CXX_FS_NO_LINK AND NOT CXX_FS_CAN_LINK)
+    message(FATAL_ERROR "Cannot run simple program using std::filesystem")
+endif()
