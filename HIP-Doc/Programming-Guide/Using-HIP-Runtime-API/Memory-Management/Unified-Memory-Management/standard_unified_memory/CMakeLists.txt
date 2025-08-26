@@ -31,7 +31,7 @@ endif()
 
 if(NOT DEFINED ENV{HSA_XNACK})
     message(FATAL_ERROR "Environment variable HSA_XNACK must be set for this example!")
-elseif(NOT ENV{HSA_XNACK} EQUAL 1)
+elseif(NOT $ENV{HSA_XNACK} EQUAL 1)
     message(FATAL_ERROR "Environment variable HSA_XNACK must be set to 1 for this example!")
 endif()
 
