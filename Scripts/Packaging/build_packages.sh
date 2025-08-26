@@ -36,6 +36,7 @@ BUILD_DIR="$SRC_DIR/build"
 DEB_DIR="$BUILD_DIR/deb"
 RPM_DIR="$BUILD_DIR/rpm"
 PACKGEN="" # Default is both DEB and RPM
+ROCM_ROOT="/opt/rocm"
 
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
@@ -66,6 +67,7 @@ while [ : ]; do
       echo "  --deb-dir <path>                 Set the DEB directory"
       echo "  --rpm-dir <path>                 Set the RPM directory"
       echo "  --packgen <format>               Specify the package format. Options 'DEB' or 'RPM'. Default: '', which generates both."      
+      echo "  --rocm-root <path>               Set the ROCM_ROOT directory"
       exit 0
       ;;
     --pkgname)
@@ -112,6 +114,10 @@ while [ : ]; do
       PACKGEN="$2"
       shift 2
       ;;
+    --rocm-root)
+      ROCM_ROOT="$2"
+      shift 2
+      ;;
     --)
       shift
       break
@@ -154,6 +160,7 @@ print_input_variables() {
     echo "DEB_DIR=$DEB_DIR"
     echo "RPM_DIR=$RPM_DIR"
     echo "PACKGEN=$PACKGEN"
+    echo "ROCM_ROOT=$ROCM_ROOT"
     echo "************************************"
 }
 
@@ -161,7 +168,7 @@ build_project() {
     echo "** Building the project **"
     mkdir -p "$BUILD_DIR"
     pushd "$BUILD_DIR" || exit
-    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$SRC_DIR"
+    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$SRC_DIR" -DROCM_ROOT="$ROCM_ROOT"
     make -j$(nproc)
     popd || exit
 }
