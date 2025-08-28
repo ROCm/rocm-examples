@@ -84,8 +84,8 @@ int main()
         HIP_CHECK(hipMemcpy(d_dataA, vectorA.data(), arraySize * sizeof(*d_dataA), hipMemcpyHostToDevice));
         HIP_CHECK(hipMemcpy(d_dataB, vectorB.data(), arraySize * sizeof(*d_dataB), hipMemcpyHostToDevice));
         // Launch the GPU kernels
-        hipLaunchKernelGGL(kernelA, dim3(numOfBlocks), dim3(threadsPerBlock), 0, 0, d_dataA, arraySize);
-        hipLaunchKernelGGL(kernelB, dim3(numOfBlocks), dim3(threadsPerBlock), 0, 0, d_dataA, d_dataB, arraySize);
+        kernelA<<<numOfBlocks, threadsPerBlock>>>(d_dataA, arraySize);
+        kernelB<<<numOfBlocks, threadsPerBlock>>>(d_dataA, d_dataB, arraySize);
         // Device to Host copies
         HIP_CHECK(hipMemcpy(vectorA.data(), d_dataA, arraySize * sizeof(*vectorA.data()), hipMemcpyDeviceToHost));
         HIP_CHECK(hipMemcpy(vectorB.data(), d_dataB, arraySize * sizeof(*vectorB.data()), hipMemcpyDeviceToHost));

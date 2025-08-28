@@ -93,13 +93,13 @@ int main()
         // Stream 2: Host to Device 2
         HIP_CHECK(hipMemcpyAsync(d_dataB, vectorB.data(), arraySize * sizeof(*d_dataB), hipMemcpyHostToDevice, streamB));
         // Stream 1: Kernel 1
-        hipLaunchKernelGGL(kernelA, dim3(numOfBlocks), dim3(threadsPerBlock), 0, streamA, d_dataA, arraySize);
+        kernelA<<<numOfBlocks, threadsPerBlock, 0, streamA>>>(d_dataA, arraySize);
         // Record event after the GPU kernel in Stream 1
         HIP_CHECK(hipEventRecord(event, streamA));
         // Stream 2: Wait for event before starting Kernel 2
         HIP_CHECK(hipStreamWaitEvent(streamB, event, 0));
         // Stream 2: Kernel 2
-        hipLaunchKernelGGL(kernelB, dim3(numOfBlocks), dim3(threadsPerBlock), 0, streamB, d_dataA, d_dataB, arraySize);
+        kernelB<<<numOfBlocks, threadsPerBlock, 0, streamB>>>(d_dataA, d_dataB, arraySize);
         // Stream 1: Device to Host 2 (after Kernel 1)
         HIP_CHECK(hipMemcpyAsync(vectorA.data(), d_dataA, arraySize * sizeof(*vectorA.data()), hipMemcpyDeviceToHost, streamA));
         // Stream 2: Device to Host 2 (after Kernel 2)

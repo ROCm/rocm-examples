@@ -23,14 +23,14 @@
   <ItemGroup>
     <CustomBuild Include="myKernel.hip">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o "$(OutDir)myKernel.hsaco" %(Identity) --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Compiling HIP Code Object myKernel.hsaco</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(OutDir)myKernel.hsaco</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o "$(OutDir)myKernel.hsaco" %(Identity) --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Compiling HIP Code Object myKernel.hsaco</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(OutDir)myKernel.hsaco</Outputs>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(BinDir)myKernel.hsaco</ObjectFileName>
-      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(BinDir)myKernel.hsaco</ObjectFileName>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o "$(OutDir)myKernel.hsaco" %(Identity) --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">Compiling to HSA Code Object myKernel.hsaco</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">$(OutDir)myKernel.hsaco</Outputs>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">"$(ClangToolPath)$(ClangToolExe)" --cuda-device-only -std=c++17 -o "$(OutDir)myKernel.hsaco" %(Identity) --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102</Command>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">Compiling to HSA Code Object myKernel.hsaco</Message>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">$(OutDir)myKernel.hsaco</Outputs>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">$(BinDir)myKernel.hsaco</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64' and '$(PlatformToolset)'=='HIP clang $(HIPVersion)'">$(BinDir)myKernel.hsaco</ObjectFileName>
     </CustomBuild>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />

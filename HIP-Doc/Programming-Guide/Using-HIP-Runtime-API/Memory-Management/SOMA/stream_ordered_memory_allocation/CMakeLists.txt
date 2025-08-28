@@ -34,11 +34,6 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    # The example calls hipInit which internally uses the CUDA driver API. We must explicitly link the driver library.
-    find_package(CUDAToolkit REQUIRED)
-endif()
-
 set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
@@ -53,6 +48,5 @@ set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA
                                                  $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
 target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
 target_include_directories(${example_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
-target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda_driver>)
 
 install(TARGETS ${example_name})

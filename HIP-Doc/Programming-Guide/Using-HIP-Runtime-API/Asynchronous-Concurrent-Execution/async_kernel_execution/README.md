@@ -32,7 +32,6 @@ This example should be compared to the [sequential kernel execution example](../
 * `hipStreamDestroy` destroys a stream.
 * `hipMemcpyAsync` performs a copy operation in a stream. The call returns immediately to the host and the copy
   operation is performed asynchronously.
-* `hipLaunchKernelGGL` can launch a kernel in a stream.
 * `hipStreamSynchronize` blocks the host until all operations in the given stream have finished.
 
 ## Demonstrated API Calls
@@ -50,7 +49,6 @@ This example should be compared to the [sequential kernel execution example](../
 * `hipFree`
 * `hipGetErrorString`
 * `hipMalloc`
-* `hipLaunchKernelGGL`
 * `hipMemcpyAsync`
 * `hipStreamCreate`
 * `hipStreamDestroy`

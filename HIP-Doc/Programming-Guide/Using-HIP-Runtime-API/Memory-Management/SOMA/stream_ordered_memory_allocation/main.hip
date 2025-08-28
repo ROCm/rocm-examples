@@ -52,9 +52,6 @@ __global__ void myKernel(int* data, std::size_t numElements)
 
 int main()
 {
-    // Initialize HIP.
-    HIP_CHECK(hipInit(0));
-
     // Stream 0.
     constexpr hipStream_t streamId = 0;
 

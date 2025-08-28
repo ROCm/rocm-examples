@@ -56,7 +56,7 @@ int main()
     *b = 2;
 
     // Launch add() kernel on GPU.
-    hipLaunchKernelGGL(add, dim3(1), dim3(1), 0, 0, a, b, c);
+    add<<<1, 1>>>(a, b, c);
 
     // Wait for GPU to finish before accessing on host.
     HIP_CHECK(hipDeviceSynchronize());

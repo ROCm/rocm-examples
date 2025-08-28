@@ -21,7 +21,6 @@ bytes between the host and the device. It should be compared to the various unif
 
 * `hipFree` is used to free previously allocated device memory.
 * `hipGetErrorString` transforms a HIP error code into a human-readable string.
-* `hipLaunchKernelGGL` is used to launch a kernel on the device.
 * `hipMalloc` is used to allocate device memory.
 * `hipMemcpy` is used to transfer bytes between the host and the device.
 
@@ -34,6 +33,5 @@ bytes between the host and the device. It should be compared to the various unif
 * `hipDeviceSynchronize`
 * `hipFree`
 * `hipGetErrorString`
-* `hipLaunchKernelGGL`
 * `hipMalloc`
 * `hipMemcpy`

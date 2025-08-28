@@ -61,7 +61,7 @@ int main()
     HIP_CHECK(hipMemcpy(d_b, &b, sizeof(*d_b), hipMemcpyHostToDevice));
 
     // Launch add() kernel on GPU.
-    hipLaunchKernelGGL(add, dim3(1), dim3(1), 0, 0, d_a, d_b, d_c);
+    add<<<1, 1>>>(d_a, d_b, d_c);
 
     // Copy the result back to the host.
     HIP_CHECK(hipMemcpy(&c, d_c, sizeof(*d_c), hipMemcpyDeviceToHost));
