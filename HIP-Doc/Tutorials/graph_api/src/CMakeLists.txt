@@ -20,41 +20,37 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_objects ${PROJECT_NAME}_objects)
 set(example_streams ${PROJECT_NAME}_streams)
 set(example_graph_capture ${PROJECT_NAME}_graph_capture)
 
-add_executable(${example_streams} backprojection.hip
-                                  filtering.hip
-                                  main_streams.hip
-                                  normalization.hip
-                                  projection.cpp
-                                  shifting.hip
-                                  volume.cpp
-                                  weighting.hip)
+add_library(${example_objects} OBJECT backprojection.hip
+                                      filtering.hip
+                                      log_transform.hip
+                                      normalization.hip
+                                      projection.cpp
+                                      volume.cpp
+                                      weighting.hip)
+set_target_properties(${example_objects} PROPERTIES CXX_EXTENSIONS OFF
+                                                    CXX_SCAN_FOR_MODULES OFF
+                                                    HIP_EXTENSIONS OFF)
+target_compile_definitions(${example_objects} PUBLIC $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+target_compile_features(${example_objects} PRIVATE cxx_std_20 hip_std_20)
+target_link_libraries(${example_objects} PUBLIC hip::hipfft TIFF::tiff TIFF::CXX)
 
+add_executable(${example_streams} main_streams.hip)
 set_target_properties(${example_streams} PROPERTIES CXX_EXTENSIONS OFF
                                                     CXX_SCAN_FOR_MODULES OFF
                                                     HIP_EXTENSIONS OFF)
-
-target_compile_definitions(${example_streams} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\""
-                                                      $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+target_compile_definitions(${example_streams} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\"")
 target_compile_features(${example_streams} PRIVATE cxx_std_20 hip_std_20)
-target_link_libraries(${example_streams} PRIVATE hip::hipfft TIFF::tiff TIFF::CXX)
+target_link_libraries(${example_streams} PRIVATE ${example_objects} hip::hipfft)
 
 
-add_executable(${example_graph_capture}  backprojection.hip
-                                         filtering.hip
-                                         main_graph_capture.hip
-                                         normalization.hip
-                                         projection.cpp
-                                         shifting.hip
-                                         volume.cpp
-                                         weighting.hip)
+add_executable(${example_graph_capture} main_graph_capture.hip)
 set_target_properties(${example_graph_capture} PROPERTIES CXX_EXTENSIONS OFF
                                                           CXX_SCAN_FOR_MODULES OFF
                                                           HIP_EXTENSIONS OFF)
-
-target_compile_definitions(${example_graph_capture} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\""
-                                                            $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+target_compile_definitions(${example_graph_capture} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\"")
 target_compile_features(${example_graph_capture} PRIVATE cxx_std_20 hip_std_20)
-target_link_libraries(${example_graph_capture} PRIVATE hip::hipfft TIFF::tiff TIFF::CXX)
+target_link_libraries(${example_graph_capture} PRIVATE ${example_objects} hip::hipfft)

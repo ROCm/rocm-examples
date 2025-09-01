@@ -42,12 +42,8 @@ __global__ void normalization_kernel(std::uint16_t const* __restrict__ in, std::
             auto in_row = reinterpret_cast<std::uint16_t const*>(reinterpret_cast<char const*>(in) + v * in_pitch);
             auto out_row = reinterpret_cast<float*>(reinterpret_cast<char*>(out) + v * out_pitch);
 
-            // Make sure there are no garbage bits in the input
-            auto val = in_row[h];
-            val &= 0x0FFF;
-
-            // Normalize and invert; we want black surroundings and a white object
-            out_row[h] = 1.f - (static_cast<float>(val) / maximum);
+            // Normalize
+            out_row[h] = static_cast<float>(in_row[h]) / maximum;
         }
     }
 }

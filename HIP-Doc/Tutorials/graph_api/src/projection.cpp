@@ -25,6 +25,7 @@
 #include <tiffio.h>
 #include <tiffio.hxx>
 
+#include <cmath>
 #include <cstdarg>
 #include <cstddef>
 #include <cstdint>
@@ -77,7 +78,7 @@ void get_field(TIFF* tiff, std::uint32_t tag, auto& param, std::string error_msg
         throw std::runtime_error{error_msg};
 }
 
-void get_projection_dims(std::string path, std::uint32_t& N_h, std::uint32_t& N_v) noexcept(false)
+projection_geometry::projection_geometry(std::string path) noexcept(false)
 {
     std::ifstream file{path.c_str(), std::ios::binary};
     if(!file.is_open())
@@ -91,6 +92,20 @@ void get_projection_dims(std::string path, std::uint32_t& N_h, std::uint32_t& N_
     get_field(tiff, TIFFTAG_IMAGELENGTH, N_v, "Could not determine TIFF's image length.");
 
     TIFFClose(tiff);
+
+    // N_h: number of detector pixels (horizontal)
+    // d_h: detector pixel size (mm)
+    // delta_h: physical shift (mm), negative values shift detector coordinate system to the left
+    h_min = -((N_h - 1) * d_h) / 2.f + delta_h;
+    v_min = -((N_v - 1) * d_v) / 2.f + delta_v;
+
+    // Filter length
+    N_hFFT = std::pow(2.f, std::ceil(std::log2(N_h)));
+    s_N_hFFT = static_cast<std::int32_t>(N_hFFT);
+
+    // Transformed filter length
+    N_hTrans = N_hFFT / 2 + 1;
+    s_N_hTrans = static_cast<std::int32_t>(N_hTrans);
 }
 
 void load_projection(void* args) noexcept

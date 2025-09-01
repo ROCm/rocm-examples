@@ -22,8 +22,8 @@
 
 #include "backprojection.hpp"
 #include "filtering.hpp"
+#include "log_transform.hpp"
 #include "normalization.hpp"
-#include "shifting.hpp"
 #include "projection.hpp"
 #include "utility.hpp"
 #include "weighting.hpp"
@@ -35,6 +35,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
@@ -43,7 +44,6 @@
 #include <numbers>
 #include <set>
 #include <stdexcept>
-#include <utility>
 #include <vector>
 
 #ifndef DATA_DIRECTORY
@@ -69,37 +69,8 @@ auto main() -> int
         for(auto&& stream : streams)
             hip_check(hipStreamCreate(&stream));
 
-        // Detector constants - all units in mm unless stated otherwise
-        constexpr auto d_sd = 553.74f; // Distance between source and detector
-        constexpr auto d_so = 210.66f; // Distance between source and origin (object center).
-        constexpr auto d_h = 0.05f; // horizontal physical length of a pixel
-        constexpr auto d_v = 0.05f; // vertical physical length of a pixel
-        constexpr auto theta_step = 0.5f; // angle step size [°]
-        constexpr auto shift_h = 4; // horizontal shift [px]
-        constexpr auto shift_v = 0; // vertical shift [px]
-        auto const delta_h = shift_h * d_h; // physical horizontal shift
-        auto const delta_v = shift_v * d_v; // physical vertical shift
-        constexpr auto bps = 12; // bits per sample (pixel) in input projection [no unit]
-
-        // Initialized after first projection is loaded - all units are px unless stated otherwise
-        auto N_h = std::uint32_t{}; // horizontal size
-        auto N_v = std::uint32_t{}; // vertical size
-        auto N_hFFT = std::uint32_t{}; // filter length
-        auto s_N_hFFT = std::int32_t{}; // signed filter length
-        auto N_hTrans = std::uint32_t{}; // transformed length
-        auto s_N_hTrans = std::int32_t{}; // signed transformed length
-        auto h_min = float{}; // Horizontal physical center of the detector [mm]
-        auto v_min = float{}; // Vertical physical center of the detector [mm]
-
-        // Volume constants - initialized after first projection is loaded
-        auto alpha = float{};
-        auto radius = float{};
-        auto d_x = float{}; // physical voxel size in x direction [mm]
-        auto d_y = float{}; // physical voxel size in y direction [mm]
-        auto d_z = float{}; // physical voxel size in z direction [mm]
-        auto N_x = std::size_t{}; // number of voxels in x direction
-        auto N_y = std::size_t{}; // number of voxels in y direction
-        auto N_z = std::size_t{}; // number of voxels in z direction
+        auto proj_geom = projection_geometry{};
+        auto vol_geom = volume_geometry{};
         auto num_subvols = int{}; // number of subvolumes
         auto sub_N_z  = std::vector<std::size_t>{}; // number of voxels in z direction for each subvolume
 
@@ -119,8 +90,6 @@ auto main() -> int
         auto host_inputs = std::vector<std::uint16_t*>{};
         auto input_projections = std::vector<std::uint16_t*>{};
         auto input_pitches = std::vector<std::size_t>{};
-        auto shifted_projections = std::vector<std::uint16_t*>{};
-        auto shifted_pitches = std::vector<std::size_t>{};
         auto projections = std::vector<float*>{};
         auto projection_pitches = std::vector<std::size_t>{};
         auto expanded_projections = std::vector<float*>{};
@@ -156,67 +125,40 @@ auto main() -> int
             else
             {
                 std::cout << "Initializing... ";
-                get_projection_dims(path.string(), N_h, N_v);
+                proj_geom = projection_geometry{path.string()};
+                vol_geom = volume_geometry{proj_geom};
 
                 auto stream = streams.at(0);
 
-                // N_h: number of detector pixels (horizontal)
-                // d_h: detector pixel size (mm)
-                // delta_h: physical shift (mm), positive values shift detector to the left
-                h_min = -((N_h - 1) * d_h) / 2.f + delta_h;
-                v_min = -((N_v - 1) * d_v) / 2.f + delta_v;
-
-                //h_min = delta_h - ((d_h * N_h) / 2.f);
-
-                // Filter length
-                N_hFFT = /*2u **/ std::pow(2.f, std::ceil(std::log2(N_h)));
-                s_N_hFFT = static_cast<std::int32_t>(N_hFFT);
-
-                // Transformed filter length
-                N_hTrans = N_hFFT / 2 + 1;
-                s_N_hTrans = static_cast<std::int32_t>(N_hTrans);
-
                 // Create filter kernel
-                hip_check(hipMalloc(&r, N_hFFT * sizeof(float)));
-                auto const creation_blocks = std::max((N_hFFT / 1024), 1u);
-                filter_creation_kernel<<<creation_blocks, 1024, 0, stream>>>(r, s_N_hFFT, d_h);
+                hip_check(hipMalloc(&r, proj_geom.N_hFFT * sizeof(float)));
+                auto const creation_blocks = std::max((proj_geom.N_hFFT / 1024), 1u);
+                filter_creation_kernel<<<creation_blocks, 1024, 0, stream>>>(r, proj_geom.s_N_hFFT, proj_geom.d_h);
 
-                hip_check(hipMalloc(&R, N_hTrans * sizeof(hipfftComplex)));
+                hip_check(hipMalloc(&R, proj_geom.N_hTrans * sizeof(hipfftComplex)));
                 auto filter_plan = hipfftHandle{};
-                hipfft_check(hipfftPlan1d(&filter_plan, N_hFFT, HIPFFT_R2C, 1));
+                hipfft_check(hipfftPlan1d(&filter_plan, proj_geom.N_hFFT, HIPFFT_R2C, 1));
                 hipfft_check(hipfftSetStream(filter_plan, stream));
                 hipfft_check(hipfftExecR2C(filter_plan, r, R));
 
-                auto absolute_blocks = std::max(1u, ((N_hTrans / 1024u) + 1u));
-                filter_absolute_kernel<<<absolute_blocks, 1024, 0, stream>>>(R, N_hTrans, d_h);
+                auto absolute_blocks = std::max(1u, ((proj_geom.N_hTrans / 1024u) + 1u));
+                filter_absolute_kernel<<<absolute_blocks, 1024, 0, stream>>>(R, proj_geom.N_hTrans, proj_geom.d_h);
 
                 hip_check(hipStreamSynchronize(stream));
                 
                 hipfft_check(hipfftDestroy(filter_plan));
                 hip_check(hipFree(r));
 
-                /* Calculate volume dimensions */
-                alpha = std::atan((((N_h * d_h) / 2.f) + std::abs(delta_h)) / d_sd);
-                radius = std::abs(d_so) * std::sin(alpha);
-
-                d_x = radius / ((((N_h * d_h) / 2.f) + std::abs(delta_h)) / d_h);
-                d_y = d_x;
-                d_z = d_x;
-
-                N_x = (2.f * radius) / d_x;
-                N_y = N_x;
-                N_z = ((N_v * d_v / 2.f) + std::abs(delta_v)) * (std::abs(d_so) / d_sd) * (2.f / d_z);
-
                 /* Estimate number of subvolumes. We will split the volume along the z axis */
-                auto const input_proj_single = N_h * N_v * sizeof(std::uint16_t);
+                auto const input_proj_single = proj_geom.N_h * proj_geom.N_v * sizeof(std::uint16_t);
                 auto const input_proj_total = input_proj_single * 2u * num_streams;
-                auto const proj_single = N_h * N_v * sizeof(float);
+                auto const proj_single = proj_geom.N_h * proj_geom.N_v * sizeof(float);
                 auto const proj_total = proj_single * num_streams;
-                auto const expanded_single = N_hFFT * N_v * sizeof(float);
+                auto const expanded_single = proj_geom.N_hFFT * proj_geom.N_v * sizeof(float);
                 auto const expanded_total = expanded_single * num_streams;
-                auto const transformed_single = N_hTrans * N_v * sizeof(hipfftComplex);
+                auto const transformed_single = proj_geom.N_hTrans * proj_geom.N_v * sizeof(hipfftComplex);
                 auto const transformed_total = transformed_single * num_streams;
-                auto const volume_total = N_x * N_y * N_z * sizeof(float);
+                auto const volume_total = vol_geom.N_x * vol_geom.N_y * vol_geom.N_z * sizeof(float);
                 auto const mem_total = input_proj_total + proj_total + expanded_total + transformed_total + volume_total;
                 auto dev_mem_free = std::size_t{};
                 auto dev_mem_total = std::size_t{};
@@ -234,11 +176,11 @@ auto main() -> int
                 if((dev_mem_free - mem_required) < (1024 * 1024 * 1024))
                     num_subvols *= 2;
 
-                auto const s_N_z = N_z / num_subvols;
+                auto const s_N_z = vol_geom.N_z / num_subvols;
                 for(auto i = 0; i < num_subvols - 1; ++i)
                     sub_N_z.push_back(s_N_z);
 
-                if(auto const remainder = N_z % num_subvols; remainder == 0)
+                if(auto const remainder = vol_geom.N_z % num_subvols; remainder == 0)
                     sub_N_z.push_back(s_N_z);
                 else
                     sub_N_z.push_back(s_N_z + remainder);
@@ -247,19 +189,21 @@ auto main() -> int
                 hip_check(hipEventCreate(&save_event));
 
                 std::cout << "Done!" << std::endl;
-                std::cout << "Volume dimensions: " << N_x << " x " << N_y << " x " << N_z << std::endl;
+                std::cout << "Volume dimensions: " << vol_geom.N_x << " x "
+                                                   << vol_geom.N_y << " x "
+                                                   << vol_geom.N_z << std::endl;
                 if(num_subvols > 1)
                 {
                     std::cout << "Number of subvolumes: " << num_subvols << std::endl;
                     for(auto s_N_z : sub_N_z)
-                        std::cout << "\tDimensions: " << N_x << " x " << N_y << " x " << s_N_z << std::endl;
+                        std::cout << "\tDimensions: " << vol_geom.N_x << " x " << vol_geom.N_y << " x " << s_N_z << std::endl;
                 }
 
                 break;
             }
         }
 
-        // Initialize stream data
+        // Initialize per-stream data
         auto host_output = static_cast<float*>(nullptr);        
         for(auto stream_idx = 0; stream_idx < streams.size(); ++stream_idx)
         {
@@ -267,38 +211,35 @@ auto main() -> int
             auto stream = streams.at(stream_idx);
 
             auto host_input = static_cast<std::uint16_t*>(nullptr);
-            hip_check(hipHostMalloc(&host_input, N_h * N_v * sizeof(std::uint16_t), hipHostMallocWriteCombined));
+            hip_check(hipHostMalloc(&host_input,
+                                    proj_geom.N_h * proj_geom.N_v * sizeof(std::uint16_t),
+                                    hipHostMallocWriteCombined));
             host_inputs.push_back(host_input);
 
-            hip_check(hipHostMalloc(&host_output, N_h * N_v * sizeof(float), hipHostMallocDefault));
+            hip_check(hipHostMalloc(&host_output, proj_geom.N_h * proj_geom.N_v * sizeof(float), hipHostMallocDefault));
 
             auto input = static_cast<std::uint16_t*>(nullptr);
             auto input_pitch = std::size_t{};
-            hip_check(hipMallocPitch(&input, &input_pitch, N_h * sizeof(std::uint16_t), N_v));
+            hip_check(hipMallocPitch(&input, &input_pitch, proj_geom.N_h * sizeof(std::uint16_t), proj_geom.N_v));
             input_projections.push_back(input);
             input_pitches.push_back(input_pitch);
 
-            auto shifted = static_cast<std::uint16_t*>(nullptr);
-            auto shifted_pitch = std::size_t{};
-            hip_check(hipMallocPitch(&shifted, &shifted_pitch, N_h * sizeof(std::uint16_t), N_v));
-            shifted_projections.push_back(shifted);
-            shifted_pitches.push_back(shifted_pitch);
-
             auto proj = static_cast<float*>(nullptr);
             auto proj_pitch = std::size_t{};
-            hip_check(hipMallocPitch(&proj, &proj_pitch, N_h * sizeof(float), N_v));
+            hip_check(hipMallocPitch(&proj, &proj_pitch, proj_geom.N_h * sizeof(float), proj_geom.N_v));
             projections.push_back(proj);
             projection_pitches.push_back(proj_pitch);
 
             auto expanded = static_cast<float*>(nullptr);
             auto expanded_pitch = std::size_t{};
-            hip_check(hipMallocPitch(&expanded, &expanded_pitch, N_hFFT * sizeof(float), N_v));
+            hip_check(hipMallocPitch(&expanded, &expanded_pitch, proj_geom.N_hFFT * sizeof(float), proj_geom.N_v));
             expanded_projections.push_back(expanded);
             expanded_pitches.push_back(expanded_pitch);
             
             auto transformed = static_cast<hipfftComplex*>(nullptr);
             auto transformed_pitch = std::size_t{};
-            hip_check(hipMallocPitch(&transformed, &transformed_pitch, N_hTrans * sizeof(hipfftComplex), N_v));
+            hip_check(hipMallocPitch(&transformed, &transformed_pitch,
+                                     proj_geom.N_hTrans * sizeof(hipfftComplex), proj_geom.N_v));
             transformed_projections.push_back(transformed);
             transformed_pitches.push_back(transformed_pitch);
 
@@ -311,10 +252,10 @@ auto main() -> int
             auto fw_ostride = 1;
             auto fw_odist = fw_onembed;
             hipfft_check(hipfftCreate(&forward));
-            hipfft_check(hipfftMakePlanMany(forward, 1, &s_N_hFFT,
+            hipfft_check(hipfftMakePlanMany(forward, 1, &proj_geom.s_N_hFFT,
                                             &fw_inembed, 1, fw_idist,
                                             &fw_onembed, 1, fw_odist,
-                                            HIPFFT_R2C, static_cast<int>(N_v), &forward_size));
+                                            HIPFFT_R2C, static_cast<int>(proj_geom.N_v), &forward_size));
             hipfft_check(hipfftSetStream(forward, stream));
 
             auto& backward = backward_plans.at(stream_idx);
@@ -326,10 +267,10 @@ auto main() -> int
             auto bw_ostride = fw_istride;
             auto bw_odist = fw_idist;
             hipfft_check(hipfftCreate(&backward));
-            hipfft_check(hipfftMakePlanMany(backward, 1, &s_N_hFFT,
+            hipfft_check(hipfftMakePlanMany(backward, 1, &proj_geom.s_N_hFFT,
                                             &bw_inembed, bw_istride, bw_idist,
                                             &bw_onembed, bw_ostride, bw_odist,
-                                            HIPFFT_C2R, static_cast<int>(N_v), &backward_size));
+                                            HIPFFT_C2R, static_cast<int>(proj_geom.N_v), &backward_size));
             hipfft_check(hipfftSetStream(backward, stream));
 
             // create a HIP texture from the projection
@@ -337,8 +278,8 @@ auto main() -> int
             res_desc.resType = hipResourceTypePitch2D;
             res_desc.res.pitch2D.desc = hipCreateChannelDesc<float>();
             res_desc.res.pitch2D.devPtr = static_cast<void*>(proj);
-            res_desc.res.pitch2D.width = N_h;
-            res_desc.res.pitch2D.height = N_v;
+            res_desc.res.pitch2D.width = proj_geom.N_h;
+            res_desc.res.pitch2D.height = proj_geom.N_v;
             res_desc.res.pitch2D.pitchInBytes = proj_pitch;
 
             auto tex_desc = hipTextureDesc{};
@@ -370,17 +311,20 @@ auto main() -> int
         auto const s_N_z_first = sub_N_z.at(0); // might be different from s_N_z for the last subvolume
         create_volume("volume.tif");
         auto host_vol_raw_ptr = static_cast<float*>(nullptr);
-        hip_check(hipHostMalloc(&host_vol_raw_ptr, N_x * N_y * s_N_z_first * sizeof(float), hipHostMallocDefault));
-        auto host_vol_ptr = make_hipPitchedPtr(host_vol_raw_ptr, N_x * sizeof(float), N_x, N_y);
+        hip_check(hipHostMalloc(&host_vol_raw_ptr,
+                                vol_geom.N_x * vol_geom.N_y * s_N_z_first * sizeof(float),
+                                hipHostMallocDefault));
+        auto host_vol_ptr = make_hipPitchedPtr(host_vol_raw_ptr,
+                                               vol_geom.N_x * sizeof(float), vol_geom.N_x, vol_geom.N_y);
 
         auto vol_ptr = hipPitchedPtr{};
-        auto vol_ext = make_hipExtent(N_x * sizeof(float), N_y, s_N_z_first);
+        auto vol_ext = make_hipExtent(vol_geom.N_x * sizeof(float), vol_geom.N_y, s_N_z_first);
         hip_check(hipMalloc3D(&vol_ptr, vol_ext));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // MAIN LOOP
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        for(auto sub_idx = 3; sub_idx < 4 /* num_subvols */; ++sub_idx)
+        for(auto sub_idx = 0; sub_idx < num_subvols; ++sub_idx)
         {
             auto const s_N_z = sub_N_z.at(sub_idx);
             if(s_N_z != s_N_z_first) // if there is a size mismatch for the last subvolume, delete old one and realloc
@@ -389,10 +333,15 @@ auto main() -> int
                 hip_check(hipFree(vol_ptr.ptr));
                 hip_check(hipFreeHost(host_vol_raw_ptr));
                 
-                hip_check(hipHostMalloc(&host_vol_raw_ptr, N_x * N_y * s_N_z * sizeof(float), hipHostMallocDefault));
-                host_vol_ptr = make_hipPitchedPtr(host_vol_raw_ptr, N_x * sizeof(float), N_x, N_y);
+                hip_check(hipHostMalloc(&host_vol_raw_ptr,
+                                        vol_geom.N_x * vol_geom.N_y * s_N_z * sizeof(float),
+                                        hipHostMallocDefault));
+                host_vol_ptr = make_hipPitchedPtr(host_vol_raw_ptr,
+                                                  vol_geom.N_x * sizeof(float),
+                                                  vol_geom.N_x,
+                                                  vol_geom.N_y);
 
-                vol_ext = make_hipExtent(N_x * sizeof(float), N_y, s_N_z);
+                vol_ext = make_hipExtent(vol_geom.N_x * sizeof(float), vol_geom.N_y, s_N_z);
                 hip_check(hipMalloc3D(&vol_ptr, vol_ext));
             }
 
@@ -413,6 +362,9 @@ auto main() -> int
                 if(path.extension() != std::filesystem::path{".tif"})
                     continue;
 
+                if(proj_idx >= proj_geom.num_proj) // We do not want to read both the 0° and 360° projections; skip 360°
+                    break;
+                    
                 // Distribute projections evenly among streams.
                 auto stream = streams.at(stream_idx);
 
@@ -421,8 +373,8 @@ auto main() -> int
                 auto load_proj_args = new load_projection_args
                 {
                     path.string(),
-                    N_h,
-                    N_v,
+                    proj_geom.N_h,
+                    proj_geom.N_v,
                     host_inputs.at(stream_idx)
                 };
                 hip_check(hipLaunchHostFunc(stream, load_projection, static_cast<void*>(load_proj_args)));
@@ -431,127 +383,98 @@ auto main() -> int
                 auto input = input_projections.at(stream_idx);
                 auto input_pitch = input_pitches.at(stream_idx);
                 hip_check(hipMemcpy2DAsync(input, input_pitch,
-                                        host_input, N_h * sizeof(std::uint16_t),
-                                        N_h * sizeof(std::uint16_t), N_v,
-                                        hipMemcpyHostToDevice, stream));
+                                           host_input, proj_geom.N_h * sizeof(std::uint16_t),
+                                           proj_geom.N_h * sizeof(std::uint16_t), proj_geom.N_v,
+                                           hipMemcpyHostToDevice, stream));
 
                 auto threads_per_block = dim3{32, 32, 1};
-                auto blocks_per_grid = dim3{(N_h / threads_per_block.x) + 1,
-                                            (N_v / threads_per_block.y) + 1,
+                auto blocks_per_grid = dim3{(proj_geom.N_h / threads_per_block.x) + 1,
+                                            (proj_geom.N_v / threads_per_block.y) + 1,
                                             1};
-
-                /*auto shifted = shifted_projections.at(stream_idx);
-                auto shifted_pitch = shifted_pitches.at(stream_idx);
-                shifting_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(input, input_pitch,
-                                                                                  shifted, shifted_pitch,
-                                                                                  N_h, N_v,
-                                                                                  shift_h, shift_v);*/
 
                 auto proj = projections.at(stream_idx);
                 auto proj_pitch = projection_pitches.at(stream_idx);
-                normalization_kernel<bps><<<blocks_per_grid, threads_per_block, 0, stream>>>(input, input_pitch,
-                                                                                             proj, proj_pitch,
-                                                                                             N_h, N_v);
+                normalization_kernel<proj_geom.bps><<<blocks_per_grid, threads_per_block, 0, stream>>>(input,
+                                                                                                       input_pitch,
+                                                                                                       proj,
+                                                                                                       proj_pitch,
+                                                                                                       proj_geom.N_h,
+                                                                                                       proj_geom.N_v);
 
-                /*if(sub_idx == 3 && proj_idx == 0)
-                {
-                    hip_check(hipMemcpy2DAsync(host_output, N_h * sizeof(float),
-                                               proj, proj_pitch,
-                                               N_h * sizeof(float), N_v,
-                                               hipMemcpyDeviceToHost, stream));
-                    auto save_args = new save_projection_args
-                    {
-                        "normalized.tif",
-                        N_h, N_v,
-                        host_output
-                    };
-                    hip_check(hipLaunchHostFunc(stream, save_projection<float>, static_cast<void*>(save_args)));
-                }*/
+                log_transformation_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj,
+                                                                                             proj_pitch,
+                                                                                             proj_geom.N_h,
+                                                                                             proj_geom.N_v);
 
-                /*weighting_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj, proj_pitch, N_h, N_v, d_sd,
-                                                                                    h_min, v_min, d_h, d_v);*/
-
-                /*if(sub_idx == 3 && proj_idx == 0)
-                {
-                    hip_check(hipMemcpy2DAsync(host_output, N_h * sizeof(float),
-                                               proj, proj_pitch,
-                                               N_h * sizeof(float), N_v,
-                                               hipMemcpyDeviceToHost, stream));
-                    auto save_args = new save_projection_args
-                    {
-                        "weighted.tif",
-                        N_h, N_v,
-                        host_output
-                    };
-                    hip_check(hipLaunchHostFunc(stream, save_projection<float>, static_cast<void*>(save_args)));
-                }*/
+                weighting_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj,
+                                                                                    proj_pitch,
+                                                                                    proj_geom.N_h,
+                                                                                    proj_geom.N_v,
+                                                                                    proj_geom.d_sd,
+                                                                                    proj_geom.d_so,
+                                                                                    proj_geom.h_min,
+                                                                                    proj_geom.v_min,
+                                                                                    proj_geom.d_h,
+                                                                                    proj_geom.d_v);
 
                 // Expand projection to filter length
                 auto expanded = expanded_projections.at(stream_idx);
                 auto expanded_pitch = expanded_pitches.at(stream_idx);
-                hip_check(hipMemset2DAsync(expanded, expanded_pitch, 0, N_hFFT * sizeof(float), N_v, stream));
-                hip_check(hipMemcpy2DAsync(expanded, expanded_pitch,
-                                           proj, proj_pitch,
-                                           N_h * sizeof(float), N_v, hipMemcpyDeviceToDevice, stream));
+                hip_check(hipMemset2DAsync(expanded,
+                                           expanded_pitch,
+                                           0,
+                                           proj_geom.N_hFFT * sizeof(float),
+                                           proj_geom.N_v,
+                                           stream));
+                hip_check(hipMemcpy2DAsync(expanded,
+                                           expanded_pitch,
+                                           proj,
+                                           proj_pitch,
+                                           proj_geom.N_h * sizeof(float),
+                                           proj_geom.N_v,
+                                           hipMemcpyDeviceToDevice,
+                                           stream));
 
                 // Fourier-transform projection and filter kernel
                 auto transformed = transformed_projections.at(stream_idx);
                 auto transformed_pitch = transformed_pitches.at(stream_idx);
-                hip_check(hipMemset2DAsync(transformed, transformed_pitch, 0, N_hTrans * sizeof(hipfftComplex), N_v, stream));
+                hip_check(hipMemset2DAsync(transformed,
+                                           transformed_pitch,
+                                           0,
+                                           proj_geom.N_hTrans * sizeof(hipfftComplex),
+                                           proj_geom.N_v,
+                                           stream));
                 auto& forward = forward_plans.at(stream_idx);
                 hipfft_check(hipfftExecR2C(forward, expanded, transformed));
                 
                 // Apply filter
-                auto filter_blocks_per_grid = dim3{(N_hTrans / threads_per_block.x) + 1,
-                                                (N_v / threads_per_block.y) + 1,
-                                                1};
+                auto filter_blocks_per_grid = dim3{(proj_geom.N_hTrans / threads_per_block.x) + 1,
+                                                   (proj_geom.N_v / threads_per_block.y) + 1,
+                                                   1};
                 filter_application_kernel<<<filter_blocks_per_grid, threads_per_block, 0, stream>>>(transformed,
                                                                                                     transformed_pitch,
-                                                                                                    R, N_hTrans, N_v);
+                                                                                                    R,
+                                                                                                    proj_geom.N_hTrans,
+                                                                                                    proj_geom.N_v);
                 
                 auto& backward = backward_plans.at(stream_idx);
                 hipfft_check(hipfftExecC2R(backward, transformed, expanded));
 
-                hip_check(hipMemcpy2DAsync(proj, proj_pitch,
-                                        expanded, expanded_pitch,
-                                        N_h * sizeof(float), N_v,
-                                        hipMemcpyDeviceToDevice, stream));
+                hip_check(hipMemcpy2DAsync(proj,
+                                           proj_pitch,
+                                           expanded,
+                                           expanded_pitch,
+                                           proj_geom.N_h * sizeof(float),
+                                           proj_geom.N_v,
+                                           hipMemcpyDeviceToDevice,
+                                           stream));
                 
-                /*if(sub_idx == 3 && proj_idx == 0)
-                {
-                    hip_check(hipMemcpy2DAsync(host_output, N_h * sizeof(float),
-                                               proj, proj_pitch,
-                                               N_h * sizeof(float), N_v,
-                                               hipMemcpyDeviceToHost, stream));
-                    auto save_args = new save_projection_args
-                    {
-                        "unnormalized.tif",
-                        N_h, N_v,
-                        host_output
-                    };
-                    hip_check(hipLaunchHostFunc(stream, save_projection<float>, static_cast<void*>(save_args)));
-                }*/
-
-                filter_normalization_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj, proj_pitch, N_hFFT,
-                                                                                            N_h, N_v);
+                filter_normalization_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj,
+                                                                                               proj_pitch,
+                                                                                               proj_geom.N_hFFT,
+                                                                                               proj_geom.N_h,
+                                                                                               proj_geom.N_v);
                 
-                /*if(sub_idx == 3 && proj_idx == 0)
-                {
-                    hip_check(hipMemcpy2DAsync(host_output, N_h * sizeof(float),
-                                               proj, proj_pitch,
-                                               N_h * sizeof(float), N_v,
-                                               hipMemcpyDeviceToHost, stream));
-                    auto save_args = new save_projection_args
-                    {
-                        "filtered.tif",
-                        N_h, N_v,
-                        host_output
-                    };
-                    hip_check(hipLaunchHostFunc(stream, save_projection<float>, static_cast<void*>(save_args)));
-                    hip_check(hipStreamSynchronize(stream));
-                    std::exit(EXIT_SUCCESS);
-                }*/
-
                 // The backprojection always runs in the first stream. If multiple streams are preprocessing, let the
                 // first stream wait for the current projection to finish preprocessing.
                 if(stream_idx > 0)
@@ -562,26 +485,36 @@ auto main() -> int
                 }
 
                 // Backprojection
-                auto const theta_deg = theta_step * proj_idx; // Angle of current projection in degrees
+                auto const theta_deg = proj_geom.theta_sign * proj_geom.theta_step * proj_idx; // Current angle
                 auto const theta_rad = theta_deg * std::numbers::pi_v<float> / 180.f; // Convert to radians
                 auto const sin_theta = std::sin(theta_rad);
                 auto const cos_theta = std::cos(theta_rad);
 
                 auto bp_block_size = dim3{32u, 8u, 4u};
-                auto bp_blocks = dim3{static_cast<std::uint32_t>(N_x / bp_block_size.x + 1),
-                                      static_cast<std::uint32_t>(N_y / bp_block_size.y + 1),
+                auto bp_blocks = dim3{static_cast<std::uint32_t>(vol_geom.N_x / bp_block_size.x + 1),
+                                      static_cast<std::uint32_t>(vol_geom.N_y / bp_block_size.y + 1),
                                       static_cast<std::uint32_t>(s_N_z / bp_block_size.z + 1)};
 
                 auto& p_tex = texture_projections.at(stream_idx);
                 backprojection_kernel<<<bp_blocks, bp_block_size, 0, streams.at(0)>>>(static_cast<float*>(vol_ptr.ptr),
                                                                                       vol_ptr.pitch,
-                                                                                      N_x, N_y, N_z,
-                                                                                      s_N_z, s_N_z_first * sub_idx,
-                                                                                      d_x, d_y, d_z,
-                                                                                      p_tex, h_min, v_min,
-                                                                                      sin_theta, cos_theta, d_h, d_v,
-                                                                                      d_sd, d_so);
-                hip_check(hipStreamSynchronize(streams.at(0)));
+                                                                                      vol_geom.N_x,
+                                                                                      vol_geom.N_y,
+                                                                                      vol_geom.N_z,
+                                                                                      s_N_z,
+                                                                                      s_N_z_first * sub_idx,
+                                                                                      vol_geom.d_x,
+                                                                                      vol_geom.d_y,
+                                                                                      vol_geom.d_z,
+                                                                                      p_tex,
+                                                                                      proj_geom.h_min,
+                                                                                      proj_geom.v_min,
+                                                                                      sin_theta,
+                                                                                      cos_theta,
+                                                                                      proj_geom.d_h,
+                                                                                      proj_geom.d_v,
+                                                                                      proj_geom.d_sd,
+                                                                                      proj_geom.d_so);
 
                 // The backprojection always runs in the first stream. If multiple streams are preprocessing, let the
                 // current stream wait for the backprojection to finish before reusing the projection memory.
@@ -611,8 +544,8 @@ auto main() -> int
             {
                 "volume.tif",
                 host_vol_raw_ptr,
-                N_x, N_y, N_z, s_N_z,
-                d_x, d_y
+                vol_geom.N_x, vol_geom.N_y, vol_geom.N_z, s_N_z,
+                vol_geom.d_x, vol_geom.d_y
             };
             hip_check(hipStreamWaitEvent(save_stream, save_event));
             hip_check(hipLaunchHostFunc(save_stream, save_volume, save_vol_args));
@@ -630,7 +563,7 @@ auto main() -> int
         hip_check(hipGraphDestroy(graph));
 
         // Run instantiated graph
-        hip_check(hipGraphLaunch(graph_exec, streams.at(0)));
+        hip_check(hipGraphLaunch(graphExec, streams.at(0)));
         std::cout << "Captured graph launched, waiting for completion...";
         hip_check(hipStreamSynchronize(streams.at(0)));
         
@@ -664,9 +597,6 @@ auto main() -> int
             hip_check(hipFree(p));
 
         for(auto&& p : projections)
-            hip_check(hipFree(p));
-
-        for(auto&& p : shifted_projections)
             hip_check(hipFree(p));
 
         for(auto&& p : input_projections)

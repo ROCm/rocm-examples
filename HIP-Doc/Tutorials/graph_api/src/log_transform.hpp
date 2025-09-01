@@ -20,22 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef SHIFTING_HPP
-#define SHIFTING_HPP
+#ifndef LOG_TRANSFORM_HPP
+#define LOG_TRANSFORM_HPP
 
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
 #include <cstdint>
 
-/*
- Takes the input image and shifts it horizontally and/or vertically by the specified amount of pixels. (0, 0) is in the
- upper left corner. Negative values therefore indicate a left shift (x axis) or a top shift (y axis), positive values
- a right shift (x axis) or bottom shift (y axis).
- */
-__global__ void shifting_kernel(std::uint16_t const* __restrict__ in, std::size_t const in_pitch,
-                                std::uint16_t* __restrict__ out, std::size_t const out_pitch,
-                                std::uint32_t const N_h, std::uint32_t const N_v,
-                                std::int32_t const shift_h, std::int32_t const shift_v);
+__global__ void log_transformation_kernel(float* proj, std::size_t pitch, std::uint32_t N_h, std::uint32_t N_v);
 
 #endif

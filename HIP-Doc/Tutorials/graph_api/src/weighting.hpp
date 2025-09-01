@@ -28,10 +28,10 @@
 #include <cstddef>
 #include <cstdint>
 
-__global__ void weighting_kernel(float* p, std::size_t const pitch,
-                                 std::uint32_t const N_h, std::uint32_t const N_v,
-                                 float const d_sd,
-                                 float const h_min, float const v_min,
-                                 float const d_h, float const d_v);
+__global__ void weighting_kernel(float* p, std::size_t pitch,
+                                 std::uint32_t N_h, std::uint32_t N_v,
+                                 float d_sd, float d_so,
+                                 float h_min, float v_min,
+                                 float d_h, float d_v);
 
 #endif

@@ -29,7 +29,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include(FetchContent)
 
-# Download walnut data
+# Download seashell data
 set(DATA_BASE 20211124_seashell)
 set(DATA_URL https://zenodo.org/records/6983008/files/${DATA_BASE}.zip)
 set(DATA_ARCHIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DATA_BASE}.zip)

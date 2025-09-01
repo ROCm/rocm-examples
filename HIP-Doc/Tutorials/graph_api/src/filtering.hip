@@ -30,7 +30,7 @@
 #include <cstdint>
 #include <numbers>
 
-// Creates a simple Ram-Lak filter
+// Creates a Shepp-Logan filter
 __global__ void filter_creation_kernel(float* __restrict__ r, std::int32_t N_hFFT, float tau)
 {
     constexpr auto pi = std::numbers::pi_v<float>;
@@ -42,14 +42,12 @@ __global__ void filter_creation_kernel(float* __restrict__ r, std::int32_t N_hFF
 
         if(j == 0)
             r[i] = (1.f / 4.f) * (1.f / tau);
-            // r[i] = (1.f / 8.f) * (1.f / (tau * tau));
+        else if(j % 2 == 0)
+            r[i] = 0;
         else
         {
-            if(j % 2 == 0)
-                r[i] = 0;
-            else
-                r[i] = -(1.f / (j * j * pi * pi * tau));
-                //r[i] = -(1.f / (2.f * j * j * pi * pi * tau * tau));
+            auto const x = pi * j / N_hFFT;
+            r[i] = -(1.f / (j * j * pi * pi * tau)) * (sinf(x) / x);
         }
     }
 }

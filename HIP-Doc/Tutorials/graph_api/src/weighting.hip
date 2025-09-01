@@ -34,11 +34,11 @@
  for differences in the absorption, each pixel must be weighted with a factor which depends on the detector geometry and
  the distances during the measurement.
 */
-__global__ void weighting_kernel(float* p, std::size_t const pitch,
-                                 std::uint32_t const N_h, std::uint32_t const N_v,
-                                 float const d_sd,
-                                 float const h_min, float const v_min,
-                                 float const d_h, float const d_v)
+__global__ void weighting_kernel(float* p, std::size_t pitch,
+                                 std::uint32_t N_h, std::uint32_t N_v,
+                                 float d_sd, float d_so,
+                                 float h_min, float v_min,
+                                 float d_h, float d_v)
 {
     auto const h = blockDim.x * blockIdx.x + threadIdx.x;
     auto const v = blockDim.y * blockIdx.y + threadIdx.y;
@@ -47,12 +47,19 @@ __global__ void weighting_kernel(float* p, std::size_t const pitch,
     {
         auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(p) + v * pitch);
         
-        // physical detector coordinates in mm
-        auto const h_j = (d_h / 2.f) + h * d_h + h_min;
-        auto const v_i = (d_v / 2.f) + v * d_v + v_min;
+        // physical detector coordinates in mm (pixel center); adding 0.5f to stay consistent with texture fetching
+        // during backprojection
+        auto const h_j = (h + 0.5f) * d_h + h_min;
+        auto const v_i = (v + 0.5f) * d_v + v_min;
+
+        // distance weighting
+        auto const dist_w = rsqrtf(d_sd * d_sd + h_j * h_j + v_i * v_i);
+
+        // cosine weighting
+        auto const cos_w = d_so * rsqrtf(d_so * d_so + h_j * h_j + v_i * v_i);
 
         // calculate weight
-        auto const w_ij = d_sd * rsqrtf(d_sd * d_sd + h_j * h_j + v_i * v_i);
+        auto const w_ij = d_sd * dist_w * cos_w;
 
         // write value
         row[h] *= w_ij;

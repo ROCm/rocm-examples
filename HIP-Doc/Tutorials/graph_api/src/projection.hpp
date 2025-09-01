@@ -41,7 +41,35 @@
 #include <utility>
 #include <vector>
 
-void get_projection_dims(std::string path, std::uint32_t& N_h, std::uint32_t& N_v) noexcept(false);
+struct projection_geometry
+{
+    // Detector constants - all units in mm unless stated otherwise
+    static constexpr auto d_sd = 553.74f; // Distance between source and detector
+    static constexpr auto d_so = 210.66f; // Distance between source and origin (object center).
+    static constexpr auto d_h = 0.05f; // horizontal physical length of a pixel
+    static constexpr auto d_v = 0.05f; // vertical physical length of a pixel
+    static constexpr auto theta_step = 0.5f; // angle step size [°]
+    static constexpr auto theta_sign = -1.f; // If the reconstructed volume shows ghosts / distortion, flip this
+    static constexpr auto shift_h = -4; // horizontal shift [px]
+    static constexpr auto shift_v = 0; // vertical shift [px]
+    static constexpr auto delta_h = shift_h * d_h; // physical horizontal shift
+    static constexpr auto delta_v = shift_v * d_v; // physical vertical shift
+    static constexpr auto bps = 12; // bits per sample (pixel) in input projection [no unit]
+    static constexpr auto num_proj = static_cast<std::uint32_t>(360.f / theta_step); // Total number of projections
+
+    // All units are px unless stated otherwise
+    std::uint32_t N_h{}; // horizontal size
+    std::uint32_t N_v{}; // vertical size
+    std::uint32_t N_hFFT{}; // filter length
+    std::int32_t s_N_hFFT{}; // signed filter length
+    std::uint32_t N_hTrans{}; // transformed length
+    std::int32_t s_N_hTrans{}; // signed transformed length
+    float h_min{}; // Horizontal physical center of the detector [mm]
+    float v_min{}; // Vertical physical center of the detector [mm]
+
+    projection_geometry() noexcept = default;
+    projection_geometry(std::string path) noexcept(false);
+};
 
 struct load_projection_args
 {

@@ -20,41 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "shifting.hpp"
-
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
 #include <cstdint>
+#include <limits>
 
-/*
- Takes the input image and shifts it horizontally and/or vertically by the specified amount of pixels. (0, 0) is in the
- upper left corner. Negative values therefore indicate a left shift (x axis) or a top shift (y axis), positive values
- a right shift (x axis) or bottom shift (y axis).
- */
-__global__ void shifting_kernel(std::uint16_t const* __restrict__ in, std::size_t const in_pitch,
-                                std::uint16_t* __restrict__ out, std::size_t const out_pitch,
-                                std::uint32_t const N_h, std::uint32_t const N_v,
-                                std::int32_t const shift_h, std::int32_t const shift_v)
+__global__ void log_transformation_kernel(float* proj, std::size_t pitch, std::uint32_t N_h, std::uint32_t N_v)
 {
-    auto shift_idx = [](std::uint32_t idx, std::int32_t shift, std::uint32_t dim)
-    {
-        auto const shifted_idx = static_cast<std::int32_t>(idx) + shift;
-        return (shifted_idx < 0) ? (shifted_idx + dim) : (shifted_idx % dim);
-    };
+    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
 
     for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < N_v; v += blockDim.y * gridDim.y)
     {
         for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < N_h; h += blockDim.x * gridDim.x)
         {
-            auto const in_row = reinterpret_cast<std::uint16_t const*>(reinterpret_cast<char const*>(in) + v * in_pitch);
-            auto const val = in_row[h];
-
-            auto const shifted_h = shift_idx(h, shift_h, N_h);
-            auto const shifted_v = shift_idx(v, shift_v, N_v);
-
-            auto out_row = reinterpret_cast<std::uint16_t*>(reinterpret_cast<char*>(out) + shifted_v * out_pitch);
-            out_row[shifted_h] = val;
+            auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(proj) + v * pitch);
+            
+            auto const val = max(row[h], epsilon); // prevent logf(0)
+            row[h] = -logf(val);
         }
     }
 }
