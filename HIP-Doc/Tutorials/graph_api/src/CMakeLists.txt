@@ -46,11 +46,14 @@ target_compile_definitions(${example_streams} PRIVATE "DATA_DIRECTORY=\"${DATA_D
 target_compile_features(${example_streams} PRIVATE cxx_std_20 hip_std_20)
 target_link_libraries(${example_streams} PRIVATE ${example_objects} hip::hipfft)
 
-
-add_executable(${example_graph_capture} main_graph_capture.hip)
-set_target_properties(${example_graph_capture} PROPERTIES CXX_EXTENSIONS OFF
-                                                          CXX_SCAN_FOR_MODULES OFF
-                                                          HIP_EXTENSIONS OFF)
-target_compile_definitions(${example_graph_capture} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\"")
-target_compile_features(${example_graph_capture} PRIVATE cxx_std_20 hip_std_20)
-target_link_libraries(${example_graph_capture} PRIVATE ${example_objects} hip::hipfft)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(STATUS "The graph capture tutorial is available only on Linux.")
+else()
+    add_executable(${example_graph_capture} main_graph_capture.hip)
+    set_target_properties(${example_graph_capture} PROPERTIES CXX_EXTENSIONS OFF
+                                                              CXX_SCAN_FOR_MODULES OFF
+                                                              HIP_EXTENSIONS OFF)
+    target_compile_definitions(${example_graph_capture} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\"")
+    target_compile_features(${example_graph_capture} PRIVATE cxx_std_20 hip_std_20)
+    target_link_libraries(${example_graph_capture} PRIVATE ${example_objects} hip::hipfft)
+endif()
