@@ -33,6 +33,7 @@ if(
     NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
 )
     add_subdirectory(hipBLAS)
+    add_subdirectory(hipBLASLt)
     add_subdirectory(hipCUB)
     add_subdirectory(hipFFT)
     add_subdirectory(hipRAND)
