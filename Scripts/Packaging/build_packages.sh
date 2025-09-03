@@ -43,7 +43,7 @@ PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stac
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
 
 # Getopt argument parsing
-VALID_ARGS=$(getopt -o h --long help,pkgname:,version:,deb-release:,rpm-release:,install-prefix:,test-install-prefix:,src-dir:,build-dir:,deb-dir:,rpm-dir:,packgen: -- "$@")
+VALID_ARGS=$(getopt -o h --long help,pkgname:,version:,deb-release:,rpm-release:,install-prefix:,test-install-prefix:,src-dir:,build-dir:,deb-dir:,rpm-dir:,packgen:,rocm-root: -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Invalid arguments"
     exit 1
