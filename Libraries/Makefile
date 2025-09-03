@@ -22,6 +22,7 @@
 
 LIBRARIES := \
 	hipBLAS \
+	hipBLASLt \
 	hipCUB \
 	hipFFT \
 	hipSOLVER \
