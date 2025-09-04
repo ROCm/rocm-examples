@@ -28,6 +28,7 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 include(FetchContent)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
 
 # Download seashell data
 set(DATA_BASE 20211124_seashell)
@@ -54,6 +55,9 @@ if(NOT TIFF_FOUND)
 
     target_compile_definitions(tiff PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
     target_compile_definitions(tiffxx PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+    set(TIFF_TARGET TIFF::tiff) # find_package uses the uppercase notation, libTIFF uses lowercase
+else()
+    set(TIFF_TARGET TIFF::TIFF)
 endif()
 
 find_package(hipfft REQUIRED)
