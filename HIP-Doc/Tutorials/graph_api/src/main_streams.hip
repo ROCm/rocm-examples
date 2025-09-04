@@ -60,9 +60,8 @@ auto main() -> int
 
         auto const num_streams = dev_props.concurrentKernels;
 
-        std::cout << "Device supports " << num_streams
-                  << " concurrent kernels, preprocessing on "
-                  << num_streams << " streams." << std::endl;
+        std::cout << "Device supports " << num_streams << " concurrent kernels; preprocessing will use "
+                  << num_streams << " parallel streams." << std::endl;
 
         auto streams = std::vector<hipStream_t>{};
         streams.resize(num_streams);
@@ -323,7 +322,7 @@ auto main() -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         for(auto sub_idx = 0; sub_idx < num_subvols; ++sub_idx)
         {
-            auto const s_N_z = sub_N_z.at(sub_idx);
+            auto s_N_z = sub_N_z.at(sub_idx);
 
             auto sub_idx_info = new int;
             *sub_idx_info = sub_idx;
@@ -335,181 +334,196 @@ auto main() -> int
             }, sub_idx_info));
             hip_check(hipMemset3DAsync(vol_ptr, 0, vol_ext, streams.at(0)));
 
+            auto paths_it = std::begin(paths);
             auto proj_idx = 0;
-            auto stream_idx = 0;
-            for(auto const& path : paths)
+            while(proj_idx < proj_geom.num_proj)
             {
-                if(path.extension() != std::filesystem::path{".tif"})
-                    continue;
+                auto batch_size = std::min(num_streams, static_cast<int>(proj_geom.num_proj - proj_idx));
 
-                if(proj_idx >= proj_geom.num_proj) // We do not want to read both the 0° and 360° projections; skip 360°
-                    break;
-
-                // Distribute projections evenly among streams.
-                auto stream = streams.at(stream_idx);
-
-                // Using a pointer here ensures that the arguments live beyond the scope of a loop iteration. The
-                // pointer will be deleted inside load_projection().
-                auto load_proj_args = new load_projection_args
+                // Launch batch in parallel streams
+                for(auto stream_idx = 0; stream_idx < batch_size; ++stream_idx, ++proj_idx, ++paths_it)
                 {
-                    path.string(),
-                    proj_geom.N_h,
-                    proj_geom.N_v,
-                    host_inputs.at(stream_idx)
-                };
-                hip_check(hipLaunchHostFunc(stream, load_projection, static_cast<void*>(load_proj_args)));
+                    // Skip non-tif files
+                    while(paths_it != std::end(paths) && paths_it->extension() != std::filesystem::path{".tif"})
+                        ++paths_it;
 
-                auto host_input = host_inputs.at(stream_idx);
-                auto input = input_projections.at(stream_idx);
-                auto input_pitch = input_pitches.at(stream_idx);
-                hip_check(hipMemcpy2DAsync(input, input_pitch,
-                                           host_input, proj_geom.N_h * sizeof(std::uint16_t),
-                                           proj_geom.N_h * sizeof(std::uint16_t), proj_geom.N_v,
-                                           hipMemcpyHostToDevice, stream));
+                    if(paths_it == std::end(paths))
+                    {
+                        std::cerr << "Warning: Unexpected end of input files." << std::endl;
+                        break;
+                    }
 
-                auto threads_per_block = dim3{32, 32, 1};
-                auto blocks_per_grid = dim3{(proj_geom.N_h / threads_per_block.x) + 1,
-                                            (proj_geom.N_v / threads_per_block.y) + 1,
-                                            1};
+                    auto stream = streams.at(stream_idx);
 
-                auto proj = projections.at(stream_idx);
-                auto proj_pitch = projection_pitches.at(stream_idx);
-                normalization_kernel<proj_geom.bps><<<blocks_per_grid, threads_per_block, 0, stream>>>(input,
-                                                                                                       input_pitch,
-                                                                                                       proj,
-                                                                                                       proj_pitch,
-                                                                                                       proj_geom.N_h,
-                                                                                                       proj_geom.N_v);
+                    // Using a pointer here ensures that the arguments live beyond the scope of a loop iteration. The
+                    // pointer will be deleted inside load_projection().
+                    auto path = *paths_it;
+                    auto load_proj_args = new load_projection_args
+                    {
+                        path.string(),
+                        proj_geom.N_h,
+                        proj_geom.N_v,
+                        host_inputs.at(stream_idx)
+                    };
+                    hip_check(hipLaunchHostFunc(stream, load_projection, static_cast<void*>(load_proj_args)));
 
-                log_transformation_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj,
-                                                                                             proj_pitch,
-                                                                                             proj_geom.N_h,
-                                                                                             proj_geom.N_v);
+                    auto host_input = host_inputs.at(stream_idx);
+                    auto input = input_projections.at(stream_idx);
+                    auto input_pitch = input_pitches.at(stream_idx);
+                    hip_check(hipMemcpy2DAsync(
+                        input,
+                        input_pitch,
+                        host_input,
+                        proj_geom.N_h * sizeof(std::uint16_t),
+                        proj_geom.N_h * sizeof(std::uint16_t),
+                        proj_geom.N_v,
+                        hipMemcpyHostToDevice,
+                        stream
+                    ));
 
-                weighting_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj,
-                                                                                    proj_pitch,
-                                                                                    proj_geom.N_h,
-                                                                                    proj_geom.N_v,
-                                                                                    proj_geom.d_sd,
-                                                                                    proj_geom.d_so,
-                                                                                    proj_geom.h_min,
-                                                                                    proj_geom.v_min,
-                                                                                    proj_geom.d_h,
-                                                                                    proj_geom.d_v);
+                    auto threads_per_block = dim3{32, 32, 1};
+                    auto blocks_per_grid = dim3{
+                        (proj_geom.N_h / threads_per_block.x) + 1, (proj_geom.N_v / threads_per_block.y) + 1, 1
+                    };
 
-                // Expand projection to filter length
-                auto expanded = expanded_projections.at(stream_idx);
-                auto expanded_pitch = expanded_pitches.at(stream_idx);
-                hip_check(hipMemset2DAsync(expanded,
-                                           expanded_pitch,
-                                           0,
-                                           proj_geom.N_hFFT * sizeof(float),
-                                           proj_geom.N_v,
-                                           stream));
-                hip_check(hipMemcpy2DAsync(expanded,
-                                           expanded_pitch,
-                                           proj,
-                                           proj_pitch,
-                                           proj_geom.N_h * sizeof(float),
-                                           proj_geom.N_v,
-                                           hipMemcpyDeviceToDevice,
-                                           stream));
+                    auto proj = projections.at(stream_idx);
+                    auto proj_pitch = projection_pitches.at(stream_idx);
+                    normalization_kernel<proj_geom.bps><<<blocks_per_grid, threads_per_block, 0, stream>>>(
+                        input, input_pitch, proj, proj_pitch, proj_geom.N_h, proj_geom.N_v
+                    );
 
-                // R2C Fourier-transform projection
-                auto transformed = transformed_projections.at(stream_idx);
-                auto transformed_pitch = transformed_pitches.at(stream_idx);
-                hip_check(hipMemset2DAsync(transformed,
-                                           transformed_pitch,
-                                           0,
-                                           proj_geom.N_hTrans * sizeof(hipfftComplex),
-                                           proj_geom.N_v,
-                                           stream));
-                auto& forward = forward_plans.at(stream_idx);
-                hipfft_check(hipfftExecR2C(forward, expanded, transformed));
-                
-                // Apply filter
-                auto filter_blocks_per_grid = dim3{(proj_geom.N_hTrans / threads_per_block.x) + 1,
-                                                   (proj_geom.N_v / threads_per_block.y) + 1,
-                                                   1};
-                filter_application_kernel<<<filter_blocks_per_grid, threads_per_block, 0, stream>>>(transformed,
-                                                                                                    transformed_pitch,
-                                                                                                    R,
-                                                                                                    proj_geom.N_hTrans,
-                                                                                                    proj_geom.N_v);
-                
-                auto& backward = backward_plans.at(stream_idx);
-                hipfft_check(hipfftExecC2R(backward, transformed, expanded));
+                    log_transformation_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(
+                        proj, proj_pitch, proj_geom.N_h, proj_geom.N_v
+                    );
 
-                // Shrink projection to original size and normalize
-                hip_check(hipMemcpy2DAsync(proj,
-                                           proj_pitch,
-                                           expanded,
-                                           expanded_pitch,
-                                           proj_geom.N_h * sizeof(float),
-                                           proj_geom.N_v,
-                                           hipMemcpyDeviceToDevice,
-                                           stream));
-                
-                filter_normalization_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(proj,
-                                                                                               proj_pitch,
-                                                                                               proj_geom.N_hFFT,
-                                                                                               proj_geom.N_h,
-                                                                                               proj_geom.N_v);
-                
-                // The backprojection always runs in the first stream. If multiple streams are preprocessing, let the
-                // first stream wait for the current projection to finish preprocessing.
-                if(stream_idx > 0)
-                {
-                    auto pp_event = preprocessing_events.at(stream_idx - 1);
-                    hip_check(hipEventRecord(pp_event, stream));
-                    hip_check(hipStreamWaitEvent(streams.at(0), pp_event));
+                    weighting_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(
+                        proj,
+                        proj_pitch,
+                        proj_geom.N_h,
+                        proj_geom.N_v,
+                        proj_geom.d_sd,
+                        proj_geom.d_so,
+                        proj_geom.h_min,
+                        proj_geom.v_min,
+                        proj_geom.d_h,
+                        proj_geom.d_v
+                    );
+
+                    // Expand projection to filter length
+                    auto expanded = expanded_projections.at(stream_idx);
+                    auto expanded_pitch = expanded_pitches.at(stream_idx);
+                    hip_check(hipMemset2DAsync(
+                        expanded, expanded_pitch, 0, proj_geom.N_hFFT * sizeof(float), proj_geom.N_v, stream
+                    ));
+                    hip_check(hipMemcpy2DAsync(
+                        expanded,
+                        expanded_pitch,
+                        proj,
+                        proj_pitch,
+                        proj_geom.N_h * sizeof(float),
+                        proj_geom.N_v,
+                        hipMemcpyDeviceToDevice,
+                        stream
+                    ));
+
+                    // R2C Fourier-transform projection
+                    auto transformed = transformed_projections.at(stream_idx);
+                    auto transformed_pitch = transformed_pitches.at(stream_idx);
+                    hip_check(hipMemset2DAsync(
+                        transformed,
+                        transformed_pitch,
+                        0,
+                        proj_geom.N_hTrans * sizeof(hipfftComplex),
+                        proj_geom.N_v,
+                        stream
+                    ));
+                    auto& forward = forward_plans.at(stream_idx);
+                    hipfft_check(hipfftExecR2C(forward, expanded, transformed));
+                    
+                    // Apply filter
+                    auto filter_blocks_per_grid = dim3{(proj_geom.N_hTrans / threads_per_block.x) + 1,
+                                                    (proj_geom.N_v / threads_per_block.y) + 1,
+                                                    1};
+                    filter_application_kernel<<<filter_blocks_per_grid, threads_per_block, 0, stream>>>(
+                        transformed, transformed_pitch, R, proj_geom.N_hTrans, proj_geom.N_v
+                    );
+                    
+                    auto& backward = backward_plans.at(stream_idx);
+                    hipfft_check(hipfftExecC2R(backward, transformed, expanded));
+
+                    // Shrink projection to original size and normalize
+                    hip_check(hipMemcpy2DAsync(
+                        proj,
+                        proj_pitch,
+                        expanded,
+                        expanded_pitch,
+                        proj_geom.N_h * sizeof(float),
+                        proj_geom.N_v,
+                        hipMemcpyDeviceToDevice,
+                        stream
+                    ));
+                    
+                    filter_normalization_kernel<<<blocks_per_grid, threads_per_block, 0, stream>>>(
+                        proj, proj_pitch, proj_geom.N_hFFT, proj_geom.N_h, proj_geom.N_v
+                    );
+
+                    // The backprojection always runs in the first stream. If multiple streams are preprocessing, let
+                    // the first stream wait for the current projection before starting the backprojection.
+                    if(stream_idx > 0)
+                    {
+                        auto pp_event = preprocessing_events.at(stream_idx - 1);
+                        hip_check(hipEventRecord(pp_event, stream));
+                        hip_check(hipStreamWaitEvent(streams.at(0), pp_event));
+                    }
+
+                    // Backprojection
+                    auto theta_deg = proj_geom.theta_sign * proj_geom.theta_step * proj_idx; // Current angle
+                    auto theta_rad = theta_deg * std::numbers::pi_v<float> / 180.f; // Convert to radians
+                    auto sin_theta = std::sin(theta_rad);
+                    auto cos_theta = std::cos(theta_rad);
+
+                    auto bp_block_size = dim3{32u, 8u, 4u};
+                    auto bp_blocks = dim3{
+                        static_cast<std::uint32_t>(vol_geom.N_x / bp_block_size.x + 1),
+                        static_cast<std::uint32_t>(vol_geom.N_y / bp_block_size.y + 1),
+                        static_cast<std::uint32_t>(s_N_z / bp_block_size.z + 1)
+                    };
+
+                    auto& p_tex = texture_projections.at(stream_idx);
+                    backprojection_kernel<<<bp_blocks, bp_block_size, 0, streams.at(0)>>>(
+                        static_cast<float*>(vol_ptr.ptr),
+                        vol_ptr.pitch,
+                        vol_geom.N_x,
+                        vol_geom.N_y,
+                        vol_geom.N_z,
+                        s_N_z,
+                        s_N_z_first * sub_idx,
+                        vol_geom.d_x,
+                        vol_geom.d_y,
+                        vol_geom.d_z,
+                        p_tex,
+                        proj_geom.h_min,
+                        proj_geom.v_min,
+                        sin_theta,
+                        cos_theta,
+                        proj_geom.d_h,
+                        proj_geom.d_v,
+                        proj_geom.d_sd,
+                        proj_geom.d_so
+                    );
+
+                    // The backprojection always runs in the first stream. If multiple streams are preprocessing, let
+                    // the current stream wait for the backprojection to finish before reusing the projection memory.
+                    if(stream_idx > 0)
+                    {
+                        auto bp_event = backprojection_events.at(stream_idx - 1);
+                        hip_check(hipEventRecord(bp_event, streams.at(0)));
+                        hip_check(hipStreamWaitEvent(stream, bp_event));
+                    }
                 }
-
-                // Backprojection
-                auto const theta_deg = proj_geom.theta_sign * proj_geom.theta_step * proj_idx; // Current angle
-                auto const theta_rad = theta_deg * std::numbers::pi_v<float> / 180.f; // Convert to radians
-                auto const sin_theta = std::sin(theta_rad);
-                auto const cos_theta = std::cos(theta_rad);
-
-                auto bp_block_size = dim3{32u, 8u, 4u};
-                auto bp_blocks = dim3{static_cast<std::uint32_t>(vol_geom.N_x / bp_block_size.x + 1),
-                                      static_cast<std::uint32_t>(vol_geom.N_y / bp_block_size.y + 1),
-                                      static_cast<std::uint32_t>(s_N_z / bp_block_size.z + 1)};
-
-                auto& p_tex = texture_projections.at(stream_idx);
-                backprojection_kernel<<<bp_blocks, bp_block_size, 0, streams.at(0)>>>(static_cast<float*>(vol_ptr.ptr),
-                                                                                      vol_ptr.pitch,
-                                                                                      vol_geom.N_x,
-                                                                                      vol_geom.N_y,
-                                                                                      vol_geom.N_z,
-                                                                                      s_N_z,
-                                                                                      s_N_z_first * sub_idx,
-                                                                                      vol_geom.d_x,
-                                                                                      vol_geom.d_y,
-                                                                                      vol_geom.d_z,
-                                                                                      p_tex,
-                                                                                      proj_geom.h_min,
-                                                                                      proj_geom.v_min,
-                                                                                      sin_theta,
-                                                                                      cos_theta,
-                                                                                      proj_geom.d_h,
-                                                                                      proj_geom.d_v,
-                                                                                      proj_geom.d_sd,
-                                                                                      proj_geom.d_so);
-
-                // The backprojection always runs in the first stream. If multiple streams are preprocessing, let the
-                // current stream wait for the backprojection to finish before reusing the projection memory.
-                if(stream_idx > 0)
-                {
-                    auto bp_event = backprojection_events.at(stream_idx - 1);
-                    hip_check(hipEventRecord(bp_event, streams.at(0)));
-                    hip_check(hipStreamWaitEvent(stream, bp_event));
-                }
-
-                stream_idx = (stream_idx + 1) % streams.size();
-                proj_idx++;
             }
             
+            // Copy volume back to host and save
             auto memcpy_params = hipMemcpy3DParms{};
             std::memset(&memcpy_params, 0, sizeof(hipMemcpy3DParms));
             memcpy_params.dstPos = make_hipPos(0, 0, 0);
