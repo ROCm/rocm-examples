@@ -120,7 +120,7 @@ auto main() -> int
         // Load first projection and initialize the invariants
         for(auto const& path : paths)
         {
-            if(path.extension() != std::filesystem::path({".tif"}))
+            if(path.extension() != std::filesystem::path{".tif"})
                 continue;
             else
             {

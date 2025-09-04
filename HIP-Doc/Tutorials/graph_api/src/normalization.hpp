@@ -28,16 +28,17 @@
 #include <cstddef>
 #include <cstdint>
 
+/* Takes a projection and transforms it onto the [0.f, 1.f] range. */
 template <std::uint16_t bits>
 __global__ void normalization_kernel(std::uint16_t const* __restrict__ in, std::size_t const in_pitch,
                                      float* __restrict__ out, std::size_t const out_pitch,
-                                     std::uint32_t const dim_h, std::uint32_t const dim_v)
+                                     std::uint32_t const N_h, std::uint32_t const N_v)
 {
     constexpr auto maximum = (1 << bits) - 1;
 
-    for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < dim_v; v += blockDim.y * gridDim.y)
+    for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < N_v; v += blockDim.y * gridDim.y)
     {
-        for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < dim_h; h += blockDim.x * gridDim.x)
+        for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < N_h; h += blockDim.x * gridDim.x)
         {
             auto in_row = reinterpret_cast<std::uint16_t const*>(reinterpret_cast<char const*>(in) + v * in_pitch);
             auto out_row = reinterpret_cast<float*>(reinterpret_cast<char*>(out) + v * out_pitch);

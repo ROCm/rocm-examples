@@ -116,7 +116,7 @@ auto main() -> int
         // Load first projection and initialize the invariants
         for(auto const& path : paths)
         {
-            if(path.extension() != std::filesystem::path({".tif"}))
+            if(path.extension() != std::filesystem::path{".tif"})
                 continue;
             else
             {
@@ -137,7 +137,7 @@ auto main() -> int
                 hipfft_check(hipfftSetStream(filter_plan, stream));
                 hipfft_check(hipfftExecR2C(filter_plan, r, R));
 
-                auto absolute_blocks = std::max(1u, ((proj_geom.N_hTrans / 1024u) + 1u));
+                auto absolute_blocks = (proj_geom.N_hTrans / 1024u) + 1u;
                 filter_absolute_kernel<<<absolute_blocks, 1024, 0, stream>>>(R, proj_geom.N_hTrans, proj_geom.d_h);
 
                 hip_check(hipStreamSynchronize(stream));
@@ -192,7 +192,9 @@ auto main() -> int
                 {
                     std::cout << "Number of subvolumes: " << num_subvols << std::endl;
                     for(auto s_N_z : sub_N_z)
-                        std::cout << "\tDimensions: " << vol_geom.N_x << " x " << vol_geom.N_y << " x " << s_N_z << std::endl;
+                        std::cout << "\tDimensions: " << vol_geom.N_x << " x "
+                                                      << vol_geom.N_y << " x "
+                                                      << s_N_z << std::endl;
                 }
 
                 break;
@@ -200,7 +202,6 @@ auto main() -> int
         }
 
         // Initialize per-stream data
-        auto host_output = static_cast<float*>(nullptr);        
         for(auto stream_idx = 0; stream_idx < streams.size(); ++stream_idx)
         {
             std::cout << "Initializing stream " << stream_idx << "... ";
@@ -211,8 +212,6 @@ auto main() -> int
                                     proj_geom.N_h * proj_geom.N_v * sizeof(std::uint16_t),
                                     hipHostMallocWriteCombined));
             host_inputs.push_back(host_input);
-
-            hip_check(hipHostMalloc(&host_output, proj_geom.N_h * proj_geom.N_v * sizeof(float), hipHostMallocDefault));
 
             auto input = static_cast<std::uint16_t*>(nullptr);
             auto input_pitch = std::size_t{};
@@ -234,8 +233,9 @@ auto main() -> int
             
             auto transformed = static_cast<hipfftComplex*>(nullptr);
             auto transformed_pitch = std::size_t{};
-            hip_check(hipMallocPitch(&transformed, &transformed_pitch,
-                                     proj_geom.N_hTrans * sizeof(hipfftComplex), proj_geom.N_v));
+            hip_check(hipMallocPitch(
+                &transformed, &transformed_pitch, proj_geom.N_hTrans * sizeof(hipfftComplex), proj_geom.N_v
+            ));
             transformed_projections.push_back(transformed);
             transformed_pitches.push_back(transformed_pitch);
 
@@ -304,17 +304,18 @@ auto main() -> int
             std::cout << "Done!" << std::endl;
         }
 
-        auto const s_N_z_first = sub_N_z.at(0); // might be different from s_N_z for the last subvolume
+        auto const s_N_z_first = sub_N_z.front(); // Use the initial subvolume size for offset calculations
+        auto const s_N_z_last = sub_N_z.back(); // If there is a largest subvolume, it will be the last
         create_volume("volume.tif");
         auto host_vol_raw_ptr = static_cast<float*>(nullptr);
-        hip_check(hipHostMalloc(&host_vol_raw_ptr,
-                                vol_geom.N_x * vol_geom.N_y * s_N_z_first * sizeof(float),
-                                hipHostMallocDefault));
-        auto host_vol_ptr = make_hipPitchedPtr(host_vol_raw_ptr,
-                                               vol_geom.N_x * sizeof(float), vol_geom.N_x, vol_geom.N_y);
-
+        hip_check(hipHostMalloc(
+            &host_vol_raw_ptr, vol_geom.N_x * vol_geom.N_y * s_N_z_last * sizeof(float), hipHostMallocDefault
+        ));
+        auto host_vol_ptr = make_hipPitchedPtr(
+            host_vol_raw_ptr, vol_geom.N_x * sizeof(float), vol_geom.N_x, vol_geom.N_y
+        );    
         auto vol_ptr = hipPitchedPtr{};
-        auto vol_ext = make_hipExtent(vol_geom.N_x * sizeof(float), vol_geom.N_y, s_N_z_first);
+        auto vol_ext = make_hipExtent(vol_geom.N_x * sizeof(float), vol_geom.N_y, s_N_z_last);
         hip_check(hipMalloc3D(&vol_ptr, vol_ext));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -323,23 +324,6 @@ auto main() -> int
         for(auto sub_idx = 0; sub_idx < num_subvols; ++sub_idx)
         {
             auto const s_N_z = sub_N_z.at(sub_idx);
-            if(s_N_z != s_N_z_first) // if there is a size mismatch for the last subvolume, delete old one and realloc
-            {
-                hip_check(hipStreamSynchronize(save_stream)); // Wait for preceding operations on volume to complete
-                hip_check(hipFree(vol_ptr.ptr));
-                hip_check(hipFreeHost(host_vol_raw_ptr));
-                
-                hip_check(hipHostMalloc(&host_vol_raw_ptr,
-                                        vol_geom.N_x * vol_geom.N_y * s_N_z * sizeof(float),
-                                        hipHostMallocDefault));
-                host_vol_ptr = make_hipPitchedPtr(host_vol_raw_ptr,
-                                                  vol_geom.N_x * sizeof(float),
-                                                  vol_geom.N_x,
-                                                  vol_geom.N_y);
-
-                vol_ext = make_hipExtent(vol_geom.N_x * sizeof(float), vol_geom.N_y, s_N_z);
-                hip_check(hipMalloc3D(&vol_ptr, vol_ext));
-            }
 
             auto sub_idx_info = new int;
             *sub_idx_info = sub_idx;
@@ -431,7 +415,7 @@ auto main() -> int
                                            hipMemcpyDeviceToDevice,
                                            stream));
 
-                // Fourier-transform projection and filter kernel
+                // R2C Fourier-transform projection
                 auto transformed = transformed_projections.at(stream_idx);
                 auto transformed_pitch = transformed_pitches.at(stream_idx);
                 hip_check(hipMemset2DAsync(transformed,
@@ -456,6 +440,7 @@ auto main() -> int
                 auto& backward = backward_plans.at(stream_idx);
                 hipfft_check(hipfftExecC2R(backward, transformed, expanded));
 
+                // Shrink projection to original size and normalize
                 hip_check(hipMemcpy2DAsync(proj,
                                            proj_pitch,
                                            expanded,

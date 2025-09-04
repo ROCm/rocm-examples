@@ -23,11 +23,11 @@
 set(example_objects ${PROJECT_NAME}_objects)
 set(example_streams ${PROJECT_NAME}_streams)
 set(example_graph_capture ${PROJECT_NAME}_graph_capture)
+set(example_graph_creation ${PROJECT_NAME}_graph_creation)
 
 add_library(${example_objects} OBJECT backprojection.hip
                                       filtering.hip
                                       log_transform.hip
-                                      normalization.hip
                                       projection.cpp
                                       volume.cpp
                                       weighting.hip)
@@ -57,3 +57,11 @@ else()
     target_compile_features(${example_graph_capture} PRIVATE cxx_std_20 hip_std_20)
     target_link_libraries(${example_graph_capture} PRIVATE ${example_objects} hip::hipfft)
 endif()
+
+add_executable(${example_graph_creation} main_graph_creation.hip)
+set_target_properties(${example_graph_creation} PROPERTIES CXX_EXTENSIONS OFF
+                                                          CXX_SCAN_FOR_MODULES OFF
+                                                          HIP_EXTENSIONS OFF)
+target_compile_definitions(${example_graph_creation} PRIVATE "DATA_DIRECTORY=\"${DATA_DIRECTORY}\"")
+target_compile_features(${example_graph_creation} PRIVATE cxx_std_20 hip_std_20)
+target_link_libraries(${example_graph_creation} PRIVATE ${example_objects} hip::hipfft)
