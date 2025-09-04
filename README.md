@@ -271,6 +271,12 @@ The following options are available when building with CMake.
   - [hipCUB](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipCUB/)
     - [device_radix_sort](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
     - [device_sum](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
+  - [hipRAND](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/)
+    - [c_cpp_api](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/c_cpp_api) Showcases the use of the hipRAND cpp API.
+      - [simple_distributions_cpp](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/c_cpp_api/simple_distributions_cpp) Shows an example for a simple distribution.
+    - [device_api](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/device_api) Showcases the use of the hipRAND device API.
+      - [pseudorandom_generations](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/device_api/pseudorandom_generations) Shows an example for a pseudorandom generator inside a kernel.
+      - [quasirandom_generations](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/device_api/quasirandom_generations) Shows an example for a quasirandom generator inside a kernel.
   - [hipSOLVER](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/)
     - [gels](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/gels/): Solve a linear system of the form $A\times X=B$.
     - [geqrf](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/geqrf/): Program that showcases how to obtain a QR decomposition with the hipSOLVER API.
