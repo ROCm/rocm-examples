@@ -27,12 +27,12 @@
 #include <cstddef>
 #include <cstdint>
 
-[[gnu::always_inline]] __device__ auto vol_centered_coordinate(unsigned int coord, std::uint32_t dim, float size) -> float
+__forceinline__ __device__ auto vol_centered_coordinate(unsigned int coord, std::uint32_t dim, float size) -> float
 {
     return (static_cast<float>(coord) - 0.5f * (static_cast<float>(dim) - 1.f)) * size;
 }
 
-[[gnu::always_inline]] __device__ auto proj_pixel_coordinate(float coord, float minimum, float px_size) -> float
+__forceinline__ __device__ auto proj_pixel_coordinate(float coord, float minimum, float px_size) -> float
 {
     return (coord - minimum) / px_size;
 }
