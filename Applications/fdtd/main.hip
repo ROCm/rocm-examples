@@ -30,12 +30,19 @@
 #include <algorithm>
 #include <chrono>
 #include <cmath>
-#include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <string>
 
-namespace fs = std::filesystem;
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    static_assert(false, "filesystem not available");
+#endif
 
 // Physical constants.
 __device__ __constant__ constexpr float c0 = 299792458.0f; // Speed of light (m/s).

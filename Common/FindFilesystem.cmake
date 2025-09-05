@@ -23,45 +23,57 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 include(CMakePushCheckState)
+include(CheckIncludeFileCXX)
 include(CheckCXXSourceCompiles)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-cmake_push_check_state()
+cmake_push_check_state(RESET)
 
-set(test_code
+# find available header: filesystem or experimental/filesystem
+check_include_file_cxx("filesystem" CXX_HAVE_FS_HEADER)
+if (CXX_HAVE_FS_HEADER)
+    set(FS_HEADER filesystem)
+    set(FS_NAMESPACE std::filesystem)
+    set(CXX_FS_HEADER_FOUND ON)
+else()
+    check_include_file_cxx("experimental/filesystem" CXX_HAVE_EXPERIMENTAL_FS_HEADER)
+    if(CXX_HAVE_EXPERIMENTAL_FS_HEADER)
+        set(FS_HEADER experimental/filesystem)
+        set(FS_NAMESPACE std::experimental::filesystem)
+        set(CXX_FS_HEADER_FOUND ON)
+    else()
+        set(CXX_FS_HEADER_FOUND OFF)
+        return()
+    endif()
+endif()
+
+string(CONFIGURE
 [[
-#include <filesystem>
-#include <iostream>
+    #include <@FS_HEADER@>
+    #include <iostream>
 
-namespace fs = std::filesystem;
+    int main() {
+        std::cout << @FS_NAMESPACE@::current_path() << std::endl;
+        return 0;
+    }
+]] test_code @ONLY)
 
-int main()
-{
-    std::cout << fs::current_path() << std::endl;
-    return 0;
-}
-]]
-)
-# Check if std::filesystem works without additional libraries
+# Check if filesystem works without additional libraries
 check_cxx_source_compiles("${test_code}" CXX_FS_NO_LINK)
 
-if (CXX_FS_NO_LINK)
-    message(STATUS "No extra linking required to use std::filesystem")
-else()
+if (NOT CXX_FS_NO_LINK)
     # Check if we can link stdc++fs
 	set(CMAKE_REQUIRED_LIBRARIES stdc++fs)
 	check_cxx_source_compiles("${test_code}" CXX_FS_CAN_LINK)
     if (CXX_FS_CAN_LINK)
-        set(CXX_FS_LIBRARY stdc++fs CACHE STRING "Additional library required to use std::filesystem" FORCE)
-        message(STATUS "Need explicite linking to stdc++fs")
+        set(CXX_FS_LIBRARY stdc++fs CACHE STRING "Additional library required to use filesystem" FORCE)
     endif()
 endif()
 
-unset(test_code)
 cmake_pop_check_state()
 
 if(NOT CXX_FS_NO_LINK AND NOT CXX_FS_CAN_LINK)
-    message(FATAL_ERROR "Cannot run simple program using std::filesystem")
+    message(FATAL_ERROR "Cannot run simple program using filesystem")
 endif()

@@ -24,10 +24,19 @@
 
 #include <hip/hip_runtime.h>
 
-#include <filesystem>
 #include <iostream>
 #include <numeric>
 #include <vector>
+
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    static_assert(false, "filesystem not available");
+#endif
 
 int main(int, char* argv[])
 {
@@ -65,9 +74,9 @@ int main(int, char* argv[])
     // To do that, find the directory where the example executable is placed in from the 0th argument.
     // Note that this does not always work (the executable may be invoked with a completely different
     // value for argv[0]), but works for the purposes of this example.
-    std::filesystem::path exe_dir
-        = std::filesystem::weakly_canonical(std::filesystem::path(argv[0])).parent_path();
-    std::filesystem::path module_path = exe_dir / module_file_name;
+    fs::path exe_dir
+        = fs::canonical(fs::path(argv[0])).parent_path();
+    fs::path module_path = exe_dir / module_file_name;
 
     // Load the module from the path that we just constructed.
     // If the module does not exist, this function will return an error.

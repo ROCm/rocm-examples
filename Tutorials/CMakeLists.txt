@@ -23,15 +23,18 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(Tutorials LANGUAGES CXX)
 include(CTest)
+include(CMakePushCheckState)
+include(CheckIncludeFileCXX)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(
-    CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-    AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.4"
-)
-    # g++ < 10.4 does not support all required C++17 features
-else()
+# skip redution if execution header is not available (for GCC < 10.1)
+cmake_push_check_state(RESET)
+set(CMAKE_REQUIRED_LIBRARIES "tbb")
+check_include_file_cxx(execution CXX_HAVE_EXECUTION_POLICIES)
+cmake_pop_check_state()
+
+if(CXX_HAVE_EXECUTION_POLICIES)
     add_subdirectory(reduction)
 endif()
