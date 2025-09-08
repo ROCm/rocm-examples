@@ -50,9 +50,11 @@ jobs:
             run: |
                   $ProgressPreference = 'SilentlyContinue'
                   Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe"
-                  Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe -OutFile Setup.exe
+                  Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe -OutFile HIPSDK.exe
                   Write-Host "Installing HIP SDK"
-                  Start-Process Setup.exe -ArgumentList '-install','-log',"installer_log.txt" -NoNewWindow -Wait
+                  Start-Process HIPSDK.exe -ArgumentList '-install','-log',"$((Get-Location).Path)\installer_log.txt" -NoNewWindow -Wait
+                  Write-Host "Installer log:"
+                  Get-Content "installer_log.txt"
                   if (Test-Path -Path "${{ env.HIP_PATH }}") {
                       Write-Host "HIP_PATH directory exists: ${{ env.HIP_PATH }}"
                       Write-Host "HIP SDK installed successfully"
@@ -61,7 +63,6 @@ jobs:
                       Write-Host "HIP SDK installation failed"
                       Exit 1
                   }
-                  msbuild -version
           - name: Build ${{ matrix.config }} x64
             shell: pwsh
             run: |
