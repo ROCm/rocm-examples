@@ -23,6 +23,7 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Doc-Programming-Guide-Programming-for-HIP-Runtime-Compiler LANGUAGES CXX)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
@@ -32,8 +33,13 @@ if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
     message(STATUS "The HIPRTC linker examples are available only for AMD targets.")
 else()
     add_subdirectory(linker_apis)
-    add_subdirectory(linker_apis_file)
     add_subdirectory(linker_apis_options)
+
+    if(NOT CXX_FS_HEADER_FOUND)
+        message("filesystem not found, not building Linker APIs File example")
+    else()
+        add_subdirectory(linker_apis_file)
+    endif()
 endif()
 
 add_subdirectory(lowered_names)

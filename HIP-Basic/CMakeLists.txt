@@ -24,6 +24,8 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Basic LANGUAGES CXX)
 include(CTest)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../Common/FindFilesystem.cmake")
+
 # ROCm installation path
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -97,11 +99,8 @@ if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
         endif()
     endif()
 
-    if(
-        CMAKE_CXX_COMPILER_ID STREQUAL "GNU"
-        AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "10.4"
-    )
-        # g++ < 10.4 does not support all required C++17 features
+    if(NOT CXX_FS_HEADER_FOUND)
+        message("filesystem not found, not building module API example")
     else()
         add_subdirectory(module_api)
     endif()

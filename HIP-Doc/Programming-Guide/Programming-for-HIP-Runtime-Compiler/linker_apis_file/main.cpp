@@ -26,12 +26,22 @@
 
 #include <cstddef>
 #include <cstdlib>
-#include <filesystem>
 #include <fstream>
 #include <ios>
 #include <iostream>
 #include <string>
 #include <vector>
+
+#if __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    static_assert(false, "filesystem not available");
+#endif
+
 
 #define CHECK_RET_CODE(call, ret_code)                                                             \
 {                                                                                                  \
@@ -138,7 +148,7 @@ int main()
                                    nullptr,               // Array of options applied to this input
                                    nullptr));             // Array of option values cast to void*
     // [sphinx-link-add-end]
-    std::filesystem::remove(bc_file_path);
+    fs::remove(bc_file_path);
 
     void* binary = nullptr;
     auto binarySize = std::size_t{};
