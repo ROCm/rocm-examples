@@ -25,21 +25,14 @@ set(example_name rocrand_pseudorandom_generations)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
-set(GPU_RUNTIMES "HIP" "CUDA")
-set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
+select_gpu_language()
 
-if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    message(
-        FATAL_ERROR
-        "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}"
-    )
-endif()
-
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${LANG}_STANDARD 17)
-set(CMAKE_${LANG}_EXTENSIONS OFF)
-set(CMAKE_${LANG}_STANDARD_REQUIRED ON)
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+select_hip_platform()
 
 if(WIN32)
     set(ROCM_ROOT
