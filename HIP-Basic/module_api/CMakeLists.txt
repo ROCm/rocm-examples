@@ -25,6 +25,7 @@ set(example_name hip_module_api)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/FindFilesystem.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()
 
@@ -83,9 +84,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 set(include_dirs "../../Common" "../../External")
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(
-    main.hip
-    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
-)
+target_link_libraries(${example_name} PRIVATE ${CXX_FS_LIBRARY})
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
