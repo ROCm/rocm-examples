@@ -19,7 +19,6 @@ more information on this topic, please refer to the
 
 * `hipDeviceSynchronize` is used to synchronize the device with the host.
 * `hipGetErrorString` transforms a HIP error code into a human-readable string.
-* `hipLaunchKernelGGL` is used to launch a kernel on the device.
 * The `__managed__` attribute is used to statically allocate memory in the unified memory space.
 
 ## Demonstrated API Calls
@@ -30,4 +29,3 @@ more information on this topic, please refer to the
 
 * `hipDeviceSynchronize`
 * `hipGetErrorString`
-* `hipLaunchKernelGGL`

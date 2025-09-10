@@ -30,7 +30,6 @@ works on Linux.
 * `hipDeviceSynchronize` is used to synchronize the device with the host.
 * `hipFree` is used to free previously allocated unified memory.
 * `hipGetErrorString` transforms a HIP error code into a human-readable string.
-* `hipLaunchKernelGGL` is used to launch a kernel on the device.
 * `hipMallocManaged` is used to allocate unified memory.
 * `hipMemAdvise` is used to set advice for variables in the unified memory space.
 * `hipMemRangeGetAttribute` is used to query for memory range attributes.
@@ -44,7 +43,6 @@ works on Linux.
 * `hipDeviceSynchronize`
 * `hipFree`
 * `hipGetErrorString`
-* `hipLaunchKernelGGL`
 * `hipMallocManaged`
 * `hipMemAdvise`
 * `hipMemRangeGetAttribute`

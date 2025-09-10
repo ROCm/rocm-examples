@@ -63,7 +63,7 @@ int main()
     HIP_CHECK(hipMemPrefetchAsync(c, sizeof(*c), deviceId, 0));
 
     // Launch add() kernel on GPU.
-    hipLaunchKernelGGL(add, dim3(1), dim3(1), 0, 0, a, b, c);
+    add<<<1, 1>>>(a, b, c);
 
     // Prefetch the result back to the CPU.
     HIP_CHECK(hipMemPrefetchAsync(c, sizeof(*c), hipCpuDeviceId, 0));

@@ -40,6 +40,5 @@ on this topic, please refer to the
 * `hipFree`
 * `hipGetErrorString`
 * `hipGetLastError`
-* `hipLaunchKernelGGL`
 * `hipMalloc`
 * `hipMemcpy`

@@ -20,46 +20,50 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// [sphinx-start]
-#include <hip/hip_runtime.h>
+#ifndef POPCOUNT_HPP
+#define POPCOUNT_HPP
 
-#include <iostream>
+#if __cplusplus >= 202002L
 
-#define HIP_CHECK(expression)              \
-{                                          \
-    const hipError_t err = expression;     \
-    if(err != hipSuccess)                  \
-    {                                      \
-        std::cerr << "HIP error: "         \
-            << hipGetErrorString(err)      \
-            << " at " << __LINE__ << "\n"; \
-    }                                      \
-}
+#include <bit>
 
-// Addition of two values.
-__global__ void add(int *a, int *b, int *c)
+using std::popcount;
+
+#elif defined(__clang__) || defined(__GNUC__)
+
+inline auto popcount(unsigned int x) -> int
 {
-    *c = *a + *b;
+    return __builtin_popcount(x);
 }
 
-// Declare a, b and c as static variables.
-__managed__ int a, b, c;
-
-int main()
+inline auto popcount(unsigned long x) -> int
 {
-    // Setup input values.
-    a = 1;
-    b = 2;
-
-    // Launch add() kernel on GPU.
-    add<<<1, 1>>>(&a, &b, &c);
-
-    // Wait for GPU to finish before accessing on host.
-    HIP_CHECK(hipDeviceSynchronize());
-
-    // Print the result.
-    std::cout << a << " + " << b << " = " << c << std::endl;
-
-    return 0;
+    return __builtin_popcountl(x);
 }
-// [sphinx-end]
+
+inline auto popcount(unsigned long long x) -> int
+{
+    return __builtin_popcountll(x);
+}
+
+#elif defined(_MSC_VER)
+
+#include <intrin.h>
+
+inline auto popcount(unsigned short x) -> unsigned short
+{
+    return __popcnt16(x);
+}
+
+inline auto popcount(unsigned int x) -> unsigned int
+{
+    return __popcnt(x);
+}
+
+inline auto popcount(unsigned __int64 x) -> unsigned __int64
+{
+    return __popcnt64(x);
+}
+#endif
+
+#endif

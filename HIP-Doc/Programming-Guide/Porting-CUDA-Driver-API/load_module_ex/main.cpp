@@ -103,11 +103,10 @@ int main()
 
     options[0] = hipJitOptionMaxRegisters;
     unsigned maxRegs = 15;
-    optionValues[0] = (void *)(&maxRegs);
+    optionValues[0] = static_cast<void*>(&maxRegs);
 
-    // hipModuleLoadData(module, imagePtr) will be called on HIP-Clang path, JIT
-    // options will not be used, and cupModuleLoadDataEx(module, imagePtr,
-    // numOptions, options, optionValues) will be called on NVCC path
+    // hipModuleLoadData(module, imagePtr) will be called on HIP-Clang path, JIT options will not be used, and
+    // cuModuleLoadDataEx(module, imagePtr, numOptions, options, optionValues) will be called on NVCC path
     HIP_CHECK(hipModuleLoadDataEx(&module, imagePtr, numOptions, options, optionValues));
 
     // Get kernel function from the module via its name
