@@ -1,16 +1,22 @@
-name: Build HIP-Doc VS
+name: Build HIP nvcc Portable Solution
 
 on:
   push:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
+      - 'Applications/**'
+      - 'HIP-Basic/**'
       - 'HIP-Doc/**'
+      - 'Libraries/hip**'
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
+      - 'Applications/**'
+      - 'HIP-Basic/**'
       - 'HIP-Doc/**'
+      - 'Libraries/hip**'
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
 
@@ -18,16 +24,19 @@ env:
     PLATFORM_TOOLSET_VERSION: 6.4
     HIP_PATH: C:\Program Files\AMD\ROCm\6.4\
     HIPSDK_INSTALLER_VERSION: 25.Q3
-    VULKAN_SDK: C:\VulkanSDK\1.4.313.2\
+    CUDA_VERSION: 12.8.1
+    CUDA_INSTALLER_VERSION: 572.61
+    CUDA_PATH: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8
     GLFW_DIR: C:\glfw-3.4.bin.WIN64\
+    VULKAN_SDK: C:\VulkanSDK\1.4.313.2\
 
 jobs:
     build:
-        name: "Build HIP Documentation VS"
+        name: "Build HIP nvcc Portable Solution"
         strategy:
           matrix:
             config: [Debug, Release]
-        runs-on: windows-latest
+        runs-on: windows-2025
         steps:
           - uses: actions/checkout@v4
           - uses: microsoft/setup-msbuild@v2
@@ -50,6 +59,22 @@ jobs:
                   Invoke-WebRequest -Uri https://sdk.lunarg.com/sdk/download/1.4.313.2/windows/vulkansdk-windows-X64-1.4.313.2.exe -OutFile vulkansdk-windows-X64-1.4.313.2.exe
                   Write-Host "Installing Vulkan SDK"
                   Start-Process vulkansdk-windows-X64-1.4.313.2.exe -ArgumentList '--accept-licenses','--default-answer','--confirm-command','install' -NoNewWindow -Wait
+          - name: Install CUDA Toolkit
+            shell: pwsh
+            run: |
+                  $ProgressPreference = 'SilentlyContinue'
+                  Write-Host "Downloading installer https://developer.download.nvidia.com/compute/cuda/${{ env.CUDA_VERSION }}/local_installers/cuda_${{ env.CUDA_VERSION }}_${{ env.CUDA_INSTALLER_VERSION }}_windows.exe"
+                  Invoke-WebRequest -Uri https://developer.download.nvidia.com/compute/cuda/${{ env.CUDA_VERSION }}/local_installers/cuda_${{ env.CUDA_VERSION }}_${{ env.CUDA_INSTALLER_VERSION }}_windows.exe -OutFile CUDAToolkit.exe
+                  Write-Host "Installing CUDA Toolkit"
+                  Start-Process CUDAToolkit.exe -ArgumentList '-s cuda_profiler_api_12.8 cudart_12.8 nvcc_12.8 nvrtc_dev_12.8 cublas_dev_12.8 cufft_dev_12.8 curand_dev_12.8 cusolver_dev_12.8 cusparse_dev_12.8 visual_studio_integration_12.8','-n' -NoNewWindow -Wait
+                  if (Test-Path -Path "${{ env.CUDA_PATH }}") {
+                      Write-Host "CUDA_PATH directory exists: ${{ env.CUDA_PATH }}"
+                      Write-Host "CUDA Toolkit installed successfully"
+                  } else {
+                      Write-Host "CUDA_PATH directory DOES NOT exist: ${{ env.CUDA_PATH }}"
+                      Write-Host "CUDA Toolkit installation failed"
+                      Exit 1
+                  }
           - name: Install HIP SDK
             shell: pwsh
             run: |
@@ -68,13 +93,20 @@ jobs:
                       Write-Host "HIP SDK installation failed"
                       Exit 1
                   }
-          - name: Build ${{ matrix.config }} x64
+          - name: Apply patch
             shell: pwsh
             run: |
-                  Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang 6\..' | Select-Object -First 1).Matches.Value) with HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}"
-                  Get-ChildItem -Recurse -File | Where-Object { Select-String -Pattern 'HIP clang 6\..' -Path $_ } | ForEach-Object {
-                    (Get-Content -Path $_.FullName) -replace 'HIP clang 6\..', "HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}" | Set-Content -Path $_.FullName
+                  Write-Host "Applying patches $(Get-ChildItem -File Scripts\VisualStudio\*.patch)"
+                  git apply (Get-ChildItem -File Scripts\VisualStudio\*.patch).FullName
+                  Write-Host "Patches applied. Showing diff"
+                  git diff
+          - name: Build HIP nvcc ${{ matrix.config }} x64
+            shell: pwsh
+            run: |
+                  Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang .\..' | Select-Object -First 1).Matches.Value) with HIP nvcc ${{ env.PLATFORM_TOOLSET_VERSION }}"
+                  Get-ChildItem -Recurse -File | Where-Object { Select-String -Pattern 'HIP clang .\..' -Path $_ } | ForEach-Object {
+                    (Get-Content -Path $_.FullName) -replace 'HIP clang .\..', "HIP nvcc ${{ env.PLATFORM_TOOLSET_VERSION }}" | Set-Content -Path $_.FullName
                   }
-                  msbuild Scripts\VisualStudio\build.proj -maxCpuCount -detailedSummary -property:"Category=HIP-Doc;Configuration=${{ matrix.config }};Platform=x64"
+                  msbuild ROCm-Examples-Portable-VS2022.sln -maxCpuCount -detailedSummary -property:"Configuration=${{ matrix.config }};Platform=x64"
                   Write-Host "msbuild returned: $LastExitCode"
                   Exit $LastExitCode
