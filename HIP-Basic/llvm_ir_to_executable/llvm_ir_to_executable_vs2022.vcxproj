@@ -107,7 +107,7 @@
         FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)clang++" --cuda-device-only -c -emit-llvm main.hip --offload-arch=%%a -o "$(IntDir)main_%%a.bc" -I ../../Common -std=c++17
         FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)llvm-dis" "$(IntDir)main_%%a.bc" -o "$(IntDir)main_%%a.ll"
         FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)clang++" -target amdgcn-amd-amdhsa -mcpu=%%a "$(IntDir)main_%%a.ll" -o "$(IntDir)main_%%a.o"
-        SET TARGETS=host-x86_64-unknown-linux
+        SET TARGETS=host-x86_64-pc-windows-msvc
         SET INPUTS=-input=nul
         SETLOCAL ENABLEDELAYEDEXPANSION
         FOR %%a in ($(OffloadArch)) DO SET TARGETS=!TARGETS!,hipv4-amdgcn-amd-amdhsa--%%a&amp; SET INPUTS=!INPUTS! -input="$(IntDir)main_%%a.o"
@@ -139,7 +139,7 @@
         FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)clang++" --cuda-device-only -c -emit-llvm main.hip --offload-arch=%%a -o "$(IntDir)main_%%a.bc" -I ../../Common -std=c++17
         FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)llvm-dis" "$(IntDir)main_%%a.bc" -o "$(IntDir)main_%%a.ll"
         FOR %%a in ($(OffloadArch)) DO "$(ClangToolPath)clang++" -target amdgcn-amd-amdhsa -mcpu=%%a "$(IntDir)main_%%a.ll" -o "$(IntDir)main_%%a.o"
-        SET TARGETS=host-x86_64-unknown-linux
+        SET TARGETS=host-x86_64-pc-windows-msvc
         SET INPUTS=-input=nul
         SETLOCAL ENABLEDELAYEDEXPANSION
         FOR %%a in ($(OffloadArch)) DO SET TARGETS=!TARGETS!,hipv4-amdgcn-amd-amdhsa--%%a&amp; SET INPUTS=!INPUTS! -input="$(IntDir)main_%%a.o"
