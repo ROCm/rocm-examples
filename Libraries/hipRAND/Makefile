@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,30 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipBLAS \
-	hipCUB \
-	hipFFT \
-	hipSOLVER \
-	rocRAND \
-	hipRAND
+EXAMPLES := \
+	c_cpp_api \
+	device_api
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	rocBLAS \
-	rocFFT \
-	rocPRIM \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust
-endif
-
-all: $(LIBRARIES)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(LIBRARIES):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(LIBRARIES)
+.PHONY: all clean $(EXAMPLES)
