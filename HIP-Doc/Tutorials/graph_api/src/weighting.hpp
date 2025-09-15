@@ -26,12 +26,15 @@
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
-#include <cstdint>
 
-__global__ void weighting_kernel(float* p, std::size_t pitch,
-                                 std::uint32_t N_h, std::uint32_t N_v,
-                                 float d_sd, float d_so,
-                                 float h_min, float v_min,
-                                 float d_h, float d_v);
+__global__ void weighting_kernel(
+    float* p,
+    std::size_t pitch,
+    uint2 dim,
+    float d_sd,
+    float d_so,
+    float2 minCoord,
+    float2 pixelDim
+);
 
 #endif

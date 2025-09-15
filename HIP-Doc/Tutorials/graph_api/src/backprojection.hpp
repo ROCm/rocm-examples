@@ -28,12 +28,20 @@
 #include <cstddef>
 #include <cstdint>
 
-__global__ void backprojection_kernel(float* __restrict__ vol, std::size_t pitch,
-                                      std::size_t N_x, std::size_t N_y, std::size_t N_z,
-                                      std::size_t s_N_z, std::size_t z_offset,
-                                      float d_x, float d_y, float d_z,
-                                      hipTextureObject_t proj, float h_min, float v_min,
-                                      float sin_theta, float cos_theta, float d_h, float d_v,
-                                      float d_sd, float d_so);
+__global__ void backprojection_kernel(
+    float* __restrict__ vol,
+    std::size_t pitch,
+    ulonglong3 volDim,
+    std::size_t s_N_z,
+    std::size_t zOffset,
+    float3 voxelDim,
+    hipTextureObject_t proj,
+    float2 minCoord,
+    float sin_theta,
+    float cos_theta,
+    float2 pixelDim,
+    float d_sd,
+    float d_so
+);
 
 #endif

@@ -27,18 +27,17 @@
 #include <hipfft/hipfft.h>
 
 #include <cstddef>
-#include <cstdint>
 #include <numbers>
 
 // Creates a Shepp-Logan filter
-__global__ void filter_creation_kernel(float* __restrict__ r, std::int32_t N_hFFT, float tau)
+__global__ void filter_creation_kernel(float* __restrict__ r, int N_hFFT, float tau)
 {
     constexpr auto pi = std::numbers::pi_v<float>;
     auto const i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    if(i < static_cast<std::uint32_t>(N_hFFT))
+    if(i < static_cast<unsigned int>(N_hFFT))
     {
-        auto const j = -((N_hFFT - 2) / 2) + static_cast<std::int32_t>(i);
+        auto const j = -((N_hFFT - 2) / 2) + static_cast<int>(i);
 
         if(j == 0)
             r[i] = (1.f / 4.f) * (1.f / tau);
@@ -52,7 +51,7 @@ __global__ void filter_creation_kernel(float* __restrict__ r, std::int32_t N_hFF
     }
 }
 
-__global__ void filter_absolute_kernel(hipfftComplex* R, std::uint32_t N_hTrans, float tau)
+__global__ void filter_absolute_kernel(hipfftComplex* R, unsigned int N_hTrans, float tau)
 {
     auto const i = blockIdx.x * blockDim.x + threadIdx.x;
     if(i < N_hTrans)
@@ -64,14 +63,14 @@ __global__ void filter_absolute_kernel(hipfftComplex* R, std::uint32_t N_hTrans,
     }
 }
 
-__global__ void filter_application_kernel(hipfftComplex* __restrict__ P, std::size_t const pitch,
+__global__ void filter_application_kernel(hipfftComplex* __restrict__ P, std::size_t pitch,
                                           hipfftComplex const* __restrict__ R,
-                                          std::uint32_t const N_hTrans, std::uint32_t const N_v)
+                                          uint2 dimTrans)
 {
     auto const h = blockIdx.x * blockDim.x + threadIdx.x;
     auto const v = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if(h < N_hTrans && v < N_v)
+    if(h < dimTrans.x && v < dimTrans.y)
     {
         auto row = reinterpret_cast<hipfftComplex*>(reinterpret_cast<char*>(P) + v * pitch);
 
@@ -80,14 +79,12 @@ __global__ void filter_application_kernel(hipfftComplex* __restrict__ P, std::si
     }
 }
 
-__global__ void filter_normalization_kernel(float* p, std::size_t const pitch,
-                                            std::uint32_t const N_hFFT,
-                                            std::uint32_t const N_h, std::uint32_t const N_v)
+__global__ void filter_normalization_kernel(float* p, std::size_t pitch, unsigned int N_hFFT, uint2 dim)
 {
     auto const h = blockIdx.x * blockDim.x + threadIdx.x;
     auto const v = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if((h < N_h) && (v < N_v))
+    if((h < dim.x) && (v < dim.y))
     {
         auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(p) + v * pitch);
         row[h] /= N_hFFT;

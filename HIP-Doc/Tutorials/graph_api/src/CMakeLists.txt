@@ -26,8 +26,11 @@ set(example_graph_capture ${PROJECT_NAME}_graph_capture)
 set(example_graph_creation ${PROJECT_NAME}_graph_creation)
 
 add_library(${example_objects} OBJECT backprojection.hip
+                                      dataset.cpp
                                       filtering.hip
                                       log_transform.hip
+                                      normalization.hip
+                                      phantom.hip
                                       projection.cpp
                                       volume.cpp
                                       weighting.hip)

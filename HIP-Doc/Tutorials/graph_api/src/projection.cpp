@@ -22,6 +22,8 @@
 
 #include "projection.hpp"
 
+#include "utility.hpp"
+
 #include <tiffio.h>
 #include <tiffio.hxx>
 
@@ -70,42 +72,6 @@ namespace
         if(auto err = std::fclose(logfile); err != 0)
             std::perror("Could not close logfile");
     }
-}
-
-void get_field(TIFF* tiff, std::uint32_t tag, auto& param, std::string error_msg) noexcept(false)
-{
-    if(auto err = TIFFGetField(tiff, tag, &param); err != 1)
-        throw std::runtime_error{error_msg};
-}
-
-projection_geometry::projection_geometry(std::string path) noexcept(false)
-{
-    std::ifstream file{path.c_str(), std::ios::binary};
-    if(!file.is_open())
-        throw std::runtime_error{"Could not open " + path + " for reading."};
-
-    auto tiff = TIFFStreamOpen(path.c_str(), &file);
-    if(tiff == nullptr)
-        throw std::runtime_error{"Could not open TIFF file at " + path + " for reading."};
-
-    get_field(tiff, TIFFTAG_IMAGEWIDTH, N_h, "Could not determine TIFF's image width.");
-    get_field(tiff, TIFFTAG_IMAGELENGTH, N_v, "Could not determine TIFF's image length.");
-
-    TIFFClose(tiff);
-
-    // N_h: number of detector pixels (horizontal)
-    // d_h: detector pixel size (mm)
-    // delta_h: physical shift (mm), negative values shift detector coordinate system to the left
-    h_min = -((N_h - 1) * d_h) / 2.f + delta_h;
-    v_min = -((N_v - 1) * d_v) / 2.f + delta_v;
-
-    // Filter length
-    N_hFFT = std::pow(2.f, std::ceil(std::log2(N_h)));
-    s_N_hFFT = static_cast<std::int32_t>(N_hFFT);
-
-    // Transformed filter length
-    N_hTrans = N_hFFT / 2 + 1;
-    s_N_hTrans = static_cast<std::int32_t>(N_hTrans);
 }
 
 void load_projection(void* args) noexcept

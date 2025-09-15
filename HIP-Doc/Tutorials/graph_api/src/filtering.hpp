@@ -28,18 +28,15 @@
 #include <hipfft/hipfft.h>
 
 #include <cstddef>
-#include <cstdint>
 
-__global__ void filter_creation_kernel(float* __restrict__ r, std::int32_t N_hFFT, float tau);
+__global__ void filter_creation_kernel(float* __restrict__ r, int N_hFFT, float tau);
 
-__global__ void filter_absolute_kernel(hipfftComplex* R, std::uint32_t N_hTrans, float tau);
+__global__ void filter_absolute_kernel(hipfftComplex* R, unsigned int N_hTrans, float tau);
 
-__global__ void filter_application_kernel(hipfftComplex* __restrict__ P, std::size_t const pitch,
+__global__ void filter_application_kernel(hipfftComplex* __restrict__ P, std::size_t pitch,
                                           hipfftComplex const* __restrict__ R,
-                                          std::uint32_t N_hTrans, std::uint32_t N_v);
+                                          uint2 dimTrans);
 
-__global__ void filter_normalization_kernel(float* p, std::size_t const pitch,
-                                            std::uint32_t const N_hFFT,
-                                            std::uint32_t const N_h, std::uint32_t const N_v);
+__global__ void filter_normalization_kernel(float* p, std::size_t pitch, unsigned int N_hFFT, uint2 dim);
 
 #endif

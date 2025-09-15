@@ -26,8 +26,7 @@
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
-#include <cstdint>
 
-__global__ void log_transformation_kernel(float* proj, std::size_t pitch, std::uint32_t N_h, std::uint32_t N_v);
+__global__ void log_transformation_kernel(float* proj, std::size_t pitch, uint2 dim);
 
 #endif

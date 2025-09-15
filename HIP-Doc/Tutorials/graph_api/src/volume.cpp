@@ -39,22 +39,6 @@
 #include <stdexcept>
 #include <string>
 
-volume_geometry::volume_geometry(projection_geometry const& proj_geom) noexcept
-{
-    /* Calculate volume dimensions */
-    alpha = std::atan(((proj_geom.N_h * proj_geom.d_h) / 2.f) / proj_geom.d_sd);
-    radius = std::abs(proj_geom.d_so) * std::sin(alpha);
-
-    d_x = radius / ((((proj_geom.N_h * proj_geom.d_h) / 2.f) + std::abs(proj_geom.delta_h)) / proj_geom.d_h);
-    d_y = d_x;
-    d_z = d_x;
-
-    N_x = (2.f * radius) / d_x;
-    N_y = N_x;
-    N_z = ((proj_geom.N_v * proj_geom.d_v / 2.f) +
-          std::abs(proj_geom.delta_v)) * (std::abs(proj_geom.d_so) / proj_geom.d_sd) * (2.f / d_z);
-}
-
 void create_volume(std::string path) noexcept(false)
 {
     auto tiff = TIFFOpen(path.c_str(), "w8"); // open in BigTIFF mode
@@ -105,8 +89,8 @@ void save_volume(void* args) noexcept
             set_field(TIFFTAG_RESOLUTIONUNIT, RESUNIT_CENTIMETER, "Could not set TIFF's resolution unit.");
             set_field(TIFFTAG_SAMPLEFORMAT, SAMPLEFORMAT_IEEEFP, "Could not set TIFF's sample format.");
             set_field(TIFFTAG_SAMPLESPERPIXEL, 1, "Could not set TIFF's samples per pixel.");
-            // set_field(TIFFTAG_SMAXSAMPLEVALUE, 1.f, "Could not set TIFF's maximum sample value.");
-            // set_field(TIFFTAG_SMINSAMPLEVALUE, 0.f, "Could not set TIFF's minimum sample value.");
+            set_field(TIFFTAG_SMAXSAMPLEVALUE, 1.f, "Could not set TIFF's maximum sample value.");
+            set_field(TIFFTAG_SMINSAMPLEVALUE, 0.f, "Could not set TIFF's minimum sample value.");
             set_field(TIFFTAG_XRESOLUTION, x_cm, "Could not set TIFF's horizontal resolution.");
             set_field(TIFFTAG_YRESOLUTION, y_cm, "Could not set TIFF's vertical resolution.");
 

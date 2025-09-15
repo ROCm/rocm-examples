@@ -30,17 +30,21 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 include(FetchContent)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
 
-# Download seashell data
-set(DATA_BASE 20211124_seashell)
-set(DATA_URL https://zenodo.org/records/6983008/files/${DATA_BASE}.zip)
-set(DATA_ARCHIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DATA_BASE}.zip)
+option(GRAPH_TUTORIAL_REAL_WORLD_DATA "Use a (large) real-world dataset instead of the Shepp-Logan phantom" OFF)
+
 set(DATA_DIRECTORY ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${PROJECT_NAME}_data)
+if(GRAPH_TUTORIAL_FETCH_REAL_WORLD_DATA)
+    # Download seashell data
+    set(DATA_BASE 20211124_seashell)
+    set(DATA_URL https://zenodo.org/records/6983008/files/${DATA_BASE}.zip)
+    set(DATA_ARCHIVE ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/${DATA_BASE}.zip)
 
-if(NOT EXISTS ${DATA_DIRECTORY}/${DATA_BASE}_0001.tif)
-    message(STATUS "Downloading data archive")
-    file(DOWNLOAD ${DATA_URL} ${DATA_ARCHIVE} SHOW_PROGRESS EXPECTED_HASH MD5=098895e54442370de4d6f0b526e262a1)
+    if(NOT EXISTS ${DATA_DIRECTORY}/${DATA_BASE}_0001.tif)
+        message(STATUS "Downloading data archive")
+        file(DOWNLOAD ${DATA_URL} ${DATA_ARCHIVE} SHOW_PROGRESS EXPECTED_HASH MD5=098895e54442370de4d6f0b526e262a1)
 
-    file(ARCHIVE_EXTRACT INPUT ${DATA_ARCHIVE} DESTINATION ${DATA_DIRECTORY})
+        file(ARCHIVE_EXTRACT INPUT ${DATA_ARCHIVE} DESTINATION ${DATA_DIRECTORY})
+    endif()
 endif()
 
 find_package(TIFF COMPONENTS CXX)
@@ -55,7 +59,7 @@ if(NOT TIFF_FOUND)
 
     target_compile_definitions(tiff PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
     target_compile_definitions(tiffxx PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
-    set(TIFF_TARGET TIFF::tiff) # find_package uses the uppercase notation, libTIFF uses lowercase
+    set(TIFF_TARGET TIFF::tiff) # CMake's FindTIFF module uses the uppercase notation, libTIFF uses lowercase
 else()
     set(TIFF_TARGET TIFF::TIFF)
 endif()

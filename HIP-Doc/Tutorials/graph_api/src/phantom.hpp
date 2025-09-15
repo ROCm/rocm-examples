@@ -20,36 +20,24 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef VOLUME_HPP
-#define VOLUME_HPP
+#ifndef PHANTOM_HPP
+#define PHANTOM_HPP
 
 #include "projection.hpp"
+#include "volume.hpp"
 
 #include <hip/hip_runtime.h>
 
-#include <cstddef>
-#include <string>
+#include <vector>
 
-struct volumeGeometry
-{ 
-    float3 voxelDim{};  // physical voxel sizes [mm]
-    ulonglong3 dim{};   // number of voxels in each direction
-};
-
-void create_volume(std::string path) noexcept(false);
-
-struct save_volume_args
+namespace phantom
 {
-    std::string path;
-    float* vol;
-    std::size_t N_x;
-    std::size_t N_y;
-    std::size_t N_z;
-    std::size_t s_N_z;
-    float d_x;
-    float d_y;
-};
-void save_volume(void* args) noexcept;
-
+    auto make_projectionGeometry() noexcept -> projectionGeometry;
+    auto make_volumeGeometry() noexcept -> volumeGeometry;
+    auto make_projections(
+        projectionGeometry const& proj_geom,
+        volumeGeometry const& vol_geom
+    ) noexcept(false) -> std::vector<hipPitchedPtr>;
+}
 
 #endif

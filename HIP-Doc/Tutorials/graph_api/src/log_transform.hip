@@ -23,16 +23,15 @@
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
-#include <cstdint>
 #include <limits>
 
-__global__ void log_transformation_kernel(float* proj, std::size_t pitch, std::uint32_t N_h, std::uint32_t N_v)
+__global__ void log_transformation_kernel(float* proj, std::size_t pitch, uint2 dim)
 {
     constexpr auto epsilon = std::numeric_limits<float>::epsilon();
 
-    for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < N_v; v += blockDim.y * gridDim.y)
+    for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < dim.y; v += blockDim.y * gridDim.y)
     {
-        for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < N_h; h += blockDim.x * gridDim.x)
+        for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < dim.x; h += blockDim.x * gridDim.x)
         {
             auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(proj) + v * pitch);
             

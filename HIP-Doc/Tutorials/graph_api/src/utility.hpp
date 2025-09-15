@@ -27,6 +27,8 @@
 
 #include <hipfft/hipfft.h>
 
+#include <tiffio.h>
+
 #include <source_location>
 #include <stdexcept>
 #include <string>
@@ -117,6 +119,12 @@ inline void hipfft_check(hipfftResult res, std::source_location const loc = std:
 
         throw std::runtime_error{msg};
     }
+}
+
+inline void get_field(TIFF* tiff, std::uint32_t tag, auto& param, std::string error_msg) noexcept(false)
+{
+    if(auto err = TIFFGetField(tiff, tag, &param); err != 1)
+        throw std::runtime_error{error_msg};
 }
 
 #endif

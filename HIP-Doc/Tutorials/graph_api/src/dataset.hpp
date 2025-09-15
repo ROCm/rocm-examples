@@ -20,36 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef VOLUME_HPP
-#define VOLUME_HPP
+#ifndef DATASET_HPP
+#define DATASET_HPP
 
 #include "projection.hpp"
+#include "volume.hpp"
 
-#include <hip/hip_runtime.h>
-
-#include <cstddef>
 #include <string>
 
-struct volumeGeometry
-{ 
-    float3 voxelDim{};  // physical voxel sizes [mm]
-    ulonglong3 dim{};   // number of voxels in each direction
-};
-
-void create_volume(std::string path) noexcept(false);
-
-struct save_volume_args
+namespace dataset
 {
-    std::string path;
-    float* vol;
-    std::size_t N_x;
-    std::size_t N_y;
-    std::size_t N_z;
-    std::size_t s_N_z;
-    float d_x;
-    float d_y;
-};
-void save_volume(void* args) noexcept;
-
+    auto make_projectionGeometry(std::string path) noexcept(false) -> projectionGeometry;
+    auto make_volumeGeometry(projectionGeometry const& projGeom) noexcept -> volumeGeometry;
+}
 
 #endif

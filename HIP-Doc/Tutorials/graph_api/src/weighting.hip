@@ -34,23 +34,27 @@
  for differences in the absorption, each pixel must be weighted with a factor which depends on the detector geometry and
  the distances during the measurement.
 */
-__global__ void weighting_kernel(float* p, std::size_t pitch,
-                                 std::uint32_t N_h, std::uint32_t N_v,
-                                 float d_sd, float d_so,
-                                 float h_min, float v_min,
-                                 float d_h, float d_v)
+__global__ void weighting_kernel(
+    float* p,
+    std::size_t pitch,
+    uint2 dim,
+    float d_sd,
+    float d_so,
+    float2 minCoord,
+    float2 pixelDim
+)
 {
     auto const h = blockDim.x * blockIdx.x + threadIdx.x;
     auto const v = blockDim.y * blockIdx.y + threadIdx.y;
 
-    if((h < N_h) && (v < N_v))
+    if((h < dim.x) && (v < dim.y))
     {
         auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(p) + v * pitch);
         
         // physical detector coordinates in mm (pixel center); adding 0.5f to stay consistent with texture fetching
         // during backprojection
-        auto const h_j = (h + 0.5f) * d_h + h_min;
-        auto const v_i = (v + 0.5f) * d_v + v_min;
+        auto const h_j = (h + 0.5f) * pixelDim.x + minCoord.x;
+        auto const v_i = (v + 0.5f) * pixelDim.y + minCoord.y;
 
         // distance weighting
         auto const dist_w = rsqrtf(d_sd * d_sd + h_j * h_j + v_i * v_i);

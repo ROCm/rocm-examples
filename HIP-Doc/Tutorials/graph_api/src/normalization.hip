@@ -20,36 +20,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef VOLUME_HPP
-#define VOLUME_HPP
-
-#include "projection.hpp"
+#include "normalization.hpp"
 
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
-#include <string>
+#include <cstdint>
 
-struct volumeGeometry
-{ 
-    float3 voxelDim{};  // physical voxel sizes [mm]
-    ulonglong3 dim{};   // number of voxels in each direction
-};
-
-void create_volume(std::string path) noexcept(false);
-
-struct save_volume_args
+__global__ void normalization_kernel(
+    std::uint16_t const* __restrict__ in,
+    std::size_t const inPitch,
+    float* __restrict__ out,
+    std::size_t const outPitch,
+    uint2 dim,
+    std::uint16_t bits
+)
 {
-    std::string path;
-    float* vol;
-    std::size_t N_x;
-    std::size_t N_y;
-    std::size_t N_z;
-    std::size_t s_N_z;
-    float d_x;
-    float d_y;
-};
-void save_volume(void* args) noexcept;
+    auto const maximum = (1 << bits) - 1;
 
+    for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < dim.y; v += blockDim.y * gridDim.y)
+    {
+        for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < dim.x; h += blockDim.x * gridDim.x)
+        {
+            auto in_row = reinterpret_cast<std::uint16_t const*>(reinterpret_cast<char const*>(in) + v * inPitch);
+            auto out_row = reinterpret_cast<float*>(reinterpret_cast<char*>(out) + v * outPitch);
 
-#endif
+            // Normalize
+            out_row[h] = static_cast<float>(in_row[h]) / maximum;
+        }
+    }
+}

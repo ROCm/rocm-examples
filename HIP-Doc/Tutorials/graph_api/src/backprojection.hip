@@ -27,31 +27,41 @@
 #include <cstddef>
 #include <cstdint>
 
-__forceinline__ __device__ auto vol_centered_coordinate(unsigned int coord, std::uint32_t dim, float size) -> float
+__forceinline__ __device__ auto vol_centered_coordinate(
+    unsigned int coord, unsigned long long dim, float vxSize
+) -> float
 {
-    return (static_cast<float>(coord) - 0.5f * (static_cast<float>(dim) - 1.f)) * size;
+    return (static_cast<float>(coord) - 0.5f * (static_cast<float>(dim) - 1.f)) * vxSize;
 }
 
-__forceinline__ __device__ auto proj_pixel_coordinate(float coord, float minimum, float px_size) -> float
+__forceinline__ __device__ auto proj_pixel_coordinate(float coord, float minimum, float pxSize) -> float
 {
-    return (coord - minimum) / px_size;
+    return (coord - minimum) / pxSize;
 }
 
-__global__ void backprojection_kernel(float* __restrict__ vol, std::size_t pitch,
-                                      std::size_t N_x, std::size_t N_y, std::size_t N_z,
-                                      std::size_t s_N_z, std::size_t z_offset,
-                                      float d_x, float d_y, float d_z,
-                                      hipTextureObject_t proj, float h_min, float v_min,
-                                      float sin_theta, float cos_theta, float d_h, float d_v,
-                                      float d_sd, float d_so)
+__global__ void backprojection_kernel(
+    float* __restrict__ vol,
+    std::size_t pitch,
+    ulonglong3 volDim,
+    std::size_t s_N_z,
+    std::size_t zOffset,
+    float3 voxelDim,
+    hipTextureObject_t proj,
+    float2 minCoord,
+    float sin_theta,
+    float cos_theta,
+    float2 pixelDim,
+    float d_sd,
+    float d_so
+)
 {
     auto const x_in = blockIdx.x * blockDim.x + threadIdx.x;
     auto const y_in = blockIdx.y * blockDim.y + threadIdx.y;
     auto z_in = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if((x_in < N_x) && (y_in < N_y) && (z_in < s_N_z))
+    if((x_in < volDim.x) && (y_in < volDim.y) && (z_in < s_N_z))
     {
-        auto const slice_pitch = pitch * N_y;
+        auto const slice_pitch = pitch * volDim.y;
         auto slice = reinterpret_cast<char*>(vol) + z_in * slice_pitch;
         auto row = reinterpret_cast<float*>(slice + y_in * pitch);
 
@@ -59,12 +69,12 @@ __global__ void backprojection_kernel(float* __restrict__ vol, std::size_t pitch
         auto old_val = row[x_in];
 
         // add offset for current subvolume
-        z_in += z_offset;
+        z_in += zOffset;
 
         // get coordinates relative to volume center (0, 0, 0)
-        auto x = vol_centered_coordinate(x_in, N_x, d_x);
-        auto y = vol_centered_coordinate(y_in, N_y, d_y);
-        auto z = vol_centered_coordinate(z_in, N_z, d_z);
+        auto x = vol_centered_coordinate(x_in, volDim.x, voxelDim.x);
+        auto y = vol_centered_coordinate(y_in, volDim.y, voxelDim.y);
+        auto z = vol_centered_coordinate(z_in, volDim.z, voxelDim.z);
 
         // rotate coordinates
         auto s = x * cos_theta + y * sin_theta;
@@ -72,8 +82,8 @@ __global__ void backprojection_kernel(float* __restrict__ vol, std::size_t pitch
 
         // project rotated coordinates onto detector; add 0.5 to each coordinate to reflect HIP's filtering mechanism
         auto factor = d_sd / (s + d_so);
-        auto h = proj_pixel_coordinate(t * factor, h_min, d_h) + 0.5f;
-        auto v = proj_pixel_coordinate(z * factor, v_min, d_v) + 0.5f;
+        auto h = proj_pixel_coordinate(t * factor, minCoord.x, pixelDim.x) + 0.5f;
+        auto v = proj_pixel_coordinate(z * factor, minCoord.y, pixelDim.y) + 0.5f;
 
         // get projection value (with implicit linear interpolation)
         auto det = tex2D<float>(proj, h, v);

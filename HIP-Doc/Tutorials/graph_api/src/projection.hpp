@@ -41,34 +41,23 @@
 #include <utility>
 #include <vector>
 
-struct projection_geometry
+struct projectionGeometry
 {
-    // Detector constants - all units in mm unless stated otherwise
-    static constexpr auto d_sd = 553.74f; // Distance between source and detector
-    static constexpr auto d_so = 210.66f; // Distance between source and origin (object center).
-    static constexpr auto d_h = 0.05f; // horizontal physical length of a pixel
-    static constexpr auto d_v = 0.05f; // vertical physical length of a pixel
-    static constexpr auto theta_step = 0.5f; // angle step size [°]
-    static constexpr auto theta_sign = -1.f; // If the reconstructed volume shows ghosts / distortion, flip this
-    static constexpr auto shift_h = -4; // horizontal shift [px]
-    static constexpr auto shift_v = 0; // vertical shift [px]
-    static constexpr auto delta_h = shift_h * d_h; // physical horizontal shift
-    static constexpr auto delta_v = shift_v * d_v; // physical vertical shift
-    static constexpr auto bps = 12; // bits per sample (pixel) in input projection [no unit]
-    static constexpr auto num_proj = static_cast<std::uint32_t>(360.f / theta_step); // Total number of projections
-
-    // All units are px unless stated otherwise
-    std::uint32_t N_h{}; // horizontal size
-    std::uint32_t N_v{}; // vertical size
-    std::uint32_t N_hFFT{}; // filter length
-    std::int32_t s_N_hFFT{}; // signed filter length
-    std::uint32_t N_hTrans{}; // transformed length
-    std::int32_t s_N_hTrans{}; // signed transformed length
-    float h_min{}; // Horizontal physical center of the detector [mm]
-    float v_min{}; // Vertical physical center of the detector [mm]
-
-    projection_geometry() noexcept = default;
-    projection_geometry(std::string path) noexcept(false);
+    // Detector constants
+    float d_sd{};           // Distance between source and detector [mm]
+    float d_so{};           // Distance between source and origin (object center) [mm]
+    float2 pixelDim{};      // Physical pixel lengths [mm]
+    float thetaStep{};      // angle step size [°]
+    float thetaSign{};      // angle sign; flip this, if the reconstructed volume shows ghosts / distortions
+    int2 shift{};           // detector shift due to misalignment [px]
+    float2 delta{};         // physical detector shift [mm]
+    std::uint16_t bps{};    // bits per sample in input projection
+    std::uint32_t numProj;  // Total number of projections
+    uint2 dim{};            // Number of pixels in each dimension
+    uint2 dimFFT{};         // x = filter length, y = dim.y
+    int2 s_dimFFT{};        // x = signed filter length, y = dim.y
+    uint2 dimTrans{};       // x = transformed filter length, y = dim.y
+    float2 minCoord{};        // Starting corner of the detector, i.e. pixel (0, 0) [mm]
 };
 
 struct load_projection_args
@@ -78,21 +67,24 @@ struct load_projection_args
     std::uint32_t N_v;
     std::uint16_t* data;
 };
+
 void load_projection(void* args) noexcept;
 
+template <typename T>
 struct save_projection_args
 {
     std::string path;
     std::uint32_t N_h;
     std::uint32_t N_v;
-    float* data;
+    T* data;
 };
+
 template <typename T>
 void save_projection(void* args) noexcept
 {
     try
     {
-        auto my_args = static_cast<save_projection_args*>(args);
+        auto my_args = static_cast<save_projection_args<T>*>(args);
 
         std::ofstream file{my_args->path.c_str(), std::ios::binary | std::ios::trunc};
         if(!file.is_open())
