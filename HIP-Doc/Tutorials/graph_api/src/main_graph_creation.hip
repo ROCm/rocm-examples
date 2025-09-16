@@ -75,10 +75,10 @@ auto main(int argc, char** argv) -> int
         }
 
         // Fetch device properties
-        auto devprops = hipDeviceProp_t{};
-        hip_check(hipGetDeviceProperties(&devprops, 0));
+        auto devProps = hipDeviceProp_t{};
+        hip_check(hipGetDeviceProperties(&devProps, 0));
 
-        auto const numBranches = devprops.asyncEngineCount;
+        auto const numBranches = devProps.asyncEngineCount;
 
         std::cout << "Device supports " << numBranches << " asynchronous engines; preprocessing will use "
                   << numBranches << " parallel branches." << std::endl;
@@ -165,7 +165,7 @@ auto main(int argc, char** argv) -> int
 
         hip_check(hipMalloc(&R, projGeom.dimTrans.x * sizeof(hipfftComplex)));
         auto filterPlan = hipfftHandle{};
-        hipfft_check(hipfftPlan1d(&filterPlan, projGeom.dimTrans.x, HIPFFT_R2C, 1));
+        hipfft_check(hipfftPlan1d(&filterPlan, projGeom.dimFFT.x, HIPFFT_R2C, 1));
         hipfft_check(hipfftSetStream(filterPlan, stream));
         hipfft_check(hipfftExecR2C(filterPlan, r, R));
 
@@ -343,8 +343,7 @@ auto main(int argc, char** argv) -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         auto graphCreated = false;
         auto graph = hipGraph_t{};
-        auto graphExec = hipGraphExec_t{};      // for typical batch topology
-        auto graphExecFinal = hipGraphExec_t{}; // for final batch topology
+        auto graphExec = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
         hip_check(hipStreamCreate(&graphStream));
         
@@ -565,24 +564,18 @@ auto main(int argc, char** argv) -> int
                         &transformedMemsetNode, graph, nullptr, 0, &transformedMemsetNodeParams
                     ));
 
-                    auto& forward = forwardPlans.at(branchIdx);
-                    hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToexpandedNode};
-                    hip_check(hipStreamBeginCaptureToGraph(stream,
-                                                           graph,
-                                                           forwardDeps,
-                                                           nullptr,
-                                                           2,
-                                                           hipStreamCaptureModeGlobal));
-                    hipfft_check(hipfftExecR2C(forward, expanded, transformed));
-                    hip_check(hipStreamEndCapture(stream, &graph));
+                    // Create a child graph for the forward FFT
+                    auto forwardGraph = hipGraph_t{};
+                    hip_check(hipGraphCreate(&forwardGraph, 0));
 
-                    // Get last node in graph -> this is the hipFFT operation's node
-                    auto nodes = std::vector<hipGraphNode_t>{};
-                    auto numNodes = std::size_t{};
-                    hip_check(hipGraphGetNodes(graph, nullptr, &numNodes));
-                    nodes.resize(numNodes);
-                    hip_check(hipGraphGetNodes(graph, nodes.data(), &numNodes));
-                    auto r2cNode = nodes.back();
+                    auto& forward = forwardPlans.at(branchIdx);
+                    hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
+                    hipfft_check(hipfftExecR2C(forward, expanded, transformed));
+                    hip_check(hipStreamEndCapture(stream, &forwardGraph));
+
+                    hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToexpandedNode};
+                    auto forwardNode = hipGraphNode_t{};
+                    hip_check(hipGraphAddChildGraphNode(&forwardNode, graph, forwardDeps, 2, forwardGraph));
 
                     // Apply filter
                     auto filterBlocksPerGrid = dim3{
@@ -606,21 +599,25 @@ auto main(int argc, char** argv) -> int
                     filterApplicationKernelNodeParams.sharedMemBytes = 0;
                     auto filterApplicationKernelNode = hipGraphNode_t{};
                     hip_check(hipGraphAddKernelNode(
-                        &filterApplicationKernelNode, graph, &r2cNode, 1, &filterApplicationKernelNodeParams
+                        &filterApplicationKernelNode, graph, &forwardNode, 1, &filterApplicationKernelNodeParams
                     ));
+
+                    hip_check(hipGraphDestroy(forwardGraph));
+
+                    // Create a child graph for the backward FFT
+                    auto backwardGraph = hipGraph_t{};
+                    hip_check(hipGraphCreate(&backwardGraph, 0));
 
                     // C2R Fourier-transform projection
                     auto& backward = backwardPlans.at(branchIdx);
-                    hip_check(hipStreamBeginCaptureToGraph(
-                        stream, graph, &filterApplicationKernelNode, nullptr, 1, hipStreamCaptureModeGlobal
-                    ));
+                    hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
                     hipfft_check(hipfftExecC2R(backward, transformed, expanded));
-                    hip_check(hipStreamEndCapture(stream, &graph));
+                    hip_check(hipStreamEndCapture(stream, &backwardGraph));
 
-                    hip_check(hipGraphGetNodes(graph, nullptr, &numNodes));
-                    nodes.resize(numNodes);
-                    hip_check(hipGraphGetNodes(graph, nodes.data(), &numNodes));
-                    auto c2rNode = nodes.back();
+                    auto backwardNode = hipGraphNode_t{};
+                    hip_check(hipGraphAddChildGraphNode(
+                        &backwardNode, graph, &filterApplicationKernelNode, 1, backwardGraph
+                    ));
 
                     // Shrink projection to original size and normalize
                     auto copyExpandedToProjNodeParams = hipMemcpy3DParms{};
@@ -638,8 +635,10 @@ auto main(int argc, char** argv) -> int
                     copyExpandedToProjNodeParams.kind = hipMemcpyDeviceToDevice;
                     auto copyExpandedToProjNode = hipGraphNode_t{};
                     hip_check(hipGraphAddMemcpyNode(
-                        &copyExpandedToProjNode, graph, &c2rNode, 1, &copyExpandedToProjNodeParams
+                        &copyExpandedToProjNode, graph, &backwardNode, 1, &copyExpandedToProjNodeParams
                     ));
+
+                    hip_check(hipGraphDestroy(backwardGraph));
 
                     void* filterNormalizationKernelParams[] =
                     {
@@ -725,7 +724,7 @@ auto main(int argc, char** argv) -> int
 
                     // The backprojection always runs in the first branch. If multiple branches are preprocessing, the
                     // additional branches need to wait for preceding backprojection kernels.
-                    if(branchIdx > 0)
+                    if(batchSize > 0)
                         precedingBpKernelNode = backprojectionKernelNode;
                 }
 
@@ -793,14 +792,11 @@ auto main(int argc, char** argv) -> int
                     // Make sure preceding graphes have finished
                     hip_check(hipStreamSynchronize(graphStream));
                     hip_check(hipGraphExecDestroy(graphExec));
-                    graphCreated = false;
 
                     // Incomplete batch: topology changed, must instantiate new executable graph
-                    hip_check(hipGraphInstantiate(&graphExecFinal, graph, nullptr, nullptr, 0));
+                    hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
                     hip_check(hipGraphDestroy(graph));
-                    hip_check(hipGraphLaunch(graphExecFinal, graphStream));
-                    hip_check(hipStreamSynchronize(graphStream));
-                    hip_check(hipGraphExecDestroy(graphExecFinal));
+                    hip_check(hipGraphLaunch(graphExec, graphStream));
                 }
             }
 
@@ -832,9 +828,7 @@ auto main(int argc, char** argv) -> int
         std::cout << "Done!" << std::endl;
 
         // Cleanup
-        if(graphCreated)
-            hip_check(hipGraphExecDestroy(graphExec));
-        
+        hip_check(hipGraphExecDestroy(graphExec));
         hip_check(hipStreamDestroy(graphStream));
 
         hip_check(hipFree(vol.ptr));

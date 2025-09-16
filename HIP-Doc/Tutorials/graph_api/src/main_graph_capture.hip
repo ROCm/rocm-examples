@@ -75,10 +75,10 @@ auto main(int argc, char** argv) -> int
         }
 
         // Fetch device properties
-        auto dev_props = hipDeviceProp_t{};
-        hip_check(hipGetDeviceProperties(&dev_props, 0));
+        auto devProps = hipDeviceProp_t{};
+        hip_check(hipGetDeviceProperties(&devProps, 0));
 
-        auto const numStreams = dev_props.asyncEngineCount;
+        auto const numStreams = devProps.asyncEngineCount;
 
         std::cout << "Device has " << numStreams << " asynchronous engines; preprocessing will use "
                   << numStreams << " parallel streams." << std::endl;
@@ -105,7 +105,6 @@ auto main(int argc, char** argv) -> int
         backwardPlans.resize(numStreams);
         backwardSizes.resize(numStreams);
 
-        auto current_angle = 0.f;
         auto hostInputs = std::vector<std::uint16_t*>{};
         auto inputProjections = std::vector<std::uint16_t*>{};
         auto inputPitches = std::vector<std::size_t>{};
@@ -128,9 +127,9 @@ auto main(int argc, char** argv) -> int
         auto paths = std::set<std::filesystem::path>{};
         if(useDataset)
         {
-            auto const data_path = std::filesystem::path{DATA_DIRECTORY};
-            auto data_it = std::filesystem::directory_iterator{data_path};
-            for(auto& entry : data_it)
+            auto const dataPath = std::filesystem::path{DATA_DIRECTORY};
+            auto dataIt = std::filesystem::directory_iterator{dataPath};
+            for(auto& entry : dataIt)
                 paths.insert(entry.path());
         }
 
@@ -167,35 +166,35 @@ auto main(int argc, char** argv) -> int
         filter_creation_kernel<<<creationBlocks, 1024, 0, stream>>>(r, projGeom.s_dimFFT.x, projGeom.pixelDim.x);
 
         hip_check(hipMalloc(&R, projGeom.dimTrans.x * sizeof(hipfftComplex)));
-        auto filter_plan = hipfftHandle{};
-        hipfft_check(hipfftPlan1d(&filter_plan, projGeom.dimFFT.x, HIPFFT_R2C, 1));
-        hipfft_check(hipfftSetStream(filter_plan, stream));
-        hipfft_check(hipfftExecR2C(filter_plan, r, R));
+        auto filterPlan = hipfftHandle{};
+        hipfft_check(hipfftPlan1d(&filterPlan, projGeom.dimFFT.x, HIPFFT_R2C, 1));
+        hipfft_check(hipfftSetStream(filterPlan, stream));
+        hipfft_check(hipfftExecR2C(filterPlan, r, R));
 
         auto absoluteBlocks = (projGeom.dimTrans.x / 1024u) + 1u;
         filter_absolute_kernel<<<absoluteBlocks, 1024, 0, stream>>>(R, projGeom.dimTrans.x, projGeom.pixelDim.x);
 
         hip_check(hipStreamSynchronize(stream));
         
-        hipfft_check(hipfftDestroy(filter_plan));
+        hipfft_check(hipfftDestroy(filterPlan));
         hip_check(hipFree(r));
 
         /* Estimate number of subvolumes. We will split the volume along the z axis */
-        auto const input_proj_single = projGeom.dim.x * projGeom.dim.y * sizeof(std::uint16_t);
-        auto const input_proj_total = input_proj_single * 2u * numStreams;
-        auto const proj_single = projGeom.dim.x * projGeom.dim.y * sizeof(float);
-        auto const proj_total = proj_single * numStreams;
-        auto const expanded_single = projGeom.dimFFT.x * projGeom.dimFFT.y * sizeof(float);
-        auto const expanded_total = expanded_single * numStreams;
-        auto const transformed_single = projGeom.dimTrans.x * projGeom.dimTrans.y * sizeof(hipfftComplex);
-        auto const transformed_total = transformed_single * numStreams;
-        auto const volume_total = volGeom.dim.x * volGeom.dim.y * volGeom.dim.z * sizeof(float);
-        auto const mem_total = input_proj_total + proj_total + expanded_total + transformed_total + volume_total;
+        auto const inputProjSingle = projGeom.dim.x * projGeom.dim.y * sizeof(std::uint16_t);
+        auto const inputProjTotal = inputProjSingle * 2u * numStreams;
+        auto const projSingle = projGeom.dim.x * projGeom.dim.y * sizeof(float);
+        auto const projTotal = projSingle * numStreams;
+        auto const expandedSingle = projGeom.dimFFT.x * projGeom.dimFFT.y * sizeof(float);
+        auto const expandedTotal = expandedSingle * numStreams;
+        auto const transformedSingle = projGeom.dimTrans.x * projGeom.dimTrans.y * sizeof(hipfftComplex);
+        auto const transformedTotal = transformedSingle * numStreams;
+        auto const volumeTotal = volGeom.dim.x * volGeom.dim.y * volGeom.dim.z * sizeof(float);
+        auto const memTotal = inputProjTotal + projTotal + expandedTotal + transformedTotal + volumeTotal;
         auto devMemFree = std::size_t{};
         auto devMemTotal = std::size_t{};
         hip_check(hipMemGetInfo(&devMemFree, &devMemTotal));
 
-        auto memRequired = mem_total;
+        auto memRequired = memTotal;
         numSubvols = 1;
         while(std::max(memRequired, devMemFree) == memRequired)
         {
@@ -357,8 +356,7 @@ auto main(int argc, char** argv) -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         auto graphCreated = false;
         auto graph = hipGraph_t{};
-        auto graphExec = hipGraphExec_t{};      // for typical batch topology
-        auto graphExecFinal = hipGraphExec_t{}; // for final batch topology
+        auto graphExec = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
         hip_check(hipStreamCreate(&graphStream));
         for(auto subIdx = 0; subIdx < numSubvols; ++subIdx)
@@ -367,13 +365,13 @@ auto main(int argc, char** argv) -> int
 
             auto subIdxInfo = new int;
             *subIdxInfo = subIdx;
-            hip_check(hipLaunchHostFunc(streams.at(0), [](void* arg)
+            hip_check(hipLaunchHostFunc(graphStream, [](void* arg)
             {
                 auto mySubIdx = static_cast<int*>(arg);
                 std::cout << "Processing subvolume #" << *mySubIdx << std::endl;
                 delete mySubIdx;
             }, subIdxInfo));
-            hip_check(hipMemset3DAsync(vol, 0, volExt, streams.at(0)));
+            hip_check(hipMemset3DAsync(vol, 0, volExt, graphStream));
 
             auto pathsIt = std::begin(paths);
             auto projIdx = 0;
@@ -422,8 +420,8 @@ auto main(int argc, char** argv) -> int
                         hip_check(hipLaunchHostFunc(stream, load_projection, static_cast<void*>(loadProjArgs)));
 
                         auto hostInput = hostInputs.at(streamIdx);
-                        auto input = inputProjections.at(streamIdx);
-                        auto inputPitch = inputPitches.at(streamIdx);
+                        input = inputProjections.at(streamIdx);
+                        inputPitch = inputPitches.at(streamIdx);
                         hip_check(hipMemcpy2DAsync(
                             input,
                             inputPitch,
@@ -637,14 +635,11 @@ auto main(int argc, char** argv) -> int
                     // Make sure preceding graphes have finished
                     hip_check(hipStreamSynchronize(graphStream));
                     hip_check(hipGraphExecDestroy(graphExec));
-                    graphCreated = false;
 
                     // Incomplete batch: topology changed, must instantiate new executable graph
-                    hip_check(hipGraphInstantiate(&graphExecFinal, graph, nullptr, nullptr, 0));
+                    hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
                     hip_check(hipGraphDestroy(graph));
                     hip_check(hipGraphLaunch(graphExecFinal, graphStream));
-                    hip_check(hipStreamSynchronize(graphStream));
-                    hip_check(hipGraphExecDestroy(graphExecFinal));
                 }
             }
             
@@ -657,8 +652,8 @@ auto main(int argc, char** argv) -> int
             memcpyParams.srcPtr = vol;
             memcpyParams.extent = volExt;
             memcpyParams.kind = hipMemcpyDeviceToHost;
-            hip_check(hipMemcpy3DAsync(&memcpyParams, streams.at(0)));
-            hip_check(hipEventRecord(saveEvent, streams.at(0)));
+            hip_check(hipMemcpy3DAsync(&memcpyParams, graphStream));
+            hip_check(hipEventRecord(saveEvent, graphStream));
             
             auto saveVolArgs = new save_volume_args
             {
@@ -676,9 +671,7 @@ auto main(int argc, char** argv) -> int
         std::cout << "Done!" << std::endl;
 
         // Cleanup
-        if(graphCreated)
-            hip_check(hipGraphExecDestroy(graphExec));
-        
+        hip_check(hipGraphExecDestroy(graphExec));
         hip_check(hipStreamDestroy(graphStream));
 
         hip_check(hipFree(vol.ptr));
@@ -718,7 +711,7 @@ auto main(int argc, char** argv) -> int
         }
         else
         {
-            for(auto& p : phantomProjections)
+            for(auto&& p : phantomProjections)
                 hip_check(hipFree(p.ptr));
         }
 

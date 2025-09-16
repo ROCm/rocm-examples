@@ -75,10 +75,10 @@ auto main(int argc, char** argv) -> int
         }
 
         // Fetch device properties
-        auto dev_props = hipDeviceProp_t{};
-        hip_check(hipGetDeviceProperties(&dev_props, 0));
+        auto devProps = hipDeviceProp_t{};
+        hip_check(hipGetDeviceProperties(&devProps, 0));
 
-        auto const numStreams = dev_props.asyncEngineCount;
+        auto const numStreams = devProps.asyncEngineCount;
 
         std::cout << "Device has " << numStreams << " asynchronous engines; preprocessing will use "
                   << numStreams << " parallel streams." << std::endl;
@@ -90,7 +90,6 @@ auto main(int argc, char** argv) -> int
 
         auto projGeom = projectionGeometry{};
         auto volGeom = volumeGeometry{};
-
         auto numSubvols = int{}; // number of subvolumes
         auto sub_N_z  = std::vector<std::size_t>{}; // number of voxels in z direction for each subvolume
 
@@ -106,7 +105,6 @@ auto main(int argc, char** argv) -> int
         backwardPlans.resize(numStreams);
         backwardSizes.resize(numStreams);
 
-        auto current_angle = 0.f;
         auto hostInputs = std::vector<std::uint16_t*>{};
         auto inputProjections = std::vector<std::uint16_t*>{};
         auto inputPitches = std::vector<std::size_t>{};
@@ -168,17 +166,17 @@ auto main(int argc, char** argv) -> int
         filter_creation_kernel<<<creationBlocks, 1024, 0, stream>>>(r, projGeom.s_dimFFT.x, projGeom.pixelDim.x);
 
         hip_check(hipMalloc(&R, projGeom.dimTrans.x * sizeof(hipfftComplex)));
-        auto filter_plan = hipfftHandle{};
-        hipfft_check(hipfftPlan1d(&filter_plan, projGeom.dimFFT.x, HIPFFT_R2C, 1));
-        hipfft_check(hipfftSetStream(filter_plan, stream));
-        hipfft_check(hipfftExecR2C(filter_plan, r, R));
+        auto filterPlan = hipfftHandle{};
+        hipfft_check(hipfftPlan1d(&filterPlan, projGeom.dimFFT.x, HIPFFT_R2C, 1));
+        hipfft_check(hipfftSetStream(filterPlan, stream));
+        hipfft_check(hipfftExecR2C(filterPlan, r, R));
 
         auto absoluteBlocks = (projGeom.dimTrans.x / 1024u) + 1u;
         filter_absolute_kernel<<<absoluteBlocks, 1024, 0, stream>>>(R, projGeom.dimTrans.x, projGeom.pixelDim.x);
 
         hip_check(hipStreamSynchronize(stream));
                 
-        hipfft_check(hipfftDestroy(filter_plan));
+        hipfft_check(hipfftDestroy(filterPlan));
         hip_check(hipFree(r));
 
         /* Estimate number of subvolumes. We will split the volume along the z axis */
@@ -249,9 +247,7 @@ auto main(int argc, char** argv) -> int
 
                 auto input = static_cast<std::uint16_t*>(nullptr);
                 auto inputPitch = std::size_t{};
-                hip_check(hipMallocPitch(
-                    &input, &inputPitch, projGeom.dim.x * sizeof(std::uint16_t), projGeom.dim.y
-                ));
+                hip_check(hipMallocPitch(&input, &inputPitch, projGeom.dim.x * sizeof(std::uint16_t), projGeom.dim.y));
                 inputProjections.push_back(input);
                 inputPitches.push_back(inputPitch);
             }
@@ -264,8 +260,7 @@ auto main(int argc, char** argv) -> int
 
             auto expanded = static_cast<float*>(nullptr);
             auto expandedPitch = std::size_t{};
-            hip_check(hipMallocPitch(
-                &expanded, &expandedPitch, projGeom.dimFFT.x * sizeof(float), projGeom.dimFFT.y));
+            hip_check(hipMallocPitch(&expanded, &expandedPitch, projGeom.dimFFT.x * sizeof(float), projGeom.dimFFT.y));
             expandedProjections.push_back(expanded);
             expandedPitches.push_back(expandedPitch);
             
@@ -404,8 +399,8 @@ auto main(int argc, char** argv) -> int
                             break;
                         }
 
-                        // Using a pointer here ensures that the arguments live beyond the scope of a loop iteration. The
-                        // pointer will be deleted inside load_projection().
+                        // Using a pointer here ensures that the arguments live beyond the scope of a loop iteration.
+                        // The pointer will be deleted inside load_projection().
                         auto path = *pathsIt;
                         auto loadProjArgs = new load_projection_args
                         {
@@ -488,9 +483,11 @@ auto main(int argc, char** argv) -> int
                     hipfft_check(hipfftExecR2C(forward, expanded, transformed));
                     
                     // Apply filter
-                    auto filterBlocksPerGrid = dim3{(projGeom.dimTrans.x / threadsPerBlock.x) + 1,
-                                                    (projGeom.dimTrans.y / threadsPerBlock.y) + 1,
-                                                    1};
+                    auto filterBlocksPerGrid = dim3{
+                        (projGeom.dimTrans.x / threadsPerBlock.x) + 1,
+                        (projGeom.dimTrans.y / threadsPerBlock.y) + 1,
+                        1
+                    };
                     filter_application_kernel<<<filterBlocksPerGrid, threadsPerBlock, 0, stream>>>(
                         transformed, transformedPitch, R, projGeom.dimTrans
                     );
@@ -628,7 +625,7 @@ auto main(int argc, char** argv) -> int
         }
         else
         {
-            for(auto& p : phantomProjections)
+            for(auto&& p : phantomProjections)
                 hip_check(hipFree(p.ptr));
         }
 
