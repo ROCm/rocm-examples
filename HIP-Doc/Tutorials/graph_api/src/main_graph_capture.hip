@@ -639,7 +639,7 @@ auto main(int argc, char** argv) -> int
                     // Incomplete batch: topology changed, must instantiate new executable graph
                     hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
                     hip_check(hipGraphDestroy(graph));
-                    hip_check(hipGraphLaunch(graphExecFinal, graphStream));
+                    hip_check(hipGraphLaunch(graphExec, graphStream));
                 }
             }
             
