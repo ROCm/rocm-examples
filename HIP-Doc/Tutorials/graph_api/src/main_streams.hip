@@ -161,11 +161,11 @@ auto main(int argc, char** argv) -> int
         auto stream = streams.at(0);
 
         // Create filter kernel
-        hip_check(hipMalloc(&r, projGeom.dimFFT.x * sizeof(float)));
+        hip_check(hipMalloc(reinterpret_cast<void**>(&r), projGeom.dimFFT.x * sizeof(float)));
         auto const creationBlocks = std::max((projGeom.dimFFT.x / 1024u), 1u);
         filter_creation_kernel<<<creationBlocks, 1024, 0, stream>>>(r, projGeom.s_dimFFT.x, projGeom.pixelDim.x);
 
-        hip_check(hipMalloc(&R, projGeom.dimTrans.x * sizeof(hipfftComplex)));
+        hip_check(hipMalloc(reinterpret_cast<void**>(&R), projGeom.dimTrans.x * sizeof(hipfftComplex)));
         auto filterPlan = hipfftHandle{};
         hipfft_check(hipfftPlan1d(&filterPlan, projGeom.dimFFT.x, HIPFFT_R2C, 1));
         hipfft_check(hipfftSetStream(filterPlan, stream));
@@ -240,34 +240,49 @@ auto main(int argc, char** argv) -> int
             if(useDataset)
             {
                 auto hostInput = static_cast<std::uint16_t*>(nullptr);
-                hip_check(hipHostMalloc(&hostInput,
+                hip_check(hipHostMalloc(reinterpret_cast<void**>(&hostInput),
                                         projGeom.dim.x * projGeom.dim.y * sizeof(std::uint16_t),
                                         hipHostMallocWriteCombined));
                 hostInputs.push_back(hostInput);
 
                 auto input = static_cast<std::uint16_t*>(nullptr);
                 auto inputPitch = std::size_t{};
-                hip_check(hipMallocPitch(&input, &inputPitch, projGeom.dim.x * sizeof(std::uint16_t), projGeom.dim.y));
+                hip_check(hipMallocPitch(
+                    reinterpret_cast<void**>(&input),
+                    &inputPitch,
+                    projGeom.dim.x * sizeof(std::uint16_t),
+                    projGeom.dim.y
+                ));
                 inputProjections.push_back(input);
                 inputPitches.push_back(inputPitch);
             }
 
             auto proj = static_cast<float*>(nullptr);
             auto projPitch = std::size_t{};
-            hip_check(hipMallocPitch(&proj, &projPitch, projGeom.dim.x * sizeof(float), projGeom.dim.y));
+            hip_check(hipMallocPitch(
+                reinterpret_cast<void**>(&proj), &projPitch, projGeom.dim.x * sizeof(float), projGeom.dim.y
+            ));
             projections.push_back(proj);
             projectionPitches.push_back(projPitch);
 
             auto expanded = static_cast<float*>(nullptr);
             auto expandedPitch = std::size_t{};
-            hip_check(hipMallocPitch(&expanded, &expandedPitch, projGeom.dimFFT.x * sizeof(float), projGeom.dimFFT.y));
+            hip_check(hipMallocPitch(
+                reinterpret_cast<void**>(&expanded),
+                &expandedPitch,
+                projGeom.dimFFT.x * sizeof(float),
+                projGeom.dimFFT.y
+            ));
             expandedProjections.push_back(expanded);
             expandedPitches.push_back(expandedPitch);
             
             auto transformed = static_cast<hipfftComplex*>(nullptr);
             auto transformedPitch = std::size_t{};
             hip_check(hipMallocPitch(
-                &transformed, &transformedPitch, projGeom.dimTrans.x * sizeof(hipfftComplex), projGeom.dimTrans.y
+                reinterpret_cast<void**>(&transformed),
+                &transformedPitch,
+                projGeom.dimTrans.x * sizeof(hipfftComplex),
+                projGeom.dimTrans.y
             ));
             transformedProjections.push_back(transformed);
             transformedPitches.push_back(transformedPitch);
@@ -342,7 +357,9 @@ auto main(int argc, char** argv) -> int
         create_volume("volume.tif");
         auto hostVolPtr = static_cast<float*>(nullptr);
         hip_check(hipHostMalloc(
-            &hostVolPtr, volGeom.dim.x * volGeom.dim.y * s_N_z_last * sizeof(float), hipHostMallocDefault
+            reinterpret_cast<void**>(&hostVolPtr),
+            volGeom.dim.x * volGeom.dim.y * s_N_z_last * sizeof(float),
+            hipHostMallocDefault
         ));
         auto hostVol = make_hipPitchedPtr(
             hostVolPtr, volGeom.dim.x * sizeof(float), volGeom.dim.x, volGeom.dim.y
