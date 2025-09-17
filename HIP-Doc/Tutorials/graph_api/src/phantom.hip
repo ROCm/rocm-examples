@@ -32,6 +32,7 @@
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
+#include <cstring>
 #include <iostream>
 #include <limits>
 #include <numbers>
@@ -220,7 +221,6 @@ __device__ auto siddon_raytrace(float const* vol,
         auto r_axis = r[axis];  // Ray direction component for current axis
 
         if(fabsf(r_axis) < std::numeric_limits<float>::epsilon()) // Ray parallel to axis
-        // if(fabsf(r_axis) < 1e-10f) // Ray (nearly) parallel to axis
         {
             // Is the ray outside of the volume? If so, there is no intersection
             if(s0 < boundsMin[axis] || s0 > boundsMax[axis])
