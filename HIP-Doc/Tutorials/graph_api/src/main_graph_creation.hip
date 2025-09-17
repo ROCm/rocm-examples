@@ -160,7 +160,7 @@ auto main(int argc, char** argv) -> int
 
         // Create filter kernel
         hip_check(hipMalloc(&r, projGeom.dimFFT.x * sizeof(float)));
-        auto const creationBlocks = std::max((projGeom.dimFFT.x / 1024), 1u);
+        auto const creationBlocks = std::max((projGeom.dimFFT.x / 1024u), 1u);
         filter_creation_kernel<<<creationBlocks, 1024, 0, stream>>>(r, projGeom.s_dimFFT.x, projGeom.pixelDim.x);
 
         hip_check(hipMalloc(&R, projGeom.dimTrans.x * sizeof(hipfftComplex)));
@@ -192,7 +192,7 @@ auto main(int argc, char** argv) -> int
         auto devMemTotal = std::size_t{};
         hip_check(hipMemGetInfo(&devMemFree, &devMemTotal));
 
-        auto memRequired = memTotal;
+        auto memRequired = static_cast<std::size_t>(memTotal);
         numSubvols = 1;
         while(std::max(memRequired, devMemFree) == memRequired)
         {
