@@ -493,7 +493,8 @@ namespace phantom
         {
             auto projPtr = static_cast<std::uint16_t*>(nullptr);
             auto projPitch = std::size_t{};
-            hip_check(hipMallocPitch(&projPtr, &projPitch, projGeom.dim.x * sizeof(float), projGeom.dim.y));
+            hip_check(hipMallocPitch(
+                reinterpret_cast<void**>(&projPtr), &projPitch, projGeom.dim.x * sizeof(float), projGeom.dim.y));
             auto proj = make_hipPitchedPtr(projPtr, projPitch, projGeom.dim.x, projGeom.dim.y);
             
             create_projection(volume, volGeom, proj, projGeom, projIdx);

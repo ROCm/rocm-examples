@@ -64,6 +64,7 @@ else()
     set(TIFF_TARGET TIFF::TIFF)
 endif()
 
+find_package(hip REQUIRED)
 find_package(hipfft REQUIRED)
 
 add_subdirectory(src)

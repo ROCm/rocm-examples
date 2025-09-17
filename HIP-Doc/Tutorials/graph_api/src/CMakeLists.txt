@@ -39,7 +39,7 @@ set_target_properties(${example_objects} PROPERTIES CXX_EXTENSIONS OFF
                                                     HIP_EXTENSIONS OFF)
 target_compile_definitions(${example_objects} PUBLIC $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
 target_compile_features(${example_objects} PRIVATE cxx_std_20 hip_std_20)
-target_link_libraries(${example_objects} PUBLIC hip::hipfft ${TIFF_TARGET} TIFF::CXX)
+target_link_libraries(${example_objects} PUBLIC hip::host hip::hipfft ${TIFF_TARGET} TIFF::CXX)
 
 add_executable(${example_streams} main_streams.hip)
 set_target_properties(${example_streams} PROPERTIES CXX_EXTENSIONS OFF
