@@ -69,6 +69,9 @@ namespace
 
     [[gnu::destructor]] void shutdown_libtiff()
     {
+        if(logfile == nullptr)
+            return;
+            
         if(auto err = std::fclose(logfile); err != 0)
             std::perror("Could not close logfile");
     }

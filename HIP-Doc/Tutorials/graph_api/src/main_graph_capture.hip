@@ -400,7 +400,7 @@ auto main(int argc, char** argv) -> int
                 auto batchSize = std::min(numStreams, static_cast<int>(projGeom.numProj - projIdx));
 
                 // Launch batch in parallel streams
-                for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx, ++pathsIt)
+                for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx)
                 {
                     auto stream = streams.at(streamIdx);
 
@@ -583,6 +583,9 @@ auto main(int argc, char** argv) -> int
                         hip_check(hipEventRecord(bpEvent, streams.at(0)));
                         hip_check(hipStreamWaitEvent(stream, bpEvent));
                     }
+
+                    if(useDataset)
+                        ++pathsIt;
                 }
 
                 // Stop capturing

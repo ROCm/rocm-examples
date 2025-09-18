@@ -392,7 +392,7 @@ auto main(int argc, char** argv) -> int
                 auto batchSize = std::min(numBranches, static_cast<int>(projGeom.numProj - projIdx));
 
                 // Add nodes for each projection in batch
-                for(auto branchIdx = 0; branchIdx < batchSize; ++branchIdx, ++projIdx, ++pathsIt)
+                for(auto branchIdx = 0; branchIdx < batchSize; ++branchIdx, ++projIdx)
                 {
                     auto stream = streams.at(branchIdx);
 
@@ -745,6 +745,9 @@ auto main(int argc, char** argv) -> int
                     // additional branches need to wait for preceding backprojection kernels.
                     if(batchSize > 0)
                         precedingBpKernelNode = backprojectionKernelNode;
+
+                    if(useDataset)
+                        ++pathsIt;
                 }
 
                 // Instantiate and launch the graph
