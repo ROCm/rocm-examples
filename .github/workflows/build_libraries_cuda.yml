@@ -13,8 +13,8 @@ on:
       - '.github/workflows/**'
 
 env:
-    ROCM_VERSION: 6.4
-    AMDGPU_INSTALLER_VERSION: 6.4.60400-1
+    ROCM_VERSION: '7.0'
+    AMDGPU_INSTALLER_VERSION: 7.0.70000-1
 
 jobs:
   build:
