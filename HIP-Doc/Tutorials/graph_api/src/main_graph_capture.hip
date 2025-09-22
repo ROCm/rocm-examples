@@ -386,16 +386,14 @@ auto main(int argc, char** argv) -> int
 
                 auto batchSize = std::min(numStreams, static_cast<int>(projGeom.numProj - projIdx));
 
-                // Create a fork for each additional stream
+                // Fork: Record events on stream 0, then have other streams wait
                 for(auto streamIdx = 1; streamIdx < batchSize; ++streamIdx)
                 {
-                    hip_check(hipStreamBeginCaptureToGraph(
-                        streams.at(streamIdx),
-                        graph,
-                        nullptr,
-                        nullptr,
-                        0,
-                        hipStreamCaptureModeGlobal));
+                    auto forkEvent = hipEvent_t{};
+                    hip_check(hipEventCreate(&forkEvent));
+                    hip_check(hipEventRecord(forkEvent, streams.at(0)));
+                    hip_check(hipStreamWaitEvent(streams.at(streamIdx), forkEvent));
+                    hip_check(hipEventDestroy(forkEvent)); // Can destroy after wait is recorded
                 }
 
                 // Launch batch in parallel streams
@@ -567,6 +565,16 @@ auto main(int argc, char** argv) -> int
 
                     if(useDataset)
                         ++pathsIt;
+                }
+
+                // Join: Record events on all streams except stream 0, then have stream 0 wait
+                for(auto streamIdx = 1; streamIdx < batchSize; ++streamIdx)
+                {
+                    auto joinEvent = hipEvent_t{};
+                    hip_check(hipEventCreate(&joinEvent));
+                    hip_check(hipEventRecord(joinEvent, streams.at(streamIdx)));
+                    hip_check(hipStreamWaitEvent(streams.at(0), joinEvent));
+                    hip_check(hipEventDestroy(joinEvent)); // Can destroy after wait is recorded
                 }
 
                 // Stop capturing -- this will stop capturing on all streams
