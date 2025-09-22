@@ -528,15 +528,6 @@ auto main(int argc, char** argv) -> int
                         proj, projPitch, projGeom.dimFFT.x, projGeom.dim
                     );
 
-                    // The backprojection always runs in the first stream. If multiple streams are preprocessing, let
-                    // the first stream wait for the current projection before starting the backprojection.
-                    if(streamIdx > 0)
-                    {
-                        auto ppEvent = preprocessingEvents.at(streamIdx - 1);
-                        hip_check(hipEventRecord(ppEvent, stream));
-                        hip_check(hipStreamWaitEvent(streams.at(0), ppEvent));
-                    }
-
                     // Backprojection
                     auto thetaDeg = projGeom.thetaSign * projGeom.thetaStep * projIdx; // Current angle
                     auto thetaRad = thetaDeg * std::numbers::pi_v<float> / 180.f; // Convert to radians
@@ -551,7 +542,7 @@ auto main(int argc, char** argv) -> int
                     };
 
                     auto& projTex = textureProjections.at(streamIdx);
-                    backprojection_kernel<<<bpBlocks, bpBlockSize, 0, streams.at(0)>>>(
+                    backprojection_kernel<<<bpBlocks, bpBlockSize, 0, stream>>>(
                         static_cast<float*>(vol.ptr),
                         vol.pitch,
                         volGeom.dim,
@@ -566,15 +557,6 @@ auto main(int argc, char** argv) -> int
                         projGeom.d_sd,
                         projGeom.d_so
                     );
-
-                    // The backprojection always runs in the first stream. If multiple streams are preprocessing, let
-                    // the current stream wait for the backprojection to finish before reusing the projection memory.
-                    if(streamIdx > 0)
-                    {
-                        auto bpEvent = backprojectionEvents.at(streamIdx - 1);
-                        hip_check(hipEventRecord(bpEvent, streams.at(0)));
-                        hip_check(hipStreamWaitEvent(stream, bpEvent));
-                    }
 
                     if(useDataset)
                         ++pathsIt;

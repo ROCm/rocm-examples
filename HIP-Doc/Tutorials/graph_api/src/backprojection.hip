@@ -65,9 +65,6 @@ __global__ void backprojection_kernel(
         auto slice = reinterpret_cast<char*>(vol) + z_in * slice_pitch;
         auto row = reinterpret_cast<float*>(slice + y_in * pitch);
 
-        // load old value from global memory while executing other instructions
-        auto old_val = row[x_in];
-
         // add offset for current subvolume
         z_in += zOffset;
 
@@ -90,6 +87,6 @@ __global__ void backprojection_kernel(
 
         // backproject and write value
         auto u = -(d_so / (s + d_so));
-        row[x_in] = old_val + 0.5f * det * u * u;
+        atomicAdd(&row[x_in], 0.5f * det * u * u);
     }
 }

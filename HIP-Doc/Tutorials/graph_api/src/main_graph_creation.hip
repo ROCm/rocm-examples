@@ -382,7 +382,6 @@ auto main(int argc, char** argv) -> int
 
             auto pathsIt = std::begin(paths);
             auto projIdx = 0;
-            auto precedingBpKernelNode = hipGraphNode_t{};
             while(projIdx < projGeom.numProj)
             {
                 // Create graph for this batch
@@ -694,18 +693,6 @@ auto main(int argc, char** argv) -> int
                         static_cast<std::uint32_t>(s_N_z / bpBlockSize.z + 1)
                     };
 
-                    // The backprojection always runs in the first branch. If multiple branches are preprocessing, the
-                    // additional branches need to wait for preceding backprojection kernels. If we are in the first
-                    // branch, we need to make sure the preceding backprojection kernel node is valid.
-                    if(branchIdx == 0)
-                        hip_check(hipGraphAddEmptyNode(&precedingBpKernelNode, graph, nullptr, 0));
-
-                    hipGraphNode_t backprojectionKernelDeps[] =
-                    {
-                        filterNormalizationKernelNode,
-                        precedingBpKernelNode
-                    };
-
                     auto& projTex = textureProjections.at(branchIdx);
 
                     auto z_offset = s_N_z_first * subIdx;
@@ -736,15 +723,10 @@ auto main(int argc, char** argv) -> int
                     hip_check(hipGraphAddKernelNode(
                         &backprojectionKernelNode,
                         graph,
-                        backprojectionKernelDeps,
-                        2,
+                        &filterNormalizationKernelNode,
+                        1,
                         &backprojectionKernelNodeParams
                     ));
-
-                    // The backprojection always runs in the first branch. If multiple branches are preprocessing, the
-                    // additional branches need to wait for preceding backprojection kernels.
-                    if(batchSize > 0)
-                        precedingBpKernelNode = backprojectionKernelNode;
 
                     if(useDataset)
                         ++pathsIt;
