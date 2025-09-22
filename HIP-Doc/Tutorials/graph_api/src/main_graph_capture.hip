@@ -361,20 +361,6 @@ auto main(int argc, char** argv) -> int
         auto graph = hipGraph_t{};
         auto graphExec = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
-        auto forkEvents = std::vector<hipEvent_t>{};
-        auto joinEvents = std::vector<hipEvent_t>{};
-
-        for(auto i = 0; i < numStreams - 1; ++i)
-        {
-            auto forkEvent = hipEvent_t{};
-            auto joinEvent = hipEvent_t{};
-
-            hip_check(hipEventCreate(&forkEvent));
-            hip_check(hipEventCreate(&joinEvent));
-
-            forkEvents.push_back(forkEvent);
-            joinEvents.push_back(joinEvent);
-        }
 
         hip_check(hipStreamCreate(&graphStream));
         for(auto subIdx = 0; subIdx < numSubvols; ++subIdx)
@@ -400,19 +386,22 @@ auto main(int argc, char** argv) -> int
 
                 auto batchSize = std::min(numStreams, static_cast<int>(projGeom.numProj - projIdx));
 
-                // Before launching the batch computation, create a graph-like structure by creating a fork for each
-                // batch item
-                for(auto streamIdx = 0; streamIdx < batchSize - 1; ++streamIdx)
-                    hip_check(hipEventRecord(forkEvents.at(streamIdx), streams.at(0)));
+                // Create a fork for each additional stream
+                for(auto streamIdx = 1; streamIdx < batchSize; ++streamIdx)
+                {
+                    hip_check(hipStreamBeginCaptureToGraph(
+                        streams.at(streamIdx),
+                        graph,
+                        nullptr,
+                        nullptr,
+                        0,
+                        hipStreamCaptureModeGlobal));
+                }
 
                 // Launch batch in parallel streams
                 for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx)
                 {
                     auto stream = streams.at(streamIdx);
-
-                    // Place current stream into capture mode
-                    if(streamIdx > 0)
-                        hip_check(hipStreamWaitEvent(stream, forkEvents.at(streamIdx - 1)));
 
                     auto input = static_cast<std::uint16_t*>(nullptr);
                     auto inputPitch = std::size_t{};
@@ -578,17 +567,9 @@ auto main(int argc, char** argv) -> int
 
                     if(useDataset)
                         ++pathsIt;
-
-                    // Join current stream back to stream 0
-                    if(streamIdx > 0)
-                        hip_check(hipEventRecord(joinEvents.at(streamIdx - 1), stream));
                 }
 
-                // Wait for all streams to join
-                for(auto streamIdx = 0; streamIdx < batchSize - 1; ++streamIdx)
-                    hip_check(hipStreamWaitEvent(streams.at(0), joinEvents.at(streamIdx)));
-
-                // Stop capturing
+                // Stop capturing -- this will stop capturing on all streams
                 hip_check(hipStreamEndCapture(streams.at(0), &graph));
 
                 // Instantiate and launch the graph
@@ -689,12 +670,6 @@ auto main(int argc, char** argv) -> int
         std::cout << "All work items enqueued, waiting for completion...";
         hip_check(hipStreamSynchronize(saveStream));
         std::cout << "Done!" << std::endl;
-
-        for(auto&& e : joinEvents)
-            hip_check(hipEventDestroy(e));
-
-        for(auto&& e : forkEvents)
-            hip_check(hipEventDestroy(e));
 
         // Cleanup
         hip_check(hipGraphExecDestroy(graphExec));
