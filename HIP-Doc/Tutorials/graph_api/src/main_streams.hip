@@ -115,9 +115,6 @@ auto main(int argc, char** argv) -> int
         auto transformedProjections = std::vector<hipfftComplex*>{};
         auto transformedPitches = std::vector<std::size_t>{};
         auto textureProjections = std::vector<hipTextureObject_t>{};
-
-        auto preprocessingEvents = std::vector<hipEvent_t>{};
-        auto backprojectionEvents = std::vector<hipEvent_t>{};
         
         auto saveStream = hipStream_t{};
         auto saveEvent = hipEvent_t{};
@@ -337,17 +334,6 @@ auto main(int argc, char** argv) -> int
 
             auto& projTex = textureProjections.emplace_back();
             hip_check(hipCreateTextureObject(&projTex, &resDesc, &texDesc, nullptr));
-
-            if(streamIdx > 0)
-            {
-                auto ppEvent = hipEvent_t{};
-                hip_check(hipEventCreate(&ppEvent));
-                preprocessingEvents.push_back(ppEvent);
-
-                auto bpEvent = hipEvent_t{};
-                hip_check(hipEventCreate(&bpEvent));
-                backprojectionEvents.push_back(bpEvent);
-            }
 
             std::cout << "Done!" << std::endl;
         }
@@ -592,12 +578,6 @@ auto main(int argc, char** argv) -> int
 
         hip_check(hipFree(vol.ptr));
         hip_check(hipFreeHost(hostVolPtr));
-
-        for(auto&& e : backprojectionEvents)
-            hip_check(hipEventDestroy(e));
-
-        for(auto&& e : preprocessingEvents)
-            hip_check(hipEventDestroy(e));
 
         for(auto&& tex : textureProjections)
             hip_check(hipDestroyTextureObject(tex));

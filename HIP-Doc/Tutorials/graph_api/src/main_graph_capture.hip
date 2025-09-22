@@ -115,9 +115,6 @@ auto main(int argc, char** argv) -> int
         auto transformedProjections = std::vector<hipfftComplex*>{};
         auto transformedPitches = std::vector<std::size_t>{};
         auto textureProjections = std::vector<hipTextureObject_t>{};
-
-        auto preprocessingEvents = std::vector<hipEvent_t>{};
-        auto backprojectionEvents = std::vector<hipEvent_t>{};
         
         auto saveStream = hipStream_t{};
         auto saveEvent = hipEvent_t{};
@@ -338,17 +335,6 @@ auto main(int argc, char** argv) -> int
             auto& projTex = textureProjections.emplace_back();
             hip_check(hipCreateTextureObject(&projTex, &resDesc, &texDesc, nullptr));
 
-            if(streamIdx > 0)
-            {
-                auto ppEvent = hipEvent_t{};
-                hip_check(hipEventCreate(&ppEvent));
-                preprocessingEvents.push_back(ppEvent);
-
-                auto bpEvent = hipEvent_t{};
-                hip_check(hipEventCreate(&bpEvent));
-                backprojectionEvents.push_back(bpEvent);
-            }
-
             std::cout << "Done!" << std::endl;
         }
 
@@ -375,16 +361,19 @@ auto main(int argc, char** argv) -> int
         auto graph = hipGraph_t{};
         auto graphExec = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
-        auto branchForkEvents = std::vector<hipEvent_t>{};
-        auto branchJoinEvents = std::vector<hipEvent_t>{};
+        auto forkEvents = std::vector<hipEvent_t>{};
+        auto joinEvents = std::vector<hipEvent_t>{};
 
         for(auto i = 0; i < numStreams - 1; ++i)
         {
-            auto& fork = branchForkEvents.emplace_back();
-            auto& join = branchJoinEvents.emplace_back();
+            auto forkEvent = hipEvent_t{};
+            auto joinEvent = hipEvent_t{};
 
-            hip_check(hipEventCreate(&fork));
-            hip_check(hipEventCreate(&join));
+            hip_check(hipEventCreate(&forkEvent));
+            hip_check(hipEventCreate(&joinEvent));
+
+            forkEvents.push_back(forkEvent);
+            joinEvents.push_back(joinEvent);
         }
 
         hip_check(hipStreamCreate(&graphStream));
@@ -414,7 +403,7 @@ auto main(int argc, char** argv) -> int
                 // Before launching the batch computation, create a graph-like structure by creating a fork for each
                 // batch item
                 for(auto streamIdx = 0; streamIdx < batchSize - 1; ++streamIdx)
-                    hip_check(hipEventRecord(branchForkEvents.at(streamIdx), streams.at(0)));
+                    hip_check(hipEventRecord(forkEvents.at(streamIdx), streams.at(0)));
 
                 // Launch batch in parallel streams
                 for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx)
@@ -423,7 +412,7 @@ auto main(int argc, char** argv) -> int
 
                     // Place current stream into capture mode
                     if(streamIdx > 0)
-                        hip_check(hipStreamWaitEvent(stream, branchForkEvents.at(streamIdx - 1)));
+                        hip_check(hipStreamWaitEvent(stream, forkEvents.at(streamIdx - 1)));
 
                     auto input = static_cast<std::uint16_t*>(nullptr);
                     auto inputPitch = std::size_t{};
@@ -592,12 +581,12 @@ auto main(int argc, char** argv) -> int
 
                     // Join current stream back to stream 0
                     if(streamIdx > 0)
-                        hip_check(hipEventRecord(branchJoinEvents.at(streamIdx - 1), stream));
+                        hip_check(hipEventRecord(joinEvents.at(streamIdx - 1), stream));
                 }
 
                 // Wait for all streams to join
                 for(auto streamIdx = 0; streamIdx < batchSize - 1; ++streamIdx)
-                    hip_check(hipStreamWaitEvent(streams.at(0), branchJoinEvents.at(streamIdx)));
+                    hip_check(hipStreamWaitEvent(streams.at(0), joinEvents.at(streamIdx)));
 
                 // Stop capturing
                 hip_check(hipStreamEndCapture(streams.at(0), &graph));
@@ -697,15 +686,15 @@ auto main(int argc, char** argv) -> int
             hip_check(hipLaunchHostFunc(saveStream, save_volume, saveVolArgs));
         }
 
-        for(auto&& e : branchJoinEvents)
-            hip_check(hipEventDestroy(e));
-
-        for(auto&& e : branchForkEvents)
-            hip_check(hipEventDestroy(e));
-
         std::cout << "All work items enqueued, waiting for completion...";
         hip_check(hipStreamSynchronize(saveStream));
         std::cout << "Done!" << std::endl;
+
+        for(auto&& e : joinEvents)
+            hip_check(hipEventDestroy(e));
+
+        for(auto&& e : forkEvents)
+            hip_check(hipEventDestroy(e));
 
         // Cleanup
         hip_check(hipGraphExecDestroy(graphExec));
@@ -713,12 +702,6 @@ auto main(int argc, char** argv) -> int
 
         hip_check(hipFree(vol.ptr));
         hip_check(hipFreeHost(hostVolPtr));
-
-        for(auto&& e : backprojectionEvents)
-            hip_check(hipEventDestroy(e));
-
-        for(auto&& e : preprocessingEvents)
-            hip_check(hipEventDestroy(e));
 
         for(auto&& tex : textureProjections)
             hip_check(hipDestroyTextureObject(tex));
