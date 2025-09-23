@@ -1,4 +1,4 @@
-# HIP-Doc Peer-to-Peer Failed Memory Access Example
+# HIP-Doc Peer-to-Peer Memory Access with Host Staging Example
 
 ## Description
 
@@ -7,8 +7,7 @@ This example demonstrates how to copy data between devices by adding peer-to-pee
 For more information on this topic, please refer to the
 [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/multi_device.html#peer-to-peer-memory-access).
 
-**This will result in a failure**; this version is intended for comparison with the
-[working peer-to-peer example](../p2p_memory_access).
+This version is intended for comparison with the [default peer-to-peer example](../p2p_memory_access).
 
 ### Application flow
 

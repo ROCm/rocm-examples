@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name hip_p2p_memory_access_failed)
+set(example_name hip_p2p_memory_host_staging)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -54,7 +54,6 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
-set_tests_properties(${example_name} PROPERTIES WILL_FAIL TRUE)
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 

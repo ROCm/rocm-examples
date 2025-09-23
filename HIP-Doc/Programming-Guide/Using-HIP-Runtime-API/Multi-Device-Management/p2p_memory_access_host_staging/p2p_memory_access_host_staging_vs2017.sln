@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.36217.24
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs2017", "p2p_memory_access_failed_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_host_staging_vs2017", "p2p_memory_access_host_staging_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

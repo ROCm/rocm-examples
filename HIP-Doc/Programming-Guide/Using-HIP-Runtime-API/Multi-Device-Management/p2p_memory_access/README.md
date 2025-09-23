@@ -7,7 +7,7 @@ This example demonstrates how to copy data between devices by adding peer-to-pee
 [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/multi_device.html#peer-to-peer-memory-access).
 
 This example is intended for comparison with the
-[failed peer-to-peer memory access example](../p2p_memory_access_failed).
+[peer-to-peer memory access with host staging example](../p2p_memory_access_host_staging).
 
 ### Application flow
 

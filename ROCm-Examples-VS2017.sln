@@ -426,7 +426,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multi_device_synchronizatio
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access\p2p_memory_access_vs2017.vcxproj", "{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access_failed\p2p_memory_access_failed_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_host_staging_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access_host_staging\p2p_memory_access_host_staging_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "complex_math_vs2017", "HIP-Doc\Reference\HIP-Complex-Math-API\complex_math\complex_math_vs2017.vcxproj", "{C40C7B66-1B38-4F1C-BE0B-EC12857FDD0F}"
 EndProject

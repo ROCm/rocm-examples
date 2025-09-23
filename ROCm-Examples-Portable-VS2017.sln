@@ -128,7 +128,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "multi_device_synchronizatio
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access\p2p_memory_access_vs2017.vcxproj", "{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_failed_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access_failed\p2p_memory_access_failed_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_host_staging_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access_host_staging\p2p_memory_access_host_staging_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "constant_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\constant_memory\constant_memory_vs2017.vcxproj", "{119213EE-509A-41F2-8C87-B0872D68E41A}"
 EndProject

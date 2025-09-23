@@ -14,7 +14,7 @@
     <VCProjectVersion>17.0</VCProjectVersion>
     <ProjectGuid>{9F2D18B0-E80B-DBA5-BE33-48E79E5868A6}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>p2p_memory_access_failed_vs2022</RootNamespace>
+    <RootNamespace>p2p_memory_access_host_staging_vs2022</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <ItemGroup>

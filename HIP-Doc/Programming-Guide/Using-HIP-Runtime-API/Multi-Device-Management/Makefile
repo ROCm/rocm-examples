@@ -25,7 +25,7 @@ EXAMPLES := \
 	device_selection \
 	multi_device_synchronization \
 	p2p_memory_access \
-	p2p_memory_access_failed
+	p2p_memory_access_host_staging
 
 all: $(EXAMPLES)
 
