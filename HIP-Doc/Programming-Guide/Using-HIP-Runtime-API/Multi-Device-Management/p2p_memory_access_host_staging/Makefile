@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hip_p2p_memory_access_failed
+EXAMPLE := hip_p2p_memory_access_host_staging
 GPU_RUNTIME := HIP
 
 # HIP variables
