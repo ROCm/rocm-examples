@@ -1,0 +1,3 @@
+rocprofiler-sdk_api_callback_tracing
+api_callback_trace.log
+*.so
