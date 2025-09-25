@@ -361,7 +361,6 @@ auto main(int argc, char** argv) -> int
         // MAIN LOOP
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         auto graphCreated = false;
-        auto graph = hipGraph_t{};
         auto graphExec = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
         hip_check(hipStreamCreate(&graphStream));
