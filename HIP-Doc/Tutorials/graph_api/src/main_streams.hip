@@ -36,6 +36,7 @@
 #include <hipfft/hipfft.h>
 
 #include <algorithm>
+#include <chrono>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -357,6 +358,7 @@ auto main(int argc, char** argv) -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // MAIN LOOP
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        auto start = std::chrono::steady_clock::now();
         for(auto subIdx = 0; subIdx < numSubvols; ++subIdx)
         {
             auto s_N_z = sub_N_z.at(subIdx);
@@ -587,9 +589,12 @@ auto main(int argc, char** argv) -> int
             hip_check(hipLaunchHostFunc(saveStream, save_volume, saveVolArgs));
         }
 
-        std::cout << "All work items enqueued, waiting for completion...";
+        std::cout << "All work items enqueued, waiting for completion... ";
         hip_check(hipStreamSynchronize(saveStream));
+        auto stop = std::chrono::steady_clock::now();
         std::cout << "Done!" << std::endl;
+        auto const elapsed = std::chrono::duration<double>{stop - start};
+        std::cout << "Reconstruction time: " << elapsed << std::endl;
 
         hip_check(hipFree(vol.ptr));
         hip_check(hipFreeHost(hostVolPtr));
