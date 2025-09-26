@@ -434,6 +434,10 @@ auto main(int argc, char** argv) -> int
                         (projGeom.dim.x / threadsPerBlock.x) + 1, (projGeom.dim.y / threadsPerBlock.y) + 1, 1
                     };
 
+                    // [sphinx-preprocessing-start]
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////
+                    // START HERE
+                    ////////////////////////////////////////////////////////////////////////////////////////////////////
                     auto proj = projections.at(streamIdx);
                     auto projPitch = projectionPitches.at(streamIdx);
                     normalization_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
@@ -453,7 +457,9 @@ auto main(int argc, char** argv) -> int
                         projGeom.minCoord,
                         projGeom.pixelDim
                     );
+                    // [sphinx-preprocessing-end]
 
+                    // [sphinx-proj-to-expanded-start]
                     // Expand projection to filter length
                     auto expanded = expandedProjections.at(streamIdx);
                     auto expandedPitch = expandedPitches.at(streamIdx);
@@ -470,7 +476,9 @@ auto main(int argc, char** argv) -> int
                         hipMemcpyDeviceToDevice,
                         stream
                     ));
+                    // [sphinx-proj-to-expanded-end]
 
+                    // [sphinx-forward-start]
                     // R2C Fourier-transform projection
                     auto transformed = transformedProjections.at(streamIdx);
                     auto transformedPitch = transformedPitches.at(streamIdx);
@@ -484,7 +492,9 @@ auto main(int argc, char** argv) -> int
                     ));
                     auto& forward = forwardPlans.at(streamIdx);
                     hipfft_check(hipfftExecR2C(forward, expanded, transformed));
+                    // [sphinx-forward-end]
                     
+                    // [sphinx-filter-start]
                     // Apply filter
                     auto filterBlocksPerGrid = dim3{
                         (projGeom.dimTrans.x / threadsPerBlock.x) + 1,
@@ -497,7 +507,9 @@ auto main(int argc, char** argv) -> int
                     
                     auto& backward = backwardPlans.at(streamIdx);
                     hipfft_check(hipfftExecC2R(backward, transformed, expanded));
+                    // [sphinx-filter-end]
 
+                    // [sphinx-expanded-to-proj-start]
                     // Shrink projection to original size and normalize
                     hip_check(hipMemcpy2DAsync(
                         proj,
@@ -513,7 +525,9 @@ auto main(int argc, char** argv) -> int
                     filter_normalization_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
                         proj, projPitch, projGeom.dimFFT.x, projGeom.dim
                     );
+                    // [sphinx-expanded-to-proj-end]
 
+                    // [sphinx-bp-start]
                     // Backprojection
                     auto thetaDeg = projGeom.thetaSign * projGeom.thetaStep * projIdx; // Current angle
                     auto thetaRad = thetaDeg * std::numbers::pi_v<float> / 180.f; // Convert to radians
@@ -543,6 +557,7 @@ auto main(int argc, char** argv) -> int
                         projGeom.d_sd,
                         projGeom.d_so
                     );
+                    // [sphinx-bp-end]
 
                     if(useDataset)
                         ++pathsIt;
