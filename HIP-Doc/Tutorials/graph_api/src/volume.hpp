@@ -45,7 +45,6 @@ struct save_volume_args
     std::size_t N_x;
     std::size_t N_y;
     std::size_t N_z;
-    std::size_t s_N_z;
     float d_x;
     float d_y;
 };

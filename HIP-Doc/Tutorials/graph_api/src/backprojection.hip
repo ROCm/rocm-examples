@@ -43,8 +43,6 @@ __global__ void backprojection_kernel(
     float* __restrict__ vol,
     std::size_t pitch,
     ulonglong3 volDim,
-    std::size_t s_N_z,
-    std::size_t zOffset,
     float3 voxelDim,
     hipTextureObject_t proj,
     float2 minCoord,
@@ -59,14 +57,11 @@ __global__ void backprojection_kernel(
     auto const y_in = blockIdx.y * blockDim.y + threadIdx.y;
     auto z_in = blockIdx.z * blockDim.z + threadIdx.z;
 
-    if((x_in < volDim.x) && (y_in < volDim.y) && (z_in < s_N_z))
+    if((x_in < volDim.x) && (y_in < volDim.y) && (z_in < volDim.z))
     {
         auto const slice_pitch = pitch * volDim.y;
         auto slice = reinterpret_cast<char*>(vol) + z_in * slice_pitch;
         auto row = reinterpret_cast<float*>(slice + y_in * pitch);
-
-        // add offset for current subvolume
-        z_in += zOffset;
 
         // get coordinates relative to volume center (0, 0, 0)
         auto x = vol_centered_coordinate(x_in, volDim.x, voxelDim.x);

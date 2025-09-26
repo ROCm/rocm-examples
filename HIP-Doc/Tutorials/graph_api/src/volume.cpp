@@ -66,7 +66,7 @@ void save_volume(void* args) noexcept
                 throw std::runtime_error{error_msg};
         };
 
-        for(auto slice_idx = 0; slice_idx < my_args->s_N_z; ++slice_idx)
+        for(auto slice_idx = 0; slice_idx < my_args->N_z; ++slice_idx)
         {
             if(slice_idx > 0u)
             {
@@ -81,7 +81,6 @@ void save_volume(void* args) noexcept
 
             set_field(TIFFTAG_BITSPERSAMPLE, 8 * sizeof(float), "Could not set TIFF's bits per sample.");
             set_field(TIFFTAG_COMPRESSION, COMPRESSION_NONE, "Could not set TIFF's compression.");
-            set_field(TIFFTAG_IMAGEDEPTH, my_args->N_z, "Could not set TIFF's image depth");
             set_field(TIFFTAG_IMAGELENGTH, my_args->N_y, "Could not set TIFF's image length.");
             set_field(TIFFTAG_IMAGEWIDTH, my_args->N_x, "Could not set TIFF's image width.");
             set_field(TIFFTAG_PLANARCONFIG, PLANARCONFIG_CONTIG, "Could not set TIFF's planar configuration");

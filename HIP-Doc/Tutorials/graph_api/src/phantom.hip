@@ -165,7 +165,6 @@ auto create_phantom(ulonglong3 dim, float3 voxelDim) noexcept(false) -> hipPitch
         dim.x,
         dim.y,
         dim.z,
-        dim.z,
         voxelDim.x,
         voxelDim.y
     };

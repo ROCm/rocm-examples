@@ -65,9 +65,6 @@ auto main() -> int
         for(auto&& stream : streams)
             hip_check(hipStreamCreate(&stream));
 
-        auto numSubvols = int{}; // number of subvolumes
-        auto sub_N_z  = std::vector<std::size_t>{}; // number of voxels in z direction for each subvolume
-
         auto r = static_cast<float*>(nullptr);
         auto R = static_cast<hipfftComplex*>(nullptr);
 
@@ -87,9 +84,6 @@ auto main() -> int
         auto transformedProjections = std::vector<hipfftComplex*>{};
         auto transformedPitches = std::vector<std::size_t>{};
         auto textureProjections = std::vector<hipTextureObject_t>{};
-        
-        auto saveStream = hipStream_t{};
-        auto saveEvent = hipEvent_t{};
 
         auto projGeom = phantom::make_projectionGeometry();
         auto volGeom = phantom::make_volumeGeometry();
@@ -118,7 +112,6 @@ auto main() -> int
         hipfft_check(hipfftDestroy(filterPlan));
         hip_check(hipFree(r));
 
-        /* Estimate number of subvolumes. We will split the volume along the z axis */
         auto const inputProjSingle = projGeom.dim.x * projGeom.dim.y * sizeof(std::uint16_t);
         auto const inputProjTotal = inputProjSingle * numStreams;
         auto const projSingle = projGeom.dim.x * projGeom.dim.y * sizeof(float);
@@ -134,41 +127,17 @@ auto main() -> int
         hip_check(hipMemGetInfo(&devMemFree, &devMemTotal));
 
         auto memRequired = static_cast<std::size_t>(memTotal);
-        numSubvols = 1;
-        while(std::max(memRequired, devMemFree) == memRequired)
+        if(memRequired > devMemFree)
         {
-            memRequired /= 2;
-            numSubvols *= 2;
+            std::cerr << "Not enough device memory. Required: " << memRequired 
+                      << ", available: " << devMemFree << std::endl;
+            return EXIT_FAILURE;
         }
-
-        // if there is less than a GiB of free memory left on the device, use smaller subvolumes to be safe
-        if((devMemFree - memRequired) < (1024 * 1024 * 1024))
-            numSubvols *= 2;
-
-        auto const s_N_z = volGeom.dim.z / numSubvols;
-        for(auto i = 0; i < numSubvols - 1; ++i)
-            sub_N_z.push_back(s_N_z);
-
-        if(auto const remainder = volGeom.dim.z % numSubvols; remainder == 0)
-            sub_N_z.push_back(s_N_z);
-        else
-            sub_N_z.push_back(s_N_z + remainder);
-
-        hip_check(hipStreamCreate(&saveStream));
-        hip_check(hipEventCreate(&saveEvent));
 
         std::cout << "Done!" << std::endl;
         std::cout << "Volume dimensions: " << volGeom.dim.x << " x "
                                            << volGeom.dim.y << " x "
                                            << volGeom.dim.z << std::endl;
-        if(numSubvols > 1)
-        {
-            std::cout << "Number of subvolumes: " << numSubvols << std::endl;
-            for(auto s_N_z : sub_N_z)
-                std::cout << "\tDimensions: " << volGeom.dim.x << " x "
-                                              << volGeom.dim.y << " x "
-                                              << s_N_z << std::endl;
-        }
 
         // Initialize per-stream data
         for(auto streamIdx = 0; streamIdx < streams.size(); ++streamIdx)
@@ -260,215 +229,210 @@ auto main() -> int
             std::cout << "Done!" << std::endl;
         }
 
-        auto const s_N_z_first = sub_N_z.front(); // Use the initial subvolume size for offset calculations
-        auto const s_N_z_last = sub_N_z.back(); // If there is a largest subvolume, it will be the last
         create_volume("volume.tif");
         auto hostVolPtr = static_cast<float*>(nullptr);
         hip_check(hipHostMalloc(
             reinterpret_cast<void**>(&hostVolPtr),
-            volGeom.dim.x * volGeom.dim.y * s_N_z_last * sizeof(float),
+            volGeom.dim.x * volGeom.dim.y * volGeom.dim.z * sizeof(float),
             hipHostMallocDefault
         ));
         auto hostVol = make_hipPitchedPtr(
             hostVolPtr, volGeom.dim.x * sizeof(float), volGeom.dim.x, volGeom.dim.y
         );    
         auto vol = hipPitchedPtr{};
-        auto volExt = make_hipExtent(volGeom.dim.x * sizeof(float), volGeom.dim.y, s_N_z_last);
+        auto volExt = make_hipExtent(volGeom.dim.x * sizeof(float), volGeom.dim.y, volGeom.dim.z);
         hip_check(hipMalloc3D(&vol, volExt));
+        hip_check(hipMemset3D(vol, 0, volExt));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // MAIN LOOP
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         auto start = std::chrono::steady_clock::now();
-        for(auto subIdx = 0; subIdx < numSubvols; ++subIdx)
+
+        auto projIdx = 0;
+        while(projIdx < projGeom.numProj)
         {
-            auto s_N_z = sub_N_z.at(subIdx);
+            auto batchSize = std::min(numStreams, static_cast<int>(projGeom.numProj - projIdx));
 
-            auto subIdxInfo = new int;
-            *subIdxInfo = subIdx;
-            hip_check(hipLaunchHostFunc(streams.at(0), [](void* arg)
+            // Launch batch in parallel streams
+            for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx)
             {
-                auto mySubIdx = static_cast<int*>(arg);
-                std::cout << "Processing subvolume #" << *mySubIdx << std::endl;
-                delete mySubIdx;
-            }, subIdxInfo));
-            hip_check(hipMemset3DAsync(vol, 0, volExt, streams.at(0)));
+                auto stream = streams.at(streamIdx);
 
-            auto projIdx = 0;
-            while(projIdx < projGeom.numProj)
-            {
-                auto batchSize = std::min(numStreams, static_cast<int>(projGeom.numProj - projIdx));
+                auto threadsPerBlock = dim3{32, 32, 1};
+                auto blocksPerGrid = dim3{
+                    (projGeom.dim.x / threadsPerBlock.x) + 1, (projGeom.dim.y / threadsPerBlock.y) + 1, 1
+                };
 
-                // Launch batch in parallel streams
-                for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx)
-                {
-                    auto stream = streams.at(streamIdx);
+                auto inputPitchedPtr = phantomProjections.at(projIdx);
+                auto input = static_cast<std::uint16_t*>(inputPitchedPtr.ptr);
+                auto inputPitch = inputPitchedPtr.pitch;
 
-                    auto inputPitchedPtr = phantomProjections.at(projIdx);
-                    auto input = static_cast<std::uint16_t*>(inputPitchedPtr.ptr);
-                    auto inputPitch = inputPitchedPtr.pitch;
+                // [sphinx-preprocessing-start]
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                // START HERE
+                ////////////////////////////////////////////////////////////////////////////////////////////////////
+                auto proj = projections.at(streamIdx);
+                auto projPitch = projectionPitches.at(streamIdx);
+                normalization_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
+                    input, inputPitch, proj, projPitch, projGeom.dim, projGeom.bps
+                );
+
+                log_transformation_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(proj, projPitch, projGeom.dim);
+
+                weighting_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
+                    proj,
+                    projPitch,
+                    projGeom.dim,
+                    projGeom.d_sd,
+                    projGeom.d_so,
+                    projGeom.minCoord,
+                    projGeom.pixelDim
+                );
+                // [sphinx-preprocessing-end]
+
+                // [sphinx-proj-to-expanded-start]
+                // Expand projection to filter length
+                auto expanded = expandedProjections.at(streamIdx);
+                auto expandedPitch = expandedPitches.at(streamIdx);
+                hip_check(hipMemset2DAsync(
+                    expanded, expandedPitch, 0, projGeom.dimFFT.x * sizeof(float), projGeom.dimFFT.y, stream
+                ));
+                hip_check(hipMemcpy2DAsync(
+                    expanded,
+                    expandedPitch,
+                    proj,
+                    projPitch,
+                    projGeom.dim.x * sizeof(float),
+                    projGeom.dim.y,
+                    hipMemcpyDeviceToDevice,
+                    stream
+                ));
+                // [sphinx-proj-to-expanded-end]
+
+                // [sphinx-forward-start]
+                // R2C Fourier-transform projection
+                auto transformed = transformedProjections.at(streamIdx);
+                auto transformedPitch = transformedPitches.at(streamIdx);
+                hip_check(hipMemset2DAsync(
+                    transformed,
+                    transformedPitch,
+                    0,
+                    projGeom.dimTrans.x * sizeof(hipfftComplex),
+                    projGeom.dimTrans.y,
+                    stream
+                ));
+                auto& forward = forwardPlans.at(streamIdx);
+                hipfft_check(hipfftExecR2C(forward, expanded, transformed));
+                // [sphinx-forward-end]
                     
-                    auto threadsPerBlock = dim3{32, 32, 1};
-                    auto blocksPerGrid = dim3{
-                        (projGeom.dim.x / threadsPerBlock.x) + 1, (projGeom.dim.y / threadsPerBlock.y) + 1, 1
-                    };
-
-                    // [sphinx-preprocessing-start]
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    // START HERE
-                    ////////////////////////////////////////////////////////////////////////////////////////////////////
-                    auto proj = projections.at(streamIdx);
-                    auto projPitch = projectionPitches.at(streamIdx);
-                    normalization_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
-                        input, inputPitch, proj, projPitch, projGeom.dim, projGeom.bps
-                    );
-
-                    log_transformation_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
-                        proj, projPitch, projGeom.dim
-                    );
-
-                    weighting_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
-                        proj,
-                        projPitch,
-                        projGeom.dim,
-                        projGeom.d_sd,
-                        projGeom.d_so,
-                        projGeom.minCoord,
-                        projGeom.pixelDim
-                    );
-                    // [sphinx-preprocessing-end]
-
-                    // [sphinx-proj-to-expanded-start]
-                    // Expand projection to filter length
-                    auto expanded = expandedProjections.at(streamIdx);
-                    auto expandedPitch = expandedPitches.at(streamIdx);
-                    hip_check(hipMemset2DAsync(
-                        expanded, expandedPitch, 0, projGeom.dimFFT.x * sizeof(float), projGeom.dimFFT.y, stream
-                    ));
-                    hip_check(hipMemcpy2DAsync(
-                        expanded,
-                        expandedPitch,
-                        proj,
-                        projPitch,
-                        projGeom.dim.x * sizeof(float),
-                        projGeom.dim.y,
-                        hipMemcpyDeviceToDevice,
-                        stream
-                    ));
-                    // [sphinx-proj-to-expanded-end]
-
-                    // [sphinx-forward-start]
-                    // R2C Fourier-transform projection
-                    auto transformed = transformedProjections.at(streamIdx);
-                    auto transformedPitch = transformedPitches.at(streamIdx);
-                    hip_check(hipMemset2DAsync(
-                        transformed,
-                        transformedPitch,
-                        0,
-                        projGeom.dimTrans.x * sizeof(hipfftComplex),
-                        projGeom.dimTrans.y,
-                        stream
-                    ));
-                    auto& forward = forwardPlans.at(streamIdx);
-                    hipfft_check(hipfftExecR2C(forward, expanded, transformed));
-                    // [sphinx-forward-end]
+                // [sphinx-filter-start]
+                // Apply filter
+                auto filterBlocksPerGrid = dim3{
+                    (projGeom.dimTrans.x / threadsPerBlock.x) + 1,
+                    (projGeom.dimTrans.y / threadsPerBlock.y) + 1,
+                    1
+                };
+                filter_application_kernel<<<filterBlocksPerGrid, threadsPerBlock, 0, stream>>>(
+                    transformed, transformedPitch, R, projGeom.dimTrans
+                );
                     
-                    // [sphinx-filter-start]
-                    // Apply filter
-                    auto filterBlocksPerGrid = dim3{
-                        (projGeom.dimTrans.x / threadsPerBlock.x) + 1,
-                        (projGeom.dimTrans.y / threadsPerBlock.y) + 1,
-                        1
-                    };
-                    filter_application_kernel<<<filterBlocksPerGrid, threadsPerBlock, 0, stream>>>(
-                        transformed, transformedPitch, R, projGeom.dimTrans
-                    );
+                auto& backward = backwardPlans.at(streamIdx);
+                hipfft_check(hipfftExecC2R(backward, transformed, expanded));
+                // [sphinx-filter-end]
+
+                // [sphinx-expanded-to-proj-start]
+                // Shrink projection to original size and normalize
+                hip_check(hipMemcpy2DAsync(
+                    proj,
+                    projPitch,
+                    expanded,
+                    expandedPitch,
+                    projGeom.dim.x * sizeof(float),
+                    projGeom.dim.y,
+                    hipMemcpyDeviceToDevice,
+                    stream
+                ));
                     
-                    auto& backward = backwardPlans.at(streamIdx);
-                    hipfft_check(hipfftExecC2R(backward, transformed, expanded));
-                    // [sphinx-filter-end]
+                filter_normalization_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
+                    proj, projPitch, projGeom.dimFFT.x, projGeom.dim
+                );
+                // [sphinx-expanded-to-proj-end]
 
-                    // [sphinx-expanded-to-proj-start]
-                    // Shrink projection to original size and normalize
-                    hip_check(hipMemcpy2DAsync(
-                        proj,
-                        projPitch,
-                        expanded,
-                        expandedPitch,
-                        projGeom.dim.x * sizeof(float),
-                        projGeom.dim.y,
-                        hipMemcpyDeviceToDevice,
-                        stream
-                    ));
-                    
-                    filter_normalization_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
-                        proj, projPitch, projGeom.dimFFT.x, projGeom.dim
-                    );
-                    // [sphinx-expanded-to-proj-end]
+                // [sphinx-bp-start]
+                // Backprojection
+                auto thetaDeg = projGeom.thetaSign * projGeom.thetaStep * projIdx; // Current angle
+                auto thetaRad = thetaDeg * std::numbers::pi_v<float> / 180.f; // Convert to radians
+                auto sinTheta = std::sin(thetaRad);
+                auto cosTheta = std::cos(thetaRad);
 
-                    // [sphinx-bp-start]
-                    // Backprojection
-                    auto thetaDeg = projGeom.thetaSign * projGeom.thetaStep * projIdx; // Current angle
-                    auto thetaRad = thetaDeg * std::numbers::pi_v<float> / 180.f; // Convert to radians
-                    auto sinTheta = std::sin(thetaRad);
-                    auto cosTheta = std::cos(thetaRad);
+                auto bpBlockSize = dim3{32u, 8u, 4u};
+                auto bpBlocks = dim3{
+                    static_cast<std::uint32_t>(volGeom.dim.x / bpBlockSize.x + 1),
+                    static_cast<std::uint32_t>(volGeom.dim.y / bpBlockSize.y + 1),
+                    static_cast<std::uint32_t>(volGeom.dim.z / bpBlockSize.z + 1)
+                };
 
-                    auto bpBlockSize = dim3{32u, 8u, 4u};
-                    auto bpBlocks = dim3{
-                        static_cast<std::uint32_t>(volGeom.dim.x / bpBlockSize.x + 1),
-                        static_cast<std::uint32_t>(volGeom.dim.y / bpBlockSize.y + 1),
-                        static_cast<std::uint32_t>(s_N_z / bpBlockSize.z + 1)
-                    };
-
-                    auto& projTex = textureProjections.at(streamIdx);
-                    backprojection_kernel<<<bpBlocks, bpBlockSize, 0, stream>>>(
-                        static_cast<float*>(vol.ptr),
-                        vol.pitch,
-                        volGeom.dim,
-                        s_N_z,
-                        s_N_z_first * subIdx,
-                        volGeom.voxelDim,
-                        projTex,
-                        projGeom.minCoord,
-                        sinTheta,
-                        cosTheta,
-                        projGeom.pixelDim,
-                        projGeom.d_sd,
-                        projGeom.d_so
-                    );
-                    // [sphinx-bp-end]
-                }
+                auto& projTex = textureProjections.at(streamIdx);
+                backprojection_kernel<<<bpBlocks, bpBlockSize, 0, stream>>>(
+                    static_cast<float*>(vol.ptr),
+                    vol.pitch,
+                    volGeom.dim,
+                    volGeom.voxelDim,
+                    projTex,
+                    projGeom.minCoord,
+                    sinTheta,
+                    cosTheta,
+                    projGeom.pixelDim,
+                    projGeom.d_sd,
+                    projGeom.d_so
+                );
+                // [sphinx-bp-end]
             }
-            
-            // Copy volume back to host and save
-            auto memcpyParams = hipMemcpy3DParms{};
-            std::memset(&memcpyParams, 0, sizeof(hipMemcpy3DParms));
-            memcpyParams.dstPos = make_hipPos(0, 0, 0);
-            memcpyParams.dstPtr = hostVol;
-            memcpyParams.srcPos = make_hipPos(0, 0, 0);
-            memcpyParams.srcPtr = vol;
-            memcpyParams.extent = volExt;
-            memcpyParams.kind = hipMemcpyDeviceToHost;
-            hip_check(hipMemcpy3DAsync(&memcpyParams, streams.at(0)));
-            hip_check(hipEventRecord(saveEvent, streams.at(0)));
-            
-            auto saveVolArgs = new save_volume_args
-            {
-                "volume.tif",
-                hostVolPtr,
-                volGeom.dim.x, volGeom.dim.y, volGeom.dim.z, s_N_z,
-                volGeom.voxelDim.x, volGeom.voxelDim.y
-            };
-            hip_check(hipStreamWaitEvent(saveStream, saveEvent));
-            hip_check(hipLaunchHostFunc(saveStream, save_volume, saveVolArgs));
+        }
+        
+        // First stream waits for other streams to complete
+        auto completionEvents = std::vector<hipEvent_t>{};
+        for(auto streamIdx = 1; streamIdx < streams.size(); ++streamIdx)
+        {
+            auto event = hipEvent_t{};
+            hip_check(hipEventCreate(&event));
+            hip_check(hipEventRecord(event, streams.at(streamIdx)));
+            completionEvents.push_back(event);
         }
 
+        for(auto&& event : completionEvents)
+            hip_check(hipStreamWaitEvent(streams.at(0), event));
+
+        // Copy volume back to host and save
+        auto memcpyParams = hipMemcpy3DParms{};
+        std::memset(&memcpyParams, 0, sizeof(hipMemcpy3DParms));
+        memcpyParams.dstPos = make_hipPos(0, 0, 0);
+        memcpyParams.dstPtr = hostVol;
+        memcpyParams.srcPos = make_hipPos(0, 0, 0);
+        memcpyParams.srcPtr = vol;
+        memcpyParams.extent = volExt;
+        memcpyParams.kind = hipMemcpyDeviceToHost;
+        hip_check(hipMemcpy3DAsync(&memcpyParams, streams.at(0)));
+            
+        auto saveVolArgs = new save_volume_args
+        {
+            "volume.tif",
+            hostVolPtr,
+            volGeom.dim.x, volGeom.dim.y, volGeom.dim.z,
+            volGeom.voxelDim.x, volGeom.voxelDim.y
+        };
+        hip_check(hipLaunchHostFunc(streams.at(0), save_volume, saveVolArgs));
+
         std::cout << "All work items enqueued, waiting for completion... ";
-        hip_check(hipStreamSynchronize(saveStream));
+        hip_check(hipStreamSynchronize(streams.at(0)));
         auto stop = std::chrono::steady_clock::now();
         std::cout << "Done!" << std::endl;
         auto const elapsed = std::chrono::duration<double>{stop - start};
         std::cout << "Reconstruction time: " << elapsed << std::endl;
+
+        for(auto&& event : completionEvents)
+            hip_check(hipEventDestroy(event));
 
         hip_check(hipFree(vol.ptr));
         hip_check(hipFreeHost(hostVolPtr));
@@ -493,9 +457,6 @@ auto main() -> int
 
         for(auto&& p : phantomProjections)
             hip_check(hipFree(p.ptr));
-
-        hip_check(hipEventDestroy(saveEvent));
-        hip_check(hipStreamDestroy(saveStream));
 
         hip_check(hipFree(R));
 

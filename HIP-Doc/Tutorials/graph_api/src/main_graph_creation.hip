@@ -66,9 +66,6 @@ auto main() -> int
         for(auto&& stream : streams)
             hip_check(hipStreamCreate(&stream));
 
-        auto numSubvols = int{}; // number of subvolumes
-        auto sub_N_z  = std::vector<std::size_t>{}; // number of voxels in z direction for each subvolume
-
         auto r = static_cast<float*>(nullptr);
         auto R = static_cast<hipfftComplex*>(nullptr);
 
@@ -88,9 +85,6 @@ auto main() -> int
         auto transformedProjections = std::vector<hipfftComplex*>{};
         auto transformedPitches = std::vector<std::size_t>{};
         auto textureProjections = std::vector<hipTextureObject_t>{};
-
-        auto saveStream = hipStream_t{};
-        auto saveEvent = hipEvent_t{};
 
         auto projGeom = phantom::make_projectionGeometry();
         auto volGeom = phantom::make_volumeGeometry();
@@ -119,7 +113,6 @@ auto main() -> int
         hipfft_check(hipfftDestroy(filterPlan));
         hip_check(hipFree(r));
 
-        /* Estimate number of subvolumes. We will split the volume along the z axis */
         auto const inputProjSingle = projGeom.dim.x * projGeom.dim.y * sizeof(std::uint16_t);
         auto const inputProjTotal = inputProjSingle * numBranches;
         auto const projSingle = projGeom.dim.x * projGeom.dim.y * sizeof(float);
@@ -135,41 +128,17 @@ auto main() -> int
         hip_check(hipMemGetInfo(&devMemFree, &devMemTotal));
 
         auto memRequired = static_cast<std::size_t>(memTotal);
-        numSubvols = 1;
-        while(std::max(memRequired, devMemFree) == memRequired)
+        if(memRequired > devMemFree)
         {
-            memRequired /= 2;
-            numSubvols *= 2;
+            std::cerr << "Not enough device memory. Required: " << memRequired 
+                      << ", available: " << devMemFree << std::endl;
+            return EXIT_FAILURE;
         }
-
-        // if there is less than a GiB of free memory left on the device, use smaller subvolumes to be safe
-        if((devMemFree - memRequired) < (1024 * 1024 * 1024))
-            numSubvols *= 2;
-
-        auto const s_N_z = volGeom.dim.z / numSubvols;
-        for(auto i = 0; i < numSubvols - 1; ++i)
-            sub_N_z.push_back(s_N_z);
-
-        if(auto const remainder = volGeom.dim.z % numSubvols; remainder == 0)
-            sub_N_z.push_back(s_N_z);
-        else
-            sub_N_z.push_back(s_N_z + remainder);
-
-        hip_check(hipStreamCreate(&saveStream));
-        hip_check(hipEventCreate(&saveEvent));
 
         std::cout << "Done!" << std::endl;
         std::cout << "Volume dimensions: " << volGeom.dim.x << " x "
                                            << volGeom.dim.y << " x "
                                            << volGeom.dim.z << std::endl;
-        if(numSubvols > 1)
-        {
-            std::cout << "Number of subvolumes: " << numSubvols << std::endl;
-            for(auto s_N_z : sub_N_z)
-                std::cout << "\tDimensions: " << volGeom.dim.x << " x "
-                                              << volGeom.dim.y << " x "
-                                              << s_N_z << std::endl;
-        }
 
         // Initialize per-branch data
         for(auto branchIdx = 0; branchIdx < numBranches; ++branchIdx)
@@ -261,21 +230,20 @@ auto main() -> int
             std::cout << "Done!" << std::endl;
         }
 
-        auto const s_N_z_first = sub_N_z.front(); // Use the initial subvolume size for offset calculations
-        auto const s_N_z_last = sub_N_z.back(); // If there is a largest subvolume, it will be the last
         create_volume("volume.tif");
         auto hostVolPtr = static_cast<float*>(nullptr);
         hip_check(hipHostMalloc(
             reinterpret_cast<void**>(&hostVolPtr),
-            volGeom.dim.x * volGeom.dim.y * s_N_z_last * sizeof(float),
+            volGeom.dim.x * volGeom.dim.y * volGeom.dim.z * sizeof(float),
             hipHostMallocDefault
         ));
         auto hostVol = make_hipPitchedPtr(
             hostVolPtr, volGeom.dim.x * sizeof(float), volGeom.dim.x, volGeom.dim.y
         );    
         auto vol = hipPitchedPtr{};
-        auto volExt = make_hipExtent(volGeom.dim.x * sizeof(float), volGeom.dim.y, s_N_z_last);
+        auto volExt = make_hipExtent(volGeom.dim.x * sizeof(float), volGeom.dim.y, volGeom.dim.z);
         hip_check(hipMalloc3D(&vol, volExt));
+        hip_check(hipMemset3D(vol, 0, volExt));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // MAIN LOOP
@@ -284,407 +252,389 @@ auto main() -> int
         auto graphExec = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
         hip_check(hipStreamCreate(&graphStream));
+
         auto start = std::chrono::steady_clock::now();
-        for(auto subIdx = 0; subIdx < numSubvols; ++subIdx)
+
+        auto projIdx = 0;
+        while(projIdx < projGeom.numProj)
         {
-            auto s_N_z = sub_N_z.at(subIdx);
+            // Create graph template for this batch
+            auto graph = hipGraph_t{};
+            hip_check(hipGraphCreate(&graph, 0));
 
-            auto subIdxInfo = new int;
-            *subIdxInfo = subIdx;
-            hip_check(hipLaunchHostFunc(graphStream, [](void* arg)
+            auto batchSize = std::min(numBranches, static_cast<int>(projGeom.numProj - projIdx));
+
+            // Add nodes for each projection in batch
+            for(auto branchIdx = 0; branchIdx < batchSize; ++branchIdx, ++projIdx)
             {
-                auto mySubIdx = static_cast<int*>(arg);
-                std::cout << "Processing subvolume #" << *mySubIdx << std::endl;
-                delete mySubIdx;
-            }, subIdxInfo));
-            hip_check(hipMemset3DAsync(vol, 0, volExt, graphStream));
+                auto stream = streams.at(branchIdx);
 
-            auto projIdx = 0;
-            while(projIdx < projGeom.numProj)
+                auto threadsPerBlock = dim3{32, 32, 1};
+                auto blocksPerGrid = dim3{
+                    (projGeom.dim.x / threadsPerBlock.x) + 1, (projGeom.dim.y / threadsPerBlock.y) + 1, 1
+                };
+
+                auto inputPitchedPtr = phantomProjections.at(projIdx);
+                auto input = static_cast<std::uint16_t*>(inputPitchedPtr.ptr);
+                auto inputPitch = inputPitchedPtr.pitch;
+
+                auto proj = projections.at(branchIdx);
+                auto projPitch = projectionPitches.at(branchIdx);
+                void* normalizationKernelParams[] =
+                {
+                    static_cast<void*>(&input),
+                    static_cast<void*>(&inputPitch),
+                    static_cast<void*>(&proj),
+                    static_cast<void*>(&projPitch),
+                    static_cast<void*>(&projGeom.dim),
+                    static_cast<void*>(&projGeom.bps)
+                };
+
+                auto normalizationKernelNodeParams = hipKernelNodeParams{};
+                normalizationKernelNodeParams.blockDim = threadsPerBlock;
+                normalizationKernelNodeParams.extra = nullptr;
+                normalizationKernelNodeParams.func = reinterpret_cast<void*>(normalization_kernel);
+                normalizationKernelNodeParams.gridDim = blocksPerGrid;
+                normalizationKernelNodeParams.kernelParams = normalizationKernelParams;
+                normalizationKernelNodeParams.sharedMemBytes = 0;
+                auto normalizationKernelNode = hipGraphNode_t{};
+                hip_check(hipGraphAddKernelNode(
+                    &normalizationKernelNode, graph, nullptr, 0, &normalizationKernelNodeParams
+                ));
+
+                void* logTransformationKernelParams[] =
+                {
+                    static_cast<void*>(&proj),
+                    static_cast<void*>(&projPitch),
+                    static_cast<void*>(&projGeom.dim)
+                };
+                auto logTransformationKernelNodeParams = hipKernelNodeParams{};
+                logTransformationKernelNodeParams.blockDim = threadsPerBlock;
+                logTransformationKernelNodeParams.extra = nullptr;
+                logTransformationKernelNodeParams.func = reinterpret_cast<void*>(log_transformation_kernel);
+                logTransformationKernelNodeParams.gridDim = blocksPerGrid;
+                logTransformationKernelNodeParams.kernelParams = logTransformationKernelParams;
+                logTransformationKernelNodeParams.sharedMemBytes = 0;
+                auto logTransformationKernelNode = hipGraphNode_t{};
+                hip_check(hipGraphAddKernelNode(
+                    &logTransformationKernelNode,
+                    graph,
+                    &normalizationKernelNode,
+                    1,
+                    &logTransformationKernelNodeParams
+                ));
+
+                void* weightingKernelParams[] =
+                {
+                    static_cast<void*>(&proj),
+                    static_cast<void*>(&projPitch),
+                    static_cast<void*>(&projGeom.dim),
+                    static_cast<void*>(&projGeom.d_sd),
+                    static_cast<void*>(&projGeom.d_so),
+                    static_cast<void*>(&projGeom.minCoord),
+                    static_cast<void*>(&projGeom.pixelDim)
+                };
+                auto weightingKernelNodeParams = hipKernelNodeParams{};
+                weightingKernelNodeParams.blockDim = threadsPerBlock;
+                weightingKernelNodeParams.extra = nullptr;
+                weightingKernelNodeParams.func = reinterpret_cast<void*>(weighting_kernel);
+                weightingKernelNodeParams.gridDim = blocksPerGrid;
+                weightingKernelNodeParams.kernelParams = weightingKernelParams;
+                weightingKernelNodeParams.sharedMemBytes = 0;
+                auto weightingKernelNode = hipGraphNode_t{};
+                hip_check(hipGraphAddKernelNode(
+                    &weightingKernelNode, graph, &logTransformationKernelNode, 1, &weightingKernelNodeParams
+                ));
+
+                // Expand projection to filter length
+                auto expanded = expandedProjections.at(branchIdx);
+                auto expandedPitch = expandedPitches.at(branchIdx);
+                auto expandedMemsetNodeParams = hipMemsetParams{};
+                expandedMemsetNodeParams.dst = static_cast<void*>(expanded);
+                expandedMemsetNodeParams.elementSize = sizeof(float);
+                expandedMemsetNodeParams.height = projGeom.dimFFT.y;
+                expandedMemsetNodeParams.pitch = expandedPitch;
+                expandedMemsetNodeParams.value = 0;
+                expandedMemsetNodeParams.width = projGeom.dimFFT.x;
+                auto expandedMemsetNode = hipGraphNode_t{};
+                hip_check(hipGraphAddMemsetNode(
+                    &expandedMemsetNode, graph, nullptr, 0, &expandedMemsetNodeParams
+                ));
+
+                auto copyProjToexpandedNodeParams = hipMemcpy3DParms{};
+                std::memset(&copyProjToexpandedNodeParams, 0, sizeof(hipMemcpy3DParms));
+                copyProjToexpandedNodeParams.srcPos = make_hipPos(0, 0, 0);
+                copyProjToexpandedNodeParams.srcPtr = make_hipPitchedPtr(
+                    static_cast<void*>(proj), projPitch, projGeom.dim.x, projGeom.dim.y);
+                copyProjToexpandedNodeParams.dstPos = make_hipPos(0, 0, 0);
+                copyProjToexpandedNodeParams.dstPtr = make_hipPitchedPtr(
+                    static_cast<void*>(expanded), expandedPitch, projGeom.dimFFT.x, projGeom.dimFFT.y);
+                copyProjToexpandedNodeParams.extent = make_hipExtent(
+                    projGeom.dim.x * sizeof(float), projGeom.dim.y, 1);
+                copyProjToexpandedNodeParams.kind = hipMemcpyDeviceToDevice;
+                hipGraphNode_t copyProjToexpandedDeps[] = {expandedMemsetNode, weightingKernelNode};
+                auto copyProjToexpandedNode = hipGraphNode_t{};
+                hip_check(hipGraphAddMemcpyNode(
+                    &copyProjToexpandedNode,
+                    graph,
+                    copyProjToexpandedDeps,
+                    2,
+                    &copyProjToexpandedNodeParams
+                ));
+
+                // R2C Fourier-transform projection
+                auto transformed = transformedProjections.at(branchIdx);
+                auto transformedPitch = transformedPitches.at(branchIdx);
+                auto transformedMemsetNodeParams = hipMemsetParams{};
+                transformedMemsetNodeParams.dst = static_cast<void*>(transformed);
+                transformedMemsetNodeParams.elementSize = sizeof(float); // elementSize maximum is 4 bytes
+                transformedMemsetNodeParams.height = projGeom.dimTrans.y;
+                transformedMemsetNodeParams.pitch = transformedPitch;
+                transformedMemsetNodeParams.value = 0;
+                transformedMemsetNodeParams.width = projGeom.dimTrans.x * 2; // hipfftComplex = 2 floats
+                auto transformedMemsetNode = hipGraphNode_t{};
+                hip_check(hipGraphAddMemsetNode(
+                    &transformedMemsetNode, graph, nullptr, 0, &transformedMemsetNodeParams
+                ));
+
+                // Create a child graph for the forward FFT
+                auto forwardGraph = hipGraph_t{};
+                hip_check(hipGraphCreate(&forwardGraph, 0));
+
+                auto& forward = forwardPlans.at(branchIdx);
+                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
+                hipfft_check(hipfftExecR2C(forward, expanded, transformed));
+                hip_check(hipStreamEndCapture(stream, &forwardGraph));
+
+                hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToexpandedNode};
+                auto forwardNode = hipGraphNode_t{};
+                hip_check(hipGraphAddChildGraphNode(&forwardNode, graph, forwardDeps, 2, forwardGraph));
+
+                // Apply filter
+                auto filterBlocksPerGrid = dim3{
+                    (projGeom.dimTrans.x / threadsPerBlock.x) + 1,
+                    (projGeom.dimTrans.y / threadsPerBlock.y) + 1,
+                    1
+                };
+                void* filterApplicationKernelParams[] =
+                {
+                    static_cast<void*>(&transformed),
+                    static_cast<void*>(&transformedPitch),
+                    static_cast<void*>(&R),
+                    static_cast<void*>(&projGeom.dimTrans)
+                };
+                auto filterApplicationKernelNodeParams = hipKernelNodeParams{};
+                filterApplicationKernelNodeParams.blockDim = threadsPerBlock;
+                filterApplicationKernelNodeParams.extra = nullptr;
+                filterApplicationKernelNodeParams.func = reinterpret_cast<void*>(filter_application_kernel);
+                filterApplicationKernelNodeParams.gridDim = filterBlocksPerGrid;
+                filterApplicationKernelNodeParams.kernelParams = filterApplicationKernelParams;
+                filterApplicationKernelNodeParams.sharedMemBytes = 0;
+                auto filterApplicationKernelNode = hipGraphNode_t{};
+                hip_check(hipGraphAddKernelNode(
+                    &filterApplicationKernelNode, graph, &forwardNode, 1, &filterApplicationKernelNodeParams
+                ));
+
+                hip_check(hipGraphDestroy(forwardGraph));
+
+                // Create a child graph for the backward FFT
+                auto backwardGraph = hipGraph_t{};
+                hip_check(hipGraphCreate(&backwardGraph, 0));
+
+                // C2R Fourier-transform projection
+                auto& backward = backwardPlans.at(branchIdx);
+                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
+                hipfft_check(hipfftExecC2R(backward, transformed, expanded));
+                hip_check(hipStreamEndCapture(stream, &backwardGraph));
+
+                auto backwardNode = hipGraphNode_t{};
+                hip_check(hipGraphAddChildGraphNode(
+                    &backwardNode, graph, &filterApplicationKernelNode, 1, backwardGraph
+                ));
+
+                // Shrink projection to original size and normalize
+                auto copyExpandedToProjNodeParams = hipMemcpy3DParms{};
+                std::memset(&copyExpandedToProjNodeParams, 0, sizeof(hipMemcpy3DParms));
+                copyExpandedToProjNodeParams.srcPos = make_hipPos(0, 0, 0);
+                copyExpandedToProjNodeParams.srcPtr = make_hipPitchedPtr(
+                    static_cast<void*>(expanded), expandedPitch, projGeom.dimFFT.x, projGeom.dimFFT.y
+                );
+                copyExpandedToProjNodeParams.dstPos = make_hipPos(0, 0, 0);
+                copyExpandedToProjNodeParams.dstPtr = make_hipPitchedPtr(
+                    static_cast<void*>(proj), projPitch, projGeom.dim.x, projGeom.dim.y
+                );
+                copyExpandedToProjNodeParams.extent = make_hipExtent(
+                    projGeom.dim.x * sizeof(float), projGeom.dim.y, 1);
+                copyExpandedToProjNodeParams.kind = hipMemcpyDeviceToDevice;
+                auto copyExpandedToProjNode = hipGraphNode_t{};
+                hip_check(hipGraphAddMemcpyNode(
+                    &copyExpandedToProjNode, graph, &backwardNode, 1, &copyExpandedToProjNodeParams
+                ));
+
+                hip_check(hipGraphDestroy(backwardGraph));
+
+                void* filterNormalizationKernelParams[] =
+                {
+                    static_cast<void*>(&proj),
+                    static_cast<void*>(&projPitch),
+                    static_cast<void*>(&projGeom.dimFFT.x),
+                    static_cast<void*>(&projGeom.dim)
+                };
+                auto filterNormalizationKernelNodeParams = hipKernelNodeParams{};
+                filterNormalizationKernelNodeParams.blockDim = threadsPerBlock;
+                filterNormalizationKernelNodeParams.extra = nullptr;
+                filterNormalizationKernelNodeParams.func = reinterpret_cast<void*>(filter_normalization_kernel);
+                filterNormalizationKernelNodeParams.gridDim = blocksPerGrid;
+                filterNormalizationKernelNodeParams.kernelParams = filterNormalizationKernelParams;
+                filterNormalizationKernelNodeParams.sharedMemBytes = 0;
+                auto filterNormalizationKernelNode = hipGraphNode_t{};
+                hip_check(hipGraphAddKernelNode(
+                    &filterNormalizationKernelNode,
+                    graph,
+                    &copyExpandedToProjNode,
+                    1,
+                    &filterNormalizationKernelNodeParams));
+
+                // Backprojection
+                auto thetaDeg = projGeom.thetaSign * projGeom.thetaStep * projIdx; // Current angle
+                auto thetaRad = thetaDeg * std::numbers::pi_v<float> / 180.f; // Convert to radians
+                auto sinTheta = std::sin(thetaRad);
+                auto cosTheta = std::cos(thetaRad);
+
+                auto bpBlockSize = dim3{32u, 8u, 4u};
+                auto bpBlocks = dim3{
+                    static_cast<std::uint32_t>(volGeom.dim.x / bpBlockSize.x + 1),
+                    static_cast<std::uint32_t>(volGeom.dim.y / bpBlockSize.y + 1),
+                    static_cast<std::uint32_t>(volGeom.dim.z / bpBlockSize.z + 1)
+                };
+
+                auto& projTex = textureProjections.at(branchIdx);
+
+                void* backprojectionKernelParams[] =
+                {
+                    &vol.ptr,
+                    static_cast<void*>(&vol.pitch),
+                    static_cast<void*>(&volGeom.dim),
+                    static_cast<void*>(&volGeom.voxelDim),
+                    static_cast<void*>(&projTex),
+                    static_cast<void*>(&projGeom.minCoord),
+                    static_cast<void*>(&sinTheta),
+                    static_cast<void*>(&cosTheta),
+                    static_cast<void*>(&projGeom.pixelDim),
+                    static_cast<void*>(&projGeom.d_sd),
+                    static_cast<void*>(&projGeom.d_so)
+                };
+                auto backprojectionKernelNodeParams = hipKernelNodeParams{};
+                backprojectionKernelNodeParams.blockDim = bpBlockSize;
+                backprojectionKernelNodeParams.extra = nullptr;
+                backprojectionKernelNodeParams.func = reinterpret_cast<void*>(backprojection_kernel);
+                backprojectionKernelNodeParams.gridDim = bpBlocks;
+                backprojectionKernelNodeParams.kernelParams = backprojectionKernelParams;
+                backprojectionKernelNodeParams.sharedMemBytes = 0;
+                auto backprojectionKernelNode = hipGraphNode_t{};
+                hip_check(hipGraphAddKernelNode(
+                    &backprojectionKernelNode,
+                    graph,
+                    &filterNormalizationKernelNode,
+                    1,
+                    &backprojectionKernelNodeParams
+                ));
+            }
+
+            // Instantiate and launch the graph
+            if(batchSize == numBranches)
             {
-                // Create graph for this batch
-                auto graph = hipGraph_t{};
-                hip_check(hipGraphCreate(&graph, 0));
-
-                auto batchSize = std::min(numBranches, static_cast<int>(projGeom.numProj - projIdx));
-
-                // Add nodes for each projection in batch
-                for(auto branchIdx = 0; branchIdx < batchSize; ++branchIdx, ++projIdx)
+                if(!graphCreated)
                 {
-                    auto stream = streams.at(branchIdx);
+                    hip_check(hipGraphDebugDotPrint(graph, "graph_creation.dot", hipGraphDebugDotFlagsVerbose));
 
-                    auto threadsPerBlock = dim3{32, 32, 1};
-                    auto blocksPerGrid = dim3{
-                        (projGeom.dim.x / threadsPerBlock.x) + 1, (projGeom.dim.y / threadsPerBlock.y) + 1, 1
-                    };
-
-                    auto inputPitchedPtr = phantomProjections.at(projIdx);
-                    auto input = static_cast<std::uint16_t*>(inputPitchedPtr.ptr);
-                    auto inputPitch = inputPitchedPtr.pitch;
-
-                    auto proj = projections.at(branchIdx);
-                    auto projPitch = projectionPitches.at(branchIdx);
-                    void* normalizationKernelParams[] =
-                    {
-                        static_cast<void*>(&input),
-                        static_cast<void*>(&inputPitch),
-                        static_cast<void*>(&proj),
-                        static_cast<void*>(&projPitch),
-                        static_cast<void*>(&projGeom.dim),
-                        static_cast<void*>(&projGeom.bps)
-                    };
-
-                    auto normalizationKernelNodeParams = hipKernelNodeParams{};
-                    normalizationKernelNodeParams.blockDim = threadsPerBlock;
-                    normalizationKernelNodeParams.extra = nullptr;
-                    normalizationKernelNodeParams.func = reinterpret_cast<void*>(normalization_kernel);
-                    normalizationKernelNodeParams.gridDim = blocksPerGrid;
-                    normalizationKernelNodeParams.kernelParams = normalizationKernelParams;
-                    normalizationKernelNodeParams.sharedMemBytes = 0;
-                    auto normalizationKernelNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddKernelNode(
-                        &normalizationKernelNode, graph, nullptr, 0, &normalizationKernelNodeParams
-                    ));
-
-                    void* logTransformationKernelParams[] =
-                    {
-                        static_cast<void*>(&proj),
-                        static_cast<void*>(&projPitch),
-                        static_cast<void*>(&projGeom.dim)
-                    };
-                    auto logTransformationKernelNodeParams = hipKernelNodeParams{};
-                    logTransformationKernelNodeParams.blockDim = threadsPerBlock;
-                    logTransformationKernelNodeParams.extra = nullptr;
-                    logTransformationKernelNodeParams.func = reinterpret_cast<void*>(log_transformation_kernel);
-                    logTransformationKernelNodeParams.gridDim = blocksPerGrid;
-                    logTransformationKernelNodeParams.kernelParams = logTransformationKernelParams;
-                    logTransformationKernelNodeParams.sharedMemBytes = 0;
-                    auto logTransformationKernelNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddKernelNode(
-                        &logTransformationKernelNode,
-                        graph,
-                        &normalizationKernelNode,
-                        1,
-                        &logTransformationKernelNodeParams
-                    ));
-
-                    void* weightingKernelParams[] =
-                    {
-                        static_cast<void*>(&proj),
-                        static_cast<void*>(&projPitch),
-                        static_cast<void*>(&projGeom.dim),
-                        static_cast<void*>(&projGeom.d_sd),
-                        static_cast<void*>(&projGeom.d_so),
-                        static_cast<void*>(&projGeom.minCoord),
-                        static_cast<void*>(&projGeom.pixelDim)
-                    };
-                    auto weightingKernelNodeParams = hipKernelNodeParams{};
-                    weightingKernelNodeParams.blockDim = threadsPerBlock;
-                    weightingKernelNodeParams.extra = nullptr;
-                    weightingKernelNodeParams.func = reinterpret_cast<void*>(weighting_kernel);
-                    weightingKernelNodeParams.gridDim = blocksPerGrid;
-                    weightingKernelNodeParams.kernelParams = weightingKernelParams;
-                    weightingKernelNodeParams.sharedMemBytes = 0;
-                    auto weightingKernelNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddKernelNode(
-                        &weightingKernelNode, graph, &logTransformationKernelNode, 1, &weightingKernelNodeParams
-                    ));
-
-                    // Expand projection to filter length
-                    auto expanded = expandedProjections.at(branchIdx);
-                    auto expandedPitch = expandedPitches.at(branchIdx);
-                    auto expandedMemsetNodeParams = hipMemsetParams{};
-                    expandedMemsetNodeParams.dst = static_cast<void*>(expanded);
-                    expandedMemsetNodeParams.elementSize = sizeof(float);
-                    expandedMemsetNodeParams.height = projGeom.dimFFT.y;
-                    expandedMemsetNodeParams.pitch = expandedPitch;
-                    expandedMemsetNodeParams.value = 0;
-                    expandedMemsetNodeParams.width = projGeom.dimFFT.x;
-                    auto expandedMemsetNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddMemsetNode(
-                        &expandedMemsetNode, graph, nullptr, 0, &expandedMemsetNodeParams
-                    ));
-
-                    auto copyProjToexpandedNodeParams = hipMemcpy3DParms{};
-                    std::memset(&copyProjToexpandedNodeParams, 0, sizeof(hipMemcpy3DParms));
-                    copyProjToexpandedNodeParams.srcPos = make_hipPos(0, 0, 0);
-                    copyProjToexpandedNodeParams.srcPtr = make_hipPitchedPtr(
-                        static_cast<void*>(proj), projPitch, projGeom.dim.x, projGeom.dim.y);
-                    copyProjToexpandedNodeParams.dstPos = make_hipPos(0, 0, 0);
-                    copyProjToexpandedNodeParams.dstPtr = make_hipPitchedPtr(
-                        static_cast<void*>(expanded), expandedPitch, projGeom.dimFFT.x, projGeom.dimFFT.y);
-                    copyProjToexpandedNodeParams.extent = make_hipExtent(
-                        projGeom.dim.x * sizeof(float), projGeom.dim.y, 1);
-                    copyProjToexpandedNodeParams.kind = hipMemcpyDeviceToDevice;
-                    hipGraphNode_t copyProjToexpandedDeps[] = {expandedMemsetNode, weightingKernelNode};
-                    auto copyProjToexpandedNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddMemcpyNode(
-                        &copyProjToexpandedNode,
-                        graph,
-                        copyProjToexpandedDeps,
-                        2,
-                        &copyProjToexpandedNodeParams
-                    ));
-
-                    // R2C Fourier-transform projection
-                    auto transformed = transformedProjections.at(branchIdx);
-                    auto transformedPitch = transformedPitches.at(branchIdx);
-                    auto transformedMemsetNodeParams = hipMemsetParams{};
-                    transformedMemsetNodeParams.dst = static_cast<void*>(transformed);
-                    transformedMemsetNodeParams.elementSize = sizeof(float); // elementSize maximum is 4 bytes
-                    transformedMemsetNodeParams.height = projGeom.dimTrans.y;
-                    transformedMemsetNodeParams.pitch = transformedPitch;
-                    transformedMemsetNodeParams.value = 0;
-                    transformedMemsetNodeParams.width = projGeom.dimTrans.x * 2; // hipfftComplex = 2 floats
-                    auto transformedMemsetNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddMemsetNode(
-                        &transformedMemsetNode, graph, nullptr, 0, &transformedMemsetNodeParams
-                    ));
-
-                    // Create a child graph for the forward FFT
-                    auto forwardGraph = hipGraph_t{};
-                    hip_check(hipGraphCreate(&forwardGraph, 0));
-
-                    auto& forward = forwardPlans.at(branchIdx);
-                    hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
-                    hipfft_check(hipfftExecR2C(forward, expanded, transformed));
-                    hip_check(hipStreamEndCapture(stream, &forwardGraph));
-
-                    hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToexpandedNode};
-                    auto forwardNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddChildGraphNode(&forwardNode, graph, forwardDeps, 2, forwardGraph));
-
-                    // Apply filter
-                    auto filterBlocksPerGrid = dim3{
-                        (projGeom.dimTrans.x / threadsPerBlock.x) + 1,
-                        (projGeom.dimTrans.y / threadsPerBlock.y) + 1,
-                        1
-                    };
-                    void* filterApplicationKernelParams[] =
-                    {
-                        static_cast<void*>(&transformed),
-                        static_cast<void*>(&transformedPitch),
-                        static_cast<void*>(&R),
-                        static_cast<void*>(&projGeom.dimTrans)
-                    };
-                    auto filterApplicationKernelNodeParams = hipKernelNodeParams{};
-                    filterApplicationKernelNodeParams.blockDim = threadsPerBlock;
-                    filterApplicationKernelNodeParams.extra = nullptr;
-                    filterApplicationKernelNodeParams.func = reinterpret_cast<void*>(filter_application_kernel);
-                    filterApplicationKernelNodeParams.gridDim = filterBlocksPerGrid;
-                    filterApplicationKernelNodeParams.kernelParams = filterApplicationKernelParams;
-                    filterApplicationKernelNodeParams.sharedMemBytes = 0;
-                    auto filterApplicationKernelNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddKernelNode(
-                        &filterApplicationKernelNode, graph, &forwardNode, 1, &filterApplicationKernelNodeParams
-                    ));
-
-                    hip_check(hipGraphDestroy(forwardGraph));
-
-                    // Create a child graph for the backward FFT
-                    auto backwardGraph = hipGraph_t{};
-                    hip_check(hipGraphCreate(&backwardGraph, 0));
-
-                    // C2R Fourier-transform projection
-                    auto& backward = backwardPlans.at(branchIdx);
-                    hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
-                    hipfft_check(hipfftExecC2R(backward, transformed, expanded));
-                    hip_check(hipStreamEndCapture(stream, &backwardGraph));
-
-                    auto backwardNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddChildGraphNode(
-                        &backwardNode, graph, &filterApplicationKernelNode, 1, backwardGraph
-                    ));
-
-                    // Shrink projection to original size and normalize
-                    auto copyExpandedToProjNodeParams = hipMemcpy3DParms{};
-                    std::memset(&copyExpandedToProjNodeParams, 0, sizeof(hipMemcpy3DParms));
-                    copyExpandedToProjNodeParams.srcPos = make_hipPos(0, 0, 0);
-                    copyExpandedToProjNodeParams.srcPtr = make_hipPitchedPtr(
-                        static_cast<void*>(expanded), expandedPitch, projGeom.dimFFT.x, projGeom.dimFFT.y
-                    );
-                    copyExpandedToProjNodeParams.dstPos = make_hipPos(0, 0, 0);
-                    copyExpandedToProjNodeParams.dstPtr = make_hipPitchedPtr(
-                        static_cast<void*>(proj), projPitch, projGeom.dim.x, projGeom.dim.y
-                    );
-                    copyExpandedToProjNodeParams.extent = make_hipExtent(
-                        projGeom.dim.x * sizeof(float), projGeom.dim.y, 1);
-                    copyExpandedToProjNodeParams.kind = hipMemcpyDeviceToDevice;
-                    auto copyExpandedToProjNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddMemcpyNode(
-                        &copyExpandedToProjNode, graph, &backwardNode, 1, &copyExpandedToProjNodeParams
-                    ));
-
-                    hip_check(hipGraphDestroy(backwardGraph));
-
-                    void* filterNormalizationKernelParams[] =
-                    {
-                        static_cast<void*>(&proj),
-                        static_cast<void*>(&projPitch),
-                        static_cast<void*>(&projGeom.dimFFT.x),
-                        static_cast<void*>(&projGeom.dim)
-                    };
-                    auto filterNormalizationKernelNodeParams = hipKernelNodeParams{};
-                    filterNormalizationKernelNodeParams.blockDim = threadsPerBlock;
-                    filterNormalizationKernelNodeParams.extra = nullptr;
-                    filterNormalizationKernelNodeParams.func = reinterpret_cast<void*>(filter_normalization_kernel);
-                    filterNormalizationKernelNodeParams.gridDim = blocksPerGrid;
-                    filterNormalizationKernelNodeParams.kernelParams = filterNormalizationKernelParams;
-                    filterNormalizationKernelNodeParams.sharedMemBytes = 0;
-                    auto filterNormalizationKernelNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddKernelNode(
-                        &filterNormalizationKernelNode,
-                        graph,
-                        &copyExpandedToProjNode,
-                        1,
-                        &filterNormalizationKernelNodeParams));
-
-                    // Backprojection
-                    auto thetaDeg = projGeom.thetaSign * projGeom.thetaStep * projIdx; // Current angle
-                    auto thetaRad = thetaDeg * std::numbers::pi_v<float> / 180.f; // Convert to radians
-                    auto sinTheta = std::sin(thetaRad);
-                    auto cosTheta = std::cos(thetaRad);
-
-                    auto bpBlockSize = dim3{32u, 8u, 4u};
-                    auto bpBlocks = dim3{
-                        static_cast<std::uint32_t>(volGeom.dim.x / bpBlockSize.x + 1),
-                        static_cast<std::uint32_t>(volGeom.dim.y / bpBlockSize.y + 1),
-                        static_cast<std::uint32_t>(s_N_z / bpBlockSize.z + 1)
-                    };
-
-                    auto& projTex = textureProjections.at(branchIdx);
-
-                    auto z_offset = s_N_z_first * subIdx;
-                    void* backprojectionKernelParams[] =
-                    {
-                        &vol.ptr,
-                        static_cast<void*>(&vol.pitch),
-                        static_cast<void*>(&volGeom.dim),
-                        static_cast<void*>(&s_N_z),
-                        static_cast<void*>(&z_offset),
-                        static_cast<void*>(&volGeom.voxelDim),
-                        static_cast<void*>(&projTex),
-                        static_cast<void*>(&projGeom.minCoord),
-                        static_cast<void*>(&sinTheta),
-                        static_cast<void*>(&cosTheta),
-                        static_cast<void*>(&projGeom.pixelDim),
-                        static_cast<void*>(&projGeom.d_sd),
-                        static_cast<void*>(&projGeom.d_so)
-                    };
-                    auto backprojectionKernelNodeParams = hipKernelNodeParams{};
-                    backprojectionKernelNodeParams.blockDim = bpBlockSize;
-                    backprojectionKernelNodeParams.extra = nullptr;
-                    backprojectionKernelNodeParams.func = reinterpret_cast<void*>(backprojection_kernel);
-                    backprojectionKernelNodeParams.gridDim = bpBlocks;
-                    backprojectionKernelNodeParams.kernelParams = backprojectionKernelParams;
-                    backprojectionKernelNodeParams.sharedMemBytes = 0;
-                    auto backprojectionKernelNode = hipGraphNode_t{};
-                    hip_check(hipGraphAddKernelNode(
-                        &backprojectionKernelNode,
-                        graph,
-                        &filterNormalizationKernelNode,
-                        1,
-                        &backprojectionKernelNodeParams
-                    ));
-                }
-
-                // Instantiate and launch the graph
-                if(batchSize == numBranches)
-                {
-                    if(!graphCreated)
-                    {
-                        hip_check(hipGraphDebugDotPrint(graph, "graph_creation.dot", hipGraphDebugDotFlagsVerbose));
-
-                        hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
-                        hip_check(hipGraphDestroy(graph));
-                        hip_check(hipGraphLaunch(graphExec, graphStream));
-                        graphCreated = true;
-                    }
-                    else
-                    {
-                        // Make sure preceding graph has finished
-                        hip_check(hipStreamSynchronize(graphStream));
-
-                        // Update existing executable graph after each iteration with new input data
-                        auto result = hipGraphExecUpdateResult{};
-                        auto errorNode = hipGraphNode_t{};
-                        hip_check(hipGraphExecUpdate(graphExec, graph, &errorNode, &result));
-                        if(result != hipGraphExecUpdateSuccess)
-                        {
-                            auto msg = std::string{"Failed to update graph: "};
-                            switch(result)
-                            {
-                            case hipGraphExecUpdateError:
-                                msg += "Invalid value.";
-                                break;
-                            case hipGraphExecUpdateErrorFunctionChanged:
-                                msg += "Function of kernel node changed.";
-                                break;
-                            case hipGraphExecUpdateErrorNodeTypeChanged:
-                                msg += "Type of node changed.";
-                                break;
-                            case hipGraphExecUpdateErrorNotSupported:
-                                msg += "Something about the node is not supported.";
-                                break;
-                            case hipGraphExecUpdateErrorParametersChanged:
-                                msg += "Unsupported parameter change.";
-                                break;
-                            case hipGraphExecUpdateErrorTopologyChanged:
-                                msg += "Graph topology changed.";
-                                break;
-                            case hipGraphExecUpdateErrorUnsupportedFunctionChange:
-                                msg += "Unsupported change of kernel node function.";
-                                break;
-                            default:
-                                msg += "Unknown error.";
-                                break;
-                            }
-                            throw std::runtime_error{msg};
-                        }
-                        hip_check(hipGraphDestroy(graph));
-                        hip_check(hipGraphLaunch(graphExec, graphStream));
-                    }
+                    hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
+                    hip_check(hipGraphDestroy(graph));
+                    hip_check(hipGraphLaunch(graphExec, graphStream));
+                    graphCreated = true;
                 }
                 else
                 {
-                    hip_check(hipGraphDebugDotPrint(graph, "graph_creation_final.dot", hipGraphDebugDotFlagsVerbose));
-
-                    // Make sure preceding graphes have finished
+                    // Make sure preceding graph has finished
                     hip_check(hipStreamSynchronize(graphStream));
-                    hip_check(hipGraphExecDestroy(graphExec));
 
-                    // Incomplete batch: topology changed, must instantiate new executable graph
-                    hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
+                    // Update existing executable graph after each iteration with new input data
+                    auto result = hipGraphExecUpdateResult{};
+                    auto errorNode = hipGraphNode_t{};
+                    hip_check(hipGraphExecUpdate(graphExec, graph, &errorNode, &result));
+                    if(result != hipGraphExecUpdateSuccess)
+                    {
+                        auto msg = std::string{"Failed to update graph: "};
+                        switch(result)
+                        {
+                        case hipGraphExecUpdateError:
+                            msg += "Invalid value.";
+                            break;
+                        case hipGraphExecUpdateErrorFunctionChanged:
+                            msg += "Function of kernel node changed.";
+                            break;
+                        case hipGraphExecUpdateErrorNodeTypeChanged:
+                            msg += "Type of node changed.";
+                            break;
+                        case hipGraphExecUpdateErrorNotSupported:
+                            msg += "Something about the node is not supported.";
+                            break;
+                        case hipGraphExecUpdateErrorParametersChanged:
+                            msg += "Unsupported parameter change.";
+                            break;
+                        case hipGraphExecUpdateErrorTopologyChanged:
+                            msg += "Graph topology changed.";
+                            break;
+                        case hipGraphExecUpdateErrorUnsupportedFunctionChange:
+                            msg += "Unsupported change of kernel node function.";
+                            break;
+                        default:
+                            msg += "Unknown error.";
+                            break;
+                        }
+                        throw std::runtime_error{msg};
+                    }
                     hip_check(hipGraphDestroy(graph));
                     hip_check(hipGraphLaunch(graphExec, graphStream));
                 }
             }
-
-            // Copy volume back to host and save
-            auto memcpyParams = hipMemcpy3DParms{};
-            std::memset(&memcpyParams, 0, sizeof(hipMemcpy3DParms));
-            memcpyParams.dstPos = make_hipPos(0, 0, 0);
-            memcpyParams.dstPtr = hostVol;
-            memcpyParams.srcPos = make_hipPos(0, 0, 0);
-            memcpyParams.srcPtr = vol;
-            memcpyParams.extent = volExt;
-            memcpyParams.kind = hipMemcpyDeviceToHost;
-            hip_check(hipMemcpy3DAsync(&memcpyParams, graphStream));
-            hip_check(hipEventRecord(saveEvent, graphStream));
-            
-            auto saveVolArgs = new save_volume_args
+            else
             {
-                "volume.tif",
-                hostVolPtr,
-                volGeom.dim.x, volGeom.dim.y, volGeom.dim.z, s_N_z,
-                volGeom.voxelDim.x, volGeom.voxelDim.y
-            };
-            hip_check(hipStreamWaitEvent(saveStream, saveEvent));
-            hip_check(hipLaunchHostFunc(saveStream, save_volume, saveVolArgs));
+                hip_check(hipGraphDebugDotPrint(graph, "graph_creation_final.dot", hipGraphDebugDotFlagsVerbose));
+
+                // Make sure preceding graph has finished
+                hip_check(hipStreamSynchronize(graphStream));
+                hip_check(hipGraphExecDestroy(graphExec));
+
+                // Incomplete batch: topology changed, must instantiate new executable graph
+                hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
+                hip_check(hipGraphDestroy(graph));
+                hip_check(hipGraphLaunch(graphExec, graphStream));
+            }
         }
 
+        // Copy volume back to host and save
+        auto memcpyParams = hipMemcpy3DParms{};
+        std::memset(&memcpyParams, 0, sizeof(hipMemcpy3DParms));
+        memcpyParams.dstPos = make_hipPos(0, 0, 0);
+        memcpyParams.dstPtr = hostVol;
+        memcpyParams.srcPos = make_hipPos(0, 0, 0);
+        memcpyParams.srcPtr = vol;
+        memcpyParams.extent = volExt;
+        memcpyParams.kind = hipMemcpyDeviceToHost;
+        hip_check(hipMemcpy3DAsync(&memcpyParams, graphStream));
+        
+        auto saveVolArgs = new save_volume_args
+        {
+            "volume.tif",
+            hostVolPtr,
+            volGeom.dim.x, volGeom.dim.y, volGeom.dim.z,
+            volGeom.voxelDim.x, volGeom.voxelDim.y
+        };
+        hip_check(hipLaunchHostFunc(graphStream, save_volume, saveVolArgs));
+
         std::cout << "All work items enqueued, waiting for completion... ";
-        hip_check(hipStreamSynchronize(saveStream));
+        hip_check(hipStreamSynchronize(graphStream));
         auto stop = std::chrono::steady_clock::now();
         std::cout << "Done!" << std::endl;
         auto const elapsed = std::chrono::duration<double>{stop - start};
@@ -717,9 +667,6 @@ auto main() -> int
 
         for(auto&& p : phantomProjections)
             hip_check(hipFree(p.ptr));
-
-        hip_check(hipEventDestroy(saveEvent));
-        hip_check(hipStreamDestroy(saveStream));
 
         hip_check(hipFree(R));
 

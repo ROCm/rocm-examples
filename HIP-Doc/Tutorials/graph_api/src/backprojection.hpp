@@ -32,8 +32,6 @@ __global__ void backprojection_kernel(
     float* __restrict__ vol,
     std::size_t pitch,
     ulonglong3 volDim,
-    std::size_t s_N_z,
-    std::size_t zOffset,
     float3 voxelDim,
     hipTextureObject_t proj,
     float2 minCoord,
