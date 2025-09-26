@@ -21,7 +21,6 @@
 // SOFTWARE.
 
 #include "backprojection.hpp"
-#include "dataset.hpp"
 #include "filtering.hpp"
 #include "log_transform.hpp"
 #include "normalization.hpp"
@@ -42,39 +41,16 @@
 #include <cstdint>
 #include <cstdlib>
 #include <cstring>
-#include <filesystem>
 #include <iostream>
 #include <numbers>
 #include <set>
 #include <stdexcept>
 #include <vector>
 
-#ifndef DATA_DIRECTORY
-#define DATA_DIRECTORY "hip_graph_api_tutorial_data"
-#endif
-
-auto main(int argc, char** argv) -> int
+auto main() -> int
 {
     try
     {
-        auto useDataset = false;
-        if(argc > 1)
-        {
-            if(argc > 2)
-            {
-                std::cerr << "Too many options passed. --dataset is the only valid option." << std::endl;
-                return EXIT_FAILURE;
-            }
-
-            if(std::strcmp(argv[1], "--dataset") != 0)
-            {
-                std::cerr << "Invalid option passed. --dataset is the only valid option." << std::endl;
-                return EXIT_FAILURE;
-            }
-            
-            useDataset = true;
-        }
-
         // Fetch device properties
         auto devProps = hipDeviceProp_t{};
         hip_check(hipGetDeviceProperties(&devProps, 0));
@@ -90,8 +66,6 @@ auto main(int argc, char** argv) -> int
         for(auto&& stream : streams)
             hip_check(hipStreamCreate(&stream));
 
-        auto projGeom = projectionGeometry{};
-        auto volGeom = volumeGeometry{};
         auto numSubvols = int{}; // number of subvolumes
         auto sub_N_z  = std::vector<std::size_t>{}; // number of voxels in z direction for each subvolume
 
@@ -107,9 +81,6 @@ auto main(int argc, char** argv) -> int
         backwardPlans.resize(numBranches);
         backwardSizes.resize(numBranches);
 
-        auto hostInputs = std::vector<std::uint16_t*>{};
-        auto inputProjections = std::vector<std::uint16_t*>{};
-        auto inputPitches = std::vector<std::size_t>{};
         auto projections = std::vector<float*>{};
         auto projectionPitches = std::vector<std::size_t>{};
         auto expandedProjections = std::vector<float*>{};
@@ -121,39 +92,9 @@ auto main(int argc, char** argv) -> int
         auto saveStream = hipStream_t{};
         auto saveEvent = hipEvent_t{};
 
-        // A directory iterator is not guaranteed to go through the elements alphabetically (or another way of sorting).
-        // Using a set for the paths guarantees alphabetical ordering.
-        auto paths = std::set<std::filesystem::path>{};
-        if(useDataset)
-        {
-            auto const dataPath = std::filesystem::path{DATA_DIRECTORY};
-            auto dataIt = std::filesystem::directory_iterator{dataPath};
-            for(auto& entry : dataIt)
-                paths.insert(entry.path());
-        }
-
-        auto phantomProjections = std::vector<hipPitchedPtr>{};
-        if(!useDataset)
-        {
-            projGeom = phantom::make_projectionGeometry();
-            volGeom = phantom::make_volumeGeometry();
-            phantomProjections = phantom::make_projections(projGeom, volGeom);
-        }
-        else
-        {
-            // Load first projection and obtain geometry from there
-            for(auto const& path : paths)
-            {
-                if(path.extension() != std::filesystem::path{".tif"})
-                    continue;
-                else
-                {
-                    projGeom = dataset::make_projectionGeometry(path.string());
-                    volGeom = dataset::make_volumeGeometry(projGeom);
-                    break;
-                }
-            }
-        }
+        auto projGeom = phantom::make_projectionGeometry();
+        auto volGeom = phantom::make_volumeGeometry();
+        auto phantomProjections = phantom::make_projections(projGeom, volGeom);
         
         std::cout << "Initializing... ";
 
@@ -180,7 +121,7 @@ auto main(int argc, char** argv) -> int
 
         /* Estimate number of subvolumes. We will split the volume along the z axis */
         auto const inputProjSingle = projGeom.dim.x * projGeom.dim.y * sizeof(std::uint16_t);
-        auto const inputProjTotal = inputProjSingle * 2u * numBranches;
+        auto const inputProjTotal = inputProjSingle * numBranches;
         auto const projSingle = projGeom.dim.x * projGeom.dim.y * sizeof(float);
         auto const projTotal = projSingle * numBranches;
         auto const expandedSingle = projGeom.dimFFT.x * projGeom.dimFFT.y * sizeof(float);
@@ -235,28 +176,6 @@ auto main(int argc, char** argv) -> int
         {
             std::cout << "Initializing branch #" << branchIdx << "...";
             auto stream = streams.at(branchIdx);
-
-            if(useDataset)
-            {
-                auto hostInput = static_cast<std::uint16_t*>(nullptr);
-                hip_check(hipHostMalloc(
-                    reinterpret_cast<void**>(&hostInput),
-                    projGeom.dim.x * projGeom.dim.y * sizeof(std::uint16_t),
-                    hipHostMallocWriteCombined
-                ));
-                hostInputs.push_back(hostInput);
-
-                auto input = static_cast<std::uint16_t*>(nullptr);
-                auto inputPitch = std::size_t{};
-                hip_check(hipMallocPitch(
-                    reinterpret_cast<void**>(&input),
-                    &inputPitch,
-                    projGeom.dim.x * sizeof(std::uint16_t),
-                    projGeom.dim.y
-                ));
-                inputProjections.push_back(input);
-                inputPitches.push_back(inputPitch);
-            }
 
             auto proj = static_cast<float*>(nullptr);
             auto projPitch = std::size_t{};
@@ -380,7 +299,6 @@ auto main(int argc, char** argv) -> int
             }, subIdxInfo));
             hip_check(hipMemset3DAsync(vol, 0, volExt, graphStream));
 
-            auto pathsIt = std::begin(paths);
             auto projIdx = 0;
             while(projIdx < projGeom.numProj)
             {
@@ -395,73 +313,14 @@ auto main(int argc, char** argv) -> int
                 {
                     auto stream = streams.at(branchIdx);
 
-                    auto input = static_cast<std::uint16_t*>(nullptr);
-                    auto inputPitch = std::size_t{};
-                    auto copyInputNode = hipGraphNode_t{};
-                    if(!useDataset)
-                    {
-                        auto inputPitchedPtr = phantomProjections.at(projIdx);
-                        input = static_cast<std::uint16_t*>(inputPitchedPtr.ptr);
-                        inputPitch = inputPitchedPtr.pitch;
-                        hip_check(hipGraphAddEmptyNode(&copyInputNode, graph, nullptr, 0));
-                    }
-                    else
-                    {
-                        // Skip non-tif files
-                        while(pathsIt != std::end(paths) && pathsIt->extension() != std::filesystem::path{".tif"})
-                            ++pathsIt;
-
-                        if(pathsIt == std::end(paths))
-                        {
-                            std::cerr << "Warning: Unexpected end of input files." << std::endl;
-                            break;
-                        }
-
-                        // Using a pointer here ensures that the arguments live beyond the scope of a loop iteration.
-                        // The pointer will be deleted inside load_projection().
-                        auto path = *pathsIt;
-                        auto loadProjArgs = new load_projection_args
-                        {
-                            path.string(),
-                            projGeom.dim.x,
-                            projGeom.dim.y,
-                            hostInputs.at(branchIdx)
-                        };
-                        auto loadProjNodeParams = hipHostNodeParams{};
-                        loadProjNodeParams.fn = load_projection;
-                        loadProjNodeParams.userData = static_cast<void*>(loadProjArgs);
-                        auto loadProjNode = hipGraphNode_t{};
-                        hip_check(hipGraphAddHostNode(&loadProjNode, graph, nullptr, 0, &loadProjNodeParams));
-
-                        auto hostInput = hostInputs.at(branchIdx);
-                        input = inputProjections.at(branchIdx);
-                        inputPitch = inputPitches.at(branchIdx);
-                        auto copyInputNodeParams = hipMemcpy3DParms{};
-                        std::memset(&copyInputNodeParams, 0, sizeof(hipMemcpy3DParms));
-                        copyInputNodeParams.srcPos = make_hipPos(0, 0, 0);
-                        copyInputNodeParams.srcPtr = make_hipPitchedPtr(
-                            static_cast<void*>(hostInput),
-                            projGeom.dim.x * sizeof(std::uint16_t),
-                            projGeom.dim.x,
-                            projGeom.dim.y
-                        );
-                        copyInputNodeParams.dstPos = make_hipPos(0, 0, 0);
-                        copyInputNodeParams.dstPtr = make_hipPitchedPtr(
-                            static_cast<void*>(input), inputPitch, projGeom.dim.x, projGeom.dim.y
-                        );
-                        copyInputNodeParams.extent = make_hipExtent(
-                            projGeom.dim.x * sizeof(std::uint16_t), projGeom.dim.y, 1
-                        );
-                        copyInputNodeParams.kind = hipMemcpyHostToDevice;
-                        hip_check(hipGraphAddMemcpyNode(
-                            &copyInputNode, graph, &loadProjNode, 1, &copyInputNodeParams
-                        ));
-                    }
-
                     auto threadsPerBlock = dim3{32, 32, 1};
                     auto blocksPerGrid = dim3{
                         (projGeom.dim.x / threadsPerBlock.x) + 1, (projGeom.dim.y / threadsPerBlock.y) + 1, 1
                     };
+
+                    auto inputPitchedPtr = phantomProjections.at(projIdx);
+                    auto input = static_cast<std::uint16_t*>(inputPitchedPtr.ptr);
+                    auto inputPitch = inputPitchedPtr.pitch;
 
                     auto proj = projections.at(branchIdx);
                     auto projPitch = projectionPitches.at(branchIdx);
@@ -484,7 +343,7 @@ auto main(int argc, char** argv) -> int
                     normalizationKernelNodeParams.sharedMemBytes = 0;
                     auto normalizationKernelNode = hipGraphNode_t{};
                     hip_check(hipGraphAddKernelNode(
-                        &normalizationKernelNode, graph, &copyInputNode, 1, &normalizationKernelNodeParams
+                        &normalizationKernelNode, graph, nullptr, 0, &normalizationKernelNodeParams
                     ));
 
                     void* logTransformationKernelParams[] =
@@ -727,9 +586,6 @@ auto main(int argc, char** argv) -> int
                         1,
                         &backprojectionKernelNodeParams
                     ));
-
-                    if(useDataset)
-                        ++pathsIt;
                 }
 
                 // Instantiate and launch the graph
@@ -859,19 +715,8 @@ auto main(int argc, char** argv) -> int
         for(auto&& p : projections)
             hip_check(hipFree(p));
 
-        if(useDataset)
-        {
-            for(auto&& p : inputProjections)
-                hip_check(hipFree(p));
-
-            for(auto&& p : hostInputs)
-                hip_check(hipFreeHost(p));
-        }
-        else
-        {
-            for(auto&& p : phantomProjections)
-                hip_check(hipFree(p.ptr));
-        }
+        for(auto&& p : phantomProjections)
+            hip_check(hipFree(p.ptr));
 
         hip_check(hipEventDestroy(saveEvent));
         hip_check(hipStreamDestroy(saveStream));
@@ -882,11 +727,6 @@ auto main(int argc, char** argv) -> int
             hip_check(hipStreamDestroy(stream));
 
         return EXIT_SUCCESS;
-    }
-    catch(std::filesystem::filesystem_error const& e)
-    {
-        std::cerr << "Caught filesystem error: " << e.what() << " (" << e.code() << ')' << std::endl;
-        return EXIT_FAILURE;
     }
     catch(std::runtime_error const& e)
     {
