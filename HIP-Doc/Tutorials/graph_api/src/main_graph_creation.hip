@@ -556,7 +556,7 @@ auto main() -> int
                 else
                 {
                     // Make sure preceding graph has finished
-                    hip_check(hipStreamSynchronize(graphStream));
+                    // hip_check(hipStreamSynchronize(graphStream));
 
                     // Update existing executable graph after each iteration with new input data
                     auto result = hipGraphExecUpdateResult{};
