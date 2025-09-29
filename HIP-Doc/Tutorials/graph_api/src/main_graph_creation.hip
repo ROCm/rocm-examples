@@ -250,6 +250,8 @@ auto main() -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         auto graphCreated = false;
         auto graphExec = hipGraphExec_t{};
+        auto graphFinalCreated = false;
+        auto graphExecFinal = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
         hip_check(hipStreamCreate(&graphStream));
 
@@ -555,9 +557,6 @@ auto main() -> int
                 }
                 else
                 {
-                    // Make sure preceding graph has finished
-                    // hip_check(hipStreamSynchronize(graphStream));
-
                     // Update existing executable graph after each iteration with new input data
                     auto result = hipGraphExecUpdateResult{};
                     auto errorNode = hipGraphNode_t{};
@@ -602,16 +601,22 @@ auto main() -> int
             {
                 hip_check(hipGraphDebugDotPrint(graph, "graph_creation_final.dot", hipGraphDebugDotFlagsVerbose));
 
-                // Make sure preceding graph has finished
-                hip_check(hipStreamSynchronize(graphStream));
-                hip_check(hipGraphExecDestroy(graphExec));
-
                 // Incomplete batch: topology changed, must instantiate new executable graph
-                hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
+                hip_check(hipGraphInstantiate(&graphExecFinal, graph, nullptr, nullptr, 0));
                 hip_check(hipGraphDestroy(graph));
-                hip_check(hipGraphLaunch(graphExec, graphStream));
+                hip_check(hipGraphLaunch(graphExecFinal, graphStream));
+
+                graphFinalCreated = true;
             }
         }
+
+        // Obtain reconstruction time before copying back the result
+        auto stop = std::chrono::steady_clock::time_point{};
+        hip_check(hipLaunchHostFunc(graphStream, [](void* data)
+        {
+            auto& stop = *(static_cast<std::chrono::steady_clock::time_point*>(data));
+            stop = std::chrono::steady_clock::now();
+        }, static_cast<void*>(&stop)));
 
         // Copy volume back to host and save
         auto memcpyParams = hipMemcpy3DParms{};
@@ -635,12 +640,14 @@ auto main() -> int
 
         std::cout << "All work items enqueued, waiting for completion... ";
         hip_check(hipStreamSynchronize(graphStream));
-        auto stop = std::chrono::steady_clock::now();
         std::cout << "Done!" << std::endl;
+
         auto const elapsed = std::chrono::duration<double>{stop - start};
         std::cout << "Reconstruction time: " << elapsed << std::endl;
 
         // Cleanup
+        if(graphFinalCreated)
+            hip_check(hipGraphExecDestroy(graphExecFinal));
         hip_check(hipGraphExecDestroy(graphExec));
         hip_check(hipStreamDestroy(graphStream));
 

@@ -404,6 +404,14 @@ auto main() -> int
         for(auto&& event : completionEvents)
             hip_check(hipStreamWaitEvent(streams.at(0), event));
 
+        // Obtain reconstruction time before copying back the result
+        auto stop = std::chrono::steady_clock::time_point{};
+        hip_check(hipLaunchHostFunc(streams.at(0), [](void* data)
+        {
+            auto& stop = *(static_cast<std::chrono::steady_clock::time_point*>(data));
+            stop = std::chrono::steady_clock::now();
+        }, static_cast<void*>(&stop)));
+
         // Copy volume back to host and save
         auto memcpyParams = hipMemcpy3DParms{};
         std::memset(&memcpyParams, 0, sizeof(hipMemcpy3DParms));
@@ -426,8 +434,8 @@ auto main() -> int
 
         std::cout << "All work items enqueued, waiting for completion... ";
         hip_check(hipStreamSynchronize(streams.at(0)));
-        auto stop = std::chrono::steady_clock::now();
         std::cout << "Done!" << std::endl;
+
         auto const elapsed = std::chrono::duration<double>{stop - start};
         std::cout << "Reconstruction time: " << elapsed << std::endl;
 
