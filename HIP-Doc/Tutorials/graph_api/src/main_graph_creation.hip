@@ -362,7 +362,7 @@ auto main() -> int
                 expandedMemsetNodeParams.width = projGeom.dimFFT.x;
                 auto expandedMemsetNode = hipGraphNode_t{};
                 hip_check(hipGraphAddMemsetNode(
-                    &expandedMemsetNode, graph, nullptr, 0, &expandedMemsetNodeParams
+                    &expandedMemsetNode, graph, &weightingKernelNode, 1, &expandedMemsetNodeParams
                 ));
 
                 auto copyProjToExpandedNodeParams = hipMemcpy3DParms{};
@@ -376,13 +376,12 @@ auto main() -> int
                 copyProjToExpandedNodeParams.extent = make_hipExtent(
                     projGeom.dim.x * sizeof(float), projGeom.dim.y, 1);
                 copyProjToExpandedNodeParams.kind = hipMemcpyDeviceToDevice;
-                hipGraphNode_t copyProjToExpandedDeps[] = {expandedMemsetNode, weightingKernelNode};
                 auto copyProjToExpandedNode = hipGraphNode_t{};
                 hip_check(hipGraphAddMemcpyNode(
                     &copyProjToExpandedNode,
                     graph,
-                    copyProjToExpandedDeps,
-                    2,
+                    &expandedMemsetNode,
+                    1,
                     &copyProjToExpandedNodeParams
                 ));
 
@@ -398,7 +397,7 @@ auto main() -> int
                 transformedMemsetNodeParams.width = projGeom.dimTrans.x * 2; // hipfftComplex = 2 floats
                 auto transformedMemsetNode = hipGraphNode_t{};
                 hip_check(hipGraphAddMemsetNode(
-                    &transformedMemsetNode, graph, nullptr, 0, &transformedMemsetNodeParams
+                    &transformedMemsetNode, graph, &copyProjToExpandedNode, 1, &transformedMemsetNodeParams
                 ));
 
                 // Before capturing the FFT operations, obtain the set of nodes already present in the graph
@@ -411,9 +410,8 @@ auto main() -> int
                     std::begin(nodesBeforeForward), std::end(nodesBeforeForward)
                 };
 
-                hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToExpandedNode};
                 hip_check(hipStreamBeginCaptureToGraph(
-                    stream, graph, forwardDeps, nullptr, 2, hipStreamCaptureModeGlobal));
+                    stream, graph, &transformedMemsetNode, nullptr, 1, hipStreamCaptureModeGlobal));
 
                 auto& forward = forwardPlans.at(branchIdx);
                 hipfft_check(hipfftExecR2C(forward, expanded, transformed));
