@@ -43,6 +43,7 @@
 #include <cstring>
 #include <iostream>
 #include <numbers>
+#include <ostream>
 #include <set>
 #include <stdexcept>
 #include <vector>
@@ -90,7 +91,7 @@ auto main() -> int
         auto volGeom = phantom::make_volumeGeometry();
         auto phantomProjections = phantom::make_projections(projGeom, volGeom);
         
-        std::cout << "Initializing... ";
+        std::cout << "Initializing... " << std::flush;
 
         auto stream = streams.at(0);
 
@@ -143,7 +144,7 @@ auto main() -> int
         // Initialize per-branch data
         for(auto branchIdx = 0; branchIdx < numBranches; ++branchIdx)
         {
-            std::cout << "Initializing branch #" << branchIdx << "...";
+            std::cout << "Initializing branch #" << branchIdx << "... " << std::flush;
             auto stream = streams.at(branchIdx);
 
             auto proj = static_cast<float*>(nullptr);
@@ -638,7 +639,7 @@ auto main() -> int
         };
         hip_check(hipLaunchHostFunc(graphStream, save_volume, saveVolArgs));
 
-        std::cout << "All work items enqueued, waiting for completion... ";
+        std::cout << "All work items enqueued, waiting for completion... " << std::flush;
         hip_check(hipStreamSynchronize(graphStream));
         std::cout << "Done!" << std::endl;
 

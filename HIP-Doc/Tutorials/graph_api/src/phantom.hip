@@ -36,6 +36,7 @@
 #include <iostream>
 #include <limits>
 #include <numbers>
+#include <ostream>
 #include <vector>
 
 struct spheroid
@@ -483,7 +484,7 @@ namespace phantom
     auto make_projections(
         projectionGeometry const& projGeom, volumeGeometry const& volGeom) noexcept(false) -> std::vector<hipPitchedPtr>
     {
-        std::cout << "Generating dataset... ";
+        std::cout << "Generating dataset... " << std::flush;
 
         auto volume = create_phantom(volGeom.dim, volGeom.voxelDim);
 
