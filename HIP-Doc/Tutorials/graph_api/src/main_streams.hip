@@ -472,6 +472,8 @@ auto main() -> int
         for(auto&& stream : streams)
             hip_check(hipStreamDestroy(stream));
 
+        hip_check(hipDeviceSynchronize());
+
         return EXIT_SUCCESS;
     }
     catch(std::runtime_error const& e)
