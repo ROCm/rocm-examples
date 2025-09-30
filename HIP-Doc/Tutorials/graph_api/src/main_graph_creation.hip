@@ -42,6 +42,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <iterator>
 #include <numbers>
 #include <ostream>
 #include <set>
@@ -249,8 +250,10 @@ auto main() -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // MAIN LOOP
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        auto graphsCreated = false;
-        auto graphExecs = std::vector<hipGraphExec_t>{};
+        auto graphCreated = false;
+        auto graphExec = hipGraphExec_t{};
+        auto graphFinalCreated = false;
+        auto graphExecFinal = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
         hip_check(hipStreamCreate(&graphStream));
 
@@ -261,17 +264,14 @@ auto main() -> int
         {
             auto batchSize = std::min(numBranches, static_cast<int>(projGeom.numProj - projIdx));
 
-            // Create separate graph for each batch item
-            auto graphs = std::vector<hipGraph_t>{};
-            graphs.resize(batchSize);
-            for(auto&& graph : graphs)
-                hip_check(hipGraphCreate(&graph, 0));
+            // Create graph for current batch
+            auto graph = hipGraph_t{};
+            hip_check(hipGraphCreate(&graph, 0));
 
             // Add nodes for each projection in batch
             for(auto branchIdx = 0; branchIdx < batchSize; ++branchIdx, ++projIdx)
             {
                 auto stream = streams.at(branchIdx);
-                auto graph = graphs.at(branchIdx);
 
                 auto threadsPerBlock = dim3{32, 32, 1};
                 auto blocksPerGrid = dim3{
@@ -401,22 +401,50 @@ auto main() -> int
                     &transformedMemsetNode, graph, nullptr, 0, &transformedMemsetNodeParams
                 ));
 
-                // Capture the forward FFT operations into a separate graph
-                hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToExpandedNode};
-                auto forwardGraph = hipGraph_t{};
-                hip_check(hipGraphCreate(&forwardGraph, 0));
+                // Before capturing the FFT operations, obtain the set of nodes already present in the graph
+                auto nodesBeforeForward = std::vector<hipGraphNode_t>{};
+                auto numNodesBeforeForward = std::size_t{};
+                hip_check(hipGraphGetNodes(graph, nullptr, &numNodesBeforeForward));
+                nodesBeforeForward.resize(numNodesBeforeForward);
+                hip_check(hipGraphGetNodes(graph, nodesBeforeForward.data(), &numNodesBeforeForward));
+                auto nodesBeforeForwardSorted = std::set<hipGraphNode_t>{
+                    std::begin(nodesBeforeForward), std::end(nodesBeforeForward)
+                };
 
-                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
+                hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToExpandedNode};
+                hip_check(hipStreamBeginCaptureToGraph(
+                    stream, graph, forwardDeps, nullptr, 2, hipStreamCaptureModeGlobal));
 
                 auto& forward = forwardPlans.at(branchIdx);
                 hipfft_check(hipfftExecR2C(forward, expanded, transformed));
 
-                hip_check(hipStreamEndCapture(stream, &forwardGraph));
+                hip_check(hipStreamEndCapture(stream, &graph));
 
-                // Add as child graph to current graph
-                auto forwardNode = hipGraphNode_t{};
-                hip_check(hipGraphAddChildGraphNode(&forwardNode, graph, forwardDeps, 2, forwardGraph));
-                hip_check(hipGraphDestroy(forwardGraph));
+                auto is_leaf = [](hipGraphNode_t node)
+                {
+                    auto numDependentNodes = std::size_t{};
+                    hip_check(hipGraphNodeGetDependentNodes(node, nullptr, &numDependentNodes));
+                    return numDependentNodes == 0;
+                };
+
+                // Obtain nodes in graph again, the new nodes will be our dependencies for the next step
+                auto nodesAfterForward = std::vector<hipGraphNode_t>{};
+                auto numNodesAfterForward = std::size_t{};
+                hip_check(hipGraphGetNodes(graph, nullptr, &numNodesAfterForward));
+                nodesAfterForward.resize(numNodesAfterForward);
+                hip_check(hipGraphGetNodes(graph, nodesAfterForward.data(), &numNodesAfterForward));
+                auto nodesAfterForwardSorted = std::set<hipGraphNode_t>{
+                    std::begin(nodesAfterForward), std::end(nodesAfterForward)
+                };
+
+                // Compute difference between both sets
+                auto forwardFFTNodes = std::vector<hipGraphNode_t>{};
+                std::set_difference(std::begin(nodesAfterForwardSorted), std::end(nodesAfterForwardSorted),
+                                    std::begin(nodesBeforeForwardSorted), std::end(nodesBeforeForwardSorted),
+                                    std::back_inserter(forwardFFTNodes));
+
+                // Find leaf node in difference set
+                auto forwardLeafNode = *(std::find_if(std::begin(forwardFFTNodes), std::end(forwardFFTNodes), is_leaf));
 
                 // Apply filter
                 auto filterBlocksPerGrid = dim3{
@@ -440,23 +468,44 @@ auto main() -> int
                 filterApplicationKernelNodeParams.sharedMemBytes = 0;
                 auto filterApplicationKernelNode = hipGraphNode_t{};
                 hip_check(hipGraphAddKernelNode(
-                    &filterApplicationKernelNode, graph, &forwardNode, 1, &filterApplicationKernelNodeParams
+                    &filterApplicationKernelNode, graph, &forwardLeafNode, 1, &filterApplicationKernelNodeParams
                 ));
 
-                // C2R Fourier-transform projection - again as child graph
-                auto backwardGraph = hipGraph_t{};
-                hip_check(hipGraphCreate(&backwardGraph, 0));
+                // C2R Fourier-transform projection - same node counting procedure as above
+                auto nodesBeforeBackward = std::vector<hipGraphNode_t>{};
+                auto numNodesBeforeBackward = std::size_t{};
+                hip_check(hipGraphGetNodes(graph, nullptr, &numNodesBeforeBackward));
+                nodesBeforeBackward.resize(numNodesBeforeBackward);
+                hip_check(hipGraphGetNodes(graph, nodesBeforeBackward.data(), &numNodesBeforeBackward));
+                auto nodesBeforeBackwardSorted = std::set<hipGraphNode_t>{
+                    std::begin(nodesBeforeBackward), std::end(nodesBeforeBackward)
+                };
 
-                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
+                hip_check(hipStreamBeginCaptureToGraph(
+                    stream, graph, &filterApplicationKernelNode, nullptr, 1, hipStreamCaptureModeGlobal
+                ));
 
                 auto& backward = backwardPlans.at(branchIdx);
                 hipfft_check(hipfftExecC2R(backward, transformed, expanded));
 
-                hip_check(hipStreamEndCapture(stream, &backwardGraph));
+                hip_check(hipStreamEndCapture(stream, &graph));
 
-                auto backwardNode = hipGraphNode_t{};
-                hip_check(hipGraphAddChildGraphNode(
-                    &backwardNode, graph, &filterApplicationKernelNode, 1, backwardGraph
+                auto nodesAfterBackward = std::vector<hipGraphNode_t>{};
+                auto numNodesAfterBackward = std::size_t{};
+                hip_check(hipGraphGetNodes(graph, nullptr, &numNodesAfterBackward));
+                nodesAfterBackward.resize(numNodesAfterBackward);
+                hip_check(hipGraphGetNodes(graph, nodesAfterBackward.data(), &numNodesAfterBackward));
+                auto nodesAfterBackwardSorted = std::set<hipGraphNode_t>{
+                    std::begin(nodesAfterBackward), std::end(nodesAfterBackward)
+                };
+
+                auto backwardFFTNodes = std::vector<hipGraphNode_t>{};
+                std::set_difference(std::begin(nodesAfterBackwardSorted), std::end(nodesAfterBackwardSorted),
+                                    std::begin(nodesBeforeBackwardSorted), std::end(nodesBeforeBackwardSorted),
+                                    std::back_inserter(backwardFFTNodes));
+
+                auto backwardLeafNode = *(
+                    std::find_if(std::begin(backwardFFTNodes), std::end(backwardFFTNodes), is_leaf
                 ));
 
                 // Shrink projection to original size and normalize
@@ -475,7 +524,7 @@ auto main() -> int
                 copyExpandedToProjNodeParams.kind = hipMemcpyDeviceToDevice;
                 auto copyExpandedToProjNode = hipGraphNode_t{};
                 hip_check(hipGraphAddMemcpyNode(
-                    &copyExpandedToProjNode, graph, &backwardNode, 1, &copyExpandedToProjNodeParams
+                    &copyExpandedToProjNode, graph, &backwardLeafNode, 1, &copyExpandedToProjNodeParams
                 ));
 
                 void* filterNormalizationKernelParams[] =
@@ -546,32 +595,20 @@ auto main() -> int
                 ));
             }
 
-            // Instantiate and launch the graphs
-            if(!graphsCreated)
+            // Instantiate and launch the graph
+            if(batchSize == numBranches)
             {
-                for(auto branchIdx = 0u; branchIdx < batchSize; ++branchIdx)
+                if(!graphCreated)
                 {
-                    auto& graph = graphs.at(branchIdx);
-                    if(branchIdx == 0u)
-                        hip_check(hipGraphDebugDotPrint(graph, "graph_creation.dot", hipGraphDebugDotFlagsVerbose));
+                    hip_check(hipGraphDebugDotPrint(graph, "graph_creation.dot", hipGraphDebugDotFlagsVerbose));
 
-                    auto& graphExec = graphExecs.emplace_back();
                     hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
                     hip_check(hipGraphDestroy(graph));
-
-                    auto& stream = streams.at(branchIdx);
-                    hip_check(hipGraphLaunch(graphExec, stream));
-                    graphsCreated = true;
+                    hip_check(hipGraphLaunch(graphExec, graphStream));
+                    graphCreated = true;
                 }
-            }
-            else
-            {
-                for(auto branchIdx = 0u; branchIdx < batchSize; ++branchIdx)
+                else
                 {
-                    auto& graph = graphs.at(branchIdx);
-                    auto& graphExec = graphExecs.at(branchIdx);
-                    auto& stream = streams.at(branchIdx);
-
                     // Update existing executable graph after each iteration with new input data
                     auto result = hipGraphExecUpdateResult{};
                     auto errorNode = hipGraphNode_t{};
@@ -609,27 +646,25 @@ auto main() -> int
                         throw std::runtime_error{msg};
                     }
                     hip_check(hipGraphDestroy(graph));
-                    hip_check(hipGraphLaunch(graphExec, stream));
+                    hip_check(hipGraphLaunch(graphExec, graphStream));
                 }
+            }
+            else
+            {
+                hip_check(hipGraphDebugDotPrint(graph, "graph_creation_final.dot", hipGraphDebugDotFlagsVerbose));
+
+                // Incomplete batch: topology changed, must instantiate new executable graph
+                hip_check(hipGraphInstantiate(&graphExecFinal, graph, nullptr, nullptr, 0));
+                hip_check(hipGraphDestroy(graph));
+                hip_check(hipGraphLaunch(graphExecFinal, graphStream));
+
+                graphFinalCreated = true;
             }
         }
 
-        // First stream waits for other streams to complete
-        auto completionEvents = std::vector<hipEvent_t>{};
-        for(auto streamIdx = 1; streamIdx < streams.size(); ++streamIdx)
-        {
-            auto event = hipEvent_t{};
-            hip_check(hipEventCreate(&event));
-            hip_check(hipEventRecord(event, streams.at(streamIdx)));
-            completionEvents.push_back(event);
-        }
-
-        for(auto&& event : completionEvents)
-            hip_check(hipStreamWaitEvent(streams.at(0), event));
-
         // Obtain reconstruction time before copying back the result
         auto stop = std::chrono::steady_clock::time_point{};
-        hip_check(hipLaunchHostFunc(streams.at(0), [](void* data)
+        hip_check(hipLaunchHostFunc(graphStream, [](void* data)
         {
             auto& stop = *(static_cast<std::chrono::steady_clock::time_point*>(data));
             stop = std::chrono::steady_clock::now();
@@ -644,7 +679,7 @@ auto main() -> int
         memcpyParams.srcPtr = vol;
         memcpyParams.extent = volExt;
         memcpyParams.kind = hipMemcpyDeviceToHost;
-        hip_check(hipMemcpy3DAsync(&memcpyParams, streams.at(0)));
+        hip_check(hipMemcpy3DAsync(&memcpyParams, graphStream));
         
         auto saveVolArgs = new save_volume_args
         {
@@ -653,18 +688,20 @@ auto main() -> int
             volGeom.dim.x, volGeom.dim.y, volGeom.dim.z,
             volGeom.voxelDim.x, volGeom.voxelDim.y
         };
-        hip_check(hipLaunchHostFunc(streams.at(0), save_volume, saveVolArgs));
+        hip_check(hipLaunchHostFunc(graphStream, save_volume, saveVolArgs));
 
         std::cout << "All work items enqueued, waiting for completion... " << std::flush;
-        hip_check(hipStreamSynchronize(streams.at(0)));
+        hip_check(hipStreamSynchronize(graphStream));
         std::cout << "Done!" << std::endl;
 
         auto const elapsed = std::chrono::duration<double>{stop - start};
         std::cout << "Reconstruction time: " << elapsed << std::endl;
 
         // Cleanup
-        for(auto&& graphExec : graphExecs)
-            hip_check(hipGraphExecDestroy(graphExec));
+        if(graphFinalCreated)
+            hip_check(hipGraphExecDestroy(graphExecFinal));
+        hip_check(hipGraphExecDestroy(graphExec));
+        hip_check(hipStreamDestroy(graphStream));
 
         hip_check(hipFree(vol.ptr));
         hip_check(hipFreeHost(hostVolPtr));
