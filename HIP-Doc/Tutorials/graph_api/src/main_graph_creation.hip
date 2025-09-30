@@ -61,11 +61,14 @@ auto main() -> int
         std::cout << "Device supports " << numBranches << " asynchronous engines; preprocessing will use "
                   << numBranches << " parallel branches." << std::endl;
         
-        // For interoperability with hipFFT we require streams
+        // For interoperability with hipFFT we require streams and events
         auto streams = std::vector<hipStream_t>{};
         streams.resize(numBranches);
         for(auto&& stream : streams)
             hip_check(hipStreamCreate(&stream));
+
+        auto forwardEvents = std::vector<hipEvent_t>{};
+        auto backwardEvents = std::vector<hipEvent_t>{};
 
         auto r = static_cast<float*>(nullptr);
         auto R = static_cast<hipfftComplex*>(nullptr);
@@ -146,6 +149,14 @@ auto main() -> int
         {
             std::cout << "Initializing branch #" << branchIdx << "... " << std::flush;
             auto stream = streams.at(branchIdx);
+
+            auto forwardEvent = hipEvent_t{};
+            hip_check(hipEventCreate(&forwardEvent));
+            forwardEvents.push_back(forwardEvent);
+
+            auto backwardEvent = hipEvent_t{};
+            hip_check(hipEventCreate(&backwardEvent));
+            backwardEvents.push_back(backwardEvent);
 
             auto proj = static_cast<float*>(nullptr);
             auto projPitch = std::size_t{};
@@ -267,6 +278,10 @@ auto main() -> int
 
             auto batchSize = std::min(numBranches, static_cast<int>(projGeom.numProj - projIdx));
 
+            // Root node for entire graph
+            auto rootNode = hipGraphNode_t{};
+            hip_check(hipGraphAddEmptyNode(&rootNode, graph, nullptr, 0));
+
             // Add nodes for each projection in batch
             for(auto branchIdx = 0; branchIdx < batchSize; ++branchIdx, ++projIdx)
             {
@@ -302,7 +317,7 @@ auto main() -> int
                 normalizationKernelNodeParams.sharedMemBytes = 0;
                 auto normalizationKernelNode = hipGraphNode_t{};
                 hip_check(hipGraphAddKernelNode(
-                    &normalizationKernelNode, graph, nullptr, 0, &normalizationKernelNodeParams
+                    &normalizationKernelNode, graph, &rootNode, 1, &normalizationKernelNodeParams
                 ));
 
                 void* logTransformationKernelParams[] =
@@ -364,25 +379,25 @@ auto main() -> int
                     &expandedMemsetNode, graph, nullptr, 0, &expandedMemsetNodeParams
                 ));
 
-                auto copyProjToexpandedNodeParams = hipMemcpy3DParms{};
-                std::memset(&copyProjToexpandedNodeParams, 0, sizeof(hipMemcpy3DParms));
-                copyProjToexpandedNodeParams.srcPos = make_hipPos(0, 0, 0);
-                copyProjToexpandedNodeParams.srcPtr = make_hipPitchedPtr(
+                auto copyProjToExpandedNodeParams = hipMemcpy3DParms{};
+                std::memset(&copyProjToExpandedNodeParams, 0, sizeof(hipMemcpy3DParms));
+                copyProjToExpandedNodeParams.srcPos = make_hipPos(0, 0, 0);
+                copyProjToExpandedNodeParams.srcPtr = make_hipPitchedPtr(
                     static_cast<void*>(proj), projPitch, projGeom.dim.x, projGeom.dim.y);
-                copyProjToexpandedNodeParams.dstPos = make_hipPos(0, 0, 0);
-                copyProjToexpandedNodeParams.dstPtr = make_hipPitchedPtr(
+                copyProjToExpandedNodeParams.dstPos = make_hipPos(0, 0, 0);
+                copyProjToExpandedNodeParams.dstPtr = make_hipPitchedPtr(
                     static_cast<void*>(expanded), expandedPitch, projGeom.dimFFT.x, projGeom.dimFFT.y);
-                copyProjToexpandedNodeParams.extent = make_hipExtent(
+                copyProjToExpandedNodeParams.extent = make_hipExtent(
                     projGeom.dim.x * sizeof(float), projGeom.dim.y, 1);
-                copyProjToexpandedNodeParams.kind = hipMemcpyDeviceToDevice;
-                hipGraphNode_t copyProjToexpandedDeps[] = {expandedMemsetNode, weightingKernelNode};
-                auto copyProjToexpandedNode = hipGraphNode_t{};
+                copyProjToExpandedNodeParams.kind = hipMemcpyDeviceToDevice;
+                hipGraphNode_t copyProjToExpandedDeps[] = {expandedMemsetNode, weightingKernelNode};
+                auto copyProjToExpandedNode = hipGraphNode_t{};
                 hip_check(hipGraphAddMemcpyNode(
-                    &copyProjToexpandedNode,
+                    &copyProjToExpandedNode,
                     graph,
-                    copyProjToexpandedDeps,
+                    copyProjToExpandedDeps,
                     2,
-                    &copyProjToexpandedNodeParams
+                    &copyProjToExpandedNodeParams
                 ));
 
                 // R2C Fourier-transform projection
@@ -400,18 +415,21 @@ auto main() -> int
                     &transformedMemsetNode, graph, nullptr, 0, &transformedMemsetNodeParams
                 ));
 
-                // Create a child graph for the forward FFT
-                auto forwardGraph = hipGraph_t{};
-                hip_check(hipGraphCreate(&forwardGraph, 0));
+                auto& forwardEvent = forwardEvents.at(branchIdx);
+                hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToExpandedNode};
+
+                hip_check(hipStreamBeginCaptureToGraph(
+                    stream, graph, forwardDeps, nullptr, 2, hipStreamCaptureModeGlobal
+                ));
 
                 auto& forward = forwardPlans.at(branchIdx);
-                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
                 hipfft_check(hipfftExecR2C(forward, expanded, transformed));
-                hip_check(hipStreamEndCapture(stream, &forwardGraph));
+                hip_check(hipEventRecord(forwardEvent, stream));
 
-                hipGraphNode_t forwardDeps[] = {transformedMemsetNode, copyProjToexpandedNode};
-                auto forwardNode = hipGraphNode_t{};
-                hip_check(hipGraphAddChildGraphNode(&forwardNode, graph, forwardDeps, 2, forwardGraph));
+                hip_check(hipStreamEndCapture(stream, &graph));
+
+                auto forwardWaitNode = hipGraphNode_t{};
+                hip_check(hipGraphAddEventWaitNode(&forwardWaitNode, graph, nullptr, 0, forwardEvent));
 
                 // Apply filter
                 auto filterBlocksPerGrid = dim3{
@@ -435,25 +453,24 @@ auto main() -> int
                 filterApplicationKernelNodeParams.sharedMemBytes = 0;
                 auto filterApplicationKernelNode = hipGraphNode_t{};
                 hip_check(hipGraphAddKernelNode(
-                    &filterApplicationKernelNode, graph, &forwardNode, 1, &filterApplicationKernelNodeParams
+                    &filterApplicationKernelNode, graph, &forwardWaitNode, 1, &filterApplicationKernelNodeParams
                 ));
-
-                hip_check(hipGraphDestroy(forwardGraph));
-
-                // Create a child graph for the backward FFT
-                auto backwardGraph = hipGraph_t{};
-                hip_check(hipGraphCreate(&backwardGraph, 0));
 
                 // C2R Fourier-transform projection
+                auto& backwardEvent = backwardEvents.at(branchIdx);
                 auto& backward = backwardPlans.at(branchIdx);
-                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
-                hipfft_check(hipfftExecC2R(backward, transformed, expanded));
-                hip_check(hipStreamEndCapture(stream, &backwardGraph));
 
-                auto backwardNode = hipGraphNode_t{};
-                hip_check(hipGraphAddChildGraphNode(
-                    &backwardNode, graph, &filterApplicationKernelNode, 1, backwardGraph
+                hip_check(hipStreamBeginCaptureToGraph(
+                    stream, graph, &filterApplicationKernelNode, nullptr, 1, hipStreamCaptureModeGlobal
                 ));
+
+                hipfft_check(hipfftExecC2R(backward, transformed, expanded));
+                hip_check(hipEventRecord(backwardEvent, stream));
+
+                hip_check(hipStreamEndCapture(stream, &graph));
+
+                auto backwardWaitNode = hipGraphNode_t{};
+                hip_check(hipGraphAddEventWaitNode(&backwardWaitNode, graph, nullptr, 0, backwardEvent));
 
                 // Shrink projection to original size and normalize
                 auto copyExpandedToProjNodeParams = hipMemcpy3DParms{};
@@ -471,10 +488,8 @@ auto main() -> int
                 copyExpandedToProjNodeParams.kind = hipMemcpyDeviceToDevice;
                 auto copyExpandedToProjNode = hipGraphNode_t{};
                 hip_check(hipGraphAddMemcpyNode(
-                    &copyExpandedToProjNode, graph, &backwardNode, 1, &copyExpandedToProjNodeParams
+                    &copyExpandedToProjNode, graph, &backwardWaitNode, 1, &copyExpandedToProjNodeParams
                 ));
-
-                hip_check(hipGraphDestroy(backwardGraph));
 
                 void* filterNormalizationKernelParams[] =
                 {
@@ -677,6 +692,12 @@ auto main() -> int
             hip_check(hipFree(p.ptr));
 
         hip_check(hipFree(R));
+
+        for(auto&& event : backwardEvents)
+            hip_check(hipEventDestroy(event));
+
+        for(auto&& event : forwardEvents)
+            hip_check(hipEventDestroy(event));
 
         for(auto&& stream : streams)
             hip_check(hipStreamDestroy(stream));
