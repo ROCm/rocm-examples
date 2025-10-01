@@ -78,8 +78,6 @@ auto main() -> int
         backwardPlans.resize(numStreams);
         backwardSizes.resize(numStreams);
 
-        auto inputProjections = std::vector<std::uint16_t*>{};
-        auto inputPitches = std::vector<std::size_t>{};
         auto projections = std::vector<float*>{};
         auto projectionPitches = std::vector<std::size_t>{};
         auto expandedProjections = std::vector<float*>{};
@@ -250,24 +248,29 @@ auto main() -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // MAIN LOOP
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // [sphinx-graph-vars-start]
         auto graphCreated = false;
         auto graphExec = hipGraphExec_t{};
         auto graphFinalCreated = false;
         auto graphExecFinal = hipGraphExec_t{};
         auto graphStream = hipStream_t{};
-
         hip_check(hipStreamCreate(&graphStream));
+        // [sphinx-graph-vars-end]
+
         auto start = std::chrono::steady_clock::now();
             
         auto projIdx = 0;
         while(projIdx < projGeom.numProj)
         {
+            // [sphinx-begin-capture-start]
             // Capture the current batch into a graph template
             auto graph = hipGraph_t{};
             hip_check(hipStreamBeginCapture(streams.at(0), hipStreamCaptureModeGlobal));
+            // [sphinx-begin-capture-end]
 
             auto batchSize = std::min(numStreams, static_cast<int>(projGeom.numProj - projIdx));
 
+            // [sphinx-fork-start]
             // Fork: Record events on stream 0, then have other streams wait
             for(auto streamIdx = 1; streamIdx < batchSize; ++streamIdx)
             {
@@ -277,6 +280,7 @@ auto main() -> int
                 hip_check(hipStreamWaitEvent(streams.at(streamIdx), forkEvent));
                 hip_check(hipEventDestroy(forkEvent)); // Can destroy after wait is recorded
             }
+            // [sphinx-fork-end]
 
             // Launch batch in parallel streams
             for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx)
@@ -298,9 +302,7 @@ auto main() -> int
                     input, inputPitch, proj, projPitch, projGeom.dim, projGeom.bps
                 );
 
-                log_transformation_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
-                    proj, projPitch, projGeom.dim
-                );
+                log_transformation_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(proj, projPitch, projGeom.dim);
 
                 weighting_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
                     proj,
@@ -401,6 +403,7 @@ auto main() -> int
                 );
             }
 
+            // [sphinx-join-start]
             // Join: Record events on all streams except stream 0, then have stream 0 wait
             for(auto streamIdx = 1; streamIdx < batchSize; ++streamIdx)
             {
@@ -410,22 +413,28 @@ auto main() -> int
                 hip_check(hipStreamWaitEvent(streams.at(0), joinEvent));
                 hip_check(hipEventDestroy(joinEvent)); // Can destroy after wait is recorded
             }
+            // [sphinx-join-end]
 
+            // [sphinx-stop-capture-start]
             // Stop capturing -- this will stop capturing on all streams
             hip_check(hipStreamEndCapture(streams.at(0), &graph));
+            // [sphinx-stop-capture-end]
 
             // Instantiate and launch the graph
             if(batchSize == numStreams)
             {
+                // [sphinx-graph-instantiate-start]
                 if(!graphCreated)
                 {
                     hip_check(hipGraphDebugDotPrint(graph, "graph_capture.dot", hipGraphDebugDotFlagsVerbose));
-
+                    
                     hip_check(hipGraphInstantiate(&graphExec, graph, nullptr, nullptr, 0));
                     hip_check(hipGraphDestroy(graph));
                     hip_check(hipGraphLaunch(graphExec, graphStream));
                     graphCreated = true;
                 }
+                // [sphinx-graph-instantiate-end]
+                // [sphinx-graph-update-start]
                 else
                 {
                     // Update existing executable graph after each iteration with new input data
@@ -467,15 +476,18 @@ auto main() -> int
                     hip_check(hipGraphDestroy(graph));
                     hip_check(hipGraphLaunch(graphExec, graphStream));
                 }
+                // [sphinx-graph-update-end]
             }
             else
             {
+                // [sphinx-graph-final-start]
                 hip_check(hipGraphDebugDotPrint(graph, "graph_capture_final.dot", hipGraphDebugDotFlagsVerbose));
 
                 // Incomplete batch: topology changed, must instantiate new executable graph
                 hip_check(hipGraphInstantiate(&graphExecFinal, graph, nullptr, nullptr, 0));
                 hip_check(hipGraphDestroy(graph));
                 hip_check(hipGraphLaunch(graphExecFinal, graphStream));
+                // [sphinx-graph-final-end]
                 
                 graphFinalCreated = true;
             }

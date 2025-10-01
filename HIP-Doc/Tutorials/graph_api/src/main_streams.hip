@@ -52,6 +52,7 @@ auto main() -> int
 {
     try
     {
+        // [sphinx-async-engine-start]
         // Fetch device properties
         auto devProps = hipDeviceProp_t{};
         hip_check(hipGetDeviceProperties(&devProps, 0));
@@ -65,6 +66,7 @@ auto main() -> int
         streams.resize(numStreams);
         for(auto&& stream : streams)
             hip_check(hipStreamCreate(&stream));
+        // [sphinx-async-engine-end]
 
         auto r = static_cast<float*>(nullptr);
         auto R = static_cast<hipfftComplex*>(nullptr);
@@ -250,6 +252,7 @@ auto main() -> int
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         auto start = std::chrono::steady_clock::now();
 
+        // [sphinx-batch-start]
         auto projIdx = 0;
         while(projIdx < projGeom.numProj)
         {
@@ -259,6 +262,7 @@ auto main() -> int
             for(auto streamIdx = 0; streamIdx < batchSize; ++streamIdx, ++projIdx)
             {
                 auto stream = streams.at(streamIdx);
+                // [sphinx-batch-end]
 
                 auto threadsPerBlock = dim3{32, 32, 1};
                 auto blocksPerGrid = dim3{
@@ -392,6 +396,7 @@ auto main() -> int
             }
         }
         
+        // [sphinx-sync-start]
         // First stream waits for other streams to complete
         auto completionEvents = std::vector<hipEvent_t>{};
         for(auto streamIdx = 1; streamIdx < streams.size(); ++streamIdx)
@@ -404,6 +409,7 @@ auto main() -> int
 
         for(auto&& event : completionEvents)
             hip_check(hipStreamWaitEvent(streams.at(0), event));
+        // [sphinx-sync-end]
 
         // Obtain reconstruction time before copying back the result
         auto stop = std::chrono::steady_clock::time_point{};
