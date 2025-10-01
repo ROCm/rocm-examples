@@ -28,6 +28,8 @@
 
 #include <hip/hip_runtime.h>
 
+#include <omp.h>
+
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
@@ -368,7 +370,8 @@ void create_projection(
     volumeGeometry const& volGeom,
     hipPitchedPtr proj,
     projectionGeometry const& projGeom,
-    std::uint32_t projIdx
+    std::uint32_t projIdx,
+    hipStream_t& stream
 ) noexcept
 {
     auto theta = projGeom.thetaSign * projGeom.thetaStep * projIdx;
@@ -413,7 +416,7 @@ void create_projection(
                                                                    projGeom.dim.y / threadsPerBlock.y + 1u;
     blocksPerGrid.z = 1u;
 
-    create_projection_kernel<<<blocksPerGrid, threadsPerBlock>>>(
+    create_projection_kernel<<<blocksPerGrid, threadsPerBlock, 0, stream>>>(
         static_cast<float*>(vol.ptr),
         vol.pitch,
         volGeom.dim,
@@ -482,7 +485,10 @@ namespace phantom
     };
 
     auto make_projections(
-        projectionGeometry const& projGeom, volumeGeometry const& volGeom) noexcept(false) -> std::vector<hipPitchedPtr>
+        projectionGeometry const& projGeom,
+        volumeGeometry const& volGeom,
+        std::vector<hipStream_t>& streams)
+    noexcept(false) -> std::vector<hipPitchedPtr>
     {
         std::cout << "Generating dataset... " << std::flush;
 
@@ -495,11 +501,21 @@ namespace phantom
             auto projPitch = std::size_t{};
             hip_check(hipMallocPitch(
                 reinterpret_cast<void**>(&projPtr), &projPitch, projGeom.dim.x * sizeof(float), projGeom.dim.y));
-            auto proj = make_hipPitchedPtr(projPtr, projPitch, projGeom.dim.x, projGeom.dim.y);
-            
-            create_projection(volume, volGeom, proj, projGeom, projIdx);
-            projections.push_back(proj);
+            projections.push_back(make_hipPitchedPtr(projPtr, projPitch, projGeom.dim.x, projGeom.dim.y));
         }
+
+        auto streamIdx = 0;
+        for(auto projIdx = 0; projIdx < projGeom.numProj; ++projIdx)
+        {
+            auto& stream = streams.at(streamIdx);
+            auto& proj = projections.at(projIdx);
+            
+            create_projection(volume, volGeom, proj, projGeom, projIdx, stream);
+            streamIdx = (streamIdx + 1) % streams.size();
+        }
+
+        for(auto&& stream : streams)
+            hip_check(hipStreamSynchronize(stream));
 
         hip_check(hipFree(volume.ptr));
 
@@ -507,4 +523,3 @@ namespace phantom
         return projections;
     }
 }
-

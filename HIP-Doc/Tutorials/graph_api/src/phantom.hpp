@@ -36,7 +36,8 @@ namespace phantom
     auto make_volumeGeometry() noexcept -> volumeGeometry;
     auto make_projections(
         projectionGeometry const& proj_geom,
-        volumeGeometry const& vol_geom
+        volumeGeometry const& vol_geom,
+        std::vector<hipStream_t>& streams
     ) noexcept(false) -> std::vector<hipPitchedPtr>;
 }
 

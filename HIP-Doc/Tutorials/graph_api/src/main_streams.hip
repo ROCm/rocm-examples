@@ -88,7 +88,7 @@ auto main() -> int
 
         auto projGeom = phantom::make_projectionGeometry();
         auto volGeom = phantom::make_volumeGeometry();
-        auto phantomProjections = phantom::make_projections(projGeom, volGeom);
+        auto phantomProjections = phantom::make_projections(projGeom, volGeom, streams);
 
         std::cout << "Initializing... " << std::flush;
 
