@@ -36,7 +36,7 @@ if(NOT TIFF_FOUND)
     FetchContent_Declare(
         libtiff
         GIT_REPOSITORY https://gitlab.com/libtiff/libtiff.git
-        GIT_TAG v4.7.0)
+        GIT_TAG v4.7.1)
     set(BUILD_SHARED_LIBS "ON")
     FetchContent_MakeAvailable(libtiff)
 
