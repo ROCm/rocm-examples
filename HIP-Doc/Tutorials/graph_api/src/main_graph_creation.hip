@@ -400,7 +400,7 @@ auto main() -> int
                     &transformedMemsetNode, graph, &copyProjToExpandedNode, 1, &transformedMemsetNodeParams
                 ));
 
-                // Before capturing the FFT operations, obtain the set of nodes already present in the graph
+                /*// Before capturing the FFT operations, obtain the set of nodes already present in the graph
                 auto nodesBeforeForward = std::vector<hipGraphNode_t>{};
                 auto numNodesBeforeForward = std::size_t{};
                 hip_check(hipGraphGetNodes(graph, nullptr, &numNodesBeforeForward));
@@ -442,7 +442,22 @@ auto main() -> int
                                     std::back_inserter(forwardFFTNodes));
 
                 // Find leaf node in difference set
-                auto forwardLeafNode = *(std::find_if(std::begin(forwardFFTNodes), std::end(forwardFFTNodes), is_leaf));
+                auto forwardLeafNode = *(std::find_if(std::begin(forwardFFTNodes), std::end(forwardFFTNodes), is_leaf));*/
+
+                auto forwardGraph = hipGraph_t{};
+                hip_check(hipGraphCreate(&forwardGraph, 0));
+
+                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
+
+                auto& forward = forwardPlans.at(branchIdx);
+                hipfft_check(hipfftExecR2C(forward, expanded, transformed));
+
+                hip_check(hipStreamEndCapture(stream, &forwardGraph));
+
+                auto forwardNode = hipGraphNode_t{};
+                hip_check(hipGraphAddChildGraphNode(&forwardNode, graph, &transformedMemsetNode, 1, forwardGraph));
+
+                hip_check(hipGraphDestroy(forwardGraph));
 
                 // Apply filter
                 auto filterBlocksPerGrid = dim3{
@@ -466,11 +481,11 @@ auto main() -> int
                 filterApplicationKernelNodeParams.sharedMemBytes = 0;
                 auto filterApplicationKernelNode = hipGraphNode_t{};
                 hip_check(hipGraphAddKernelNode(
-                    &filterApplicationKernelNode, graph, &forwardLeafNode, 1, &filterApplicationKernelNodeParams
+                    &filterApplicationKernelNode, graph, &forwardNode, 1, &filterApplicationKernelNodeParams
                 ));
 
                 // C2R Fourier-transform projection - same node counting procedure as above
-                auto nodesBeforeBackward = std::vector<hipGraphNode_t>{};
+                /*auto nodesBeforeBackward = std::vector<hipGraphNode_t>{};
                 auto numNodesBeforeBackward = std::size_t{};
                 hip_check(hipGraphGetNodes(graph, nullptr, &numNodesBeforeBackward));
                 nodesBeforeBackward.resize(numNodesBeforeBackward);
@@ -504,7 +519,24 @@ auto main() -> int
 
                 auto backwardLeafNode = *(
                     std::find_if(std::begin(backwardFFTNodes), std::end(backwardFFTNodes), is_leaf
+                ));*/
+
+                auto backwardGraph = hipGraph_t{};
+                hip_check(hipGraphCreate(&backwardGraph, 0));
+
+                hip_check(hipStreamBeginCapture(stream, hipStreamCaptureModeGlobal));
+
+                auto& backward = backwardPlans.at(branchIdx);
+                hipfft_check(hipfftExecC2R(backward, transformed, expanded));
+
+                hip_check(hipStreamEndCapture(stream, &backwardGraph));
+
+                auto backwardNode = hipGraphNode_t{};
+                hip_check(hipGraphAddChildGraphNode(
+                    &backwardNode, graph, &filterApplicationKernelNode, 1, backwardGraph
                 ));
+
+                hip_check(hipGraphDestroy(backwardGraph));
 
                 // Shrink projection to original size and normalize
                 auto copyExpandedToProjNodeParams = hipMemcpy3DParms{};
@@ -522,7 +554,7 @@ auto main() -> int
                 copyExpandedToProjNodeParams.kind = hipMemcpyDeviceToDevice;
                 auto copyExpandedToProjNode = hipGraphNode_t{};
                 hip_check(hipGraphAddMemcpyNode(
-                    &copyExpandedToProjNode, graph, &backwardLeafNode, 1, &copyExpandedToProjNodeParams
+                    &copyExpandedToProjNode, graph, &backwardNode, 1, &copyExpandedToProjNodeParams
                 ));
 
                 void* filterNormalizationKernelParams[] =
