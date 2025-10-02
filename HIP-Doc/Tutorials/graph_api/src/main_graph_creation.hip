@@ -328,6 +328,7 @@ auto main() -> int
                     &logTransformationKernelNodeParams
                 ));
 
+                // [sphinx-weighting-node-start]
                 void* weightingKernelParams[] =
                 {
                     static_cast<void*>(&proj),
@@ -349,10 +350,12 @@ auto main() -> int
                 hip_check(hipGraphAddKernelNode(
                     &weightingKernelNode, graph, &logTransformationKernelNode, 1, &weightingKernelNodeParams
                 ));
+                // [sphinx-weighting-node-end]
 
                 // Expand projection to filter length
                 auto expanded = expandedProjections.at(branchIdx);
                 auto expandedPitch = expandedPitches.at(branchIdx);
+                // [sphinx-memset-node-start]
                 auto expandedMemsetNodeParams = hipMemsetParams{};
                 expandedMemsetNodeParams.dst = static_cast<void*>(expanded);
                 expandedMemsetNodeParams.elementSize = sizeof(float);
@@ -364,6 +367,7 @@ auto main() -> int
                 hip_check(hipGraphAddMemsetNode(
                     &expandedMemsetNode, graph, &weightingKernelNode, 1, &expandedMemsetNodeParams
                 ));
+                // [sphinx-memset-node-end]
 
                 auto copyProjToExpandedNodeParams = hipMemcpy3DParms{};
                 std::memset(&copyProjToExpandedNodeParams, 0, sizeof(hipMemcpy3DParms));
@@ -400,6 +404,7 @@ auto main() -> int
                     &transformedMemsetNode, graph, &copyProjToExpandedNode, 1, &transformedMemsetNodeParams
                 ));
 
+                // [sphinx-before-forward-start]
                 // Before capturing the FFT operations, obtain the set of nodes already present in the graph
                 auto nodesBeforeForward = std::vector<hipGraphNode_t>{};
                 auto numNodesBeforeForward = std::size_t{};
@@ -409,7 +414,9 @@ auto main() -> int
                 auto nodesBeforeForwardSorted = std::set<hipGraphNode_t>{
                     std::begin(nodesBeforeForward), std::end(nodesBeforeForward)
                 };
+                // [sphinx-before-forward-end]
 
+                // [sphinx-hipfft-start]
                 hip_check(hipStreamBeginCaptureToGraph(
                     stream, graph, &transformedMemsetNode, nullptr, 1, hipStreamCaptureModeGlobal));
 
@@ -417,14 +424,18 @@ auto main() -> int
                 hipfft_check(hipfftExecR2C(forward, expanded, transformed));
 
                 hip_check(hipStreamEndCapture(stream, &graph));
+                // [sphinx-hipfft-end]
 
+                // [sphinx-is-leaf-start]
                 auto is_leaf = [](hipGraphNode_t node)
                 {
                     auto numDependentNodes = std::size_t{};
                     hip_check(hipGraphNodeGetDependentNodes(node, nullptr, &numDependentNodes));
                     return numDependentNodes == 0;
                 };
+                // [sphinx-is-leaf-end]
 
+                // [sphinx-after-forward-start]
                 // Obtain nodes in graph again, the new nodes will be our dependencies for the next step
                 auto nodesAfterForward = std::vector<hipGraphNode_t>{};
                 auto numNodesAfterForward = std::size_t{};
@@ -434,15 +445,20 @@ auto main() -> int
                 auto nodesAfterForwardSorted = std::set<hipGraphNode_t>{
                     std::begin(nodesAfterForward), std::end(nodesAfterForward)
                 };
+                // [sphinx-after-forward-end]
 
+                // [sphinx-node-difference-start]
                 // Compute difference between both sets
                 auto forwardFFTNodes = std::vector<hipGraphNode_t>{};
                 std::set_difference(std::begin(nodesAfterForwardSorted), std::end(nodesAfterForwardSorted),
                                     std::begin(nodesBeforeForwardSorted), std::end(nodesBeforeForwardSorted),
                                     std::back_inserter(forwardFFTNodes));
+                // [sphinx-node-difference-end]
 
+                // [sphinx-find-leaf-start]
                 // Find leaf node in difference set
                 auto forwardLeafNode = *(std::find_if(std::begin(forwardFFTNodes), std::end(forwardFFTNodes), is_leaf));
+                // [sphinx-find-leaf-end]
 
                 // Apply filter
                 auto filterBlocksPerGrid = dim3{
