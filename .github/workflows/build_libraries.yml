@@ -52,6 +52,7 @@ jobs:
                     hipblaslt-dev \
                     hiptensor-dev \
                     rocwmma-dev \
+                    migraphx-dev \
                     hipsparselt-dev
                   rm -rf /var/lib/apt/lists/*
                   echo "/opt/rocm/bin" >> $GITHUB_PATH
