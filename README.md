@@ -367,6 +367,15 @@ The following options are available when building with CMake.
       - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/permute): Shows how to perform tensor dimension reordering operations.
       - [trinary](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/trinary): Shows how to combine three tensors using nested binary operations with permutation.
     - [reduction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/reduction): Program that showcases tensor reduction operations using hipTensor.
+  - [MIGraphX](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/)
+    - [migraphx](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/): Core MIGraphX functionality examples including model parsing, custom operators, and dynamic batch processing.
+      - [cpp_dynamic_batch](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/cpp_dynamic_batch/): Demonstrates running graph programs with dynamic batch sizes using the MIGraphX C++ API.
+      - [cpp_parse_load_save](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/cpp_parse_load_save/): Shows how to parse ONNX models, serialize programs to MessagePack or JSON format, and load saved programs.
+      - [custom_op_hip_kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/custom_op_hip_kernel/): Demonstrates implementing custom operators with HIP kernels for element-wise operations.
+      - [custom_op_miopen_kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/custom_op_miopen_kernel/): Shows how to integrate MIOpen's optimized deep learning primitives as custom operators.
+      - [custom_op_rocblas_kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/custom_op_rocblas_kernel/): Demonstrates integrating rocBLAS linear algebra routines as custom operators.
+    - [vision](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/vision/): Computer vision inference examples.
+      - [cpp_mnist](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/vision/cpp_mnist/): Demonstrates MNIST handwritten digit inference with optional FP16/INT8 quantization and multi-target support.
   - [rocALUTION](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/)
     - [amg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/amg/): Showcases Smoothed Aggregation Algebraic Multigrid method for solving linear systems with automatic hierarchy construction.
     - [as_precond](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/as_precond/): Showcases Additive Schwarz preconditioner with domain decomposition and two-level preconditioning.
