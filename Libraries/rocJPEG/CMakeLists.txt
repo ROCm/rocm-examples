@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,42 +21,31 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries LANGUAGES CXX)
+project(rocJPEG_examples LANGUAGES CXX)
 include(CTest)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-# CMake configuration files for CUDA versions of HIP libraries are not yet
-# included under the HIP SDK for Windows.
-if(
-    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
-)
-    add_subdirectory(hipBLAS)
-    if(CMAKE_VERSION VERSION_LESS "3.25.2")
-        message(WARNING "CMake version < 3.25.2, not building hipBLASLt examples.")
-    else()
-        add_subdirectory(hipBLASLt)
-    endif()
-    add_subdirectory(hipCUB)
-    add_subdirectory(hipFFT)
-    add_subdirectory(hipRAND)
-    add_subdirectory(hipSOLVER)
-    add_subdirectory(hipSPARSE)
-    add_subdirectory(hipSPARSELt)
-    add_subdirectory(hipTensor)
-    add_subdirectory(MIGraphX)
-    add_subdirectory(MIVisionX)
-    add_subdirectory(RCCL)
-    add_subdirectory(rocALUTION)
-    add_subdirectory(rocBLAS)
-    add_subdirectory(rocJPEG)
-    add_subdirectory(rocFFT)
-    add_subdirectory(rocPRIM)
-    add_subdirectory(rocProfiler-SDK)
-    add_subdirectory(rocRAND)
-    add_subdirectory(rocSOLVER)
-    add_subdirectory(rocSPARSE)
-    add_subdirectory(rocThrust)
-    add_subdirectory(rocWMMA)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    message(STATUS "rocJPEG examples are only available on Linux")
+    return()
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+find_package(rocjpeg)
+if(NOT rocjpeg_FOUND)
+    message(STATUS "rocJPEG could not be found, not building rocJPEG examples")
+    return(1)
+endif()
+
+add_subdirectory(rocjpeg_decode)
+add_subdirectory(rocjpeg_decode_batched)
+add_subdirectory(rocjpeg_decode_perf)
