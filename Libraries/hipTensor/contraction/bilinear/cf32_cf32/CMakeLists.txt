@@ -25,15 +25,28 @@ set(example_name hiptensor_contraction_bilinear_cf32_cf32)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-if(GPU_RUNTIME STREQUAL "CUDA")
-    message(STATUS "hipTensor examples do not support the CUDA runtime")
-    return()
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/HipPlatform.cmake")
+select_gpu_language()
+
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    message(FATAL_ERROR "hipTensor examples do not support the CUDA runtime.")
 endif()
 
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+
+# see https://rocm.docs.amd.com/projects/hipTensor/en/latest/install/installation.html#gpu-support
+set(HIPTENSOR_SUPPORTED_ARCH gfx908 gfx90a gfx942 gfx950)
+
+foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
+    if(NOT ARCH IN_LIST HIPTENSOR_SUPPORTED_ARCH)
+        message(FATAL_ERROR "hipTensor does not support architecture: ${ARCH}, not building hipTensor examples")
+    endif()
+endforeach()
+
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+select_hip_platform()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "hipTensor examples are only available on Linux")
