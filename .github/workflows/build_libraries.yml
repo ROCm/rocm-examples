@@ -46,6 +46,7 @@ jobs:
                     rocsolver-dev hipsolver-dev \
                     rocfft-dev hipfft-dev \
                     rocalution-dev \
+                    rocjpeg-dev \
                     rocsparse-dev \
                     rocthrust-dev \
                     libdw-dev rocprofiler-sdk \

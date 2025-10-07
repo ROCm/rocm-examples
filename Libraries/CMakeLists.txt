@@ -49,6 +49,7 @@ if(
     add_subdirectory(RCCL)
     add_subdirectory(rocALUTION)
     add_subdirectory(rocBLAS)
+    add_subdirectory(rocJPEG)
     add_subdirectory(rocFFT)
     add_subdirectory(rocPRIM)
     add_subdirectory(rocProfiler-SDK)

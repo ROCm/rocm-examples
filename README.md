@@ -430,6 +430,10 @@ The following options are available when building with CMake.
     - [level_3](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
       - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
+  - [rocJPEG](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/)
+    - [rocjpeg_decode](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/rocjpeg_decode): Program that showcases decoding of JPEG images.
+    - [rocjpeg_decode_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/rocjpeg_decode_batched): Program that showcases decoding a batch of JPEG images.
+    - [rocjpeg_decode_perf](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/rocjpeg_decode_perf): Program that showcases performant decoding of JPEG images.
   - [rocFFT](/Libraries/rocFFT/)
     - [callback](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocFFT/callback/): Program that showcases the use of rocFFT `callback` functionality.
     - [complex_complex](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocFFT/complex_complex/): Program that showcases a Fast Fourier Transform from complex to complex numbers.
