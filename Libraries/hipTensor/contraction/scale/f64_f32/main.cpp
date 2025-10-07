@@ -28,7 +28,7 @@ int main()
     if(!is_f64_supported())
     {
         std::cout << "unsupported host device" << std::endl;
-        exit(EXIT_FAILURE);
+        return 0;
     }
 
     // 2. Define data types.
