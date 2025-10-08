@@ -22,32 +22,29 @@
 
 cmake_minimum_required(VERSION 3.21)
 
-project(hip_graph_api_tutorial LANGUAGES CXX HIP)
+project(hip_graph_api_tutorial LANGUAGES CXX)
 
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-include(FetchContent)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
 
-find_package(TIFF COMPONENTS CXX)
-if(NOT TIFF_FOUND)
-    message(STATUS "Could not find system libtiff, fetching from upstream...")
-    FetchContent_Declare(
-        libtiff
-        GIT_REPOSITORY https://gitlab.com/libtiff/libtiff.git
-        GIT_TAG v4.7.1)
-    set(BUILD_SHARED_LIBS "ON")
-    FetchContent_MakeAvailable(libtiff)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-    target_compile_definitions(tiff PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
-    target_compile_definitions(tiffxx PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
-    set(TIFF_TARGET TIFF::tiff) # CMake's FindTIFF module uses the uppercase notation, libTIFF uses lowercase
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
-    set(TIFF_TARGET TIFF::TIFF)
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 endif()
 
-find_package(hip REQUIRED)
-find_package(hipfft REQUIRED)
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_subdirectory(src)

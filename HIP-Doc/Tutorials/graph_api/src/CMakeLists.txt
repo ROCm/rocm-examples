@@ -25,6 +25,30 @@ set(example_streams ${PROJECT_NAME}_streams)
 set(example_graph_capture ${PROJECT_NAME}_graph_capture)
 set(example_graph_creation ${PROJECT_NAME}_graph_creation)
 
+include(FetchContent)
+
+find_package(TIFF COMPONENTS CXX)
+if(NOT TIFF_FOUND)
+    message(STATUS "Could not find system libtiff, fetching from upstream...")
+    FetchContent_Declare(
+        libtiff
+        GIT_REPOSITORY https://gitlab.com/libtiff/libtiff.git
+        GIT_TAG v4.7.1)
+    set(BUILD_SHARED_LIBS "ON")
+    FetchContent_MakeAvailable(libtiff)
+
+    target_compile_definitions(tiff PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+    target_compile_definitions(tiffxx PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+
+    set(TIFF_TARGET TIFF::tiff) # CMake's FindTIFF module uses the uppercase notation, libTIFF uses lowercase
+    install(TARGETS tiff tiffxx)
+else()
+    set(TIFF_TARGET TIFF::TIFF)
+endif()
+
+find_package(hip REQUIRED)
+find_package(hipfft REQUIRED)
+
 add_library(${example_objects} OBJECT backprojection.hip
                                       filtering.hip
                                       log_transform.hip
@@ -33,34 +57,66 @@ add_library(${example_objects} OBJECT backprojection.hip
                                       projection.cpp
                                       volume.cpp
                                       weighting.hip)
-set_target_properties(${example_objects} PROPERTIES CXX_EXTENSIONS OFF
+set_source_files_properties(backprojection.hip
+                            filtering.hip
+                            log_transform.hip
+                            normalization.hip
+                            phantom.hip
+                            weighting.hip
+                            PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_target_properties(${example_objects} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                    CXX_EXTENSIONS OFF
                                                     CXX_SCAN_FOR_MODULES OFF
-                                                    HIP_EXTENSIONS OFF)
+                                                    $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
 target_compile_definitions(${example_objects} PUBLIC $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
-target_compile_features(${example_objects} PRIVATE cxx_std_20 hip_std_20)
+target_compile_features(${example_objects} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
+target_include_directories(${example_objects} PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_objects} PUBLIC hip::host hip::hipfft ${TIFF_TARGET} TIFF::CXX)
 
 add_executable(${example_streams} main_streams.hip)
-set_target_properties(${example_streams} PROPERTIES CXX_EXTENSIONS OFF
+add_test(NAME ${example_streams} COMMAND ${example_streams})
+set_source_files_properties(main_streams.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_target_properties(${example_streams} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                    CXX_EXTENSIONS OFF
                                                     CXX_SCAN_FOR_MODULES OFF
-                                                    HIP_EXTENSIONS OFF)
-target_compile_features(${example_streams} PRIVATE cxx_std_20 hip_std_20)
+                                                    $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+target_compile_features(${example_streams} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
+target_include_directories(${example_streams} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_streams} PRIVATE ${example_objects} hip::hipfft)
+install(TARGETS ${example_streams})
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "The graph capture tutorial is available only on Linux.")
 else()
     add_executable(${example_graph_capture} main_graph_capture.hip)
-    set_target_properties(${example_graph_capture} PROPERTIES CXX_EXTENSIONS OFF
+    add_test(NAME ${example_graph_capture} COMMAND ${example_graph_capture})
+    set_source_files_properties(main_graph_capture.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+    set_target_properties(${example_graph_capture} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                              CXX_EXTENSIONS OFF
                                                               CXX_SCAN_FOR_MODULES OFF
-                                                              HIP_EXTENSIONS OFF)
-    target_compile_features(${example_graph_capture} PRIVATE cxx_std_20 hip_std_20)
+                                                              $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+    target_compile_features(${example_graph_capture} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
+    target_include_directories(${example_graph_capture} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
     target_link_libraries(${example_graph_capture} PRIVATE ${example_objects} hip::hipfft)
+    install(TARGETS ${example_graph_capture})
 endif()
 
 add_executable(${example_graph_creation} main_graph_creation.hip)
-set_target_properties(${example_graph_creation} PROPERTIES CXX_EXTENSIONS OFF
-                                                          CXX_SCAN_FOR_MODULES OFF
-                                                          HIP_EXTENSIONS OFF)
-target_compile_features(${example_graph_creation} PRIVATE cxx_std_20 hip_std_20)
+add_test(NAME ${example_graph_creation} COMMAND ${example_graph_creation})
+set_source_files_properties(main_graph_creation.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_target_properties(${example_graph_creation} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                           CXX_EXTENSIONS OFF
+                                                           CXX_SCAN_FOR_MODULES OFF
+                                                           $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+target_compile_features(${example_graph_creation} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
+target_include_directories(${example_graph_creation} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_graph_creation} PRIVATE ${example_objects} hip::hipfft)
+install(TARGETS ${example_graph_creation})
+
+# Make sure the TIFF library can be picked up by the tutorial application
+if(NOT TIFF_FOUND)
+    set_target_properties(tiff PROPERTIES LIBRARY_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}>
+                                          RUNTIME_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}>)
+    set_target_properties(tiffxx PROPERTIES LIBRARY_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}
+                                            RUNTIME_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}>)
+endif()
