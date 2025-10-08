@@ -23,6 +23,7 @@
 // [sphinx-start]
 #include <hip/hip_runtime.h>
 
+#include <cstdlib>
 #include <iostream>
 
 #define HIP_CHECK(expression)              \
@@ -33,6 +34,7 @@
         std::cerr << "HIP error: "         \
             << hipGetErrorString(err)      \
             << " at " << __LINE__ << "\n"; \
+        std::exit(EXIT_FAILURE);           \
     }                                      \
 }
 
@@ -47,6 +49,16 @@ __managed__ int a, b, c;
 
 int main()
 {
+    // Query managed memory support status.
+    int managedMemory;
+    HIP_CHECK(hipDeviceGetAttribute(&managedMemory, hipDeviceAttributeManagedMemory, 0));
+    if(managedMemory != 1)
+    {
+        std::cout << "Allocating managed memory is NOT supported." << std::endl;
+        std::cout << "This system does not support __managed__ variables." << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     // Setup input values.
     a = 1;
     b = 2;
@@ -60,6 +72,6 @@ int main()
     // Print the result.
     std::cout << a << " + " << b << " = " << c << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

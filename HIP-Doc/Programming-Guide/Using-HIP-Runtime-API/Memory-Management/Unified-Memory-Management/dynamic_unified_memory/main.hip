@@ -23,6 +23,7 @@
 // [sphinx-start]
 #include <hip/hip_runtime.h>
 
+#include <cstdlib>
 #include <iostream>
 
 #define HIP_CHECK(expression)              \
@@ -33,6 +34,7 @@
         std::cerr << "HIP error: "         \
             << hipGetErrorString(err)      \
             << " at " << __LINE__ << "\n"; \
+        std::exit(EXIT_FAILURE);           \
     }                                      \
 }
 
@@ -44,6 +46,15 @@ __global__ void add(int *a, int *b, int *c)
 
 int main()
 {
+    // Query managed memory support status.
+    int managedMemory;
+    HIP_CHECK(hipDeviceGetAttribute(&managedMemory, hipDeviceAttributeManagedMemory, 0));
+    if(managedMemory != 1)
+    {
+        std::cout << "Allocating managed memory is NOT supported." << std::endl;
+        std::cout << "hipMallocManaged() will still work but fall back to system memory." << std::endl;
+    }
+
     int *a, *b, *c;
 
     // Allocate memory for a, b and c that is accessible to both device and host codes.
@@ -69,6 +80,6 @@ int main()
     HIP_CHECK(hipFree(b));
     HIP_CHECK(hipFree(c));
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

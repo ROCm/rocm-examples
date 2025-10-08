@@ -17,6 +17,7 @@ more information on this topic, please refer to the
 
 ## Key APIs and Concepts
 
+* `hipDeviceGetAttribute` is used to query the device's ability to allocate managed memory.
 * `hipDeviceSynchronize` is used to synchronize the device with the host.
 * `hipFree` is used to free previously allocated unified memory.
 * `hipGetErrorString` transforms a HIP error code into a human-readable string.
@@ -28,6 +29,7 @@ more information on this topic, please refer to the
 
 #### Host symbols
 
+* `hipDeviceGetAttribute`
 * `hipDeviceSynchronize`
 * `hipFree`
 * `hipGetErrorString`

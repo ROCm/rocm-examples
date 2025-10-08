@@ -29,12 +29,6 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(FATAL_ERROR "This example is not supported on Windows!")
 endif()
 
-if(NOT DEFINED ENV{HSA_XNACK})
-    message(FATAL_ERROR "Environment variable HSA_XNACK must be set for this example!")
-elseif(NOT $ENV{HSA_XNACK} EQUAL 1)
-    message(FATAL_ERROR "Environment variable HSA_XNACK must be set to 1 for this example!")
-endif()
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})

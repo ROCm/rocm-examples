@@ -27,6 +27,8 @@ works on Linux.
 
 ## Key APIs and Concepts
 
+* `hipDeviceGetAttribute` is used to query the device's ability to coherently access managed memory concurrently with
+  the CPU.
 * `hipDeviceSynchronize` is used to synchronize the device with the host.
 * `hipFree` is used to free previously allocated unified memory.
 * `hipGetErrorString` transforms a HIP error code into a human-readable string.
@@ -40,6 +42,7 @@ works on Linux.
 
 #### Host symbols
 
+* `hipDeviceGetAttribute`
 * `hipDeviceSynchronize`
 * `hipFree`
 * `hipGetErrorString`

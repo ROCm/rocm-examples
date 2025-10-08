@@ -22,6 +22,7 @@ environment variable `HSA_XNACK` must be set to `1`.
 
 ## Key APIs and Concepts
 
+* `hipDeviceGetAttribute` is used to query the device's abilities to directly access pageable memory on the host.
 * `hipDeviceSynchronize` is used to synchronize the device with the host.
 * `hipGetErrorString` transforms a HIP error code into a human-readable string.
 * The standard C++ operators `new` and `delete` are used to manage unified memory allocations.
@@ -32,5 +33,6 @@ environment variable `HSA_XNACK` must be set to `1`.
 
 #### Host symbols
 
+* `hipDeviceGetAttribute`
 * `hipDeviceSynchronize`
 * `hipGetErrorString`

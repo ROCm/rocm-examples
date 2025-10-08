@@ -36,12 +36,6 @@ ICPPFLAGS :=
 ILDFLAGS  :=
 ILDLIBS   :=
 
-ifndef HSA_XNACK
-    $(error Environment variable HSA_XNACK must be set for this example!)
-else ifneq ($(HSA_XNACK), 1)
-    $(error Environment variable HSA_XNACK must be set to 1 for this example!)
-endif
-
 ifeq ($(GPU_RUNTIME), CUDA)
     ICXXFLAGS += -x cu
     ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)

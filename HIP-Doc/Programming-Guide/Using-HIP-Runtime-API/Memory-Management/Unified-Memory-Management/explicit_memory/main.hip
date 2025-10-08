@@ -23,6 +23,7 @@
 // [sphinx-start]
 #include <hip/hip_runtime.h>
 
+#include <cstdlib>
 #include <iostream>
 
 #define HIP_CHECK(expression)              \
@@ -33,6 +34,7 @@
         std::cerr << "HIP error: "         \
             << hipGetErrorString(err)      \
             << " at " << __LINE__ << "\n"; \
+        std::exit(EXIT_FAILURE);           \
     }                                      \
 }
 
@@ -74,6 +76,6 @@ int main()
     // Prints the result.
     std::cout << a << " + " << b << " = " << c << std::endl;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

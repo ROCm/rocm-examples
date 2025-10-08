@@ -24,6 +24,7 @@
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 
 #define HIP_CHECK(expression)              \
@@ -34,6 +35,7 @@
         std::cerr << "HIP error: "         \
             << hipGetErrorString(err)      \
             << " at " << __LINE__ << "\n"; \
+        std::exit(EXIT_FAILURE);           \
     }                                      \
 }
 
@@ -51,6 +53,15 @@ int main()
 
     int deviceId;
     HIP_CHECK(hipGetDevice(&deviceId));
+
+    // Device must be able to coherently access managed memory concurrently with the CPU.
+    int concurrentManagedAccess;
+    HIP_CHECK(hipDeviceGetAttribute(&concurrentManagedAccess, hipDeviceAttributeConcurrentManagedAccess, deviceId));
+    if(concurrentManagedAccess != 1)
+    {
+        std::cout << "Device does not support concurrent managed access." << std::endl;
+        return EXIT_SUCCESS;
+    }
 
     // Allocate memory for a, b and c that is accessible to both device and host codes.
     HIP_CHECK(hipMallocManaged(&a, sizeof(*a)));
@@ -85,6 +96,6 @@ int main()
     HIP_CHECK(hipFree(b));
     HIP_CHECK(hipFree(c));
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]

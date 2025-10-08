@@ -23,6 +23,8 @@
 // [sphinx-start]
 #include <hip/hip_runtime.h>
 
+#include <cstdlib>
+#include <cstring>
 #include <iostream>
 
 #define HIP_CHECK(expression)              \
@@ -33,6 +35,7 @@
         std::cerr << "HIP error: "         \
             << hipGetErrorString(err)      \
             << " at " << __LINE__ << "\n"; \
+        std::exit(EXIT_FAILURE);           \
     }                                      \
 }
 
@@ -45,6 +48,38 @@ __global__ void add(int *a, int *b, int *c)
 // This example requires HMM support and the environment variable HSA_XNACK needs to be set to 1
 int main()
 {
+    // Check whether HSA_XNACK environment variable is set to 1.
+    if(char* hsaXnack = std::getenv("HSA_XNACK"); (hsaXnack == nullptr) || (std::strcmp(hsaXnack, "1") != 0))
+    {
+        std::cout << "Environment variable HSA_XNACK not set to 1." << std::endl;
+        return EXIT_SUCCESS;
+    }
+
+    // Query pageable memory support status.
+    int pageableMemoryAccess;
+    int hostNativeAtomicSupported;
+    int pageableMemoryAccessUsesHostPageTables;
+    int directManagedMemAccessFromHost;
+    HIP_CHECK(hipDeviceGetAttribute(&pageableMemoryAccess, hipDeviceAttributePageableMemoryAccess, 0));
+    HIP_CHECK(hipDeviceGetAttribute(&hostNativeAtomicSupported, hipDeviceAttributeHostNativeAtomicSupported, 0));
+    HIP_CHECK(hipDeviceGetAttribute(
+        &pageableMemoryAccessUsesHostPageTables, hipDeviceAttributePageableMemoryAccessUsesHostPageTables, 0
+    ));
+    HIP_CHECK(hipDeviceGetAttribute(
+        &directManagedMemAccessFromHost, hipDeviceAttributeDirectManagedMemAccessFromHost, 0
+    ));
+
+    if(pageableMemoryAccess != 1 && 
+       hostNativeAtomicSupported != 1 &&
+       pageableMemoryAccessUsesHostPageTables != 1
+       && directManagedMemAccessFromHost != 1)
+    {
+        std::cout 
+            << "This system does not support using standard C++ memory management facilities for GPU kernels."
+            << std::endl;
+        return EXIT_SUCCESS;
+    }
+
     // Allocate memory for a, b, and c.
     int *a = new int[1];
     int *b = new int[1];
@@ -68,6 +103,6 @@ int main()
     delete[] b;
     delete[] a;
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 // [sphinx-end]
