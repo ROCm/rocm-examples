@@ -29,6 +29,7 @@
 
 #include <tiffio.h>
 
+#include <cstdint>
 #include <source_location>
 #include <stdexcept>
 #include <string>
@@ -52,7 +53,9 @@ inline void hip_check(hipError_t err, std::source_location const loc = std::sour
     }
 }
 
-inline void hipfft_check(hipfftResult res, std::source_location const loc = std::source_location::current()) noexcept(false)
+inline void hipfft_check(
+    hipfftResult res, std::source_location const loc = std::source_location::current()
+) noexcept(false)
 {
     using namespace std::literals::string_literals;
     auto getHipFFTResultString = [](hipfftResult r)

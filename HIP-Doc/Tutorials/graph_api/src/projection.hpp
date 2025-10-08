@@ -32,14 +32,12 @@
 
 #include <cstdint>
 #include <exception>
-#include <filesystem>
 #include <fstream>
 #include <ios>
 #include <iostream>
 #include <stdexcept>
 #include <string>
-#include <utility>
-#include <vector>
+#include <type_traits>
 
 struct projectionGeometry
 {
@@ -59,16 +57,6 @@ struct projectionGeometry
     uint2 dimTrans{};       // x = transformed filter length, y = dim.y
     float2 minCoord{};        // Starting corner of the detector, i.e. pixel (0, 0) [mm]
 };
-
-struct load_projection_args
-{
-    std::string path;
-    std::uint32_t N_h;
-    std::uint32_t N_v;
-    std::uint16_t* data;
-};
-
-void load_projection(void* args) noexcept;
 
 template <typename T>
 struct save_projection_args

@@ -25,7 +25,6 @@
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
-#include <cstdint>
 
 /*
  Weights each pixel in the projection with a weighting factor.

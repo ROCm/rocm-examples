@@ -25,16 +25,11 @@
 #include "projection.hpp"
 #include "utility.hpp"
 
-#include <hip/hip_runtime.h>
-
 #include <tiffio.h>
 #include <tiffio.hxx>
 
-#include <cmath>
-#include <cstddef>
 #include <cstdint>
 #include <exception>
-#include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <string>
