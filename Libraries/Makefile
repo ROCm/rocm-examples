@@ -22,7 +22,6 @@
 
 LIBRARIES := \
 	hipBLAS \
-	hipBLASLt \
 	hipCUB \
 	hipFFT \
 	hipSOLVER \
@@ -31,6 +30,7 @@ LIBRARIES := \
 
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
+	hipBLASLt \
 	hipTensor \
 	rocBLAS \
 	rocFFT \

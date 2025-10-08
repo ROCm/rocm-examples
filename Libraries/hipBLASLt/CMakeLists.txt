@@ -85,5 +85,6 @@ add_subdirectory(gemm_with_scale_a_b_vector)
 add_subdirectory(gemm_with_TF32)
 add_subdirectory(groupedgemm_ext)
 add_subdirectory(groupedgemm_fixed_mk_ext)
-add_subdirectory(groupedgemm_get_all_algos_ext)
+# Disabled until fix is upstreamed in later ROCm version
+# add_subdirectory(groupedgemm_get_all_algos_ext)
 add_subdirectory(weight_swizzle_padding)
