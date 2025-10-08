@@ -61,7 +61,6 @@ EXAMPLES := \
 	gemm_with_TF32 \
 	groupedgemm_ext \
 	groupedgemm_fixed_mk_ext \
-	groupedgemm_get_all_algos_ext \
 	weight_swizzle_padding
 
 
