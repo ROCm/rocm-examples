@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-Unified-Memory-Management
+project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-Unified-Memory
         LANGUAGES CXX)
 
 add_subdirectory(data_prefetching)

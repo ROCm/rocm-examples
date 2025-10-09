@@ -24,7 +24,7 @@ SUBDIRECTORIES := \
 	Device-Memory \
 	Host-Memory \
 	SOMA \
-	Unified-Memory-Management \
+	Unified-Memory \
 	Virtual-Memory-Management
 
 all: $(SUBDIRECTORIES)

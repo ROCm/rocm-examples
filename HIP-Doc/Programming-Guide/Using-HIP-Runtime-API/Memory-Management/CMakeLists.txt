@@ -26,5 +26,5 @@ project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management LANGUA
 add_subdirectory(Device-Memory)
 add_subdirectory(Host-Memory)
 add_subdirectory(SOMA)
-add_subdirectory(Unified-Memory-Management)
+add_subdirectory(Unified-Memory)
 add_subdirectory(Virtual-Memory-Management)
