@@ -59,7 +59,7 @@ int main()
     HIP_CHECK(hipDeviceGetAttribute(&concurrentManagedAccess, hipDeviceAttributeConcurrentManagedAccess, deviceId));
     if(concurrentManagedAccess != 1)
     {
-        std::cout << "Device does not support concurrent managed access." << std::endl;
+        std::cout << "Device " << deviceId << " does not support concurrent access to managed memory." << std::endl;
         return EXIT_SUCCESS;
     }
 

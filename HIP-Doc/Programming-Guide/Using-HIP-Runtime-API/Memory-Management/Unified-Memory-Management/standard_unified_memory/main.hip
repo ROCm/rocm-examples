@@ -57,26 +57,10 @@ int main()
 
     // Query pageable memory support status.
     int pageableMemoryAccess;
-    int hostNativeAtomicSupported;
-    int pageableMemoryAccessUsesHostPageTables;
-    int directManagedMemAccessFromHost;
     HIP_CHECK(hipDeviceGetAttribute(&pageableMemoryAccess, hipDeviceAttributePageableMemoryAccess, 0));
-    HIP_CHECK(hipDeviceGetAttribute(&hostNativeAtomicSupported, hipDeviceAttributeHostNativeAtomicSupported, 0));
-    HIP_CHECK(hipDeviceGetAttribute(
-        &pageableMemoryAccessUsesHostPageTables, hipDeviceAttributePageableMemoryAccessUsesHostPageTables, 0
-    ));
-    HIP_CHECK(hipDeviceGetAttribute(
-        &directManagedMemAccessFromHost, hipDeviceAttributeDirectManagedMemAccessFromHost, 0
-    ));
-
-    if(pageableMemoryAccess != 1 && 
-       hostNativeAtomicSupported != 1 &&
-       pageableMemoryAccessUsesHostPageTables != 1
-       && directManagedMemAccessFromHost != 1)
+    if(pageableMemoryAccess != 1)
     {
-        std::cout 
-            << "This system does not support using standard C++ memory management facilities for GPU kernels."
-            << std::endl;
+        std::cout << "This system does not support accessing system memory from GPU kernels." << std::endl;
         return EXIT_SUCCESS;
     }
 
