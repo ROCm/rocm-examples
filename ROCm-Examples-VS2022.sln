@@ -446,6 +446,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtc_error_handling_vs2022",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lowered_names_vs2022", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\lowered_names\lowered_names_vs2022.vcxproj", "{47C2919C-406D-283A-5FB6-B011EB2354FF}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "memory_range_attributes_vs2022", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\memory_range_attributes\memory_range_attributes_vs2022.vcxproj", "{FF6DDF3C-7303-5546-029A-B2A4E785531D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "system_unified_memory_vs2022", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\system_unified_memory\system_unified_memory_vs2022.vcxproj", "{03D3BAC0-19DE-1313-A724-B03B234AF794}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1152,6 +1156,14 @@ Global
 		{47C2919C-406D-283A-5FB6-B011EB2354FF}.Debug|x64.Build.0 = Debug|x64
 		{47C2919C-406D-283A-5FB6-B011EB2354FF}.Release|x64.ActiveCfg = Release|x64
 		{47C2919C-406D-283A-5FB6-B011EB2354FF}.Release|x64.Build.0 = Release|x64
+		{FF6DDF3C-7303-5546-029A-B2A4E785531D}.Debug|x64.ActiveCfg = Debug|x64
+		{FF6DDF3C-7303-5546-029A-B2A4E785531D}.Debug|x64.Build.0 = Debug|x64
+		{FF6DDF3C-7303-5546-029A-B2A4E785531D}.Release|x64.ActiveCfg = Release|x64
+		{FF6DDF3C-7303-5546-029A-B2A4E785531D}.Release|x64.Build.0 = Release|x64
+		{03D3BAC0-19DE-1313-A724-B03B234AF794}.Debug|x64.ActiveCfg = Debug|x64
+		{03D3BAC0-19DE-1313-A724-B03B234AF794}.Debug|x64.Build.0 = Debug|x64
+		{03D3BAC0-19DE-1313-A724-B03B234AF794}.Release|x64.ActiveCfg = Release|x64
+		{03D3BAC0-19DE-1313-A724-B03B234AF794}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1375,6 +1387,8 @@ Global
 		{D7C61E16-DC76-A0ED-ABBD-1EBD581DBD37} = {AA794309-1F62-4964-A6BE-7E09BE0C1875}
 		{01CF7922-4880-2C13-A711-27CE4C746B04} = {AA794309-1F62-4964-A6BE-7E09BE0C1875}
 		{47C2919C-406D-283A-5FB6-B011EB2354FF} = {AA794309-1F62-4964-A6BE-7E09BE0C1875}
+		{FF6DDF3C-7303-5546-029A-B2A4E785531D} = {93690A3D-0E5F-4651-816F-51AE7E03529D}
+		{03D3BAC0-19DE-1313-A724-B03B234AF794} = {93690A3D-0E5F-4651-816F-51AE7E03529D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

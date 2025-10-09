@@ -446,6 +446,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtc_error_handling_vs2019",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lowered_names_vs2019", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\lowered_names\lowered_names_vs2019.vcxproj", "{1035D3D6-5EAB-48D3-A12B-C4A700ACC145}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "memory_range_attributes_vs2019", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\memory_range_attributes\memory_range_attributes_vs2019.vcxproj", "{781D843C-DACD-472F-8BB0-5FEE740CFAE8}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "system_unified_memory_vs2019", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\system_unified_memory\system_unified_memory_vs2019.vcxproj", "{066E3B94-B39E-429D-8F8C-6730380600C1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1152,6 +1156,14 @@ Global
 		{1035D3D6-5EAB-48D3-A12B-C4A700ACC145}.Debug|x64.Build.0 = Debug|x64
 		{1035D3D6-5EAB-48D3-A12B-C4A700ACC145}.Release|x64.ActiveCfg = Release|x64
 		{1035D3D6-5EAB-48D3-A12B-C4A700ACC145}.Release|x64.Build.0 = Release|x64
+		{781D843C-DACD-472F-8BB0-5FEE740CFAE8}.Debug|x64.ActiveCfg = Debug|x64
+		{781D843C-DACD-472F-8BB0-5FEE740CFAE8}.Debug|x64.Build.0 = Debug|x64
+		{781D843C-DACD-472F-8BB0-5FEE740CFAE8}.Release|x64.ActiveCfg = Release|x64
+		{781D843C-DACD-472F-8BB0-5FEE740CFAE8}.Release|x64.Build.0 = Release|x64
+		{066E3B94-B39E-429D-8F8C-6730380600C1}.Debug|x64.ActiveCfg = Debug|x64
+		{066E3B94-B39E-429D-8F8C-6730380600C1}.Debug|x64.Build.0 = Debug|x64
+		{066E3B94-B39E-429D-8F8C-6730380600C1}.Release|x64.ActiveCfg = Release|x64
+		{066E3B94-B39E-429D-8F8C-6730380600C1}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1375,6 +1387,8 @@ Global
 		{0685653A-110C-4F44-AEF3-6AB0A2A3D4A8} = {D0056E51-E2CD-40B1-B542-02F90E2F0767}
 		{A8A0E921-900B-4126-A9CC-B03A34633E55} = {D0056E51-E2CD-40B1-B542-02F90E2F0767}
 		{1035D3D6-5EAB-48D3-A12B-C4A700ACC145} = {D0056E51-E2CD-40B1-B542-02F90E2F0767}
+		{781D843C-DACD-472F-8BB0-5FEE740CFAE8} = {04EF8648-7D8C-437E-85E9-B38B93C49CFD}
+		{066E3B94-B39E-429D-8F8C-6730380600C1} = {04EF8648-7D8C-437E-85E9-B38B93C49CFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

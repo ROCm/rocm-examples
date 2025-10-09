@@ -25,8 +25,8 @@ EXAMPLES := \
 	dynamic_unified_memory \
 	explicit_memory \
 	memory_range_attributes \
-	standard_unified_memory \
 	static_unified_memory \
+	system_unified_memory \
 	unified_memory_advice
 
 all: $(EXAMPLES)

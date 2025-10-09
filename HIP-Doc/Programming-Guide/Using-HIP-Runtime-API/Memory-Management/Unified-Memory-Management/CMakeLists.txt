@@ -27,18 +27,7 @@ project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-Unifie
 add_subdirectory(data_prefetching)
 add_subdirectory(dynamic_unified_memory)
 add_subdirectory(explicit_memory)
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "The memory range attributes example is available only on Linux.")
-else()
-    add_subdirectory(memory_range_attributes)
-endif()
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "The standard unified memory example is available only on Linux.")
-else()
-    add_subdirectory(standard_unified_memory)
-endif()
-
+add_subdirectory(memory_range_attributes)
 add_subdirectory(static_unified_memory)
+add_subdirectory(system_unified_memory)
 add_subdirectory(unified_memory_advice)

@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hip_standard_unified_memory
+EXAMPLE := hip_system_unified_memory
 GPU_RUNTIME := HIP
 
 # HIP variables

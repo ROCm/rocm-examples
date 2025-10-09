@@ -200,6 +200,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "sequential_kernel_execution_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\sequential_kernel_execution\sequential_kernel_execution_vs2017.vcxproj", "{FEE9F556-803D-43D9-BB9F-92D1465D86BE}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "memory_range_attributes_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\memory_range_attributes\memory_range_attributes_vs2017.vcxproj", "{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "system_unified_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\system_unified_memory\system_unified_memory_vs2017.vcxproj", "{8CA9BC58-4800-4C31-A828-C149A3B10484}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -506,6 +510,14 @@ Global
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE}.Debug|x64.Build.0 = Debug|x64
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE}.Release|x64.ActiveCfg = Release|x64
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE}.Release|x64.Build.0 = Release|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Debug|x64.ActiveCfg = Debug|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Debug|x64.Build.0 = Debug|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Release|x64.ActiveCfg = Release|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Release|x64.Build.0 = Release|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Debug|x64.ActiveCfg = Debug|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Debug|x64.Build.0 = Debug|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Release|x64.ActiveCfg = Release|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -606,6 +618,8 @@ Global
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54} = {11AB9420-D165-489A-8240-0FA4D8164E9E}
+		{8CA9BC58-4800-4C31-A828-C149A3B10484} = {11AB9420-D165-489A-8240-0FA4D8164E9E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {20E1D613-A9A0-4471-B029-8528325AE9EC}

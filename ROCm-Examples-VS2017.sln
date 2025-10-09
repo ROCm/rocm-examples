@@ -446,6 +446,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "rtc_error_handling_vs2017",
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lowered_names_vs2017", "HIP-Doc\Programming-Guide\Programming-for-HIP-Runtime-Compiler\lowered_names\lowered_names_vs2017.vcxproj", "{B514436C-B525-48DE-A82C-0110FE55943B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "memory_range_attributes_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\memory_range_attributes\memory_range_attributes_vs2017.vcxproj", "{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "system_unified_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\system_unified_memory\system_unified_memory_vs2017.vcxproj", "{8CA9BC58-4800-4C31-A828-C149A3B10484}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1152,6 +1156,14 @@ Global
 		{B514436C-B525-48DE-A82C-0110FE55943B}.Debug|x64.Build.0 = Debug|x64
 		{B514436C-B525-48DE-A82C-0110FE55943B}.Release|x64.ActiveCfg = Release|x64
 		{B514436C-B525-48DE-A82C-0110FE55943B}.Release|x64.Build.0 = Release|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Debug|x64.ActiveCfg = Debug|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Debug|x64.Build.0 = Debug|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Release|x64.ActiveCfg = Release|x64
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54}.Release|x64.Build.0 = Release|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Debug|x64.ActiveCfg = Debug|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Debug|x64.Build.0 = Debug|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Release|x64.ActiveCfg = Release|x64
+		{8CA9BC58-4800-4C31-A828-C149A3B10484}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1375,6 +1387,8 @@ Global
 		{1DC058BF-4C29-46EC-A856-D0707D772445} = {80D8FD1A-D25D-439F-B809-910F5D4C4A9B}
 		{DCF80A40-6BC2-4629-BF87-11699A465E3D} = {80D8FD1A-D25D-439F-B809-910F5D4C4A9B}
 		{B514436C-B525-48DE-A82C-0110FE55943B} = {80D8FD1A-D25D-439F-B809-910F5D4C4A9B}
+		{3EE0BD23-158E-4D1D-A7E9-4D0EC4A3EB54} = {8D25760A-A72D-42C0-9660-11DC1CD5CE6E}
+		{8CA9BC58-4800-4C31-A828-C149A3B10484} = {8D25760A-A72D-42C0-9660-11DC1CD5CE6E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5C96FD63-6F26-4E6F-B6D0-7FB9E1833081}

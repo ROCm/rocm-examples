@@ -1,4 +1,4 @@
-# HIP-Doc Standard Unified Memory Example
+# HIP-Doc System Unified Memory Example
 
 ## Description
 
