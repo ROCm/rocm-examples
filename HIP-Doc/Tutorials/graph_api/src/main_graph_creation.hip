@@ -752,7 +752,7 @@ auto main() -> int
         std::cout << "Done!" << std::endl;
 
         auto const elapsed = std::chrono::duration<double>{stop - start};
-        std::cout << "Reconstruction time: " << elapsed << std::endl;
+        std::cout << "Reconstruction time: " << elapsed.count() << 's' << std::endl;
 
         // Cleanup
         if(graphFinalCreated)
