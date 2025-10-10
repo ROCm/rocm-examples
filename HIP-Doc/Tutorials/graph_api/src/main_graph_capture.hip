@@ -52,6 +52,9 @@ auto main() -> int
 {
     try
     {
+        auto hasTextures = int{0};
+        hip_check(hipDeviceGetAttribute(&hasTextures, hipDeviceAttributeImageSupport, 0));
+
         // Fetch device properties
         auto devProps = hipDeviceProp_t{};
         hip_check(hipGetDeviceProperties(&devProps, 0));
@@ -206,26 +209,29 @@ auto main() -> int
                                             HIPFFT_C2R, projGeom.s_dimFFT.y, &backwardSize));
             hipfft_check(hipfftSetStream(backward, stream));
 
-            // create a HIP texture from the projection
-            auto resDesc = hipResourceDesc{};
-            resDesc.resType = hipResourceTypePitch2D;
-            resDesc.res.pitch2D.desc = hipCreateChannelDesc<float>();
-            resDesc.res.pitch2D.devPtr = static_cast<void*>(proj);
-            resDesc.res.pitch2D.width = projGeom.dim.x;
-            resDesc.res.pitch2D.height = projGeom.dim.y;
-            resDesc.res.pitch2D.pitchInBytes = projPitch;
+            if(hasTextures)
+            {
+                // create a HIP texture from the projection
+                auto resDesc = hipResourceDesc{};
+                resDesc.resType = hipResourceTypePitch2D;
+                resDesc.res.pitch2D.desc = hipCreateChannelDesc<float>();
+                resDesc.res.pitch2D.devPtr = static_cast<void*>(proj);
+                resDesc.res.pitch2D.width = projGeom.dim.x;
+                resDesc.res.pitch2D.height = projGeom.dim.y;
+                resDesc.res.pitch2D.pitchInBytes = projPitch;
 
-            auto texDesc = hipTextureDesc{};
-            texDesc.addressMode[0] = hipAddressModeBorder;
-            texDesc.addressMode[1] = hipAddressModeBorder;
-            texDesc.readMode = hipReadModeElementType;
-            texDesc.borderColor[0] = 0.f;
-            texDesc.borderColor[0] = 0.f;
-            texDesc.filterMode = hipFilterModeLinear;
-            texDesc.normalizedCoords = 0;
+                auto texDesc = hipTextureDesc{};
+                texDesc.addressMode[0] = hipAddressModeBorder;
+                texDesc.addressMode[1] = hipAddressModeBorder;
+                texDesc.readMode = hipReadModeElementType;
+                texDesc.borderColor[0] = 0.f;
+                texDesc.borderColor[0] = 0.f;
+                texDesc.filterMode = hipFilterModeLinear;
+                texDesc.normalizedCoords = 0;
 
-            auto& projTex = textureProjections.emplace_back();
-            hip_check(hipCreateTextureObject(&projTex, &resDesc, &texDesc, nullptr));
+                auto& projTex = textureProjections.emplace_back();
+                hip_check(hipCreateTextureObject(&projTex, &resDesc, &texDesc, nullptr));
+            }
 
             std::cout << "Done!" << std::endl;
         }
@@ -387,20 +393,42 @@ auto main() -> int
                     static_cast<std::uint32_t>(volGeom.dim.z / bpBlockSize.z + 1)
                 };
 
-                auto& projTex = textureProjections.at(streamIdx);
-                backprojection_kernel<<<bpBlocks, bpBlockSize, 0, stream>>>(
-                    static_cast<float*>(vol.ptr),
-                    vol.pitch,
-                    volGeom.dim,
-                    volGeom.voxelDim,
-                    projTex,
-                    projGeom.minCoord,
-                    sinTheta,
-                    cosTheta,
-                    projGeom.pixelDim,
-                    projGeom.d_sd,
-                    projGeom.d_so
-                );
+                if(hasTextures)
+                {
+                    auto& projTex = textureProjections.at(streamIdx);
+                    backprojection_kernel<<<bpBlocks, bpBlockSize, 0, stream>>>(
+                        static_cast<float*>(vol.ptr),
+                        vol.pitch,
+                        volGeom.dim,
+                        volGeom.voxelDim,
+                        projTex,
+                        projGeom.minCoord,
+                        sinTheta,
+                        cosTheta,
+                        projGeom.pixelDim,
+                        projGeom.d_sd,
+                        projGeom.d_so
+                    );
+                }
+                else
+                {
+                    // Fallback for devices without support for texture instructions
+                    backprojection_kernel_no_tex<<<bpBlocks, bpBlockSize, 0, stream>>>(
+                        static_cast<float*>(vol.ptr),
+                        vol.pitch,
+                        volGeom.dim,
+                        volGeom.voxelDim,
+                        proj,
+                        projPitch,
+                        projGeom.dim,
+                        projGeom.minCoord,
+                        sinTheta,
+                        cosTheta,
+                        projGeom.pixelDim,
+                        projGeom.d_sd,
+                        projGeom.d_so
+                    );
+                }
             }
 
             // [sphinx-join-start]
@@ -537,8 +565,11 @@ auto main() -> int
         hip_check(hipFree(vol.ptr));
         hip_check(hipFreeHost(hostVolPtr));
 
-        for(auto&& tex : textureProjections)
-            hip_check(hipDestroyTextureObject(tex));
+        if(hasTextures)
+        {
+            for(auto&& tex : textureProjections)
+                hip_check(hipDestroyTextureObject(tex));
+        }
 
         for(auto&& plan : backwardPlans)
             hipfft_check(hipfftDestroy(plan));

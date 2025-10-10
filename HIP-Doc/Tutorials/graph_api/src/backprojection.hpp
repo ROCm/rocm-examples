@@ -42,4 +42,22 @@ __global__ void backprojection_kernel(
     float d_so
 );
 
+// Fallback for devices without support for texture instructions
+// Overloaded kernel names are not supported by manual graph creation API
+__global__ void backprojection_kernel_no_tex(
+    float* __restrict__ vol,
+    std::size_t volPitch,
+    ulonglong3 volDim,
+    float3 voxelDim,
+    float const* __restrict__ proj,
+    std::size_t projPitch,
+    uint2 projDim,
+    float2 minCoord,
+    float sin_theta,
+    float cos_theta,
+    float2 pixelDim,
+    float d_sd,
+    float d_so
+);
+
 #endif

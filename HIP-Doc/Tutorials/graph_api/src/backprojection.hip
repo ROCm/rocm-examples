@@ -39,6 +39,37 @@ __forceinline__ __device__ auto proj_pixel_coordinate(float coord, float minimum
     return (coord - minimum) / pxSize;
 }
 
+// CDNA devices do not support texture instructions, so we calculate the texture fetch ourselves.
+// https://rocmdocs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/device_memory/texture_fetching.html#linear-filtering
+__forceinline__ __device__ auto interpolate(float const* proj, std::size_t pitch, uint2 dim, float h, float v) -> float
+{
+    auto const h_prime = h - 0.5f;
+    auto i_f = float{};
+    auto const alpha = modff(h_prime, &i_f);
+    auto const i = static_cast<int>(i_f);
+
+    auto const v_prime = v - 0.5f;
+    auto j_f = float{};
+    auto const beta = modff(v_prime, &j_f);
+    auto const j = static_cast<int>(j_f);
+
+    auto fetch = [proj, pitch, dim](int x, int y)
+    {
+        if(x < 0 || x >= static_cast<int>(dim.x) || y < 0 || y >= static_cast<int>(dim.y))
+            return 0.f;
+
+        auto const row = reinterpret_cast<float const*>(reinterpret_cast<char const*>(proj) + y * pitch);
+        return row[x];
+    };
+
+    auto const t1 = (1.f - alpha) * (1.f - beta) * fetch(i, j);
+    auto const t2 = alpha         * (1.f - beta) * fetch(i + 1, j);
+    auto const t3 = (1.f - alpha) * beta         * fetch(i, j + 1);
+    auto const t4 = alpha         * beta         * fetch(i + 1, j + 1);
+
+    return t1 + t2 + t3 + t4;
+}
+
 __global__ void backprojection_kernel(
     float* __restrict__ vol,
     std::size_t pitch,
@@ -53,6 +84,7 @@ __global__ void backprojection_kernel(
     float d_so
 )
 {
+#ifndef __GFX9__ // GFX9 devices don't support texture instructions
     auto const x_in = blockIdx.x * blockDim.x + threadIdx.x;
     auto const y_in = blockIdx.y * blockDim.y + threadIdx.y;
     auto z_in = blockIdx.z * blockDim.z + threadIdx.z;
@@ -79,6 +111,56 @@ __global__ void backprojection_kernel(
 
         // get projection value (with implicit linear interpolation)
         auto det = tex2D<float>(proj, h, v);
+
+        // backproject and write value
+        auto u = -(d_so / (s + d_so));
+        atomicAdd(&row[x_in], 0.5f * det * u * u);
+    }
+#endif
+}
+
+__global__ void backprojection_kernel_no_tex(
+    float* __restrict__ vol,
+    std::size_t volPitch,
+    ulonglong3 volDim,
+    float3 voxelDim,
+    float const* __restrict__ proj,
+    std::size_t projPitch,
+    uint2 projDim,
+    float2 minCoord,
+    float sin_theta,
+    float cos_theta,
+    float2 pixelDim,
+    float d_sd,
+    float d_so
+)
+{
+    auto const x_in = blockIdx.x * blockDim.x + threadIdx.x;
+    auto const y_in = blockIdx.y * blockDim.y + threadIdx.y;
+    auto z_in = blockIdx.z * blockDim.z + threadIdx.z;
+
+    if((x_in < volDim.x) && (y_in < volDim.y) && (z_in < volDim.z))
+    {
+        auto const slice_pitch = volPitch * volDim.y;
+        auto slice = reinterpret_cast<char*>(vol) + z_in * slice_pitch;
+        auto row = reinterpret_cast<float*>(slice + y_in * volPitch);
+
+        // get coordinates relative to volume center (0, 0, 0)
+        auto x = vol_centered_coordinate(x_in, volDim.x, voxelDim.x);
+        auto y = vol_centered_coordinate(y_in, volDim.y, voxelDim.y);
+        auto z = vol_centered_coordinate(z_in, volDim.z, voxelDim.z);
+
+        // rotate coordinates
+        auto s = x * cos_theta + y * sin_theta;
+        auto t = -x * sin_theta + y * cos_theta;
+
+        // project rotated coordinates onto detector; add 0.5 to each coordinate to reflect HIP's filtering mechanism
+        auto factor = d_sd / (s + d_so);
+        auto h = proj_pixel_coordinate(t * factor, minCoord.x, pixelDim.x) + 0.5f;
+        auto v = proj_pixel_coordinate(z * factor, minCoord.y, pixelDim.y) + 0.5f;
+
+        // get projection value (with implicit linear interpolation)
+        auto det = interpolate(proj, projPitch, projDim, h, v);
 
         // backproject and write value
         auto u = -(d_so / (s + d_so));
