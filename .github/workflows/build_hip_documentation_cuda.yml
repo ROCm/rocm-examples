@@ -40,7 +40,7 @@ jobs:
               wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
               apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
               apt-get update -qq &&
-              apt-get install -y hip-dev hipify-clang
+              apt-get install -y hip-dev hipify-clang hipfft-dev
 
           - name: Configure and Build
             shell: bash
