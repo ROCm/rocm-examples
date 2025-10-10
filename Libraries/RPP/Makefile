@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,42 +20,20 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-  hipBLAS \
-  hipCUB \
-  hipFFT \
-  hipSOLVER \
-  hipSPARSE \
-  hipSPARSELt \
-  rocRAND \
-  hipRAND
+EXAMPLES := \
+	box_filter \
+	brightness \
+	contrast \
+	flip \
+	gamma_correction \
+	resize
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-  hipBLASLt \
-  hipTensor \
-  MIGraphX \
-  MIVisionX \
-  RCCL \
-  rocALUTION \
-  rocBLAS \
-  rocFFT \
-  rocJPEG \
-  rocPRIM \
-  rocProfiler-SDK \
-  rocSOLVER \
-  rocSPARSE \
-  rocThrust \
-  rocWMMA \
-  RPP
-endif
-
-all: $(LIBRARIES)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(LIBRARIES):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(LIBRARIES)
+.PHONY: all clean $(EXAMPLES)

@@ -31,7 +31,7 @@ jobs:
                   apt-get update -qq &&
                   apt-get install -y build-essential g++ glslang-tools \
                     python3 python3-pip libglfw3-dev libvulkan-dev locales wget pkg-config \
-                    protobuf-compiler libprotoc-dev
+                    protobuf-compiler libprotoc-dev libopencv-dev
                   python3 -m pip install --upgrade pip
                   python3 -m pip install cmake future==1.0.0 pytz==2022.1 numpy==1.23.0 \
                   google==3.0.0 protobuf==3.12.4
@@ -51,6 +51,7 @@ jobs:
                     rocjpeg-dev \
                     rocsparse-dev \
                     rocthrust-dev \
+                    rpp-dev \
                     libdw-dev rocprofiler-sdk \
                     rccl-dev \
                     hipblaslt-dev \

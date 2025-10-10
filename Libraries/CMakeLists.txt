@@ -59,4 +59,5 @@ if(
     add_subdirectory(rocSPARSE)
     add_subdirectory(rocThrust)
     add_subdirectory(rocWMMA)
+    add_subdirectory(RPP)
 endif()
