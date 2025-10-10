@@ -24,8 +24,6 @@ cmake_minimum_required(VERSION 3.21)
 
 project(hip_graph_api_tutorial LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})

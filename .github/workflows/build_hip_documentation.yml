@@ -9,7 +9,7 @@ on:
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
-      - 'HIP-Programmin-Guide/**'
+      - 'HIP-Doc/**'
       - '.github/workflows/**'
 
 env:
