@@ -28,8 +28,6 @@
 
 #include <hip/hip_runtime.h>
 
-#include <omp.h>
-
 #include <algorithm>
 #include <cmath>
 #include <cstddef>
