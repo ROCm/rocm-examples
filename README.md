@@ -536,6 +536,13 @@ The following options are available when building with CMake.
     - [simple_hgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_hgemm/) : Showcases a simple half-precision matrix-matrix multiplication.
     - [simple_sgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_sgemm/) : Showcases a simple single-precision matrix-matrix multiplication.
     - [simple_sgemv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_sgemv/) : Showcases a simple single-precision matrix-vector multiplication.
+  - [RPP](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RPP/)
+    - [box_filter](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RPP/box_filter/): Showcases how to apply a box filter (mean filter) to images using spatial convolution with configurable kernel sizes.
+    - [brightness](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RPP/brightness/): Showcases how to adjust image brightness using linear transformation with alpha and beta parameters.
+    - [contrast](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RPP/contrast/): Showcases how to adjust image contrast by scaling pixel values around a center point.
+    - [flip](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RPP/flip/): Showcases how to flip images horizontally, vertically, or both to create mirror reflections.
+    - [gamma_correction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RPP/gamma_correction/): Showcases how to apply gamma correction using power-law transformation to adjust image brightness and contrast.
+    - [resize](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RPP/resize/): Showcases how to resize images to specified dimensions using nearest neighbor or bilinear interpolation.
 - [Tools](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/): Showcases the ROCm tools for debugging and performance analysis.
   - [ROCgdb](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/ROCgdb): Shows how to use ROCgdb for GPU debugging.
   - [rocprof-compute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/rocprof-compute): Shows how to use the ROCm Compute Profiler.
