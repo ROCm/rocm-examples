@@ -283,7 +283,7 @@ auto main() -> int
                 auto forkEvent = hipEvent_t{};
                 hip_check(hipEventCreate(&forkEvent));
                 hip_check(hipEventRecord(forkEvent, streams.at(0)));
-                hip_check(hipStreamWaitEvent(streams.at(streamIdx), forkEvent));
+                hip_check(hipStreamWaitEvent(streams.at(streamIdx), forkEvent, 0));
                 hip_check(hipEventDestroy(forkEvent)); // Can destroy after wait is recorded
             }
             // [sphinx-fork-end]
@@ -438,7 +438,7 @@ auto main() -> int
                 auto joinEvent = hipEvent_t{};
                 hip_check(hipEventCreate(&joinEvent));
                 hip_check(hipEventRecord(joinEvent, streams.at(streamIdx)));
-                hip_check(hipStreamWaitEvent(streams.at(0), joinEvent));
+                hip_check(hipStreamWaitEvent(streams.at(0), joinEvent, 0));
                 hip_check(hipEventDestroy(joinEvent)); // Can destroy after wait is recorded
             }
             // [sphinx-join-end]

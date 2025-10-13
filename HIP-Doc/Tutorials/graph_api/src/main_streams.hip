@@ -436,7 +436,7 @@ auto main() -> int
         }
 
         for(auto&& event : completionEvents)
-            hip_check(hipStreamWaitEvent(streams.at(0), event));
+            hip_check(hipStreamWaitEvent(streams.at(0), event, 0));
         // [sphinx-sync-end]
 
         // Obtain reconstruction time before copying back the result
