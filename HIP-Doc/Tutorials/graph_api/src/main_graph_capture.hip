@@ -144,7 +144,7 @@ auto main() -> int
                                            << volGeom.dim.z << std::endl;
 
         // Initialize per-stream data
-        for(auto streamIdx = 0; streamIdx < streams.size(); ++streamIdx)
+        for(auto streamIdx = 0u; streamIdx < streams.size(); ++streamIdx)
         {
             std::cout << "Initializing stream " << streamIdx << "... " << std::flush;
             auto stream = streams.at(streamIdx);
@@ -265,7 +265,7 @@ auto main() -> int
 
         auto start = std::chrono::steady_clock::now();
             
-        auto projIdx = 0;
+        auto projIdx = 0u;
         while(projIdx < projGeom.numProj)
         {
             // [sphinx-begin-capture-start]

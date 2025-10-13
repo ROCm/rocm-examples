@@ -146,7 +146,7 @@ auto main() -> int
                                            << volGeom.dim.z << std::endl;
 
         // Initialize per-stream data
-        for(auto streamIdx = 0; streamIdx < streams.size(); ++streamIdx)
+        for(auto streamIdx = 0u; streamIdx < streams.size(); ++streamIdx)
         {
             std::cout << "Initializing stream " << streamIdx << "... " << std::flush;
             auto stream = streams.at(streamIdx);
@@ -259,7 +259,7 @@ auto main() -> int
         auto start = std::chrono::steady_clock::now();
 
         // [sphinx-batch-start]
-        auto projIdx = 0;
+        auto projIdx = 0u;
         while(projIdx < projGeom.numProj)
         {
             auto batchSize = std::min(numStreams, static_cast<int>(projGeom.numProj - projIdx));
@@ -427,7 +427,7 @@ auto main() -> int
         // [sphinx-sync-start]
         // First stream waits for other streams to complete
         auto completionEvents = std::vector<hipEvent_t>{};
-        for(auto streamIdx = 1; streamIdx < streams.size(); ++streamIdx)
+        for(auto streamIdx = 1u; streamIdx < streams.size(); ++streamIdx)
         {
             auto event = hipEvent_t{};
             hip_check(hipEventCreate(&event));

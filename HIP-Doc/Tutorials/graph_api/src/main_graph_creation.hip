@@ -265,7 +265,7 @@ auto main() -> int
 
         auto start = std::chrono::steady_clock::now();
 
-        auto projIdx = 0;
+        auto projIdx = 0u;
         while(projIdx < projGeom.numProj)
         {
             auto batchSize = std::min(numBranches, static_cast<int>(projGeom.numProj - projIdx));

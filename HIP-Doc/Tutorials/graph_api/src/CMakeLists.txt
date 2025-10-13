@@ -94,6 +94,7 @@ set_target_properties(${example_streams} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:C
                                                     CXX_SCAN_FOR_MODULES OFF
                                                     $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
 target_compile_features(${example_streams} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
+target_compile_options(${example_streams} PRIVATE $<$<COMPILE_LANG_AND_ID:HIP,Clang>:-Wall -Wextra -pedantic>)
 target_include_directories(${example_streams} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_streams} PRIVATE ${example_objects} hip::hipfft)
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
@@ -113,6 +114,7 @@ else()
                                                               CXX_SCAN_FOR_MODULES OFF
                                                               $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
     target_compile_features(${example_graph_capture} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
+    target_compile_options(${example_graph_capture} PRIVATE $<$<COMPILE_LANG_AND_ID:HIP,Clang>:-Wall -Wextra -pedantic>)
     target_include_directories(${example_graph_capture} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
     target_link_libraries(${example_graph_capture} PRIVATE ${example_objects} hip::hipfft)
     if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
@@ -130,6 +132,7 @@ set_target_properties(${example_graph_creation} PROPERTIES $<$<COMPILE_LANGUAGE:
                                                            CXX_SCAN_FOR_MODULES OFF
                                                            $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
 target_compile_features(${example_graph_creation} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
+target_compile_options(${example_graph_creation} PRIVATE $<$<COMPILE_LANG_AND_ID:HIP,Clang>:-Wall -Wextra -pedantic>)
 target_include_directories(${example_graph_creation} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_graph_creation} PRIVATE ${example_objects} hip::hipfft)
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
