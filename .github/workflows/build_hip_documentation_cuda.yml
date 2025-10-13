@@ -48,5 +48,5 @@ jobs:
             run: |
               cd HIP-Doc && mkdir build && cd build
               export CMAKE_POLICY_VERSION_MINIMUM="3.5"
-              cmake -DGPU_RUNTIME=CUDA -DHIP_PLATFORM=nvidia ..
+              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -DROCM_EXAMPLES_GPU_PLATFORM=nvidia ..
               cmake --build . -j

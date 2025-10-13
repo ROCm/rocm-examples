@@ -46,8 +46,8 @@ else()
     set(TIFF_TARGET TIFF::TIFF)
 endif()
 
-find_package(hip REQUIRED CONFIG)
-find_package(hipfft REQUIRED CONFIG)
+find_package(hip REQUIRED)
+find_package(hipfft REQUIRED)
 
 add_library(${example_objects} OBJECT backprojection.hip
                                       filtering.hip
@@ -73,7 +73,7 @@ target_compile_definitions(${example_objects} PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:
                                                      $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
 target_compile_features(${example_objects} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
 target_include_directories(${example_objects} PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
-target_link_libraries(${example_objects} PUBLIC hip::hipfft ${TIFF_TARGET} TIFF::CXX)
+target_link_libraries(${example_objects} PUBLIC hip::host hip::hipfft ${TIFF_TARGET} TIFF::CXX)
 
 add_executable(${example_streams} main_streams.hip)
 add_test(NAME ${example_streams} COMMAND ${example_streams})
