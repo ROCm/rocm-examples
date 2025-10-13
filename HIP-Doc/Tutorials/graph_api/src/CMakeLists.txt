@@ -46,8 +46,13 @@ else()
     set(TIFF_TARGET TIFF::TIFF)
 endif()
 
-find_package(hip REQUIRED)
-find_package(hipfft REQUIRED)
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    find_package(hip REQUIRED CONFIG)
+else()
+    find_package(hip MODULE REQUIRED)
+endif()
+
+find_package(hipfft REQUIRED CONFIG)
 
 add_library(${example_objects} OBJECT backprojection.hip
                                       filtering.hip
@@ -69,7 +74,8 @@ set_target_properties(${example_objects} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:C
                                                     CXX_EXTENSIONS OFF
                                                     CXX_SCAN_FOR_MODULES OFF
                                                     $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
-target_compile_definitions(${example_objects} PUBLIC $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+target_compile_definitions(${example_objects} PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:__HIP_PLATFORM_NVIDIA__>
+                                                     $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
 target_compile_features(${example_objects} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
 target_include_directories(${example_objects} PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_objects} PUBLIC hip::hipfft ${TIFF_TARGET} TIFF::CXX)
