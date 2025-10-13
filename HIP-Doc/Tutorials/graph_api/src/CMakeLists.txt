@@ -29,7 +29,7 @@ include(FetchContent)
 
 find_package(TIFF COMPONENTS CXX)
 if(NOT TIFF_FOUND)
-    message(STATUS "Could not find system libtiff, fetching from upstream...")
+    message(STATUS "Could not find system LibTIFF, fetching from upstream...")
     FetchContent_Declare(
         libtiff
         GIT_REPOSITORY https://gitlab.com/libtiff/libtiff.git
@@ -40,7 +40,7 @@ if(NOT TIFF_FOUND)
     target_compile_definitions(tiff PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
     target_compile_definitions(tiffxx PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
 
-    set(TIFF_TARGET TIFF::tiff) # CMake's FindTIFF module uses the uppercase notation, libTIFF uses lowercase
+    set(TIFF_TARGET TIFF::tiff) # CMake's FindTIFF module uses the uppercase notation, LibTIFF uses lowercase
     install(TARGETS tiff tiffxx)
 else()
     set(TIFF_TARGET TIFF::TIFF)
@@ -142,8 +142,17 @@ install(TARGETS ${example_graph_creation})
 
 # Make sure the TIFF library can be picked up by the tutorial application
 if(NOT TIFF_FOUND)
-    set_target_properties(tiff PROPERTIES LIBRARY_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}>
-                                          RUNTIME_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}>)
-    set_target_properties(tiffxx PROPERTIES LIBRARY_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}
-                                            RUNTIME_OUTPUT_DIRECTORY $<TARGET_FILE_DIR:${example_streams}>)
+    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+        # On Windows we need to copy tiff.dll to the executables' output directory.
+        foreach(target ${example_streams} ${example_graph_creation})
+            add_custom_command(TARGET ${target} POST_BUILD
+                               COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                                    $<TARGET_RUNTIME_DLLS:${target}> $<TARGET_FILE_DIR:${target}>
+                               COMMAND_EXPAND_LISTS)
+        endforeach()
+    else()
+        # On Linux we must add libtiff.so to the executable's RPATH.
+        set_target_properties(${example_streams} ${example_graph_capture} ${example_graph_creation}
+                              PROPERTIES BUILD_RPATH "$<TARGET_FILE_DIR:tiff>;$<TARGET_FILE_DIR:tiffxx>")
+    endif()
 endif()

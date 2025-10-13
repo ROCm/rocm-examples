@@ -25,8 +25,8 @@
 #include "projection.hpp"
 #include "utility.hpp"
 
+#include <tiff.h>
 #include <tiffio.h>
-#include <tiffio.hxx>
 
 #include <cstdint>
 #include <exception>
