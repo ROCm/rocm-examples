@@ -60,7 +60,6 @@ add_library(${example_objects} OBJECT backprojection.hip
                                       log_transform.hip
                                       normalization.hip
                                       phantom.hip
-                                      tiff.cpp
                                       volume.cpp
                                       weighting.hip)
 set_source_files_properties(backprojection.hip
