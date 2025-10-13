@@ -22,6 +22,7 @@
 
 #include "phantom.hpp"
 
+#include "cudaHelpers.hpp"
 #include "projection.hpp"
 #include "utility.hpp"
 #include "volume.hpp"
@@ -251,7 +252,7 @@ __device__ auto siddon_raytrace(float const* vol,
             // Account for last row's rays starting at the detector boundary
             auto tolerance = 0.5f * std::numeric_limits<float>::epsilon();
             i[axis] = static_cast<long long>(floorf((pos - boundsMin[axis]) / voxelDims[axis])) + tolerance;
-            i[axis] = max(0ll, min(volDims[axis] - 1, i[axis]));
+            i[axis] = max(std::int64_t{0}, min(static_cast<std::int64_t>(volDims[axis] - 1), i[axis]));
             if(i_step[axis] > 0) // Next boundary is "upper" face of the voxel
                 alpha_next[axis] = (boundsMin[axis] + (i[axis] + 1) * voxelDims[axis] - s0) / r_axis;
             else // Next boundary is "lower" face of the voxel
@@ -265,9 +266,6 @@ __device__ auto siddon_raytrace(float const* vol,
     // Check if the ray actually intersects the volume
     if(alpha_min > alpha_max)
         return 0.f;
-
-    auto x = blockIdx.x * blockDim.x + threadIdx.x;
-    auto y = blockIdx.y * blockDim.y + threadIdx.y;
 
     // Step through voxels along trajectory
     auto alpha_current = alpha_min;
@@ -292,7 +290,9 @@ __device__ auto siddon_raytrace(float const* vol,
 
         // Get current voxel value and accumulate weighted by intersection length
         auto val = float{};
-        if(i[0] >= 0ll && i[0] < volDims[0] && i[1] >= 0ll && i[1] < volDims[1] && i[2] >= 0ll && i[2] < volDims[2])
+        if(i[0] >= 0ll && i[0] < static_cast<std::int64_t>(volDims[0]) &&
+           i[1] >= 0ll && i[1] < static_cast<std::int64_t>(volDims[1]) &&
+           i[2] >= 0ll && i[2] < static_cast<std::int64_t>(volDims[2]))
         {
             auto slicePitch = volPitch * volDims[1];
             auto slice = reinterpret_cast<char const*>(vol) + i[2] * slicePitch;
@@ -313,7 +313,7 @@ __device__ auto siddon_raytrace(float const* vol,
         alpha_next[min_axis] += alpha_inc[min_axis];
 
         // If voxel index is out of bounds, exit
-        if(i[min_axis] < 0 || i[min_axis] >= volDims[min_axis])
+        if(i[min_axis] < 0 || i[min_axis] >= static_cast<std::int64_t>(volDims[min_axis]))
             break;
     }
 
@@ -329,25 +329,22 @@ __global__ void create_projection_kernel(
     std::size_t projPitch,
     uint2 projDim,
     float2 pixelDims,
-    float d_so,
-    float d_sd,
     float3 sourcePos,
-    float3 originPos,
     float3 detectorCenter,
     float3 h_axis,
     float3 v_axis
 )
 {
-    int h_in = blockIdx.x * blockDim.x + threadIdx.x;
-    int v_in = blockIdx.y * blockDim.y + threadIdx.y;
+    auto h_in = blockIdx.x * blockDim.x + threadIdx.x;
+    auto v_in = blockIdx.y * blockDim.y + threadIdx.y;
 
     if (h_in >= projDim.x || v_in >= projDim.y)
         return;
 
     // Get detector pixel position in space
     auto pixelPos = detectorCenter +
-                    (h_in - projDim.x / 2.f + 0.5f) * pixelDims.x * h_axis +
-                    (v_in - projDim.y / 2.f + 0.5f) * pixelDims.y * v_axis;
+                    (static_cast<int>(h_in) - projDim.x / 2.f + 0.5f) * pixelDims.x * h_axis +
+                    (static_cast<int>(v_in) - projDim.y / 2.f + 0.5f) * pixelDims.y * v_axis;
 
     // Raytrace from source to pixel (Siddon's algorithm)
     auto attenuation = siddon_raytrace(vol, volPitch, volDims, voxelDims, sourcePos, pixelPos);
@@ -423,10 +420,7 @@ void create_projection(
         proj.pitch,
         projGeom.dim,
         projGeom.pixelDim,
-        projGeom.d_so,
-        projGeom.d_sd,
         sourcePos,
-        originPos,
         detectorCenter,
         h_axis,
         v_axis
@@ -444,8 +438,8 @@ namespace phantom
         constexpr auto d_v = 0.004f;
 
         // Filter length
-        auto const N_hFFT = std::pow(2.f, std::ceil(std::log2(N_h)));
-        auto const s_N_hFFT = static_cast<std::int32_t>(N_hFFT);
+        auto const N_hFFT = static_cast<unsigned int>(std::pow(2.f, std::ceil(std::log2(N_h))));
+        auto const s_N_hFFT = static_cast<int>(N_hFFT);
 
         // Transformed filter length
         auto const N_hTrans = N_hFFT / 2 + 1;
@@ -460,18 +454,18 @@ namespace phantom
         {
             d_sd,
             d_so,
-            float2{d_h, d_v},            // pixelDim
-            0.5f,                        // thetaStep
-            1.f,                         // thetaSign
-            int2{0, 0},                  // shift
-            float2{0.f, 0.f},            // delta
-            12,                          // bps
-            720,                         // numProj            
-            uint2{N_h, N_v},             // dim
-            uint2{N_hFFT, N_v},          // dimFFT
-            int2{s_N_hFFT, N_v},         // s_dimFFT
-            uint2{N_hTrans, N_v},        // dimTrans
-            float2{h_min, v_min}         // minCoord
+            float2{d_h, d_v},                      // pixelDim
+            0.5f,                                  // thetaStep
+            1.f,                                   // thetaSign
+            int2{0, 0},                            // shift
+            float2{0.f, 0.f},                      // delta
+            12,                                    // bps
+            720,                                   // numProj            
+            uint2{N_h, N_v},                       // dim
+            uint2{N_hFFT, N_v},                    // dimFFT
+            int2{s_N_hFFT, static_cast<int>(N_v)}, // s_dimFFT
+            uint2{N_hTrans, N_v},                  // dimTrans
+            float2{h_min, v_min}                   // minCoord
         };
     }
 
@@ -493,7 +487,7 @@ namespace phantom
         auto volume = create_phantom(volGeom.dim, volGeom.voxelDim);
 
         auto projections = std::vector<hipPitchedPtr>{}; // Forward projections in uint12 format
-        for(auto projIdx = 0; projIdx < projGeom.numProj; ++projIdx)
+        for(auto projIdx = 0u; projIdx < projGeom.numProj; ++projIdx)
         {
             auto projPtr = static_cast<std::uint16_t*>(nullptr);
             auto projPitch = std::size_t{};
@@ -502,8 +496,8 @@ namespace phantom
             projections.push_back(make_hipPitchedPtr(projPtr, projPitch, projGeom.dim.x, projGeom.dim.y));
         }
 
-        auto streamIdx = 0;
-        for(auto projIdx = 0; projIdx < projGeom.numProj; ++projIdx)
+        auto streamIdx = 0u;
+        for(auto projIdx = 0u; projIdx < projGeom.numProj; ++projIdx)
         {
             auto& stream = streams.at(streamIdx);
             auto& proj = projections.at(projIdx);
