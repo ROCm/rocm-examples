@@ -46,12 +46,7 @@ else()
     set(TIFF_TARGET TIFF::TIFF)
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    find_package(hip REQUIRED CONFIG)
-else()
-    find_package(hip MODULE REQUIRED)
-endif()
-
+find_package(hip REQUIRED CONFIG)
 find_package(hipfft REQUIRED CONFIG)
 
 add_library(${example_objects} OBJECT backprojection.hip
