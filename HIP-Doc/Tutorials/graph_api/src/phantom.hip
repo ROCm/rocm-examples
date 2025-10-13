@@ -50,7 +50,7 @@ struct spheroid
     float intensity;  // intensity value (1 = black, 2 = white)
 };
 
-constexpr spheroid shepp_logan_phantom[] =
+constexpr __device__ spheroid shepp_logan_phantom[] =
 {
     // x,      y,       minor,   major,   theta, intensity
     {  0.f,    0.f,     0.69f,   0.92f,   0.f,   2.f},      // Great white spheroid

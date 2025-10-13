@@ -51,6 +51,10 @@ if(NOT TARGET hip::host) # hipFFT usually pulls this in automatically
     find_package(hip REQUIRED)
 endif()
 
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    find_package(CUDAToolkit REQUIRED)
+endif()
+
 add_library(${example_objects} OBJECT backprojection.hip
                                       filtering.hip
                                       log_transform.hip
@@ -71,13 +75,16 @@ set_target_properties(${example_objects} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:C
                                                     CXX_EXTENSIONS OFF
                                                     CXX_SCAN_FOR_MODULES OFF
                                                     $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
-target_compile_definitions(${example_objects} PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:__HIP_PLATFORM_NVIDIA__>
-                                                     $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
+target_compile_definitions(${example_objects} PUBLIC $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
 target_compile_features(${example_objects} PRIVATE cuda_std_20 cxx_std_20 hip_std_20)
 target_compile_options(${example_objects} PRIVATE $<$<COMPILE_LANG_AND_ID:HIP,Clang>:-Wall -Wextra -pedantic>
                                                   $<$<COMPILE_LANGUAGE:CUDA>:--expt-relaxed-constexpr>)
 target_include_directories(${example_objects} PUBLIC $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
 target_link_libraries(${example_objects} PUBLIC hip::host hip::hipfft ${TIFF_TARGET} TIFF::CXX)
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    target_compile_definitions(${example_objects} PRIVATE $<$<COMPILE_LANGUAGE:CXX>:__HIP_PLATFORM_NVIDIA__>)
+    target_link_libraries(${example_objects} PRIVATE CUDA::cudart)
+endif()
 
 add_executable(${example_streams} main_streams.hip)
 add_test(NAME ${example_streams} COMMAND ${example_streams})
