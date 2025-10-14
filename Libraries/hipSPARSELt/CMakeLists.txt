@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,31 +21,36 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Libraries LANGUAGES CXX)
+project(hipSPARSELt_examples LANGUAGES CXX)
 include(CTest)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-# CMake configuration files for CUDA versions of HIP libraries are not yet
-# included under the HIP SDK for Windows.
-if(
-    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
-)
-    add_subdirectory(hipBLAS)
-    add_subdirectory(hipBLASLt)
-    add_subdirectory(hipCUB)
-    add_subdirectory(hipFFT)
-    add_subdirectory(hipRAND)
-    add_subdirectory(hipSOLVER)
-    add_subdirectory(hipSPARSELt)
-    add_subdirectory(hipTensor)
-    add_subdirectory(rocBLAS)
-    add_subdirectory(rocFFT)
-    add_subdirectory(rocPRIM)
-    add_subdirectory(rocRAND)
-    add_subdirectory(rocSOLVER)
-    add_subdirectory(rocSPARSE)
-    add_subdirectory(rocThrust)
-    add_subdirectory(rocWMMA)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(STATUS "The hipSPARSELt examples are available on Linux only.")
+else()
+    find_package(hipsparselt)
+    
+    if(NOT hipsparselt_FOUND)
+        message(STATUS "hipSPARSELt could not be found, not building hipSPARSELt examples")
+    else()
+        add_subdirectory(spmm)
+    endif()
 endif()
