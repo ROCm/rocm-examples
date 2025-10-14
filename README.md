@@ -376,6 +376,10 @@ The following options are available when building with CMake.
       - [custom_op_rocblas_kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/custom_op_rocblas_kernel/): Demonstrates integrating rocBLAS linear algebra routines as custom operators.
     - [vision](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/vision/): Computer vision inference examples.
       - [cpp_mnist](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/vision/cpp_mnist/): Demonstrates MNIST handwritten digit inference with optional FP16/INT8 quantization and multi-target support.
+  - [MIVisionX](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIVisionX/)
+    - [canny](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIVisionX/canny/): Demonstrates Canny edge detection using OpenVX framework with color space conversion, channel extraction, and configurable hysteresis thresholding.
+    - [mv_objdetect](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIVisionX/mv_objdetect/): Showcases real-time object detection using MIVisionX deployment framework with pre-trained YoloV2 Tiny model, including automated model compilation and video decoding integration.
+    - [opencv_orb](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIVisionX/opencv_orb/): Demonstrates ORB (Oriented FAST and Rotated BRIEF) feature detection using OpenVX with OpenCV extensions for keypoint detection and descriptor computation.
   - [RCCL](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/)
     - [allgather](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/allgather/): Showcases how to collect data from all ranks and distribute the concatenated result to every rank.
     - [allreduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/allreduce/): Showcases how to reduce data from all ranks and distribute the result to every rank.
