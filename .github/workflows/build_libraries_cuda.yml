@@ -73,6 +73,18 @@ jobs:
           cd Libraries/hipFFT
           make GPU_RUNTIME=CUDA -j
 
+      - name: Install hipSPARSELt
+        shell: bash
+        run: |
+          apt-get install -y hipsparselt-dev
+
+      - name: Build hipSPARSELt examples
+        shell: bash
+        run: |
+          cd Libraries/hipSPARSELt
+          make GPU_RUNTIME=CUDA -j
+
+
       - name: Build and install rocRAND
         shell: bash
         run: |
