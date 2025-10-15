@@ -22,7 +22,8 @@
 
 EXAMPLES := \
 	spmm \
-	spmm_alphavec
+	spmm_alphavec \
+	spmm_bias
 
 all: $(EXAMPLES)
 

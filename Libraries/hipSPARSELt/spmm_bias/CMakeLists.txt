@@ -20,12 +20,14 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipSPARSELt_examples LANGUAGES CXX)
-include(CTest)
+set(example_name hipsparselt_spmm_bias)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+project(${example_name} LANGUAGES CXX)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -43,16 +45,20 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "The hipSPARSELt examples are available on Linux only.")
-else()
-    find_package(hipsparselt)
-    
-    if(NOT hipsparselt_FOUND)
-        message(STATUS "hipSPARSELt could not be found, not building hipSPARSELt examples")
-    else()
-        add_subdirectory(spmm)
-        add_subdirectory(spmm_alphavec)
-        add_subdirectory(spmm_bias)
-    endif()
-endif()
+find_package(hip REQUIRED)
+find_package(hipsparselt REQUIRED)
+
+add_executable(${example_name} main.cpp)
+# Make example runnable using CTest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_target_properties(${example_name} PROPERTIES CXX_EXTENSIONS OFF)
+
+target_compile_features(${example_name} PRIVATE cxx_std_17)
+target_include_directories(${example_name} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../../Common")
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE hip::host roc::hipsparselt)
+
+install(TARGETS ${example_name})
