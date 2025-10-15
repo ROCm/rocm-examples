@@ -20,17 +20,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-	Programming-Guide \
-	Reference \
-	Tutorials
+cmake_minimum_required(VERSION 3.21)
 
-all: $(SUBDIRECTORIES)
+project(hip_graph_api_tutorial LANGUAGES CXX)
 
-clean: TARGET=clean
-clean: all
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-$(SUBDIRECTORIES):
-	$(MAKE) -C $@ $(TARGET)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+endif()
 
-.PHONY: all clean $(SUBDIRECTORIES)
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
+add_subdirectory(src)

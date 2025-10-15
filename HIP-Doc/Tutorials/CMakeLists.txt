@@ -20,17 +20,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := \
-	Programming-Guide \
-	Reference \
-	Tutorials
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(HIP-Doc-Tutorials LANGUAGES CXX)
 
-all: $(SUBDIRECTORIES)
+include(CTest)
 
-clean: TARGET=clean
-clean: all
-
-$(SUBDIRECTORIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(SUBDIRECTORIES)
+add_subdirectory(graph_api)

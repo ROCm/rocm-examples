@@ -260,6 +260,8 @@ The following options are available when building with CMake.
     - [Low-Precision-Floating-Point-Types](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Reference/Low-Precision-Floating-Point-Types) contains the examples from the [Low precision floating point types](https://rocm.docs.amd.com/projects/HIP/en/latest/reference/low_fp_types.html) page.
       - [low_precision_float_fp8](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Reference/Low-Precision-Floating-Point-Types/low_precision_float_fp8): Shows how to convert a single-precision `float` value to an 8-bit floating-point type and back.
       - [low_precision_float_fp16](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Reference/Low-Precision-Floating-Point-Types/low_precision_float_fp16): Shows how to perform an addition of two 16-bit `__half` values and store the result as single-precision `float`.
+  - [Tutorial](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials) hosts the examples from the HIP documentation's Tutorials section.
+    - [graph_api](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/graph_api): Shows how to convert an existing stream-based application to a graph-based application.
 - [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/README.md) for details.
 - [Docs](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/)
   - [CONTRIBUTING.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/CONTRIBUTING.md) contains information on how to contribute to the examples.

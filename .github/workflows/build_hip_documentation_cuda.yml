@@ -30,7 +30,7 @@ jobs:
             run: |
                   apt-get update -qq &&
                   apt-get install -y build-essential g++ glslang-tools \
-                    python3 python3-pip locales wget
+                    python3 python3-pip locales wget git libtiff-dev
                   python3 -m pip install --upgrade pip
                   python3 -m pip install cmake
 
@@ -40,7 +40,7 @@ jobs:
               wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
               apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
               apt-get update -qq &&
-              apt-get install -y hip-dev hipify-clang
+              apt-get install -y hip-dev hipify-clang hipfft-dev
 
           - name: Configure and Build
             shell: bash
@@ -48,5 +48,5 @@ jobs:
             run: |
               cd HIP-Doc && mkdir build && cd build
               export CMAKE_POLICY_VERSION_MINIMUM="3.5"
-              cmake -DGPU_RUNTIME=CUDA ..
+              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -DHIP_PLATFORM=nvidia ..
               cmake --build . -j

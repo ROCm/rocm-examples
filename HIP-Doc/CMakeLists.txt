@@ -27,6 +27,7 @@ include(CTest)
 
 add_subdirectory(Programming-Guide)
 add_subdirectory(Reference)
+add_subdirectory(Tutorials)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../Common/HipPlatform.cmake")
 select_gpu_language()
