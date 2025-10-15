@@ -58,10 +58,6 @@ set_target_properties(${example_name} PROPERTIES CXX_EXTENSIONS OFF)
 target_compile_features(${example_name} PRIVATE cxx_std_17)
 target_include_directories(${example_name} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../../Common")
 
-if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    target_compile_definitions(${example_name} PRIVATE __HIP_PLATFORM_NVIDIA__)
-endif()
-
 # Link to example library
 target_link_libraries(${example_name} PRIVATE hip::host roc::hipsparselt)
 
