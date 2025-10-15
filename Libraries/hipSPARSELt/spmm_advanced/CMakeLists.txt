@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name hipsparselt_spmm_bias)
+set(example_name hipsparselt_spmm_advanced)
 
 project(${example_name} LANGUAGES CXX)
 

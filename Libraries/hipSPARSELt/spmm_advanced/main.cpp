@@ -56,7 +56,7 @@ int main()
     constexpr auto m = 32;
     constexpr auto n = 32;
     constexpr auto p = 64;
-
+    
     auto hostAlpha = std::vector<__half>{};
     hostAlpha.resize(p);
     std::generate(std::begin(hostAlpha), std::end(hostAlpha), randomHalf);
@@ -145,6 +145,16 @@ int main()
     constexpr auto DBytes = colsD * rowsD * sizeof(__half);
     HIP_CHECK(hipMalloc(&deviceD, DBytes));
     HIP_CHECK(hipMemset(deviceD, 0, DBytes));
+    
+    // Initialize bias
+    auto hostBias = std::vector<__half>{};
+    hostBias.resize(rowsD);
+    std::generate(std::begin(hostBias), std::end(hostBias), randomHalf);
+
+    auto deviceBias = static_cast<__half*>(nullptr);
+    auto biasBytes = rowsD * sizeof(__half);
+    HIP_CHECK(hipMalloc(&deviceBias, biasBytes));
+    HIP_CHECK(hipMemcpy(deviceBias, hostBias.data(), biasBytes, hipMemcpyHostToDevice));
 
     // Initialize matrix multiplication
     auto matmulDesc = hipsparseLtMatmulDescriptor_t{};
@@ -159,15 +169,39 @@ int main()
         &DDesc,
         computePrecision
     ));
-
+    
     // Set alpha vector mode
     auto alphaMode = 1;
     HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
-        &handle,
-        &matmulDesc,
-        HIPSPARSELT_MATMUL_ALPHA_VECTOR_SCALING,
-        &alphaMode,
-        sizeof(alphaMode)
+        &handle, &matmulDesc, HIPSPARSELT_MATMUL_ALPHA_VECTOR_SCALING, &alphaMode, sizeof(alphaMode)
+    ));
+
+    // Enable bias
+    HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
+        &handle, &matmulDesc, HIPSPARSELT_MATMUL_BIAS_POINTER, static_cast<void*>(&deviceBias), sizeof(void*)
+    ));
+
+    // Broadcast the bias vector
+    auto biasStride = 0;
+    HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
+        &handle, &matmulDesc, HIPSPARSELT_MATMUL_BIAS_STRIDE, &biasStride, sizeof(biasStride)
+    ))
+
+    // Enable ReLU activation
+    auto enableRelu = 1;
+    HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
+        &handle, &matmulDesc, HIPSPARSELT_MATMUL_ACTIVATION_RELU, &enableRelu, sizeof(enableRelu)
+    ));
+
+    // Set ReLU bounds (optional)
+    auto upperBound = __float2half(static_cast<float>(0x7bff));
+    HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
+        &handle, &matmulDesc, HIPSPARSELT_MATMUL_ACTIVATION_RELU_UPPERBOUND, &upperBound, sizeof(upperBound)
+    ));
+
+    auto threshold = __float2half(0.f);
+    HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
+        &handle, &matmulDesc, HIPSPARSELT_MATMUL_ACTIVATION_RELU_THRESHOLD, &threshold, sizeof(threshold)
     ));
 
     // Select algorithm
@@ -249,6 +283,7 @@ int main()
     HIP_CHECK(hipFree(compressedA));
     HIP_CHECK(hipFree(workspace));
     HIPSPARSELT_CHECK(hipsparseLtMatmulPlanDestroy(&matmulPlan));
+    HIP_CHECK(hipFree(deviceBias));
     HIP_CHECK(hipFree(deviceD));
     HIPSPARSELT_CHECK(hipsparseLtMatDescriptorDestroy(&DDesc));
     HIP_CHECK(hipFree(deviceC));

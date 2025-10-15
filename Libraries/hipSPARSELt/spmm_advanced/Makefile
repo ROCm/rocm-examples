@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hipsparselt_spmm_bias
+EXAMPLE := hipsparselt_spmm_advanced
 COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME := HIP
 
