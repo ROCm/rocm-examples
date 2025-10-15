@@ -81,8 +81,6 @@ $\mathbf{D}$ are dense matrices.
   * `const hipsparseLtMatmulDescriptor_t*`: A matrix multiplication descriptor.
   * `hipsparseLtMatmulAlg_t`. The algorithm used to perform the matrix multiplication. `HIPSPARSELT_MATMUL_ALG_DEFAULT`
     is the only valid value.
-* The matrix multiplication algorithm is freed by calling
-  `hipsparseLtMatmulAlgSelectionDestroy(const hipsparseLtMatmulAlgSelection_t*)`.
 * The matrix multiplication plan is initialized by calling `hipsparseLtMatmulPlanInit` which takes the following
   parameters:
   * `const hipsparseLtHandle_t*`: The library handle.
@@ -110,7 +108,7 @@ $\mathbf{D}$ are dense matrices.
   * `const hipsparseLtHandle_t*`: The library handle.
   * `const hipsparseLtMatmulDescriptor_t*`: A matrix multiplication descriptor.
   * `const void*`: A pointer to a pruned matrix.
-  * `bool*`: Whether or not the pruning operation succeeded.
+  * `int*`: Whether or not the pruning operation succeeded. `0` if correct, `1` if wrong.
   * `hipStream_t`: The stream to perform the validation operation on.
 * The size of a compressed matrix is obtained by calling `hipsparseLtSpMMACompressedSize` which takes the following
   parameters:
@@ -158,7 +156,6 @@ $\mathbf{D}$ are dense matrices.
 * `hipsparseLtInit`
 * `hipsparseLtMatDescriptorDestroy`
 * `hipsparseLtMatmul`
-* `hipsparseLtMatmulAlgSelectionDestroy`
 * `hipsparseLtMatmulAlgSelectionInit`
 * `hipsparseLtMatmulDescriptorInit`
 * `hipsparseLtMatmulGetWorkspace`

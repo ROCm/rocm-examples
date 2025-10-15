@@ -45,7 +45,7 @@ int main()
     // Generates random values in [0, 1]
     auto randomHalf = []()
     {
-        return __float2half(static_cast<float>(std::rand()) / RAND_MAX);
+        return __float2half(static_cast<float>(std::rand()) / static_cast<float>(RAND_MAX));
     };
 
     // Create a stream for the matrix multiplication
@@ -178,11 +178,11 @@ int main()
         &handle, &matmulDesc, deviceA, prunedA, HIPSPARSELT_PRUNE_SPMMA_TILE, matmulStream
     ));
 
-    auto isValid = false;
+    auto isValid = int{};
     HIPSPARSELT_CHECK(hipsparseLtSpMMAPruneCheck(
         &handle, &matmulDesc, prunedA, &isValid, matmulStream
     ));
-    if(!isValid)
+    if(isValid != 0) // 0 correct, 1 wrong
     {
         std::cerr << "Error: Matrix pruning failed to achieve required sparsity pattern." << std::endl;
         return EXIT_FAILURE;
@@ -223,7 +223,6 @@ int main()
     HIP_CHECK(hipFree(compressedA));
     HIP_CHECK(hipFree(workspace));
     HIPSPARSELT_CHECK(hipsparseLtMatmulPlanDestroy(&matmulPlan));
-    HIPSPARSELT_CHECK(hipsparseLtMatmulAlgSelectionDestroy(&matmulAlgSelect));
     HIP_CHECK(hipFree(deviceD));
     HIPSPARSELT_CHECK(hipsparseLtMatDescriptorDestroy(&DDesc));
     HIP_CHECK(hipFree(deviceC));

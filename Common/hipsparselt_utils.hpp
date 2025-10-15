@@ -88,7 +88,7 @@ inline const char* hipsparseStatusToString(hipsparseStatus_t status)
         std::cerr << "hipSPARSELt error encountered: \""        \
                   << hipsparseStatusToString(status)            \
                   << "\" at " << __FILE__ << ':' << __LINE__    \
-                  << std::endl;                                 \                                     
+                  << std::endl;                                 \
         std::exit(EXIT_FAILURE);                                \
     }                                                           \
 }
