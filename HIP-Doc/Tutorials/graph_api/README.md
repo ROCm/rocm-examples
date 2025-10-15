@@ -6,6 +6,10 @@ This example demonstrates how to port an existing stream-based application to a 
 information on this topic, please refer to the
 [HIP Documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/tutorial/graph_api.html).
 
+### Prerequisites
+
+On Windows, this example can only be built by CMake and the Ninja generator. Visual Studio generators are not supported.
+
 ### Application flow
 
 #### Stream variant
