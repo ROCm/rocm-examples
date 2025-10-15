@@ -30,6 +30,7 @@
 
 #include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <cstdlib>
 #include <ctime>
 
@@ -182,7 +183,7 @@ int main()
     ));
 
     // Broadcast the bias vector
-    auto biasStride = 0;
+    auto biasStride = std::int64_t{0};
     HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
         &handle, &matmulDesc, HIPSPARSELT_MATMUL_BIAS_STRIDE, &biasStride, sizeof(biasStride)
     ))
