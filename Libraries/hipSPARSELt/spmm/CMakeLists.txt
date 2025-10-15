@@ -52,6 +52,7 @@ add_executable(${example_name} main.cpp)
 # Make example runnable using CTest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 set_target_properties(${example_name} PROPERTIES CXX_EXTENSIONS OFF)
 
 target_compile_features(${example_name} PRIVATE cxx_std_17)
