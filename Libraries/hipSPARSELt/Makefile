@@ -21,7 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	spmm
+	spmm \
+	spmm_alphavec
 
 all: $(EXAMPLES)
 
