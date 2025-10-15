@@ -178,15 +178,22 @@ int main()
         &handle, &matmulDesc, deviceA, prunedA, HIPSPARSELT_PRUNE_SPMMA_TILE, matmulStream
     ));
 
-    auto isValid = int{};
+    auto deviceIsValid = static_cast<int*>(nullptr);
+    HIP_CHECK(hipMalloc(&deviceIsValid, sizeof(int)));
     HIPSPARSELT_CHECK(hipsparseLtSpMMAPruneCheck(
-        &handle, &matmulDesc, prunedA, &isValid, matmulStream
+        &handle, &matmulDesc, prunedA, deviceIsValid, matmulStream
     ));
-    if(isValid != 0) // 0 correct, 1 wrong
+
+    auto hostIsValid = int{};
+    HIP_CHECK(hipMemcpyAsync(&hostIsValid, deviceIsValid, sizeof(int), hipMemcpyDeviceToHost, matmulStream));
+    HIP_CHECK(hipStreamSynchronize(matmulStream));
+    if(hostIsValid != 0) // 0 correct, 1 wrong
     {
         std::cerr << "Error: Matrix pruning failed to achieve required sparsity pattern." << std::endl;
         return EXIT_FAILURE;
     }
+
+    HIP_CHECK(hipFree(deviceIsValid));
     
     // Compress pruned A
     auto compressedA = static_cast<__half*>(nullptr);
