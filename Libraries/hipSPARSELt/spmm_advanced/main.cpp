@@ -197,7 +197,7 @@ int main()
     ));
 
     // Set ReLU bounds (optional)
-    auto upper_bound = 0x7bff.f;
+    auto upper_bound = static_cast<float>(0x7bff);
     HIPSPARSELT_CHECK(hipsparseLtMatmulDescSetAttribute(
         &handle, &matmul_desc, HIPSPARSELT_MATMUL_ACTIVATION_RELU_UPPERBOUND, &upper_bound, sizeof(upper_bound)
     ));
