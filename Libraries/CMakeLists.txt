@@ -55,6 +55,7 @@ if(
     add_subdirectory(rocALUTION)
     add_subdirectory(rocBLAS)
     add_subdirectory(rocCV)
+    add_subdirectory(rocDecode)
     add_subdirectory(rocJPEG)
     add_subdirectory(rocFFT)
     add_subdirectory(rocPRIM)

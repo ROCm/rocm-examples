@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,44 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-  hipBLAS \
-  hipCUB \
-  hipFFT \
-  hipSOLVER \
-  hipSPARSE \
-  hipSPARSELt \
-  rocRAND \
-  hipRAND
+EXAMPLES := \
+	rocdec_decode \
+	video_decode \
+	video_decode_batch \
+	video_decode_mem \
+	video_decode_multi_files \
+	video_decode_perf \
+	video_decode_pic_files \
+	video_decode_raw \
+	video_decode_rgb \
+	video_to_sequence
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-  hipBLASLt \
-  hipTensor \
-  MIGraphX \
-  MIVisionX \
-  RCCL \
-  rocALUTION \
-  rocBLAS \
-  rocCV \
-  rocDecode \
-  rocFFT \
-  rocJPEG \
-  rocPRIM \
-  rocProfiler-SDK \
-  rocSOLVER \
-  rocSPARSE \
-  rocThrust \
-  rocWMMA \
-  RPP
-endif
-
-all: $(LIBRARIES)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(LIBRARIES):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(LIBRARIES)
+.PHONY: all clean $(EXAMPLES)
