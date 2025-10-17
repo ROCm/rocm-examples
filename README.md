@@ -265,6 +265,15 @@ The following options are available when building with CMake.
 - [Docs](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/)
   - [CONTRIBUTING.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
 - [Libraries](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/)
+  - [Composable Kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/)
+    - [Basic](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic): Basic examples intended as introduction to Composable Kernel.
+      - [batched_transpose](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/batched_transpose): Shows how to perform a batched tensor transpose.
+      - [copy](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/copy): Demonstrates how to perform copy operations.
+      - [elementwise](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/elementwise): Shows how to perform element-wise operations on tensors.
+      - [img2col](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/img2col): Demonstrates how to perform the $\text{im2col}$ operation.
+      - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/permute): Shows how to perform a tensor permutation.
+      - [pooling](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/pooling): Demonstrates how to use Composable Kernel Tile's pooling operator.
+      - [reduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/reduce): Shows how to perform parallel reduction on tensors.
   - [hipBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/)
     - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
     - [her](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.

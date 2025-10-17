@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,46 +20,13 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	ComposableKernel \
-	hipBLAS \
-	hipCUB \
-	hipFFT \
-	hipSOLVER \
-	hipSPARSE \
-	hipSPARSELt \
-	rocRAND \
-	hipRAND
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(ComposableKernel_ck_tile_basic_examples LANGUAGES CXX)
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-  hipBLASLt \
-  hipTensor \
-  MIGraphX \
-  MIVisionX \
-  RCCL \
-  rocAL \
-  rocALUTION \
-  rocBLAS \
-  rocCV \
-  rocDecode \
-  rocFFT \
-  rocJPEG \
-  rocPRIM \
-  rocProfiler-SDK \
-  rocSOLVER \
-  rocSPARSE \
-  rocThrust \
-  rocWMMA \
-  RPP
-endif
-
-all: $(LIBRARIES)
-
-clean: TARGET=clean
-clean: all
-
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(LIBRARIES)
+add_subdirectory(copy)
+add_subdirectory(batched_transpose)
+add_subdirectory(elementwise)
+add_subdirectory(img2col)
+add_subdirectory(permute)
+add_subdirectory(pooling)
+add_subdirectory(reduce)

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,46 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	ComposableKernel \
-	hipBLAS \
-	hipCUB \
-	hipFFT \
-	hipSOLVER \
-	hipSPARSE \
-	hipSPARSELt \
-	rocRAND \
-	hipRAND
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-  hipBLASLt \
-  hipTensor \
-  MIGraphX \
-  MIVisionX \
-  RCCL \
-  rocAL \
-  rocALUTION \
-  rocBLAS \
-  rocCV \
-  rocDecode \
-  rocFFT \
-  rocJPEG \
-  rocPRIM \
-  rocProfiler-SDK \
-  rocSOLVER \
-  rocSPARSE \
-  rocThrust \
-  rocWMMA \
-  RPP
-endif
+# There is no CMake component for ck_tile we link to, so we create our own
+if(NOT TARGET ck_tile)
+    find_package(hip REQUIRED)
+    find_path(CK_TILE_INCLUDE_DIR NAMES ck_tile/core.hpp)
+    
+    add_library(ck_tile INTERFACE)
+    target_include_directories(ck_tile INTERFACE ${CK_TILE_INCLUDE_DIR})
+    target_link_libraries(ck_tile INTERFACE hip::host)
 
-all: $(LIBRARIES)
-
-clean: TARGET=clean
-clean: all
-
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(LIBRARIES)
+    add_library(composable_kernel::ck_tile ALIAS ck_tile)
+endif()

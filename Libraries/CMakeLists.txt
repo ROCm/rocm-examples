@@ -32,6 +32,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 if(
     NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
 )
+    add_subdirectory(ComposableKernel)
     add_subdirectory(hipBLAS)
     if(CMAKE_VERSION VERSION_LESS "3.25.2")
         message(WARNING "CMake version < 3.25.2, not building hipBLASLt examples.")
