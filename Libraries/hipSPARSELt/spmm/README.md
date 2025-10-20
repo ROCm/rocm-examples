@@ -1,9 +1,9 @@
-# hipSPARSELt Sparse Matrix-Matrix Multiplication Example
+# hipSPARSELt Sparse Matrix-Matrix Multiplication example
 
 ## Description
 
 This example demonstrates how to perform *sparse matrix - dense matrix multiplication* using hipSPARSELt. On AMD
-Instinct™ MI300 GPUs it makes use of SMFMA (Sparse Matrix Fused Multiply Add) matrix instructions. The calculation
+Instinct™ MI300 GPUs, it makes use of SMFMA (Sparse Matrix Fused Multiply Add) matrix instructions. The calculation
 performed by this example is
 $\mathbf{D} = \alpha \times \mathbf{A} \times \mathbf{B}^{\text{T}} + \beta \times \mathbf{C}$, where $\alpha$ and
 $\beta$ are scalar values, $\mathbf{A}$ is a sparse matrix and $\mathbf{B}$, $\mathbf{C}$ and $\mathbf{D}$ are dense
@@ -22,7 +22,7 @@ matrices.
     2. A host buffer is allocated and initialized with random values.
     3. The buffer is copied to the device.
 5. $\mathbf{D}$ is created on the device:
-    1. A dense descripor is created.
+    1. A dense descriptor is created.
     2. A device buffer is allocated and filled with zeroes.
 6. A descriptor for the matrix multiplication is created. $\mathbf{B}$ is marked for a transpose operation here.
 7. A matrix multiplication algorithm is automatically selected by hipSPARSELt.
@@ -32,13 +32,13 @@ matrices.
 11. The pruned $\mathbf{A}$ is compressed.
 12. The matrix multiplication is performed.
 13. $\mathbf{D}$ is copied back to the host.
-14. All buffers, handles and descriptors are freed.
+14. All buffers, handles, and descriptors are freed.
 
-## Key APIs and Concepts
+## Key APIs and concepts
 
 ### hipSPARSELt
 
-* hipSPARSELt is initialized by calling `hipsparseLtInit(hipsparseLtHandle_t*)` and is shut down by calling
+* hipSPARSELt is initialized by calling `hipsparseLtInit(hipsparseLtHandle_t*)` and is closed by calling
   `hipsparseLtDestroy(hipsparseLtHandle_t*)`.
 * A structured (sparse) matrix descriptor is obtained by calling `hipsparseLtStructuredDescriptorInit`.
 * A dense matrix descriptor is obtained by calling `hipsparseLtDenseDescriptorInit`.
