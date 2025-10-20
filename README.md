@@ -336,7 +336,7 @@ The following options are available when building with CMake.
     - [sygvj](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/sygvj): Calculates the generalized eigenvalues and eigenvectors from a pair of real symmetric matrices using the Jacobi method.
   - [hipSPARSELt](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/)
     - [spmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/spmm): Perform a *sparse matrix - dense matrix multiplication*.
-    - [spmm_advanced](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/spmm_alphavec): Perform a *sparse matrix - dense matrix multiplication* with a scaling vector, bias addition and an activation function.
+    - [spmm_advanced](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/spmm_advanced): Perform a *sparse matrix - dense matrix multiplication* with a scaling vector, bias addition and an activation function.
   - [hipTensor](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/)
     - [contraction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction): Tensor contraction operations that compute products over shared dimensions
       - [bilinear](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear): Bilinear contractions with accumulation support for combining tensor products with existing output data
