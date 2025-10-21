@@ -22,7 +22,13 @@
 
 set(example_name hipsparselt_spmm_advanced)
 
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(WARNING "The hipSPARSELt examples are available on Linux only.")
+    return()
+endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
 select_gpu_language()
