@@ -45,6 +45,7 @@ if(
     add_subdirectory(hipSPARSE)
     add_subdirectory(hipSPARSELt)
     add_subdirectory(hipTensor)
+    add_subdirectory(rocALUTION)
     add_subdirectory(rocBLAS)
     add_subdirectory(rocFFT)
     add_subdirectory(rocPRIM)

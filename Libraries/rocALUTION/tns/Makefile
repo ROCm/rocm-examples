@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipBLAS \
-	hipCUB \
-	hipFFT \
-	hipSOLVER \
-	hipSPARSE \
-	hipSPARSELt \
-	rocRAND \
-	hipRAND
+EXAMPLE := rocalution_tns
+COMMON_INCLUDE_DIR := ../../../Common
+EXTERNAL_DIR := ../../../External
+GPU_RUNTIME := HIP
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	hipBLASLt \
-	hipTensor \
-	rocALUTION \
-	rocBLAS \
-	rocFFT \
-	rocPRIM \
-	rocProfiler-SDK \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust \
-	rocWMMA
+ifneq ($(GPU_RUNTIME), HIP)
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
-all: $(LIBRARIES)
+# Common variables and flags
+CXX ?= g++
+ROCM_INSTALL_DIR := /opt/rocm
 
-clean: TARGET=clean
-clean: all
+ROCALUTION_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+CXX_STD   := c++17
+CXXFLAGS ?= -Wall -Wextra
+ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICPPFLAGS := -isystem $(ROCALUTION_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -DEXAMPLE_DATA_DIR=\"$(CURDIR)/../data\"
+ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDLIBS   := -lrocalution
 
-.PHONY: all clean $(LIBRARIES)
+$(EXAMPLE): main.cpp
+	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
