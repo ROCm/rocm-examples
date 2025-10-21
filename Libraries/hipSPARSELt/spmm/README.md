@@ -1,0 +1,96 @@
+# hipSPARSELt Sparse Matrix-Matrix Multiplication example
+
+## Description
+
+This example demonstrates how to perform *sparse matrix - dense matrix multiplication* using hipSPARSELt. On AMD
+Instinct™ MI300 GPUs, it makes use of SMFMA (Sparse Matrix Fused Multiply Add) matrix instructions. The calculation
+performed by this example is
+$\mathbf{D} = \alpha \times \mathbf{A} \times \mathbf{B}^{\text{T}} + \beta \times \mathbf{C}$, where $\alpha$ and
+$\beta$ are scalar values, $\mathbf{A}$ is a sparse matrix and $\mathbf{B}$, $\mathbf{C}$ and $\mathbf{D}$ are dense
+matrices.
+
+### Application flow
+
+1. A HIP stream is created for later usage.
+2. The hipSPARSELt library is initialized by obtaining a library handle.
+3. $\mathbf{A}$ is created on the host and copied to the device:
+    1. A structured (sparse) descriptor is created.
+    2. A host buffer is allocated and initialized with random values.
+    3. The buffer is copied to the device.
+4. $\mathbf{B}$ and $\mathbf{C}$ are created on the host and copied to the device. For each matrix:
+    1. A dense descriptor is created.
+    2. A host buffer is allocated and initialized with random values.
+    3. The buffer is copied to the device.
+5. $\mathbf{D}$ is created on the device:
+    1. A dense descriptor is created.
+    2. A device buffer is allocated and filled with zeroes.
+6. A descriptor for the matrix multiplication is created. $\mathbf{B}$ is marked for a transpose operation here.
+7. A matrix multiplication algorithm is automatically selected by hipSPARSELt.
+8. A matrix multiplication plan is initialized.
+9. A workspace buffer is allocated.
+10. $\mathbf{A}$ is pruned using a 2:4 sparsity pattern.
+11. The pruned $\mathbf{A}$ is compressed.
+12. The matrix multiplication is performed.
+13. $\mathbf{D}$ is copied back to the host.
+14. All buffers, handles, and descriptors are freed.
+
+## Key APIs and concepts
+
+### hipSPARSELt
+
+* hipSPARSELt is initialized by calling `hipsparseLtInit(hipsparseLtHandle_t*)` and is closed by calling
+  `hipsparseLtDestroy(hipsparseLtHandle_t*)`.
+* A structured (sparse) matrix descriptor is obtained by calling `hipsparseLtStructuredDescriptorInit`.
+* A dense matrix descriptor is obtained by calling `hipsparseLtDenseDescriptorInit`.
+* A matrix descriptor of any type is freed by calling `hipsparseLtMatDescriptorDestroy`.
+* A matrix multiplication descriptor is obtained by calling `hipsparseLtMatmulDescriptorInit`.
+* An algorithm for matrix multiplication is selected by calling `hipsparseLtMatmulAlgSelectionInit`.
+* A matrix multiplication plan is initialized by calling `hipsparseLtMatmulPlanInit` and freed by calling
+  `hipsparseLtMatmulPlanDestroy`.
+* The required amount of memory for hipSPARSELt's workspace is obtained by calling `hipsparseLtMatmulGetWorkspace`.
+* A dense matrix is pruned by calling `hipsparseLtSpMMAPrune`.
+* A pruning operation's success is queried by calling `hipsparseLtSpMMAPruneCheck`.
+* The size of a compressed matrix is obtained by calling `hipsparseLtSpMMACompressedSize`.
+* A pruned matrix is compressed by calling `hipsparseLtSpMMACompress`.
+* A matrix multiplication $\mathbf{D} = \alpha \times \mathbf{A} \times \mathbf{B} + \beta \times \mathbf{C}$ is
+  performed by calling `hipsparseLtMatmul`.
+
+## Used API surface
+
+### hipSPARSELt
+
+#### Types
+
+* `hipsparseLtHandle_t`
+* `hipsparseLtMatDescriptor_t`
+* `hipsparseLtMatmulAlgSelection_t`
+* `hipsparseLtMatmulDescriptor_t`
+* `hipsparseLtMatmulPlan_t`
+
+#### Functions
+
+* `hipsparseLtDenseDescriptorInit`
+* `hipsparseLtDestroy`
+* `hipsparseLtInit`
+* `hipsparseLtMatDescriptorDestroy`
+* `hipsparseLtMatmul`
+* `hipsparseLtMatmulAlgSelectionInit`
+* `hipsparseLtMatmulDescriptorInit`
+* `hipsparseLtMatmulGetWorkspace`
+* `hipsparseLtMatmulPlanDestroy`
+* `hipsparseLtMatmulPlanInit`
+* `hipsparseLtSpMMACompress`
+* `hipsparseLtSpMMACompressedSize`
+* `hipsparseLtSpMMAPrune`
+* `hipsparseLtSpMMAPruneCheck`
+* `hipsparseLtStructuredDescriptorInit`
+
+## HIP runtime
+
+* `hipFree`
+* `hipMalloc`
+* `hipMemcpy`
+* `hipMemset`
+* `hipStreamCreate`
+* `hipStreamDestroy`
+* `hipStreamSynchronize`

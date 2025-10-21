@@ -26,6 +26,7 @@ LIBRARIES := \
 	hipCUB \
 	hipFFT \
 	hipSOLVER \
+	hipSPARSELt \
 	rocRAND \
 	hipRAND
 
