@@ -367,6 +367,37 @@ The following options are available when building with CMake.
       - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/permute): Shows how to perform tensor dimension reordering operations.
       - [trinary](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/trinary): Shows how to combine three tensors using nested binary operations with permutation.
     - [reduction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/reduction): Program that showcases tensor reduction operations using hipTensor.
+  - [rocALUTION](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/)
+    - [amg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/amg/): Showcases Smoothed Aggregation Algebraic Multigrid method for solving linear systems with automatic hierarchy construction.
+    - [as_precond](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/as_precond/): Showcases Additive Schwarz preconditioner with domain decomposition and two-level preconditioning.
+    - [async](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/async/): Showcases asynchronous memory transfers and computations to overlap data movement with computation.
+    - [benchmark](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/benchmark/): Showcases performance benchmarking of fundamental linear algebra operations across different matrix formats.
+    - [bicgstab](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/bicgstab/): Showcases Bi-Conjugate Gradient Stabilized method for solving nonsymmetric linear systems.
+    - [block_precond](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/block_precond/): Showcases block preconditioning techniques for structured linear systems.
+    - [cg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/cg/): Showcases Conjugate Gradient method for solving symmetric positive definite linear systems.
+    - [cg_amg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/cg_amg/): Showcases Conjugate Gradient solver combined with Algebraic Multigrid preconditioning.
+    - [cg_rsamg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/cg_rsamg/): Showcases Conjugate Gradient solver with Rough Smoothed Aggregation Multigrid preconditioning.
+    - [cg_saamg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/cg_saamg/): Showcases Conjugate Gradient solver with Smoothed Aggregation Algebraic Multigrid preconditioning.
+    - [cmk](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/cmk/): Showcases Chebyshev-Marker-Krylov methods for eigenvalue problems.
+    - [complex](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/complex/): Showcases complex-valued linear solver using Induced Dimension Reduction method.
+    - [direct](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/direct/): Showcases direct solver methods for linear systems using factorization techniques.
+    - [fcg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/fcg/): Showcases Flexible Conjugate Gradient method for varying preconditioner scenarios.
+    - [fgmres](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/fgmres/): Showcases Flexible Generalized Minimal Residual method with varying preconditioners.
+    - [fixed_point](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/fixed_point/): Showcases fixed-point iteration methods for solving linear systems.
+    - [gmres](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/gmres/): Showcases Generalized Minimal Residual method for solving nonsymmetric linear systems.
+    - [idr](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/idr/): Showcases Induced Dimension Reduction method for solving nonsymmetric linear systems.
+    - [itsolve](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/itsolve/): Showcases iterative solver framework and configuration options.
+    - [key](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/key/): Showcases key linear algebra operations and solver utilities.
+    - [me_preconditioner](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/me_preconditioner/): Showcases Multi-Element preconditioning techniques for enhanced convergence.
+    - [mixed_precision](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/mixed_precision/): Showcases mixed-precision defect correction method using different precision levels for inner/outer solvers.
+    - [power_method](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/power_method/): Showcases power iteration method for finding dominant eigenvalues and eigenvectors.
+    - [sa_amg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/sa_amg/): Showcases Smoothed Aggregation Algebraic Multigrid method with advanced configuration options.
+    - [simple_spmv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/simple_spmv/): Showcases fundamental sparse matrix-vector multiplication operations with format conversion.
+    - [sp_precond](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/sp_precond/): Showcases sparse preconditioning techniques for iterative solvers.
+    - [stencil](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/stencil/): Showcases stencil-based operations and structured grid computations.
+    - [tns](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/tns/): Showcases tensor network solver methods for high-dimensional problems.
+    - [ua_amg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/ua_amg/): Showcases Unsmoothed Aggregation Algebraic Multigrid method for coarse grid construction.
+    - [var_precond](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/var_precond/): Showcases variable preconditioning techniques for adaptive solver performance.
   - [rocBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/)
     - [level_1](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_1/): Operations between vectors and vectors.
       - [axpy](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_1/axpy/): Simple program that showcases the AXPY operation.

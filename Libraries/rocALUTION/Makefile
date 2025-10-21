@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,37 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipBLAS \
-	hipCUB \
-	hipFFT \
-	hipSOLVER \
-	hipSPARSE \
-	hipSPARSELt \
-	rocRAND \
-	hipRAND
+EXAMPLES := \
+	amg \
+	sa_amg \
+	ua_amg \
+	as_precond \
+	async \
+	benchmark \
+	bicgstab \
+	block_precond \
+	cg_amg \
+	cg_rsamg \
+	cg_saamg \
+	cg \
+	cmk \
+	complex \
+	direct \
+	fcg \
+	fixed_point \
+	gmres \
+	fgmres \
+	idr \
+	key \
+	me_preconditioner \
+	mixed_precision \
+	power_method \
+	simple_spmv \
+	stencil \
+	tns \
+	var_precond \
+	itsolve
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	hipBLASLt \
-	hipTensor \
-	rocALUTION \
-	rocBLAS \
-	rocFFT \
-	rocPRIM \
-	rocProfiler-SDK \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust \
-	rocWMMA
-endif
-
-all: $(LIBRARIES)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(LIBRARIES):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(LIBRARIES)
+.PHONY: all clean $(EXAMPLES)
