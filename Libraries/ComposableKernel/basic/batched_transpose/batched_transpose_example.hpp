@@ -22,10 +22,8 @@
 
 #pragma once
 
-#include <ck_tile/core.hpp>
 #include <ck_tile/host.hpp>
 #include <ck_tile/ops/batched_transpose.hpp>
-#include <ck_tile/ops/reduce.hpp>
 
 #include <string>
 
@@ -33,7 +31,6 @@ struct batched_transpose_trait
 {
     std::string type;
     std::string layout;
-    std::string pipeline;
 };
 
 struct batched_transpose_kargs : public ck_tile::BatchedTransposeHostArgs

@@ -24,6 +24,8 @@
 
 #include <ck_tile/host.hpp>
 
+#include <hip/hip_runtime.h>
+
 #include <algorithm>
 #include <cstddef>
 #include <cstdlib>
@@ -79,12 +81,13 @@ float image_to_column(const image_to_column_traits& traits,
             args.N * args.output_spatial_lengths[0] * args.output_spatial_lengths[1],
             args.filter_spatial_lengths[0] * args.filter_spatial_lengths[1] * args.C,
             args.G);
-        const dim3 blocks = Kernel::BlockSize();
+        constexpr dim3 blocks = Kernel::BlockSize();
 
         constexpr ck_tile::index_t kBlockPerCu = 2;
 
         float ave_time = ck_tile::launch_kernel(
-            stream_conf, ck_tile::make_kernel<kBlockPerCu>(Kernel{}, grids, blocks, 0, kargs));
+            stream_conf,
+            ck_tile::make_kernel<blocks.x, kBlockPerCu>(Kernel{}, grids, blocks, 0, kargs));
 
         return ave_time;
     }
