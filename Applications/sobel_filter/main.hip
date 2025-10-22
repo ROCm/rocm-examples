@@ -315,20 +315,13 @@ int main(int argc, char* argv[])
 #ifdef _WIN32
     char separator = srcpath.find_last_of('/') == std::string::npos ? '\\' : '/';
 
+    // On MSVS we don't have the full path with HIP clang
+    // input file is copied over to the binary directory
     if(srcpath.find("sobel_filter") == std::string::npos)
     {
-        char fullpath[MAX_PATH];
-        if(GetFullPathNameA(srcpath.c_str(), MAX_PATH, fullpath, nullptr))
-        {
-            srcpath = std::string(fullpath);
-            srcpath = srcpath.substr(0, srcpath.find_last_of(separator)) + separator
-                      + "Applications" + separator + "sobel_filter" + separator + "main.hip";
-        }
-        else
-        {
-            std::cerr << "Failed to find image path." << std::endl;
-            return -1;
-        }
+        char buffer[MAX_PATH];
+        GetModuleFileNameA(NULL, buffer, MAX_PATH);
+        srcpath = std::string(buffer);
     }
 #elif defined(__linux__)
     constexpr char separator = '/';
