@@ -8,8 +8,6 @@ The output is a `token*topk` weight tensor (usually single-precision) and an ind
 
 ### Application flow
 
-#### Forward pass
-
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
 2. Buffers for the input matrix, the weight and the index tensor are created on the host.
 3. The input matrix is initialized with random floating-point values.
