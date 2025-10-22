@@ -66,4 +66,5 @@ add_test(${example_name} COMMAND ${example_name})
 
 set_source_files_properties(image_to_column.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
+target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)

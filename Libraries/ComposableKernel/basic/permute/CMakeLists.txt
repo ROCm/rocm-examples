@@ -66,11 +66,13 @@ find_package(hip REQUIRED)
 add_executable(${example_name} permute.cpp)
 add_test(${example_name} COMMAND "${example_script} $<TARGET_FILE:${example_name}>")
 set_source_files_properties(permute.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
 
 # Alternative implementation
 add_executable(${example_name_alternative} matrix_core_swizzle.cpp permute.cpp)
 add_test(${example_name_alternative} COMMAND "${example_script} $<TARGET_FILE:${example_name_alternative}>")
 set_source_files_properties(matrix_core_swizzle.cpp permute.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_name_alternative} PRIVATE cxx_std_17 hip_std_17)
 target_compile_definitions(${example_name_alternative} PRIVATE PERMUTE_USE_ALTERNATIVE_IMPL)
 target_link_libraries(${example_name_alternative} PRIVATE composable_kernel::ck_tile hip::host)
