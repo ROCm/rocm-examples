@@ -55,7 +55,7 @@ find_package(hip REQUIRED)
 add_executable(${example_name} topk_softmax_api.cpp topk_softmax.cpp)
 add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
 
-set_source_files_properties(topf_softmax_api.cpp topk_softmax.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(topk_softmax_api.cpp topk_softmax.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
