@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,27 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "reduce.hpp"
+#include "test_copy.hpp"
 
 #include <ck_tile/host.hpp>
-#include <ck_tile/ops/reduce.hpp>
 
 #include <cstddef>
 #include <cstdlib>
 #include <iostream>
-#include <tuple>
-#include <stdexcept>
-#include <string>
 #include <ostream>
-#include <vector>
+#include <string>
+#include <tuple>
 
 auto create_args(int argc, char* argv[])
 {
     ck_tile::ArgParser arg_parser;
-    arg_parser.insert("m", "3328", "m dimension")
-        .insert("n", "4096", "n dimension")
+    arg_parser.insert("m", "64", "m dimension")
+        .insert("n", "8", "n dimension")
+        .insert("id", "0", "warp to use")
         .insert("v", "1", "cpu validation or not")
         .insert("prec", "fp16", "precision")
-        .insert("warmup", "5", "cold iter")
-        .insert("repeat", "20", "hot iter");
+        .insert("warmup", "50", "cold iter")
+        .insert("repeat", "100", "hot iter");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -51,49 +49,57 @@ auto create_args(int argc, char* argv[])
 template <typename DataType>
 bool run(const ck_tile::ArgParser& arg_parser)
 {
-    using XDataType       = DataType;
-    using ComputeDataType = float;
-    using YDataType       = DataType;
+    using XDataType = DataType;
+    using YDataType = DataType;
 
-    ck_tile::index_t m = arg_parser.get_int("m");
-    ck_tile::index_t n = arg_parser.get_int("n");
-    int do_validation  = arg_parser.get_int("v");
-    int warmup         = arg_parser.get_int("warmup");
-    int repeat         = arg_parser.get_int("repeat");
+    ck_tile::index_t m       = arg_parser.get_int("m");
+    ck_tile::index_t n       = arg_parser.get_int("n");
+    ck_tile::index_t warp_id = arg_parser.get_int("id");
+    int do_validation        = arg_parser.get_int("v");
+    int warmup               = arg_parser.get_int("warmup");
+    int repeat               = arg_parser.get_int("repeat");
 
     ck_tile::HostTensor<XDataType> x_host({m, n});
-    ck_tile::HostTensor<YDataType> y_host_ref({m});
-    ck_tile::HostTensor<YDataType> y_host_dev({m});
+    ck_tile::HostTensor<YDataType> y_host_ref({m, n});
+    ck_tile::HostTensor<YDataType> y_host_dev({m, n});
 
-    ck_tile::FillUniformDistribution<XDataType>{-5.f, 5.f}(x_host);
+    // ck_tile::FillConstant<XDataType>{1.f}(x_host);
+    ck_tile::half_t value = 1;
+    for(int i = 0; i < m; i++)
+    {
+        value = 1;
+        for(int j = 0; j < n; j++)
+        {
+            x_host(i, j) = value++;
+        }
+    }
 
     ck_tile::DeviceMem x_buf(x_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem y_buf(y_host_dev.get_element_space_size_in_bytes());
 
     x_buf.ToDevice(x_host.data());
 
-    using ReduceOp   = ck_tile::ReduceOp::Add;
-    using BlockWarps = ck_tile::sequence<4, 1>;
-    using BlockTile  = ck_tile::sequence<128, 128>;
-    using WarpTile   = ck_tile::sequence<32, 128>;
-    using Vector     = ck_tile::sequence<8, 8>;
+    using BlockWaves = ck_tile::sequence<2, 1>;
+    using BlockTile  = ck_tile::sequence<64, 8>;
+    using WaveTile   = ck_tile::sequence<64, 8>;
+    using Vector     = ck_tile::sequence<1, 4>;
 
-    // cross warp-reduce
-    // using BlockWarps = ck_tile::sequence<2, 2>;
-    // using BlockTile  = ck_tile::sequence<2, 1024>;
-    // using WarpTile   = ck_tile::sequence<1, 512>;
-    // using Vector = ck_tile::sequence<1, 8>;
-
-    constexpr ck_tile::index_t kBlockSize  = 256;
-    constexpr ck_tile::index_t kBlockPerCu = 1;
-    ck_tile::index_t kGridSize             = (m / BlockTile::at(ck_tile::number<0>{}));
+    ck_tile::index_t kGridSize = (m / BlockTile::at(ck_tile::number<0>{}));
     std::cout << "grid size " << kGridSize << std::endl;
 
-    using Shape = ck_tile::Reduce2dShape<BlockWarps, BlockTile, WarpTile, Vector>;
-    using Problem =
-        ck_tile::Reduce2dProblem<XDataType, ComputeDataType, YDataType, Shape, ReduceOp>;
+    using Shape   = ck_tile::TileCopyShape<BlockWaves, BlockTile, WaveTile, Vector>;
+    using Problem = ck_tile::TileCopyProblem<XDataType, Shape>;
+    using Kernel  = ck_tile::TileCopy<Problem>;
 
-    using Kernel = ck_tile::Reduce<Problem>;
+    constexpr ck_tile::index_t kBlockSize  = 128;
+    constexpr ck_tile::index_t kBlockPerCu = 1;
+    std::cout << "block size " << kBlockSize << std::endl;
+    std::cout << "warp size " << ck_tile::get_warp_size() << std::endl;
+    std::cout << "warps per block _M " << Shape::WarpPerBlock_M << " " << Shape::WarpPerBlock_N
+              << std::endl;
+    std::cout << "Block waves: " << BlockWaves::at(ck_tile::number<0>{}) << " "
+              << BlockWaves::at(ck_tile::number<1>{}) << std::endl;
+    std::cout << " Wave Groups: " << Shape::WaveGroups << std::endl;
 
     float ave_time = launch_kernel(ck_tile::stream_config{nullptr, true, 0, warmup, repeat},
                                    ck_tile::make_kernel<kBlockSize, kBlockPerCu>(
@@ -104,12 +110,12 @@ bool run(const ck_tile::ArgParser& arg_parser)
                                        static_cast<XDataType*>(x_buf.GetDeviceBuffer()),
                                        static_cast<YDataType*>(y_buf.GetDeviceBuffer()),
                                        m,
-                                       n));
+                                       n,
+                                       warp_id));
 
     std::size_t num_btype = sizeof(XDataType) * m * n + sizeof(YDataType) * m;
 
     float gb_per_sec = num_btype / 1.E6 / ave_time;
-
     std::cout << "Perf: " << ave_time << " ms, " << gb_per_sec << " GB/s" << std::endl;
 
     bool pass = true;
@@ -117,10 +123,8 @@ bool run(const ck_tile::ArgParser& arg_parser)
     if(do_validation)
     {
         // reference
-        ck_tile::reference_reduce<XDataType, ComputeDataType, YDataType>(
-            x_host, y_host_ref, ReduceOp{});
         y_buf.FromDevice(y_host_dev.mData.data());
-        pass = ck_tile::check_err(y_host_dev, y_host_ref);
+        pass = ck_tile::check_err(y_host_dev, x_host);
 
         std::cout << "valid:" << (pass ? "y" : "n") << std::flush << std::endl;
     }
@@ -135,13 +139,5 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
 
     const std::string data_type = arg_parser.get_str("prec");
-
-    if(data_type == "fp16")
-    {
-        return run<ck_tile::half_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    // else if(data_type == "bf16")
-    // {
-    //     return run<ck_tile::bf16_t>(arg_parser) ? 0 : -2;
-    // }
+    return run<ck_tile::half_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
 }

@@ -57,12 +57,13 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(composable_kernel REQUIRED)
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
+
+find_package(hip REQUIRED)
 
 add_executable(${example_name} image_to_column.cpp)
 add_test(${example_name} COMMAND ${example_name})
 
 set_source_files_properties(image_to_column.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile)
+target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)

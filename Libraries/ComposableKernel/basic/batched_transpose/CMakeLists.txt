@@ -66,7 +66,5 @@ add_test(${example_name} COMMAND "${example_script} $<TARGET_FILE:${example_name
 set_source_files_properties(batched_transpose_api.cpp batched_transpose_example.cpp
                             PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
-target_compile_options(${example_name} PRIVATE
-                       $<$<COMPILE_LANG_AND_ID:HIP,Clang>:-Wno-undefined-func-template -Wno-float-equal>
-)
+target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile)

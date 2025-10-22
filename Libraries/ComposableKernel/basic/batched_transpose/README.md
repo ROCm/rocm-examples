@@ -40,12 +40,12 @@ $$
 
 The example makes use of three key architectural components:
 
-* **Problem** combines data types using CK Tile's `BatchedTransposeProblem` (or `BatchedTransposeLdsProblem` on devices
-  which support LDS acceleration).
-* **Policy** defines memory access patterns and distribution strategies. In this example it is set to CK Tile's
-  `BatchedTransposePolicy` (or `BatchedTransposeLdsPolicy` on devices which support LDS acceleration).
-* **Kernel** implements the actual computation using the problem definition. The example implementation uses CK Tile's
-  `BatchedTransposeKernel` kernel.
+* A **problem** combines data types using CK Tile's `BatchedTransposeProblem`.
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+  storage phases. In this example it is set to CK Tile's
+  `BatchedTransposePipeline`.
+* A **kernel** implements the actual computation using the problem definition. The example implementation uses
+  CK Tile's `BatchedTransposeKernel` kernel.
 
 ### Tile programming model
 
@@ -61,11 +61,7 @@ input, computes the permuted indices, and writes to the output.
 * `ck_tile::ArgParser`
 * `ck_tile::BatchedTransposeHostArgs`
 * `ck_tile::BatchedTransposeKernel`
-* `ck_tile::BatchedTransposeLdsPipeline`
-* `ck_tile::BatchedTransposeLdsPolicy`
-* `ck_tile::BatchedTransposeLdsProblem`
 * `ck_tile::BatchedTransposePipeline`
-* `ck_tile::BatchedTransposePolicy`
 * `ck_tile::BatchedTransposeProblem`
 * `ck_tile::bf16_t`
 * `ck_tile::DeviceMem`
@@ -80,7 +76,6 @@ input, computes the permuted indices, and writes to the output.
 #### Functions
 
 * `ck_tile::check_err`
-* `ck_tile::dump_batched_transpose_json`
 * `ck_tile::launch_kernel`
 * `ck_tile::make_kernel`
 * `ck_tile::make_tuple`

@@ -13,7 +13,7 @@ Given a tensor $\mathbf{X}$ and a reduction axis, the performed computation is $
 2. $\mathbf{X}$ is created on the host and initialized with random floating-point values in the range $[-5, 5]$.
 3. Buffers for $\mathbf{X}$ and $\mathbf{Y}$ are created on the device.
 4. $\mathbf{X}$ is copied from the host to the device.
-5. CK Tile's built-in reduction kernel is instantiated and launched on the device.
+5. A custom reduction kernel is instantiated and launched on the device.
 6. If validation is enabled the results are compared agains CK Tile's built-in `reference_reduce` function.
 7. All buffers are freed automatically.
 
@@ -23,10 +23,10 @@ Given a tensor $\mathbf{X}$ and a reduction axis, the performed computation is $
 
 The example makes use of three key architectural components:
 
-* **Shape** defines the hierarchical tile structure and memory layout. In this example, it is set to a 
-`Reduce2dShape` which is part of CK Tile.
-* **Problem** combines data types with the shape configuration using CK Tile's `Reduce2dProblem`.
-* **Kernel** implements the actual computation using the problem definition. The example implementation uses CK Tile's
+* A **shape** defines the hierarchical tile structure and memory layout. In this example, it is set to a custom
+  `Reduce2dShape`.
+* A **problem** combines data types with the shape configuration using a custom `Reduce2dProblem`.
+* A **kernel** implements the actual computation using the problem definition. The example implementation uses a custom
   `Reduce` kernel.
 
 ### Tile programming model
@@ -48,18 +48,33 @@ shared memory and register accumulation for efficiency.
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
 * `ck_tile::number`
-* `ck_tile::Reduce`
-* `ck_tile::Reduce2dProblem`
-* `ck_tile::Reduce2dShape`
 * `ck_tile::ReduceOp::Add`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
 
 #### Functions
 
+* `ck_tile::block_tile_reduce`
+* `ck_tile::block_tile_reduce_sync`
+* `ck_tile::cast_tile`
 * `ck_tile::check_err`
-* `ck_tile::dump_reduce_json_results`
+* `ck_tile::get_block_id`
+* `ck_tile::integer_divide_ceil`
 * `ck_tile::launch_kernel`
+* `ck_tile::load_tile`
 * `ck_tile::make_kernel`
+* `ck_tile::make_naive_tensor_view`
+* `ck_tile::make_naive_tensor_view_packed`
+* `ck_tile::make_tile_window`
 * `ck_tile::make_tuple`
+* `ck_tile::move_tile_window`
+* `ck_tile::reduce_on_sequence`
 * `ck_tile::reference_reduce`
+* `ck_tile::set_tile`
+* `ck_tile::store_tile`
+
+### HIP Runtime
+
+#### Device symbols
+
+* `__builtin_amdgcn_readfirstlane`
