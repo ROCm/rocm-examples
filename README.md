@@ -275,6 +275,11 @@ The following options are available when building with CMake.
       - [img2col](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/img2col): Demonstrates how to perform the $\text{im2col}$ operation.
       - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/permute): Shows how to perform a tensor permutation.
       - [reduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/reduce): Shows how to perform parallel reduction on tensors.
+    - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm): GEMM examples using the CK Tile programming model.
+      - [batched_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/batched_gemm): Demonstrates how to perform a batched GEMM operation.
+      - [flatmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/flatmm): Shows how to perform a FLATMM operation.
+      - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm): Illustrates how to perform a regular GEMM operation.
+      - [grouped_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/grouped_gemm): Demonstrates how to perform a grouped GEMM operation.
   - [hipBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/)
     - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
     - [her](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.
