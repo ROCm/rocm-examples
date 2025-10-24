@@ -334,6 +334,11 @@ The following options are available when building with CMake.
     - [syevj](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/syevj): Calculates the eigenvalues and eigenvectors from a real symmetric matrix using the Jacobi method.
     - [syevj_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/syevj_batched): Showcases how to compute the eigenvalues and eigenvectors (via Jacobi method) of each matrix in a batch of real symmetric matrices.
     - [sygvj](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSOLVER/sygvj): Calculates the generalized eigenvalues and eigenvectors from a pair of real symmetric matrices using the Jacobi method.
+  - [hipSPARSE](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSE/)
+    - [axpyi](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSE/axpyi/): Showcases how to scale a sparse vector and add it to a dense vector.
+    - [csrmv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSE/csrmv/): Showcases CSR matrix-vector multiplication with performance optimization.
+    - [handle](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSE/handle/): Showcases hipSPARSE library initialization, handle management, and version querying.
+    - [hybmv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSE/hybmv/): Showcases HYB (Hybrid) format matrix-vector multiplication for optimized performance.
   - [hipSPARSELt](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/)
     - [spmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/spmm): Perform a *sparse matrix - dense matrix multiplication*.
     - [spmm_advanced](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/spmm_advanced): Perform a *sparse matrix - dense matrix multiplication* with a scaling vector, bias addition and an activation function.
