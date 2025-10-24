@@ -24,6 +24,28 @@ cmake_minimum_required(VERSION 3.21)
 
 project(hip_graph_api_tutorial LANGUAGES CXX)
 
+# Check for general C++20 support
+list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_20 COMPILER_KNOWS_CXX20)
+if(COMPILER_KNOWS_CXX20 EQUAL -1)
+    message(STATUS "The C++ compiler does not support C++20. Not building the HIP Graph API tutorial examples.")
+    return()
+endif()
+
+# Check for C++20 features we use in the tutorial
+include(CheckIncludeFileCXX)
+set(CMAKE_REQUIRED_QUIET TRUE)
+check_include_file_cxx(numbers HAVE_NUMBERS)
+if(NOT HAVE_NUMBERS)
+    message(STATUS "<numbers> not found. Not building the HIP Graph API tutorial examples.")
+    return()
+endif()
+
+check_include_file_cxx(source_location HAVE_SOURCE_LOC)
+if(NOT HAVE_SOURCE_LOC)
+    message(STATUS "<source_location> not found. Not building the HIP Graph API tutorial examples.")
+    return()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
