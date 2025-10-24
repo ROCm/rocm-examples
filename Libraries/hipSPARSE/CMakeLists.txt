@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,36 +20,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-	hipBLAS \
-	hipBLASLt \
-	hipCUB \
-	hipFFT \
-	hipSOLVER \
-	hipSPARSE \
-	hipSPARSELt \
-	rocRAND \
-	hipRAND
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(hipSPARSE_examples LANGUAGES CXX)
+include(CTest)
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-	hipTensor \
-	rocBLAS \
-	rocFFT \
-	rocPRIM \
-	rocProfiler-SDK \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust \
-	rocWMMA
-endif
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-all: $(LIBRARIES)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+endif()
 
-clean: TARGET=clean
-clean: all
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+find_package(hipsparse)
+if(NOT hipsparse_FOUND)
+    message(STATUS "hipSPARSE could not be found, not building hipSPARSE examples")
+    return(1)
+endif()
 
-.PHONY: all clean $(LIBRARIES)
+add_subdirectory(axpyi)
+add_subdirectory(csrmv)
+add_subdirectory(handle)
+add_subdirectory(hybmv)
