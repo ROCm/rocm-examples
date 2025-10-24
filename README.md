@@ -280,6 +280,10 @@ The following options are available when building with CMake.
       - [flatmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/flatmm): Shows how to perform a FLATMM operation.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm): Illustrates how to perform a regular GEMM operation.
       - [grouped_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/grouped_gemm): Demonstrates how to perform a grouped GEMM operation.
+    - [moe](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe): MoE examples using the CK Tile programming model.
+      - [fused_moe](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/fused_moe): Shows how to implement the fused MoE block operator.
+      - [moe_smoothquant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/moe_smoothquant): Demonstrates how to implement MoE-SmoothQuant.
+      - [moe_sorting](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/moe_sorting): Illustrates how to implement the MoE sorting kernel.
   - [hipBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/)
     - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
     - [her](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.
