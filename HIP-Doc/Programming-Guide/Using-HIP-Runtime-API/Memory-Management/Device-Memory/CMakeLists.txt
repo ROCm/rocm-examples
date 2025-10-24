@@ -23,6 +23,9 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-Device-Memory LANGUAGES CXX)
 
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 add_subdirectory(constant_memory)
 add_subdirectory(dynamic_shared_memory)
 add_subdirectory(explicit_copy)

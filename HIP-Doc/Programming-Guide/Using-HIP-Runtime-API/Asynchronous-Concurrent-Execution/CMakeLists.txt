@@ -23,6 +23,9 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Asynchronous-Concurrent-Execution LANGUAGES CXX)
 
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 add_subdirectory(async_kernel_execution)
 add_subdirectory(event_based_synchronization)
 add_subdirectory(sequential_kernel_execution)

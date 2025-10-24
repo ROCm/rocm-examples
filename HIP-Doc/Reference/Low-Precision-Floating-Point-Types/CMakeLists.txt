@@ -26,6 +26,9 @@ project(HIP-Doc-Reference-Low-Precision-Floating-Point-Types LANGUAGES CXX)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Low-precision floating-point examples are available only on Linux.")
 elseif(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
