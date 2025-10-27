@@ -85,7 +85,6 @@ endif()
 # Copy object file to executable output directory
 if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "HIP")
     set(example_module_hsaco "$<TARGET_FILE_DIR:${example_name}>/${example_module_suffix}.hsaco")
-    message(STATUS "Target path: ${example_module_hsaco}")
     add_custom_command(TARGET ${example_name} POST_BUILD
                        COMMAND ${CMAKE_COMMAND}
                        ARGS -E copy $<TARGET_OBJECTS:${example_module}> ${example_module_hsaco}
