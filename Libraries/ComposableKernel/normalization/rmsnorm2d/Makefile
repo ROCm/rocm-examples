@@ -1,0 +1,90 @@
+# MIT License
+#
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+EXAMPLE := ComposableKernel_ck_tile_rmsnorm2d
+EXAMPLE_BASIC := ComposableKernel_ck_tile_rmsnorm2d_basic
+EXAMPLE_GENERATOR := generate.py
+GPU_RUNTIME := HIP
+
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD) -x hip -fgpu-flush-denormals-to-zero
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
+
+CXXFLAGS ?= -Wall -Wextra -Wno-float-equal -Wno-undefined-func-template
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+BASE_OPTS := --offload-compress
+
+SRCS := rmsnorm2d_fwd.cpp
+SRC_DIR := .
+GEN_SRC_DIR := sources
+GEN_OBJ_DIR := objects
+
+GENERATION_DONE := $(GEN_SRC_DIR)/.generated
+
+.PHONY: all
+all: $(EXAMPLE) $(EXAMPLE_BASIC)
+
+$(GEN_SRC_DIR) $(GEN_OBJ_DIR):
+	mkdir -p $@
+
+.PHONY: generate
+generate: $(GENERATION_DONE)
+
+$(GENERATION_DONE): $(EXAMPLE_GENERATOR) | $(GEN_SRC_DIR)
+	python3 $(EXAMPLE_GENERATOR) --api fwd --working_path $(GEN_SRC_DIR) --gen_blobs
+	@touch $@
+
+GEN_SRCS = $(shell if [ -f $(GENERATION_DONE) ]; then find $(GEN_SRC_DIR) -name "*.cpp" 2> /dev/null; fi)
+
+-include $(GENERATION_DONE)
+
+GEN_OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(GEN_OBJ_DIR)/%.o,$(SRCS)) \
+			$(patsubst $(GEN_SRC_DIR)/%.cpp,$(GEN_OBJ_DIR)/%.o,$(GEN_SRCS))
+	
+$(GEN_OBJ_DIR)/layernorm2d_fwd.o: layernorm2d_fwd.cpp | $(GEN_OBJ_DIR)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(BASE_OPTS) -c $< -o $@
+
+$(GEN_OBJ_DIR)/%.o: $(GEN_SRC_DIR)/%.cpp | $(GEN_OBJ_DIR)
+	$(HIPCXX) -I $(shell pwd) $(ICXXFLAGS) $(ICPPFLAGS) $(BASE_OPTS) -c $< -o $@
+
+$(EXAMPLE): $(GEN_OBJS)
+	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+
+$(EXAMPLE_BASIC): example_rmsnorm2d_fwd.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+.PHONY: clean
+clean:
+	$(RM) -r $(EXAMPLE) $(EXAMPLE_BASIC) $(GEN_SRC_DIR) $(GEN_OBJ_DIR)
