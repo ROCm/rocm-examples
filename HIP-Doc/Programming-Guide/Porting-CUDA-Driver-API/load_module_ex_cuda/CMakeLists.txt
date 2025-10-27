@@ -36,7 +36,7 @@ set_property(TARGET ${example_module} PROPERTY CUDA_PTX_COMPILATION ON)
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
-add_test(NAME ${example_name} COMMAND ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name} WORKING_DIRECTORY $<TARGET_FILE_DIR:${example_name}>)
 
 add_dependencies(${example_name} ${example_module})
 set_target_properties(${example_name} PROPERTIES CXX_EXTENSIONS OFF)
