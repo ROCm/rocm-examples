@@ -288,6 +288,8 @@ The following options are available when building with CMake.
       - [add_rmsnorm2d_quant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/add_rmsnorm2d_quant): Demonstrates how to perform add + RMSNorm2D + row-wise dynamic quantization forward operations.
       - [layernorm2d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/layernorm2d): Show how to perform the forward pass of the Layernorm2D operation.
       - [rmsnorm2d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/rmsnorm2d): Illustrates how to perform the forward pass of RMSNorm2D.
+    - [quantization](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/quantization): Quantization examples using the CK Tile programming model.
+      - [smoothquant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/quantization/smoothquant): Demonstrates how to implement SmoothQuant.
   - [hipBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/)
     - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
     - [her](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.
