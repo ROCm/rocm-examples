@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name ComposableKernel_ck_tile_moe_sorting)
+set(example_name ComposableKernel_ck_tile_layernorm2d)
+set(example_script test_ck_tile_layernorm2d)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -60,10 +61,38 @@ find_package(composable_kernel REQUIRED)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
-add_executable(${example_name} moe_sorting_api.cpp moe_sorting.cpp)
-add_test(${example_name} COMMAND ${example_name})
-set_source_files_properties(moe_sorting_api.cpp moe_sorting.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+add_executable(${example_name})
+
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/layernorm2d_fwd_srcs.txt
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
+        --api fwd
+        --working_path ${CMAKE_CURRENT_BINARY_DIR}
+        --list_blobs
+    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/generate.py
+)
+
+file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/layernorm2d_fwd_srcs.txt EXAMPLE_FWD_GEN_SRCS)
+
+add_custom_command(
+    OUTPUT ${EXAMPLE_FWD_GEN_SRCS}
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
+        --api fwd
+        --working_path ${CMAKE_CURRENT_BINARY_DIR}
+        --gen_blobs
+)
+
+set_source_files_properties(
+    layernorm2d_fwd.cpp
+    ${EXAMPLE_FWD_GEN_SRCS}
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
+
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
+target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal --offload-compress)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
+target_sources(${example_name} PRIVATE layernorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
+
+add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
