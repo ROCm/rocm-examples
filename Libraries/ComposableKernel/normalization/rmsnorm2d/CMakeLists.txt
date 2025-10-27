@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 set(example_name ComposableKernel_ck_tile_rmsnorm2d)
+set(example_name_basic ${example_name}_basic)
 set(example_script test_ck_tile_rmsnorm2d.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
@@ -63,7 +64,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 ########################################################################################################################
-# Basic example
+# Verbose example
 ########################################################################################################################
 add_executable(${example_name})
 
@@ -100,11 +101,13 @@ target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::ho
 target_sources(${example_name} PRIVATE rmsnorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
 
 ########################################################################################################################
-# Tile example
+# Basic example
 ########################################################################################################################
-add_executable(${example_name_tile} example_add_rmsnorm2d_rdquant_fwd.cpp)
-add_test(${example_name_tile} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name_tile}>")
+add_executable(${example_name_basic} example_add_rmsnorm2d_rdquant_fwd.cpp)
+add_test(${example_name_basic}
+         COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name_basic}>"
+)
 set_source_files_properties(example_add_rmsnorm2d_rdquant_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-target_compile_features(${example_name_tile} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_name_tile} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
-target_link_libraries(${example_name_tile} PRIVATE composable_kernel::ck_tile hip::host)
+target_compile_features(${example_name_basic} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(${example_name_basic} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
+target_link_libraries(${example_name_basic} PRIVATE composable_kernel::ck_tile hip::host)
