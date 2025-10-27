@@ -26,6 +26,9 @@ project(HIP-Doc-Programming-Guide-HIP-Porting-CUDA-Driver-API LANGUAGES CXX)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 add_subdirectory(address_retrieval)
 add_subdirectory(load_module)
 add_subdirectory(load_module_ex)

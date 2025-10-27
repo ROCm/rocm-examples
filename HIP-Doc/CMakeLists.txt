@@ -25,22 +25,15 @@ project(HIP-Doc LANGUAGES CXX)
 
 include(CTest)
 
-add_subdirectory(Programming-Guide)
-add_subdirectory(Reference)
-add_subdirectory(Tutorials)
-
 include("${CMAKE_CURRENT_LIST_DIR}/../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-
-
-
-
-
-
-
-
-
+add_subdirectory(Programming-Guide)
+add_subdirectory(Reference)
+add_subdirectory(Tutorials)

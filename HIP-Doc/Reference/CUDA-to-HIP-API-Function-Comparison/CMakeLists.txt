@@ -26,6 +26,9 @@ project(HIP-Doc-Reference-CUDA-to-HIP-API-Function-Comparison LANGUAGES CXX)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 if(NOT ${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
     message(STATUS "The block reduction example is available only for CUDA.")
 else()
