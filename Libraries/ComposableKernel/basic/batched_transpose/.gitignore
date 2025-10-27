@@ -1,1 +1,2 @@
+*.o
 ComposableKernel_ck_tile_batched_transpose

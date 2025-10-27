@@ -1,2 +1,9 @@
+codegen/__pycache__
+codegen/ops/__pycache__
+
 ComposableKernel_ck_tile_fmha_fwd
 ComposableKernel_ck_tile_fmha_bwd
+fwd_sources
+fwd_objects
+bwd_sources
+bwd_objects

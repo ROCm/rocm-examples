@@ -37,7 +37,7 @@
 #include <type_traits>
 
 #ifdef PERMUTE_USE_ALTERNATIVE_IMPL
-#include "alternative_impl/matrix_core_swizzle.hpp"
+#include "matrix_core_swizzle.hpp"
 #endif
 
 namespace detail {

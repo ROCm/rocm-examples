@@ -1,2 +1,3 @@
+*.o
 ComposableKernel_ck_tile_gemm_basic
 ComposableKernel_ck_tile_gemm_universal
