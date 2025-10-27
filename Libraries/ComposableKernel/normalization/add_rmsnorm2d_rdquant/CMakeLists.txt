@@ -22,7 +22,6 @@
 
 set(example_name ComposableKernel_ck_tile_add_rmsnorm2d_rdquant)
 set(example_name_tile ${example_name}_tile)
-set(example_instances ${example_name}_instances)
 set(example_script test_ck_tile_add_rmsnorm2d_rdquant.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
