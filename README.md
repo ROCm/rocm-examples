@@ -284,6 +284,10 @@ The following options are available when building with CMake.
       - [fused_moe](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/fused_moe): Shows how to implement the fused MoE block operator.
       - [moe_smoothquant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/moe_smoothquant): Demonstrates how to implement MoE-SmoothQuant.
       - [moe_sorting](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/moe_sorting): Illustrates how to implement the MoE sorting kernel.
+    - [normalization](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization): Normalization examples using the CK Tile programming model.
+      - [add_rmsnorm2d_quant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/add_rmsnorm2d_quant): Demonstrates how to perform add + RMSNorm2D + row-wise dynamic quantization forward operations.
+      - [layernorm2d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/layernorm2d): Show how to perform the forward pass of the Layernorm2D operation.
+      - [rmsnorm2d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/rmsnorm2d): Illustrates how to perform the forward pass of RMSNorm2D.
   - [hipBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/)
     - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
     - [her](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/her/): Showcases a rank-2 update of a Hermitian matrix with complex values.

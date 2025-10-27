@@ -26,5 +26,6 @@ project(ComposableKernel_attention_examples LANGUAGES CXX)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-add_subdirectory(fmha)
-add_subdirectory(topk_softmax)
+add_subdirectory(add_rmsnorm2d_rdquant)
+add_subdirectory(layernorm2d)
+add_subdirectory(rmsnorm2d)

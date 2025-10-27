@@ -23,6 +23,14 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(ComposableKernel_examples LANGUAGES CXX)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(STATUS "Composable Kernel examples are supported on Linux only.")
+    return()
+endif()
+
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 include(CTest)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
@@ -32,7 +40,7 @@ select_hip_platform()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "Composable Kernel examples are not supported for CUDA.")
-    return(1)
+    return()
 endif()
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -62,4 +70,5 @@ else()
     add_subdirectory(basic)
     add_subdirectory(gemm)
     add_subdirectory(moe)
+    add_subdirectory(normalization)
 endif()

@@ -31,10 +31,20 @@ set(example_bwd_script test_ck_tile_fmha_bwd.sh)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    message(STATUS "Composable Kernel examples are supported only on Linux.")
+    return()
+endif()
+
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
+
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    message(STATUS "Composable Kernel examples are not supported for CUDA.")
+    return()
+endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT

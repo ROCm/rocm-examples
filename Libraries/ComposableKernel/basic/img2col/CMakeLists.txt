@@ -27,7 +27,7 @@ project(${example_name} LANGUAGES CXX)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Composable Kernel examples are supported only on Linux.")
-    return(1)
+    return()
 endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
@@ -37,7 +37,7 @@ select_hip_platform()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "Composable Kernel examples are not supported for CUDA.")
-    return(1)
+    return()
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")

@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name ComposableKernel_ck_tile_flatmm)
-set(example_script test_ck_tile_flatmm.sh)
+set(example_name ComposableKernel_ck_tile_rmsnorm2d)
+set(example_script test_ck_tile_rmsnorm2d.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -62,10 +62,49 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
-add_executable(${example_name} flatmm_basic.cpp)
+########################################################################################################################
+# Basic example
+########################################################################################################################
+add_executable(${example_name})
+
+add_custom_command(
+    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/rmsnorm2d_fwd_srcs.txt
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
+        --api fwd
+        --working_path ${CMAKE_CURRENT_BINARY_DIR}
+        --list_blobs
+    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/generate.py
+)
+
+file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/rmsnorm2d_fwd_srcs.txt EXAMPLE_FWD_GEN_SRCS)
+
+add_custom_command(
+    OUTPUT ${EXAMPLE_FWD_GEN_SRCS}
+    COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
+        --api fwd
+        --working_path ${CMAKE_CURRENT_BINARY_DIR}
+        --gen_blobs
+)
+
+set_source_files_properties(
+    rmsnorm2d_fwd.cpp
+    ${EXAMPLE_FWD_GEN_SRCS}
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
+
 add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
-set_source_files_properties(flatmm_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-target_compile_definitions(${example_name} PRIVATE USING_MFMA_16x16x32=1 ENABLE_FP8=1)
+set_source_files_properties(rmsnorm2d_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_name} PRIVATE -Wno-unused-local-typedef)
+target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal --offload-compress)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
+target_sources(${example_name} PRIVATE rmsnorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
+
+########################################################################################################################
+# Tile example
+########################################################################################################################
+add_executable(${example_name_tile} example_add_rmsnorm2d_rdquant_fwd.cpp)
+add_test(${example_name_tile} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name_tile}>")
+set_source_files_properties(example_add_rmsnorm2d_rdquant_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_name_tile} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(${example_name_tile} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
+target_link_libraries(${example_name_tile} PRIVATE composable_kernel::ck_tile hip::host)
