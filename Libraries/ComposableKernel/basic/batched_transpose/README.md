@@ -7,6 +7,7 @@ conversions such as NCHW to NHWC and NHWC to NCHW, which are essential for deep 
 accelerators.
 
 Currently, the example supports batched transpose operations in two directions:
+
 * NCHW to NHWC
 * NHWC to NCHW
 
@@ -41,9 +42,8 @@ $$
 The example makes use of three key architectural components:
 
 * A **problem** combines data types using CK Tile's `BatchedTransposeProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
-  storage phases. In this example it is set to CK Tile's
-  `BatchedTransposePipeline`.
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
+  storage phases. In this example it is set to CK Tile's `BatchedTransposePipeline`.
 * A **kernel** implements the actual computation using the problem definition. The example implementation uses
   CK Tile's `BatchedTransposeKernel` kernel.
 

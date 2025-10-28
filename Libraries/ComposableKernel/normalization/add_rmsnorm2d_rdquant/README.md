@@ -13,9 +13,9 @@ example with a fixed tile size ("_tile") and one with flexible tile size dependi
 3. The input tensors are initialized with random values.
 4. Buffers for all tensors are created on the device.
 5. The input tensors are copied from the host to the device.
-5. CK Tile's built-in `AddRmsnorm2dRdquantFwd` kernel is instantiated and launched on the device.
-6. If validation is enabled, the results are compared against CK Tile's `reference_rmsnorm2d_fwd` function.
-7. All buffers are freed automatically.
+6. CK Tile's built-in `AddRmsnorm2dRdquantFwd` kernel is instantiated and launched on the device.
+7. If validation is enabled, the results are compared against CK Tile's `reference_rmsnorm2d_fwd` function.
+8. All buffers are freed automatically.
 
 ## Key APIs and concepts
 
@@ -27,7 +27,7 @@ The example makes use of four key architectural components:
   `Generic2dBlockShape`.
 * A **problem** combines data types with the shape configuration. In this example it is set to CK Tile's
   `AddRmsnorm2dRdquantFwdPipelineProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example it is set to CK Tile's `AddRmsnorm2dRdquantFwdPipelineOnePass` or
   `AddRmsnorm2dRdquantFwdPipelineThreePass`, depending on the chosen parameters.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's

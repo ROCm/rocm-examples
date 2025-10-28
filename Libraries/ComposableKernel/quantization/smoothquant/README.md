@@ -26,7 +26,7 @@ The example makes use of four key architectural components:
   `Generic2dBlockShape`.
 * A **problem** combines data types with the shape configuration. In this example the problem is set to CK Tile's
   `SmoothquantPipelineProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example the pipeline is set to either `SmoothquantPipelineOnePass` or
   `SmoothquantPipelineTwoPass`, depending on the chosen parameters.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's

@@ -1,5 +1,7 @@
 # CK Tile Programming Model: Image to Column (im2col) with CK Tile
 
+## Description
+
 This example demonstrates the $\text{im2col}$ transformation using the CK Tile programming model. This transformation is
 a key step for converting convolution operations into general matrix multiplication (GEMM) for efficient GPU execution.
 
@@ -24,13 +26,13 @@ $\mathbf{X}$ into columns:
 10. If enabled via command-line parameter, the results are compared against CK Tile's `reference_im2col` implementation.
 11. All buffers are freed automatically.
 
-# Key APIs and concepts
+## Key APIs and concepts
 
 ### CK Tile architecture
 
 The example makes use of three key architectural components:
 
-* **Shape** defines the hierarchical tile structure and memory layout. In this application, it is set to a 
+* **Shape** defines the hierarchical tile structure and memory layout. In this application, it is set to a
 `TileImageToColumnShape` which is part of CK Tile.
 * **Problem** combines data types with the shape configuration using CK Tile's `BlockImageToColumnProblem`.
 * **Kernel** implements the actual computation using the problem definition. The example implementation uses CK Tile's

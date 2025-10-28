@@ -15,7 +15,7 @@ The output is a `token*topk` weight tensor (usually single-precision) and an ind
 5. The input matrix is copied to the device.
 6. CK Tile's `TopkSoftmaxKernel` is instantiated and launched on the device.
 7. The weight and index tensors are copied to the host.
-8. If validation is enabled, the results are compared against an implementation using CK Tile's `reference_softmax` and 
+8. If validation is enabled, the results are compared against an implementation using CK Tile's `reference_softmax` and
    `reference_topk` functions.
 9. All buffers are freed automatically.
 
@@ -25,8 +25,9 @@ The output is a `token*topk` weight tensor (usually single-precision) and an ind
 
 The example makes use of three key architectural components:
 
-* A **problem** combines data types with the shape configuration. In this example the shapes are defined by the tokens, experts and strides of the tensors. These are passed to CK Tile's `TopkSoftmaxWarpPerRowProblem`. 
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+* A **problem** combines data types with the shape configuration. In this example the shapes are defined by the tokens,
+  experts and strides of the tensors. These are passed to CK Tile's `TopkSoftmaxWarpPerRowProblem`.
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example it is set to CK Tile's `TopkSoftmaxWarpPerRowPipeline`.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
   `TopkSoftmaxKernel` is used.

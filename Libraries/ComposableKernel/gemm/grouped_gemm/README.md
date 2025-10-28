@@ -29,7 +29,7 @@ The example makes use of four key architectural components:
   `TileGemmShape`.
 * A **problem** combines data types with the shape configuration. In this example the problems are set to CK Tile's
   `UniversalGemmPipelineProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example the pipelines are set to `GemmPipelineAgBgCrCompV3`.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
   `GroupedGemmKernel` is used.

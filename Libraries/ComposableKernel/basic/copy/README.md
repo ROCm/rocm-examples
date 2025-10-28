@@ -24,9 +24,9 @@ and $\mathbf{Y}$ is the output tensor.
 
 The example makes use of three key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout. In this example it is set to a custom 
+* A **shape** defines the hierarchical tile structure and memory layout. In this example it is set to a custom
   `TileCopyShape`.
-* A **problem** combines data types with the shape configuration. In this example it is set to a custom 
+* A **problem** combines data types with the shape configuration. In this example it is set to a custom
   `TileCopyProblem`.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example a custom
   `TileCopyKernel` is used.

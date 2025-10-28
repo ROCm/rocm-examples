@@ -35,7 +35,7 @@ The example makes use of four key architectural components:
   `FusedMoeGemmShape`.
 * A **problem** combines data types with the shape configuration. In this example the problem is set to CK Tile's
   `FusedMoeGemmPipelineProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example the pipeline is set to `FusedMoeGemmPipeline_FlatmmUk`.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
   `FusedMoeGemmKernel` is used.
@@ -71,7 +71,6 @@ The example makes use of four key architectural components:
 * `ck_tile::remove_cvref_t`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
-
 
 #### Functions
 
