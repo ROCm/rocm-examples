@@ -15,7 +15,7 @@ The application flow is the same for both examples; they only differ in the kern
 4. Buffers for the input matrices and the output matrix are created on the device.
 5. The input matrices are copied to the device.
 6. CK Tile's `GemmKernel` is instantiated and launched on the device.
-7. If validation is enabled, the results are compared against CK Tile's `reference_gemm` function or 
+7. If validation is enabled, the results are compared against CK Tile's `reference_gemm` function or
    `reference_gemm_gpu` kernel.
 8. All buffers are freed automatically.
 
@@ -29,7 +29,7 @@ The example makes use of four key architectural components:
   `TileGemmShape`.
 * A **problem** combines data types with the shape configuration. In this example the problems are set to CK Tile's
   `GemmPipelineProblem` (basic example) and `UniversalGemmPipelineProblem` (universal example).
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example the pipelines are set to `GemmPipelineAGmemBGmemCRegV1` (basic example) and
   `GemmPipelineAgBgCrCompV3` (universal example).
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's

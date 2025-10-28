@@ -25,7 +25,7 @@ with the `_fwd` suffix contain the algorithm's forward pass, while the `_bwd` fi
 3. Buffers for all tensors are created on the device.
 4. The tensors are copied from the host to the device.
 5. CK Tile's built-in `fmha_bwd` kernel is instantiated and launched on the device.
-6. If validation is enabled, the results are compared against a custom implementation using CK Tile's `reference_` 
+6. If validation is enabled, the results are compared against a custom implementation using CK Tile's `reference_`
    functionality.
 7. All buffers are freed automatically.
 
@@ -35,7 +35,7 @@ with the `_fwd` suffix contain the algorithm's forward pass, while the `_bwd` fi
 
 The example makes use of three key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout. In this example it is set to a custom 
+* A **shape** defines the hierarchical tile structure and memory layout. In this example it is set to a custom
   shape based on the sequence length.
 * A **problem** combines data types with the shape configuration. In this example its components are set individually
   by specifying the individual tensors' dimensions, strides, etc. as part of the arguments to the kernel.

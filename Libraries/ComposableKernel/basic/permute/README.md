@@ -113,7 +113,6 @@ The example shows two different kernel implementations:
 * `ck_tile::make_static_distributed_tensor`
 * `ck_tile::make_static_tile_distribution`
 * `ck_tile::make_tile_window`
-+ `ck_tile::reference_permute`
+* `ck_tile::reference_permute`
 * `ck_tile::store_tile`
 * `ck_tile::transform_tensor_view`
-

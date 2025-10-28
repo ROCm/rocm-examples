@@ -12,7 +12,7 @@ This example demonstrates how to perform a batched GEMM operation with the CK Ti
 4. Buffers for the input matrices and the output matrix are created on the device.
 5. The input matrices are copied to the device, the output matrix is initialized to `0` on the device.
 6. CK Tile's `BatchedGemmKernel` is instantiated and launched on the device.
-7. If validation is enabled, the results are compared against CK Tile's `reference_batched_gemm` function or 
+7. If validation is enabled, the results are compared against CK Tile's `reference_batched_gemm` function or
    `reference_batched_gemm_gpu` kernel.
 8. All buffers are freed automatically.
 
@@ -26,7 +26,7 @@ The example makes use of four key architectural components:
   `TileGemmShape`.
 * A **problem** combines data types with the shape configuration. In this example the problem is set to CK Tile's
   `UniversalGemmPipelineProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and 
+* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example the pipeline is set to `GemmPipelineAgBgCrCompV3`.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
   `BatchedGemmKernel` is used.
