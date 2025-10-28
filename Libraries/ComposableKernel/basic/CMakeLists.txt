@@ -28,8 +28,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 add_subdirectory(copy)
 add_subdirectory(batched_transpose)
-add_subdirectory(elementwise)
 add_subdirectory(img2col)
 add_subdirectory(permute)
-add_subdirectory(pooling)
 add_subdirectory(reduce)

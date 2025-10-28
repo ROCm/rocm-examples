@@ -32,7 +32,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
@@ -62,30 +62,34 @@ find_package(composable_kernel REQUIRED)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
+find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 ########################################################################################################################
 # Verbose example
 ########################################################################################################################
 add_executable(${example_name})
 
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/rmsnorm2d_fwd_srcs.txt
+execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd
         --working_path ${CMAKE_CURRENT_BINARY_DIR}
         --list_blobs
-    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/generate.py
+    RESULT_VARIABLE ret
 )
 
-file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/rmsnorm2d_fwd_srcs.txt EXAMPLE_FWD_GEN_SRCS)
+file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/rmsnorm2d_fwd_blobs.txt EXAMPLE_FWD_GEN_SRCS)
 
-add_custom_command(
-    OUTPUT ${EXAMPLE_FWD_GEN_SRCS}
+add_custom_target(rmsnorm2d_fwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd
         --working_path ${CMAKE_CURRENT_BINARY_DIR}
         --gen_blobs
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/rmsnorm2d_fwd_blobs.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
+    BYPRODUCTS ${EXAMPLE_FWD_GEN_SRCS}
+    COMMENT "Generating FMHA forward pass source files"
 )
+
+add_dependencies(${example_name} rmsnorm2d_fwd_gen_srcs)
 
 set_source_files_properties(
     rmsnorm2d_fwd.cpp
@@ -97,17 +101,18 @@ add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<
 set_source_files_properties(rmsnorm2d_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal --offload-compress)
+target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_name} PRIVATE rmsnorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
 
 ########################################################################################################################
 # Basic example
 ########################################################################################################################
-add_executable(${example_name_basic} example_add_rmsnorm2d_rdquant_fwd.cpp)
+add_executable(${example_name_basic} example_rmsnorm2d_fwd.cpp)
 add_test(${example_name_basic}
          COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name_basic}>"
 )
-set_source_files_properties(example_add_rmsnorm2d_rdquant_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(example_rmsnorm2d_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name_basic} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
 target_link_libraries(${example_name_basic} PRIVATE composable_kernel::ck_tile hip::host)

@@ -36,7 +36,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
@@ -77,23 +77,25 @@ file(GLOB_RECURSE EXAMPLE_CODE_GEN_SCRIPTS CONFIGURE_DEPENDS ${CMAKE_CURRENT_LIS
 ########################################################################################################################35
 add_executable(${example_fwd})
 
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt
+execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd,fwd_splitkv,fwd_appendkv
-        --list-blobs ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt
-    DEPENDS ${EXAMPLE_CODE_GEN_SCRIPTS}
+        --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt
+    RESULT_VARIABLE ret
 )
 
 file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt EXAMPLE_FWD_GEN_SRCS)
 
-add_custom_command(
-    OUTPUT ${EXAMPLE_FWD_GEN_SRCS}
+add_custom_target(fmha_fwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd,fwd_splitkv,fwd_appendkv
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
+    BYPRODUCTS ${EXAMPLE_FWD_GEN_SRCS}
+    COMMENT "Generating FMHA forward pass source files"
 )
+
+add_dependencies(${example_fwd} fmha_fwd_gen_srcs)
 
 set_source_files_properties(fmha_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
@@ -116,25 +118,27 @@ add_test(${example_fwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_fwd_script}
 ########################################################################################################################
 add_executable(${example_bwd})
 
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
+execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
-        --list-blobs ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
+        --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
         --receipt 3
-    DEPENDS ${EXAMPLE_CODE_GEN_SCRIPTS}
+    RESULT_VARIABLE ret
 )
 
 file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt EXAMPLE_BWD_GEN_SRCS)
 
-add_custom_command(
-    OUTPUT ${EXAMPLE_BWD_GEN_SRCS}
+add_custom_target(fmha_bwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
         --receipt 3
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
+    BYPRODUCTS ${EXAMPLE_BWD_GEN_SRCS}
+    COMMENT "Generating FMHA backward pass source files"
 )
+
+add_dependencies(${example_bwd} fmha_bwd_gen_srcs)
 
 target_compile_options(${example_fwd} PRIVATE -Wno-float-equal
                                               -Wno-undefined-func-template

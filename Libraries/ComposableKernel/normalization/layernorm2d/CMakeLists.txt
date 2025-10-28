@@ -31,7 +31,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
@@ -65,24 +65,27 @@ find_package(Python3 REQUIRED COMPONENTS Interpreter)
 
 add_executable(${example_name})
 
-add_custom_command(
-    OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/layernorm2d_fwd_srcs.txt
+execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd
         --working_path ${CMAKE_CURRENT_BINARY_DIR}
         --list_blobs
-    DEPENDS ${CMAKE_CURRENT_LIST_DIR}/generate.py
+    RESULT_VARIABLE ret
 )
 
-file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/layernorm2d_fwd_srcs.txt EXAMPLE_FWD_GEN_SRCS)
+file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/layernorm2d_fwd_blobs.txt EXAMPLE_FWD_GEN_SRCS)
 
-add_custom_command(
-    OUTPUT ${EXAMPLE_FWD_GEN_SRCS}
+add_custom_target(layernorm2d_fwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd
         --working_path ${CMAKE_CURRENT_BINARY_DIR}
         --gen_blobs
+    DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/layernorm2d_fwd_blobs.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
+    BYPRODUCTS ${EXAMPLE_FWD_GEN_SRCS}
+    COMMENT "Generating FMHA forward pass source files"
 )
+
+add_dependencies(${example_name} layernorm2d_fwd_gen_srcs)
 
 set_source_files_properties(
     layernorm2d_fwd.cpp
@@ -92,6 +95,7 @@ set_source_files_properties(
 
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal --offload-compress)
+target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_name} PRIVATE layernorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
 
