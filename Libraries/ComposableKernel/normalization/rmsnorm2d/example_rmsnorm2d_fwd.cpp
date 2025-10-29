@@ -211,7 +211,7 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE
+        return EXIT_FAILURE;
 
     const std::string data_type = arg_parser.get_str("prec");
     if(data_type == "fp16")

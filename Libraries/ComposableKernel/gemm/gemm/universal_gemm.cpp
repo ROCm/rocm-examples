@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "gemm_utils.hpp"
+#include "run_gemm_example.inc"
 
 #include <ck_tile/host.hpp>
 

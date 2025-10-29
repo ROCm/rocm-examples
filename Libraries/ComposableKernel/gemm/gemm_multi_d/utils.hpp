@@ -22,6 +22,13 @@
 
 #pragma once
 
+#include <ck_tile/core.hpp>
+#include <ck_tile/host.hpp>
+#include <ck_tile/ops/common.hpp>
+
+#include <algorithm>
+#include <type_traits>
+
 struct MultiplyMultiply
 {
     template <typename E, typename C, typename D0, typename D1>

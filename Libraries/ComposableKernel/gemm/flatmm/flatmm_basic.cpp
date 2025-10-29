@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "flatmm_basic.hpp"
+#include "run_flatmm_example.inc"
 
 #include <ck_tile/host.hpp>
 
