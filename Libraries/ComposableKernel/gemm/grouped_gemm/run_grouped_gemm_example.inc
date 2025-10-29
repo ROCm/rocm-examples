@@ -22,6 +22,11 @@
 
 #pragma once
 
+#include <ck_tile/core.hpp>
+#include <ck_tile/host.hpp>
+#include <ck_tile/ops/common.hpp>
+#include <ck_tile/ops/gemm.hpp>
+
 #include <hip/hip_runtime.h>
 
 #include <algorithm>
