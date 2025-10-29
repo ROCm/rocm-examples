@@ -49,6 +49,7 @@ jobs:
                     rocsparse-dev \
                     rocthrust-dev \
                     libdw-dev rocprofiler-sdk \
+                    rccl-dev \
                     hipblaslt-dev \
                     hiptensor-dev \
                     rocwmma-dev \
