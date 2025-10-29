@@ -20,21 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	attention \
-	basic \
-	convolution \
-	gemm \
-	moe \
-	normalization \
-	quantization
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(ComposableKernel_ck_tile_convolution_examples LANGUAGES CXX)
 
-all: $(EXAMPLES)
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-clean: TARGET=clean
-clean: all
-
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
-
-.PHONY: all clean $(EXAMPLES)
+add_subdirectory(grouped_convolution)
