@@ -281,7 +281,8 @@ The following options are available when building with CMake.
       - [batched_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/batched_gemm): Demonstrates how to perform a batched GEMM operation.
       - [flatmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/flatmm): Shows how to perform a FLATMM operation.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm): Illustrates how to perform a regular GEMM operation.
-      - [grouped_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/grouped_gemm): Demonstrates how to perform a grouped GEMM operation.
+      - [gemm_multi_d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm_multi_d): Demonstrates how to perform a Multiple D GEMM operation.
+      - [grouped_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/grouped_gemm): Shows how to perform a grouped GEMM operation.
     - [MoE](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe): MoE examples using the CK Tile programming model.
       - [fused_moe](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/fused_moe): Shows how to implement the fused MoE block operator.
       - [moe_smoothquant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/moe_smoothquant): Demonstrates how to implement MoE-SmoothQuant.
