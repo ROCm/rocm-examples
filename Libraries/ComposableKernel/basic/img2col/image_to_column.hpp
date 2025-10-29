@@ -23,6 +23,7 @@
 #pragma once
 
 #include <ck_tile/core.hpp>
+#include <ck_tile/host/convolution_parameter.hpp>
 #include <ck_tile/host/kernel_launch.hpp>
 #include <ck_tile/ops/image_to_column.hpp>
 

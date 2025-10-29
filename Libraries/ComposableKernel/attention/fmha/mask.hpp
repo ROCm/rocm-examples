@@ -44,6 +44,8 @@ enum class mask_enum
 struct mask_info
 {
     mask_enum type;
+    ck_tile::index_t seqlen_q;
+    ck_tile::index_t seqlen_k;
     ck_tile::index_t y, x;
     ck_tile::index_t left, right; // FA style SWA left/right
 
@@ -65,6 +67,8 @@ struct mask_info
         ck_tile::index_t x_total = seqlen_k;
         ck_tile::index_t y_total = seqlen_q;
         mask_info tmp;
+        tmp.seqlen_q = seqlen_q;
+        tmp.seqlen_k = seqlen_k;
         auto found_0 = str.find(':');
         if(found_0 != std::string::npos)
         {
@@ -101,6 +105,7 @@ struct mask_info
                 tmp.type            = mask_enum::window_generic;
                 ck_tile::index_t v0 = std::atoi(v.substr(0, found_1).c_str());
                 ck_tile::index_t v1 = std::atoi(v.substr(found_1 + 1).c_str());
+                // TODO: some validation
                 if(t == "t")
                 {
                     tmp.type = mask_enum::mask_top_left;
@@ -170,7 +175,22 @@ struct mask_info
         }
         return tmp;
     }
-
+    ck_tile::index_t get_unmaskarea() const
+    {
+        if(type == mask_enum::no_mask)
+            return seqlen_q * seqlen_k;
+        ck_tile::index_t area = 0;
+        for(ck_tile::index_t i_y = 0; i_y < seqlen_q; ++i_y)
+        {
+            ck_tile::index_t x_start = std::max(-y + i_y + 1, static_cast<ck_tile::index_t>(0));
+            ck_tile::index_t x_end   = std::min(i_y + x, seqlen_k);
+            if(x_end > x_start)
+            {
+                area += (x_end - x_start);
+            }
+        }
+        return area;
+    }
     friend std::ostream& operator<<(std::ostream& os, const mask_info& mi)
     {
         mi.serialize(os);

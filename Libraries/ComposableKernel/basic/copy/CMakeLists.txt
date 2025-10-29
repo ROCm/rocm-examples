@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 set(example_name ComposableKernel_ck_tile_copy)
-set(example_script test_ck_tile_copy.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -62,7 +61,7 @@ find_package(composable_kernel REQUIRED)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 add_executable(${example_name} test_copy.cpp)
-add_test(${example_name} COMMAND "${example_script} $<TARGET_FILE:${example_name}>")
+add_test(${example_name} COMMAND ${example_name})
 
 set_source_files_properties(test_copy.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 

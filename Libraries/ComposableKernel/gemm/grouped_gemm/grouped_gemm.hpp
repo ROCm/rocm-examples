@@ -53,7 +53,7 @@ using BDataType   = Types::BDataType;
 using AccDataType = Types::AccDataType;
 using CDataType   = Types::CDataType;
 
-using grouped_gemm_kargs = ck_tile::GemmHostArgs;
+using grouped_gemm_kargs = ck_tile::GemmHostArgs</*NumDTensor = 0*/>;
 
 auto create_args(int argc, char* argv[])
 {
@@ -82,7 +82,17 @@ inline std::size_t get_workspace_size(const std::vector<grouped_gemm_kargs>& gem
     return gemm_descs.size() * sizeof(ck_tile::GemmTransKernelArg);
 }
 
-template <typename ALayout, typename BLayout, typename CLayout>
+template <typename ADataType,
+          typename BDataType,
+          typename DsDataType,
+          typename AccDataType,
+          typename CDataType,
+          typename ALayout,
+          typename BLayout,
+          typename DsLayout,
+          typename CLayout,
+          bool Persistent,
+          typename CDEElementWise>
 float grouped_gemm(const std::vector<grouped_gemm_kargs>& gemm_descs,
                    const ck_tile::stream_config& s,
                    void* kargs_ptr);

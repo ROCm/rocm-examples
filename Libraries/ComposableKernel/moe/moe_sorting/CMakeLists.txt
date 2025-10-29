@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 set(example_name ComposableKernel_ck_tile_moe_sorting)
+set(example_script test_ck_tile_moe_sorting.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -62,7 +63,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 add_executable(${example_name} moe_sorting_api.cpp moe_sorting.cpp)
-add_test(${example_name} COMMAND ${example_name})
+add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
 set_source_files_properties(moe_sorting_api.cpp moe_sorting.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
