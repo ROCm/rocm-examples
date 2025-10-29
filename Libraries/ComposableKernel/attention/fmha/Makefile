@@ -90,7 +90,7 @@ $(FWD_OBJ_DIR)/fmha_fwd.o: fmha_fwd.cpp | $(FWD_OBJ_DIR)
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(FWD_PP_DEFS) -c $< -o $@
 
 $(FWD_OBJ_DIR)/%.o: $(FWD_SRC_DIR)/%.cpp | $(FWD_OBJ_DIR)
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(FWD_PP_DEFS) -c $< -o $@
+	$(HIPCXX) -I $(shell pwd) $(ICXXFLAGS) $(ICPPFLAGS) $(FWD_PP_DEFS) -c $< -o $@
 
 $(EXAMPLE_FWD): $(FWD_OBJECTS)
 	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
@@ -99,7 +99,7 @@ $(BWD_OBJ_DIR)/fmha_bwd.o: fmha_bwd.cpp | $(BWD_OBJ_DIR)
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c $< -o $@
 
 $(BWD_OBJ_DIR)/%.o: $(BWD_SRC_DIR)/%.cpp | $(BWD_OBJ_DIR)
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c $< -o $@
+	$(HIPCXX) -I $(shell pwd) $(ICXXFLAGS) $(ICPPFLAGS) -c $< -o $@
 
 $(EXAMPLE_BWD): $(BWD_OBJECTS)
 	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)

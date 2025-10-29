@@ -66,6 +66,7 @@ The example makes use of three key architectural components:
 
 #### Functions
 
+* `ck_tile::async_load_tile`
 * `ck_tile::check_err`
 * `ck_tile::get_block_id`
 * `ck_tile::get_warp_id`

@@ -79,7 +79,7 @@ add_executable(${example_fwd})
 
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
-        --api fwd,fwd_splitkv,fwd_appendkv
+        --api fwd,fwd_splitkv,fwd_appendkv,pagedkv_prefill
         --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt
     RESULT_VARIABLE ret
 )
@@ -88,7 +88,7 @@ file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt EXAMPLE_FWD_GEN_SRCS)
 
 add_custom_target(fmha_fwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
-        --api fwd,fwd_splitkv,fwd_appendkv
+        --api fwd,fwd_splitkv,fwd_appendkv,pagedkv_prefill
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
     BYPRODUCTS ${EXAMPLE_FWD_GEN_SRCS}
@@ -108,6 +108,7 @@ target_compile_features(${example_fwd} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_fwd} PRIVATE -Wno-float-equal
                                               -Wno-undefined-func-template
                                               -fgpu-flush-denormals-to-zero)
+target_include_directories(${example_fwd} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_fwd} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_fwd} PRIVATE fmha_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
 
@@ -145,6 +146,7 @@ target_compile_options(${example_fwd} PRIVATE -Wno-float-equal
                                               -fgpu-flush-denormals-to-zero
 )
 target_compile_features(${example_bwd} PRIVATE cxx_std_17 hip_std_17)
+target_include_directories(${example_bwd} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_bwd} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_bwd} PRIVATE fmha_bwd.cpp ${EXAMPLE_BWD_GEN_SRCS})
 
