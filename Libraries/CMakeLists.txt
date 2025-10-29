@@ -46,6 +46,7 @@ if(
     add_subdirectory(hipSPARSELt)
     add_subdirectory(hipTensor)
     add_subdirectory(MIGraphX)
+    add_subdirectory(RCCL)
     add_subdirectory(rocALUTION)
     add_subdirectory(rocBLAS)
     add_subdirectory(rocFFT)

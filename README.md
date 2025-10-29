@@ -376,6 +376,16 @@ The following options are available when building with CMake.
       - [custom_op_rocblas_kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/custom_op_rocblas_kernel/): Demonstrates integrating rocBLAS linear algebra routines as custom operators.
     - [vision](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/vision/): Computer vision inference examples.
       - [cpp_mnist](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/vision/cpp_mnist/): Demonstrates MNIST handwritten digit inference with optional FP16/INT8 quantization and multi-target support.
+  - [RCCL](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/)
+    - [allgather](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/allgather/): Showcases how to collect data from all ranks and distribute the concatenated result to every rank.
+    - [allreduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/allreduce/): Showcases how to reduce data from all ranks and distribute the result to every rank.
+    - [broadcast](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/broadcast/): Showcases how to distribute data from a root rank to all ranks in the communicator.
+    - [buffer_registration](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/buffer_registration/): Showcases buffer registration optimization for repeated collective operations to eliminate per-iteration memory management overhead.
+    - [device_api](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/device_api/): Showcases RCCL device-side API concepts and the benefits of fusing computation with collective communication operations.
+    - [gradient_allreduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/gradient_allreduce/): Showcases AllReduce operations in a distributed deep learning training scenario with multiple gradient layers.
+    - [reduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/reduce/): Showcases how to reduce data from all ranks to a single specified root rank.
+    - [reducescatter](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/reducescatter/): Showcases how to reduce data from all ranks and scatter the result chunks to all ranks.
+    - [send_recv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/send_recv/): Showcases point-to-point communication using Send and Recv operations with ring topology.
   - [rocALUTION](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/)
     - [amg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/amg/): Showcases Smoothed Aggregation Algebraic Multigrid method for solving linear systems with automatic hierarchy construction.
     - [as_precond](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/as_precond/): Showcases Additive Schwarz preconditioner with domain decomposition and two-level preconditioning.
