@@ -76,6 +76,7 @@ The example makes use of four key architectural components:
 
 #### Functions
 
+* `ck_tile::cast_pointer_to_constant_address_space`
 * `ck_tile::check_err`
 * `ck_tile::get_absolute_threshold`
 * `ck_tile::get_relative_threshold`
@@ -93,3 +94,4 @@ The example makes use of four key architectural components:
 * `hipFree`
 * `hipMalloc`
 * `hipMemcpy`
+* `hipMemcpyWithStream`
