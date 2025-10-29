@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -33,7 +33,11 @@ if(
     NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
 )
     add_subdirectory(hipBLAS)
-    add_subdirectory(hipBLASLt)
+    if(CMAKE_VERSION VERSION_LESS "3.25.2")
+        message(WARNING "CMake version < 3.25.2, not building hipBLASLt examples.")
+    else()
+        add_subdirectory(hipBLASLt)
+    endif()
     add_subdirectory(hipCUB)
     add_subdirectory(hipFFT)
     add_subdirectory(hipRAND)
