@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := ComposableKernel_ck_tile_flatmm
+EXAMPLE := ComposableKernel_ck_tile_gemm_multi_d
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -32,11 +32,11 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD) -x hip
-ICPPFLAGS := -DUSING_MFMA_16x16x32=1 -DENABLE_FP8=1
+ICPPFLAGS :=
 ILDFLAGS  :=
 ILDLIBS   :=
 
-CXXFLAGS ?= -Wall -Wextra -Wno-unused-local-typedef
+CXXFLAGS ?= -Wall -Wextra
 ICXXFLAGS += $(CXXFLAGS)
 ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
