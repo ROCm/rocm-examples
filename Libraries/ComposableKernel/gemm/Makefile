@@ -24,6 +24,7 @@ EXAMPLES := \
 	batched_gemm \
 	flatmm \
 	gemm \
+	gemm_multi_d \
 	grouped_gemm
 
 all: $(EXAMPLES)
