@@ -79,10 +79,10 @@ bool run(const ck_tile::ArgParser& arg_parser)
 
     x_buf.ToDevice(x_host.data());
 
-    using BlockWaves = ck_tile::sequence<2, 1>;
-    using BlockTile  = ck_tile::sequence<64, 8>;
-    using WaveTile   = ck_tile::sequence<64, 8>;
-    using Vector     = ck_tile::sequence<1, 4>;
+    using BlockWaves         = ck_tile::sequence<2, 1>;
+    using BlockTile          = ck_tile::sequence<64, 8>;
+    using WaveTile           = ck_tile::sequence<64, 8>;
+    using Vector             = ck_tile::sequence<1, 2>;
     constexpr bool AsyncCopy = true;
 
     ck_tile::index_t kGridSize = (m / BlockTile::at(ck_tile::number<0>{}));
