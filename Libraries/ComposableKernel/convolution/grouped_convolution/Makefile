@@ -20,21 +20,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-	attention \
-	basic \
-	convolution \
-	gemm \
-	moe \
-	normalization \
-	quantization
+EXAMPLE := ComposableKernel_ck_tile_grouped_convolution
+GPU_RUNTIME := HIP
 
-all: $(EXAMPLES)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-clean: TARGET=clean
-clean: all
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD) -x hip -mllvm -enable-noalias-to-md-conversion=0
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
 
-.PHONY: all clean $(EXAMPLES)
+CXXFLAGS ?= -Wall -Wextra
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+SOURCES := $(wildcard *.cpp)
+OBJECTS := $(SOURCES:.cpp=.o)
+
+%.o: %.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ -c $<
+
+$(EXAMPLE): $(OBJECTS)
+	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE) $(OBJECTS)
+
+.PHONY: clean

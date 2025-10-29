@@ -21,13 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	attention \
-	basic \
-	convolution \
-	gemm \
-	moe \
-	normalization \
-	quantization
+	grouped_convolution
 
 all: $(EXAMPLES)
 
