@@ -31,6 +31,15 @@ endif()
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+set(CK_SUPPORTED_ARCH gfx90a gfx942 gfx950)
+
+foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
+    if(NOT ARCH IN_LIST CK_SUPPORTED_ARCH)
+        message(STATUS "CK Tile examples are not supported for ${ARCH}. Not building CK Tile examples")
+        return()
+    endif()
+endforeach()
+
 include(CTest)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
