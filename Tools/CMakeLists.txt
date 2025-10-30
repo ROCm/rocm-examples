@@ -20,20 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
-project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.4.0)
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(Tools LANGUAGES CXX)
 include(CTest)
 
-include("${CMAKE_CURRENT_LIST_DIR}/Common/HipPlatform.cmake")
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-# Set default build type to Release
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+# The HIP tools are supported neither on Windows nor on CUDA.
+if(
+    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
+)
+    add_subdirectory(rocprof-compute)
 endif()
-
-add_subdirectory(Applications)
-add_subdirectory(HIP-Basic)
-add_subdirectory(HIP-Doc)
-add_subdirectory(Libraries)
-add_subdirectory(Tools)
-add_subdirectory(Tutorials)

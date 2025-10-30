@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,19 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
-project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.4.0)
-include(CTest)
+TOOLS :=
 
-include("${CMAKE_CURRENT_LIST_DIR}/Common/HipPlatform.cmake")
+ifneq ($(GPU_RUNTIME), CUDA)
+TOOLS += \
+	rocprof-compute
+endif
 
-# Set default build type to Release
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
+all: $(TOOLS)
 
-add_subdirectory(Applications)
-add_subdirectory(HIP-Basic)
-add_subdirectory(HIP-Doc)
-add_subdirectory(Libraries)
-add_subdirectory(Tools)
-add_subdirectory(Tutorials)
+clean: TARGET=clean
+clean: all
+
+$(TOOLS):
+	$(MAKE) -C $@ $(TOOLS)
+
+.PHONY: all clean $(TOOLS)
