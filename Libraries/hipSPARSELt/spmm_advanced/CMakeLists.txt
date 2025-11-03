@@ -49,6 +49,14 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 find_package(hip REQUIRED)
 find_package(hipsparselt REQUIRED)
 
+hipsparselt_get_supported_architectures(HIPSPARSELT_SUPPORTED_ARCH)
+foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
+    if(NOT ARCH IN_LIST HIPSPARSELT_SUPPORTED_ARCH)
+        message(WARNING "hipSPARSELt does not support architecture: ${ARCH}, not building hipSPARSELt examples")
+        return()
+    endif()
+endforeach()
+
 add_executable(${example_name} main.cpp)
 # Make example runnable using CTest
 add_test(NAME ${example_name} COMMAND ${example_name})
