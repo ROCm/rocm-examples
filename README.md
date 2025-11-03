@@ -434,6 +434,17 @@ The following options are available when building with CMake.
     - [level_3](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_3/): Operations between matrices and matrices.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_3/gemm/): Showcases the general matrix product operation.
       - [gemm_strided_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocBLAS/level_3/gemm_strided_batched/): Showcases the general matrix product operation with strided and batched matrices.
+  - [rocCV](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/)
+    - [bilateral_filter](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/bilateral_filter/): Showcases edge-preserving smoothing filter that reduces noise while maintaining image boundaries.
+    - [bnd_box](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/bnd_box/): Showcases drawing bounding boxes on images for object detection and annotation visualization.
+    - [center_crop](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/center_crop/): Showcases extracting rectangular regions from the center of images while maintaining aspect ratios.
+    - [composite](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/composite/): Showcases alpha blending of foreground and background images using mask-based pixel selection.
+    - [copy_make_border](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/copy_make_border/): Showcases adding padding around images using various border handling modes and configurable colors.
+    - [cropandresize](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/cropandresize/): Showcases a combined crop and resize pipeline with batch processing for machine learning preprocessing.
+    - [custom_crop](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/custom_crop/): Showcases extracting rectangular regions from specific coordinates within images with precise positioning control.
+    - [gamma_contrast](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/gamma_contrast/): Showcases non-linear brightness and contrast adjustment using gamma transformation formulas.
+    - [normalize](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/normalize/): Showcases per-channel scaling and shifting operations for image normalization in machine learning pipelines.
+    - [warp_perspective](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocCV/warp_perspective/): Showcases 3D perspective transformations using transformation matrices for geometric image warping.
   - [rocJPEG](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/)
     - [rocjpeg_decode](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/rocjpeg_decode): Program that showcases decoding of JPEG images.
     - [rocjpeg_decode_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/rocjpeg_decode_batched): Program that showcases decoding a batch of JPEG images.

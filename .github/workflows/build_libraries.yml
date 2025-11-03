@@ -74,6 +74,7 @@ jobs:
           - name: Make
             shell: bash
             run: |
+              sed -i '/rocCV/d' Libraries/Makefile
               cd Libraries
               make -j
 
