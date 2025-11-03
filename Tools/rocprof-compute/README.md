@@ -20,5 +20,5 @@ The `advanced` example script shows how to perform a more fine-grained analysis:
 * Profiling multiple runs and using the CLI to compare the results
 * Profiling with program counter (PC) sampling.
 
-For more information on the functionality of `rocprof-compute`, please refer to its
-[documentation](https://rocm.docs.amd.com/projects/rocprofiler-compute/en/latest/).
+For more information on the functionality of `rocprof-compute` or on how to analyze the output with interactive tools,
+please refer to its [documentation](https://rocm.docs.amd.com/projects/rocprofiler-compute/en/latest/).

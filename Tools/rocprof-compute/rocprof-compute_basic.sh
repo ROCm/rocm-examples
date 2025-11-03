@@ -21,10 +21,6 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-#Show how to generate both [format1] and [format2] output formats using [tool_name] flags
-#Write README.md explaining when to use basic vs advanced [tool_purpose] and how to interpret the [output_file] file
-#Include example showing how to [tool_specific_advanced_usage]
-
 EXAMPLE_TOOL := rocprof-compute
 EXAMPLE_BIN := ${EXAMPLE_TOOL}_vcopy
 EXAMPLE_WORKLOAD := ./${EXAMPLE_BIN} -n 1048576 -b 256
