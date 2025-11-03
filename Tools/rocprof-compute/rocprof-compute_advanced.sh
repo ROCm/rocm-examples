@@ -21,70 +21,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE_TOOL := rocprof-compute
-EXAMPLE_WORKLOAD := "${EXAMPLE_TOOL}_vcopy"
-USED_GPU :=
+EXAMPLE_TOOL="rocprof-compute"
+EXAMPLE_BIN="${EXAMPLE_TOOL}_vcopy"
+EXAMPLE_WORKLOAD="./$EXAMPLE_BIN -n 1048576 -b 256"
 
 # Check for existence of tool
-if ! [ -x "$(command -v ${EXAMPLE_TOOL})" ]; then
-    echo "Error: Could not find ${EXAMPLE_TOOL} in the PATH." >&2
+if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
+    echo "Error: Could not find $EXAMPLE_TOOL in the PATH." >&2
     exit 1
 fi
+
+# Exit on any error
+set -e
 
 echo "==============================================================================="
 echo "Profiling workload; filtering for kernel substring vecCopy"
 echo "==============================================================================="
 # Kernels are specified as a substring list. The following matches all kernel names which contain "vecCopy".
-WORKDIR := "${EXAMPLE_WORKLOAD}_substr"
-${EXAMPLE_TOOL} profile --name ${WORKDIR} --kernel vecCopy -- ./${EXAMPLE_WORKLOAD} -n 1048576 -b 256
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_substr --kernel vecCopy -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Profiling workload; filtering for Wavefront Launch Statistics"
 echo "==============================================================================="
 # It is possible to only collect some metrics. The list of supported hardware report blocks can be obtained with
 # rocprof-compute profile --list-metrics
-WORKDIR := "${EXAMPLE_WORKLOAD}_wavefront"
-${EXAMPLE_TOOL} profile --name ${WORKDIR} --block 7 -- ./${EXAMPLE_WORKLOAD} -n 1048576 -b 256
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_wavefront --block 7 -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Profiling two runs for comparative analysis"
 echo "==============================================================================="
-${EXAMPLE_TOOL} profile --name ${EXAMPLE_WORKLOAD}_first -- ./${EXAMPLE_WORKLOAD} -n 1048576 -b 256
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
-${EXAMPLE_TOOL} profile --name ${EXAMPLE_WORKLOAD}_second -- ./${EXAMPLE_WORKLOAD} -n 1048576 -b 256
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
-${EXAMPLE_TOOL} analyze --path workload/${EXAMPLE_WORKLOAD}_first/* --path workload/${EXAMPLE_WORKLOAD}_second
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_first -- .$EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_second -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL analyze --path workload/${EXAMPLE_BIN}_first/* --path workload/${EXAMPLE_BIN}_second
 
 echo "==============================================================================="
 echo "Profiling with PC sampling"
 echo "==============================================================================="
 # At the moment, block 21 (the block containing PC metrics) must be explicitly enabled.
-${EXAMPLE_TOOL} profile \
-    --name ${EXAMPLE_WORKLOAD}_pc \
-    --block 21 \
-    --pc-sampling-method stochastic \
-    -- ./${EXAMPLE_WORKLOAD} -n 1048576 -b 256
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_pc --block 21 --pc-sampling-method stochastic -- $EXAMPLE_WORKLOAD
 
 exit 0

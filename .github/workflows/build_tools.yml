@@ -28,8 +28,8 @@ jobs:
           - name: Install dependencies
             run: |
                   apt-get update -qq &&
-                  apt-get install -y build-essential g++ glslang-tools \
-                    python3 python3-pip wget git
+                  apt-get install -y build-essential elfutils g++ git glslang-tools python3 python3-pip wget \
+                    libboost-dev libiberty-dev libpapi-dev libopenmpi-dev libsqlite3-dev libtbb-dev libunwind-dev
                   python3 -m pip install --upgrade pip
                   python3 -m pip install cmake
           - name: Install ROCm Dev
@@ -38,14 +38,19 @@ jobs:
                   wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
                   apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
                   apt-get update -qq &&
-                  apt-get -y install rocm-dev rocm-llvm-dev rocprofiler-compute
+                  apt-get -y install aomp aomp-extras rocm-dev rocm-llvm-dev rocprofiler-compute rocprofiler-systems
                   echo "/opt/rocm/bin" >> $GITHUB_PATH
                   echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
                   echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
                   apt-get autoclean
+          - name: Set up Python virtual environment
+            run: |
+              python3 -m venv rocprof-compute_venv
+              ./rocprof-compute_venv/bin/python3 -m pip install -r /opt/rocm/libexec/rocprofiler-compute/requirements.txt
           - name: Configure and Build
             shell: bash
             run: |
+              source ./rocprof-compute_venv/bin/activate.sh
               cd Tools && mkdir build && cd build
               cmake -DGPU_TARGETS="${GPU_TARGETS}" -S ..
               cmake --build . -j 4

@@ -21,34 +21,29 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE_TOOL := rocprof-compute
-EXAMPLE_BIN := ${EXAMPLE_TOOL}_vcopy
-EXAMPLE_WORKLOAD := ./${EXAMPLE_BIN} -n 1048576 -b 256
+EXAMPLE_TOOL="rocprof-compute"
+EXAMPLE_BIN="${EXAMPLE_TOOL}_vcopy"
+EXAMPLE_WORKLOAD="./$EXAMPLE_BIN -n 1048576 -b 256"
 
 # Check for existence of tool
-if ! [ -x "$(command -v ${EXAMPLE_TOOL})" ]; then
-    echo "Error: Could not find ${EXAMPLE_TOOL} in the PATH." >&2
+if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
+    echo "Error: Could not find $EXAMPLE_TOOL in the PATH." >&2
     exit 1
 fi
+
+# Exit on any error
+set -e
 
 echo "==============================================================================="
 echo "Profiling workload"
 echo "==============================================================================="
-${EXAMPLE_TOOL} profile --name ${EXAMPLE_BIN} -- ${EXAMPLE_WORKLOAD}
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL profile --name $EXAMPLE_BIN -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Profiling workload for roofline analysis"
 echo "==============================================================================="
 # The following will only collect metrics which are required for roofline analysis.
-${EXAMPLE_TOOL} profile --name ${EXAMPLE_BIN}_roofline --roof-only -- ${EXAMPLE_WORKLOAD}
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_roofline --roof-only -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Profiling workload and saving in rocpd file format"
@@ -58,9 +53,11 @@ ${EXAMPLE_TOOL} profile \
     --name ${EXAMPLE_BIN}_rocpd \
     --format-rocprof-output rocpd \
     --retain-rocpd-output \
-    -- ./${EXAMPLE_WORKLOAD}
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
+    -- $EXAMPLE_WORKLOAD
+
+# Check if the workload directory exists before analyzing
+if [ ! -d "workloads/$EXAMPLE_BIN" ]; then
+    echo "Error: workloads/$EXAMPLE_BIN directory not found" >&2
     exit 1
 fi
 
@@ -68,30 +65,19 @@ echo "==========================================================================
 echo "Performing CLI analysis: System Speed-of-Light"
 echo "==============================================================================="
 # Block 2: Speed-of-Light
-${EXAMPLE_TOOL} analyze --path workloads/${EXAMPLE_WORKLOAD}/* --block 2
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL analyze --path workloads/$EXAMPLE_BIN/* --block 2
+
 
 echo "==============================================================================="
 echo "Performing CLI analysis: Memory chart"
 echo "==============================================================================="
 # Block 3: Memory chart
-${EXAMPLE_TOOL} analyze --path workloads/${EXAMPLE_WORKLOAD}/* --block 3
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL analyze --path workloads/$EXAMPLE_BIN/* --block 3
 
 echo "==============================================================================="
 echo "Performing CLI analysis: Roofline"
 echo "==============================================================================="
 # Block 4: Roofline
-${EXAMPLE_TOOL} profile --path workloads/${EXAMPLE_WORKLOAD}/* --block 4
-if [ $? -eq 1 ]; then
-    echo "${EXAMPLE_TOOL} returned an error." >&2
-    exit 1
-fi
+$EXAMPLE_TOOL analyze --path workloads/$EXAMPLE_BIN/* --block 4
 
 exit 0
