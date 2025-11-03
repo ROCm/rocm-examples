@@ -85,9 +85,12 @@ file(COPY ${example_basic_script} ${example_advanced_script} DESTINATION ${examp
 # Create the virtual environment required for running rocprof-compute
 set(venv_dir "${example_work_dir}/${example_name}_venv")
 add_custom_command(
-    OUTPUT ${venv_dir}
+    TARGET ${example_workload}
+    POST_BUILD
     COMMAND ${Python3_EXECUTABLE} -m venv ${venv_dir}
     COMMAND ${venv_dir}/bin/python3 -m pip install -r ${ROCM_ROOT}/libexec/rocprofiler-compute/requirements.txt
+    BYPRODUCTS ${venv_dir}
+    COMMENT "Setting up Python virtual environment for rocprof-compute"
 )
 
 # Now activate the new virtual environment
