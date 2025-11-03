@@ -69,7 +69,7 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hip REQUIRED)
-find_package(Python3 3.12 REQUIRED COMPONENTS Interpreter)
+find_package(Python3 3.3 REQUIRED COMPONENTS Interpreter)
 
 add_executable(${example_workload} vcopy.cpp)
 set_source_files_properties(copy.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
