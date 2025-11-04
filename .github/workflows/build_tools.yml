@@ -25,6 +25,8 @@ jobs:
             image: ubuntu:22.04
         steps:
           - uses: actions/checkout@v4
+          - name: Install Python
+            run: apt update -qq && apt install -y lsb_release python3 python3-pip python3-venv
           - uses: actions/setup-python@v6
             with:
               python-version: '>=3.3'
@@ -32,7 +34,7 @@ jobs:
           - name: Install dependencies
             run: |
                   apt-get update -qq &&
-                  apt-get install -y build-essential elfutils g++ git glslang-tools python3 python3-pip python3-venv wget \
+                  apt-get install -y build-essential elfutils g++ git glslang-tools wget \
                     libboost-dev libiberty-dev libpapi-dev libopenmpi-dev libsqlite3-dev libtbb-dev libunwind-dev
                   python3 -m pip install --upgrade pip
                   python3 -m pip install cmake
