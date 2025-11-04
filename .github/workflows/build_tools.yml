@@ -25,16 +25,12 @@ jobs:
             image: ubuntu:22.04
         steps:
           - uses: actions/checkout@v4
-          - name: Set up Python
-            run: |
-              apt update -qq && apt install -y python3 python3-pip
-              python3 -m pip install --upgrade pip
-              python3 -m pip install -r /opt/rocm/libexec/rocprofiler-compute/requirements.txt
           - name: Install dependencies
             run: |
                   apt-get update -qq &&
-                  apt-get install -y build-essential elfutils g++ git glslang-tools wget \
+                  apt-get install -y build-essential elfutils g++ git glslang-tools wget python3 python3-pip \
                     libboost-dev libiberty-dev libpapi-dev libopenmpi-dev libsqlite3-dev libtbb-dev libunwind-dev
+                  python3 -m pip install --upgrade pip
                   python3 -m pip install cmake
           - name: Install ROCm Dev
             run: |
@@ -47,6 +43,8 @@ jobs:
                   echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
                   echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
                   apt-get autoclean
+          - name: Install rocprof-compute dependencies
+            run: python3 -m pip install -r /opt/rocm/libexec/rocprofiler-compute/requirements.txt
           - name: Configure and Build
             shell: bash
             run: |
