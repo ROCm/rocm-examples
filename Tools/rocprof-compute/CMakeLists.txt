@@ -84,9 +84,6 @@ target_link_libraries(${example_workload} PRIVATE hip::host)
 set(example_work_dir $<TARGET_FILE_DIR:${example_workload}>)
 
 # Copy the scripts
-file(CHMOD
-     "${CMAKE_CURRENT_SOURCE_DIR}/${example_basic_script}" "${CMAKE_CURRENT_SOURCE_DIR}/${example_advanced_script}"
-     FILE_PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE GROUP_READ GROUP_EXECUTE)
 add_custom_command(
     TARGET ${example_workload}
     POST_BUILD
