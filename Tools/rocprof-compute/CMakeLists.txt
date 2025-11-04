@@ -70,8 +70,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hip REQUIRED)
 
-# This example requires a virtual environment with the dependencies installed from /opt/rocm/libexec/rocprofiler-compute/requirements.txt
-set(Python3_FIND_VIRTUALENV FIRST)
+# This example requires a Python environment with the dependencies installed from /opt/rocm/libexec/rocprofiler-compute/requirements.txt
 find_package(Python3 3.3 REQUIRED COMPONENTS Interpreter)
 
 add_executable(${example_workload} vcopy.cpp)
