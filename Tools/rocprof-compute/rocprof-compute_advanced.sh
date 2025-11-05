@@ -37,8 +37,9 @@ set -e
 echo "==============================================================================="
 echo "Profiling workload; filtering for kernel substring vecCopy"
 echo "==============================================================================="
-# Kernels are specified as a substring list. The following matches all kernel names which contain "vecCopy".
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_substr --kernel vecCopy -- $EXAMPLE_WORKLOAD
+# Kernels are specified as a substring list. The following matches all kernel names which contain "vecCopy". Roofline
+# profiling is disabled to save profiling time.
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_substr --kernel vecCopy --no-roof -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Profiling workload; filtering for Wavefront Launch Statistics"
@@ -50,9 +51,9 @@ $EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_wavefront --block 7 -- $EXAMPLE_WORK
 echo "==============================================================================="
 echo "Profiling two runs for comparative analysis"
 echo "==============================================================================="
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_first -- .$EXAMPLE_WORKLOAD
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_second -- $EXAMPLE_WORKLOAD
-$EXAMPLE_TOOL analyze --path workload/${EXAMPLE_BIN}_first/* --path workload/${EXAMPLE_BIN}_second
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_first --no-roof -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_second --no-roof -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_first/* --path workloads/${EXAMPLE_BIN}_second/*
 
 echo "==============================================================================="
 echo "Profiling with PC sampling"

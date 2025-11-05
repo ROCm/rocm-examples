@@ -28,7 +28,8 @@ set(example_basic_script ${example_basic}.sh)
 set(example_advanced ${example_name}_advanced)
 set(example_advanced_script ${example_advanced}.sh)
 
-set(example_workload ${example_name}_vcopy)
+set(example_vcopy ${example_name}_vcopy)
+set(example_occupancy ${example_name}_occupancy)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -73,19 +74,26 @@ find_package(hip REQUIRED)
 # This example requires a Python environment with the dependencies installed from /opt/rocm/libexec/rocprofiler-compute/requirements.txt
 find_package(Python3 3.3 REQUIRED COMPONENTS Interpreter)
 
-add_executable(${example_workload} vcopy.cpp)
+add_executable(${example_vcopy} vcopy.cpp)
 set_source_files_properties(vcopy.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-set_target_properties(${example_workload} PROPERTIES $<$<COMPILE_LANGUAGE:CXX>:CXX_EXTENSIONS OFF>
+set_target_properties(${example_vcopy} PROPERTIES $<$<COMPILE_LANGUAGE:CXX>:CXX_EXTENSIONS OFF>
                                                      $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
-target_compile_features(${example_workload} PRIVATE cxx_std_17 hip_std_17)
-target_link_libraries(${example_workload} PRIVATE hip::host)
+target_compile_features(${example_vcopy} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_vcopy} PRIVATE hip::host)
+
+add_executable(${example_occupancy} occupancy.hip)
+set_source_files_properties(occupancy.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_target_properties(${example_occupancy} PROPERTIES $<$<COMPILE_LANGUAGE:CXX>:CXX_EXTENSIONS OFF>
+                                                     $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+target_compile_features(${example_occupancy} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_occupancy} PRIVATE hip::host)
 
 # We will work from the executable output directory
-set(example_work_dir $<TARGET_FILE_DIR:${example_workload}>)
+set(example_work_dir $<TARGET_FILE_DIR:${example_vcopy}>)
 
 # Copy the scripts
 add_custom_command(
-    TARGET ${example_workload}
+    TARGET ${example_vcopy}
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${example_basic_script}" ${example_work_dir}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${example_advanced_script}" ${example_work_dir}
@@ -98,5 +106,5 @@ add_custom_command(
 add_test(NAME ${example_basic} COMMAND ${example_basic_script} WORKING_DIRECTORY ${example_work_dir})
 add_test(NAME ${example_advanced} COMMAND ${example_advanced_script} WORKING_DIRECTORY ${example_work_dir})
 
-install(TARGETS ${example_workload})
+install(TARGETS ${example_occupancy} ${example_vcopy})
 install(PROGRAMS ${example_basic_script} ${example_advanced_script} TYPE BIN)

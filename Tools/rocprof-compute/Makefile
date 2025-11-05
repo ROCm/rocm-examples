@@ -20,7 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := rocprof-compute_vcopy
+EXAMPLE_VCOPY := rocprof-compute_vcopy
+EXAMPLE_OCCUPANCY := rocprof-compute_occupancy
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -42,10 +43,13 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): vcopy.cpp
+$(EXAMPLE_VCOPY): vcopy.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+$(EXAMPLE_OCCUPANCY): occupancy.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:
-	$(RM) $(EXAMPLE)
+	$(RM) $(EXAMPLE_VCOPY) $(EXAMPLE_OCCUPANCY)
 
 .PHONY: clean

@@ -22,8 +22,8 @@
 # SOFTWARE.
 
 EXAMPLE_TOOL="rocprof-compute"
-EXAMPLE_BIN="${EXAMPLE_TOOL}_vcopy"
-EXAMPLE_WORKLOAD="./$EXAMPLE_BIN -n 1048576 -b 256"
+EXAMPLE_BIN="${EXAMPLE_TOOL}_occupancy"
+EXAMPLE_WORKLOAD="./$EXAMPLE_BIN"
 
 # Check for existence of tool
 if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
@@ -39,21 +39,30 @@ echo "Profiling workload"
 echo "==============================================================================="
 $EXAMPLE_TOOL profile --name $EXAMPLE_BIN -- $EXAMPLE_WORKLOAD
 
-echo "==============================================================================="
-echo "Profiling workload for roofline analysis"
-echo "==============================================================================="
+# Roofline profiling is part of the default profiling set. If you want to perform roofline analysis only, uncommment the
+# following section.
+#echo "==============================================================================="
+#echo "Profiling workload for roofline analysis"
+#echo "==============================================================================="
 # The following will only collect metrics which are required for roofline analysis.
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_roofline --roof-only -- $EXAMPLE_WORKLOAD
+#$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_roofline --roof-only -- $EXAMPLE_WORKLOAD
 
-echo "==============================================================================="
-echo "Profiling workload and saving in rocpd file format"
-echo "==============================================================================="
-# The following will store the results in *.rocpd file(s). rocprof-compute also supports csv (default) and json.
-${EXAMPLE_TOOL} profile \
-    --name ${EXAMPLE_BIN}_rocpd \
-    --format-rocprof-output rocpd \
-    --retain-rocpd-output \
-    -- $EXAMPLE_WORKLOAD
+# The rocpd file format is only supported for rocprof-compute >= 3.3.0 (= at least ROCm 7.1). We perform a version check
+# before continuing to the next example
+RPCVER=$($EXAMPLE_TOOL --version | grep version | awk '{print $3}')
+if ! printf '3.3.0\n%s\n' $RPCVER | sort -V -C; then
+    echo "rocprof-compute only supports the rocpd format starting from v3.3.0. Skipping rocpd example."
+else
+    echo "==============================================================================="
+    echo "Profiling workload and saving in rocpd file format"
+    echo "==============================================================================="
+    # The following will store the results in *.rocpd file(s). rocprof-compute also supports csv (default).
+    ${EXAMPLE_TOOL} profile \
+        --name ${EXAMPLE_BIN}_rocpd \
+        --format-rocprof-output rocpd \
+        --retain-rocpd-output \
+        -- $EXAMPLE_WORKLOAD
+fi
 
 # Check if the workload directory exists before analyzing
 if [ ! -d "workloads/$EXAMPLE_BIN" ]; then
