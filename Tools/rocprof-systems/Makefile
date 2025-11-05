@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,17 +20,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Tools LANGUAGES CXX)
-include(CTest)
+EXAMPLE := rocprof-systems_matmul
+EXAMPLE_USER_API := ${EXAMPLE}_userapi
+COMMON_INCLUDE_DIR := ../../Common
+EXTERNAL_DIR := ../../External
+GPU_RUNTIME := HIP
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-# The HIP tools are supported neither on Windows nor on CUDA.
-if(
-    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
-)
-    add_subdirectory(rocprof-compute)
-    add_subdirectory(rocprof-systems)
-endif()
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
+
+CXXFLAGS ?= -Wall -Wextra
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+USER_API_DEFS := -DEXAMPLE_USER_API
+USER_API_LIBS := -lrocprof-sys-user
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+$(EXAMPLE_USER_API): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(USER_API_DEFS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS) $(USER_API_LIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
