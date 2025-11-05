@@ -10,15 +10,11 @@ $$\hat{\mathbf{y}} = \alpha \cdot op(A) \cdot \mathbf{x} + \beta \cdot \mathbf{y
 
 where
 
-<!-- markdownlint-disable MD051 -->
-
 - $\alpha$ and $\beta$ are scalars
 - $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
 - $op(A)$ is a sparse matrix in BSR format, result of applying one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 - $\textbf{m}$ is the mask vector with elements 0 and 1. Value 1 represents the elements where the function returns with the product, and value 0 represents the identity values.
 - $\mathbf{\bar{m}} = \mathbf{1} - \mathbf{m}$
-
-<!-- markdownlint-enable MD051 -->
 
 otherwise it returns the identical $\mathbf{y}$ vector elements.
 
@@ -177,19 +173,23 @@ For instance the mask:
 
 means
 
-$$ \mathbf{m} = \left(
+$$
+\mathbf{m} = \left(
 \begin{array}{cccc:cccc:cc}
 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1
 \end{array}
-\right)$$
+\right)
+$$
 
 and
 
-$$ \mathbf{\bar{m}} = \left(
+$$
+\mathbf{\bar{m}} = \left(
 \begin{array}{cccc:cccc:cc}
 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & 0
 \end{array}
-\right)$$
+\right)
+$$
 
 The BSRX format is the same as BSR, but the `bsr_row_ptr` is separated into starting and ending indices.
 
