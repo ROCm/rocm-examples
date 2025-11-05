@@ -29,7 +29,6 @@ EXAMPLE_RUNNER="rocprof-sys-run"
 
 EXAMPLE_BIN="${EXAMPLE}_matmul"
 EXAMPLE_BIN_USERAPI="${EXAMPLE_BIN}_userapi"
-EXAMPLE_OPTS="--A_rows 8192 --A_cols 4096 --B_cols 4096"
 
 # Check for existence of tools
 if ! [ -x "$(command -v $EXAMPLE_QUERY)" ]; then
@@ -58,7 +57,7 @@ echo "==========================================================================
 # Binary-rewrite our executable to include instrumentation points
 $EXAMPLE_INSTRUMENTER --output ${EXAMPLE_BIN}.inst -- $EXAMPLE_BIN
 # Restrict our experiment to HIP API calls, ignore everything else
-$EXAMPLE_RUNNER --profile --trace --rocm-domains hip_api -- ./${EXAMPLE_BIN}.inst $EXAMPLE_OPTS
+$EXAMPLE_RUNNER --profile --trace --rocm-domains hip_api -- ./${EXAMPLE_BIN}.inst
 
 echo "==============================================================================="
 echo "Instrumenting CPU performance counters"
@@ -69,7 +68,7 @@ $EXAMPLE_INSTRUMENTER --output ${EXAMPLE_BIN}.papi.inst -- $EXAMPLE_BIN
 $EXAMPLE_RUNNER \
     --profile \
     --cpu-events PAPI_TOT_CYC,PAPI_TOT_INS,PAPI_L1_TCM,PAPI_L2_TCM,PAPI_L3_TCM \
-    -- ./${EXAMPLE_BIN}.papi.inst $EXAMPLE_OPTS
+    -- ./${EXAMPLE_BIN}.papi.inst
 
 echo "==============================================================================="
 echo "Instrumenting with user API"
@@ -77,6 +76,6 @@ echo "==========================================================================
 # The following commmands first perform a binary rewrite of the executable (for instrumentation) and then run a profile
 # and trace of the application which includes user-defined instrumentation regions.
 $EXAMPLE_INSTRUMENTER --min-instructions 512 -o ${EXAMPLE_BIN_USERAPI}.inst -- $EXAMPLE_BIN_USERAPI
-$EXAMPLE_RUNNER --profile --trace -- ${EXAMPLE_BIN_USERAPI}.inst $EXAMPLE_OPTS
+$EXAMPLE_RUNNER --profile --trace -- ${EXAMPLE_BIN_USERAPI}.inst
 
 exit 0

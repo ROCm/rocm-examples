@@ -26,7 +26,6 @@ EXAMPLE_INSTRUMENTER="rocprof-sys-instrument"
 EXAMPLE_SAMPLER="rocprof-sys-sample"
 
 EXAMPLE_BIN="${EXAMPLE}_matmul"
-EXAMPLE_WORKLOAD="./$EXAMPLE_BIN --A_rows 8192 --A_cols 4096 --B_cols 4096"
 
 # Check for existence of tools
 if ! [ -x "$(command -v $EXAMPLE_INSTRUMENTER)" ]; then
@@ -46,14 +45,14 @@ echo "Basic call-stack sampling"
 echo "==============================================================================="
 # Without any additional arguments, rocprof-sys-sample will perform timer-based sampling per thread and no process-wide
 # sampling.
-$EXAMPLE_SAMPLER -- $EXAMPLE_WORKLOAD
+$EXAMPLE_SAMPLER -- ./$EXAMPLE_BIN
 
 echo "==============================================================================="
 echo "Basic profiling and tracing"
 echo "==============================================================================="
 # By default, the profiling results are dumped to stdout. Here we save them as JSON.
 # The tracing results can be analyzed with Perfetto.
-$EXAMPLE_SAMPLER --profile --profile-format json --trace -- $EXAMPLE_WORKLOAD
+$EXAMPLE_SAMPLER --profile --profile-format json --trace -- ./$EXAMPLE_BIN
 
 echo "==============================================================================="
 echo "Basic runtime instrumentation"
@@ -64,6 +63,6 @@ echo "==========================================================================
 # * Skip instrumentation points which require traps
 # * Skip instrumenting loops within a function body
 # * Skip instrumenting functions with overlapping bodies and single functions with multiple entry points
-$EXAMPLE_INSTRUMENTER -- $EXAMPLE_WORKLOAD
+$EXAMPLE_INSTRUMENTER -- ./$EXAMPLE_BIN
 
 exit 0
