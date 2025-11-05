@@ -31,20 +31,17 @@ EXAMPLE_BIN="${EXAMPLE}_matmul"
 EXAMPLE_BIN_USERAPI="${EXAMPLE_BIN}_userapi"
 
 # Check for existence of tools
-if ! [ -x "$(command -v $EXAMPLE_QUERY)" ]; then
-    echo "Error: Could not find $EXAMPLE_QUERY in the PATH." >&2
-    exit 1
-fi
-if ! [ -x "$(command -v $EXAMPLE_INSTRUMENTER)" ]; then
-    echo "Error: Could not find $EXAMPLE_INSTRUMENTER in the PATH." >&2
-    exit 1
-fi
-if ! [ -x "$(command -v $EXAMPLE_SAMPLER)" ]; then
-    echo "Error: Could not find $EXAMPLE_SAMPLER in the PATH." >&2
-    exit 1
-fi
-if ! [ -x "$(command -v $EXAMPLE_RUNNER)" ]; then
-    echo "Error: Could not find $EXAMPLE_RUNNER in the PATH." >&2
+REQUIRED_TOOLS="$EXAMPLE_QUERY $EXAMPLE_INSTRUMENTER $EXAMPLE_SAMPLER $EXAMPLE_RUNNER"
+MISSING_TOOLS=""
+
+for tool in $REQUIRED_TOOLS; do
+    if ! [ -x "$(command -v $tool)" ]; then
+        MISSING_TOOLS="$MISSING_TOOLS $tool"
+    fi
+done
+
+if [ -n "$MISSING_TOOLS" ]; then
+    echo "Error: Could not find the following tools in PATH:$MISSING_TOOLS" >&2
     exit 1
 fi
 
@@ -75,7 +72,7 @@ echo "Instrumenting with user API"
 echo "==============================================================================="
 # The following commmands first perform a binary rewrite of the executable (for instrumentation) and then run a profile
 # and trace of the application which includes user-defined instrumentation regions.
-$EXAMPLE_INSTRUMENTER --min-instructions 512 -o ${EXAMPLE_BIN_USERAPI}.inst -- $EXAMPLE_BIN_USERAPI
-$EXAMPLE_RUNNER --profile --trace -- ${EXAMPLE_BIN_USERAPI}.inst
+$EXAMPLE_INSTRUMENTER --min-instructions 512 -o ${EXAMPLE_BIN_USERAPI}.inst -- ./$EXAMPLE_BIN_USERAPI
+$EXAMPLE_RUNNER --profile --trace -- ./${EXAMPLE_BIN_USERAPI}.inst
 
 exit 0

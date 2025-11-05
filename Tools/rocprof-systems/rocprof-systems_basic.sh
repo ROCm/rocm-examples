@@ -28,12 +28,17 @@ EXAMPLE_SAMPLER="rocprof-sys-sample"
 EXAMPLE_BIN="${EXAMPLE}_matmul"
 
 # Check for existence of tools
-if ! [ -x "$(command -v $EXAMPLE_INSTRUMENTER)" ]; then
-    echo "Error: Could not find $EXAMPLE_INSTRUMENTER in the PATH." >&2
-    exit 1
-fi
-if ! [ -x "$(command -v $EXAMPLE_SAMPLER)" ]; then
-    echo "Error: Could not find $EXAMPLE_SAMPLER in the PATH." >&2
+REQUIRED_TOOLS="$EXAMPLE_INSTRUMENTER $EXAMPLE_SAMPLER"
+MISSING_TOOLS=""
+
+for tool in $REQUIRED_TOOLS; do
+    if ! [ -x "$(command -v $tool)" ]; then
+        MISSING_TOOLS="$MISSING_TOOLS $tool"
+    fi
+done
+
+if [ -n "$MISSING_TOOLS" ]; then
+    echo "Error: Could not find the following tools in PATH:$MISSING_TOOLS" >&2
     exit 1
 fi
 

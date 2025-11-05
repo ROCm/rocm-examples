@@ -24,7 +24,8 @@ TOOLS :=
 
 ifneq ($(GPU_RUNTIME), CUDA)
 TOOLS += \
-	rocprof-compute
+	rocprof-compute \
+	rocprof-systems
 endif
 
 all: $(TOOLS)

@@ -25,8 +25,8 @@ please refer to its [documentation](https://rocm.docs.amd.com/projects/rocprofil
 
 ## Usage
 
-After building the example executable either by calling `make` in this directory or as part of the repository's CMake
-build process the scripts can be executed without additional parameters as long as the executable resides in the same
+After building the example executables either by calling `make` in this directory or as part of the repository's CMake
+build process the scripts can be executed without additional parameters as long as the executables reside in the same
 directory:
 
 ```console
