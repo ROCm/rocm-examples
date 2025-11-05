@@ -10,11 +10,15 @@ $$\hat{\mathbf{y}} = \alpha \cdot op(A) \cdot \mathbf{x} + \beta \cdot \mathbf{y
 
 where
 
+<!-- markdownlint-disable MD051 -->
+
 - $\alpha$ and $\beta$ are scalars
 - $\mathbf{x}$ and $\mathbf{y}$ are dense vectors
 - $op(A)$ is a sparse matrix in BSR format, result of applying one of the `rocsparse_operation` described below in [Key APIs and Concepts - rocSPARSE](#rocsparse).
 - $\textbf{m}$ is the mask vector with elements 0 and 1. Value 1 represents the elements where the function returns with the product, and value 0 represents the identity values.
 - $\mathbf{\bar{m}} = \mathbf{1} - \mathbf{m}$
+
+<!-- markdownlint-enable MD051 -->
 
 otherwise it returns the identical $\mathbf{y}$ vector elements.
 
