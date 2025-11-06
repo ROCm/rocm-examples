@@ -51,7 +51,7 @@ echo "Kernel name filtering"
 echo "==============================================================================="
 # Kernels are specified as regular expressions in a YAML file. Note that YAML files can contain more than just filters;
 # for the sake of easy to follow examples they are split into multiple files here.
-$EXAMPLE_TOOL --input kernel_filter.yml --output-format pftrace -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL --runtime-trace --input kernel_filter.yml --output-format pftrace -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Collecting PMC counters"
