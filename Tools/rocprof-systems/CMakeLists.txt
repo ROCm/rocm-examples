@@ -61,7 +61,9 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hip REQUIRED)
-find_package(rocprofiler-systems REQUIRED COMPONENTS user)
+if(NOT TARGET rocprofiler-systems::rocprofiler-systems-user-library)
+    find_package(rocprofiler-systems REQUIRED COMPONENTS user)
+endif()
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
