@@ -45,7 +45,7 @@ if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA"
     endif()
 
     find_package(rocprofiler-sdk-roctx QUIET)
-    if(NOT rocrofiler-sdk-roctx_FOUND)
+    if(NOT rocprofiler-sdk-roctx_FOUND)
         message(STATUS "rocprofiler-sdk-roctx not found. Skipping rocprofv3 examples.")
     else()
         add_subdirectory(rocprofv3)
