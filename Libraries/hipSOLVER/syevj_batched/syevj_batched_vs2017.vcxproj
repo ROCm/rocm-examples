@@ -30,16 +30,16 @@
     <Content Include="$(HIPExecutablePath)\hipsolver.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="$(HIPExecutablePath)\hipblas.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="$(HIPExecutablePath)\rocblas.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(HIPExecutablePath)\rocsolver.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="$(HIPExecutablePath)\rocsparse.dll">
+    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
