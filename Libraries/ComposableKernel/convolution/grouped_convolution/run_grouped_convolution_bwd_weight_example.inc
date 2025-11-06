@@ -26,29 +26,7 @@
 #include <cstddef>
 #include <iostream>
 #include <stdexcept>
-#include <type_traits>
-
-template <typename InDataType, typename WeiDataType, typename AccDataType, typename OutDataType>
-auto calculate_rtol_atol(const ck_tile::index_t GemmK,
-                         const ck_tile::index_t kbatch,
-                         const float max_accumulated_value)
-{
-    using ComputeType =
-        std::conditional_t<sizeof(InDataType) < sizeof(WeiDataType), InDataType, WeiDataType>;
-    // Calculate thresholds
-    const auto rtol = ck_tile::get_relative_threshold<ComputeType, OutDataType, AccDataType>(
-        ck_tile::integer_divide_ceil(GemmK, kbatch));
-    const auto atol = ck_tile::get_absolute_threshold<ComputeType, OutDataType, AccDataType>(
-        max_accumulated_value / kbatch, ck_tile::integer_divide_ceil(GemmK, kbatch));
-    // Calculate error due to split_k accumulation
-    const auto rtol_split_k =
-        ck_tile::get_relative_threshold<OutDataType, OutDataType, OutDataType>(kbatch);
-    const auto atol_split_k =
-        ck_tile::get_absolute_threshold<OutDataType, OutDataType, OutDataType>(
-            max_accumulated_value, kbatch);
-    // Use higher threshold
-    return ck_tile::make_tuple(std::max(rtol, rtol_split_k), std::max(atol, atol_split_k));
-}
+#include <vector>
 
 template <ck_tile::index_t NDimSpatial,
           typename InDataType,
@@ -58,16 +36,18 @@ template <ck_tile::index_t NDimSpatial,
           typename InLayout,
           typename WeiLayout,
           typename OutLayout>
-float invoke_grouped_conv_fwd(ck_tile::GroupedConvHostArgs& args, int n_warmup, int n_repeat)
+float invoke_grouped_conv_bwd_weight(ck_tile::GroupedConvBwdWeightHostArgs& args,
+                                     int n_warmup,
+                                     int n_repeat)
 {
-    float ave_time = grouped_conv_fwd<NDimSpatial,
-                                      InDataType,
-                                      WeiDataType,
-                                      AccDataType,
-                                      OutDataType,
-                                      InLayout,
-                                      WeiLayout,
-                                      OutLayout>(
+    float ave_time = grouped_conv_bwd_weight<NDimSpatial,
+                                             InDataType,
+                                             WeiDataType,
+                                             AccDataType,
+                                             OutDataType,
+                                             InLayout,
+                                             WeiLayout,
+                                             OutLayout>(
         args, ck_tile::stream_config{nullptr, true, 1, n_warmup, n_repeat});
 
     std::size_t flop     = args.GetFlops();
@@ -88,7 +68,7 @@ template <ck_tile::index_t NDimSpatial,
           typename InLayout,
           typename WeiLayout,
           typename OutLayout>
-int run_grouped_conv_fwd_example_with_layouts(
+int run_grouped_conv_bwd_weight_example_with_layouts(
     int argc, char* argv[], const InLayout, const WeiLayout, const OutLayout)
 {
     auto [result, arg_parser] = create_args(argc, argv);
@@ -142,23 +122,23 @@ int run_grouped_conv_fwd_example_with_layouts(
 
     if(init_method == 0)
     {
-        ck_tile::FillUniformDistribution<InDataType>{-5.f, 5.f}(input);
-        ck_tile::FillUniformDistribution<WeiDataType>{-5.f, 5.f}(weight);
+        ck_tile::FillUniformDistribution<InDataType>{-1.f, 1.f}(input);
+        ck_tile::FillUniformDistribution<OutDataType>{-1.f, 1.f}(output);
     }
     else if(init_method == 1)
     {
         ck_tile::FillMonotonicSeq<InDataType>{}(input);
-        ck_tile::FillMonotonicSeq<WeiDataType>{}(weight);
+        ck_tile::FillMonotonicSeq<OutDataType>{}(output);
     }
     else if(init_method == 2)
     {
         ck_tile::FillUniformDistribution<InDataType>{1.f, 1.f}(input);
-        ck_tile::FillUniformDistribution<WeiDataType>{1.f, 1.f}(weight);
+        ck_tile::FillUniformDistribution<OutDataType>{1.f, 1.f}(output);
     }
     else
     {
         input.SetZero();
-        weight.SetZero();
+        output.SetZero();
     }
 
     ck_tile::DeviceMem input_dev_buf(input.get_element_space_size_in_bytes());
@@ -166,54 +146,55 @@ int run_grouped_conv_fwd_example_with_layouts(
     ck_tile::DeviceMem output_dev_buf(output.get_element_space_size_in_bytes());
 
     input_dev_buf.ToDevice(input.data());
-    weight_dev_buf.ToDevice(weight.data());
-    output_dev_buf.SetZero();
+    weight_dev_buf.SetZero();
+    output_dev_buf.ToDevice(output.data());
 
-    ck_tile::GroupedConvHostArgs args(conv_param,
-                                      input_dev_buf.GetDeviceBuffer(),
-                                      weight_dev_buf.GetDeviceBuffer(),
-                                      {},
-                                      output_dev_buf.GetDeviceBuffer(),
-                                      kbatch);
+    ck_tile::GroupedConvBwdWeightHostArgs args(conv_param,
+                                               input_dev_buf.GetDeviceBuffer(),
+                                               weight_dev_buf.GetDeviceBuffer(),
+                                               {},
+                                               output_dev_buf.GetDeviceBuffer(),
+                                               kbatch);
 
     std::cout << "Run Grouped Conv Fwd kernel" << std::endl;
     std::cout << "input: " << input.mDesc << std::endl;
     std::cout << "weight: " << weight.mDesc << std::endl;
     std::cout << "output: " << output.mDesc << std::endl;
 
-    invoke_grouped_conv_fwd<NDimSpatial,
-                            InDataType,
-                            WeiDataType,
-                            AccDataType,
-                            OutDataType,
-                            InLayout,
-                            WeiLayout,
-                            OutLayout>(args, n_warmup, n_repeat);
+    invoke_grouped_conv_bwd_weight<NDimSpatial,
+                                   InDataType,
+                                   WeiDataType,
+                                   AccDataType,
+                                   OutDataType,
+                                   InLayout,
+                                   WeiLayout,
+                                   OutLayout>(args, n_warmup, n_repeat);
 
-    output_dev_buf.FromDevice(output.data());
+    weight_dev_buf.FromDevice(weight.data());
     bool pass = true;
 
     if(arg_parser.get_int("v") == 1)
     {
-        ck_tile::HostTensor<OutDataType> output_host_ref(out_g_n_k_wos_desc);
-        output_host_ref.SetZero();
+        ck_tile::HostTensor<WeiDataType> weight_host_ref(wei_g_k_c_xs_desc);
+        weight_host_ref.SetZero();
 
-        ck_tile::reference_grouped_conv_fwd<NDimSpatial, InDataType, WeiDataType, OutDataType>(
-            input,
-            weight,
-            output_host_ref,
-            conv_param.conv_filter_strides_,
-            conv_param.conv_filter_dilations_,
-            conv_param.input_left_pads_,
-            conv_param.input_right_pads_);
+        ck_tile::
+            reference_grouped_conv_bwd_weight<NDimSpatial, InDataType, WeiDataType, OutDataType>(
+                input,
+                weight_host_ref,
+                output,
+                conv_param.conv_filter_strides_,
+                conv_param.conv_filter_dilations_,
+                conv_param.input_left_pads_,
+                conv_param.input_right_pads_);
         const ck_tile::index_t GemmK = weight.get_element_size() / (conv_param.G_ * conv_param.K_);
         const float max_accumulated_value =
-            *std::max_element(output_host_ref.mData.begin(), output_host_ref.mData.end());
+            *std::max_element(weight_host_ref.mData.begin(), weight_host_ref.mData.end());
         const auto rtol_atol =
             calculate_rtol_atol<InDataType, WeiDataType, AccDataType, OutDataType>(
                 GemmK, kbatch, max_accumulated_value);
-        pass = ck_tile::check_err(output,
-                                  output_host_ref,
+        pass = ck_tile::check_err(weight,
+                                  weight_host_ref,
                                   "Error: Incorrect results!",
                                   rtol_atol.at(ck_tile::number<0>{}),
                                   rtol_atol.at(ck_tile::number<1>{}));

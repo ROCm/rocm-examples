@@ -2,17 +2,41 @@
 
 ## Description
 
-This example demonstrates how to perform a grouped convolution operation (forward pass) with the CK Tile programming
-model.
+This example demonstrates how to perform a grouped convolution operation
+(forward and backward passes) with the CK Tile programming model.
+
+### Supported architectures
+
+The example is supported for the following architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
 
 ### Application flow
+
+#### Forward pass
+
+1. Command line arguments are parsed to configure matrix dimensions and
+   execution parameters.
+2. Buffers for the input matrices and the output matrix are created on the
+   host.
+3. The input matrices are initialized with random values.
+4. Buffers for the input matrices and the output matrix are created on the device.
+5. The input matrices are copied to the device, the output matrix is initialized to `0` on the device.
+6. CK Tile's `GroupedConvolutionForwardKernel` is instantiated and launched on the device.
+7. If validation is enabled, the results are compared against CK Tile's `reference_grouped_conv_fwd` function.
+8. All buffers are freed automatically.
+
+#### Backward pass
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
 2. Buffers for the input matrices and the output matrix are created on the host.
 3. The input matrices are initialized with random values.
 4. Buffers for the input matrices and the output matrix are created on the device.
 5. The input matrices are copied to the device, the output matrix is initialized to `0` on the device.
-6. CK Tile's `GroupedConvolutionForwardKernel` is instantiated and launched on the device.
+6. CK Tile's `GroupedConvolutionBackwardWeightKernel` is instantiated and launched on the device.
 7. If validation is enabled, the results are compared against CK Tile's `reference_grouped_conv_fwd` function.
 8. All buffers are freed automatically.
 
@@ -49,7 +73,7 @@ The example makes use of four key architectural components:
 * `ck_tile::GemmPipelineAGmemBGmemCRegV1`
 * `ck_tile::GemmPipelineProblem`
 * `ck_tile::GemmTile1DPartitioner`
-* `ck_tile::GroupedConvHostArgs`
+* `ck_tile::GroupedConvFwdHostArgs`
 * `ck_tile::GroupedConvolutionForwardKernel`
 * `ck_tile::GroupedConvTraits`
 * `ck_tile::half_t`

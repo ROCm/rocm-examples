@@ -21,6 +21,8 @@
 # SOFTWARE.
 
 EXAMPLE := ComposableKernel_ck_tile_grouped_convolution
+EXAMPLE_FWD := $(EXAMPLE)_fwd
+EXAMPLE_BWD := $(EXAMPLE)_bwd
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -48,10 +50,13 @@ OBJECTS := $(SOURCES:.cpp=.o)
 %.o: %.cpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ -c $<
 
-$(EXAMPLE): $(OBJECTS)
+$(EXAMPLE_FWD): grouped_convolution_forward.o
+	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+
+$(EXAMPLE_BWD): grouped_convolution_backward_weight.o
 	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 clean:
-	$(RM) $(EXAMPLE) $(OBJECTS)
+	$(RM) $(EXAMPLE_FWD) $(EXAMPLE_BWD) $(OBJECTS)
 
 .PHONY: clean

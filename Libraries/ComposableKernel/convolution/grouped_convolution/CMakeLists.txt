@@ -21,6 +21,8 @@
 # SOFTWARE.
 
 set(example_name ComposableKernel_ck_tile_grouped_convolution)
+set(example_fwd ${example_name}_fwd)
+set(example_bwd ${example_name}_bwd)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -61,9 +63,16 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
-add_executable(${example_name} grouped_convolution_forward.cpp)
-add_test(${example_name} COMMAND ${example_name})
+add_executable(${example_fwd} grouped_convolution_forward.cpp)
+add_test(${example_fwd} COMMAND ${example_fwd})
 set_source_files_properties(grouped_convolution_forward.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_name} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
-target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
+target_compile_features(${example_fwd} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(${example_fwd} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
+target_link_libraries(${example_fwd} PRIVATE composable_kernel::ck_tile hip::host)
+
+add_executable(${example_bwd} grouped_convolution_backward_weight.cpp)
+add_test(${example_bwd} COMMAND ${example_bwd})
+set_source_files_properties(grouped_convolution_backward_weight.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_bwd} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(${example_bwd} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
+target_link_libraries(${example_bwd} PRIVATE composable_kernel::ck_tile hip::host)
