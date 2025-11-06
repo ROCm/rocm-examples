@@ -173,19 +173,23 @@ For instance the mask:
 
 means
 
-$$ \mathbf{m} = \left(
+$$
+\mathbf{m} = \left(
 \begin{array}{cccc:cccc:cc}
 1 & 1 & 1 & 1 & 0 & 0 & 0 & 0 & 1 & 1
 \end{array}
-\right)$$
+\right)
+$$
 
 and
 
-$$ \mathbf{\bar{m}} = \left(
+$$
+\mathbf{\bar{m}} = \left(
 \begin{array}{cccc:cccc:cc}
 0 & 0 & 0 & 0 & 1 & 1 & 1 & 1 & 0 & 0
 \end{array}
-\right)$$
+\right)
+$$
 
 The BSRX format is the same as BSR, but the `bsr_row_ptr` is separated into starting and ending indices.
 
