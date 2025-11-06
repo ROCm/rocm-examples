@@ -98,7 +98,9 @@ add_custom_command(
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${example_basic_script}" ${example_work_dir}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${example_advanced_script}" ${example_work_dir}
-    BYPRODUCTS ${example_basic_script} ${example_advanced_script}
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/kernel_filter.yml" ${example_work_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/wavefront_stats.yml" ${example_work_dir}
+    BYPRODUCTS ${example_basic_script} ${example_advanced_script} kernel_filter.yml wavefront_stats.yml
     WORKING_DIRECTORY ${example_work_dir}
     COMMENT "Copying ${example_name} scripts to ${example_work_dir}"
 )
@@ -109,3 +111,4 @@ add_test(NAME ${example_advanced} COMMAND ${example_advanced_script} WORKING_DIR
 
 install(TARGETS ${example_workload} ${example_workload_roctx})
 install(PROGRAMS ${example_basic_script} ${example_advanced_script} TYPE BIN)
+install(FILES kernel_filter.yml wavefront_stats.yml TYPE BIN)
