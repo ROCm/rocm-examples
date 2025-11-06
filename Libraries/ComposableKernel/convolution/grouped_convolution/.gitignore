@@ -1,2 +1,3 @@
 *.o
-ComposableKernel_ck_tile_grouped_convolution
+ComposableKernel_ck_tile_grouped_convolution_fwd
+ComposableKernel_ck_tile_grouped_convolution_bwd
