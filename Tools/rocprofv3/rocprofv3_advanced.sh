@@ -21,15 +21,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+EXAMPLE_QUERY="roprofv3-avail"
 EXAMPLE_TOOL="rocprofv3"
 EXAMPLE_BIN="${EXAMPLE_TOOL}_matmul"
 EXAMPLE_BIN_ROCTX="${EXAMPLE_BIN}_roctx"
 EXAMPLE_WORKLOAD="./$EXAMPLE_BIN"
 EXAMPLE_WORKLOAD_ROCTX="${EXAMPLE_WORKLOAD}_roctx"
 
-# Check for existence of tool
-if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
-    echo "Error: Could not find $EXAMPLE_TOOL in the PATH." >&2
+# Check for existence of tools
+REQUIRED_TOOLS="$EXAMPLE_QUERY $EXAMPLE_TOOL"
+MISSING_TOOLS=""
+
+for tool in $REQUIRED_TOOLS; do
+    if ! [ -x "$(command -v $tool)" ]; then
+        MISSING_TOOLS="$MISSING_TOOLS $tool"
+    fi
+done
+
+if [ -n "$MISSING_TOOLS" ]; then
+    echo "Error: Could not find the following tools in PATH:$MISSING_TOOLS" >&2
     exit 1
 fi
 
@@ -59,16 +69,20 @@ $EXAMPLE_TOOL --marker-trace --output-format pftrace -- $EXAMPLE_WORKLOAD_ROCTX
 echo "==============================================================================="
 echo "PC sampling"
 echo "==============================================================================="
-# PC sampling is currently a beta feature.
+# PC sampling is currently a beta feature and not supported on all devices
 # Only time is supported as the sampling unit; instructions and cycles will be added in the future.
 # Only host_trap is supported as the sampling method; stochastic will be added in the future.
 # The sampling interval is set to 1µs.
-$EXAMPLE_TOOL \
-    --pc-sampling-beta-enabled \
-    --pc-sampling-unit time \
-    --pc-sampling-method host_trap \
-    --pc-sampling-interval 1 \
-    --output-format csv \
-    -- $EXAMPLE_WORKLOAD
+if [[ $($EXAMPLE_QUERY info --pc-sampling) ]]; then
+    $EXAMPLE_TOOL \
+        --pc-sampling-beta-enabled \
+        --pc-sampling-unit time \
+        --pc-sampling-method host_trap \
+        --pc-sampling-interval 1 \
+        --output-format csv \
+        -- $EXAMPLE_WORKLOAD
+else
+    echo "PC sampling not supported on any agent"
+fi
 
 exit 0
