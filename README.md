@@ -271,7 +271,7 @@ The following options are available when building with CMake.
       - [topk_softmax](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/attention/topk_softmax): Demonstrates a topk-softmax kernel.
     - [Basic](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic): Basic examples intended as introduction to Composable Kernel.
       - [batched_transpose](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/batched_transpose): Shows how to perform a batched tensor transpose.
-      - [copy](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/copy): Demonstrates how to perform copy operations.
+      - [elementwise](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/elementwise): Demonstrates how to perform various elementwise operations.
       - [img2col](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/img2col): Demonstrates how to perform the $\text{im2col}$ operation.
       - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/permute): Shows how to perform a tensor permutation.
       - [reduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/reduce): Shows how to perform parallel reduction on tensors.

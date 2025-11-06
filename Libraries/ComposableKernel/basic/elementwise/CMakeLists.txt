@@ -20,7 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name ComposableKernel_ck_tile_copy)
+set(example_name ComposableKernel_ck_tile_elementwise)
+set(example_unary ${example_name}_unary)
+set(example_transpose ${example_name}_transpose)
+set(example_add_4d ${example_name}_add_4d)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -57,14 +60,32 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(composable_kernel REQUIRED)
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
-add_executable(${example_name} test_copy.cpp)
+set_source_files_properties(
+    elementwise_example_add_4d.cpp
+    elementwise_example_transpose.cpp
+    elementwise_example_unary.cpp
+    elementwise_example.cpp
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
+
+add_executable(${example_name} elementwise_example.cpp)
 add_test(${example_name} COMMAND ${example_name})
-
-set_source_files_properties(test_copy.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_name} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile)
+
+add_executable(${example_unary} elementwise_example_unary.cpp)
+add_test(${example_unary} COMMAND ${example_unary})
+target_compile_features(${example_unary} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_unary} PRIVATE composable_kernel::ck_tile)
+
+add_executable(${example_transpose} elementwise_example_transpose.cpp)
+add_test(${example_transpose} COMMAND ${example_transpose})
+target_compile_features(${example_transpose} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_transpose} PRIVATE composable_kernel::ck_tile)
+
+add_executable(${example_add_4d} elementwise_example_add_4d.cpp)
+add_test(${example_add_4d} COMMAND ${example_add_4d})
+target_compile_features(${example_add_4d} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_add_4d} PRIVATE composable_kernel::ck_tile)

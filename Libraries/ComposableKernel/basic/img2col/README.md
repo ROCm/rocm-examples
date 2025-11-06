@@ -11,6 +11,11 @@ $\mathbf{X}$ into columns:
 * Each patch is flattened and stacked as a column in the output matrix.
 * This enables convolution as matrix multiplication: $\text{im2col}(X) \times \mathbf{W}$.
 
+### Supported architectures
+
+The example is available for
+[all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus).
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
