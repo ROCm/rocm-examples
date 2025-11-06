@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,21 +20,41 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-TOOLS :=
+EXAMPLE := rocprofv3_matmul
+EXAMPLE_ROCTX := ${EXAMPLE}_roctx
+COMMON_INCLUDE_DIR := ../../Common
+EXTERNAL_DIR := ../../External
+GPU_RUNTIME := HIP
 
-ifneq ($(GPU_RUNTIME), CUDA)
-TOOLS += \
-	rocprof-compute \
-	rocprof-systems \
-	rocprofv3
-endif
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-all: $(TOOLS)
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-clean: TARGET=clean
-clean: all
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
 
-$(TOOLS):
-	$(MAKE) -C $@ $(TOOLS)
+CXXFLAGS ?= -Wall -Wextra
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
-.PHONY: all clean $(TOOLS)
+ROCTX_DEFS := -DEXAMPLE_ROCTX
+ROCTX_LIBS := -lrocprofiler-sdk-roctx
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+$(EXAMPLE_ROCTX): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ROCTX_DEFS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS) $(ROCTX_LIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean
