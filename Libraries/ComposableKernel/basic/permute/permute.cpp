@@ -27,6 +27,7 @@
 #include <hip/hip_runtime.h>
 
 #include <algorithm>
+#include <cstdint>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -47,17 +48,17 @@ struct to_integer_type;
 template <>
 struct to_integer_type<4>
 {
-    using type = int32_t;
+    using type = std::int32_t;
 };
 template <>
 struct to_integer_type<2>
 {
-    using type = int16_t;
+    using type = std::int16_t;
 };
 template <>
 struct to_integer_type<1>
 {
-    using type = int8_t;
+    using type = std::int8_t;
 };
 } // namespace detail
 

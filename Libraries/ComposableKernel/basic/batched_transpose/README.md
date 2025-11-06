@@ -23,6 +23,15 @@ $$
 Y_{n, h, w, c} = X_{n, c, h, w}
 $$
 
+### Supported architectures
+
+The example is supported for the following GPU architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.

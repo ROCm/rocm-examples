@@ -20,7 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := ComposableKernel_ck_tile_copy
+EXAMPLE := ComposableKernel_ck_tile_elementwise
+EXAMPLE_UNARY := ComposableKernel_ck_tile_elementwise_unary
+EXAMPLE_TRANSPOSE := ComposableKernel_ck_tile_elementwise_transpose
+EXAMPLE_ADD_4D := ComposableKernel_ck_tile_elementwise_add_4d
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -31,7 +34,7 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
-ICXXFLAGS := -std=$(CXX_STD) -x hip -mllvm -enable-noalias-to-md-conversion=0
+ICXXFLAGS := -std=$(CXX_STD) -x hip
 ICPPFLAGS :=
 ILDFLAGS  :=
 ILDLIBS   :=
@@ -42,14 +45,17 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-SOURCES := $(wildcard *.cpp)
-OBJECTS := $(SOURCES:.cpp=.o)
+$(EXAMPLE): elementwise_example.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-%.o: %.cpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ -c $<
+$(EXAMPLE_UNARY): elementwise_example_unary.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-$(EXAMPLE): $(OBJECTS)
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+$(EXAMPLE_TRANSPOSE): elementwise_example_transpose.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+$(EXAMPLE_ADD_4D): elementwise_example_add_4d.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:
 	$(RM) $(EXAMPLE) $(OBJECTS)
