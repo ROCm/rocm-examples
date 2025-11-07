@@ -80,6 +80,7 @@ add_executable(${example_fwd})
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd,fwd_splitkv,fwd_appendkv,pagedkv_prefill
+        --optdim 32,64,128,256
         --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt
     RESULT_VARIABLE ret
 )
@@ -89,6 +90,7 @@ file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt EXAMPLE_FWD_GEN_SRCS)
 add_custom_target(fmha_fwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd,fwd_splitkv,fwd_appendkv,pagedkv_prefill
+        --optdim 32,64,128,256
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
     BYPRODUCTS ${EXAMPLE_FWD_GEN_SRCS}
@@ -122,8 +124,9 @@ add_executable(${example_bwd})
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
-        --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
         --receipt 3
+        --optdim 32,64,128,256
+        --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
     RESULT_VARIABLE ret
 )
 
@@ -132,8 +135,9 @@ file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt EXAMPLE_BWD_GEN_SRCS)
 add_custom_target(fmha_bwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
-        --output_dir ${CMAKE_CURRENT_BINARY_DIR}
         --receipt 3
+        --optdim 32,64,128,256
+        --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
     BYPRODUCTS ${EXAMPLE_BWD_GEN_SRCS}
     COMMENT "Generating FMHA backward pass source files"

@@ -22,6 +22,9 @@
 
 #pragma once
 
+#include <ck_tile/core.hpp>
+#include <ck_tile/ops/fmha.hpp>
+
 #include <ostream>
 #include <string>
 

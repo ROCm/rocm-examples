@@ -26,7 +26,6 @@
 #include "mask.hpp"
 
 #include <ck_tile/core.hpp>
-#include <ck_tile/host/device_prop.hpp>
 #include <ck_tile/host/kernel_launch.hpp>
 #include <ck_tile/ops/fmha.hpp>
 #include <ck_tile/ops/epilogue.hpp>
