@@ -6,6 +6,11 @@ This example demonstrates how to launch a topk-softmax kernel with the CK Tile p
 `token*expert` 2D matrix. The operation will do one softmax per row (`expert`), then find the `topk` value for each row.
 The output is a `token*topk` weight tensor (usually single-precision) and an index tensor (32-bit integer).
 
+### Supported architectures
+
+The example is available for
+[all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus).
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.

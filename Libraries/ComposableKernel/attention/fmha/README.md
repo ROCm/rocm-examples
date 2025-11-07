@@ -5,6 +5,17 @@
 This example demonstrates how to perform FMHA (fused multi-head attention) with the CK Tile programming model. The files
 with the `_fwd` suffix contain the algorithm's forward pass, while the `_bwd` files show the backward pass.
 
+### Supported architectures
+
+The forward pass example is supported for the following GPU architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
+The backward pass is only supported for the `gfx942` architecture.
+
 ### Application flow
 
 #### Forward pass

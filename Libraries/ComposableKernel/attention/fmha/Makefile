@@ -64,11 +64,11 @@ $(FWD_SRC_DIR) $(FWD_OBJ_DIR) $(BWD_SRC_DIR) $(BWD_OBJ_DIR):
 generate: $(FWD_GENERATION_DONE) $(BWD_GENERATION_DONE)
 
 $(FWD_GENERATION_DONE): $(EXAMPLE_GENERATOR) | $(FWD_SRC_DIR)
-	python3 $(EXAMPLE_GENERATOR) --api fwd,fwd_splitkv,fwd_appendkv --output_dir $(FWD_SRC_DIR)
+	python3 $(EXAMPLE_GENERATOR) --api fwd,fwd_splitkv,fwd_appendkv --optdim 32,64,128,256 --output_dir $(FWD_SRC_DIR)
 	@touch $@
 
 $(BWD_GENERATION_DONE): $(EXAMPLE_GENERATOR) | $(BWD_SRC_DIR)
-	python3 $(EXAMPLE_GENERATOR) --api bwd --output_dir $(BWD_SRC_DIR) --receipt 3
+	python3 $(EXAMPLE_GENERATOR) --api bwd --receipt 3 --optdim 32,64,128,256 --output_dir $(BWD_SRC_DIR)
 	@touch $@
 
 FWD_SRCS := fmha_fwd.cpp
