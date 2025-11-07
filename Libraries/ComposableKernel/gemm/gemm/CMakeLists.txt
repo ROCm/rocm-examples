@@ -20,10 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_basic ComposableKernel_ck_tile_gemm_basic)
+set(example_name ComposableKernel_ck_tile_gemm)
+set(example_basic ${example_name}_basic)
 set(example_basic_script test_ck_tile_gemm_basic.sh)
-set(example_universal ComposableKernel_ck_tile_gemm_universal)
+set(example_universal ${example_name}_universal)
 set(example_universal_script test_ck_tile_gemm_universal.sh)
+set(example_weight_preshuffle ${example_name}_weight_preshuffle)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -64,9 +66,15 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
+set_source_files_properties(
+    gemm_basic.cpp
+    gemm_weight_preshuffle.cpp
+    universal_gemm.cpp
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
+
 add_executable(${example_basic} gemm_basic.cpp)
 add_test(${example_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script} $<TARGET_FILE:${example_basic}>")
-set_source_files_properties(gemm_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_basic} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_basic} PRIVATE composable_kernel::ck_tile hip::host)
@@ -75,7 +83,22 @@ add_executable(${example_universal} universal_gemm.cpp)
 add_test(${example_universal}
          COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_universal_script} $<TARGET_FILE:${example_universal}>"
 )
-set_source_files_properties(universal_gemm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_universal} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_universal} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_universal} PRIVATE composable_kernel::ck_tile hip::host)
+
+add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
+add_test(
+    ${example_weight_preshuffle}
+    COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script} $<TARGET_FILE:${example_weight_preshuffle}>"
+)
+target_compile_features(${example_weight_preshuffle} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(
+    ${example_weight_preshuffle}
+    PRIVATE
+    -Wno-unused-local-typedef
+    -Wno-gnu-line-marker
+    --save-temps
+    "SHELL:-mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32 -mllvm -enable-noalias-to-md-conversion=0"
+)
+target_link_libraries(${example_weight_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)

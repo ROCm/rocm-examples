@@ -4,6 +4,15 @@
 
 This example demonstrates how to perform a batched GEMM operation with the CK Tile programming model.
 
+### Supported architectures
+
+The example is supported for the following architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.

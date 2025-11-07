@@ -20,8 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name ComposableKernel_ck_tile_flatmm)
-set(example_script test_ck_tile_flatmm.sh)
+set(example_name ComposableKernel_ck_tile_block_scale_gemm)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -62,8 +61,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
-add_executable(${example_name} flatmm_basic.cpp)
-add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
-set_source_files_properties(flatmm_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+add_executable(${example_name} gemm_aquant_basic.cpp)
+add_test(${example_name} COMMAND ${example_name})
+set_source_files_properties(gemm_aquant_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(${example_name} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)

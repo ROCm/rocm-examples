@@ -20,8 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE_BASIC := ComposableKernel_ck_tile_gemm_basic
-EXAMPLE_UNIVERSAL := ComposableKernel_ck_tile_gemm_universal
+EXAMPLE := ComposableKernel_ck_tile_gemm
+EXAMPLE_BASIC := $(EXAMPLE)_basic
+EXAMPLE_UNIVERSAL := $(EXAMPLE)_universal
+EXAMPLE_WEIGHT_PRESHUFFLE := $(EXAMPLE)_weight_preshuffle
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -45,19 +47,20 @@ ILDLIBS   += $(LDLIBS)
 
 SOURCES := $(wildcard *.cpp)
 OBJECTS := $(SOURCES:.cpp=.o)
+WEIGHT_PRESHUFFLE_FLAGS := -mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32
 
 .PHONY: all
-all: $(EXAMPLE_BASIC) $(EXAMPLE_UNIVERSAL)
+all: $(EXAMPLE_BASIC) $(EXAMPLE_UNIVERSAL) $(EXAMPLE_WEIGHT_PRESHUFFLE)
 
-%.o: %.cpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ -c $<
+$(EXAMPLE_BASIC): gemm_basic.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-$(EXAMPLE_BASIC): gemm_basic.o
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+$(EXAMPLE_UNIVERSAL): universal_gemm.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
-$(EXAMPLE_UNIVERSAL): universal_gemm.o
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+$(EXAMPLE_WEIGHT_PRESHUFFLE): gemm_weight_preshuffle.cpp
+	$(HIPCXX) $(ICXXFLAGS) $(WEIGHT_PRESHUFFLE_FLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 .PHONY: clean
 clean:
-	$(RM) $(EXAMPLE_BASIC) $(EXAMPLE_UNIVERSAL) $(OBJECTS)
+	$(RM) $(EXAMPLE_BASIC) $(EXAMPLE_UNIVERSAL) $(EXAMPLE_WEIGHT_PRESHUFFLE) $(OBJECTS)

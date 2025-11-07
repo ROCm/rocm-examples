@@ -4,6 +4,15 @@
 
 This example demonstrates how to perform a Multiple D GEMM operation with the CK Tile programming model.
 
+### Supported architectures
+
+The example is supported for the following architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
@@ -28,7 +37,7 @@ The example makes use of four key architectural components:
 * A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
   storage phases. In this example the pipeline is set to `BaseGemmPipelineAgBgCrCompV3`.
 * A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
-  `GemmKernel` is used.
+  `GemmKernelMultiD` is used.
 
 ## Used API surface
 
@@ -46,8 +55,8 @@ The example makes use of four key architectural components:
 * `ck_tile::BaseGemmPipelineAgBgCrCompV3`
 * `ck_tile::BaseGemmPipelineAgBgCrCompV4`
 * `ck_tile::BaseGemmPipelineAgBgCrMem`
-* `ck_tile::GemmHostArgs`
-* `ck_tile::GemmKernel`
+* `ck_tile::GemmMultiDHostArgs`
+* `ck_tile::GemmKernelMultiD`
 * `ck_tile::GemmPipelineProblem`
 * `ck_tile::GemmPipelineScheduler::Interwave`
 * `ck_tile::GemmPipelineScheduler::Intrawave`
