@@ -389,6 +389,11 @@ The following options are available when building with CMake.
     - [reduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/reduce/): Showcases how to reduce data from all ranks to a single specified root rank.
     - [reducescatter](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/reducescatter/): Showcases how to reduce data from all ranks and scatter the result chunks to all ranks.
     - [send_recv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/RCCL/send_recv/): Showcases point-to-point communication using Send and Recv operations with ring topology.
+  - [rocAL](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocAL/): Showcases functionality of the rocAL library with examples for basic image processing, multi-threaded data loading, advanced image augmentation, and video processing workflows.
+    - [basic](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocAL/basic/): Demonstrates basic rocAL functionality for loading and processing JPEG images with crop and resize augmentations.
+    - [dataloader](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocAL/dataloader/): Shows multi-threaded data loading capabilities with parallel processing across multiple shards and label handling.
+    - [image_augmentation](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocAL/image_augmentation/): Demonstrates advanced multi-branch augmentation pipelines with complex image transformation effects and dynamic parameter management.
+    - [video](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocAL/video/): Showcases video and sequence processing capabilities with hardware acceleration, temporal manipulation, and multi-format support.
   - [rocALUTION](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/)
     - [amg](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/amg/): Showcases Smoothed Aggregation Algebraic Multigrid method for solving linear systems with automatic hierarchy construction.
     - [as_precond](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocALUTION/as_precond/): Showcases Additive Schwarz preconditioner with domain decomposition and two-level preconditioning.

@@ -48,6 +48,7 @@ jobs:
                     rocblas-dev hipblas-dev \
                     rocsolver-dev hipsolver-dev \
                     rocfft-dev hipfft-dev \
+                    rocal-dev \
                     rocalution-dev \
                     rocdecode-dev \
                     rocjpeg-dev \

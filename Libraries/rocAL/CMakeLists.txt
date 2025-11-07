@@ -1,6 +1,4 @@
-# MIT License
-#
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,45 +18,38 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-LIBRARIES := \
-  hipBLAS \
-  hipCUB \
-  hipFFT \
-  hipSOLVER \
-  hipSPARSE \
-  hipSPARSELt \
-  rocRAND \
-  hipRAND
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(rocAL_examples LANGUAGES CXX)
+include(CTest)
 
-ifneq ($(GPU_RUNTIME), CUDA)
-LIBRARIES += \
-  hipBLASLt \
-  hipTensor \
-  MIGraphX \
-  MIVisionX \
-  RCCL \
-  rocAL \
-  rocALUTION \
-  rocBLAS \
-  rocCV \
-  rocDecode \
-  rocFFT \
-  rocJPEG \
-  rocPRIM \
-  rocProfiler-SDK \
-  rocSOLVER \
-  rocSPARSE \
-  rocThrust \
-  rocWMMA \
-  RPP
-endif
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-all: $(LIBRARIES)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    message(STATUS "rocAL examples are only available on Linux")
+    return()
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+endif()
 
-clean: TARGET=clean
-clean: all
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-$(LIBRARIES):
-	$(MAKE) -C $@ $(TARGET)
+find_library(ROCAL_LIBRARY
+    NAMES rocal
+    PATHS "${ROCM_ROOT}/lib"
+    PATH_SUFFIXES lib lib64
+)
 
-.PHONY: all clean $(LIBRARIES)
+if(NOT ROCAL_LIBRARY)
+    message(STATUS "rocAL could not be found, not building rocAL examples")
+    return()
+endif()
+
+add_subdirectory(basic)
+add_subdirectory(dataloader)
+add_subdirectory(image_augmentation)
+add_subdirectory(video)
