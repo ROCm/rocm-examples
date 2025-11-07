@@ -21,7 +21,7 @@ For a full overview over the examples see the section [repository contents](#rep
 
 - [CMake](https://cmake.org/download/) (at least version 3.21)
 - A number of examples also support building via  GNU Make - available through the distribution's package manager
-- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 7.x.x)
 - For example-specific prerequisites, see the example subdirectories.
 
 ### Windows
