@@ -52,6 +52,7 @@ if(
     endif()
     add_subdirectory(MIVisionX)
     add_subdirectory(RCCL)
+    add_subdirectory(rocAL)
     add_subdirectory(rocALUTION)
     add_subdirectory(rocBLAS)
     add_subdirectory(rocCV)
