@@ -8,6 +8,15 @@ Unlike the standard SmoothQuant operation, the input scale comes from different 
 `[expert, hidden]`. To handle this, we reuse the `topk-id` from the previous `topk-softmax` operation, select the
 corresponding expert from the current top-k results, and expand both the output and per-token scale by the top-k factor.
 
+### Supported architectures
+
+The example is supported for the following architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.

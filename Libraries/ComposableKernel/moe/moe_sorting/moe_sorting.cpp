@@ -194,7 +194,7 @@ bool test_moe_sorting(ck_tile::ArgParser args)
     // for simplicity, below buffer allocate 2 dword
     ck_tile::HostTensor<IndexType> sorted_id_cnt_host({2}, {1});
 #if MOE_SORTING_FMOE_2D_BUF
-    ck_tile::HostTensor<std::int8_t> moe_buf_host(
+    ck_tile::HostTensor<int8_t> moe_buf_host(
         {static_cast<std::size_t>(is_local_token ? local_tokens : tokens) * moe_buf_interm_dim *
          moe_buf_elem_bytes});
     auto moe_buf_bytes = moe_buf_interm_dim == 0 ? static_cast<std::size_t>(0)
@@ -207,7 +207,7 @@ bool test_moe_sorting(ck_tile::ArgParser args)
 
     ck_tile::FillUniformDistribution<WeightType>{-.5f, .5f}(weights_host);
 #if MOE_SORTING_FMOE_2D_BUF
-    ck_tile::FillUniformDistribution<std::int8_t>{-.5f, .5f}(moe_buf_host);
+    ck_tile::FillUniformDistribution<int8_t>{-.5f, .5f}(moe_buf_host);
 #else
     ck_tile::FillUniformDistribution<WeightType>{-.5f, .5f}(moe_buf_host);
 #endif
@@ -377,7 +377,7 @@ bool test_moe_sorting(ck_tile::ArgParser args)
     sorted_weights_dev.FromDevice(sorted_weights_host.data());
     sorted_expert_ids_dev.FromDevice(sorted_expert_ids_host.data());
     sorted_id_cnt_dev.FromDevice(sorted_id_cnt_host.data());
-    if(moe_buf_size > 0)
+    if(moe_buf_bytes > 0)
     {
         moe_buf_dev.FromDevice(moe_buf_host.data());
     }
@@ -389,7 +389,7 @@ bool test_moe_sorting(ck_tile::ArgParser args)
         ck_tile::HostTensor<WeightType> sorted_weights_ref({max_output_ids}, {1});
         ck_tile::HostTensor<IndexType> sorted_expert_ids_ref({max_output_ids / unit_size}, {1});
 
-        std::int32_t ref_total_tokens_post_pad = 0;
+        int32_t ref_total_tokens_post_pad = 0;
         ck_tile::reference_moe_sorting<WeightType, IndexType>(topk_ids_host,
                                                               weights_host,
                                                               local_expert_masking_host,
