@@ -2,12 +2,18 @@
 
 ## Description
 
-This example demonstrates how to perform a GEMM operation with the CK Tile programming model. Two variants are shown:
-one with a regular implementation of the grouped GEMM operation and one with a persistent `TileLoop` kernel.
+This example demonstrates how to perform a GEMM operation with the CK Tile programming model.
+
+### Supported architectures
+
+The example is supported for the following architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
 
 ### Application flow
-
-The application flow is the same for both examples; they only differ in the kernel instantation parameters.
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
 2. Buffers for the input matrices and the output matrix are created on the host.
@@ -48,9 +54,8 @@ The example makes use of four key architectural components:
 * `ck_tile::CShuffleEpilogue`
 * `ck_tile::CShuffleEpilogueProblem`
 * `ck_tile::DeviceMem`
+* `ck_tile::element_wise::PassThrough`
 * `ck_tile::FillUniformDistribution`
-* `ck_tile::GemmHostArgs`
-* `ck_tile::GemmKernel`
 * `ck_tile::GemmPipelineAgBgCrCompV3`
 * `ck_tile::GemmPipelineAgBgCrCompV4`
 * `ck_tile::GemmPipelineAgBgCrMem`
@@ -59,11 +64,14 @@ The example makes use of four key architectural components:
 * `ck_tile::GemmPipelineScheduler`
 * `ck_tile::GemmSpatiallyLocalTilePartitioner`
 * `ck_tile::GemmTile1DPartitioner`
+* `ck_tile::GroupedGemmHostArgs`
+* `ck_tile::GroupedGemmKernel`
 * `ck_tile::half_t`
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
 * `ck_tile::integral_constant`
 * `ck_tile::memory_operation_enum`
+* `ck_tile::PersistentTileGemmUniversalTraits`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
 * `ck_tile::TailNumber`
@@ -71,7 +79,8 @@ The example makes use of four key architectural components:
 * `ck_tile::tensor_layout::gemm::RowMajor`
 * `ck_tile::TileGemmShape`
 * `ck_tile::TileGemmTraits`
-* `ck_tile::TileGemmUniversalTraits`
+* `ck_tile::tuple`
+* `ck_tile::UniversalGemmKernelArgs`
 * `ck_tile::UniversalGemmPipelineProblem`
 
 #### Functions
@@ -91,7 +100,4 @@ The example makes use of four key architectural components:
 
 #### Host symbols
 
-* `hipFree`
-* `hipMalloc`
-* `hipMemcpy`
 * `hipMemcpyWithStream`

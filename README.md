@@ -279,6 +279,7 @@ The following options are available when building with CMake.
       - [grouped_convolution](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/convolution): Demonstrates how to perform a grouped convolution operation (forward pass).
     - [GEMM](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm): GEMM examples using the CK Tile programming model.
       - [batched_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/batched_gemm): Demonstrates how to perform a batched GEMM operation.
+      - [block_scale_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/block_scale_gemm): Showcases a block-scale GEMM operation.
       - [flatmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/flatmm): Shows how to perform a FLATMM operation.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm): Illustrates how to perform a regular GEMM operation.
       - [gemm_multi_d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm_multi_d): Demonstrates how to perform a Multiple D GEMM operation.

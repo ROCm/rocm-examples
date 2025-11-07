@@ -27,6 +27,7 @@ file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 add_subdirectory(batched_gemm)
+add_subdirectory(block_scale_gemm)
 add_subdirectory(flatmm)
 add_subdirectory(gemm)
 add_subdirectory(gemm_multi_d)

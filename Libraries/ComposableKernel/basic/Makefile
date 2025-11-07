@@ -22,7 +22,7 @@
 
 EXAMPLES := \
 	batched_transpose \
-	copy \
+	elementwise \
 	img2col \
 	permute \
 	reduce
