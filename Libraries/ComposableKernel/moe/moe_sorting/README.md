@@ -7,6 +7,14 @@ commonly used in MoE models before launching the fused MoE GEMM block. The input
 matrix. The operation rearranges the input weight IDs into different experts and feeds them into the fused MoE GEMM
 kernel.
 
+### Supported architectures
+
+The example is supported for the following architectures:
+
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.

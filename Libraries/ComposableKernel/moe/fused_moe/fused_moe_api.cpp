@@ -26,7 +26,8 @@
 
 int fused_moe_get_workspace_size(int tokens, int num_experts, int topk)
 {
-    return ck_tile::moe_sorting_get_workspace_size(tokens, num_experts, topk);
+    return ck_tile::moe_sorting_get_workspace_size(
+        tokens, num_experts, topk, 0 /*dispatch policy*/);
 }
 
 float fused_moe(fused_moe_traits t, fused_moe_args a, const ck_tile::stream_config& s)

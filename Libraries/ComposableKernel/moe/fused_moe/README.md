@@ -10,6 +10,13 @@ The algorithm implemented here utilizes more kernel fusion to boost performance.
 achieves a 1.5~2x performance boost. In addition, it uses no workspace memory und requires less kernel instances which
 improves maintainability.
 
+### Supported architectures
+
+The example is supported for the following architectures:
+
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
