@@ -402,11 +402,11 @@ float fused_moesorting_mp(fused_moesorting_trait t,
             {
                 if(a.tokens * a.topk % 4 == 0)
                 {
-                    MOR_SORTING_MP_DISPATCH_(uint8_t, 4, 16, 16)
+                    MOR_SORTING_MP_DISPATCH_(std::uint8_t, 4, 16, 16)
                 }
                 else
                 {
-                    MOR_SORTING_MP_DISPATCH_(uint8_t, 1, 16, 16)
+                    MOR_SORTING_MP_DISPATCH_(std::uint8_t, 1, 16, 16)
                 }
             }
             else if(mesh_byte_size == 2)
@@ -414,11 +414,11 @@ float fused_moesorting_mp(fused_moesorting_trait t,
 #if MOE_SORTING_SUPPORT_LARGE_TOPK
                 if(a.tokens * a.topk % 4 == 0)
                 {
-                    MOR_SORTING_MP_DISPATCH_(uint16_t, 4, 8, 8)
+                    MOR_SORTING_MP_DISPATCH_(std::uint16_t, 4, 8, 8)
                 }
                 else
                 {
-                    MOR_SORTING_MP_DISPATCH_(uint16_t, 1, 8, 8)
+                    MOR_SORTING_MP_DISPATCH_(std::uint16_t, 1, 8, 8)
                 }
 #else
                 std::printf("do not support large topk %d\n", a.topk);

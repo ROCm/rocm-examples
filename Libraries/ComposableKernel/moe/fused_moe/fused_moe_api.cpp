@@ -59,8 +59,13 @@ float fused_moe(fused_moe_traits t, fused_moe_args a, const ck_tile::stream_conf
         a.block_m,               // index_t unit_size;
         a.num_experts,           // index_t num_experts;
         a.topk,                  // index_t topk;
+#if MOE_SORTING_FMOE_2D_BUF
+        a.stride_token,
+        o_data_bytes,
+#else
         static_cast<ck_tile::long_index_t>(a.num_tokens) * a.stride_token *
             o_data_bytes // index_t moe_buf_bytes;
+#endif
     };
 
     auto t1 = fused_moegemm_traits{t.prec_i,
