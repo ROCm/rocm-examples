@@ -449,7 +449,7 @@ struct fmha_batch_prefill_args
     ck_tile::index_t nhead_k;
 
     // SGLang-style page table
-    int32_t num_total_pages;
+    std::int32_t num_total_pages;
     void* kv_indptr;
     void* kv_page_indices;
 #if 0 // we assume page_block_size=1 for now

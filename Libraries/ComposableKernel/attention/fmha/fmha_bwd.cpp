@@ -412,10 +412,10 @@ bool run(const ck_tile::ArgParser& arg_parser)
     ck_tile::DeviceMem dv_buf(dv_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem do_buf(do_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem dbias_buf(dbias_host.get_element_space_size_in_bytes());
-    ck_tile::DeviceMem seqstart_q(seqstart_q_host.size() * sizeof(int32_t));
-    ck_tile::DeviceMem seqstart_k(seqstart_k_host.size() * sizeof(int32_t));
-    ck_tile::DeviceMem drop_seed_buf(drop_prefs ? sizeof(uint64_t) : 0);
-    ck_tile::DeviceMem drop_offset_buf(drop_prefs ? sizeof(uint64_t) : 0);
+    ck_tile::DeviceMem seqstart_q(seqstart_q_host.size() * sizeof(std::int32_t));
+    ck_tile::DeviceMem seqstart_k(seqstart_k_host.size() * sizeof(std::int32_t));
+    ck_tile::DeviceMem drop_seed_buf(drop_prefs ? sizeof(std::uint64_t) : 0);
+    ck_tile::DeviceMem drop_offset_buf(drop_prefs ? sizeof(std::uint64_t) : 0);
     ck_tile::DeviceMem alibi_slope_buf(alibi_slope_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem dq_acc_buf(dq_acc_host.get_element_space_size_in_bytes());
 

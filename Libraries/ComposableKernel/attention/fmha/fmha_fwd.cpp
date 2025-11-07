@@ -671,11 +671,11 @@ bool run(const ck_tile::ArgParser& arg_parser)
         p_drop > 0 ? get_lengths(true, shape_batch, nhead, shape_seqlen_q, max_seqlen_k)
                    : std::array<ck_tile::index_t, 4>{1, 1, 1, 1});
 
-    ck_tile::HostTensor<int32_t> block_table_host(
+    ck_tile::HostTensor<std::int32_t> block_table_host(
         0 < page_block_size ? std::array<ck_tile::index_t, 2>{batch, max_num_page_blocks / batch}
                             : std::array<ck_tile::index_t, 2>{1, 1});
 
-    ck_tile::HostTensor<int32_t> cache_batch_idx_host(use_cache_batch_idx
+    ck_tile::HostTensor<std::int32_t> cache_batch_idx_host(use_cache_batch_idx
                                                           ? std::array<ck_tile::index_t, 1>{batch}
                                                           : std::array<ck_tile::index_t, 1>{1});
 
@@ -769,18 +769,18 @@ bool run(const ck_tile::ArgParser& arg_parser)
     ck_tile::DeviceMem o_acc_buf(o_acc_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem lse_buf(lse_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem o_buf(o_host.get_element_space_size_in_bytes());
-    ck_tile::DeviceMem seqstart_q(seqstart_q_host.size() * sizeof(int32_t));
-    ck_tile::DeviceMem seqstart_k(seqstart_k_host.size() * sizeof(int32_t));
+    ck_tile::DeviceMem seqstart_q(seqstart_q_host.size() * sizeof(std::int32_t));
+    ck_tile::DeviceMem seqstart_k(seqstart_k_host.size() * sizeof(std::int32_t));
     ck_tile::DeviceMem seqlen_k_buf((mode == mode_enum::batch && use_kvcache) ||
                                             0 <= seqlen_kpads[0]
-                                        ? seqlen_ks.size() * sizeof(int32_t)
+                                        ? seqlen_ks.size() * sizeof(std::int32_t)
                                         : 0);
     ck_tile::DeviceMem cache_seqlen_k_buf(
-        need_append_kvcache ? cache_seqlen_ks.size() * sizeof(int32_t) : 0);
+        need_append_kvcache ? cache_seqlen_ks.size() * sizeof(std::int32_t) : 0);
     ck_tile::DeviceMem rotary_cos_buf(rotary_cos_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem rotary_sin_buf(rotary_sin_host.get_element_space_size_in_bytes());
-    ck_tile::DeviceMem drop_seed_buf(drop_prefs ? sizeof(uint64_t) : 0);
-    ck_tile::DeviceMem drop_offset_buf(drop_prefs ? sizeof(uint64_t) : 0);
+    ck_tile::DeviceMem drop_seed_buf(drop_prefs ? sizeof(std::uint64_t) : 0);
+    ck_tile::DeviceMem drop_offset_buf(drop_prefs ? sizeof(std::uint64_t) : 0);
     ck_tile::DeviceMem randval_buf(randval_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem alibi_slope_buf(alibi_slope_host.get_element_space_size_in_bytes());
     ck_tile::DeviceMem block_table_buf(block_table_host.get_element_space_size_in_bytes());
