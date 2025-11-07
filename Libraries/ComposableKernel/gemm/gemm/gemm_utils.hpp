@@ -344,12 +344,12 @@ struct GemmTypeConfig<ck_tile::half_t, ck_tile::pk_int4_t, ck_tile::half_t>
 };
 
 template <>
-struct GemmTypeConfig<ck_tile::int8_t, ck_tile::int8_t, int32_t>
+struct GemmTypeConfig<ck_tile::int8_t, ck_tile::int8_t, std::int32_t>
 {
     using ADataType   = ck_tile::int8_t;
     using BDataType   = ck_tile::int8_t;
-    using AccDataType = int32_t;
-    using CDataType   = int32_t;
+    using AccDataType = std::int32_t;
+    using CDataType   = std::int32_t;
 };
 
 template <typename T>
@@ -368,7 +368,7 @@ struct DataTypeTraits<double>
 };
 
 template <>
-struct DataTypeTraits<int32_t>
+struct DataTypeTraits<std::int32_t>
 {
     static constexpr const char* name = "int32";
 };
