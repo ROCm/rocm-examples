@@ -44,7 +44,6 @@ EXAMPLES := \
 	static_host_library \
 	texture_management \
 	vulkan_interop \
-	vulkan_interop_mipmap \
 	warp_shuffle
 
 # Only supported on HIP (not CUDA).
