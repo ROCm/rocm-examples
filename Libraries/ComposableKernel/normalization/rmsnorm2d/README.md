@@ -6,6 +6,15 @@ This example demonstrates how to perform the forward pass of RMSNorm2D using the
 two variants: One basic example with a fixed parameter set (`example_`) and one with various different available
 parameters.
 
+### Supported architectures
+
+The example is supported for the following GPU architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
