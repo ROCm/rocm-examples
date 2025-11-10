@@ -22,8 +22,8 @@
 # SOFTWARE.
 
 EXAMPLE_TOOL="rocprof-compute"
-EXAMPLE_BIN="${EXAMPLE_TOOL}_vcopy"
-EXAMPLE_WORKLOAD="./$EXAMPLE_BIN -n 1048576 -b 256"
+EXAMPLE_BIN="${EXAMPLE_TOOL}_occupancy"
+EXAMPLE_WORKLOAD="./$EXAMPLE_BIN"
 
 # Check for existence of tool
 if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
@@ -39,26 +39,24 @@ echo "Profiling workload; filtering for kernel substring vecCopy"
 echo "==============================================================================="
 # Kernels are specified as a substring list. The following matches all kernel names which contain "vecCopy". Roofline
 # profiling is disabled to save profiling time.
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_substr --kernel vecCopy --no-roof -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_substr --kernel vgprbound --no-roof -- $EXAMPLE_WORKLOAD
+# Notice the "top kernels" only shows "vgprbound" kernels, compared to the full profile capture  
+$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_substr/* --block 7 
 
 echo "==============================================================================="
-echo "Profiling workload; filtering for Wavefront Launch Statistics"
+echo "Profiling workload; filtering for System Speed-of-Light profiling and analysis"
 echo "==============================================================================="
 # It is possible to only collect some metrics. The list of supported hardware report blocks can be obtained with
 # rocprof-compute profile --list-metrics
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_wavefront --block 7 -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_sol --block 2 -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_sol/* --block 2  
+
 
 echo "==============================================================================="
 echo "Profiling two runs for comparative analysis"
 echo "==============================================================================="
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_first --no-roof -- $EXAMPLE_WORKLOAD
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_second --no-roof -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_first --block 2 --no-roof -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_second --block 2 --no-roof -- $EXAMPLE_WORKLOAD
 $EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_first/* --path workloads/${EXAMPLE_BIN}_second/*
-
-echo "==============================================================================="
-echo "Profiling with PC sampling"
-echo "==============================================================================="
-# At the moment, block 21 (the block containing PC metrics) must be explicitly enabled.
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_pc --block 21 --pc-sampling-method stochastic -- $EXAMPLE_WORKLOAD
 
 exit 0

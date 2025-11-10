@@ -61,6 +61,7 @@ else
         --name ${EXAMPLE_BIN}_rocpd \
         --format-rocprof-output rocpd \
         --retain-rocpd-output \
+        --no-roof \
         -- $EXAMPLE_WORKLOAD
 fi
 
