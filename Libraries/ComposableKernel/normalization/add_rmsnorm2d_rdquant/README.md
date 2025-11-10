@@ -6,6 +6,15 @@ This example demonstrates how to perform add + RMSNorm2D + row-wise dynamic quan
 CK Tile programming model. RDQuant is short for row-wise dynamic quantization. There are two variants: One basic
 example with a fixed tile size ("_tile") and one with flexible tile size depending on the chosen parameters.
 
+### Supported architectures
+
+The example is supported for the following GPU architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
