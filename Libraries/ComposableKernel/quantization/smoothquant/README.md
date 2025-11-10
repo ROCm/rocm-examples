@@ -5,6 +5,15 @@
 This example shows how to implement SmoothQuant using the CK Tile programming model. There are two variants: One basic
 example with a fixed parameter set (`example_`) and one example with various available parameters.
 
+### Supported architectures
+
+The example is supported for the following GPU architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.

@@ -44,7 +44,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-FWD_PP_DEFS := -DCK_TILE_FMHA_FWD_FAST_EXP2=1 -DCK_TILE_FMHA_FWD_SPLITKV_API=1 -DCK_TILE_FMHA_FWD_APPENDKV_API=1 -DCK_TILE_FMHA_FWD_PAGEDKV_API=1
+FWD_PP_DEFS := -DCK_TILE_FMHA_FWD_FAST_EXP2=1
 FWD_SRC_DIR := fwd_sources
 FWD_OBJ_DIR := fwd_objects
 BWD_SRC_DIR := bwd_sources
@@ -64,11 +64,11 @@ $(FWD_SRC_DIR) $(FWD_OBJ_DIR) $(BWD_SRC_DIR) $(BWD_OBJ_DIR):
 generate: $(FWD_GENERATION_DONE) $(BWD_GENERATION_DONE)
 
 $(FWD_GENERATION_DONE): $(EXAMPLE_GENERATOR) | $(FWD_SRC_DIR)
-	python3 $(EXAMPLE_GENERATOR) --api fwd,fwd_splitkv,fwd_appendkv --optdim 32,64,128,256 --output_dir $(FWD_SRC_DIR)
+	python3 $(EXAMPLE_GENERATOR) --api fwd --receipt 2 --optdim 64 --filter "*fp16_group*" --output_dir $(FWD_SRC_DIR)
 	@touch $@
 
 $(BWD_GENERATION_DONE): $(EXAMPLE_GENERATOR) | $(BWD_SRC_DIR)
-	python3 $(EXAMPLE_GENERATOR) --api bwd --receipt 3 --optdim 32,64,128,256 --output_dir $(BWD_SRC_DIR)
+	python3 $(EXAMPLE_GENERATOR) --api bwd --receipt 3 --optdim 64 --filter "*fp16_group*" --output_dir $(BWD_SRC_DIR)
 	@touch $@
 
 FWD_SRCS := fmha_fwd.cpp
