@@ -12,6 +12,7 @@ The examples in this subdirectory showcase the functionality of the [rocProfiler
 - Or GNU Make - available via the distribution's package manager.
 - [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 7.x.x).
 - [rocProfiler-SDK](https://github.com/ROCm/rocm-systems/tree/develop/projects/rocprofiler-sdk): `rocprofiler-sdk` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
+- [libdw-dev](https://sourceware.org/elfutils/).
 
 ## Building
 

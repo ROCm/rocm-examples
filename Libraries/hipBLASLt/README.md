@@ -8,7 +8,7 @@ The examples in this subdirectory showcase the functionality of the [hipBLASLt](
 
 ### Linux
 
-- [CMake](https://cmake.org/download/) (at least version 3.21).
+- [CMake](https://cmake.org/download/) (at least version 3.25.2).
 - Or GNU Make - available via the distribution's package manager.
 - [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 7.x.x).
 - [hipBLASLt](https://github.com/ROCm/rocm-libraries/tree/develop/projects/hipblaslt): `hipblaslt` package available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html).
