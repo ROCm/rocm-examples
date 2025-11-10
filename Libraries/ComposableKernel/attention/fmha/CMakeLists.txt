@@ -79,8 +79,10 @@ add_executable(${example_fwd})
 
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
-        --api fwd,fwd_splitkv,fwd_appendkv,pagedkv_prefill
-        --optdim 32,64,128,256
+        --api fwd
+        --optdim 64
+        --filter "*fp16_group*"
+        --receipt 2
         --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt
     RESULT_VARIABLE ret
 )
@@ -89,8 +91,10 @@ file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt EXAMPLE_FWD_GEN_SRCS)
 
 add_custom_target(fmha_fwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
-        --api fwd,fwd_splitkv,fwd_appendkv,pagedkv_prefill
-        --optdim 32,64,128,256
+        --api fwd
+        --optdim 64
+        --filter "*fp16_group*"
+        --receipt 2
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
     BYPRODUCTS ${EXAMPLE_FWD_GEN_SRCS}
@@ -101,11 +105,7 @@ add_dependencies(${example_fwd} fmha_fwd_gen_srcs)
 
 set_source_files_properties(fmha_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-target_compile_definitions(${example_fwd} PRIVATE CK_TILE_FMHA_FWD_FAST_EXP2=1
-                                                  CK_TILE_FMHA_FWD_SPLITKV_API=1
-                                                  CK_TILE_FMHA_FWD_APPENDKV_API=1
-                                                  CK_TILE_FMHA_FWD_PAGEDKV_API=1
-)
+target_compile_definitions(${example_fwd} PRIVATE CK_TILE_FMHA_FWD_FAST_EXP2=1)
 target_compile_features(${example_fwd} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_fwd} PRIVATE -Wno-float-equal
                                               -Wno-undefined-func-template
@@ -124,8 +124,9 @@ add_executable(${example_bwd})
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
+        --optdim 64
+        --filter "*fp16_group*"
         --receipt 3
-        --optdim 32,64,128,256
         --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
     RESULT_VARIABLE ret
 )
@@ -135,8 +136,9 @@ file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt EXAMPLE_BWD_GEN_SRCS)
 add_custom_target(fmha_bwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
+        --optdim 64
+        --filter "*fp16_group*"
         --receipt 3
-        --optdim 32,64,128,256
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
     BYPRODUCTS ${EXAMPLE_BWD_GEN_SRCS}
