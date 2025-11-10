@@ -45,25 +45,30 @@ jobs:
               echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
               echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
+          - name: Setup ROCm Libraries monorepo
+            shell: bash
+            run: |
+              git clone --no-checkout --depth=1 --filter=tree:0 https://github.com/ROCm/rocm-libraries.git
+              cd rocm-libraries
+              git sparse-checkout init --cone
+              git sparse-checkout set projects/hipcub projects/hiprand
+              git checkout develop
+
           - name: Build and install hipCUB
             shell: bash
             run: |
-              git clone https://github.com/ROCm/hipCUB.git
-              pushd hipCUB; mkdir build; cd build
+              cd rocm-libraries/projects/hipcub; mkdir build; cd build
               HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
               make -j
               make install
-              popd && rm -rf hipCUB
 
           - name: Build and install hipRAND
             shell: bash
             run: |
-              git clone https://github.com/ROCm/hipRAND.git
-              pushd hipRAND; mkdir build; cd build
+              cd rocm-libraries/projects/hiprand; mkdir build; cd build
               HIP_PLATFORM=nvidia CXX=g++ cmake -DBUILD_WITH_LIB=CUDA -DHIP_CUDA_lowest_cc=60 ..
               make -j
               make install
-              popd && rm -rf hipRAND
 
           - name: Configure and Build
             shell: bash

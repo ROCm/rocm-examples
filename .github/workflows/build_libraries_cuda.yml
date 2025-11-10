@@ -41,15 +41,22 @@ jobs:
           apt-get update -qq &&
           apt-get install -y hip-dev rocm-cmake
 
+      - name: Setup ROCm Libraries monorepo
+        shell: bash
+        run: |
+          git clone --no-checkout --depth=1 --filter=tree:0 https://github.com/ROCm/rocm-libraries.git
+          cd rocm-libraries
+          git sparse-checkout init --cone
+          git sparse-checkout set projects/hipcub projects/hiprand projects/hipfft projects/rocrand
+          git checkout develop
+
       - name: Build and install hipCUB
         shell: bash
         run: |
-          git clone https://github.com/ROCm/hipCUB.git
-          pushd hipCUB; mkdir build; cd build
+          cd rocm-libraries/projects/hipcub; mkdir build; cd build
           HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
           make -j
           make install
-          popd && rm -rf hipCUB
 
       - name: Build hipCUB example
         shell: bash
@@ -60,12 +67,10 @@ jobs:
       - name: Build and install hipFFT
         shell: bash
         run: |
-          git clone https://github.com/ROCm/hipFFT.git
-          pushd hipFFT; mkdir build; cd build
+          cd rocm-libraries/projects/hipfft; mkdir build; cd build
           HIP_PLATFORM=nvidia ROCM_PATH=/opt/rocm cmake -LH -DBUILD_WITH_LIB=cuda ..
           make -j
           make install
-          popd && rm -rf hipFFT
 
       - name: Build hipFFT example
         shell: bash
@@ -84,16 +89,10 @@ jobs:
           cd Libraries/hipSPARSELt
           make GPU_RUNTIME=CUDA -j
 
-
-      - name: Build and install rocRAND
+      - name: Install rocRAND
         shell: bash
         run: |
-          git clone https://github.com/ROCm/rocRAND.git
-          pushd rocRAND; mkdir build; cd build
-          HIP_PLATFORM=nvidia CXX=g++ cmake -DCMAKE_CUDA_COMPILER=/usr/local/cuda/bin/nvcc -DCMAKE_PREFIX_PATH=/opt/rocm -DCMAKE_MODULE_PATH=/opt/rocm/hip/cmake -DHIP_CUDA_lowest_cc=60 ..
-          make -j
-          make install
-          popd && rm -rf rocRAND
+          apt-get install -y rocrand-dev
 
       - name: Build rocRAND example
         shell: bash
