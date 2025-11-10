@@ -7,14 +7,7 @@ with the `_fwd` suffix contain the algorithm's forward pass, while the `_bwd` fi
 
 ### Supported architectures
 
-The forward pass example is supported for the following GPU architectures:
-
-* `gfx908`
-* `gfx90a`
-* `gfx942`
-* `gfx950`
-
-The backward pass is only supported for the `gfx942` architecture.
+The example is only supported for the `gfx942` architecture.
 
 ### Application flow
 
