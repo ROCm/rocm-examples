@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := rocprof-compute_occupancy
+EXAMPLE := rocprof-compute-occupancy
 GPU_RUNTIME := HIP
 
 # HIP variables

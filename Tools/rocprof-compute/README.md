@@ -23,13 +23,21 @@ The `advanced` example script shows how to perform a more fine-grained analysis:
 For more information on the functionality of `rocprof-compute` or on how to analyze the output with interactive tools,
 please refer to its [documentation](https://rocm.docs.amd.com/projects/rocprofiler-compute/en/latest/).
 
-## Usage
+## Building
 
-After building the example executable either by calling `make` in this directory or as part of the repository's CMake
-build process the scripts can be executed without additional parameters as long as the executable resides in the same
-directory:
+The example executables can be built either by calling `make` in this directory
+or by invoking CMake:
 
 ```console
-user@machine:rocm-examples/Tools/rocprof-compute$ ./rocprof-compute_basic.sh
-user@machine:rocm-examples/Tools/rocprof-compute$ ./rocprof-compute_advanced.sh
+$ user@machine:rocm-examples/Tools/rocprof-compute$ cmake -B build && cmake --build build
+```
+
+## Usage
+
+After building the example executable the scripts can be executed without
+additional parameters as long as the executable resides in the same directory:
+
+```console
+user@machine:rocm-examples/Tools/rocprof-compute$ cd build && ./rocprof-compute-basic.sh
+user@machine:rocm-examples/Tools/rocprof-compute$ cd build && ./rocprof-compute-advanced.sh
 ```

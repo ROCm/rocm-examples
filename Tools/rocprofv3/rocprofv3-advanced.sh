@@ -23,10 +23,10 @@
 
 EXAMPLE_QUERY="rocprofv3-avail"
 EXAMPLE_TOOL="rocprofv3"
-EXAMPLE_BIN="${EXAMPLE_TOOL}_matmul"
-EXAMPLE_BIN_ROCTX="${EXAMPLE_BIN}_roctx"
+EXAMPLE_BIN="${EXAMPLE_TOOL}-matmul"
+EXAMPLE_BIN_ROCTX="${EXAMPLE_BIN}-roctx"
 EXAMPLE_WORKLOAD="./$EXAMPLE_BIN"
-EXAMPLE_WORKLOAD_ROCTX="${EXAMPLE_WORKLOAD}_roctx"
+EXAMPLE_WORKLOAD_ROCTX="./${EXAMPLE_WORKLOAD}-roctx"
 
 # Check for existence of tools
 REQUIRED_TOOLS="$EXAMPLE_QUERY $EXAMPLE_TOOL"
@@ -40,6 +40,11 @@ done
 
 if [ -n "$MISSING_TOOLS" ]; then
     echo "Error: Could not find the following tools in PATH:$MISSING_TOOLS" >&2
+    exit 1
+fi
+
+if [[ ! -f "$EXAMPLE_BIN" || ! -f "$EXAMPLE_BIN_ROCTX" ]]; then
+    echo "Error: $EXAMPLE_BIN or $EXAMPLE_BIN_ROCTX not present in working directory" >&2
     exit 1
 fi
 

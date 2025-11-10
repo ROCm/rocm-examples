@@ -27,8 +27,8 @@ EXAMPLE_INSTRUMENTER="rocprof-sys-instrument"
 EXAMPLE_SAMPLER="rocprof-sys-sample"
 EXAMPLE_RUNNER="rocprof-sys-run"
 
-EXAMPLE_BIN="${EXAMPLE}_matmul"
-EXAMPLE_BIN_USERAPI="${EXAMPLE_BIN}_userapi"
+EXAMPLE_BIN="${EXAMPLE}-matmul"
+EXAMPLE_BIN_ROCTX="${EXAMPLE_BIN}-roctx"
 
 # Check for existence of tools
 REQUIRED_TOOLS="$EXAMPLE_QUERY $EXAMPLE_INSTRUMENTER $EXAMPLE_SAMPLER $EXAMPLE_RUNNER"
@@ -42,6 +42,11 @@ done
 
 if [ -n "$MISSING_TOOLS" ]; then
     echo "Error: Could not find the following tools in PATH:$MISSING_TOOLS" >&2
+    exit 1
+fi
+
+if [[ ! -f "$EXAMPLE_BIN" || ! -f "$EXAMPLE_BIN_ROCTX" ]]; then
+    echo "Error: $EXAMPLE_BIN or $EXAMPLE_BIN_ROCTX not present in working directory" >&2
     exit 1
 fi
 
@@ -72,7 +77,7 @@ echo "Instrumenting with user API"
 echo "==============================================================================="
 # The following commmands first perform a binary rewrite of the executable (for instrumentation) and then run a profile
 # and trace of the application which includes user-defined instrumentation regions.
-$EXAMPLE_INSTRUMENTER --min-instructions 512 -o ${EXAMPLE_BIN_USERAPI}.inst -- ./$EXAMPLE_BIN_USERAPI
-$EXAMPLE_RUNNER --profile --trace -- ./${EXAMPLE_BIN_USERAPI}.inst
+$EXAMPLE_INSTRUMENTER --min-instructions 512 -o ${EXAMPLE_BIN_ROCTX}.inst -- ./$EXAMPLE_BIN_ROCTX
+$EXAMPLE_RUNNER --profile --trace -- ./${EXAMPLE_BIN_ROCTX}.inst
 
 exit 0

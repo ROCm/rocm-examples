@@ -22,13 +22,13 @@
 
 set(example_name rocprof-compute)
 
-set(example_basic ${example_name}_basic)
+set(example_basic ${example_name}-basic)
 set(example_basic_script ${example_basic}.sh)
 
-set(example_advanced ${example_name}_advanced)
+set(example_advanced ${example_name}-advanced)
 set(example_advanced_script ${example_advanced}.sh)
 
-set(example_occupancy ${example_name}_occupancy)
+set(example_occupancy ${example_name}-occupancy)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)

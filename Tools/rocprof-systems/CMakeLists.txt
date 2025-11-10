@@ -22,14 +22,14 @@
 
 set(example_name rocprof-systems)
 
-set(example_basic ${example_name}_basic)
+set(example_basic ${example_name}-basic)
 set(example_basic_script ${example_basic}.sh)
 
-set(example_advanced ${example_name}_advanced)
+set(example_advanced ${example_name}-advanced)
 set(example_advanced_script ${example_advanced}.sh)
 
-set(example_workload ${example_name}_matmul)
-set(example_workload_userapi ${example_workload}_userapi)
+set(example_workload ${example_name}-matmul)
+set(example_workload_roctx ${example_workload}-roctx)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -61,9 +61,7 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hip REQUIRED)
-if(NOT TARGET rocprofiler-systems::rocprofiler-systems-user-library)
-    find_package(rocprofiler-systems REQUIRED COMPONENTS user)
-endif()
+find_package(rocprofiler-sdk-roctx REQUIRED)
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
@@ -77,18 +75,18 @@ target_include_directories(${example_workload} PRIVATE
 )
 target_link_libraries(${example_workload} PRIVATE hip::host)
 
-add_executable(${example_workload_userapi} main.hip)
-set_target_properties(${example_workload_userapi} PROPERTIES $<$<COMPILE_LANGUAGE:CXX>:CXX_EXTENSIONS OFF>
+add_executable(${example_workload_roctx} main.hip)
+set_target_properties(${example_workload_roctx} PROPERTIES $<$<COMPILE_LANGUAGE:CXX>:CXX_EXTENSIONS OFF>
                                                              $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
-target_compile_definitions(${example_workload_userapi} PRIVATE EXAMPLE_USER_API)
-target_compile_features(${example_workload_userapi} PRIVATE cxx_std_17 hip_std_17)
-target_include_directories(${example_workload_userapi} PRIVATE
+target_compile_definitions(${example_workload_roctx} PRIVATE EXAMPLE_ROCTX)
+target_compile_features(${example_workload_roctx} PRIVATE cxx_std_17 hip_std_17)
+target_include_directories(${example_workload_roctx} PRIVATE
     ${CMAKE_CURRENT_LIST_DIR}/../../Common/
     ${CMAKE_CURRENT_LIST_DIR}/../../External/
 )
-target_link_libraries(${example_workload_userapi} PRIVATE
+target_link_libraries(${example_workload_roctx} PRIVATE
     hip::host
-    rocprofiler-systems::rocprofiler-systems-user-library
+    rocprofiler-sdk-roctx::rocprofiler-sdk-roctx
 )
 
 # We will work from the executable output directory
@@ -109,5 +107,5 @@ add_custom_command(
 add_test(NAME ${example_basic} COMMAND ${example_basic_script} WORKING_DIRECTORY ${example_work_dir})
 add_test(NAME ${example_advanced} COMMAND ${example_advanced_script} WORKING_DIRECTORY ${example_work_dir})
 
-install(TARGETS ${example_workload} ${example_workload_userapi})
+install(TARGETS ${example_workload} ${example_workload_roctx})
 install(PROGRAMS ${example_basic_script} ${example_advanced_script} TYPE BIN)

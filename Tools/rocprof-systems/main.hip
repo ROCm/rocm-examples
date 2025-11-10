@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -23,8 +23,8 @@
 #include "CmdParser/cmdparser.hpp"
 #include "example_utils.hpp"
 
-#ifdef EXAMPLE_USER_API
-#include <rocprofiler-systems/user.h>
+#ifdef EXAMPLE_ROCTX
+#include <rocprofiler-sdk-roctx/roctx.h>
 #endif
 
 #include <hip/hip_runtime.h>
@@ -140,8 +140,8 @@ void configure_parser(cli::Parser& parser)
 
 int main(int argc, const char* argv[])
 {
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_push_region(argv[0]);
+#ifdef EXAMPLE_ROCTX
+    roctxRangePush(argv[0]);
 #endif
 
     constexpr unsigned int block_size = 16;
@@ -169,8 +169,8 @@ int main(int argc, const char* argv[])
     const unsigned int c_cols = b_cols;
     const unsigned int c_rows = a_rows;
 
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_push_region("Host memory initialization");
+#ifdef EXAMPLE_ROCTX
+    roctxRangePush("Host memory initialization");
 #endif
     std::vector<float> A(a_cols * a_rows);
     std::vector<float> B(b_cols * b_rows);
@@ -181,9 +181,9 @@ int main(int argc, const char* argv[])
 
     constexpr float b_value = 0.02F;
     std::fill(B.begin(), B.end(), b_value);
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_pop_region("Host memory initialization");
-    rocprofsys_user_push_region("Device memory initialization");
+#ifdef EXAMPLE_ROCTX
+    roctxRangePop(); // Host memory initialization
+    roctxRangePush("Device memory initialization");
 #endif
 
     const size_t a_bytes = sizeof(float) * A.size();
@@ -198,8 +198,8 @@ int main(int argc, const char* argv[])
 
     HIP_CHECK(hipMemcpy(d_A, A.data(), a_bytes, hipMemcpyHostToDevice));
     HIP_CHECK(hipMemcpy(d_B, B.data(), b_bytes, hipMemcpyHostToDevice));
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_pop_region("Device memory initialization");
+#ifdef EXAMPLE_ROCTX
+    roctxRangePop(); // Device memory initialization
 #endif
 
     const dim3 block_dim(block_size, block_size);
@@ -208,31 +208,31 @@ int main(int argc, const char* argv[])
     // Launch matrix multiplication kernel.
     std::cout << "Matrix multiplication: [" << a_rows << 'x' << a_cols << "] * [" << b_rows << 'x'
               << b_cols << "], block size: " << block_size << 'x' << block_size << std::endl;
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_push_region("Kernel launch");
+#ifdef EXAMPLE_ROCTX
+    roctxRangePush("Kernel launch");
 #endif
     matrix_multiplication_kernel<block_size>
         <<<grid_dim, block_dim, 0, hipStreamDefault>>>(d_A, d_B, d_C, a_cols);
     // Check if the kernel launch was successful.
     HIP_CHECK(hipGetLastError());
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_pop_region("Kernel launch");
-    rocprofsys_user_push_region("D2H result copy");
+#ifdef EXAMPLE_ROCTX
+    roctxRangePop(); // Kernel launch
+    roctxRangePush("D2H result copy");
 #endif
 
     // Copy the resulting matrix to the host. This call synchronizes with the host.
     HIP_CHECK(hipMemcpy(C.data(), d_C, c_bytes, hipMemcpyDeviceToHost));
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_pop_region("D2H result copy");
-    rocprofsys_user_push_region("Cleanup");
+#ifdef EXAMPLE_ROCTX
+    roctxRangePop(); // D2H result copy
+    roctxRangePush("Cleanup");
 #endif
 
     HIP_CHECK(hipFree(d_A));
     HIP_CHECK(hipFree(d_B));
     HIP_CHECK(hipFree(d_C));
 
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_pop_region("Cleanup");
+#ifdef EXAMPLE_ROCTX
+    roctxRangePop(); // Cleanup
 #endif
 
     // Check if the resulting elements match the expectation.
@@ -242,8 +242,8 @@ int main(int argc, const char* argv[])
         C.end(),
         [=](const float value) { return tolerance > std::abs(value - a_cols * b_value); });
     
-#ifdef EXAMPLE_USER_API
-    rocprofsys_user_pop_region(argv[0]);
+#ifdef EXAMPLE_ROCTX
+    roctxRangePop(); // argv[0]
 #endif
     if(validation_passed)
     {

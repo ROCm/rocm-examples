@@ -22,14 +22,14 @@
 
 set(example_name rocprofv3)
 
-set(example_basic ${example_name}_basic)
+set(example_basic ${example_name}-basic)
 set(example_basic_script ${example_basic}.sh)
 
-set(example_advanced ${example_name}_advanced)
+set(example_advanced ${example_name}-advanced)
 set(example_advanced_script ${example_advanced}.sh)
 
-set(example_workload ${example_name}_matmul)
-set(example_workload_roctx ${example_workload}_roctx)
+set(example_workload ${example_name}-matmul)
+set(example_workload_roctx ${example_workload}-roctx)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)

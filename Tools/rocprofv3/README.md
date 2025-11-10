@@ -24,14 +24,20 @@ For more information on the functionality of `rocprofv3` or on how to analyze
 the output with interactive tools, please refer to its
 [documentation](https://rocmdocs.amd.com/projects/rocprofiler-sdk/en/latest/how-to/using-rocprofv3.html).
 
-## Usage
+## Building
 
-After building the example executables either by calling `make` in this
-directory or as part of the repository's CMake build process the scripts can be
-executed without additional parameters as long as the executables reside in the
-same directory:
+The example executables can be built either by calling `make` in this directory or by invoking CMake:
 
 ```console
-user@machine:rocm-examples/Tools/rocprofv3$ ./rocprofv3_basic.sh
-user@machine:rocm-examples/Tools/rocprofv3$ ./rocprofv3_advanced.sh
+$ user@machine:rocm-examples/Tools/rocprofv3$ cmake -B build && cmake --build build
+```
+
+## Usage
+
+After building the example executables the scripts can be executed without
+additional parameters as long as the executables reside in the same directory:
+
+```console
+user@machine:rocm-examples/Tools/rocprofv3$ cd build && ./rocprofv3-basic.sh
+user@machine:rocm-examples/Tools/rocprofv3$ cd build && ./rocprofv3-advanced.sh
 ```

@@ -31,6 +31,11 @@ if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
     exit 1
 fi
 
+if [ ! -f $EXAMPLE_BIN ]; then
+    echo "Error: Could not find $EXAMPLE_BIN in working directory." >&2
+    exit 1
+fi
+
 # Exit on any error
 set -e
 

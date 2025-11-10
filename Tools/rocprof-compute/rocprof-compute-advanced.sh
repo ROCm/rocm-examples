@@ -22,12 +22,17 @@
 # SOFTWARE.
 
 EXAMPLE_TOOL="rocprof-compute"
-EXAMPLE_BIN="${EXAMPLE_TOOL}_occupancy"
+EXAMPLE_BIN="${EXAMPLE_TOOL}-occupancy"
 EXAMPLE_WORKLOAD="./$EXAMPLE_BIN"
 
 # Check for existence of tool
 if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
     echo "Error: Could not find $EXAMPLE_TOOL in the PATH." >&2
+    exit 1
+fi
+
+if [ ! -f $EXAMPLE_BIN ]; then
+    echo "Error: Could not find $EXAMPLE_BIN in working directory." >&2
     exit 1
 fi
 

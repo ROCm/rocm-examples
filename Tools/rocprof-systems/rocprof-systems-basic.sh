@@ -25,7 +25,7 @@ EXAMPLE="rocprof-systems"
 EXAMPLE_INSTRUMENTER="rocprof-sys-instrument"
 EXAMPLE_SAMPLER="rocprof-sys-sample"
 
-EXAMPLE_BIN="${EXAMPLE}_matmul"
+EXAMPLE_BIN="${EXAMPLE}-matmul"
 
 # Check for existence of tools
 REQUIRED_TOOLS="$EXAMPLE_INSTRUMENTER $EXAMPLE_SAMPLER"
@@ -39,6 +39,11 @@ done
 
 if [ -n "$MISSING_TOOLS" ]; then
     echo "Error: Could not find the following tools in PATH:$MISSING_TOOLS" >&2
+    exit 1
+fi
+
+if [ ! -f "$EXAMPLE_BIN" ]; then
+    echo "Error: $EXAMPLE_BIN not present in working directory" >&2
     exit 1
 fi
 

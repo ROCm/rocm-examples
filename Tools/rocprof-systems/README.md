@@ -20,13 +20,21 @@ example steps are performed:
 For more information on the functionality of `rocprof-sys` or on how to analyze the output with interactive tools,
 please refer to its [documentation](https://rocm.docs.amd.com/projects/rocprofiler-systems/en/latest/).
 
-## Usage
+## Building
 
-After building the example executables either by calling `make` in this directory or as part of the repository's CMake
-build process the scripts can be executed without additional parameters as long as the executables reside in the same
-directory:
+The example executables can be built either by calling `make` in this directory
+or by invoking CMake:
 
 ```console
-user@machine:rocm-examples/Tools/rocprof-systems$ ./rocprof-systems_basic.sh
-user@machine:rocm-examples/Tools/rocprof-systems$ ./rocprof-systems_advanced.sh
+$ user@machine:rocm-examples/Tools/rocprof-systems$ cmake -B build && cmake --build build
+```
+
+## Usage
+
+After building the example executables the scripts can be executed without
+additional parameters as long as the executables reside in the same directory:
+
+```console
+user@machine:rocm-examples/Tools/rocprof-systems$ cd build && ./rocprof-systems-basic.sh
+user@machine:rocm-examples/Tools/rocprof-systems$ cd build && ./rocprof-systems-advanced.sh
 ```

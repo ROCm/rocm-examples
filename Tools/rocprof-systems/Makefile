@@ -20,8 +20,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := rocprof-systems_matmul
-EXAMPLE_USER_API := ${EXAMPLE}_userapi
+EXAMPLE := rocprof-systems-matmul
+EXAMPLE_ROCTX := ${EXAMPLE}-userapi
 COMMON_INCLUDE_DIR := ../../Common
 EXTERNAL_DIR := ../../External
 GPU_RUNTIME := HIP
@@ -45,16 +45,18 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-USER_API_DEFS := -DEXAMPLE_USER_API
-USER_API_LIBS := -lrocprof-sys-user
+USER_API_DEFS := -DEXAMPLE_ROCTX
+USER_API_LIBS := -lrocprofiler-sdk-roctx
+
+all: $(EXAMPLE) $(EXAMPLE_ROCTX)
 
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-$(EXAMPLE_USER_API): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+$(EXAMPLE_ROCTX): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(USER_API_DEFS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS) $(USER_API_LIBS)
 
 clean:
-	$(RM) $(EXAMPLE)
+	$(RM) $(EXAMPLE) $(EXAMPLE_ROCTX)
 
 .PHONY: clean
