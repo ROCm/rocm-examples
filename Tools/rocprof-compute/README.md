@@ -29,7 +29,7 @@ The example executables can be built either by calling `make` in this directory
 or by invoking CMake:
 
 ```console
-$ user@machine:rocm-examples/Tools/rocprof-compute$ cmake -B build && cmake --build build
+user@machine:rocm-examples/Tools/rocprof-compute$ cmake -B build && cmake --build build
 ```
 
 ## Usage
