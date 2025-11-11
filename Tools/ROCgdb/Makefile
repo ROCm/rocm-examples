@@ -20,22 +20,36 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-TOOLS :=
+EXAMPLE := rocgdb-matmul
+COMMON_INCLUDE_DIR := ../../Common
+EXTERNAL_DIR := ../../External
+GPU_RUNTIME := HIP
 
-ifneq ($(GPU_RUNTIME), CUDA)
-TOOLS += \
-	ROCgdb \
-	rocprof-compute \
-	rocprof-systems \
-	rocprofv3
-endif
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-all: $(TOOLS)
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-clean: TARGET=clean
-clean: all
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
 
-$(TOOLS):
-	$(MAKE) -C $@
+CXXFLAGS ?= -Wall -Wextra -O0 -ggdb
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
-.PHONY: all clean $(TOOLS)
+all: $(EXAMPLE)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

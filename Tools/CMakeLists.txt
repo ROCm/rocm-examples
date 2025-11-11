@@ -30,6 +30,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 # The HIP tools are supported neither on Windows nor on CUDA.
 if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
 
+    add_subdirectory(ROCgdb)
+
     find_package(Python3 3.3 QUIET)
     if(NOT Python3_FOUND)
         message(STATUS "Python >= 3.3 not found. Skipping rocprof-compute examples.")

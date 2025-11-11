@@ -20,22 +20,22 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-TOOLS :=
+echo ===============================================================================\n
+echo Showing GPU kernel disassembly\n
+echo ===============================================================================\n
 
-ifneq ($(GPU_RUNTIME), CUDA)
-TOOLS += \
-	ROCgdb \
-	rocprof-compute \
-	rocprof-systems \
-	rocprofv3
-endif
+# By default, GPU code objects are not loaded until the first kernel is launched. Using a kernel name for setting a
+# GPU breakpoint will mark the breakpoint as 'pending'. In batch mode, pending breakpoints must be enabled. In
+# interactive mode, ROCgdb will ask the user if the unknown breakpoint is supposed to be pending.
+set breakpoint pending on
 
-all: $(TOOLS)
+# Temporary breakpoint in GPU kernel code - will be automatically deleted after the first encounter. Since this is a
+# pending breakpoint (it is set before the GPU kernel code is loaded) ROCgdb will issue a warning:
+# "Function "matrix_multiplication_kernel" not defined." In this case, it can be safely ignored.
+tbreak matrix_multiplication_kernel
 
-clean: TARGET=clean
-clean: all
+run
 
-$(TOOLS):
-	$(MAKE) -C $@
+disassemble
 
-.PHONY: all clean $(TOOLS)
+continue
