@@ -40,7 +40,7 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    message(STATUS "rocprof-compute does not support CUDA accelerators. Not building rocprof-compute examples.")
+    message(STATUS "${example_name} does not support CUDA accelerators. Not building ${example_name} examples.")
     return()
 endif()
 

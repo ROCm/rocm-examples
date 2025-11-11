@@ -37,7 +37,7 @@ set(ROCPROF_COMPUTE_SUPPORTED_ARCH gfx908 gfx90a gfx940 gfx941 gfx942 gfx950)
 
 foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
     if(NOT ARCH IN_LIST ROCPROF_COMPUTE_SUPPORTED_ARCH)
-        message(STATUS "rocprof-compute does not support architecture ${ARCH}. Not building rocprof-compute examples")
+        message(STATUS "${example_name} does not support architecture ${ARCH}. Not building ${example_name} examples")
         return()
     endif()
 endforeach()
@@ -48,7 +48,7 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    message(STATUS "rocprof-compute does not support CUDA accelerators. Not building rocprof-compute examples.")
+    message(STATUS "${example_name} does not support CUDA accelerators. Not building ${example_name} examples.")
     return()
 endif()
 
