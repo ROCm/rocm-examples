@@ -40,9 +40,9 @@ fi
 set -e
 
 echo "==============================================================================="
-echo "Profiling workload; filtering for kernel substring vecCopy"
+echo "Profiling workload; filtering for kernel substring vgprbound"
 echo "==============================================================================="
-# Kernels are specified as a substring list. The following matches all kernel names which contain "vecCopy". Roofline
+# Kernels are specified as a substring list. The following matches all kernel names which contain "vgprbound". Roofline
 # profiling is disabled to save profiling time.
 $EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_substr --kernel vgprbound --no-roof -- $EXAMPLE_WORKLOAD
 # Notice the "top kernels" only shows "vgprbound" kernels, compared to the full profile capture  

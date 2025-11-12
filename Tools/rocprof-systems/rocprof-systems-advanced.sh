@@ -75,7 +75,7 @@ $EXAMPLE_RUNNER \
 echo "==============================================================================="
 echo "Instrumenting with user API"
 echo "==============================================================================="
-# The following commmands first perform a binary rewrite of the executable (for instrumentation) and then run a profile
+# The following commands first perform a binary rewrite of the executable (for instrumentation) and then run a profile
 # and trace of the application which includes user-defined instrumentation regions.
 $EXAMPLE_INSTRUMENTER --min-instructions 512 -o ${EXAMPLE_BIN_ROCTX}.inst -- ./$EXAMPLE_BIN_ROCTX
 $EXAMPLE_RUNNER --profile --trace -- ./${EXAMPLE_BIN_ROCTX}.inst
