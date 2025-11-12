@@ -45,7 +45,7 @@ set -e
 $EXAMPLE_TOOL --batch --command=rocgdb-disassembly.gdb $EXAMPLE_WORKLOAD > rocgdb-disassembly.log
 
 # Examine stack frame
-$EXAMPLE_TOOL --batch --comman=rocgdb-stackframe.gdb $EXAMPLE_WORKLOAD > rocgdb-stackframe.log
+$EXAMPLE_TOOL --batch --command=rocgdb-stackframe.gdb $EXAMPLE_WORKLOAD > rocgdb-stackframe.log
 
 # Show system information
 $EXAMPLE_TOOL --batch --command=rocgdb-sysinfo.gdb $EXAMPLE_WORKLOAD > rocgdb-sysinfo.log
