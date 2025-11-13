@@ -56,34 +56,52 @@ echo "Kernel name filtering"
 echo "==============================================================================="
 # Kernels are specified as regular expressions in a YAML file. Note that YAML files can contain more than just filters;
 # for the sake of easy to follow examples they are split into multiple files here.
-$EXAMPLE_TOOL --runtime-trace --input kernel_filter.yml --output-format pftrace -- $EXAMPLE_WORKLOAD
+OUTDIR="${EXAMPLE_TOOL}-kernel-filter" \
+    $EXAMPLE_TOOL \
+    --runtime-trace \
+    --input kernel_filter.yml \
+    --output-directory %env{OUTDIR}% \
+    --output-format pftrace \
+    -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Collecting PMC counters"
 echo "==============================================================================="
 # PMC counters are specified in a YAML file. A device's available PMC counters can be obtained by calling:
 # rocprofv3-avail info --pmc
-$EXAMPLE_TOOL --input wavefront_stats.yml --output-format pftrace -- $EXAMPLE_WORKLOAD
+OUTDIR="${EXAMPLE_TOOL}-pmc-counters" \
+    $EXAMPLE_TOOL \
+    --input wavefront_stats.yml \
+    --output-directory %env{OUTDIR}% \
+    --output-format pftrace \
+    -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Instrumenting with rocTX"
 echo "==============================================================================="
 # The following performs a trace of an application with user-defined rocTX instrumentation.
-$EXAMPLE_TOOL --marker-trace --output-format pftrace -- $EXAMPLE_WORKLOAD_ROCTX
+OUTDIR="${EXAMPLE_TOOL}-rocTX" \
+    $EXAMPLE_TOOL \
+    --marker-trace \
+    --output-directory %env{OUTDIR}% \
+    --output-format pftrace \
+    -- $EXAMPLE_WORKLOAD_ROCTX
 
 echo "==============================================================================="
 echo "PC sampling"
 echo "==============================================================================="
-# PC sampling is currently a beta feature and not supported on all devices
-# Only time is supported as the sampling unit; instructions and cycles will be added in the future.
-# Only host_trap is supported as the sampling method; stochastic will be added in the future.
+# PC sampling is currently a beta feature and not supported on all devices.
+# Only 'time' is supported as the sampling unit; 'instructions' and 'cycles' will be added in the future.
+# Only 'host_trap' is supported as the sampling method; 'stochastic' will be added in the future.
 # The sampling interval is set to 1µs.
 if [[ $($EXAMPLE_QUERY info --pc-sampling) ]]; then
-    $EXAMPLE_TOOL \
+    OUTDIR="${EXAMPLE_TOOL}-pc-sampling" \
+        $EXAMPLE_TOOL \
         --pc-sampling-beta-enabled \
         --pc-sampling-unit time \
         --pc-sampling-method host_trap \
         --pc-sampling-interval 1 \
+        --output-directory %env{OUTDIR}% \
         --output-format csv \
         -- $EXAMPLE_WORKLOAD
 else

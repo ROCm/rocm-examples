@@ -42,19 +42,35 @@ set -e
 echo "==============================================================================="
 echo "Runtime trace (rocpd format)"
 echo "==============================================================================="
-# Target most relevant tracing options but exclude low-level APIs such as HSA or HIP compiler API
-$EXAMPLE_TOOL --runtime-trace -- $EXAMPLE_WORKLOAD
+# Target most relevant tracing options but exclude low-level APIs such as HSA or HIP compiler API.
+# By default, rocprofv3 saves its output in a new directory: %hostname%/%pid%. Explicitly setting the output directory
+# will save the results in $OUTDIR/%hostname%/%pid%.
+OUTDIR="${EXAMPLE_TOOL}-runtime-trace-rocpd" \
+    $EXAMPLE_TOOL \
+    --runtime-trace \
+    --output-directory %env{OUTDIR}% \
+    -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "Runtime trace (Perfetto format)"
 echo "==============================================================================="
-# Same as above, but the output can be analyzed with Perfetto
-$EXAMPLE_TOOL --runtime-trace --output-format pftrace -- $EXAMPLE_WORKLOAD
+# Same as above, but the output can be analyzed with Perfetto.
+OUTDIR="${EXAMPLE_TOOL}-runtime-trace-perfetto" \
+    $EXAMPLE_TOOL \
+    --runtime-trace \
+    --output-directory %env{OUTDIR}% \
+    --output-format pftrace \
+    -- $EXAMPLE_WORKLOAD
 
 echo "==============================================================================="
 echo "System trace (CSV format)"
 echo "==============================================================================="
-# A system trace is an all-inclusive option which also includes low-level APIs
-$EXAMPLE_TOOL --sys-trace --output-format csv -- $EXAMPLE_WORKLOAD
+# A system trace is an all-inclusive option which also includes low-level APIs.
+OUTDIR="${EXAMPLE_TOOL}-system-trace" \
+    $EXAMPLE_TOOL \
+    --sys-trace \
+    --output-directory %env{OUTDIR}% \
+    --output-format csv \
+    -- $EXAMPLE_WORKLOAD
 
 exit 0
