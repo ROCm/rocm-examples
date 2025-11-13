@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLE := rocprof-systems-matmul
-EXAMPLE_ROCTX := ${EXAMPLE}-userapi
+EXAMPLE_ROCTX := ${EXAMPLE}-roctx
 COMMON_INCLUDE_DIR := ../../Common
 EXTERNAL_DIR := ../../External
 GPU_RUNTIME := HIP
@@ -49,6 +49,7 @@ USER_API_DEFS := -DEXAMPLE_ROCTX
 USER_API_LIBS := -lrocprofiler-sdk-roctx
 
 all: $(EXAMPLE) $(EXAMPLE_ROCTX)
+.PHONY: all
 
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)

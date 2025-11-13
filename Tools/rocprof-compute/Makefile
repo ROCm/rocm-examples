@@ -43,6 +43,7 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 all: $(EXAMPLE)
+.PHONY: all
 
 $(EXAMPLE): occupancy.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)

@@ -48,6 +48,9 @@ ILDLIBS   += $(LDLIBS)
 ROCTX_DEFS := -DEXAMPLE_ROCTX
 ROCTX_LIBS := -lrocprofiler-sdk-roctx
 
+all: $(EXAMPLE) $(EXAMPLE_ROCTX)
+.PHONY: all
+
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 

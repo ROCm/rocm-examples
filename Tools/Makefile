@@ -35,6 +35,6 @@ clean: TARGET=clean
 clean: all
 
 $(TOOLS):
-	$(MAKE) -C $@ $(TOOLS)
+	$(MAKE) -C $@
 
 .PHONY: all clean $(TOOLS)
