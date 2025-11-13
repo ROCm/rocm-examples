@@ -50,7 +50,7 @@ jobs:
             run: |
               cd Tools
               cmake -DGPU_TARGETS="${GPU_TARGETS}" -S . -B build
-              cmake --build . -j
+              cmake --build build -j
           - name: Make
             shell: bash
             run: |
