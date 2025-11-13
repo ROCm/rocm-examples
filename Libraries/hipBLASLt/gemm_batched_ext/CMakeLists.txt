@@ -25,15 +25,15 @@ set(example_name hipblaslt_gemm_batched_ext)
 cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-if(GPU_RUNTIME STREQUAL "CUDA")
-    message(STATUS "hipBLASLt examples do not support the CUDA runtime")
-    return()
-endif()
+include("../../../Common/HipPlatform.cmake")
+select_gpu_language()
 
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+select_hip_platform()
+verify_hip_platform(PLATFORMS "amd")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "hipBLASLt examples are only available on Linux")
@@ -62,6 +62,6 @@ target_include_directories(
     ${example_name}
     PRIVATE "../../../Common" "../../../External"
 )
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
