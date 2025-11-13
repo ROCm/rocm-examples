@@ -46,10 +46,19 @@ else()
 endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
+find_package(hip REQUIRED)
+find_package(OpenMP REQUIRED)
 # Try to find rocWMMA as a package first
 find_package(rocwmma QUIET)
 
-if(NOT TARGET rocwmma AND NOT rocwmma_FOUND)
+if(TARGET roc::rocwmma)
+    set(ROCWMMA_TARGET roc::rocwmma)
+elseif(TARGET rocwmma)
+    # Fallback for legacy naming
+    set(ROCWMMA_TARGET rocwmma)
+endif()
+
+if(NOT ROCWMMA_TARGET AND NOT rocwmma_FOUND)
     # If package not found, try to find headers manually
     find_path(ROCWMMA_INCLUDE_DIR
         NAMES rocwmma/rocwmma.hpp
@@ -64,6 +73,7 @@ if(NOT TARGET rocwmma AND NOT rocwmma_FOUND)
     # Create imported target for header-only library
     add_library(rocwmma INTERFACE)
     target_include_directories(rocwmma INTERFACE ${ROCWMMA_INCLUDE_DIR})
+    set(ROCWMMA_TARGET rocwmma)
 endif()
 
 add_executable(${example_name} main.hip)
@@ -71,7 +81,7 @@ add_executable(${example_name} main.hip)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
-target_link_libraries(${example_name} PRIVATE rocwmma)
+target_link_libraries(${example_name} PRIVATE ${ROCWMMA_TARGET})
 
 target_include_directories(
     ${example_name}
