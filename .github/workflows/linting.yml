@@ -13,6 +13,7 @@ on:
       - 'release/rocm-rel*'
 
 env:
+  DEBIAN_FRONTEND: noninteractive
   CLANG_FORMAT: /usr/lib/llvm-18/bin/clang-format
 
 jobs:
