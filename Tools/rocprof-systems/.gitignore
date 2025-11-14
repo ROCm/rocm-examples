@@ -1,0 +1,5 @@
+rocprof-systems-matmul
+rocprof-systems-matmul.inst
+rocprof-systems-matmul.papi.inst
+rocprof-systems-matmul-roctx
+rocprof-systems-matmul-roctx.inst

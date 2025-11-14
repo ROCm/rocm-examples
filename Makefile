@@ -24,7 +24,8 @@ SUB_PROJECTS := \
 	Applications \
 	HIP-Basic \
 	HIP-Doc \
-	Libraries
+	Libraries \
+	Tools
 
 all: $(SUB_PROJECTS)
 

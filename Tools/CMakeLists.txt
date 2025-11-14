@@ -20,20 +20,34 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
-project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.4.0)
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(Tools LANGUAGES CXX)
 include(CTest)
 
-include("${CMAKE_CURRENT_LIST_DIR}/Common/HipPlatform.cmake")
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-# Set default build type to Release
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
+# The HIP tools are supported neither on Windows nor on CUDA.
+if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
+
+    find_package(Python3 3.3 QUIET)
+    if(NOT Python3_FOUND)
+        message(STATUS "Python >= 3.3 not found. Skipping rocprof-compute examples.")
+    else()
+        add_subdirectory(rocprof-compute)
+    endif()
+
+    find_package(rocprofiler-systems COMPONENTS user QUIET)
+    if(NOT rocprofiler-systems_FOUND)
+        message(STATUS "rocprofiler-systems not found. Skipping rocprof-systems examples.")
+    else()
+        add_subdirectory(rocprof-systems)
+    endif()
+
+    find_package(rocprofiler-sdk-roctx QUIET)
+    if(NOT rocprofiler-sdk-roctx_FOUND)
+        message(STATUS "rocprofiler-sdk-roctx not found. Skipping rocprofv3 examples.")
+    else()
+        add_subdirectory(rocprofv3)
+    endif()
 endif()
-
-add_subdirectory(Applications)
-add_subdirectory(HIP-Basic)
-add_subdirectory(HIP-Doc)
-add_subdirectory(Libraries)
-add_subdirectory(Tools)
-add_subdirectory(Tutorials)

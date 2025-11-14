@@ -509,5 +509,9 @@ The following options are available when building with CMake.
     - [simple_hgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_hgemm/) : Showcases a simple half-precision matrix-matrix multiplication.
     - [simple_sgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_sgemm/) : Showcases a simple single-precision matrix-matrix multiplication.
     - [simple_sgemv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_sgemv/) : Showcases a simple single-precision matrix-vector multiplication.
+- [Tools](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/): Showcases the ROCm tools for debugging and performance analysis.
+  - [rocprof-compute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/rocprof-compute): Shows how to use the ROCm Compute Profiler.
+  - [rocprof-systems](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/rocprof-systems): Demonstrates how to use the ROCm Systems Profiler.
+  - [rocprofv3](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/rocprofv3): Illustrates how to use the `rocprofv3` profiler.
 - [Tutorials](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tutorials/): Showcases HIP Documentation Tutorials.
   - [reduction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tutorials/reduction/): Showcases a reduction tutorial for HIP Documentation.

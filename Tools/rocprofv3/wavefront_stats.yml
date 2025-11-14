@@ -1,0 +1,14 @@
+jobs:
+  - pmc:
+    - wave_front_size
+    - MAX_WAVE_SIZE
+    - SQ_INSTS_WAVE32
+    - SQ_WAVE32_INSTS
+    - SQ_INSTS_WAVE64
+    - SQ_WAVES
+    - SQ_WAVE_CYCLES
+    - TA_BUFFER_LOAD_WAVEFRONTS
+    - TA_BUFFER_STORE_WAVEFRONTS
+    - WAVE_DEP_WAIT
+    - WAVE_ISSUE_WAIT
+    - Wavefronts
