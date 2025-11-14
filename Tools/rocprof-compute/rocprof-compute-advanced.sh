@@ -60,8 +60,31 @@ $EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_sol/* --block 2
 echo "==============================================================================="
 echo "Profiling two runs for comparative analysis"
 echo "==============================================================================="
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_first --block 2 --no-roof -- $EXAMPLE_WORKLOAD
-$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_second --block 2 --no-roof -- $EXAMPLE_WORKLOAD
-$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_first/* --path workloads/${EXAMPLE_BIN}_second/*
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_first --block 7 --no-roof -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_second --block 7 --no-roof -- $EXAMPLE_WORKLOAD
+$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_first/* --path workloads/${EXAMPLE_BIN}_second/* --block 7
 
+# Filtering for metric sets is only supported in rocprof-compute 3.3.0 and later (ROCm 7.1 and later). We verify the
+# version before proceeding to the next example.
+RPCVER=$($EXAMPLE_TOOL --version | grep version | awk '{print $3}')
+if ! printf '3.3.0\n%s\n' $RPCVER | sort -V -C; then
+    echo "rocprof-compute only supports sets profiling starting from v3.3.0. Skipping sets example."
+else
+    echo "==============================================================================="
+    echo "Profiling workload; filtering for metrics set: Wavefront Launch Statistics"
+    echo "==============================================================================="
+    # A metric set contains a subset of metrics that can be collected in a single pass. 
+    # This is useful for minimizing profiling overhead by collecting only the counters 
+    # of interest. Note that rocprof-compute might collect other metrics as well, but 
+    # only the metrics that are part of the set will be meaningful.
+    # 
+    # To list available sets, use the '--list-sets' flag:
+    # rocprof-compute profile --list-sets
+    #
+    # After obtaining the list of sets, specify a set using the '--set <set_name>' flag. Note that this flag cannot be
+    # used together with the '--roof-only' and '--block' flags.
+    $EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_launch --set launch_stats -- $EXAMPLE_WORKLOAD
+    # In this example, block 7.1 is analyzed because the 'launch_stats' set collects sub-blocks 7.1.0 through 7.1.8.
+    $EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_launch/* --block 7.1
+fi
 exit 0
