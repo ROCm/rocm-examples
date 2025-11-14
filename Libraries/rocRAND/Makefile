@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	c_cpp_api \
-	device_api
+  c_cpp_api \
+  device_api
 
 all: $(EXAMPLES)
 

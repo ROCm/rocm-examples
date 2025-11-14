@@ -41,11 +41,11 @@ ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lhipblaslt
 
 ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
-	CPPFLAGS += -D__HIP_PLATFORM_AMD__ -DROCM_USE_FLOAT16
-	COMPILER := $(HIPCXX)
+  CXXFLAGS ?= -Wall -Wextra
+  CPPFLAGS += -D__HIP_PLATFORM_AMD__ -DROCM_USE_FLOAT16
+  COMPILER := $(HIPCXX)
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP; CUDA not supported)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP; CUDA not supported)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)

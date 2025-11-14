@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 EXAMPLE := cuda_load_module_ex
-GPU_RUNTIME := CUDA
+GPU_RUNTIME ?= CUDA
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
@@ -37,11 +37,11 @@ ILDFLAGS  :=
 ILDLIBS   :=
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	ICXXFLAGS += -x cu
-	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
-	ILDLIBS += -lcudadevrt -lcudart_static -lrt
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+  ILDLIBS += -lcudadevrt -lcudart_static -lrt
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be CUDA)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be CUDA)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)

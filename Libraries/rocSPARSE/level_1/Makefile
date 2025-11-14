@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	axpyi \
-	doti \
-	gthr \
-	roti \
-	sctr
+  axpyi \
+  doti \
+  gthr \
+  roti \
+  sctr
 
 all: $(EXAMPLES)
 

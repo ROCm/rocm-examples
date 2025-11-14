@@ -23,10 +23,10 @@
 TOOLS :=
 
 ifneq ($(GPU_RUNTIME), CUDA)
-TOOLS += \
-	rocprof-compute \
-	rocprof-systems \
-	rocprofv3
+  TOOLS += \
+    rocprof-compute \
+    rocprof-systems \
+    rocprofv3
 endif
 
 all: $(TOOLS)

@@ -21,12 +21,12 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	memory_pool \
-	memory_pool_resource_usage_statistics \
-	memory_pool_threshold \
-	memory_pool_trim \
-	ordinary_memory_allocation \
-	stream_ordered_memory_allocation
+  memory_pool \
+  memory_pool_resource_usage_statistics \
+  memory_pool_threshold \
+  memory_pool_trim \
+  ordinary_memory_allocation \
+  stream_ordered_memory_allocation
 
 all: $(EXAMPLES)
 

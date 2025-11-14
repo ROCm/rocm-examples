@@ -24,10 +24,10 @@ EXAMPLE := rocprofiler-sdk_code_object_tracing
 CLIENT_LIB := lib$(EXAMPLE)_client.so
 COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
 ROCPROFILER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -42,11 +42,11 @@ ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lrocprofiler-sdk
 
 ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
-	CPPFLAGS += -D__HIP_PLATFORM_AMD__
-	COMPILER := $(HIPCXX)
+  CXXFLAGS ?= -Wall -Wextra
+  CPPFLAGS += -D__HIP_PLATFORM_AMD__
+  COMPILER := $(HIPCXX)
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP; CUDA not supported)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP; CUDA not supported)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)

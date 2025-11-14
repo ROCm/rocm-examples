@@ -21,35 +21,35 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	amg \
-	sa_amg \
-	ua_amg \
-	as_precond \
-	async \
-	benchmark \
-	bicgstab \
-	block_precond \
-	cg_amg \
-	cg_rsamg \
-	cg_saamg \
-	cg \
-	cmk \
-	complex \
-	direct \
-	fcg \
-	fixed_point \
-	gmres \
-	fgmres \
-	idr \
-	key \
-	me_preconditioner \
-	mixed_precision \
-	power_method \
-	simple_spmv \
-	stencil \
-	tns \
-	var_precond \
-	itsolve
+  amg \
+  sa_amg \
+  ua_amg \
+  as_precond \
+  async \
+  benchmark \
+  bicgstab \
+  block_precond \
+  cg_amg \
+  cg_rsamg \
+  cg_saamg \
+  cg \
+  cmk \
+  complex \
+  direct \
+  fcg \
+  fixed_point \
+  gmres \
+  fgmres \
+  idr \
+  key \
+  me_preconditioner \
+  mixed_precision \
+  power_method \
+  simple_spmv \
+  stencil \
+  tns \
+  var_precond \
+  itsolve
 
 all: $(EXAMPLES)
 

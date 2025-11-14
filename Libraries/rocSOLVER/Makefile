@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	getf2 \
-	getri \
-	syev \
-	syev_batched \
-	syev_strided_batched
+  getf2 \
+  getri \
+  syev \
+  syev_batched \
+  syev_strided_batched
 
 all: $(EXAMPLES)
 

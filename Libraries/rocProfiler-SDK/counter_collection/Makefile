@@ -21,12 +21,12 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	buffer \
-	buffer_device_serialization \
-	callback \
-	print_functional_counters \
-	device_profiling \
-	device_profiling_sync
+  buffer \
+  buffer_device_serialization \
+  callback \
+  print_functional_counters \
+  device_profiling \
+  device_profiling_sync
 
 all: $(EXAMPLES)
 

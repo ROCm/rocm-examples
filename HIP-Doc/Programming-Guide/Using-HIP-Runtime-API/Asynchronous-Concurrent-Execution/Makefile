@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	async_kernel_execution \
-	event_based_synchronization \
-	sequential_kernel_execution
+  async_kernel_execution \
+  event_based_synchronization \
+  sequential_kernel_execution
 
 all: $(EXAMPLES)
 

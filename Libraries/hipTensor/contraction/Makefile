@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	bilinear \
-	scale
+  bilinear \
+  scale
 
 all: $(EXAMPLES)
 

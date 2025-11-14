@@ -21,13 +21,16 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	data_prefetching \
-	dynamic_unified_memory \
-	explicit_memory \
-	memory_range_attributes \
-	standard_unified_memory \
-	static_unified_memory \
-	unified_memory_advice
+  data_prefetching \
+  dynamic_unified_memory \
+  explicit_memory \
+  memory_range_attributes \
+  static_unified_memory \
+  unified_memory_advice
+
+ifeq ($(HSA_XNACK), 1)
+  EXAMPLES += standard_unified_memory 
+endif
 
 all: $(EXAMPLES)
 

@@ -23,10 +23,10 @@
 EXAMPLE := rocfft_multi_gpu
 COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
 # HIP variables

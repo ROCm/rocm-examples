@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	call_stack_management \
-	device_recursion
+  call_stack_management \
+  device_recursion
 
 all: $(EXAMPLES)
 

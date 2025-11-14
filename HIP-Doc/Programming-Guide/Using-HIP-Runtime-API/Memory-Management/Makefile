@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-	Device-Memory \
-	Host-Memory \
-	SOMA \
-	Unified-Memory-Management \
-	Virtual-Memory-Management
+  Device-Memory \
+  Host-Memory \
+  SOMA \
+  Unified-Memory-Management \
+  Virtual-Memory-Management
 
 all: $(SUBDIRECTORIES)
 

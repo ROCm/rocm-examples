@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-	Programming-Guide \
-	Reference
+  Programming-Guide \
+  Reference
 
 all: $(SUBDIRECTORIES)
 

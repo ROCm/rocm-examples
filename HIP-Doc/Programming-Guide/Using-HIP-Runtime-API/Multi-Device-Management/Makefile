@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	device_enumeration \
-	device_selection \
-	multi_device_synchronization \
-	p2p_memory_access \
-	p2p_memory_access_host_staging
+  device_enumeration \
+  device_selection \
+  multi_device_synchronization \
+  p2p_memory_access \
+  p2p_memory_access_host_staging
 
 all: $(EXAMPLES)
 

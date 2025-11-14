@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 ifeq ($(GPU_RUNTIME), CUDA) # Only supported on CUDA
-	EXAMPLES := \
-		block_reduction
+  EXAMPLES := \
+    block_reduction
 endif
 
 all: $(EXAMPLES)

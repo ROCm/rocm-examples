@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	simple_distributions_cpp
+  simple_distributions_cpp
 
 all: $(EXAMPLES)
 

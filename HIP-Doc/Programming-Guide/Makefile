@@ -21,12 +21,12 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-	HIP-C++-Language-Extensions \
-	HIP-Porting-Guide \
-	Introduction-to-the-HIP-Programming-Model \
-	Porting-CUDA-Driver-API \
-	Programming-for-HIP-Runtime-Compiler \
-	Using-HIP-Runtime-API
+  HIP-C++-Language-Extensions \
+  HIP-Porting-Guide \
+  Introduction-to-the-HIP-Programming-Model \
+  Porting-CUDA-Driver-API \
+  Programming-for-HIP-Runtime-Compiler \
+  Using-HIP-Runtime-API
 
 all: $(SUBDIRECTORIES)
 

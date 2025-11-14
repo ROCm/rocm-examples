@@ -40,6 +40,15 @@ jobs:
             exit 1
           fi
 
+  make-formatting:
+    name: Makefile Formatting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check indentation
+        run: |
+          Scripts/CodeFormat/check_make.sh
+
   source-formatting:
     name: Source Code Formatting
     runs-on: ubuntu-latest

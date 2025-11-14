@@ -23,13 +23,13 @@
 EXAMPLE := rocblas_swap
 COMMON_INCLUDE_DIR := ../../../../Common
 EXTERNAL_DIR := ../../../../External
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
 ROCBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

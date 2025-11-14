@@ -21,14 +21,14 @@
 # SOFTWARE.
 
 EXAMPLE := hip_load_module_ex
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
@@ -58,7 +58,7 @@ $(EXAMPLE): main.cpp myKernel.ptx
 
 myKernel.ptx: myKernel.hip
 	$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
-	
+
 clean:
 	$(RM) $(EXAMPLE) myKernel.hsaco
 endif

@@ -21,12 +21,12 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	device_ptr \
-	norm \
-	reduce_sum \
-	remove_points \
-	saxpy \
-	vectors
+  device_ptr \
+  norm \
+  reduce_sum \
+  remove_points \
+  saxpy \
+  vectors
 
 all: $(EXAMPLES)
 

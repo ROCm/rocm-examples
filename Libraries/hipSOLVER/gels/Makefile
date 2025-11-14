@@ -23,11 +23,11 @@
 EXAMPLE := hipsolver_gels
 COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
-CUDA_INSTALL_DIR := /usr/local/cuda
+ROCM_INSTALL_DIR ?= /opt/rocm
+CUDA_INSTALL_DIR ?= /usr/local/cuda
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
 HIPSOLVER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -43,15 +43,15 @@ ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lhipsolver
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	CXXFLAGS += -x cu
-	CPPFLAGS += -D__HIP_PLATFORM_NVIDIA__
-	COMPILER := $(CUDACXX)
+  CXXFLAGS += -x cu
+  CPPFLAGS += -D__HIP_PLATFORM_NVIDIA__
+  COMPILER := $(CUDACXX)
 else ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
-	CPPFLAGS += -D__HIP_PLATFORM_AMD__
-	COMPILER := $(HIPCXX)
+  CXXFLAGS ?= -Wall -Wextra
+  CPPFLAGS += -D__HIP_PLATFORM_AMD__
+  COMPILER := $(HIPCXX)
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)

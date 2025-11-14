@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	graph_capture \
-	graph_creation   
+  graph_capture \
+  graph_creation   
 
 all: $(EXAMPLES)
 

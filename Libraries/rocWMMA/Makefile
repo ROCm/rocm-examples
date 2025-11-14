@@ -21,16 +21,16 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	hiprtc_gemm \
-	perf_dgemm \
-	perf_hgemm \
-	perf_sgemm \
-	simple_dgemm \
-	simple_dgemv \
-	simple_dlrm \
-	simple_hgemm \
-	simple_sgemm \
-	simple_sgemv
+  hiprtc_gemm \
+  perf_dgemm \
+  perf_hgemm \
+  perf_sgemm \
+  simple_dgemm \
+  simple_dgemv \
+  simple_dlrm \
+  simple_hgemm \
+  simple_sgemm \
+  simple_sgemv
 
 all: $(EXAMPLES)
 

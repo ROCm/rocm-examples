@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	contraction \
-	elementwise \
-	reduction
+  contraction \
+  elementwise \
+  reduction
 
 all: $(EXAMPLES)
 

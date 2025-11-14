@@ -21,11 +21,11 @@
 # SOFTWARE.
 
 SUB_PROJECTS := \
-	Applications \
-	HIP-Basic \
-	HIP-Doc \
-	Libraries \
-	Tools
+  Applications \
+  HIP-Basic \
+  HIP-Doc \
+  Libraries \
+  Tools
 
 all: $(SUB_PROJECTS)
 

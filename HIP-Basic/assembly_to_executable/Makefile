@@ -25,14 +25,14 @@ COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME ?= HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-HIPCXX 				  ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX                ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 CLANG                 ?= $(ROCM_INSTALL_DIR)/llvm/bin/clang
 LLVM_MC               ?= $(ROCM_INSTALL_DIR)/llvm/bin/llvm-mc
 CLANG_OFFLOAD_BUNDLER ?= $(ROCM_INSTALL_DIR)/llvm/bin/clang-offload-bundler
@@ -68,10 +68,10 @@ main_device.o: hip_obj_gen.mcin offload_bundle.hipfb
 
 offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 	$(CLANG_OFFLOAD_BUNDLER) -type=o -bundle-align=4096 \
-		-targets=host-x86_64-unknown-linux-gnu,$(GPU_ARCH_TRIPLES) \
-		-input=/dev/null \
-		$(^:%=-input=%) \
-		-output=$@
+	  -targets=host-x86_64-unknown-linux-gnu,$(GPU_ARCH_TRIPLES) \
+	  -input=/dev/null \
+	  $(^:%=-input=%) \
+	  -output=$@
 
 main.o: main.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c --cuda-host-only -fuse-cuid=none $<
@@ -84,10 +84,10 @@ main_%.o: main_%.s
 
 clean:
 	rm -f \
-		main_*.o \
-		offload_bundle.hipfb \
-		main_device.o \
-		main.o \
-		$(EXAMPLE)
+	  main_*.o \
+	  offload_bundle.hipfb \
+	  main_device.o \
+	  main.o \
+	  $(EXAMPLE)
 
 .PHONY: clean $(EXAMPLE)

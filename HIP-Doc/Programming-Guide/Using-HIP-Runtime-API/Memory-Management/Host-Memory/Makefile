@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	pageable_host_memory \
-	pinned_host_memory
+  pageable_host_memory \
+  pinned_host_memory
 
 all: $(EXAMPLES)
 

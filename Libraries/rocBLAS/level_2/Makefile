@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	gemv \
-	her
+  gemv \
+  her
 
 all: $(EXAMPLES)
 
