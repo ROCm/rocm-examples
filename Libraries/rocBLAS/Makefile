@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	level_1 \
-	level_2 \
-	level_3
+  level_1 \
+  level_2 \
+  level_3
 
 all: $(EXAMPLES)
 

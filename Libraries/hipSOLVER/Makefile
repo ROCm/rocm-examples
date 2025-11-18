@@ -21,22 +21,22 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	gels \
-	geqrf \
-	gesvd \
-	getrf \
-	potrf \
-	syevd \
-	syevdx \
-	syevj \
-	syevj_batched \
-	sygvd
+  gels \
+  geqrf \
+  gesvd \
+  getrf \
+  potrf \
+  syevd \
+  syevdx \
+  syevj \
+  syevj_batched \
+  sygvd
 
 # this example currently does not work with CUDA
 # https://github.com/ROCm/hipSOLVER/issues/152
 ifneq ($(GPU_RUNTIME), CUDA)
 EXAMPLES += \
-	sygvj
+  sygvj
 endif
 
 all: $(EXAMPLES)

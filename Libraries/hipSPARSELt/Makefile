@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	spmm \
-	spmm_advanced
+  spmm \
+  spmm_advanced
 
 all: $(EXAMPLES)
 

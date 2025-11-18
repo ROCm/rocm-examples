@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	bsric0 \
-	bsrilu0 \
-	csric0 \
-	csrilu0 \
-	csritilu0 \
-	gpsv \
-	gtsv
+  bsric0 \
+  bsrilu0 \
+  csric0 \
+  csrilu0 \
+  csritilu0 \
+  gpsv \
+  gtsv
 
 all: $(EXAMPLES)
 

@@ -21,17 +21,17 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	bitonic_sort \
-	convolution \
-	fdtd \
-	floyd_warshall \
-	histogram \
-	prefix_sum \
-	sobel_filter
+  bitonic_sort \
+  convolution \
+  fdtd \
+  floyd_warshall \
+  histogram \
+  prefix_sum \
+  sobel_filter
 
 ifneq ($(GPU_RUNTIME), CUDA)
-EXAMPLES += \
-	monte_carlo_pi
+  EXAMPLES += \
+    monte_carlo_pi
 endif
 
 all: $(EXAMPLES)

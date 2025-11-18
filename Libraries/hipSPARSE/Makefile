@@ -20,10 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 EXAMPLES := \
-	axpyi \
-	csrmv \
-	handle \
-	hybmv
+  axpyi \
+  csrmv \
+  handle \
+  hybmv
 
 all: $(EXAMPLES)
 

@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-		add_kernel
+    add_kernel
 
 all: $(EXAMPLES)
 

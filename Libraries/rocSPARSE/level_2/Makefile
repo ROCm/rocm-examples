@@ -21,19 +21,19 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	bsrmv \
-	bsrsv \
-	bsrxmv \
-	coomv \
-	csritsv \
-	csrmv \
-	csrsv \
-	ellmv \
-	gebsrmv \
-	gemvi \
-	spitsv \
-	spmv \
-	spsv
+  bsrmv \
+  bsrsv \
+  bsrxmv \
+  coomv \
+  csritsv \
+  csrmv \
+  csrsv \
+  ellmv \
+  gebsrmv \
+  gemvi \
+  spitsv \
+  spmv \
+  spsv
 
 all: $(EXAMPLES)
 

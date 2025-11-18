@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	calling_global_functions \
-	extern_shared_memory \
-	launch_bounds \
-	set_constant_memory \
-	template_warp_size_reduction \
-	timer \
-	warp_size_reduction
+  calling_global_functions \
+  extern_shared_memory \
+  launch_bounds \
+  set_constant_memory \
+  template_warp_size_reduction \
+  timer \
+  warp_size_reduction
 
 all: $(EXAMPLES)
 

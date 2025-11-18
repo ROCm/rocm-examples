@@ -21,15 +21,15 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	api_buffered_tracing \
-	api_callback_tracing \
-	code_object_isa_decode \
-	code_object_tracing \
-	counter_collection \
-	external_correlation_id_request \
-	intercept_table \
-	openmp_target \
-	pc_sampling
+  api_buffered_tracing \
+  api_callback_tracing \
+  code_object_isa_decode \
+  code_object_tracing \
+  counter_collection \
+  external_correlation_id_request \
+  intercept_table \
+  openmp_target \
+  pc_sampling
 
 all: $(EXAMPLES)
 

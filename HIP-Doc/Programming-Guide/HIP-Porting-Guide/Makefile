@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	device_code_feature_identification \
-	host_code_feature_identification \
-	identifying_compilation_target_platform \
-	identifying_host_device_compilation_pass
+  device_code_feature_identification \
+  host_code_feature_identification \
+  identifying_compilation_target_platform \
+  identifying_host_device_compilation_pass
 
 all: $(EXAMPLES)
 

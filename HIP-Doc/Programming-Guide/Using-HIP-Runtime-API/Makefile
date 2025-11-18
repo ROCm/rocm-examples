@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-	Asynchronous-Concurrent-Execution \
-	Call-Stack \
-	Error-Handling \
-	HIP-Graphs \
-	Initialization \
-	Memory-Management \
-	Multi-Device-Management
+  Asynchronous-Concurrent-Execution \
+  Call-Stack \
+  Error-Handling \
+  HIP-Graphs \
+  Initialization \
+  Memory-Management \
+  Multi-Device-Management
 
 all: $(SUBDIRECTORIES)
 

@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 EXAMPLE := hip_standard_unified_memory
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
@@ -36,14 +36,12 @@ ICPPFLAGS :=
 ILDFLAGS  :=
 ILDLIBS   :=
 
-ifndef HSA_XNACK
-    $(error Environment variable HSA_XNACK must be set for this example!)
-else ifneq ($(HSA_XNACK), 1)
-    $(error Environment variable HSA_XNACK must be set to 1 for this example!)
+ifneq ($(HSA_XNACK), 1)
+  $(error Environment variable HSA_XNACK must be set to 1 for this example!)
 endif
 
 ifeq ($(GPU_RUNTIME), CUDA)
-    ICXXFLAGS += -x cu
+  ICXXFLAGS += -x cu
     ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
 else ifeq ($(GPU_RUNTIME), HIP)
     CXXFLAGS ?= -Wall -Wextra
@@ -57,9 +55,9 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 $(EXAMPLE): main.hip
-    $(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 clean:
-    $(RM) $(EXAMPLE)
+	$(RM) $(EXAMPLE)
 
 .PHONY: clean

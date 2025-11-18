@@ -24,10 +24,10 @@ EXAMPLE := rocprof-systems-matmul
 EXAMPLE_ROCTX := ${EXAMPLE}-roctx
 COMMON_INCLUDE_DIR := ../../Common
 EXTERNAL_DIR := ../../External
-GPU_RUNTIME := HIP
+GPU_RUNTIME = HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc

@@ -21,10 +21,10 @@
 # SOFTWARE.
 
 SUBDIRECTORIES := \
-	CUDA-to-HIP-API-Function-Comparison \
-	HIP-Complex-Math-API \
-	HIP-Math-API \
-	Low-Precision-Floating-Point-Types
+  CUDA-to-HIP-API-Function-Comparison \
+  HIP-Complex-Math-API \
+  HIP-Math-API \
+  Low-Precision-Floating-Point-Types
 
 all: $(SUBDIRECTORIES)
 

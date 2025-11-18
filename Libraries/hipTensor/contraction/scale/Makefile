@@ -21,14 +21,14 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	bf16_f32 \
-	cf32_cf32 \
-	f16_f32 \
-	f32_bf16 \
-	f32_f16 \
-	f32_f32 \
-	f64_f32 \
-	f64_f64
+  bf16_f32 \
+  cf32_cf32 \
+  f16_f32 \
+  f32_bf16 \
+  f32_f16 \
+  f32_f32 \
+  f64_f32 \
+  f64_f64
 
 all: $(EXAMPLES)
 

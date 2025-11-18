@@ -21,12 +21,12 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	compilation_apis \
-	linker_apis \
-	linker_apis_file \
-	linker_apis_options \
-	lowered_names \
-	rtc_error_handling
+  compilation_apis \
+  linker_apis \
+  linker_apis_file \
+  linker_apis_options \
+  lowered_names \
+  rtc_error_handling
 
 all: $(EXAMPLES)
 

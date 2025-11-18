@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	pseudorandom_generations \
-	quasirandom_generations
+  pseudorandom_generations \
+  quasirandom_generations
 
 all: $(EXAMPLES)
 

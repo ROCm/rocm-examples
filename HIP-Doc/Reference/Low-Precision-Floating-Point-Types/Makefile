@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 ifeq ($(GPU_RUNTIME), HIP) # Only supported on HIP
-	EXAMPLES := \
-		low_precision_float_fp8 \
-		low_precision_float_fp16
+  EXAMPLES := \
+    low_precision_float_fp8 \
+    low_precision_float_fp16
 endif
 
 all: $(EXAMPLES)

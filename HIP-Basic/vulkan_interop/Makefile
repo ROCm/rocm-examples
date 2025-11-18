@@ -22,11 +22,11 @@
 
 EXAMPLE := hip_vulkan_interop
 COMMON_INCLUDE_DIR := ../../Common
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
-CUDA_INSTALL_DIR := /usr/local/cuda
+ROCM_INSTALL_DIR ?= /opt/rocm
+CUDA_INSTALL_DIR ?= /usr/local/cuda
 
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
@@ -42,15 +42,15 @@ ILDLIBS    := $(shell pkg-config --libs glfw3)
 IGLSLFLAGS := -V100
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	ICXXFLAGS += -x cu
-	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
-	COMPILER := $(CUDACXX)
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
+  COMPILER := $(CUDACXX)
 else ifeq ($(GPU_RUNTIME), HIP)
-	ICXXFLAGS ?= -Wall -Wextra
-	ICPPFLAGS += -D__HIP_PLATFORM_AMD__
-	COMPILER := $(HIPCXX)
+  ICXXFLAGS ?= -Wall -Wextra
+  ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+  COMPILER := $(HIPCXX)
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
 ICXXFLAGS  += $(CXXFLAGS)

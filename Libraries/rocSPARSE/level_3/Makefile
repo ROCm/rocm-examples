@@ -21,14 +21,14 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	bsrmm \
-	bsrsm \
-	csrmm \
-	csrsm \
-	gebsrmm \
-	gemmi \
-	sddmm \
-	spsm
+  bsrmm \
+  bsrsm \
+  csrmm \
+  csrsm \
+  gebsrmm \
+  gemmi \
+  sddmm \
+  spsm
 
 all: $(EXAMPLES)
 

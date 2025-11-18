@@ -21,16 +21,16 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	multi_gpu \
-	plan_d2z \
-	plan_many_2d_r2c \
-	plan_many_2d_z2z \
-	plan_z2z \
-	setworkarea
+  multi_gpu \
+  plan_d2z \
+  plan_many_2d_r2c \
+  plan_many_2d_z2z \
+  plan_z2z \
+  setworkarea
 
 ifneq ($(GPU_RUNTIME), CUDA)
-	EXAMPLES += \
-		callback
+  EXAMPLES += \
+    callback
 endif
 
 all: $(EXAMPLES)

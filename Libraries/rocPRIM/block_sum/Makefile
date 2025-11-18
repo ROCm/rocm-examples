@@ -22,14 +22,14 @@
 
 EXAMPLE := rocprim_block_sum
 COMMON_INCLUDE_DIR := ../../../Common
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
 ROCPRIM_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

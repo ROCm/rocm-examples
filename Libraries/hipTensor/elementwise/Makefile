@@ -21,9 +21,9 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	binary \
-	permute \
-	trinary
+  binary \
+  permute \
+  trinary
 
 all: $(EXAMPLES)
 

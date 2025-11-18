@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	simple_device_query
+  simple_device_query
 
 all: $(EXAMPLES)
 

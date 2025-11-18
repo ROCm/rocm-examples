@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	error_handling
+  error_handling
 
 all: $(EXAMPLES)
 

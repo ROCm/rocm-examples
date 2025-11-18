@@ -23,10 +23,10 @@
 EXAMPLE := hipblas_scal
 COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
 HIPBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -41,13 +41,13 @@ ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lhipblas
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	ICXXFLAGS += -x cu
-	ICPPFLAGS += -D__HIP_PLATFORM_NVIDIA__
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -D__HIP_PLATFORM_NVIDIA__
 else ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
-	ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+  CXXFLAGS ?= -Wall -Wextra
+  ICPPFLAGS += -D__HIP_PLATFORM_AMD__
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)

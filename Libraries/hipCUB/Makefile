@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	device_radix_sort \
-	device_sum
+  device_radix_sort \
+  device_sum
 
 all: $(EXAMPLES)
 

@@ -21,28 +21,28 @@
 # SOFTWARE.
 
 LIBRARIES := \
-	hipBLAS \
-	hipCUB \
-	hipFFT \
-	hipSOLVER \
-	hipSPARSE \
-	hipSPARSELt \
-	rocRAND \
-	hipRAND
+  hipBLAS \
+  hipCUB \
+  hipFFT \
+  hipSOLVER \
+  hipSPARSE \
+  hipSPARSELt \
+  rocRAND \
+  hipRAND
 
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
-	hipBLASLt \
-	hipTensor \
-	rocALUTION \
-	rocBLAS \
-	rocFFT \
-	rocPRIM \
-	rocProfiler-SDK \
-	rocSOLVER \
-	rocSPARSE \
-	rocThrust \
-	rocWMMA
+  hipBLASLt \
+  hipTensor \
+  rocALUTION \
+  rocBLAS \
+  rocFFT \
+  rocPRIM \
+  rocProfiler-SDK \
+  rocSOLVER \
+  rocSPARSE \
+  rocThrust \
+  rocWMMA
 endif
 
 all: $(LIBRARIES)

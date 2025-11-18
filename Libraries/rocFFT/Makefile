@@ -21,14 +21,14 @@
 # SOFTWARE.
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 EXAMPLES := \
-	callback \
-	complex_complex \
-	complex_real \
-	multi_gpu \
-	real_complex
+  callback \
+  complex_complex \
+  complex_real \
+  multi_gpu \
+  real_complex
 
 all: $(EXAMPLES)
 

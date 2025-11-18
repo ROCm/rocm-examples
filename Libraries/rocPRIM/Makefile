@@ -21,8 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	block_sum \
-	device_sum
+  block_sum \
+  device_sum
 
 all: $(EXAMPLES)
 

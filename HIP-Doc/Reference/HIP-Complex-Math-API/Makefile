@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	complex_math
+  complex_math
 
 all: $(EXAMPLES)
 

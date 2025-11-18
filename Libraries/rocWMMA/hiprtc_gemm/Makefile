@@ -22,14 +22,14 @@
 
 EXAMPLE := rocwmma_hiprtc_gemm
 COMMON_INCLUDE_DIR := ../../../Common
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 ifneq ($(GPU_RUNTIME), HIP)
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
 ROCWMMA_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -42,7 +42,7 @@ CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCWMMA_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS) -DROCM_ROOT_PATH=\"$(ROCM_INSTALL_DIR)\"
 ILDFLAGS  := $(LDFLAGS)
-ILDLIBS   := $(LDLIBS)
+ILDLIBS   := -lhiprtc
 
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)

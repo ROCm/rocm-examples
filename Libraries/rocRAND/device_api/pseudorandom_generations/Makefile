@@ -23,11 +23,11 @@
 EXAMPLE := rocrand_pseudorandom_generations
 COMMON_INCLUDE_DIR := ../../../../Common
 EXTERNAL_DIR := ../../../../External
-GPU_RUNTIME := HIP
+GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
-CUDA_INSTALL_DIR := /usr/local/cuda
+ROCM_INSTALL_DIR ?= /opt/rocm
+CUDA_INSTALL_DIR ?= /usr/local/cuda
 
 HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
 ROCRAND_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -43,18 +43,18 @@ ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lrocrand
 
 ifeq ($(GPU_RUNTIME), CUDA)
-	ICXXFLAGS += -x cu
-	ICPPFLAGS += -D__HIP_PLATFORM_NVIDIA__
-	ILDFLAGS  += -L $(CUDA_INSTALL_DIR)/lib64
-	ILDLIBS   += -lcudart
-	COMPILER  := $(CUDACXX)
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -D__HIP_PLATFORM_NVIDIA__
+  ILDFLAGS  += -L $(CUDA_INSTALL_DIR)/lib64
+  ILDLIBS   += -lcudart
+  COMPILER  := $(CUDACXX)
 else ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS  ?= -Wall -Wextra
-	ICPPFLAGS += -D__HIP_PLATFORM_AMD__
-	ILDLIBS   += -lamdhip64
-	COMPILER  := $(HIPCXX)
+  CXXFLAGS  ?= -Wall -Wextra
+  ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+  ILDLIBS   += -lamdhip64
+  COMPILER  := $(HIPCXX)
 else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
 ICXXFLAGS += $(CXXFLAGS)

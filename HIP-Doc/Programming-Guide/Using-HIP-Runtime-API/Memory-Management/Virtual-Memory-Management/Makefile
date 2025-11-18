@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	virtual_memory
+  virtual_memory
 
 all: $(EXAMPLES)
 
