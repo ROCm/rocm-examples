@@ -27,6 +27,16 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+# see https://github.com/ROCm/rocm-libraries/blob/40bbc75960836d1b9e0573606df9dd79800e412a/projects/hipsparselt/cmake/hipsparselt_supported_architectures.cmake#L10-L21
+set(HIPSPARSELT_SUPPORTED_ARCH gfx942 gfx950)
+
+foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
+    if(NOT ARCH IN_LIST HIPSPARSELT_SUPPORTED_ARCH)
+        message(STATUS "hipSPARSELt does not support architecture: ${ARCH}, not building hipSPARSELt examples")
+        return()
+    endif()
+endforeach()
+
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
         "$ENV{HIP_PATH}"
