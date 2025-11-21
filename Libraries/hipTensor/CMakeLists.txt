@@ -56,7 +56,7 @@ if(NOT hiptensor_FOUND)
         STATUS
         "hipTensor could not be found, not building hipTensor examples"
     )
-    return(1)
+    return()
 endif()
 
 add_subdirectory(contraction)
