@@ -22,7 +22,7 @@
 # SOFTWARE.
 
 EXAMPLE_TOOL="rocprofv3"
-EXAMPLE_BIN="${EXAMPLE_TOOL}_matmul"
+EXAMPLE_BIN="${EXAMPLE_TOOL}-matmul"
 EXAMPLE_WORKLOAD="./$EXAMPLE_BIN"
 
 # Check for existence of tool
