@@ -65,7 +65,8 @@ if(NOT ROCWMMA_TARGET AND NOT rocwmma_FOUND)
     )
 
     if(NOT ROCWMMA_INCLUDE_DIR)
-        message(FATAL_ERROR "rocWMMA headers not found. Please install rocWMMA or set ROCWMMA_INCLUDE_DIR")
+        message(WARNING "rocWMMA headers not found. Not building rocWMMA examples. Please install rocWMMA or set ROCWMMA_INCLUDE_DIR")
+        return()
     endif()
 
     # Create imported target for header-only library
