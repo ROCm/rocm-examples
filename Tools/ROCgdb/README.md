@@ -14,6 +14,7 @@ The `advanced` example script shows how to perform a more fine-grained analysis:
 
 * Several ways of examining individual GPU registers and buffers in different address spaces
 * Modifying wavefront scheduling for better control of wavefront progression
+* Debugging a single block in non-stop mode while other blocks resume their work
 
 For more information on the functionality of `ROCgdb`, please refer to its
 [documentation](https://rocm.docs.amd.com/projects/ROCgdb/en/latest/) or its
