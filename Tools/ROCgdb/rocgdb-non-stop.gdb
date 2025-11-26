@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 echo ===============================================================================\n
-echo Modifying wavefront execution\n
+echo Debugging in non-stop mode\n
 echo ===============================================================================\n
 
 # By default, GPU code objects are not loaded until the first kernel is launched. Using a kernel name for setting a
@@ -34,22 +34,26 @@ set breakpoint pending on
 # "Function "matrix_multiplication_kernel" not defined." In this case, it can be safely ignored.
 tbreak matrix_multiplication_kernel
 
+# In interactive sessions, pagination needs to be disabled for non-stop mode.
+# set pagination off
+
+# Enable non-stop mode - this must be done before the examined program is launched.
+# In non-stop mode, only the current block / work-group is stopped, while the other blocks resume their work. This is
+# useful if asynchronous activities should continue after the block of interest is stopped, for example to observe
+# changes in global memory done by other blocks.
+set non-stop on
+
 run
 
-echo -------------------------------------------------------------------------------\n
-echo Locking scheduler execution\n
-echo -------------------------------------------------------------------------------\n
-# If a GPU breakpoint is reached, 'step' can be used to step through the GPU code. By default, this still allows other
-# wavefronts to progress independently of the currently observed wavefront. To prevent this, the following instruction
-# can be used.
-set scheduler-locking on
+# Set breakpoint before global memory is written.
+break 109
+
+# In non-stop mode, 'continue' only affects the current block. To resume all threads, the '-a' parameter is required.
+continue -a
 
 echo -------------------------------------------------------------------------------\n
-echo Switching thread\n
+echo Inspecting output buffer\n
 echo -------------------------------------------------------------------------------\n
-# After setting the scheduler lock, any other wavefront will not have progressed past the point of the currently
-# examined wavefront. This way it is easily possible to switch between threads and examine their data at the same point
-# in a kernel's lifetime.
-thread 64
+x/128fw A
 
 continue

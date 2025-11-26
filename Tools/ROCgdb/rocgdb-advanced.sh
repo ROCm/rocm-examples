@@ -46,3 +46,6 @@ $EXAMPLE_TOOL --batch --command=rocgdb-gpu-data.gdb $EXAMPLE_WORKLOAD > rocgdb-g
 
 # Modifying wavefront execution
 $EXAMPLE_TOOL --batch --command=rocgdb-wave-exec.gdb $EXAMPLE_WORKLOAD > rocgdb-wave-exec.log
+
+# Non-stop mode
+$EXAMPLE_TOOL --batch --command=rocgdb-non-stop.gdb $EXAMPLE_WORKLOAD > rocgdb-non-stop.log

@@ -68,3 +68,5 @@ echo ---------------------------------------------------------------------------
 # explicit address space specifiers it is necessary to pass an address instead of a variable name. The address 0x0
 # corresponds to the start of the kernel's __shared__ buffer 'a_values'.
 x/8fw local#0x0
+
+continue
