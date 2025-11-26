@@ -34,7 +34,7 @@ set breakpoint pending on
 # "Function "matrix_multiplication_kernel" not defined." In this case, it can be safely ignored.
 tbreak matrix_multiplication_kernel
 
-# In interactive sessions, pagination needs to be disabled for non-stop mode.
+# In interactive sessions, pagination should be disabled for non-stop mode.
 # set pagination off
 
 # Enable non-stop mode - this must be done before the examined program is launched.
@@ -45,15 +45,20 @@ set non-stop on
 
 run
 
-# Set breakpoint before global memory is written.
-break 109
+# Switch to a GPU thread
+thread 8
 
-# In non-stop mode, 'continue' only affects the current block. To resume all threads, the '-a' parameter is required.
+# Set breakpoint for GPU thread before global memory is written.
+break 109 thread 8
+
+# In non-stop mode, 'continue' only affects the current wavefront. To resume all threads, the '-a' parameter is
+# required.
 continue -a
 
 echo -------------------------------------------------------------------------------\n
 echo Inspecting output buffer\n
 echo -------------------------------------------------------------------------------\n
-x/128fw A
+x/128fw C
 
-continue
+# Resume all threads.
+continue -a
