@@ -42,6 +42,8 @@ endif()
 
 project(${example_name} LANGUAGES CXX)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -81,6 +83,7 @@ add_library(${example_name}_client SHARED client.cpp)
 
 target_link_libraries(${example_name}_client PRIVATE
     rocprofiler-sdk::rocprofiler-sdk
+    ${CXX_FS_LIBRARY}
 )
 
 target_include_directories(${example_name}_client PRIVATE
@@ -98,6 +101,7 @@ target_link_libraries(${example_name} PRIVATE
     Threads::Threads
     rocprofiler-sdk-roctx::rocprofiler-sdk-roctx
     ${example_name}_client
+    ${CXX_FS_LIBRARY}
 )
 
 target_include_directories(${example_name} PRIVATE

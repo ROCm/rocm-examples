@@ -38,7 +38,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCPROFILER_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
-ILDLIBS   := -lrocprofiler-sdk -ldw -lamd_comgr
+ILDLIBS   := -lrocprofiler-sdk -ldw -lamd_comgr -lstdc++fs
 
 ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
