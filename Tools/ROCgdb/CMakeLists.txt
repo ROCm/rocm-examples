@@ -90,6 +90,7 @@ add_custom_command(
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/${example_advanced_script}" ${example_work_dir}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/rocgdb-disassembly.gdb" ${example_work_dir}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/rocgdb-gpu-data.gdb" ${example_work_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/rocgdb-non-stop.gdb" ${example_work_dir}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/rocgdb-stackframe.gdb" ${example_work_dir}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/rocgdb-sysinfo.gdb" ${example_work_dir}
     COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/rocgdb-wave-exec.gdb" ${example_work_dir}
@@ -109,6 +110,7 @@ install(
     ${example_advanced_script}
     rocgdb-disassembly.gdb
     rocgdb-gpu-data.gdb
+    rocgdb-non-stop.gdb
     rocgdb-stackframe.gdb
     rocgdb-sysinfo.gdb
     rocgdb-wave-exec.gdb
