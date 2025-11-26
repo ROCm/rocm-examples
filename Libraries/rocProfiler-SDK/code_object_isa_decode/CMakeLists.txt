@@ -64,5 +64,6 @@ target_include_directories(
     PRIVATE ../../../Common ../../../External
 )
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(client.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
 install(TARGETS ${example_name})

@@ -55,6 +55,8 @@ add_library(${example_name}_client SHARED client.cpp)
 
 target_link_libraries(${example_name}_client PRIVATE rocprofiler-sdk::rocprofiler-sdk)
 
+target_compile_features(${example_name}_client PRIVATE cxx_std_17 hip_std_17)
+
 target_include_directories(${example_name}_client PRIVATE ../../../../Common)
 
 add_executable(${example_name} main.cpp)
