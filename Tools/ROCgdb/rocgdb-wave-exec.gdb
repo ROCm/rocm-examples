@@ -52,4 +52,14 @@ echo ---------------------------------------------------------------------------
 # in a kernel's lifetime.
 thread 64
 
+# Now the other thread's or wavefront's internals can be inspected.
+
+echo -------------------------------------------------------------------------------\n
+echo Unlocking scheduler execution\n
+echo -------------------------------------------------------------------------------\n
+# If scheduler-locking is enabled, 'continue' will only resume the current wavefront. To let the entire application
+# continue, scheduler-locking needs to be disabled (or you must cycle through the wavefronts and continue them
+# manually).
+set scheduler-locking off
+
 continue
