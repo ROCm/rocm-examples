@@ -27,8 +27,31 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
 # The HIP tools are supported neither on Windows nor on CUDA.
 if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
+
+    find_program(ROCGDB_EXEC NAMES rocgdb)
+    if(NOT ROCGDB_EXEC)
+        message(STATUS "ROCgdb not found. Skipping ROCgdb examples.")
+    else()
+        add_subdirectory(ROCgdb)
+    endif()
 
     find_package(Python3 3.3 QUIET)
     if(NOT Python3_FOUND)

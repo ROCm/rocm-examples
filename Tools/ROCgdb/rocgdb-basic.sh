@@ -1,3 +1,4 @@
+#!/bin/bash
 # MIT License
 #
 # Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
@@ -20,22 +21,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-TOOLS :=
+EXAMPLE_TOOL="rocgdb"
+EXAMPLE_BIN="rocgdb-matmul"
+EXAMPLE_WORKLOAD="./$EXAMPLE_BIN"
 
-ifneq ($(GPU_RUNTIME), CUDA)
-TOOLS += \
-	ROCgdb \
-	rocprof-compute \
-	rocprof-systems \
-	rocprofv3
-endif
+# Check for existence of tool
+if ! [ -x "$(command -v $EXAMPLE_TOOL)" ]; then
+    echo "Error: Could not find $EXAMPLE_TOOL in the PATH." >&2
+    exit 1
+fi
 
-all: $(TOOLS)
+# Exit on any error
+set -e
 
-clean: TARGET=clean
-clean: all
+# ROCgdb is a fork of the standard gdb. We will not show how to use basic gdb commands here (consult the (ROC)gdb manual
+# on how to use plain gdb) and instead focus on ROCgdb's additional features.
 
-$(TOOLS):
-	$(MAKE) -C $@
+# We are running multiple examples in batch mode, i.e. non-interactive. The necessary ROCgdb commands are loaded from
+# gdb script files; they can be used in interactive mode in the same way as shown in the scripts. ROCgdb's output can
+# be inspected by opening the generated log files.
 
-.PHONY: all clean $(TOOLS)
+# Show kernel disassembly
+$EXAMPLE_TOOL --batch --command=rocgdb-disassembly.gdb $EXAMPLE_WORKLOAD > rocgdb-disassembly.log
+
+# Examine stack frame
+$EXAMPLE_TOOL --batch --command=rocgdb-stackframe.gdb $EXAMPLE_WORKLOAD > rocgdb-stackframe.log
+
+# Show system information
+$EXAMPLE_TOOL --batch --command=rocgdb-sysinfo.gdb $EXAMPLE_WORKLOAD > rocgdb-sysinfo.log
