@@ -25,6 +25,8 @@ set(example_name rocprofiler-sdk_code_object_isa_decode)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
+
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocProfiler-SDK examples do not support the CUDA runtime")
     return()
@@ -57,12 +59,13 @@ add_executable(${example_name} main.cpp client.cpp)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
-target_link_libraries(${example_name} PRIVATE rocprofiler-sdk::rocprofiler-sdk libdw::libdw amd_comgr)
+target_link_libraries(${example_name} PRIVATE rocprofiler-sdk::rocprofiler-sdk libdw::libdw amd_comgr ${CXX_FS_LIBRARY})
 
 target_include_directories(
     ${example_name}
     PRIVATE ../../../Common ../../../External
 )
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(client.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
 
 install(TARGETS ${example_name})
