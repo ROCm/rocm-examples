@@ -25,6 +25,8 @@ set(example_name rocprofiler-sdk_external_correlation_id_request)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
+
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocProfiler-SDK examples do not support the CUDA runtime")
     return()
@@ -53,7 +55,9 @@ find_package(rocprofiler-sdk REQUIRED)
 # Create client library
 add_library(${example_name}_client SHARED client.cpp)
 
-target_link_libraries(${example_name}_client PRIVATE rocprofiler-sdk::rocprofiler-sdk)
+target_link_libraries(${example_name}_client PRIVATE rocprofiler-sdk::rocprofiler-sdk ${CXX_FS_LIBRARY})
+
+target_compile_features(${example_name}_client PRIVATE cxx_std_17 hip_std_17)
 
 target_include_directories(${example_name}_client PRIVATE ../../../Common)
 
@@ -62,7 +66,7 @@ add_executable(${example_name} main.cpp)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
-target_link_libraries(${example_name} PRIVATE ${example_name}_client)
+target_link_libraries(${example_name} PRIVATE ${example_name}_client ${CXX_FS_LIBRARY})
 
 target_include_directories(
     ${example_name}
