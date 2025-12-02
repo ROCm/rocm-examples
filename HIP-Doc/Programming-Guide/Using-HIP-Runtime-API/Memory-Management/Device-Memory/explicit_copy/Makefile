@@ -41,7 +41,6 @@ ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS  ?= -Wall -Wextra
-  HIPCXX    := $(CXX)
   ICXXFLAGS += -D__HIP_PLATFORM_AMD__
   ILDFLAGS  += -L $(ROCM_INSTALL_DIR)/lib
   ILDLIBS   += -lamdhip64
