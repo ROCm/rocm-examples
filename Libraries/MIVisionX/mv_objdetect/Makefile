@@ -91,7 +91,7 @@ $(MODEL_FILE): | $(BUILD_DIR)
 # Run mv_compile to generate deployment artifacts
 $(GENERATED_FILES): $(MODEL_FILE)
 	@echo "Compiling YoloV2 model with mv_compile (batch size: $(BATCH_SIZE))..."
-	@cd $(BUILD_DIR) && CC=gcc $(MV_COMPILE) --model yoloV2Tiny20.caffemodel --install_folder . --input_dims $(BATCH_SIZE),3,416,416
+	@cd $(BUILD_DIR) && CC=gcc CXX=g++ $(MV_COMPILE) --model yoloV2Tiny20.caffemodel --install_folder . --input_dims $(BATCH_SIZE),3,416,416
 	@echo "Model compilation complete"
 
 # Build the example
