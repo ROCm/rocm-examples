@@ -53,7 +53,8 @@ add_subdirectory(code_object_tracing)
 add_subdirectory(counter_collection)
 add_subdirectory(external_correlation_id_request)
 add_subdirectory(intercept_table)
-add_subdirectory(openmp_target)
+# Disabled until OpenMP runtimes work again in CI
+#add_subdirectory(openmp_target)
 add_subdirectory(pc_sampling)
 # Disabled until feature is released in future ROCm
 # add_subdirectory(thread_trace)
