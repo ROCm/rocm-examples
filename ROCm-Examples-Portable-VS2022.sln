@@ -180,25 +180,23 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "warp_size_reduction_vs2022"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer_vs2022", "HIP-Doc\Programming-Guide\HIP-C++-Language-Extensions\timer\timer_vs2022.vcxproj", "{C1957D25-4652-01D7-463A-086B05C9B9C5}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Porting-Guide", "HIP-Porting-Guide", "{D913551B-498A-4177-A7D6-F2A22A90FC2C}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Porting-CUDA-code-to-HIP", "Porting-CUDA-code-to-HIP", "{D913551B-498A-4177-A7D6-F2A22A90FC2C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_compilation_target_platform_vs2022", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\identifying_compilation_target_platform\identifying_compilation_target_platform_vs2022.vcxproj", "{608D4B4B-6629-74E9-034A-D069EF2A68A6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_compilation_target_platform_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\identifying_compilation_target_platform\identifying_compilation_target_platform_vs2022.vcxproj", "{608D4B4B-6629-74E9-034A-D069EF2A68A6}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_host_device_compilation_pass_vs2022", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\identifying_host_device_compilation_pass\identifying_host_device_compilation_pass_vs2022.vcxproj", "{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_host_device_compilation_pass_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\identifying_host_device_compilation_pass\identifying_host_device_compilation_pass_vs2022.vcxproj", "{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_code_feature_identification_vs2022", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\device_code_feature_identification\device_code_feature_identification_vs2022.vcxproj", "{4942D042-9F8C-CF96-DF5D-D09E463256DD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_code_feature_identification_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\device_code_feature_identification\device_code_feature_identification_vs2022.vcxproj", "{4942D042-9F8C-CF96-DF5D-D09E463256DD}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "host_code_feature_identification_vs2022", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\host_code_feature_identification\host_code_feature_identification_vs2022.vcxproj", "{301FBAD3-7738-8CFD-014B-BE314C8573DD}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "host_code_feature_identification_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\host_code_feature_identification\host_code_feature_identification_vs2022.vcxproj", "{301FBAD3-7738-8CFD-014B-BE314C8573DD}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Porting-CUDA-Driver-API", "Porting-CUDA-Driver-API", "{AB3A4673-90C9-4401-8ACC-85A75018708C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "load_module_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\load_module\load_module_vs2022.vcxproj", "{B079D11D-2068-DD93-67EB-48A713E9FB07}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "load_module_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\load_module\load_module_vs2022.vcxproj", "{B079D11D-2068-DD93-67EB-48A713E9FB07}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "address_retrieval_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\address_retrieval\address_retrieval_vs2022.vcxproj", "{919E29D3-0B7C-AFFF-8E2C-3CD179744131}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "address_retrieval_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\address_retrieval\address_retrieval_vs2022.vcxproj", "{919E29D3-0B7C-AFFF-8E2C-3CD179744131}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "per_thread_default_stream_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\per_thread_default_stream\per_thread_default_stream_vs2022.vcxproj", "{2F28FDEC-F73B-C8E7-2166-6F00ED3AF12C}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "per_thread_default_stream_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\per_thread_default_stream\per_thread_default_stream_vs2022.vcxproj", "{2F28FDEC-F73B-C8E7-2166-6F00ED3AF12C}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointer_memory_type_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\pointer_memory_type\pointer_memory_type_vs2022.vcxproj", "{7B0E56C2-C6D6-E245-7B21-A64767C87738}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointer_memory_type_vs2022", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\pointer_memory_type\pointer_memory_type_vs2022.vcxproj", "{7B0E56C2-C6D6-E245-7B21-A64767C87738}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -601,11 +599,10 @@ Global
 		{53F8C1D9-E167-F401-BC95-79A9AC3ECCC7} = {D913551B-498A-4177-A7D6-F2A22A90FC2C}
 		{4942D042-9F8C-CF96-DF5D-D09E463256DD} = {D913551B-498A-4177-A7D6-F2A22A90FC2C}
 		{301FBAD3-7738-8CFD-014B-BE314C8573DD} = {D913551B-498A-4177-A7D6-F2A22A90FC2C}
-		{AB3A4673-90C9-4401-8ACC-85A75018708C} = {4596F2CF-5E1E-4EF7-8339-4934D6BF1F00}
-		{B079D11D-2068-DD93-67EB-48A713E9FB07} = {AB3A4673-90C9-4401-8ACC-85A75018708C}
-		{919E29D3-0B7C-AFFF-8E2C-3CD179744131} = {AB3A4673-90C9-4401-8ACC-85A75018708C}
-		{2F28FDEC-F73B-C8E7-2166-6F00ED3AF12C} = {AB3A4673-90C9-4401-8ACC-85A75018708C}
-		{7B0E56C2-C6D6-E245-7B21-A64767C87738} = {AB3A4673-90C9-4401-8ACC-85A75018708C}
+		{B079D11D-2068-DD93-67EB-48A713E9FB07} = {D913551B-498A-4177-A7D6-F2A22A90FC2C}
+		{919E29D3-0B7C-AFFF-8E2C-3CD179744131} = {D913551B-498A-4177-A7D6-F2A22A90FC2C}
+		{2F28FDEC-F73B-C8E7-2166-6F00ED3AF12C} = {D913551B-498A-4177-A7D6-F2A22A90FC2C}
+		{7B0E56C2-C6D6-E245-7B21-A64767C87738} = {D913551B-498A-4177-A7D6-F2A22A90FC2C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {A39869B7-4813-4EE4-B059-C79B5CA433E7}

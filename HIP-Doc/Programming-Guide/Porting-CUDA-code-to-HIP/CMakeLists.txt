@@ -21,12 +21,24 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Programming-Guide-HIP-Porting-Guide LANGUAGES CXX)
+project(HIP-Doc-Programming-Guide-Porting-CUDA-code-to-HIP LANGUAGES CXX)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+add_subdirectory(address_retrieval)
 add_subdirectory(device_code_feature_identification)
 add_subdirectory(host_code_feature_identification)
 add_subdirectory(identifying_compilation_target_platform)
 add_subdirectory(identifying_host_device_compilation_pass)
+add_subdirectory(load_module)
+add_subdirectory(load_module_ex)
+
+if(NOT ${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
+    message(STATUS "The load_module_ex_cuda example is available only for CUDA.")
+else()
+    add_subdirectory(load_module_ex_cuda)
+endif()
+
+add_subdirectory(per_thread_default_stream)
+add_subdirectory(pointer_memory_type)
