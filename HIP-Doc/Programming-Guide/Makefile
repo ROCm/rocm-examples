@@ -22,9 +22,8 @@
 
 SUBDIRECTORIES := \
   HIP-C++-Language-Extensions \
-  HIP-Porting-Guide \
   Introduction-to-the-HIP-Programming-Model \
-  Porting-CUDA-Driver-API \
+  Porting-CUDA-code-to-HIP \
   Programming-for-HIP-Runtime-Compiler \
   Using-HIP-Runtime-API
 

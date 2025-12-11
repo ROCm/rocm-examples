@@ -158,9 +158,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ordinary_memory_allocation_
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-C++-Language-Extensions", "HIP-C++-Language-Extensions", "{70A51D02-8ADF-4CFD-BE3E-6647E09AF45B}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "HIP-Porting-Guide", "HIP-Porting-Guide", "{BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Porting-CUDA-Driver-API", "Porting-CUDA-Driver-API", "{3E03B0F7-25DE-4132-A3CD-765354B26408}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Porting-CUDA-code-to-HIP", "Porting-CUDA-code-to-HIP", "{BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "calling_global_functions_vs2017", "HIP-Doc\Programming-Guide\HIP-C++-Language-Extensions\calling_global_functions\calling_global_functions_vs2017.vcxproj", "{67EF330D-B8D8-4A07-971E-80E7A0AB32D5}"
 EndProject
@@ -176,23 +174,23 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "timer_vs2017", "HIP-Doc\Pro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "warp_size_reduction_vs2017", "HIP-Doc\Programming-Guide\HIP-C++-Language-Extensions\warp_size_reduction\warp_size_reduction_vs2017.vcxproj", "{328E4455-5F63-4050-A03A-5B572858C6F7}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_code_feature_identification_vs2017", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\device_code_feature_identification\device_code_feature_identification_vs2017.vcxproj", "{16A6CA98-768D-45D7-932E-04B42AD8A19F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_code_feature_identification_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\device_code_feature_identification\device_code_feature_identification_vs2017.vcxproj", "{16A6CA98-768D-45D7-932E-04B42AD8A19F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "host_code_feature_identification_vs2017", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\host_code_feature_identification\host_code_feature_identification_vs2017.vcxproj", "{11967426-7BAC-4129-AD17-82C5DCE5AC9D}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "host_code_feature_identification_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\host_code_feature_identification\host_code_feature_identification_vs2017.vcxproj", "{11967426-7BAC-4129-AD17-82C5DCE5AC9D}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_compilation_target_platform_vs2017", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\identifying_compilation_target_platform\identifying_compilation_target_platform_vs2017.vcxproj", "{9EF24773-61DD-448C-8CF3-1A7BE4F6D779}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_compilation_target_platform_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\identifying_compilation_target_platform\identifying_compilation_target_platform_vs2017.vcxproj", "{9EF24773-61DD-448C-8CF3-1A7BE4F6D779}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_host_device_compilation_pass_vs2017", "HIP-Doc\Programming-Guide\HIP-Porting-Guide\identifying_host_device_compilation_pass\identifying_host_device_compilation_pass_vs2017.vcxproj", "{99361613-0C5F-41F6-889A-86CD3352DF02}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "identifying_host_device_compilation_pass_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\identifying_host_device_compilation_pass\identifying_host_device_compilation_pass_vs2017.vcxproj", "{99361613-0C5F-41F6-889A-86CD3352DF02}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "add_kernel_vs2017", "HIP-Doc\Programming-Guide\Introduction-to-the-HIP-Programming-Model\add_kernel\add_kernel_vs2017.vcxproj", "{05EF7925-0C5D-4BFF-8D2E-341B14ABB9B1}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "address_retrieval_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\address_retrieval\address_retrieval_vs2017.vcxproj", "{9677F7AE-0EBC-4BC4-A3FD-B61468FAA860}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "address_retrieval_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\address_retrieval\address_retrieval_vs2017.vcxproj", "{9677F7AE-0EBC-4BC4-A3FD-B61468FAA860}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "load_module_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\load_module\load_module_vs2017.vcxproj", "{26023EC2-B298-459C-8D05-CB9B185752CB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "load_module_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\load_module\load_module_vs2017.vcxproj", "{26023EC2-B298-459C-8D05-CB9B185752CB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "per_thread_default_stream_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\per_thread_default_stream\per_thread_default_stream_vs2017.vcxproj", "{0B4B7EA7-8A50-4946-8C62-45C79D3426FE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "per_thread_default_stream_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\per_thread_default_stream\per_thread_default_stream_vs2017.vcxproj", "{0B4B7EA7-8A50-4946-8C62-45C79D3426FE}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointer_memory_type_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-Driver-API\pointer_memory_type\pointer_memory_type_vs2017.vcxproj", "{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointer_memory_type_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\pointer_memory_type\pointer_memory_type_vs2017.vcxproj", "{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "async_kernel_execution_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\async_kernel_execution\async_kernel_execution_vs2017.vcxproj", "{97295C91-A455-4B78-89C9-BB6EA1791BBE}"
 EndProject
@@ -586,7 +584,6 @@ Global
 		{D42186F5-700C-485C-85E6-8168710EC240} = {812CCAB6-5157-48AD-9F9E-2E33510C0C84}
 		{70A51D02-8ADF-4CFD-BE3E-6647E09AF45B} = {23D01721-DB47-4545-AD6C-B0DF786308C8}
 		{BB989D47-FA5A-4B3E-AB7E-C18C4F62036B} = {23D01721-DB47-4545-AD6C-B0DF786308C8}
-		{3E03B0F7-25DE-4132-A3CD-765354B26408} = {23D01721-DB47-4545-AD6C-B0DF786308C8}
 		{67EF330D-B8D8-4A07-971E-80E7A0AB32D5} = {70A51D02-8ADF-4CFD-BE3E-6647E09AF45B}
 		{29A87235-CCCE-4AA3-A67B-F40AD438E730} = {70A51D02-8ADF-4CFD-BE3E-6647E09AF45B}
 		{9088361A-D41C-49F0-B98C-DA45C3D5FBDB} = {70A51D02-8ADF-4CFD-BE3E-6647E09AF45B}
@@ -599,10 +596,10 @@ Global
 		{9EF24773-61DD-448C-8CF3-1A7BE4F6D779} = {BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}
 		{99361613-0C5F-41F6-889A-86CD3352DF02} = {BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}
 		{05EF7925-0C5D-4BFF-8D2E-341B14ABB9B1} = {994A1883-8211-4E23-AF98-ADB2AC627644}
-		{9677F7AE-0EBC-4BC4-A3FD-B61468FAA860} = {3E03B0F7-25DE-4132-A3CD-765354B26408}
-		{26023EC2-B298-459C-8D05-CB9B185752CB} = {3E03B0F7-25DE-4132-A3CD-765354B26408}
-		{0B4B7EA7-8A50-4946-8C62-45C79D3426FE} = {3E03B0F7-25DE-4132-A3CD-765354B26408}
-		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B} = {3E03B0F7-25DE-4132-A3CD-765354B26408}
+		{9677F7AE-0EBC-4BC4-A3FD-B61468FAA860} = {BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}
+		{26023EC2-B298-459C-8D05-CB9B185752CB} = {BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}
+		{0B4B7EA7-8A50-4946-8C62-45C79D3426FE} = {BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}
+		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B} = {BB989D47-FA5A-4B3E-AB7E-C18C4F62036B}
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE} = {FF9F4BC0-101E-4DA0-8646-503BD6313DE9}
