@@ -29,8 +29,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "The virtual memory example is available only on Linux.")
-elseif(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    message(STATUS "The virtual memory example is currently not supported for CUDA.")
 else()
     add_subdirectory(virtual_memory)
 endif()
