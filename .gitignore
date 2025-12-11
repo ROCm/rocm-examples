@@ -6,3 +6,4 @@
 [Bb]uild
 *.pdb
 CMakeUserPresets.json
+.cline_storage
