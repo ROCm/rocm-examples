@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28701.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmeans_vs2019", "kmeans_vs2019.vcxproj", "{B7897A08-43B2-4663-BD32-C670B11BE591}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{B7897A08-43B2-4663-BD32-C670B11BE591}.Debug|x64.ActiveCfg = Debug|x64
+		{B7897A08-43B2-4663-BD32-C670B11BE591}.Debug|x64.Build.0 = Debug|x64
+		{B7897A08-43B2-4663-BD32-C670B11BE591}.Release|x64.ActiveCfg = Release|x64
+		{B7897A08-43B2-4663-BD32-C670B11BE591}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {A3B4C5D6-9E0F-1A2B-8C3D-4E5F0A6B1C7D}
+	EndGlobalSection
+EndGlobal

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4F69D38B-14C7-46B2-A195-C878A11CBB2A}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx;hip;cu</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{264A72D6-3DC8-433D-88D2-B21ECE63D0C8}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd;cuh</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{E0A027FC-A457-4F19-87CB-2FED604DF4E1}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms;txt;md</Extensions>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.hip">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="test.jpg">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="README.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include=".gitignore">
+      <Filter>Resource Files</Filter>
+    </None>
+  </ItemGroup>
+</Project>
