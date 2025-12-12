@@ -35,7 +35,7 @@
     <Content Include="$(HIPExecutablePath)\rocblas.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">

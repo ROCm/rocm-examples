@@ -56,6 +56,13 @@ jobs:
                       Write-Host "HIP SDK installation failed"
                       Exit 1
                   }
+          - name: Apply patch
+            shell: pwsh
+            run: |
+                  Write-Host "Applying patches $(Get-ChildItem -File Scripts\VisualStudio\0002-Revert-Rename-hipblas-dll-for-HIP-SDK-7.1.patch)"
+                  git apply (Get-ChildItem -File Scripts\VisualStudio\0002-Revert-Rename-hipblas-dll-for-HIP-SDK-7.1.patch).FullName
+                  Write-Host "Patches applied. Showing diff"
+                  git diff
           - name: Build ${{ matrix.config }} x64 ${{ matrix.vsversion }}
             shell: pwsh
             run: |
