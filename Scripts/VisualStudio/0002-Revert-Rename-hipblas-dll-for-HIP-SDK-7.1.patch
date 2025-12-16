@@ -1,0 +1,1356 @@
+From 548bc677c7b1a1588bf300f853dcef87967e6e85 Mon Sep 17 00:00:00 2001
+From: zichguan-amd <zichuan.guan@amd.com>
+Date: Mon, 15 Dec 2025 15:37:24 -0500
+Subject: [PATCH] Revert "Rename hipblas dll for HIP SDK 7.1"
+
+This reverts commit 95b3ad655f86f262374a4d737cb090bc8b41c53b until HIP SDK 7.1.
+---
+ .../gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj  | 4 ++--
+ .../gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj  | 4 ++--
+ .../gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj  | 4 ++--
+ Libraries/hipBLAS/her/her_vs2017.vcxproj                      | 4 ++--
+ Libraries/hipBLAS/her/her_vs2019.vcxproj                      | 4 ++--
+ Libraries/hipBLAS/her/her_vs2022.vcxproj                      | 4 ++--
+ Libraries/hipBLAS/scal/scal_vs2017.vcxproj                    | 4 ++--
+ Libraries/hipBLAS/scal/scal_vs2019.vcxproj                    | 4 ++--
+ Libraries/hipBLAS/scal/scal_vs2022.vcxproj                    | 4 ++--
+ Libraries/hipSOLVER/gels/gels_vs2017.vcxproj                  | 2 +-
+ Libraries/hipSOLVER/gels/gels_vs2019.vcxproj                  | 2 +-
+ Libraries/hipSOLVER/gels/gels_vs2022.vcxproj                  | 2 +-
+ Libraries/hipSOLVER/geqrf/geqrf_vs2017.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/geqrf/geqrf_vs2019.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/geqrf/geqrf_vs2022.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/gesvd/gesvd_vs2017.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/gesvd/gesvd_vs2019.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/gesvd/gesvd_vs2022.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/getrf/getrf_vs2017.vcxproj                | 2 +-
+ Libraries/hipSOLVER/getrf/getrf_vs2019.vcxproj                | 2 +-
+ Libraries/hipSOLVER/getrf/getrf_vs2022.vcxproj                | 2 +-
+ Libraries/hipSOLVER/potrf/potrf_vs2017.vcxproj                | 2 +-
+ Libraries/hipSOLVER/potrf/potrf_vs2019.vcxproj                | 2 +-
+ Libraries/hipSOLVER/potrf/potrf_vs2022.vcxproj                | 2 +-
+ Libraries/hipSOLVER/syevd/syevd_vs2017.vcxproj                | 2 +-
+ Libraries/hipSOLVER/syevd/syevd_vs2019.vcxproj                | 2 +-
+ Libraries/hipSOLVER/syevd/syevd_vs2022.vcxproj                | 2 +-
+ Libraries/hipSOLVER/syevdx/syevdx_vs2017.vcxproj              | 4 ++--
+ Libraries/hipSOLVER/syevdx/syevdx_vs2019.vcxproj              | 4 ++--
+ Libraries/hipSOLVER/syevdx/syevdx_vs2022.vcxproj              | 4 ++--
+ Libraries/hipSOLVER/syevj/syevj_vs2017.vcxproj                | 2 +-
+ Libraries/hipSOLVER/syevj/syevj_vs2019.vcxproj                | 2 +-
+ Libraries/hipSOLVER/syevj/syevj_vs2022.vcxproj                | 2 +-
+ .../hipSOLVER/syevj_batched/syevj_batched_vs2017.vcxproj      | 4 ++--
+ .../hipSOLVER/syevj_batched/syevj_batched_vs2019.vcxproj      | 4 ++--
+ .../hipSOLVER/syevj_batched/syevj_batched_vs2022.vcxproj      | 4 ++--
+ Libraries/hipSOLVER/sygvd/sygvd_vs2017.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/sygvd/sygvd_vs2019.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/sygvd/sygvd_vs2022.vcxproj                | 4 ++--
+ Libraries/hipSOLVER/sygvj/sygvj_vs2017.vcxproj                | 2 +-
+ Libraries/hipSOLVER/sygvj/sygvj_vs2019.vcxproj                | 2 +-
+ Libraries/hipSOLVER/sygvj/sygvj_vs2022.vcxproj                | 2 +-
+ Libraries/rocBLAS/level_1/axpy/axpy_vs2017.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/axpy/axpy_vs2019.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/axpy/axpy_vs2022.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/dot/dot_vs2017.vcxproj              | 2 +-
+ Libraries/rocBLAS/level_1/dot/dot_vs2019.vcxproj              | 2 +-
+ Libraries/rocBLAS/level_1/dot/dot_vs2022.vcxproj              | 2 +-
+ Libraries/rocBLAS/level_1/nrm2/nrm2_vs2017.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/nrm2/nrm2_vs2019.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/nrm2/nrm2_vs2022.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/scal/scal_vs2017.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/scal/scal_vs2019.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/scal/scal_vs2022.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/swap/swap_vs2017.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/swap/swap_vs2019.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_1/swap/swap_vs2022.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_2/gemv/gemv_vs2017.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_2/gemv/gemv_vs2019.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_2/gemv/gemv_vs2022.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_2/her/her_vs2017.vcxproj              | 2 +-
+ Libraries/rocBLAS/level_2/her/her_vs2019.vcxproj              | 2 +-
+ Libraries/rocBLAS/level_2/her/her_vs2022.vcxproj              | 2 +-
+ Libraries/rocBLAS/level_3/gemm/gemm_vs2017.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_3/gemm/gemm_vs2019.vcxproj            | 2 +-
+ Libraries/rocBLAS/level_3/gemm/gemm_vs2022.vcxproj            | 2 +-
+ .../gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj  | 2 +-
+ .../gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj  | 2 +-
+ .../gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj  | 2 +-
+ Libraries/rocSOLVER/getf2/getf2_vs2017.vcxproj                | 2 +-
+ Libraries/rocSOLVER/getf2/getf2_vs2019.vcxproj                | 2 +-
+ Libraries/rocSOLVER/getf2/getf2_vs2022.vcxproj                | 2 +-
+ Libraries/rocSOLVER/getri/getri_vs2017.vcxproj                | 2 +-
+ Libraries/rocSOLVER/getri/getri_vs2019.vcxproj                | 2 +-
+ Libraries/rocSOLVER/getri/getri_vs2022.vcxproj                | 2 +-
+ Libraries/rocSOLVER/syev/syev_vs2017.vcxproj                  | 2 +-
+ Libraries/rocSOLVER/syev/syev_vs2019.vcxproj                  | 2 +-
+ Libraries/rocSOLVER/syev/syev_vs2022.vcxproj                  | 2 +-
+ Libraries/rocSOLVER/syev_batched/syev_batched_vs2017.vcxproj  | 2 +-
+ Libraries/rocSOLVER/syev_batched/syev_batched_vs2019.vcxproj  | 2 +-
+ Libraries/rocSOLVER/syev_batched/syev_batched_vs2022.vcxproj  | 2 +-
+ .../syev_strided_batched/syev_strided_batched_vs2017.vcxproj  | 2 +-
+ .../syev_strided_batched/syev_strided_batched_vs2019.vcxproj  | 2 +-
+ .../syev_strided_batched/syev_strided_batched_vs2022.vcxproj  | 2 +-
+ 84 files changed, 108 insertions(+), 108 deletions(-)
+
+diff --git a/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj b/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj
+index de8a4c87..8009fc03 100644
+--- a/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj
++++ b/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj b/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj
+index 3d211541..0dfe14bd 100644
+--- a/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj
++++ b/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj b/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj
+index 255767bf..c81c916f 100644
+--- a/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj
++++ b/Libraries/hipBLAS/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/her/her_vs2017.vcxproj b/Libraries/hipBLAS/her/her_vs2017.vcxproj
+index 9a42b7f5..d327fa1c 100644
+--- a/Libraries/hipBLAS/her/her_vs2017.vcxproj
++++ b/Libraries/hipBLAS/her/her_vs2017.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/her/her_vs2019.vcxproj b/Libraries/hipBLAS/her/her_vs2019.vcxproj
+index 16ccf8e1..402f0169 100644
+--- a/Libraries/hipBLAS/her/her_vs2019.vcxproj
++++ b/Libraries/hipBLAS/her/her_vs2019.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/her/her_vs2022.vcxproj b/Libraries/hipBLAS/her/her_vs2022.vcxproj
+index 17b956b1..96bb56c1 100644
+--- a/Libraries/hipBLAS/her/her_vs2022.vcxproj
++++ b/Libraries/hipBLAS/her/her_vs2022.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/scal/scal_vs2017.vcxproj b/Libraries/hipBLAS/scal/scal_vs2017.vcxproj
+index 270f30a9..822ff759 100644
+--- a/Libraries/hipBLAS/scal/scal_vs2017.vcxproj
++++ b/Libraries/hipBLAS/scal/scal_vs2017.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/scal/scal_vs2019.vcxproj b/Libraries/hipBLAS/scal/scal_vs2019.vcxproj
+index 4283cb74..ec7e3ea4 100644
+--- a/Libraries/hipBLAS/scal/scal_vs2019.vcxproj
++++ b/Libraries/hipBLAS/scal/scal_vs2019.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipBLAS/scal/scal_vs2022.vcxproj b/Libraries/hipBLAS/scal/scal_vs2022.vcxproj
+index cdba20df..c5fa3a8f 100644
+--- a/Libraries/hipBLAS/scal/scal_vs2022.vcxproj
++++ b/Libraries/hipBLAS/scal/scal_vs2022.vcxproj
+@@ -26,13 +26,13 @@
+     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
+   </ItemGroup>
+   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/gels/gels_vs2017.vcxproj b/Libraries/hipSOLVER/gels/gels_vs2017.vcxproj
+index 09cfb63b..67f75fb8 100644
+--- a/Libraries/hipSOLVER/gels/gels_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/gels/gels_vs2017.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/gels/gels_vs2019.vcxproj b/Libraries/hipSOLVER/gels/gels_vs2019.vcxproj
+index c9be1285..ae48f567 100644
+--- a/Libraries/hipSOLVER/gels/gels_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/gels/gels_vs2019.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/gels/gels_vs2022.vcxproj b/Libraries/hipSOLVER/gels/gels_vs2022.vcxproj
+index 0fbae1d5..83a9afce 100644
+--- a/Libraries/hipSOLVER/gels/gels_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/gels/gels_vs2022.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/geqrf/geqrf_vs2017.vcxproj b/Libraries/hipSOLVER/geqrf/geqrf_vs2017.vcxproj
+index 3cd8ad90..6684053f 100644
+--- a/Libraries/hipSOLVER/geqrf/geqrf_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/geqrf/geqrf_vs2017.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/geqrf/geqrf_vs2019.vcxproj b/Libraries/hipSOLVER/geqrf/geqrf_vs2019.vcxproj
+index 0e863f41..3be21d10 100644
+--- a/Libraries/hipSOLVER/geqrf/geqrf_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/geqrf/geqrf_vs2019.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/geqrf/geqrf_vs2022.vcxproj b/Libraries/hipSOLVER/geqrf/geqrf_vs2022.vcxproj
+index dfb2391c..4773924c 100644
+--- a/Libraries/hipSOLVER/geqrf/geqrf_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/geqrf/geqrf_vs2022.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/gesvd/gesvd_vs2017.vcxproj b/Libraries/hipSOLVER/gesvd/gesvd_vs2017.vcxproj
+index f117d3fe..2356c0c5 100644
+--- a/Libraries/hipSOLVER/gesvd/gesvd_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/gesvd/gesvd_vs2017.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/gesvd/gesvd_vs2019.vcxproj b/Libraries/hipSOLVER/gesvd/gesvd_vs2019.vcxproj
+index 4ccbd77b..093af140 100644
+--- a/Libraries/hipSOLVER/gesvd/gesvd_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/gesvd/gesvd_vs2019.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/gesvd/gesvd_vs2022.vcxproj b/Libraries/hipSOLVER/gesvd/gesvd_vs2022.vcxproj
+index 6137a7f3..bea8f666 100644
+--- a/Libraries/hipSOLVER/gesvd/gesvd_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/gesvd/gesvd_vs2022.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/getrf/getrf_vs2017.vcxproj b/Libraries/hipSOLVER/getrf/getrf_vs2017.vcxproj
+index 8090eb13..492620da 100644
+--- a/Libraries/hipSOLVER/getrf/getrf_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/getrf/getrf_vs2017.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/getrf/getrf_vs2019.vcxproj b/Libraries/hipSOLVER/getrf/getrf_vs2019.vcxproj
+index cc08916a..1ca93ceb 100644
+--- a/Libraries/hipSOLVER/getrf/getrf_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/getrf/getrf_vs2019.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/getrf/getrf_vs2022.vcxproj b/Libraries/hipSOLVER/getrf/getrf_vs2022.vcxproj
+index 708cf7ed..e69fe347 100644
+--- a/Libraries/hipSOLVER/getrf/getrf_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/getrf/getrf_vs2022.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/potrf/potrf_vs2017.vcxproj b/Libraries/hipSOLVER/potrf/potrf_vs2017.vcxproj
+index 0d3e8754..a759bbc2 100644
+--- a/Libraries/hipSOLVER/potrf/potrf_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/potrf/potrf_vs2017.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/potrf/potrf_vs2019.vcxproj b/Libraries/hipSOLVER/potrf/potrf_vs2019.vcxproj
+index 135db25e..e11297d1 100644
+--- a/Libraries/hipSOLVER/potrf/potrf_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/potrf/potrf_vs2019.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/potrf/potrf_vs2022.vcxproj b/Libraries/hipSOLVER/potrf/potrf_vs2022.vcxproj
+index 5fc33f53..615c247c 100644
+--- a/Libraries/hipSOLVER/potrf/potrf_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/potrf/potrf_vs2022.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevd/syevd_vs2017.vcxproj b/Libraries/hipSOLVER/syevd/syevd_vs2017.vcxproj
+index 9522ad1b..ffe88ae7 100644
+--- a/Libraries/hipSOLVER/syevd/syevd_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/syevd/syevd_vs2017.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevd/syevd_vs2019.vcxproj b/Libraries/hipSOLVER/syevd/syevd_vs2019.vcxproj
+index f91b23f0..ddd66ff3 100644
+--- a/Libraries/hipSOLVER/syevd/syevd_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/syevd/syevd_vs2019.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevd/syevd_vs2022.vcxproj b/Libraries/hipSOLVER/syevd/syevd_vs2022.vcxproj
+index de535cd6..7f0f4de1 100644
+--- a/Libraries/hipSOLVER/syevd/syevd_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/syevd/syevd_vs2022.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevdx/syevdx_vs2017.vcxproj b/Libraries/hipSOLVER/syevdx/syevdx_vs2017.vcxproj
+index c6240926..5758a905 100644
+--- a/Libraries/hipSOLVER/syevdx/syevdx_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/syevdx/syevdx_vs2017.vcxproj
+@@ -32,13 +32,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevdx/syevdx_vs2019.vcxproj b/Libraries/hipSOLVER/syevdx/syevdx_vs2019.vcxproj
+index 37f6cdc0..3be12831 100644
+--- a/Libraries/hipSOLVER/syevdx/syevdx_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/syevdx/syevdx_vs2019.vcxproj
+@@ -32,13 +32,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevdx/syevdx_vs2022.vcxproj b/Libraries/hipSOLVER/syevdx/syevdx_vs2022.vcxproj
+index bdf3d879..7e162d16 100644
+--- a/Libraries/hipSOLVER/syevdx/syevdx_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/syevdx/syevdx_vs2022.vcxproj
+@@ -32,13 +32,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevj/syevj_vs2017.vcxproj b/Libraries/hipSOLVER/syevj/syevj_vs2017.vcxproj
+index becdecdb..d3218662 100644
+--- a/Libraries/hipSOLVER/syevj/syevj_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/syevj/syevj_vs2017.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevj/syevj_vs2019.vcxproj b/Libraries/hipSOLVER/syevj/syevj_vs2019.vcxproj
+index 077490c5..2777e297 100644
+--- a/Libraries/hipSOLVER/syevj/syevj_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/syevj/syevj_vs2019.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevj/syevj_vs2022.vcxproj b/Libraries/hipSOLVER/syevj/syevj_vs2022.vcxproj
+index a80fa941..06780f08 100644
+--- a/Libraries/hipSOLVER/syevj/syevj_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/syevj/syevj_vs2022.vcxproj
+@@ -35,7 +35,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2017.vcxproj b/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2017.vcxproj
+index b9ae37e8..40f54007 100644
+--- a/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2017.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2019.vcxproj b/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2019.vcxproj
+index a2ed19dd..5252b0b1 100644
+--- a/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2019.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2022.vcxproj b/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2022.vcxproj
+index b798e5bc..78c8d4a9 100644
+--- a/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/syevj_batched/syevj_batched_vs2022.vcxproj
+@@ -33,13 +33,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/sygvd/sygvd_vs2017.vcxproj b/Libraries/hipSOLVER/sygvd/sygvd_vs2017.vcxproj
+index b6a1b12a..4d4acfe8 100644
+--- a/Libraries/hipSOLVER/sygvd/sygvd_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/sygvd/sygvd_vs2017.vcxproj
+@@ -32,13 +32,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/sygvd/sygvd_vs2019.vcxproj b/Libraries/hipSOLVER/sygvd/sygvd_vs2019.vcxproj
+index f54f074e..e90947ba 100644
+--- a/Libraries/hipSOLVER/sygvd/sygvd_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/sygvd/sygvd_vs2019.vcxproj
+@@ -32,13 +32,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/sygvd/sygvd_vs2022.vcxproj b/Libraries/hipSOLVER/sygvd/sygvd_vs2022.vcxproj
+index cfd2e7a8..056d9053 100644
+--- a/Libraries/hipSOLVER/sygvd/sygvd_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/sygvd/sygvd_vs2022.vcxproj
+@@ -32,13 +32,13 @@
+     <Content Include="$(HIPExecutablePath)\rocsolver.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
++    <Content Include="$(HIPExecutablePath)\hipblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/sygvj/sygvj_vs2017.vcxproj b/Libraries/hipSOLVER/sygvj/sygvj_vs2017.vcxproj
+index 606356f9..8084db74 100644
+--- a/Libraries/hipSOLVER/sygvj/sygvj_vs2017.vcxproj
++++ b/Libraries/hipSOLVER/sygvj/sygvj_vs2017.vcxproj
+@@ -34,7 +34,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/sygvj/sygvj_vs2019.vcxproj b/Libraries/hipSOLVER/sygvj/sygvj_vs2019.vcxproj
+index 033d5d9a..34e38d85 100644
+--- a/Libraries/hipSOLVER/sygvj/sygvj_vs2019.vcxproj
++++ b/Libraries/hipSOLVER/sygvj/sygvj_vs2019.vcxproj
+@@ -34,7 +34,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/hipSOLVER/sygvj/sygvj_vs2022.vcxproj b/Libraries/hipSOLVER/sygvj/sygvj_vs2022.vcxproj
+index 85d2c2f2..a4dc7ff2 100644
+--- a/Libraries/hipSOLVER/sygvj/sygvj_vs2022.vcxproj
++++ b/Libraries/hipSOLVER/sygvj/sygvj_vs2022.vcxproj
+@@ -34,7 +34,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/axpy/axpy_vs2017.vcxproj b/Libraries/rocBLAS/level_1/axpy/axpy_vs2017.vcxproj
+index 776ff484..f6108ca7 100644
+--- a/Libraries/rocBLAS/level_1/axpy/axpy_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_1/axpy/axpy_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/axpy/axpy_vs2019.vcxproj b/Libraries/rocBLAS/level_1/axpy/axpy_vs2019.vcxproj
+index 15a0976e..67247ec8 100644
+--- a/Libraries/rocBLAS/level_1/axpy/axpy_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_1/axpy/axpy_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/axpy/axpy_vs2022.vcxproj b/Libraries/rocBLAS/level_1/axpy/axpy_vs2022.vcxproj
+index 18e4ad2a..a8ae8d74 100644
+--- a/Libraries/rocBLAS/level_1/axpy/axpy_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_1/axpy/axpy_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/dot/dot_vs2017.vcxproj b/Libraries/rocBLAS/level_1/dot/dot_vs2017.vcxproj
+index 7f3fdb53..6cd8c26b 100644
+--- a/Libraries/rocBLAS/level_1/dot/dot_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_1/dot/dot_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/dot/dot_vs2019.vcxproj b/Libraries/rocBLAS/level_1/dot/dot_vs2019.vcxproj
+index d97d631c..c563c7b9 100644
+--- a/Libraries/rocBLAS/level_1/dot/dot_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_1/dot/dot_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/dot/dot_vs2022.vcxproj b/Libraries/rocBLAS/level_1/dot/dot_vs2022.vcxproj
+index 9897f901..7450c5cb 100644
+--- a/Libraries/rocBLAS/level_1/dot/dot_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_1/dot/dot_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2017.vcxproj b/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2017.vcxproj
+index 4c3a2ea8..47ad0592 100644
+--- a/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2019.vcxproj b/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2019.vcxproj
+index 389cf7a0..e02959fc 100644
+--- a/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2022.vcxproj b/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2022.vcxproj
+index 120389ca..ee888271 100644
+--- a/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_1/nrm2/nrm2_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/scal/scal_vs2017.vcxproj b/Libraries/rocBLAS/level_1/scal/scal_vs2017.vcxproj
+index 38a8417b..5a3c0231 100644
+--- a/Libraries/rocBLAS/level_1/scal/scal_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_1/scal/scal_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/scal/scal_vs2019.vcxproj b/Libraries/rocBLAS/level_1/scal/scal_vs2019.vcxproj
+index aba3ab3e..2fad0d11 100644
+--- a/Libraries/rocBLAS/level_1/scal/scal_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_1/scal/scal_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/scal/scal_vs2022.vcxproj b/Libraries/rocBLAS/level_1/scal/scal_vs2022.vcxproj
+index 9cfe3722..ed5ed2b5 100644
+--- a/Libraries/rocBLAS/level_1/scal/scal_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_1/scal/scal_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/swap/swap_vs2017.vcxproj b/Libraries/rocBLAS/level_1/swap/swap_vs2017.vcxproj
+index 917e9132..419cb038 100644
+--- a/Libraries/rocBLAS/level_1/swap/swap_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_1/swap/swap_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/swap/swap_vs2019.vcxproj b/Libraries/rocBLAS/level_1/swap/swap_vs2019.vcxproj
+index c8a874ea..d69f71da 100644
+--- a/Libraries/rocBLAS/level_1/swap/swap_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_1/swap/swap_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_1/swap/swap_vs2022.vcxproj b/Libraries/rocBLAS/level_1/swap/swap_vs2022.vcxproj
+index 3060e6f6..82359034 100644
+--- a/Libraries/rocBLAS/level_1/swap/swap_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_1/swap/swap_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_2/gemv/gemv_vs2017.vcxproj b/Libraries/rocBLAS/level_2/gemv/gemv_vs2017.vcxproj
+index 4134df72..e23f9a00 100644
+--- a/Libraries/rocBLAS/level_2/gemv/gemv_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_2/gemv/gemv_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_2/gemv/gemv_vs2019.vcxproj b/Libraries/rocBLAS/level_2/gemv/gemv_vs2019.vcxproj
+index b674c16d..726544db 100644
+--- a/Libraries/rocBLAS/level_2/gemv/gemv_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_2/gemv/gemv_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_2/gemv/gemv_vs2022.vcxproj b/Libraries/rocBLAS/level_2/gemv/gemv_vs2022.vcxproj
+index 550373e3..fdf3ac7c 100644
+--- a/Libraries/rocBLAS/level_2/gemv/gemv_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_2/gemv/gemv_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_2/her/her_vs2017.vcxproj b/Libraries/rocBLAS/level_2/her/her_vs2017.vcxproj
+index a0d10243..2b24c731 100644
+--- a/Libraries/rocBLAS/level_2/her/her_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_2/her/her_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_2/her/her_vs2019.vcxproj b/Libraries/rocBLAS/level_2/her/her_vs2019.vcxproj
+index 137fbbde..3cab3342 100644
+--- a/Libraries/rocBLAS/level_2/her/her_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_2/her/her_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_2/her/her_vs2022.vcxproj b/Libraries/rocBLAS/level_2/her/her_vs2022.vcxproj
+index 2b15c8c9..e9263baa 100644
+--- a/Libraries/rocBLAS/level_2/her/her_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_2/her/her_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_3/gemm/gemm_vs2017.vcxproj b/Libraries/rocBLAS/level_3/gemm/gemm_vs2017.vcxproj
+index 8e48ac0a..10ae15e8 100644
+--- a/Libraries/rocBLAS/level_3/gemm/gemm_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_3/gemm/gemm_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_3/gemm/gemm_vs2019.vcxproj b/Libraries/rocBLAS/level_3/gemm/gemm_vs2019.vcxproj
+index d2c9e895..066516f4 100644
+--- a/Libraries/rocBLAS/level_3/gemm/gemm_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_3/gemm/gemm_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_3/gemm/gemm_vs2022.vcxproj b/Libraries/rocBLAS/level_3/gemm/gemm_vs2022.vcxproj
+index f683495f..ce1322e0 100644
+--- a/Libraries/rocBLAS/level_3/gemm/gemm_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_3/gemm/gemm_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj b/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj
+index 7cfcc6ca..1c92a92d 100644
+--- a/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj
++++ b/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2017.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj b/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj
+index 424433ec..b7a7d8bc 100644
+--- a/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj
++++ b/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2019.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj b/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj
+index bd618e7f..cb9135de 100644
+--- a/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj
++++ b/Libraries/rocBLAS/level_3/gemm_strided_batched/gemm_strided_batched_vs2022.vcxproj
+@@ -29,7 +29,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/getf2/getf2_vs2017.vcxproj b/Libraries/rocSOLVER/getf2/getf2_vs2017.vcxproj
+index c5ebe3fd..1cbe1aaa 100644
+--- a/Libraries/rocSOLVER/getf2/getf2_vs2017.vcxproj
++++ b/Libraries/rocSOLVER/getf2/getf2_vs2017.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/getf2/getf2_vs2019.vcxproj b/Libraries/rocSOLVER/getf2/getf2_vs2019.vcxproj
+index 031dbd96..6efa491d 100644
+--- a/Libraries/rocSOLVER/getf2/getf2_vs2019.vcxproj
++++ b/Libraries/rocSOLVER/getf2/getf2_vs2019.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/getf2/getf2_vs2022.vcxproj b/Libraries/rocSOLVER/getf2/getf2_vs2022.vcxproj
+index 4d0e5e5b..501cb85e 100644
+--- a/Libraries/rocSOLVER/getf2/getf2_vs2022.vcxproj
++++ b/Libraries/rocSOLVER/getf2/getf2_vs2022.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/getri/getri_vs2017.vcxproj b/Libraries/rocSOLVER/getri/getri_vs2017.vcxproj
+index 1cfc8f8e..9e02b0c7 100644
+--- a/Libraries/rocSOLVER/getri/getri_vs2017.vcxproj
++++ b/Libraries/rocSOLVER/getri/getri_vs2017.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/getri/getri_vs2019.vcxproj b/Libraries/rocSOLVER/getri/getri_vs2019.vcxproj
+index 6e2ab1f2..63f4b99c 100644
+--- a/Libraries/rocSOLVER/getri/getri_vs2019.vcxproj
++++ b/Libraries/rocSOLVER/getri/getri_vs2019.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/getri/getri_vs2022.vcxproj b/Libraries/rocSOLVER/getri/getri_vs2022.vcxproj
+index af4a6cef..2571135e 100644
+--- a/Libraries/rocSOLVER/getri/getri_vs2022.vcxproj
++++ b/Libraries/rocSOLVER/getri/getri_vs2022.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev/syev_vs2017.vcxproj b/Libraries/rocSOLVER/syev/syev_vs2017.vcxproj
+index 6fb05c90..f7100be5 100644
+--- a/Libraries/rocSOLVER/syev/syev_vs2017.vcxproj
++++ b/Libraries/rocSOLVER/syev/syev_vs2017.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev/syev_vs2019.vcxproj b/Libraries/rocSOLVER/syev/syev_vs2019.vcxproj
+index 3c0248bf..304be743 100644
+--- a/Libraries/rocSOLVER/syev/syev_vs2019.vcxproj
++++ b/Libraries/rocSOLVER/syev/syev_vs2019.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev/syev_vs2022.vcxproj b/Libraries/rocSOLVER/syev/syev_vs2022.vcxproj
+index 33e384ae..b4a8c547 100644
+--- a/Libraries/rocSOLVER/syev/syev_vs2022.vcxproj
++++ b/Libraries/rocSOLVER/syev/syev_vs2022.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev_batched/syev_batched_vs2017.vcxproj b/Libraries/rocSOLVER/syev_batched/syev_batched_vs2017.vcxproj
+index 196ff4c2..bbfa0169 100644
+--- a/Libraries/rocSOLVER/syev_batched/syev_batched_vs2017.vcxproj
++++ b/Libraries/rocSOLVER/syev_batched/syev_batched_vs2017.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev_batched/syev_batched_vs2019.vcxproj b/Libraries/rocSOLVER/syev_batched/syev_batched_vs2019.vcxproj
+index d4317e2e..ceb40508 100644
+--- a/Libraries/rocSOLVER/syev_batched/syev_batched_vs2019.vcxproj
++++ b/Libraries/rocSOLVER/syev_batched/syev_batched_vs2019.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev_batched/syev_batched_vs2022.vcxproj b/Libraries/rocSOLVER/syev_batched/syev_batched_vs2022.vcxproj
+index a415b170..dcd0fe96 100644
+--- a/Libraries/rocSOLVER/syev_batched/syev_batched_vs2022.vcxproj
++++ b/Libraries/rocSOLVER/syev_batched/syev_batched_vs2022.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2017.vcxproj b/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2017.vcxproj
+index 50414925..bc038c1b 100644
+--- a/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2017.vcxproj
++++ b/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2017.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2019.vcxproj b/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2019.vcxproj
+index 0c365484..0b78628a 100644
+--- a/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2019.vcxproj
++++ b/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2019.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+diff --git a/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2022.vcxproj b/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2022.vcxproj
+index 5113a5d8..7b9adeb5 100644
+--- a/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2022.vcxproj
++++ b/Libraries/rocSOLVER/syev_strided_batched/syev_strided_batched_vs2022.vcxproj
+@@ -32,7 +32,7 @@
+     <Content Include="$(HIPExecutablePath)\rocblas.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
++    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </Content>
+     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">
+-- 
+2.43.0
+
