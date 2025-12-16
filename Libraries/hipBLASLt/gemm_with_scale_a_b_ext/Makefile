@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hipblaslt_gemm_scale_a_b_ext
+EXAMPLE := hipblaslt_gemm_with_scale_a_b_ext
 COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME ?= HIP
