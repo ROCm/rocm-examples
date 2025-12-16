@@ -101,3 +101,7 @@ $(EXAMPLE): main.cpp visualize.cpp $(BUILD_DIR)/mvdeploy_api.cpp $(BUILD_DIR)/mv
 clean:
 	$(RM) $(EXAMPLE)
 	$(RM) -r $(BUILD_DIR)
+
+# The Python scripts used by MIVisionX don't tolerate parallel Makefile builds.
+# The file generator must be run serially.
+.NOTPARALLEL: $(GENERATED_FILES)
