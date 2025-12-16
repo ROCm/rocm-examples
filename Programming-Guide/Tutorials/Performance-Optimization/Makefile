@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-  Applications \
-  HIP-Basic \
-  HIP-Doc \
-  Libraries \
-  Programming-Guide \
-  Tools
+EXAMPLES := \
+  basic_image_gamma_correction \
+  grid_stride_image_gamma_correction \
+  tiling_matrix_multiply \
+  tiling_matrix_transpose
 
-all: $(SUB_PROJECTS)
+all: $(EXAMPLES)
 
 clean: TARGET=clean
 clean: all
 
-$(SUB_PROJECTS):
+$(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(SUB_PROJECTS)
+.PHONY: all clean $(EXAMPLES)
