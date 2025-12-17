@@ -22,6 +22,8 @@
 
 #include <hip/hip_runtime.h>
 
+#include <algorithm>
+#include <cmath>
 #include <cstdlib>
 #include <iostream>
 #include <vector>
@@ -77,60 +79,135 @@ __global__ void transpose_lds_kernel(float* in, float* out, int width, int heigh
 }
 // [Sphinx HIP matrix transpose LDS kernel end]
 
+// Helper function to compare floating-point values with tolerance
+bool are_close(float a, float b, float rel_tol = 1e-5f, float abs_tol = 1e-8f)
+{
+    return std::abs(a - b) <= std::max(rel_tol * std::max(std::abs(a), std::abs(b)), abs_tol);
+}
+
+// Verify results between two output arrays
+bool verify_results(const std::vector<float>& naive_out,
+                    const std::vector<float>& lds_out,
+                    int& mismatch_count,
+                    float& max_diff)
+{
+    mismatch_count = 0;
+    max_diff       = 0.0f;
+
+    for(size_t i = 0; i < naive_out.size(); i++)
+    {
+        if(!are_close(naive_out[i], lds_out[i]))
+        {
+            mismatch_count++;
+            float diff = std::abs(naive_out[i] - lds_out[i]);
+            max_diff   = std::max(max_diff, diff);
+        }
+    }
+
+    return mismatch_count == 0;
+}
+
 int main()
 {
-    std::vector<float> matrix_in;
-    std::vector<float> matrix_out;
+    std::cout << "Matrix Transpose Example\n";
+    std::cout << "Matrix size: " << width << "x" << height << "\n";
+    std::cout << "Tile dimension: " << tile_dim << "x" << tile_dim << "\n\n";
 
-    matrix_in.resize(width * height);
-    matrix_out.resize(width * height);
+    // Host memory allocation
+    std::vector<float> matrix_in(width * height);
+    std::vector<float> matrix_out_naive(width * height);
+    std::vector<float> matrix_out_lds(width * height);
 
+    // Initialize input matrix with random values
     for(int i = 0; i < width * height; i++)
     {
         matrix_in[i] = (float)rand() / (float)RAND_MAX;
     }
 
-    // printf("\\nInput matrix:\\n");
-    // for (int i = 0; i < height; i++) {
-    //   for (int j = 0; j < width; j++) {
-    //     printf("%.2f ", matrix_in[i * width + j]);
-    //   }
-    //   printf("\\n");
-    // }
-
+    // Device memory allocation
     float* d_in;
-    float* d_out;
+    float* d_out_naive;
+    float* d_out_lds;
 
-    hipMalloc((void**)&d_in, width * height * sizeof(float));
-    hipMalloc((void**)&d_out, width * height * sizeof(float));
+    HIP_CHECK(hipMalloc((void**)&d_in, width * height * sizeof(float)));
+    HIP_CHECK(hipMalloc((void**)&d_out_naive, width * height * sizeof(float)));
+    HIP_CHECK(hipMalloc((void**)&d_out_lds, width * height * sizeof(float)));
 
-    hipMemcpy(d_in, matrix_in.data(), width * height * sizeof(float), hipMemcpyHostToDevice);
+    // Copy input data to device
+    HIP_CHECK(
+        hipMemcpy(d_in, matrix_in.data(), width * height * sizeof(float), hipMemcpyHostToDevice));
 
+    // Kernel launch configuration
     int block_x = width / tile_dim;
     int block_y = height / tile_dim;
+    dim3 grid_dim(block_x, block_y);
+    dim3 block_dim(tile_dim, tile_dim);
 
-    transpose_naive_kernel<<<dim3(block_x, block_y), dim3(tile_dim, tile_dim)>>>(d_in,
-                                                                                 d_out,
-                                                                                 width,
-                                                                                 height);
-    transpose_lds_kernel<<<dim3(block_x, block_y), dim3(tile_dim, tile_dim)>>>(d_in,
-                                                                               d_out,
-                                                                               width,
-                                                                               height);
+    // Create events for timing
+    hipEvent_t start_naive, stop_naive, start_lds, stop_lds;
+    HIP_CHECK(hipEventCreate(&start_naive));
+    HIP_CHECK(hipEventCreate(&stop_naive));
+    HIP_CHECK(hipEventCreate(&start_lds));
+    HIP_CHECK(hipEventCreate(&stop_lds));
 
-    hipMemcpy(matrix_out.data(), d_out, width * height * sizeof(float), hipMemcpyDeviceToHost);
-    hipDeviceSynchronize();
+    // Run naive kernel with timing
+    HIP_CHECK(hipEventRecord(start_naive, 0));
+    transpose_naive_kernel<<<grid_dim, block_dim>>>(d_in, d_out_naive, width, height);
+    HIP_CHECK(hipEventRecord(stop_naive, 0));
+    HIP_CHECK(hipEventSynchronize(stop_naive));
 
-    // printf("\\nOutput matrix:\\n");
-    // for (int i = 0; i < height; i++) {
-    //   for (int j = 0; j < width; j++) {
-    //     printf("%.2f ", matrix_out[i*width + j]);
-    //   }
-    //   printf("\\n");
-    // }
+    // Run LDS kernel with timing
+    HIP_CHECK(hipEventRecord(start_lds, 0));
+    transpose_lds_kernel<<<grid_dim, block_dim>>>(d_in, d_out_lds, width, height);
+    HIP_CHECK(hipEventRecord(stop_lds, 0));
+    HIP_CHECK(hipEventSynchronize(stop_lds));
 
-    hipFree(d_in);
-    hipFree(d_out);
+    // Calculate elapsed times
+    float time_naive_ms, time_lds_ms;
+    HIP_CHECK(hipEventElapsedTime(&time_naive_ms, start_naive, stop_naive));
+    HIP_CHECK(hipEventElapsedTime(&time_lds_ms, start_lds, stop_lds));
+
+    // Copy results back to host
+    HIP_CHECK(hipMemcpy(matrix_out_naive.data(),
+                        d_out_naive,
+                        width * height * sizeof(float),
+                        hipMemcpyDeviceToHost));
+    HIP_CHECK(hipMemcpy(matrix_out_lds.data(),
+                        d_out_lds,
+                        width * height * sizeof(float),
+                        hipMemcpyDeviceToHost));
+
+    // Verify results
+    int mismatch_count;
+    float max_diff;
+    bool results_match = verify_results(matrix_out_naive, matrix_out_lds, mismatch_count, max_diff);
+
+    // Display verification results
+    std::cout << "Verification: ";
+    if(results_match)
+    {
+        std::cout << "PASSED - Results match within tolerance\n";
+    }
+    else
+    {
+        std::cout << "FAILED - " << mismatch_count << " mismatches found\n";
+        std::cout << "Maximum difference: " << max_diff << "\n";
+    }
+
+    // Display performance results
+    std::cout << "\nPerformance:\n";
+    std::cout << "Naive kernel time: " << time_naive_ms << " ms\n";
+    std::cout << "LDS kernel time:   " << time_lds_ms << " ms\n";
+    std::cout << "Speedup:           " << (time_naive_ms / time_lds_ms) << "x\n";
+
+    // Cleanup
+    HIP_CHECK(hipEventDestroy(start_naive));
+    HIP_CHECK(hipEventDestroy(stop_naive));
+    HIP_CHECK(hipEventDestroy(start_lds));
+    HIP_CHECK(hipEventDestroy(stop_lds));
+    HIP_CHECK(hipFree(d_in));
+    HIP_CHECK(hipFree(d_out_naive));
+    HIP_CHECK(hipFree(d_out_lds));
 
     return 0;
 }
