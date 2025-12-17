@@ -127,19 +127,3 @@
     <Import Condition="'$(PlatformToolset)'=='HIP nvcc $(HIPVersion)'" Project="$(VCTargetsPath)\Platforms\$(Platform)\PlatformToolsets\HIP nvcc $(HIPVersion)\AMD.HIP.Nvcc.Common.targets" />
   </ImportGroup>
 </Project>
-
-</final_file_content>
-<task_progress>
-- [x] Analyze leaf directory CMakeLists.txt files
-- [x] Analyze leaf directory Makefiles  
-- [x] Analyze leaf directory .gitignore files
-- [x] Analyze leaf directory Visual Studio files
-- [x] Analyze leaf directory README.md files
-- [x] Create CMakeLists.txt for tutorial subdirectories
-- [x] Create Makefiles for tutorial subdirectories
-- [x] Create .gitignore files for tutorial subdirectories
-- [ ] Create Visual Studio files (2017, 2019, 2022) with HIP clang and nvcc support (16/24 files complete)
-- [ ] Add Visual Studio files to top-level solution files
-- [ ] Create README.md files for tutorial subdirectories
-</task_progress>
-</write_to_file>
