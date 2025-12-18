@@ -43,9 +43,9 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hipblas)
+find_package(hipblas QUIET)
 if(NOT hipblas_FOUND)
-    message(STATUS "hipBLAS could not be found, not building hipBLAS examples")
+    message(WARNING "hipBLAS could not be found, not building hipBLAS examples")
     return()
 endif()
 

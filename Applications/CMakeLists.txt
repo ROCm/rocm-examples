@@ -34,7 +34,7 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-find_package(glfw3)
+find_package(glfw3 QUIET)
 
 add_subdirectory(bitonic_sort)
 add_subdirectory(convolution)
@@ -43,7 +43,7 @@ add_subdirectory(histogram)
 add_subdirectory(prefix_sum)
 
 if(NOT CXX_FS_HEADER_FOUND)
-    message("filesystem not found, not building fdtd example")
+    message(WARNING "filesystem not found, not building fdtd example")
 else()
     add_subdirectory(fdtd)
 endif()
@@ -53,7 +53,7 @@ if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQ
 endif()
 
 if(NOT glfw3_FOUND)
-    message("GLFW not found, not building sobel filter example")
+    message(WARNING "GLFW not found, not building sobel filter example")
 else()
     add_subdirectory(sobel_filter)
 endif()

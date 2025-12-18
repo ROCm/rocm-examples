@@ -48,9 +48,9 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocFFT)
+find_package(rocFFT QUIET)
 if(NOT rocFFT_FOUND)
-    message(STATUS "rocFFT could not be found, not building rocFFT examples")
+    message(WARNING "rocFFT could not be found, not building rocFFT examples")
     return()
 endif()
 

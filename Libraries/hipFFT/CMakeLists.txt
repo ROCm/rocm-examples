@@ -43,9 +43,9 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hipfft)
+find_package(hipfft QUIET)
 if(NOT hipfft_FOUND)
-    message(STATUS "hipFFT could not be found, not building hipFFT examples")
+    message(WARNING "hipFFT could not be found, not building hipFFT examples")
     return()
 endif()
 

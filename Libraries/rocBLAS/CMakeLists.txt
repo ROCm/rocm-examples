@@ -48,9 +48,9 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocblas)
+find_package(rocblas QUIET)
 if(NOT rocblas_FOUND)
-    message(STATUS "rocBLAS could not be found, not building rocBLAS examples")
+    message(WARNING "rocBLAS could not be found, not building rocBLAS examples")
     return()
 endif()
 

@@ -39,7 +39,7 @@ else()
     add_subdirectory(linker_apis_options)
 
     if(NOT CXX_FS_HEADER_FOUND)
-        message("filesystem not found, not building Linker APIs File example")
+        message(WARNING "filesystem not found, not building Linker APIs File example")
     else()
         add_subdirectory(linker_apis_file)
     endif()

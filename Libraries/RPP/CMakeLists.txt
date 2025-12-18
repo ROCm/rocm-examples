@@ -77,7 +77,7 @@ if(NOT rpp_FOUND)
 
         set(rpp_FOUND TRUE)
     else()
-        message(STATUS "RPP could not be found, not building RPP examples")
+        message(WARNING "RPP could not be found, not building RPP examples")
         if(NOT RPP_LIBRARY)
             message(STATUS "  - RPP library not found")
         endif()

@@ -43,9 +43,9 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocrand)
+find_package(rocrand QUIET)
 if(NOT rocrand_FOUND)
-    message(STATUS "rocRAND could not be found, not building rocRAND examples")
+    message(WARNING "rocRAND could not be found, not building rocRAND examples")
     return()
 endif()
 

@@ -48,10 +48,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocsparse)
+find_package(rocsparse QUIET)
 if(NOT rocsparse_FOUND)
     message(
-        STATUS
+        WARNING
         "rocSPARSE could not be found, not building rocSPARSE examples"
     )
     return()

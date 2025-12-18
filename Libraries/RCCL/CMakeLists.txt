@@ -40,9 +40,9 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rccl)
+find_package(rccl QUIET)
 if(NOT rccl_FOUND)
-    message(STATUS "RCCL could not be found, not building RCCL examples")
+    message(WARNING "RCCL could not be found, not building RCCL examples")
     return()
 endif()
 

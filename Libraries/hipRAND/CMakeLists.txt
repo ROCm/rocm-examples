@@ -42,7 +42,7 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hiprand)
+find_package(hiprand QUIET)
 
 #Workaround for hipRAND, requires manual linking with backend.
 if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
@@ -52,7 +52,7 @@ else()
 endif()
 
 if(NOT hiprand_FOUND)
-    message(STATUS "hipRAND could not be found, not building hipRAND examples")
+    message(WARNING "hipRAND could not be found, not building hipRAND examples")
     return()
 endif()
 

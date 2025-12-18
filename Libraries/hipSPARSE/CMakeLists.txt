@@ -43,9 +43,9 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hipsparse)
+find_package(hipsparse QUIET)
 if(NOT hipsparse_FOUND)
-    message(STATUS "hipSPARSE could not be found, not building hipSPARSE examples")
+    message(WARNING "hipSPARSE could not be found, not building hipSPARSE examples")
     return()
 endif()
 

@@ -37,7 +37,7 @@ set(ROCPROF_COMPUTE_SUPPORTED_ARCH gfx908 gfx90a gfx940 gfx941 gfx942 gfx950)
 
 foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
     if(NOT ARCH IN_LIST ROCPROF_COMPUTE_SUPPORTED_ARCH)
-        message(STATUS "${example_name} does not support architecture ${ARCH}. Not building ${example_name} examples")
+        message(WARNING "${example_name} does not support architecture ${ARCH}. Not building ${example_name} examples")
         return()
     endif()
 endforeach()
