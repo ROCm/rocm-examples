@@ -20,26 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Programming-Guide-Porting-CUDA-code-to-HIP LANGUAGES CXX)
+EXAMPLE := hip_lane_masks_bit_shift
+GPU_RUNTIME ?= HIP
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+# HIP variables
+ROCM_INSTALL_DIR ?= /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-add_subdirectory(address_retrieval)
-add_subdirectory(device_code_feature_identification)
-add_subdirectory(host_code_feature_identification)
-add_subdirectory(identifying_compilation_target_platform)
-add_subdirectory(identifying_host_device_compilation_pass)
-add_subdirectory(load_module)
-add_subdirectory(load_module_ex)
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-if(NOT ${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
-    message(STATUS "The load_module_ex_cuda example is available only for CUDA.")
-else()
-    add_subdirectory(load_module_ex_cuda)
-endif()
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
 
-add_subdirectory(lane_masks_bit_shift)
-add_subdirectory(per_thread_default_stream)
-add_subdirectory(pointer_memory_type)
+ifeq ($(GPU_RUNTIME), CUDA)
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+  CXXFLAGS ?= -Wall -Wextra
+else
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

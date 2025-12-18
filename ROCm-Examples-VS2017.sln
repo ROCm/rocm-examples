@@ -376,6 +376,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "per_thread_default_stream_v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointer_memory_type_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\pointer_memory_type\pointer_memory_type_vs2017.vcxproj", "{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lane_masks_bit_shift_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\lane_masks_bit_shift\lane_masks_bit_shift_vs2017.vcxproj", "{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "async_kernel_execution_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\async_kernel_execution\async_kernel_execution_vs2017.vcxproj", "{97295C91-A455-4B78-89C9-BB6EA1791BBE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\event_based_synchronization\event_based_synchronization_vs2017.vcxproj", "{54C05E77-0E5D-449E-B048-8166D2EE97E7}"
@@ -1060,6 +1062,10 @@ Global
 		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}.Debug|x64.Build.0 = Debug|x64
 		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}.Release|x64.ActiveCfg = Release|x64
 		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}.Release|x64.Build.0 = Release|x64
+		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Debug|x64.ActiveCfg = Debug|x64
+		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Debug|x64.Build.0 = Debug|x64
+		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Release|x64.ActiveCfg = Release|x64
+		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Release|x64.Build.0 = Release|x64
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE}.Debug|x64.ActiveCfg = Debug|x64
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE}.Debug|x64.Build.0 = Debug|x64
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE}.Release|x64.ActiveCfg = Release|x64
