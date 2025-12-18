@@ -43,7 +43,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocjpeg)
 if(NOT rocjpeg_FOUND)
     message(STATUS "rocJPEG could not be found, not building rocJPEG examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(rocjpeg_decode)

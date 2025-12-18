@@ -46,7 +46,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(hipcub)
 if(NOT hipcub_FOUND)
     message(STATUS "hipCUB could not be found, not building hipCUB examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(device_radix_sort)

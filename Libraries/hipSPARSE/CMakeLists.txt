@@ -46,7 +46,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(hipsparse)
 if(NOT hipsparse_FOUND)
     message(STATUS "hipSPARSE could not be found, not building hipSPARSE examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(axpyi)

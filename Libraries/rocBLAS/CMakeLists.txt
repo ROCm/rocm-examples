@@ -51,7 +51,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocblas)
 if(NOT rocblas_FOUND)
     message(STATUS "rocBLAS could not be found, not building rocBLAS examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(level_1)

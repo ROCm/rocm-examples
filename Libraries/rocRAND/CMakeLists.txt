@@ -46,7 +46,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocrand)
 if(NOT rocrand_FOUND)
     message(STATUS "rocRAND could not be found, not building rocRAND examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(c_cpp_api)

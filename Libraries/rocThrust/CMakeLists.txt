@@ -54,7 +54,7 @@ if(NOT rocthrust_FOUND)
         STATUS
         "rocThrust could not be found, not building rocThrust examples"
     )
-    return(1)
+    return()
 endif()
 
 add_subdirectory(device_ptr)

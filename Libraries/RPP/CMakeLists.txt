@@ -84,7 +84,7 @@ if(NOT rpp_FOUND)
         if(NOT RPP_INCLUDE_DIR)
             message(STATUS "  - RPP headers not found")
         endif()
-        return(1)
+        return()
     endif()
 endif()
 

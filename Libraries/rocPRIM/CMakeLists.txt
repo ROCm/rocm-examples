@@ -51,7 +51,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocprim)
 if(NOT rocprim_FOUND)
     message(STATUS "rocPRIM could not be found, not building rocPRIM examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(block_sum)

@@ -43,7 +43,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rccl)
 if(NOT rccl_FOUND)
     message(STATUS "RCCL could not be found, not building RCCL examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(allgather)

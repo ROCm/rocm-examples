@@ -51,7 +51,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocFFT)
 if(NOT rocFFT_FOUND)
     message(STATUS "rocFFT could not be found, not building rocFFT examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(callback)

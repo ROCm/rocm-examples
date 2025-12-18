@@ -46,7 +46,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(hipfft)
 if(NOT hipfft_FOUND)
     message(STATUS "hipFFT could not be found, not building hipFFT examples")
-    return(1)
+    return()
 endif()
 
 add_subdirectory(callback)
