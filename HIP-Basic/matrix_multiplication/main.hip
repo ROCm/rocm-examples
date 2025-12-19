@@ -28,10 +28,9 @@
 #include <algorithm>
 #include <iostream>
 #include <vector>
-#include <cstdlib>
+
 #include <cassert>
 #include <cstddef>
-#include <memory>
 
 /// \brief Multiplies matrices \p A and \p B and stores the result to \p C.
 /// - The number of rows of the result matrix is equal to the number of rows of matrix A
@@ -214,9 +213,9 @@ int main(int argc, const char* argv[])
     std::vector<float> C(c_cols * c_rows);
 
     // Set matrix elements to random value on the host.
-    for (size_t i = 0; i < A.size(); ++i) A[i] = static_cast<float>(rand() / RAND_MAX );
-    for (size_t i = 0; i < B.size(); ++i) B[i] = static_cast<float>(rand() / RAND_MAX );
-
+    for (size_t i = 0; i < A.size(); ++i) A[i] = static_cast<float>(rand() / (RAND_MAX + 1.0f) );
+    for (size_t i = 0; i < B.size(); ++i) B[i] = static_cast<float>(rand() / (RAND_MAX + 1.0f) );
+    
     const size_t a_bytes = sizeof(float) * A.size();
     const size_t b_bytes = sizeof(float) * B.size();
     const size_t c_bytes = sizeof(float) * C.size();
