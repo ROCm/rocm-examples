@@ -48,22 +48,22 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocblas)
+find_package(rocblas QUIET)
 if(NOT rocblas_FOUND)
     message(
-        STATUS
+        WARNING
         "rocBLAS could not be found, not building rocSOLVER examples"
     )
-    return(1)
+    return()
 endif()
 
-find_package(rocsolver)
+find_package(rocsolver QUIET)
 if(NOT rocsolver_FOUND)
     message(
-        STATUS
+        WARNING
         "rocSOLVER could not be found, not building rocSOLVER examples"
     )
-    return(1)
+    return()
 endif()
 
 add_subdirectory(getf2)

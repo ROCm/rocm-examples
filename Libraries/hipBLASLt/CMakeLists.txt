@@ -40,10 +40,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hipblaslt)
+find_package(hipblaslt QUIET)
 if(NOT hipblaslt_FOUND)
-    message(STATUS "hipBLASLt could not be found, not building hipBLASLt examples")
-    return(1)
+    message(WARNING "hipBLASLt could not be found, not building hipBLASLt examples")
+    return()
 endif()
 
 add_subdirectory(ext_op_amax)

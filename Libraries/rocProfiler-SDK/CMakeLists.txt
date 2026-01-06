@@ -40,10 +40,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocprofiler-sdk)
+find_package(rocprofiler-sdk QUIET)
 if(NOT rocprofiler-sdk_FOUND)
-    message(STATUS "rocProfiler-SDK could not be found, not building rocProfiler-SDK examples")
-    return(1)
+    message(WARNING "rocProfiler-SDK could not be found, not building rocProfiler-SDK examples")
+    return()
 endif()
 
 add_subdirectory(api_buffered_tracing)

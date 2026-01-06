@@ -62,7 +62,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(hip REQUIRED)
 find_program(ROCGDB_EXEC NAMES rocgdb)
 if(NOT ROCGDB_EXEC)
-    message(STATUS "ROCgdb not found. Skipping ROCgdb examples.")
+    message(WARNING "ROCgdb not found. Skipping ROCgdb examples.")
     return()
 endif()
 

@@ -48,13 +48,13 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocthrust)
+find_package(rocthrust QUIET)
 if(NOT rocthrust_FOUND)
     message(
-        STATUS
+        WARNING
         "rocThrust could not be found, not building rocThrust examples"
     )
-    return(1)
+    return()
 endif()
 
 add_subdirectory(device_ptr)

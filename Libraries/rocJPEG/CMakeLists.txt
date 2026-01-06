@@ -40,10 +40,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocjpeg)
+find_package(rocjpeg QUIET)
 if(NOT rocjpeg_FOUND)
-    message(STATUS "rocJPEG could not be found, not building rocJPEG examples")
-    return(1)
+    message(WARNING "rocJPEG could not be found, not building rocJPEG examples")
+    return()
 endif()
 
 add_subdirectory(rocjpeg_decode)

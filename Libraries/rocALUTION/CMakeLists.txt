@@ -40,10 +40,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(rocalution)
+find_package(rocalution QUIET)
 if(NOT rocalution_FOUND)
     message(
-        STATUS
+        WARNING
         "rocALUTION could not be found, not building rocALUTION examples"
     )
     return()

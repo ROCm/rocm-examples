@@ -32,7 +32,7 @@ set(HIPTENSOR_SUPPORTED_ARCH gfx908 gfx90a gfx942 gfx950)
 
 foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
     if(NOT ARCH IN_LIST HIPTENSOR_SUPPORTED_ARCH)
-        message(STATUS "hipTensor does not support architecture: ${ARCH}, not building hipTensor examples")
+        message(WARNING "hipTensor does not support architecture: ${ARCH}, not building hipTensor examples")
         return()
     endif()
 endforeach()
@@ -50,10 +50,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hiptensor)
+find_package(hiptensor QUIET)
 if(NOT hiptensor_FOUND)
     message(
-        STATUS
+        WARNING
         "hipTensor could not be found, not building hipTensor examples"
     )
     return()

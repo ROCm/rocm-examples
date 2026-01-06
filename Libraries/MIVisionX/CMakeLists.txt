@@ -51,8 +51,8 @@ find_library(OpenVX_LIBRARY
 )
 
 if(NOT OpenVX_LIBRARY)
-    message(STATUS "MIVisionX/OpenVX could not be found, not building MIVisionX examples")
-    return(1)
+    message(WARNING "MIVisionX/OpenVX could not be found, not building MIVisionX examples")
+    return()
 endif()
 
 add_subdirectory(canny)

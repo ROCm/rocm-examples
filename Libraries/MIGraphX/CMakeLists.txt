@@ -40,10 +40,10 @@ set(ROCM_ROOT
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(migraphx)
+find_package(migraphx QUIET)
 if(NOT migraphx_FOUND)
     message(
-        STATUS
+        WARNING
         "MIGraphX could not be found, not building MIGraphX examples"
     )
     return()

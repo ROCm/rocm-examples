@@ -43,13 +43,13 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hipsolver)
+find_package(hipsolver QUIET)
 if(NOT hipsolver_FOUND)
     message(
-        STATUS
+        WARNING
         "hipSOLVER could not be found, not building hipSOLVER examples"
     )
-    return(1)
+    return()
 endif()
 
 add_subdirectory(gels)
