@@ -51,6 +51,7 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(rocprofiler-sdk REQUIRED)
+find_package(Threads REQUIRED)
 
 # Create client library
 add_library(${example_name}_client SHARED client.cpp)
@@ -66,7 +67,7 @@ add_executable(${example_name} main.cpp)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
-target_link_libraries(${example_name} PRIVATE ${example_name}_client ${CXX_FS_LIBRARY})
+target_link_libraries(${example_name} PRIVATE ${example_name}_client Threads::Threads ${CXX_FS_LIBRARY})
 
 target_include_directories(
     ${example_name}
