@@ -53,13 +53,14 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 find_package(rocprofiler-sdk REQUIRED)
 find_package(libdw REQUIRED)
 find_package(amd_comgr REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(${example_name} main.cpp client.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
-target_link_libraries(${example_name} PRIVATE rocprofiler-sdk::rocprofiler-sdk libdw::libdw amd_comgr ${CXX_FS_LIBRARY})
+target_link_libraries(${example_name} PRIVATE rocprofiler-sdk::rocprofiler-sdk Threads::Threads libdw::libdw amd_comgr ${CXX_FS_LIBRARY})
 
 target_include_directories(
     ${example_name}
