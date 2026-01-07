@@ -454,6 +454,20 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "handle_vs2022", "Libraries\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "hybmv_vs2022", "Libraries\hipSPARSE\hybmv\hybmv_vs2022.vcxproj", "{B767C619-8A83-43F5-9F6A-C21A4DD3E1B4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Programming-Guide", "Programming-Guide", "{1A2B3C4D-5E6F-4A5B-6C7D-8E9F0A1B2C3D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tutorials", "Tutorials", "{2B3C4D5E-6F7A-4B5C-7D8E-9F0A1B2C3D4E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Performance-Optimization", "Performance-Optimization", "{3C4D5E6F-7A8B-4C5D-8E9F-0A1B2C3D4E5F}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "basic_image_gamma_correction_vs2022", "Programming-Guide\Tutorials\Performance-Optimization\basic_image_gamma_correction\basic_image_gamma_correction_vs2022.vcxproj", "{A1B2C3D4-E5F6-4A5B-8C9D-1E2F3A4B5C6D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "grid_stride_image_gamma_correction_vs2022", "Programming-Guide\Tutorials\Performance-Optimization\grid_stride_image_gamma_correction\grid_stride_image_gamma_correction_vs2022.vcxproj", "{D5E6F7A8-B9C0-4D5E-1F2A-3B4C5D6E7F8A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tiling_matrix_multiply_vs2022", "Programming-Guide\Tutorials\Performance-Optimization\tiling_matrix_multiply\tiling_matrix_multiply_vs2022.vcxproj", "{A9B0C1D2-E3F4-4A5B-4C5D-6E7F8A9B0C1D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tiling_matrix_transpose_vs2022", "Programming-Guide\Tutorials\Performance-Optimization\tiling_matrix_transpose\tiling_matrix_transpose_vs2022.vcxproj", "{D2E3F4A5-B6C7-4D5E-7F8A-9B0C1D2E3F4A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1176,6 +1190,22 @@ Global
 		{B767C619-8A83-43F5-9F6A-C21A4DD3E1B4}.Debug|x64.Build.0 = Debug|x64
 		{B767C619-8A83-43F5-9F6A-C21A4DD3E1B4}.Release|x64.ActiveCfg = Release|x64
 		{B767C619-8A83-43F5-9F6A-C21A4DD3E1B4}.Release|x64.Build.0 = Release|x64
+		{A1B2C3D4-E5F6-4A5B-8C9D-1E2F3A4B5C6D}.Debug|x64.ActiveCfg = Debug|x64
+		{A1B2C3D4-E5F6-4A5B-8C9D-1E2F3A4B5C6D}.Debug|x64.Build.0 = Debug|x64
+		{A1B2C3D4-E5F6-4A5B-8C9D-1E2F3A4B5C6D}.Release|x64.ActiveCfg = Release|x64
+		{A1B2C3D4-E5F6-4A5B-8C9D-1E2F3A4B5C6D}.Release|x64.Build.0 = Release|x64
+		{D5E6F7A8-B9C0-4D5E-1F2A-3B4C5D6E7F8A}.Debug|x64.ActiveCfg = Debug|x64
+		{D5E6F7A8-B9C0-4D5E-1F2A-3B4C5D6E7F8A}.Debug|x64.Build.0 = Debug|x64
+		{D5E6F7A8-B9C0-4D5E-1F2A-3B4C5D6E7F8A}.Release|x64.ActiveCfg = Release|x64
+		{D5E6F7A8-B9C0-4D5E-1F2A-3B4C5D6E7F8A}.Release|x64.Build.0 = Release|x64
+		{A9B0C1D2-E3F4-4A5B-4C5D-6E7F8A9B0C1D}.Debug|x64.ActiveCfg = Debug|x64
+		{A9B0C1D2-E3F4-4A5B-4C5D-6E7F8A9B0C1D}.Debug|x64.Build.0 = Debug|x64
+		{A9B0C1D2-E3F4-4A5B-4C5D-6E7F8A9B0C1D}.Release|x64.ActiveCfg = Release|x64
+		{A9B0C1D2-E3F4-4A5B-4C5D-6E7F8A9B0C1D}.Release|x64.Build.0 = Release|x64
+		{D2E3F4A5-B6C7-4D5E-7F8A-9B0C1D2E3F4A}.Debug|x64.ActiveCfg = Debug|x64
+		{D2E3F4A5-B6C7-4D5E-7F8A-9B0C1D2E3F4A}.Debug|x64.Build.0 = Debug|x64
+		{D2E3F4A5-B6C7-4D5E-7F8A-9B0C1D2E3F4A}.Release|x64.ActiveCfg = Release|x64
+		{D2E3F4A5-B6C7-4D5E-7F8A-9B0C1D2E3F4A}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1403,6 +1433,12 @@ Global
 		{AFF4AFC2-945D-4C37-A057-30C3FB331E04} = {C9E947D1-4731-42F4-B4FC-905C2E0D4FAB}
 		{990F6371-23A0-49F8-959E-214E5C016D92} = {C9E947D1-4731-42F4-B4FC-905C2E0D4FAB}
 		{B767C619-8A83-43F5-9F6A-C21A4DD3E1B4} = {C9E947D1-4731-42F4-B4FC-905C2E0D4FAB}
+		{2B3C4D5E-6F7A-4B5C-7D8E-9F0A1B2C3D4E} = {1A2B3C4D-5E6F-4A5B-6C7D-8E9F0A1B2C3D}
+		{3C4D5E6F-7A8B-4C5D-8E9F-0A1B2C3D4E5F} = {2B3C4D5E-6F7A-4B5C-7D8E-9F0A1B2C3D4E}
+		{A1B2C3D4-E5F6-4A5B-8C9D-1E2F3A4B5C6D} = {3C4D5E6F-7A8B-4C5D-8E9F-0A1B2C3D4E5F}
+		{D5E6F7A8-B9C0-4D5E-1F2A-3B4C5D6E7F8A} = {3C4D5E6F-7A8B-4C5D-8E9F-0A1B2C3D4E5F}
+		{A9B0C1D2-E3F4-4A5B-4C5D-6E7F8A9B0C1D} = {3C4D5E6F-7A8B-4C5D-8E9F-0A1B2C3D4E5F}
+		{D2E3F4A5-B6C7-4D5E-7F8A-9B0C1D2E3F4A} = {3C4D5E6F-7A8B-4C5D-8E9F-0A1B2C3D4E5F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D648FD37-D8CB-4EA5-8445-38BEF36F6736}

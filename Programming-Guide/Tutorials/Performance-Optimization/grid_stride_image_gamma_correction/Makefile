@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,20 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-  Applications \
-  HIP-Basic \
-  HIP-Doc \
-  Libraries \
-  Programming-Guide \
-  Tools
+EXAMPLE := programming_guide_grid_stride_image_gamma_correction
+GPU_RUNTIME ?= HIP
 
-all: $(SUB_PROJECTS)
+# HIP variables
+ROCM_INSTALL_DIR ?= /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-clean: TARGET=clean
-clean: all
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
 
-.PHONY: all clean $(SUB_PROJECTS)
+ifeq ($(GPU_RUNTIME), CUDA)
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+  CXXFLAGS ?= -Wall -Wextra
+else
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): grid_stride_image_gamma_correction.hip
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean

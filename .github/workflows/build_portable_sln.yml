@@ -8,6 +8,7 @@ on:
       - 'HIP-Basic/**'
       - 'HIP-Doc/**'
       - 'Libraries/hip**'
+      - 'Programming-Guide/**'
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
   pull_request:
@@ -17,6 +18,7 @@ on:
       - 'HIP-Basic/**'
       - 'HIP-Doc/**'
       - 'Libraries/hip**'
+      - 'Programming-Guide/**'
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
 
