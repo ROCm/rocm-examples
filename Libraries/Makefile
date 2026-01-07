@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 LIBRARIES := \
-	ComposableKernel \
 	hipBLAS \
 	hipCUB \
 	hipFFT \
@@ -33,6 +32,7 @@ LIBRARIES := \
 
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
+  ComposableKernel \
   hipBLASLt \
   hipTensor \
   MIGraphX \
