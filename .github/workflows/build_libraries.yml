@@ -62,7 +62,7 @@ jobs:
                     rocwmma-dev \
                     migraphx-dev \
                     hipsparselt-dev \
-                    mivisionx-dev
+                    mivisionx-dev \
                     composablekernel-dev
                   rm -rf /var/lib/apt/lists/*
                   echo "/opt/rocm/bin" >> $GITHUB_PATH
