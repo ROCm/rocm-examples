@@ -28,8 +28,11 @@ file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(STATUS "hipBLASLt examples are only available on Linux")
-    return()
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
     set(ROCM_ROOT
         "/opt/rocm"

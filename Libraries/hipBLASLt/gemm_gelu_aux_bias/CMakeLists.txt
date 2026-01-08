@@ -36,8 +36,11 @@ select_hip_platform()
 verify_hip_platform(PLATFORMS "amd")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(STATUS "hipBLASLt examples are only available on Linux")
-    return()
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
     set(ROCM_ROOT
         "/opt/rocm"
@@ -56,6 +59,9 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::hipblaslt)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${example_name} PRIVATE clang_rt.builtins-x86_64)
+endif()
 target_compile_definitions(${example_name} PRIVATE ROCM_USE_FLOAT16)
 
 target_include_directories(
@@ -65,3 +71,7 @@ target_include_directories(
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    install(IMPORTED_RUNTIME_ARTIFACTS roc::hipblaslt)
+endif()

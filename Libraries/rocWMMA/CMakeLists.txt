@@ -32,8 +32,11 @@ if(GPU_RUNTIME STREQUAL "CUDA")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(STATUS "rocWMMA examples are available only on Linux.")
-    return()
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
     set(ROCM_ROOT
         "/opt/rocm"
@@ -45,9 +48,29 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hip)
-find_package(OpenMP)
 # Try to find rocWMMA as a package first
 find_package(rocwmma QUIET)
+
+# Remove OpenMP dependency from rocwmma on Windows
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    if(TARGET roc::rocwmma)
+        get_target_property(ROCWMMA_LINK_LIBS roc::rocwmma INTERFACE_LINK_LIBRARIES)
+        if(ROCWMMA_LINK_LIBS)
+            list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+            set_target_properties(roc::rocwmma PROPERTIES
+                INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
+            )
+        endif()
+    elseif(TARGET rocwmma)
+        get_target_property(ROCWMMA_LINK_LIBS rocwmma INTERFACE_LINK_LIBRARIES)
+        if(ROCWMMA_LINK_LIBS)
+            list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+            set_target_properties(rocwmma PROPERTIES
+                INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
+            )
+        endif()
+    endif()
+endif()
 
 if(TARGET roc::rocwmma)
     set(ROCWMMA_TARGET roc::rocwmma)
