@@ -35,8 +35,11 @@ set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(STATUS "rocWMMA examples are available only on Linux.")
-    return()
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
 else()
     set(ROCM_ROOT
         "/opt/rocm"
@@ -47,14 +50,27 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(hip REQUIRED)
-find_package(OpenMP REQUIRED)
 # Try to find rocWMMA as a package first
 find_package(rocwmma QUIET)
 
+# Remove unnecessary OpenMP dependency from rocwmma
 if(TARGET roc::rocwmma)
+    get_target_property(ROCWMMA_LINK_LIBS roc::rocwmma INTERFACE_LINK_LIBRARIES)
+    if(ROCWMMA_LINK_LIBS)
+        list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+        set_target_properties(roc::rocwmma PROPERTIES
+            INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
+        )
+    endif()
     set(ROCWMMA_TARGET roc::rocwmma)
 elseif(TARGET rocwmma)
-    # Fallback for legacy naming
+    get_target_property(ROCWMMA_LINK_LIBS rocwmma INTERFACE_LINK_LIBRARIES)
+    if(ROCWMMA_LINK_LIBS)
+        list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+        set_target_properties(rocwmma PROPERTIES
+            INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
+        )
+    endif()
     set(ROCWMMA_TARGET rocwmma)
 endif()
 
@@ -89,7 +105,3 @@ target_include_directories(
 )
 
 install(TARGETS ${example_name})
-
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    install(IMPORTED_RUNTIME_ARTIFACTS rocwmma)
-endif()
