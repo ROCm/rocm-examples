@@ -313,17 +313,13 @@ void gemm(hipblasLtHandle_t  handle,
                                                               HIPBLASLT_MATRIX_LAYOUT_ORDER,
                                                               &orderA,
                                                               sizeof(orderA)));
-            hipblaslt_f8_fnuz* src;
-            hipblaslt_f8_fnuz* dst;
+            std::vector<hipblaslt_f8_fnuz> src(m * k, 0);
+            std::vector<hipblaslt_f8_fnuz> dst(m * k, 0);
             HIP_CHECK(
-                hipMalloc(&src, m * k * sizeof(hipblaslt_f8_fnuz))); // Allocate memory on device
+                hipMemcpy(src.data(), d_a, m * k * sizeof(hipblaslt_f8_fnuz), hipMemcpyDeviceToHost));
+            swizzle_tensor(dst.data(), src.data(), m, k, true);
             HIP_CHECK(
-                hipMalloc(&dst, m * k * sizeof(hipblaslt_f8_fnuz))); // Allocate memory on device
-            HIP_CHECK(
-                hipMemcpy(src, d_a, m * k * sizeof(hipblaslt_f8_fnuz), hipMemcpyDeviceToHost));
-            swizzle_tensor(dst, src, m, k, true);
-            HIP_CHECK(
-                hipMemcpy(d_a, dst, m * k * sizeof(hipblaslt_f8_fnuz), hipMemcpyHostToDevice));
+                hipMemcpy(d_a, dst.data(), m * k * sizeof(hipblaslt_f8_fnuz), hipMemcpyHostToDevice));
         }
     }
     else
