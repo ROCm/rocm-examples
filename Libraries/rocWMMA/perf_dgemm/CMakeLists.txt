@@ -25,6 +25,12 @@ set(example_name rocwmma_perf_dgemm)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX HIP)
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FilterHIPArchitectures.cmake")
+filter_hip_architectures("rocWMMA perf_dgemm example" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1200;gfx1201" SHOULD_SKIP)
+if(SHOULD_SKIP)
+    return()
+endif()
+
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocWMMA examples do not support the CUDA runtime")
     return()
