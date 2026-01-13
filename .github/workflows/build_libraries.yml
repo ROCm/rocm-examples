@@ -73,7 +73,7 @@ jobs:
             shell: bash
             run: |
               cd Libraries
-              cmake -DGPU_TARGETS="${GPU_TARGETS}" -S . -B build
+              cmake -DGPU_TARGETS="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=ON -S . -B build
               cmake --build build -j
           - name: Make
             shell: bash
