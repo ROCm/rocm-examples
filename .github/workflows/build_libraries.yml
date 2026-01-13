@@ -80,7 +80,7 @@ jobs:
             run: |
               sed -i '/rocCV/d' Libraries/Makefile
               cd Libraries
-              make -j ROCM_EXAMPLES_ENABLE_CK=ON
+              make -j ROCM_EXAMPLES_ENABLE_CK=ON HIP_ARCHITECTURES="${GPU_TARGETS}"
 
           # Clean the workspace here since other jobs may not have the permissions to do so later
           # (needed for self-hosted runners)

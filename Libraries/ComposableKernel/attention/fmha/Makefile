@@ -24,6 +24,12 @@ EXAMPLE_FWD := ComposableKernel_ck_tile_fmha_fwd
 EXAMPLE_BWD := ComposableKernel_ck_tile_fmha_bwd
 EXAMPLE_GENERATOR := generate.py
 GPU_RUNTIME := HIP
+COMMON_INCLUDE_DIR := ../../../../Common
+
+# Supported GPU architectures for ComposableKernel FMHA
+SUPPORTED_HIP_ARCHITECTURES := gfx90a gfx942
+EXAMPLE := $(EXAMPLE_FWD)
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
@@ -55,7 +61,12 @@ FWD_GENERATION_DONE := $(FWD_SRC_DIR)/.generated
 BWD_GENERATION_DONE := $(BWD_SRC_DIR)/.generated
 
 .PHONY: all
+ifeq ($(SKIP_BUILD),1)
+all:
+	@echo "Skipping FMHA examples: no supported architectures"
+else
 all: $(EXAMPLE_FWD) $(EXAMPLE_BWD)
+endif
 
 $(FWD_SRC_DIR) $(FWD_OBJ_DIR) $(BWD_SRC_DIR) $(BWD_OBJ_DIR):
 	mkdir -p $@
@@ -93,7 +104,7 @@ $(FWD_OBJ_DIR)/%.o: $(FWD_SRC_DIR)/%.cpp | $(FWD_OBJ_DIR)
 	$(HIPCXX) -I $(shell pwd) $(ICXXFLAGS) $(ICPPFLAGS) $(FWD_PP_DEFS) -c $< -o $@
 
 $(EXAMPLE_FWD): $(FWD_OBJECTS)
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(HIPCXX) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 $(BWD_OBJ_DIR)/fmha_bwd.o: fmha_bwd.cpp | $(BWD_OBJ_DIR)
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c $< -o $@
@@ -102,7 +113,7 @@ $(BWD_OBJ_DIR)/%.o: $(BWD_SRC_DIR)/%.cpp | $(BWD_OBJ_DIR)
 	$(HIPCXX) -I $(shell pwd) $(ICXXFLAGS) $(ICPPFLAGS) -c $< -o $@
 
 $(EXAMPLE_BWD): $(BWD_OBJECTS)
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(HIPCXX) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 .PHONY: clean
 clean:

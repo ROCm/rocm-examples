@@ -22,6 +22,11 @@
 
 EXAMPLE := ComposableKernel_ck_tile_batched_transpose
 GPU_RUNTIME := HIP
+COMMON_INCLUDE_DIR := ../../../../Common
+
+# Supported GPU architectures for ComposableKernel
+SUPPORTED_HIP_ARCHITECTURES := gfx90a gfx942
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
@@ -48,8 +53,13 @@ OBJECTS := $(SOURCES:.cpp=.o)
 %.o: %.cpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ -c $<
 
+ifeq ($(SKIP_BUILD),1)
+$(EXAMPLE):
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 $(EXAMPLE): $(OBJECTS)
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(HIPCXX) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+endif
 
 clean:
 	$(RM) $(EXAMPLE) $(OBJECTS)
