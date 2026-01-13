@@ -32,7 +32,6 @@ LIBRARIES := \
 
 ifneq ($(GPU_RUNTIME), CUDA)
 LIBRARIES += \
-  ComposableKernel \
   hipBLASLt \
   hipTensor \
   MIGraphX \
@@ -52,6 +51,10 @@ LIBRARIES += \
   rocThrust \
   rocWMMA \
   RPP
+endif
+
+ifeq ($(ROCM_EXAMPLES_ENABLE_CK), ON)
+LIBRARIES += ComposableKernel
 endif
 
 all: $(LIBRARIES)
