@@ -23,6 +23,11 @@
 EXAMPLE := ComposableKernel_ck_tile_permute
 EXAMPLE_ALT := ComposableKernel_ck_tile_permute_alternative
 GPU_RUNTIME := HIP
+COMMON_INCLUDE_DIR := ../../../../Common
+
+# Supported GPU architectures for ComposableKernel
+SUPPORTED_HIP_ARCHITECTURES := gfx90a gfx942
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
@@ -46,7 +51,12 @@ ILDLIBS   += $(LDLIBS)
 ALT_DEFS := -DPERMUTE_USE_ALTERNATIVE_IMPL
 
 .PHONY: all
+ifeq ($(SKIP_BUILD),1)
+all:
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 all: $(EXAMPLE) $(EXAMPLE_ALT)
+endif
 
 permute_base.o: permute.cpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ -c $<
@@ -58,10 +68,10 @@ matrix_core_swizzle.o: matrix_core_swizzle.cpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ALT_DEFS) -o $@ -c $<
 
 $(EXAMPLE): permute_base.o
-	$(HIPCXX) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 $(EXAMPLE_ALT): matrix_core_swizzle.o permute_alt.o
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(HIPCXX) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 .PHONY: clean
 clean:

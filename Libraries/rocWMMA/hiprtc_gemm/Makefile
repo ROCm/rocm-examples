@@ -24,6 +24,10 @@ EXAMPLE := rocwmma_hiprtc_gemm
 COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME ?= HIP
 
+# Supported GPU architectures for rocWMMA
+SUPPORTED_HIP_ARCHITECTURES := gfx908 gfx90a gfx942 gfx950 gfx1100 gfx1101 gfx1102 gfx1200 gfx1201
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+
 ifneq ($(GPU_RUNTIME), HIP)
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
@@ -44,8 +48,13 @@ ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCWMMA_INCLUDE_DIR) -D__HIP_PL
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := -lhiprtc
 
+ifeq ($(SKIP_BUILD),1)
+$(EXAMPLE):
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+endif
 
 clean:
 	$(RM) $(EXAMPLE)

@@ -24,6 +24,11 @@ EXAMPLE := ComposableKernel_ck_tile_layernorm2d
 EXAMPLE_BASIC := ComposableKernel_ck_tile_rmsnorm2d_basic
 EXAMPLE_GENERATOR := generate.py
 GPU_RUNTIME := HIP
+COMMON_INCLUDE_DIR := ../../../../Common
+
+# Supported GPU architectures for ComposableKernel
+SUPPORTED_HIP_ARCHITECTURES := gfx90a gfx942
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
@@ -52,7 +57,12 @@ GEN_OBJ_DIR := objects
 GENERATION_DONE := $(GEN_SRC_DIR)/.generated
 
 .PHONY: all
+ifeq ($(SKIP_BUILD),1)
+all:
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 all: $(EXAMPLE)
+endif
 
 $(GEN_SRC_DIR) $(GEN_OBJ_DIR):
 	mkdir -p $@
@@ -78,7 +88,7 @@ $(GEN_OBJ_DIR)/%.o: $(GEN_SRC_DIR)/%.cpp | $(GEN_OBJ_DIR)
 	$(HIPCXX) -I $(shell pwd) $(ICXXFLAGS) $(ICPPFLAGS) -c $< -o $@
 
 $(EXAMPLE): $(GEN_OBJS)
-	$(HIPCXX) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(HIPCXX) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 .PHONY: clean
 clean:

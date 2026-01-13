@@ -25,6 +25,11 @@ EXAMPLE_BASIC := $(EXAMPLE)_basic
 EXAMPLE_UNIVERSAL := $(EXAMPLE)_universal
 EXAMPLE_WEIGHT_PRESHUFFLE := $(EXAMPLE)_weight_preshuffle
 GPU_RUNTIME := HIP
+COMMON_INCLUDE_DIR := ../../../../Common
+
+# Supported GPU architectures for ComposableKernel
+SUPPORTED_HIP_ARCHITECTURES := gfx90a gfx942
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 
 # HIP variables
 ROCM_INSTALL_DIR := /opt/rocm
@@ -50,16 +55,21 @@ OBJECTS := $(SOURCES:.cpp=.o)
 WEIGHT_PRESHUFFLE_FLAGS := -mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32
 
 .PHONY: all
+ifeq ($(SKIP_BUILD),1)
+all:
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 all: $(EXAMPLE_BASIC) $(EXAMPLE_UNIVERSAL) $(EXAMPLE_WEIGHT_PRESHUFFLE)
+endif
 
 $(EXAMPLE_BASIC): gemm_basic.cpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 $(EXAMPLE_UNIVERSAL): universal_gemm.cpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 $(EXAMPLE_WEIGHT_PRESHUFFLE): gemm_weight_preshuffle.cpp
-	$(HIPCXX) $(ICXXFLAGS) $(WEIGHT_PRESHUFFLE_FLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(WEIGHT_PRESHUFFLE_FLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
 .PHONY: clean
 clean:
