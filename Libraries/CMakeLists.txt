@@ -27,12 +27,18 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+option(ROCM_EXAMPLES_ENABLE_CK "Enable Composable Kernel examples (disabled by default)" OFF)
+
 # CMake configuration files for CUDA versions of HIP libraries are not yet
 # included under the HIP SDK for Windows.
 if(
     NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
 )
-    add_subdirectory(ComposableKernel)
+    if(ROCM_EXAMPLES_ENABLE_CK)
+        add_subdirectory(ComposableKernel)
+    else()
+        message(WARNING "Composable Kernel examples disabled, not building Composable Kernel examples.")
+    endif()
     add_subdirectory(hipBLAS)
     if(CMAKE_VERSION VERSION_LESS "3.25.2")
         message(WARNING "CMake version < 3.25.2, not building hipBLASLt examples.")

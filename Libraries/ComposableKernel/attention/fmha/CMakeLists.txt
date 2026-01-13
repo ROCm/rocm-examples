@@ -42,12 +42,30 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 set(EXAMPLE_SUPPORTED_ARCH gfx942)
+
+# Filter CMAKE_HIP_ARCHITECTURES to only include supported architectures
+set(FILTERED_HIP_ARCHITECTURES)
+set(REMOVED_ARCHITECTURES)
+
 foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
-    if(NOT ARCH IN_LIST EXAMPLE_SUPPORTED_ARCH)
-        message(STATUS "CK Tile FMHA examples are not supported for ${ARCH}. Not building CK Tile FMHA examples")
-        return()
+    if(ARCH IN_LIST EXAMPLE_SUPPORTED_ARCH)
+        list(APPEND FILTERED_HIP_ARCHITECTURES ${ARCH})
+    else()
+        list(APPEND REMOVED_ARCHITECTURES ${ARCH})
     endif()
 endforeach()
+
+if(REMOVED_ARCHITECTURES)
+    message(WARNING "CK Tile FMHA examples: Removing unsupported architectures: ${REMOVED_ARCHITECTURES}")
+endif()
+
+if(NOT FILTERED_HIP_ARCHITECTURES)
+    message(STATUS "CK Tile FMHA examples: No supported architectures found. Not building CK Tile FMHA examples")
+    return()
+endif()
+
+# Override CMAKE_HIP_ARCHITECTURES for this directory scope
+set(CMAKE_HIP_ARCHITECTURES ${FILTERED_HIP_ARCHITECTURES})
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "Composable Kernel examples are not supported for CUDA.")
