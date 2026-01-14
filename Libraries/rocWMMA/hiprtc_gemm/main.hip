@@ -58,6 +58,7 @@ const int t_block_y = 4;
 
 std::string source = R"(
 
+#include <cstdint>
 #include <rocwmma/rocwmma.hpp>
 
 using rocwmma::float16_t;
