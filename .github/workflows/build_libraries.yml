@@ -74,13 +74,13 @@ jobs:
             run: |
               cd Libraries
               cmake -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=ON -S . -B build
-              cmake --build build -j
+              cmake --build build --parallel $(nproc)
           - name: Make
             shell: bash
             run: |
               sed -i '/rocCV/d' Libraries/Makefile
               cd Libraries
-              make -j ROCM_EXAMPLES_ENABLE_CK=ON HIP_ARCHITECTURES="${GPU_TARGETS}"
+              make -j $(nproc) ROCM_EXAMPLES_ENABLE_CK=ON HIP_ARCHITECTURES="${GPU_TARGETS}"
 
           # Clean the workspace here since other jobs may not have the permissions to do so later
           # (needed for self-hosted runners)
