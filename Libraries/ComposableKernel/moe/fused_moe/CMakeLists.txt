@@ -36,7 +36,7 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FilterHIPArchitectures.cmake")
-filter_hip_architectures("CK Tile fused MoE example" "gfx942;gfx950" SHOULD_SKIP)
+filter_hip_architectures("CK Tile fused MoE example" "gfx950" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
 endif()

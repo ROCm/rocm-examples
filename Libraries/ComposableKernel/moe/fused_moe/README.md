@@ -14,7 +14,6 @@ improves maintainability.
 
 The example is supported for the following architectures:
 
-* `gfx942`
 * `gfx950`
 
 ### Application flow
