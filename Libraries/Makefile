@@ -53,10 +53,6 @@ LIBRARIES += \
   RPP
 endif
 
-ifeq ($(ROCM_EXAMPLES_ENABLE_CK), ON)
-LIBRARIES += ComposableKernel
-endif
-
 all: $(LIBRARIES)
 
 clean: TARGET=clean
