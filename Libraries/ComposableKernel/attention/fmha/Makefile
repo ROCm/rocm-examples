@@ -39,7 +39,7 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
-ICXXFLAGS := -std=$(CXX_STD) -x hip -fgpu-flush-denormals-to-zero
+ICXXFLAGS := -std=$(CXX_STD) -x hip -fgpu-flush-denormals-to-zero -O3
 ICPPFLAGS :=
 ILDFLAGS  :=
 ILDLIBS   :=

@@ -73,7 +73,7 @@ jobs:
             shell: bash
             run: |
               cd Libraries
-              cmake -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=ON -S . -B build
+              cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=ON -S . -B build
               cmake --build build --parallel $(nproc)
           - name: Make
             shell: bash

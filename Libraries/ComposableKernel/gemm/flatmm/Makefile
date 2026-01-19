@@ -31,7 +31,7 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
-ICXXFLAGS := -std=$(CXX_STD) -x hip
+ICXXFLAGS := -std=$(CXX_STD) -x hip -O3
 ICPPFLAGS := -DUSING_MFMA_16x16x32=1 -DENABLE_FP8=1
 ILDFLAGS  :=
 ILDLIBS   :=
