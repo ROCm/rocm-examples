@@ -12,6 +12,10 @@ on:
       - 'HIP-Basic/**'
       - '.github/workflows/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
 env:
     DEBIAN_FRONTEND: noninteractive
     ROCM_VERSION: '7.1.1'

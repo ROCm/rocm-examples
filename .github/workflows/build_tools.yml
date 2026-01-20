@@ -12,6 +12,10 @@ on:
       - 'Tools/**'
       - '.github/workflows/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
 env:
     ROCM_VERSION: '7.1.1'
     AMDGPU_INSTALLER_VERSION: 7.1.1.70101-1

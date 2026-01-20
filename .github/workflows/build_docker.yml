@@ -11,7 +11,11 @@ on:
     paths:
       - 'Dockerfiles/**'
       - '.github/workflows/**'
-  
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
 jobs:  
     find-dockerfiles:  
       name: Find Dockerfiles

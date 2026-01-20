@@ -14,6 +14,10 @@ on:
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
 env:
     PLATFORM_TOOLSET_VERSION: 6.4
     HIP_PATH: C:\Program Files\AMD\ROCm\6.4\
