@@ -15,7 +15,7 @@ on:
 jobs:  
     find-dockerfiles:  
       name: Find Dockerfiles
-      runs-on: self-hosted
+      runs-on: ubuntu-latest
       outputs:  
         files: ${{ steps.find-files.outputs.files }}  
       steps:  
