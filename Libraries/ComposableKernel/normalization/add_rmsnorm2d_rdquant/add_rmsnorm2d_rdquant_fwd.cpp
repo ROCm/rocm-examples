@@ -20,20 +20,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "add_rmsnorm2d_rdquant_fwd.hpp"
-
-#include <ck_tile/host.hpp>
-
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <string>
-#include <tuple>
-#include <vector>
+#include "ck_tile/host.hpp"
+#include "ck_tile/core.hpp"
+#include "ck_tile/host/kernel_launch.hpp"
+#include "ck_tile/ops/add_rmsnorm2d_rdquant.hpp"
+#include <cstring>
 
 // different threshold for different dtype
-template <typename InputDataType>
+template <typename DataType>
 auto get_elimit()
 {
     double rtol = 1e-2;
@@ -65,19 +59,16 @@ auto create_args(int argc, char* argv[])
         .insert("n", "4096", "n dimension")
         .insert("stride", "-1", "stride per row, if -1 then equal to n")
         .insert("e", "1e-5", "epsilon")
-        .insert("save_x", "1", "save rms(invrms) or not. set to 1 in training case")
         .insert("v", "1", "cpu validation or not")
-        .insert("kname", "1", "print kernel name or not")
         .insert("prec", "fp16", "precision")
-        .insert("quant", "int8", "precision")
-        .insert("warmup", "5", "cold iter")
-        .insert("repeat", "20", "hot iter");
+        .insert("warmup", "0", "cold iter")
+        .insert("repeat", "1", "hot iter");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
 }
 
-template <typename InputDataType, typename QuantizedDataType, bool SaveX>
+template <typename DataType>
 bool run(const ck_tile::ArgParser& arg_parser)
 {
     ck_tile::index_t m      = arg_parser.get_int("m");
@@ -85,26 +76,21 @@ bool run(const ck_tile::ArgParser& arg_parser)
     ck_tile::index_t stride = arg_parser.get_int("stride");
     if(stride < 0)
         stride = n;
-    float epsilon                   = arg_parser.get_float("e");
-    std::string input_data_type     = arg_parser.get_str("prec");
-    std::string quantized_data_type = arg_parser.get_str("quant");
-    int kname                       = arg_parser.get_int("kname");
-    int do_validation               = arg_parser.get_int("v");
-    int warmup                      = arg_parser.get_int("warmup");
-    int repeat                      = arg_parser.get_int("repeat");
+    float epsilon         = arg_parser.get_float("e");
+    std::string data_type = arg_parser.get_str("prec");
+    int do_validation     = arg_parser.get_int("v");
+    int warmup            = arg_parser.get_int("warmup");
+    int repeat            = arg_parser.get_int("repeat");
 
     assert(stride >= n);
 
-    using TypeConfig = AddRmsnormRdquantTypeConfig<InputDataType, QuantizedDataType>;
-
-    using ADataType        = typename TypeConfig::ADataType;
-    using BDataType        = typename TypeConfig::BDataType;
-    using GammaDataType    = typename TypeConfig::GammaDataType;
-    using XDataType        = typename TypeConfig::XDataType;
-    using YScaleDataType   = typename TypeConfig::YScaleDataType;
-    using QYDataType       = typename TypeConfig::QYDataType;
-    using ComputeDataType  = float;
-    using UnquantYDataType = ck_tile::null_type;
+    using ADataType       = DataType;
+    using BDataType       = DataType;
+    using GammaDataType   = DataType;
+    using XDataType       = DataType;
+    using YScaleDataType  = float;
+    using QYDataType      = ck_tile::int8_t;
+    using ComputeDataType = float;
 
     // host verify
     ck_tile::HostTensor<ADataType> a_host({m, n}, {stride, 1});
@@ -113,10 +99,8 @@ bool run(const ck_tile::ArgParser& arg_parser)
 
     ck_tile::HostTensor<XDataType> x_host_ref({m, n}, {stride, 1});
     ck_tile::HostTensor<XDataType> x_host_dev({m, n}, {stride, 1});
-
     ck_tile::HostTensor<YScaleDataType> yscale_host_ref({m}, {1});
     ck_tile::HostTensor<YScaleDataType> yscale_host_dev({m}, {1});
-
     ck_tile::HostTensor<QYDataType> qy_host_ref({m, n}, {stride, 1});
     ck_tile::HostTensor<QYDataType> qy_host_dev({m, n}, {stride, 1});
 
@@ -135,41 +119,56 @@ bool run(const ck_tile::ArgParser& arg_parser)
     b_buf.ToDevice(b_host.data());
     gamma_buf.ToDevice(gamma_host.data());
 
-    std::cout << "[" << input_data_type << ", " << quantized_data_type << "]"
-              << " m:" << m << ", n:" << n << ", stride:" << stride << std::flush;
+    constexpr bool kThreePass = true;
 
-    add_rmsnorm2d_rdquant_fwd_traits traits{input_data_type, quantized_data_type, SaveX};
+    using BlockTile      = ck_tile::sequence<4, 128>;
+    using Vector         = ck_tile::sequence<1, 1>;
+    using ThreadPerBlock = ck_tile::sequence<4, 64>;
 
-    add_rmsnorm2d_rdquant_fwd_args args{a_buf.GetDeviceBuffer(),
-                                        b_buf.GetDeviceBuffer(),
-                                        gamma_buf.GetDeviceBuffer(),
-                                        x_buf.GetDeviceBuffer(),
-                                        yscale_buf.GetDeviceBuffer(),
-                                        qy_buf.GetDeviceBuffer(),
-                                        epsilon,
-                                        m,
-                                        n,
-                                        stride};
+    using Shape   = ck_tile::Generic2dBlockShape<BlockTile, ThreadPerBlock, Vector>;
+    using Problem = ck_tile::AddRmsnorm2dRdquantFwdPipelineProblem<ADataType,
+                                                                   BDataType,
+                                                                   GammaDataType,
+                                                                   ComputeDataType,
+                                                                   XDataType,
+                                                                   YScaleDataType,
+                                                                   QYDataType,
+                                                                   Shape,
+                                                                   true, // kPadN
+                                                                   true, // kSaveX
+                                                                   kThreePass>;
 
-    float ave_time = add_rmsnorm2d_rdquant_fwd(
-        traits, args, ck_tile::stream_config{nullptr, true, kname ? 1 : 0, warmup, repeat});
+    using OnePassPipeline   = ck_tile::AddRmsnorm2dRdquantFwdPipelineOnePass<Problem>;
+    using ThreePassPipeline = ck_tile::AddRmsnorm2dRdquantFwdPipelineThreePass<Problem>;
+    using Pipeline          = std::conditional_t<kThreePass, ThreePassPipeline, OnePassPipeline>;
+    using Kernel            = ck_tile::AddRmsnorm2dRdquantFwd<Pipeline>;
 
-    std::size_t num_byte = sizeof(ADataType) * m * n + sizeof(BDataType) * m * n +
-                           sizeof(GammaDataType) * n + sizeof(YScaleDataType) * m +
-                           sizeof(QYDataType) * m * n;
+    ck_tile::AddRmsnorm2dRdquantFwdHostArgs args{a_buf.GetDeviceBuffer(),
+                                                 b_buf.GetDeviceBuffer(),
+                                                 gamma_buf.GetDeviceBuffer(),
+                                                 x_buf.GetDeviceBuffer(),
+                                                 yscale_buf.GetDeviceBuffer(),
+                                                 qy_buf.GetDeviceBuffer(),
+                                                 epsilon,
+                                                 m,
+                                                 n,
+                                                 stride};
 
-    if constexpr(SaveX)
-        num_byte += sizeof(XDataType) * m * n;
+    auto kargs = Kernel::MakeKargs(args);
 
-    float gb_per_sec = num_byte / 1.E6 / ave_time;
-    std::cout << ", " << ave_time * 1.E3 << " us, " << gb_per_sec << " GB/s" << std::endl;
+    const dim3 grids                       = Kernel::GridSize(args);
+    const dim3 blocks                      = Kernel::BlockSize();
+    constexpr ck_tile::index_t kBlockPerCu = 1;
+    auto s = ck_tile::stream_config{nullptr, true, 0, warmup, repeat};
+
+    ck_tile::launch_kernel(s, ck_tile::make_kernel<kBlockPerCu>(Kernel{}, grids, blocks, 0, kargs));
 
     bool pass = true;
 
     if(do_validation)
     {
         using YDataType      = ComputeDataType;
-        using InvRmsDataType = InputDataType;
+        using InvRmsDataType = DataType;
 
         // Add
         {
@@ -177,36 +176,28 @@ bool run(const ck_tile::ArgParser& arg_parser)
             ck_tile::reference_binary_elementwise<ADataType, BDataType, XDataType, ComputeDataType>(
                 a_host, b_host, x_host_ref, op);
 
-            if constexpr(SaveX)
-            {
-                x_buf.FromDevice(x_host_dev.data());
+            x_buf.FromDevice(x_host_dev.data());
 
-                auto [rtol, atol] = get_elimit<XDataType>();
-                if(stride == n)
+            auto [rtol, atol] = get_elimit<XDataType>();
+            if(stride == n)
+            {
+                pass = ck_tile::check_err(
+                    x_host_dev, x_host_ref, std::string("x Error: Incorrect results!"), rtol, atol);
+            }
+            else
+            {
+                for(int i_r = 0; i_r < m; i_r++)
                 {
-                    pass = ck_tile::check_err(x_host_dev,
-                                              x_host_ref,
-                                              std::string("x Error: Incorrect results!"),
-                                              rtol,
-                                              atol);
-                }
-                else
-                {
-                    for(int i_r = 0; i_r < m; i_r++)
-                    {
-                        std::vector<QYDataType> x_host_dev_row(x_host_dev.begin() + i_r * stride,
-                                                               x_host_dev.begin() + i_r * stride +
-                                                                   n);
-                        std::vector<QYDataType> x_host_ref_row(x_host_ref.begin() + i_r * stride,
-                                                               x_host_ref.begin() + i_r * stride +
-                                                                   n);
-                        pass &= ck_tile::check_err(x_host_dev_row,
-                                                   x_host_ref_row,
-                                                   std::string("x[") + std::to_string(i_r) +
-                                                       std::string("] Error: Incorrect results!"),
-                                                   rtol,
-                                                   atol);
-                    }
+                    std::vector<QYDataType> x_host_dev_row(x_host_dev.begin() + i_r * stride,
+                                                           x_host_dev.begin() + i_r * stride + n);
+                    std::vector<QYDataType> x_host_ref_row(x_host_ref.begin() + i_r * stride,
+                                                           x_host_ref.begin() + i_r * stride + n);
+                    pass &= ck_tile::check_err(x_host_dev_row,
+                                               x_host_ref_row,
+                                               std::string("x[") + std::to_string(i_r) +
+                                                   std::string("] Error: Incorrect results!"),
+                                               rtol,
+                                               atol);
                 }
             }
         }
@@ -215,16 +206,14 @@ bool run(const ck_tile::ArgParser& arg_parser)
         // Rmsnorm2d
         {
             ck_tile::HostTensor<InvRmsDataType> invRms_host_ref({m});
-            ck_tile::HostTensor<UnquantYDataType> unquant_y_host_ref({m, n});
-
+            ck_tile::HostTensor<ck_tile::null_type> unquant_y_host_ref({m, n});
             // CAUSION: kernel use ComputeDataType version of x, but we use XDataType here for
             // simplicity
             ck_tile::reference_rmsnorm2d_fwd<XDataType,
                                              GammaDataType,
                                              ComputeDataType,
                                              YDataType,
-                                             InvRmsDataType,
-                                             UnquantYDataType>(
+                                             InvRmsDataType>(
                 x_host_ref, gamma_host, y_host, invRms_host_ref, unquant_y_host_ref, epsilon);
         }
 
@@ -287,7 +276,8 @@ bool run(const ck_tile::ArgParser& arg_parser)
             }
         }
 
-        std::cout << ", valid:" << (pass ? "y" : "n") << std::flush << std::endl;
+        std::cout << "[" << data_type << "]" << " m:" << m << ", n:" << n << ", stride:" << stride
+                  << ", valid:" << (pass ? "y" : "n") << std::flush << std::endl;
     }
 
     return pass;
@@ -297,43 +287,13 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
 
-    const std::string input_data_type     = arg_parser.get_str("prec");
-    const std::string quantized_data_type = arg_parser.get_str("quant");
-    int save_x                            = arg_parser.get_int("save_x");
-    if(input_data_type == "fp16" && quantized_data_type == "int8" && save_x)
+    const std::string data_type = arg_parser.get_str("prec");
+    if(data_type == "fp16")
     {
-        return run<ck_tile::half_t, ck_tile::int8_t, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    else if(input_data_type == "fp16" && quantized_data_type == "int8" && !save_x)
-    {
-        return run<ck_tile::half_t, ck_tile::int8_t, false>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    else if(input_data_type == "bf16" && quantized_data_type == "int8" && save_x)
-    {
-        return run<ck_tile::bf16_t, ck_tile::int8_t, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    else if(input_data_type == "bf16" && quantized_data_type == "int8" && !save_x)
-    {
-        return run<ck_tile::bf16_t, ck_tile::int8_t, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    else if(input_data_type == "fp16" && quantized_data_type == "fp8" && save_x)
-    {
-        return run<ck_tile::half_t, ck_tile::fp8_t, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    else if(input_data_type == "fp16" && quantized_data_type == "fp8" && !save_x)
-    {
-        return run<ck_tile::half_t, ck_tile::fp8_t, false>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    else if(input_data_type == "bf16" && quantized_data_type == "fp8" && save_x)
-    {
-        return run<ck_tile::bf16_t, ck_tile::fp8_t, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
-    }
-    else if(input_data_type == "bf16" && quantized_data_type == "fp8" && !save_x)
-    {
-        return run<ck_tile::bf16_t, ck_tile::fp8_t, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t>(arg_parser) ? 0 : -2;
     }
 
-    return EXIT_FAILURE;
+    return -3;
 }

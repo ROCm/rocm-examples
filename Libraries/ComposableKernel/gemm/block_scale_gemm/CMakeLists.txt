@@ -67,9 +67,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
-add_executable(${example_name} gemm_aquant_basic.cpp)
+add_executable(${example_name} gemm_quant_basic.cpp)
 add_test(${example_name} COMMAND ${example_name})
-set_source_files_properties(gemm_aquant_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(gemm_quant_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)

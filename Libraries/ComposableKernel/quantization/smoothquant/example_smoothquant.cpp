@@ -20,19 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <ck_tile/core.hpp>
-#include <ck_tile/host.hpp>
-#include <ck_tile/host/kernel_launch.hpp>
-#include <ck_tile/ops/smoothquant.hpp>
-
-#include <hip/hip_runtime.h>
-
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <string>
-#include <thread>
-#include <tuple>
+#include "ck_tile/host.hpp"
+#include "ck_tile/core.hpp"
+#include "ck_tile/host/kernel_launch.hpp"
+#include "ck_tile/ops/smoothquant.hpp"
+#include <cstring>
 
 // different threshold for different dtype
 template <typename DataType>
@@ -124,12 +116,11 @@ bool run(const ck_tile::ArgParser& arg_parser)
 
     constexpr bool kTwoPass = true;
 
-    using BlockWarps = ck_tile::sequence<2, 2>;
-    using BlockTile  = ck_tile::sequence<2, 128>;
-    using WarpTile   = ck_tile::sequence<1, 64>;
-    using Vector     = ck_tile::sequence<1, 1>;
+    using BlockTile      = ck_tile::sequence<2, 128>;
+    using Vector         = ck_tile::sequence<1, 1>;
+    using ThreadPerBlock = ck_tile::sequence<2, 128>;
 
-    using Shape   = ck_tile::Generic2dBlockShape<BlockTile, BlockWarps, WarpTile, Vector>;
+    using Shape   = ck_tile::Generic2dBlockShape<BlockTile, ThreadPerBlock, Vector>;
     using Problem = ck_tile::SmoothquantPipelineProblem<XDataType,
                                                         SmoothScaleDataType,
                                                         ComputeDataType,
@@ -156,12 +147,11 @@ bool run(const ck_tile::ArgParser& arg_parser)
     auto kargs = Kernel::MakeKargs(args);
 
     const dim3 grids                       = Kernel::GridSize(args);
-    constexpr dim3 blocks                  = Kernel::BlockSize();
+    const dim3 blocks                      = Kernel::BlockSize();
     constexpr ck_tile::index_t kBlockPerCu = 1;
     auto s = ck_tile::stream_config{nullptr, true, 1, warmup, repeat};
 
-    ck_tile::launch_kernel(
-        s, ck_tile::make_kernel<blocks.x, kBlockPerCu>(Kernel{}, grids, blocks, 0, kargs));
+    ck_tile::launch_kernel(s, ck_tile::make_kernel<kBlockPerCu>(Kernel{}, grids, blocks, 0, kargs));
 
     bool pass = true;
 
@@ -258,17 +248,17 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
 
     const std::string data_type = arg_parser.get_str("prec");
     if(data_type == "fp16")
     {
-        return run<ck_tile::half_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t>(arg_parser) ? 0 : -2;
     }
     /*else if(data_type == "bf16")
     {
         return run<ck_tile::bf16_t>(arg_parser) ? 0 : -2;
     }*/
 
-    return EXIT_FAILURE;
+    return -3;
 }

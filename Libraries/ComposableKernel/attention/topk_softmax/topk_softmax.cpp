@@ -20,23 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "topk_softmax_api.hpp"
-
-#include <ck_tile/core.hpp>
-#include <ck_tile/ops/reduce.hpp>
-
-#include <algorithm>
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
-#include <iostream>
-#include <string>
-#include <tuple>
-#include <type_traits>
 #include <vector>
+#include <iostream>
+#include <numeric>
+#include <cassert>
+#include <cstdlib>
+#include <iostream>
+#include <time.h>
+#include <unordered_set>
+
+#include "ck_tile/core.hpp"
+#include "ck_tile/ops/reduce.hpp"
+#include "topk_softmax_api.hpp"
+#include "ck_tile/utility/json_dump.hpp"
 
 #if 0
 template <typename T>
@@ -45,10 +41,10 @@ void dump_host_tensor_2d(const ck_tile::HostTensor<T>& x)
     auto len = x.get_lengths();
     assert(len.size() == 2);
     std::cout << "[";
-    for(std::size_t i = 0; i < len[0]; i++)
+    for(size_t i = 0; i < len[0]; i++)
     {
         std::cout << i << ": [";
-        for(std::size_t j = 0; j < len[1]; j++)
+        for(size_t j = 0; j < len[1]; j++)
         {
             if constexpr(std::is_same_v<T, ck_tile::fp16_t>)
             {
@@ -106,6 +102,26 @@ auto reference_topk_softmax(const ck_tile::HostTensor<InputType>& x,
     reference_topk(y, y_values, y_indices, k, dim, largest, sorted);
 }
 
+template <typename InputType, typename WeightType, typename IndexType = ck_tile::index_t>
+auto reference_topk_sigmoid(const ck_tile::HostTensor<InputType>& x,
+                            ck_tile::HostTensor<WeightType>& y_values,
+                            ck_tile::HostTensor<IndexType>& y_indices,
+                            ck_tile::index_t k,
+                            ck_tile::index_t dim = -1,
+                            bool largest         = true,
+                            bool sorted          = true)
+{
+    using namespace ck_tile;
+
+    // topk only - no need to apply the sigmoid first
+    auto x_fp32 = x.template CopyAsType<float>();
+    reference_topk(x_fp32, y_values, y_indices, k, dim, largest, sorted);
+    // apply sigmoid
+    std::transform(y_values.begin(), y_values.end(), y_values.begin(), [](auto value) {
+        return WeightType(1) / (WeightType(1) + exp(-value));
+    });
+}
+
 // different threshold for different dtype
 template <typename DataType>
 auto get_elimit(std::string /*init_method*/)
@@ -154,7 +170,10 @@ auto create_args(int argc, char* argv[])
         .insert("seed", "-1", "seed to be used, -1 means random every time")
         .insert("kname", "0", "when set to 1 it will print kernel name")
         .insert("warmup", "5", "number of iterations before benchmark the kernel")
-        .insert("repeat", "20", "number of iterations to benchmark the kernel");
+        .insert("repeat", "20", "number of iterations to benchmark the kernel")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "topk_softmax.json", "json file name to dump results")
+        .insert("activation", "softmax", "activation function to use: softmax or sigmoid");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -175,6 +194,7 @@ bool test_topk_softmax(ck_tile::ArgParser args)
     int kname               = args.get_int("kname");
     int warmup              = args.get_int("warmup");
     int repeat              = args.get_int("repeat");
+    std::string activation  = args.get_str("activation");
 
     if(stride_input < 0)
     {
@@ -194,9 +214,9 @@ bool test_topk_softmax(ck_tile::ArgParser args)
 
     if(topk > experts)
     {
-        std::printf("topk:%d value should be smaller than, or equal to number of experts:%d\n",
-                    topk,
-                    experts);
+        printf("topk:%d value should be smaller than, or equal to number of experts:%d\n",
+               topk,
+               experts);
         return false;
     }
 
@@ -208,7 +228,7 @@ bool test_topk_softmax(ck_tile::ArgParser args)
     {
         // random require per-row unique
         auto rand_gen = ck_tile::FillUniformDistribution_Unique<InputType>{
-            -5.f, 5.f, static_cast<std::uint32_t>(seed)};
+            -5.f, 5.f, static_cast<uint32_t>(seed)};
 
         for(int i_t = 0; i_t < tokens; i_t++)
         {
@@ -225,7 +245,7 @@ bool test_topk_softmax(ck_tile::ArgParser args)
 
     x_dev.ToDevice(x_host.data());
 
-    topk_softmax_trait trait{input_prec, weight_prec, experts};
+    topk_softmax_trait trait{input_prec, weight_prec, experts, activation};
 
     topk_softmax_kargs karg{x_dev.GetDeviceBuffer(),
                             value_dev.GetDeviceBuffer(),
@@ -242,18 +262,19 @@ bool test_topk_softmax(ck_tile::ArgParser args)
                               warmup,
                               repeat};
     auto ms = topk_softmax(trait, karg, sc);
-    std::printf("[%s|%s]tokens:%d, experts:%d, topk:%d, st_i:%d, st_o:%d, ms:%f, ",
-                input_prec.c_str(),
-                weight_prec.c_str(),
-                tokens,
-                experts,
-                topk,
-                stride_input,
-                stride_output,
-                ms);
+    printf("[%s|%s]tokens:%d, experts:%d, topk:%d, st_i:%d, st_o:%d, activation:%s, ms:%f, ",
+           input_prec.c_str(),
+           weight_prec.c_str(),
+           tokens,
+           experts,
+           topk,
+           stride_input,
+           stride_output,
+           activation.c_str(),
+           ms);
     if(ms < 0)
-        std::printf("not supported\n");
-    std::fflush(stdout);
+        printf("not supported\n");
+    fflush(stdout);
     if(ms < 0)
     {
         return false;
@@ -268,14 +289,27 @@ bool test_topk_softmax(ck_tile::ArgParser args)
         ck_tile::HostTensor<WeightType> value_ref({tokens, topk}, {stride_output, 1});
         ck_tile::HostTensor<IndexType> index_ref({tokens, topk}, {stride_output, 1});
 
-        reference_topk_softmax<InputType, WeightType, IndexType>(
-            x_host, value_ref, index_ref, topk);
+        if(activation == "softmax")
+        {
+            reference_topk_softmax<InputType, WeightType, IndexType>(
+                x_host, value_ref, index_ref, topk);
+        }
+        else if(activation == "sigmoid")
+        {
+            reference_topk_sigmoid<InputType, WeightType, IndexType>(
+                x_host, value_ref, index_ref, topk);
+        }
+        else
+        {
+            throw std::runtime_error("unsupported activation type: " + activation);
+        }
 
         auto [rtol, atol] = get_elimit<InputType>("");
         for(int i_t = 0; i_t < tokens; i_t++)
         {
-            auto s_begin = std::vector<std::size_t>{static_cast<std::size_t>(i_t), static_cast<std::size_t>(0)};
-            auto s_end   = std::vector<std::size_t>{static_cast<std::size_t>(i_t + 1), static_cast<std::size_t>(topk)};
+            auto s_begin = std::vector<size_t>{static_cast<size_t>(i_t), static_cast<size_t>(0)};
+            auto s_end =
+                std::vector<size_t>{static_cast<size_t>(i_t + 1), static_cast<size_t>(topk)};
             auto s_value_host = value_host.slice(s_begin, s_end);
             auto s_value_ref  = value_ref.slice(s_begin, s_end);
             rtn &= ck_tile::check_err(s_value_host,
@@ -295,8 +329,25 @@ bool test_topk_softmax(ck_tile::ArgParser args)
         }
     }
 
-    std::printf("valid:%s\n", rtn ? "y" : "n");
-    std::fflush(stdout);
+    printf("valid:%s\n", rtn ? "y" : "n");
+
+    if(args.get_int("json") == 1)
+    {
+        dump_topk_softmax_json(args.get_str("jsonfile"),
+                               input_prec,
+                               weight_prec,
+                               tokens,
+                               experts,
+                               topk,
+                               stride_input,
+                               stride_output,
+                               ms,
+                               0,
+                               0,
+                               rtn);
+    }
+
+    fflush(stdout);
     return rtn;
 }
 
@@ -304,7 +355,7 @@ int main(int argc, char** argv)
 {
     auto [result, args] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
     std::string input_prec  = args.get_str("pr_i");
     std::string weight_prec = args.get_str("pr_w");
 
@@ -318,5 +369,5 @@ int main(int argc, char** argv)
         r &= test_topk_softmax<ck_tile::bf16_t, float, ck_tile::index_t>(args);
     }
 
-    return r ? EXIT_SUCCESS : EXIT_FAILURE;
+    return r ? 0 : -1;
 }

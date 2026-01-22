@@ -108,3 +108,20 @@ target_compile_options(
     "SHELL:-mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32 -mllvm -enable-noalias-to-md-conversion=0"
 )
 target_link_libraries(${example_weight_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
+
+# Additional executables for splitk two-stage
+set(example_splitk_reduce ${example_name}_splitk_reduce)
+set(example_splitk_two_stage ${example_name}_splitk_two_stage)
+
+add_executable(${example_splitk_reduce} gemm_splitk_two_stage_reduce.cpp)
+target_compile_features(${example_splitk_reduce} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(${example_splitk_reduce} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
+target_link_libraries(${example_splitk_reduce} PRIVATE composable_kernel::ck_tile hip::host)
+set_source_files_properties(gemm_splitk_two_stage_reduce.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+
+add_executable(${example_splitk_two_stage} gemm_splitk_two_stage.cpp)
+target_compile_features(${example_splitk_two_stage} PRIVATE cxx_std_17 hip_std_17)
+target_compile_options(${example_splitk_two_stage} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
+target_link_libraries(${example_splitk_two_stage} PRIVATE composable_kernel::ck_tile hip::host)
+set_source_files_properties(gemm_splitk_two_stage.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+

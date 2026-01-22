@@ -21,7 +21,6 @@
 # SOFTWARE.
 
 set(example_name ComposableKernel_ck_tile_grouped_gemm)
-set(example_name_tileloop ${example_name}_tileloop)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -73,3 +72,23 @@ add_test(${example_name} COMMAND ${example_name})
 set_source_files_properties(grouped_gemm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
+
+# Additional grouped GEMM variants
+set(example_multi_d ${example_name}_multi_d)
+set(example_preshuffle ${example_name}_preshuffle)
+set(example_quant ${example_name}_quant)
+
+add_executable(${example_multi_d} grouped_gemm_multi_d.cpp)
+set_source_files_properties(grouped_gemm_multi_d.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_multi_d} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_multi_d} PRIVATE composable_kernel::ck_tile hip::host)
+
+add_executable(${example_preshuffle} grouped_gemm_preshuffle.cpp)
+set_source_files_properties(grouped_gemm_preshuffle.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_preshuffle} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
+
+add_executable(${example_quant} quant_grouped_gemm.cpp)
+set_source_files_properties(quant_grouped_gemm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_quant} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_quant} PRIVATE composable_kernel::ck_tile hip::host)

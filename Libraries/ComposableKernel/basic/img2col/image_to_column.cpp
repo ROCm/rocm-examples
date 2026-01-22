@@ -20,18 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "image_to_column.hpp"
-
-#include <ck_tile/host.hpp>
-
-#include <hip/hip_runtime.h>
-
 #include <algorithm>
-#include <cstddef>
-#include <cstdlib>
-#include <functional>
-#include <iterator>
-#include <numeric>
+#include <cstring>
+
+#include "ck_tile/host.hpp"
+#include "image_to_column.hpp"
 
 // Host API implementation
 template <>
@@ -81,13 +74,12 @@ float image_to_column(const image_to_column_traits& traits,
             args.N * args.output_spatial_lengths[0] * args.output_spatial_lengths[1],
             args.filter_spatial_lengths[0] * args.filter_spatial_lengths[1] * args.C,
             args.G);
-        constexpr dim3 blocks = Kernel::BlockSize();
+        const dim3 blocks = Kernel::BlockSize();
 
         constexpr ck_tile::index_t kBlockPerCu = 2;
 
         float ave_time = ck_tile::launch_kernel(
-            stream_conf,
-            ck_tile::make_kernel<blocks.x, kBlockPerCu>(Kernel{}, grids, blocks, 0, kargs));
+            stream_conf, ck_tile::make_kernel<kBlockPerCu>(Kernel{}, grids, blocks, 0, kargs));
 
         return ave_time;
     }
@@ -200,5 +192,5 @@ int main(int argc, char* argv[])
         std::cout << "valid:" << (pass ? "y" : "n") << std::endl;
     }
 
-    return pass ? EXIT_SUCCESS : EXIT_FAILURE;
+    return !pass;
 }

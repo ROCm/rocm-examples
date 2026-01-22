@@ -73,3 +73,18 @@ add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<
 set_source_files_properties(flatmm_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
+
+# Additional flatmm executables
+set(example_moe ${example_name}_moe)
+set(example_grouped ${example_name}_grouped)
+
+add_executable(${example_moe} moe_flatmm.cpp)
+set_source_files_properties(moe_flatmm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_moe} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_moe} PRIVATE composable_kernel::ck_tile hip::host)
+
+add_executable(${example_grouped} grouped_flatmm.cpp)
+set_source_files_properties(grouped_flatmm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_grouped} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_grouped} PRIVATE composable_kernel::ck_tile hip::host)
+

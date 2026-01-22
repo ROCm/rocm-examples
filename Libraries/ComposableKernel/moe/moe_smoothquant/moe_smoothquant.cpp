@@ -20,18 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "ck_tile/host.hpp"
 #include "moe_smoothquant.hpp"
-
-#include <ck_tile/host.hpp>
-
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
+#include "ck_tile/utility/json_dump.hpp"
+#include <cstring>
 #include <set>
-#include <string>
-#include <tuple>
-#include <vector>
 
 // different threshold for different dtype
 template <typename DataType>
@@ -63,11 +56,11 @@ template <typename IndexType>
 void topid_unique_gen(
     std::vector<IndexType>& host_tensor, int tokens, int topk, int num_expert, int seed)
 {
-    std::size_t total_size = topk * tokens;
+    size_t total_size = topk * tokens;
     std::srand(seed);
     std::set<IndexType> unique_set;
     IndexType current_v;
-    for(std::size_t i = 0; i < total_size; i++)
+    for(size_t i = 0; i < total_size; i++)
     {
         if(i % topk == 0)
         {
@@ -96,7 +89,9 @@ auto create_args(int argc, char* argv[])
         .insert("prec_i", "fp16", "input precision, fp16/bf16")
         .insert("prec_o", "int8", "precision, int8/fp8")
         .insert("warmup", "5", "cold iter")
-        .insert("repeat", "20", "hot iter");
+        .insert("repeat", "20", "hot iter")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "moe_smoothquant.json", "json file name to dump results");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -274,6 +269,21 @@ bool run(const ck_tile::ArgParser& arg_parser)
         std::cout << ", valid:" << (pass ? "y" : "n") << std::flush << std::endl;
     }
 
+    if(arg_parser.get_int("json"))
+    {
+        dump_moe_smoothquant_json(arg_parser.get_str("jsonfile"),
+                                  prec_i,
+                                  prec_o,
+                                  tokens,
+                                  hidden_size,
+                                  stride,
+                                  experts,
+                                  topk,
+                                  pass,
+                                  ave_time,
+                                  0,
+                                  gb_per_sec);
+    }
     return pass;
 }
 
@@ -281,26 +291,26 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
 
     const std::string prec_i = arg_parser.get_str("prec_i");
     const std::string prec_o = arg_parser.get_str("prec_o");
     if(prec_i == "fp16" && prec_o == "int8")
     {
-        return run<ck_tile::half_t, ck_tile::int8_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t, ck_tile::int8_t>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "fp16" && prec_o == "fp8")
     {
-        return run<ck_tile::half_t, ck_tile::fp8_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t, ck_tile::fp8_t>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "bf16" && prec_o == "int8")
     {
-        return run<ck_tile::bf16_t, ck_tile::int8_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::bf16_t, ck_tile::int8_t>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "bf16" && prec_o == "fp8")
     {
-        return run<ck_tile::bf16_t, ck_tile::fp8_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::bf16_t, ck_tile::fp8_t>(arg_parser) ? 0 : -2;
     }
 
-    return EXIT_FAILURE;
+    return -3;
 }

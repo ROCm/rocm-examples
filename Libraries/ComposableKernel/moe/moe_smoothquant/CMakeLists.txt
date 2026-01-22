@@ -69,52 +69,53 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 add_executable(${example_name}
-    moe_smoothquant_bf16_n64_n128_instance.cpp
-    moe_smoothquant_bf16_n256_instance.cpp
-    moe_smoothquant_bf16_n512_instance.cpp
-    moe_smoothquant_bf16_n768_instance.cpp
-    moe_smoothquant_bf16_n1024_instance.cpp
-    moe_smoothquant_bf16_n1536_instance.cpp
-    moe_smoothquant_bf16_n2048_instance.cpp
-    moe_smoothquant_bf16_n3072_instance.cpp
-    moe_smoothquant_bf16_n4096_instance.cpp
-    moe_smoothquant_bf16_n4096_tp_instance.cpp
-    moe_smoothquant_fp16_n64_n128_instance.cpp
-    moe_smoothquant_fp16_n256_instance.cpp
-    moe_smoothquant_fp16_n512_instance.cpp
-    moe_smoothquant_fp16_n768_instance.cpp
-    moe_smoothquant_fp16_n1024_instance.cpp
-    moe_smoothquant_fp16_n1536_instance.cpp
-    moe_smoothquant_fp16_n2048_instance.cpp
-    moe_smoothquant_fp16_n3072_instance.cpp
-    moe_smoothquant_fp16_n4096_instance.cpp
-    moe_smoothquant_fp16_n4096_tp_instance.cpp
-    moe_smoothquant_fwd_api.cpp
+    instances/moe_smoothquant_bf16_n64_n128_instance.cpp
+    instances/moe_smoothquant_bf16_n256_instance.cpp
+    instances/moe_smoothquant_bf16_n512_instance.cpp
+    instances/moe_smoothquant_bf16_n768_instance.cpp
+    instances/moe_smoothquant_bf16_n1024_instance.cpp
+    instances/moe_smoothquant_bf16_n1536_instance.cpp
+    instances/moe_smoothquant_bf16_n2048_instance.cpp
+    instances/moe_smoothquant_bf16_n3072_instance.cpp
+    instances/moe_smoothquant_bf16_n4096_instance.cpp
+    instances/moe_smoothquant_bf16_n4096_tp_instance.cpp
+    instances/moe_smoothquant_fp16_n64_n128_instance.cpp
+    instances/moe_smoothquant_fp16_n256_instance.cpp
+    instances/moe_smoothquant_fp16_n512_instance.cpp
+    instances/moe_smoothquant_fp16_n768_instance.cpp
+    instances/moe_smoothquant_fp16_n1024_instance.cpp
+    instances/moe_smoothquant_fp16_n1536_instance.cpp
+    instances/moe_smoothquant_fp16_n2048_instance.cpp
+    instances/moe_smoothquant_fp16_n3072_instance.cpp
+    instances/moe_smoothquant_fp16_n4096_instance.cpp
+    instances/moe_smoothquant_fp16_n4096_tp_instance.cpp
+    instances/moe_smoothquant_fwd_api.cpp
     moe_smoothquant.cpp
 )
-add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
+target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
 set_source_files_properties(
-    moe_smoothquant_bf16_n64_n128_instance.cpp
-    moe_smoothquant_bf16_n256_instance.cpp
-    moe_smoothquant_bf16_n512_instance.cpp
-    moe_smoothquant_bf16_n768_instance.cpp
-    moe_smoothquant_bf16_n1024_instance.cpp
-    moe_smoothquant_bf16_n1536_instance.cpp
-    moe_smoothquant_bf16_n2048_instance.cpp
-    moe_smoothquant_bf16_n3072_instance.cpp
-    moe_smoothquant_bf16_n4096_instance.cpp
-    moe_smoothquant_bf16_n4096_tp_instance.cpp
-    moe_smoothquant_fp16_n64_n128_instance.cpp
-    moe_smoothquant_fp16_n256_instance.cpp
-    moe_smoothquant_fp16_n512_instance.cpp
-    moe_smoothquant_fp16_n768_instance.cpp
-    moe_smoothquant_fp16_n1024_instance.cpp
-    moe_smoothquant_fp16_n1536_instance.cpp
-    moe_smoothquant_fp16_n2048_instance.cpp
-    moe_smoothquant_fp16_n3072_instance.cpp
-    moe_smoothquant_fp16_n4096_instance.cpp
-    moe_smoothquant_fp16_n4096_tp_instance.cpp
-    moe_smoothquant_fwd_api.cpp
+    instances/moe_smoothquant_bf16_n64_n128_instance.cpp
+    instances/moe_smoothquant_bf16_n256_instance.cpp
+    instances/moe_smoothquant_bf16_n512_instance.cpp
+    instances/moe_smoothquant_bf16_n768_instance.cpp
+    instances/moe_smoothquant_bf16_n1024_instance.cpp
+    instances/moe_smoothquant_bf16_n1536_instance.cpp
+    instances/moe_smoothquant_bf16_n2048_instance.cpp
+    instances/moe_smoothquant_bf16_n3072_instance.cpp
+    instances/moe_smoothquant_bf16_n4096_instance.cpp
+    instances/moe_smoothquant_bf16_n4096_tp_instance.cpp
+    instances/moe_smoothquant_fp16_n64_n128_instance.cpp
+    instances/moe_smoothquant_fp16_n256_instance.cpp
+    instances/moe_smoothquant_fp16_n512_instance.cpp
+    instances/moe_smoothquant_fp16_n768_instance.cpp
+    instances/moe_smoothquant_fp16_n1024_instance.cpp
+    instances/moe_smoothquant_fp16_n1536_instance.cpp
+    instances/moe_smoothquant_fp16_n2048_instance.cpp
+    instances/moe_smoothquant_fp16_n3072_instance.cpp
+    instances/moe_smoothquant_fp16_n4096_instance.cpp
+    instances/moe_smoothquant_fp16_n4096_tp_instance.cpp
+    instances/moe_smoothquant_fwd_api.cpp
     moe_smoothquant.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
