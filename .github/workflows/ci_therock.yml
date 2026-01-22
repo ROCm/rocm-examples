@@ -29,6 +29,7 @@ on:
       - 'CMakeLists.txt'
       - 'Makefile'
       - '.github/workflows/**'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -111,13 +112,17 @@ jobs:
 
       - name: Install TheRock tarball
         if: ${{ matrix.install_method == 'tarball' }}
+        id: install-tarball
         shell: bash
         run: |
-          LATEST_TARBALL=$(curl -s https://rocm.nightlies.amd.com/tarball/ | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" | tail -1)
+          LATEST_TARBALL=$(curl -s https://rocm.nightlies.amd.com/tarball/ \
+            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" \
+            | sort -V \
+            | tail -1)
           mkdir /therock-tarball && cd /therock-tarball
-          wget https://rocm.nightlies.amd.com/tarball/$LATEST_TARBALL
+          wget "https://rocm.nightlies.amd.com/tarball/$LATEST_TARBALL"
           mkdir install
-          tar -xzf $LATEST_TARBALL -C install
+          tar -xzf "$LATEST_TARBALL" -C install
 
           ROCM_VERSION=$(echo $LATEST_TARBALL | grep -oE "[0-9]+\.[0-9]+\.\w+")
           echo "rocm_version=$ROCM_VERSION" >> $GITHUB_OUTPUT
@@ -184,7 +189,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: rocm-examples-build-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Run tests
