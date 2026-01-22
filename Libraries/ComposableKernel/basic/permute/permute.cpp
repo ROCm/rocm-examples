@@ -21,24 +21,21 @@
 // SOFTWARE.
 
 #include "permute.hpp"
+#include "ck_tile/host.hpp"
+#include "ck_tile/utility/json_dump.hpp"
 
-#include <ck_tile/host.hpp>
-
-#include <hip/hip_runtime.h>
-
-#include <algorithm>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <iostream>
+#include <array>
+#include <cstring>
+#include <functional>
+#include <numeric>
 #include <ostream>
 #include <string>
-#include <vector>
 #include <tuple>
-#include <type_traits>
+#include <utility>
+#include <vector>
 
 #ifdef PERMUTE_USE_ALTERNATIVE_IMPL
-#include "matrix_core_swizzle.hpp"
+#include "alternative_impl/matrix_core_swizzle.hpp"
 #endif
 
 namespace detail {
@@ -48,17 +45,17 @@ struct to_integer_type;
 template <>
 struct to_integer_type<4>
 {
-    using type = std::int32_t;
+    using type = int32_t;
 };
 template <>
 struct to_integer_type<2>
 {
-    using type = std::int16_t;
+    using type = int16_t;
 };
 template <>
 struct to_integer_type<1>
 {
-    using type = std::int8_t;
+    using type = int8_t;
 };
 } // namespace detail
 
@@ -76,11 +73,11 @@ float permute(permute_traits t, permute_args a, const ck_tile::stream_config& s)
 
         auto kargs = Kernel::MakeKargs(a);
 
-        const dim3 grids      = Kernel::GridSize(a);
-        constexpr dim3 blocks = Kernel::BlockSize();
+        const dim3 grids  = Kernel::GridSize(a);
+        const dim3 blocks = Kernel::BlockSize();
 
-        float ave_time = ck_tile::launch_kernel(
-            s, ck_tile::make_kernel<blocks.x, 1>(Kernel{}, grids, blocks, 0, kargs));
+        float ave_time =
+            ck_tile::launch_kernel(s, ck_tile::make_kernel<1>(Kernel{}, grids, blocks, 0, kargs));
 
         return ave_time;
     }
@@ -92,11 +89,11 @@ float permute(permute_traits t, permute_args a, const ck_tile::stream_config& s)
 
         auto kargs = Kernel::MakeKargs(a);
 
-        const dim3 grids      = Kernel::GridSize(a);
-        constexpr dim3 blocks = Kernel::BlockSize();
+        const dim3 grids  = Kernel::GridSize(a);
+        const dim3 blocks = Kernel::BlockSize();
 
-        float ave_time = ck_tile::launch_kernel(
-            s, ck_tile::make_kernel<blocks.x, 1>(Kernel{}, grids, blocks, 0, kargs));
+        float ave_time =
+            ck_tile::launch_kernel(s, ck_tile::make_kernel<1>(Kernel{}, grids, blocks, 0, kargs));
 
         return ave_time;
     }
@@ -108,11 +105,11 @@ float permute(permute_traits t, permute_args a, const ck_tile::stream_config& s)
 
         auto kargs = Kernel::MakeKargs(a);
 
-        const dim3 grids      = Kernel::GridSize(a);
-        constexpr dim3 blocks = Kernel::BlockSize();
+        const dim3 grids  = Kernel::GridSize(a);
+        const dim3 blocks = Kernel::BlockSize();
 
-        float ave_time = ck_tile::launch_kernel(
-            s, ck_tile::make_kernel<blocks.x, 1>(Kernel{}, grids, blocks, 0, kargs));
+        float ave_time =
+            ck_tile::launch_kernel(s, ck_tile::make_kernel<1>(Kernel{}, grids, blocks, 0, kargs));
 
         return ave_time;
     }
@@ -150,7 +147,9 @@ auto create_args(int argc, char* argv[])
                 "random seed used for initializing input tensors. 0 for "
                 "non-deterministic seed")
         .insert("warmup", "5", "number of iterations before benchmark the kernel")
-        .insert("repeat", "20", "number of iterations to benchmark the kernel");
+        .insert("repeat", "20", "number of iterations to benchmark the kernel")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "permute.json", "json file name to dump results");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -229,7 +228,7 @@ bool run(const ck_tile::ArgParser& arg_parser)
     ck_tile::index_t rank = perm.size();
     if(rank > ck_tile::GenericPermuteHostArgs::kMaxRanks)
     {
-        std::printf("rank %d permute is not support yet\n", rank);
+        printf("rank %d permute is not support yet\n", rank);
         return false;
     }
 
@@ -279,6 +278,7 @@ bool run(const ck_tile::ArgParser& arg_parser)
 
         return permute(t, a, stream_config);
     };
+#if !CK_TILE_USE_WMMA
 #ifdef PERMUTE_USE_ALTERNATIVE_IMPL
     // batch* n0*n1*n2*k0*k1*k2 -> batch* n0*k0*n1*k1*n2*k2
     if((arg_parser.get_str("perm") == std::string("0,1,4,2,5,3,6") ||
@@ -368,6 +368,7 @@ bool run(const ck_tile::ArgParser& arg_parser)
     }
     else
 #endif
+#endif
     {
         ave_time = run_permute();
     }
@@ -380,15 +381,15 @@ bool run(const ck_tile::ArgParser& arg_parser)
 #if 0
         if constexpr (std::is_same_v<float, DataType>){
             // using itype = to_integer_type<sizeof(DataType)>;
-            std::fflush(stdout);
+            fflush(stdout);
             for(int zz = 0; zz < static_cast<int>(x.get_element_size()); zz++   ) {
-                std::printf("%3.0f ", x.mData[zz]);
+                printf("%3.0f ", x.mData[zz]);
             }
-            std::printf("->\n");
+            printf("->\n");
             for(int zz = 0; zz < static_cast<int>(x.get_element_size()); zz++   ) {
-                std::printf("%3.0f ", y.mData[zz]);
+                printf("%3.0f ", y.mData[zz]);
             }
-            std::fflush(stdout);
+            fflush(stdout);
         }
 #endif
         ck_tile::HostTensor<DataType> y_dev(y.get_lengths());
@@ -405,6 +406,11 @@ bool run(const ck_tile::ArgParser& arg_parser)
         std::cout << ", valid:" << (pass ? "y" : "n") << std::flush;
     }
 
+    if(arg_parser.get_int("json") == 1)
+    {
+        dump_permute_json_results(arg_parser.get_str("jsonfile"), data_type, pass, ave_time, 0, 0);
+    }
+
     std::cout << std::endl;
 
     return pass;
@@ -414,21 +420,21 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
 
     const std::string data_type = arg_parser.get_str("prec");
     if(data_type == "fp8")
     {
-        return run<ck_tile::fp8_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::fp8_t>(arg_parser) ? 0 : -2;
     }
     else if(data_type == "fp16")
     {
-        return run<ck_tile::half_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t>(arg_parser) ? 0 : -2;
     }
     else if(data_type == "fp32")
     {
-        return run<float>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<float>(arg_parser) ? 0 : -2;
     }
 
-    return EXIT_FAILURE;
+    return -3;
 }

@@ -70,59 +70,60 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 ########################################################################################################################
-# Basic example
+# Main example with instances
 ########################################################################################################################
 add_executable(${example_name}
-    add_rmsnorm2d_rdquant_fwd_api.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n64_n128_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n256_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n512_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n768_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n1024_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n1536_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n2048_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n3072_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n4096_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n8192_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n8192_tp_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n64_n128_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n256_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n512_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n768_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n1024_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n1536_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n2048_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n3072_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n4096_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n8192_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n8192_tp_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_api.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n64_n128_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n256_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n512_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n768_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n1024_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n1536_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n2048_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n3072_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n4096_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n8192_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n8192_tp_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n64_n128_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n256_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n512_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n768_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n1024_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n1536_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n2048_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n3072_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n4096_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n8192_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n8192_tp_instance.cpp
     add_rmsnorm2d_rdquant_fwd.cpp
 )
-add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
+target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
+add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
 set_source_files_properties(
-    add_rmsnorm2d_rdquant_fwd_api.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n64_n128_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n256_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n512_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n768_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n1024_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n1536_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n2048_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n3072_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n4096_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n8192_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_bf16_n8192_tp_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n64_n128_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n256_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n512_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n768_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n1024_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n1536_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n2048_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n3072_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n4096_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n8192_instance.cpp
-    add_rmsnorm2d_rdquant_fwd_fp16_n8192_tp_instance.cpp    
+    instances/add_rmsnorm2d_rdquant_fwd_api.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n64_n128_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n256_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n512_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n768_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n1024_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n1536_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n2048_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n3072_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n4096_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n8192_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_bf16_n8192_tp_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n64_n128_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n256_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n512_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n768_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n1024_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n1536_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n2048_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n3072_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n4096_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n8192_instance.cpp
+    instances/add_rmsnorm2d_rdquant_fwd_fp16_n8192_tp_instance.cpp
     add_rmsnorm2d_rdquant_fwd.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )

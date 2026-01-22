@@ -19,13 +19,15 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+#include "ck_tile/core.hpp"
+#include "ck_tile/host.hpp"
+#include "ck_tile/ops/reduce.hpp"
+#include "ck_tile/ops/batched_transpose.hpp"
+
+#include <vector>
+#include <string>
 
 #pragma once
-
-#include <ck_tile/host.hpp>
-#include <ck_tile/ops/batched_transpose.hpp>
-
-#include <string>
 
 struct batched_transpose_trait
 {

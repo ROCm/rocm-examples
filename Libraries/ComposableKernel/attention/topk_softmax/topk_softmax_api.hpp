@@ -21,11 +21,9 @@
 // SOFTWARE.
 
 #pragma once
-
-#include <ck_tile/core.hpp>
-#include <ck_tile/host.hpp>
-#include <ck_tile/ops/topk_softmax.hpp>
-
+#include "ck_tile/core.hpp"
+#include "ck_tile/host.hpp"
+#include "ck_tile/ops/topk_softmax.hpp"
 #include <string>
 
 struct topk_softmax_trait
@@ -33,6 +31,7 @@ struct topk_softmax_trait
     std::string input_type;
     std::string weight_type; // currently always float
     int experts;
+    std::string activation; // "softmax" or "sigmoid"
 };
 
 struct topk_softmax_kargs : public ck_tile::TopkSoftmaxHostArgs

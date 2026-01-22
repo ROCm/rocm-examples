@@ -20,23 +20,18 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <vector>
+#include <iostream>
+#include <numeric>
+#include <cassert>
+#include <cstdlib>
+#include <iostream>
+#include <time.h>
+#include <unordered_set>
+
 #include "batched_transpose_example.hpp"
 
-#include <ck_tile/core.hpp>
-#include <ck_tile/host.hpp>
-
-#include <cassert>
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
-#include <iostream>
-#include <string>
-#include <type_traits>
-#include <vector>
-#include <tuple>
-
+#include "ck_tile/utility/json_dump.hpp"
 #if 0
 template <typename T>
 void dump_host_tensor_4d(const ck_tile::HostTensor<T>& x)
@@ -44,16 +39,16 @@ void dump_host_tensor_4d(const ck_tile::HostTensor<T>& x)
     auto len = x.get_lengths();
     assert(len.size() == 4);
     std::cout << "[";
-    for(std::size_t i = 0; i < len[0]; i++)
+    for(size_t i = 0; i < len[0]; i++)
     {
         std::cout << "Batch " << i << ":" << std::endl;
-        for(std::size_t j = 0; j < len[1]; j++)
+        for(size_t j = 0; j < len[1]; j++)
         {
             std::cout << "  Channel " << j << ":" << std::endl;
-            for(std::size_t k = 0; k < len[2]; k++)
+            for(size_t k = 0; k < len[2]; k++)
             {
                 std::cout << "    Row " << k << ": ";
-                for(std::size_t v = 0; v < len[3]; v++)
+                for(size_t v = 0; v < len[3]; v++)
                 {
                     if constexpr(std::is_same_v<T, ck_tile::fp16_t>)
                     {
@@ -128,6 +123,8 @@ auto create_args(int argc, char* argv[])
         .insert("repeat", "100", "number of iterations to benchmark the kernel")
         .insert("seed", "-1", "seed to be used, -1 means random every time")
         .insert("kname", "0", "t to 1 will print kernel name")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "batched_transpose.json", "json file name to dump results")
         .insert("pipeline", "0", "0: no LDS usage, 1: LDS-accelerated (gfx950)");
 
     bool result = arg_parser.parse(argc, argv);
@@ -195,8 +192,8 @@ bool run_batched_transpose(ck_tile::ArgParser args)
 
     auto trait = batched_transpose_trait{prec, layout_in, pipeline};
 
-    std::uint32_t height = nchw2nhwc ? C : H * W;
-    std::uint32_t width  = nchw2nhwc ? H * W : C;
+    uint32_t height = nchw2nhwc ? C : H * W;
+    uint32_t width  = nchw2nhwc ? H * W : C;
 
     batched_transpose_kargs karg = [&]() {
         batched_transpose_kargs a_;
@@ -222,18 +219,18 @@ bool run_batched_transpose(ck_tile::ArgParser args)
               << ms << " ms " << std::endl
               << gb_per_sec << " GB/s " << std::endl;
 
-    std::printf("[%s]N:%d, C:%d, H:%d, W:%d, layout_in:%s, %f\n",
-                prec.c_str(),
-                N,
-                C,
-                H,
-                W,
-                layout_in.c_str(),
-                ms);
+    printf("[%s]N:%d, C:%d, H:%d, W:%d, layout_in:%s, %f\n",
+           prec.c_str(),
+           N,
+           C,
+           H,
+           W,
+           layout_in.c_str(),
+           ms);
     if(ms < 0)
-        std::printf("------------------------------------not "
-                    "supported-------------------------------------\n");
-    std::fflush(stdout);
+        printf("------------------------------------not "
+               "supported-------------------------------------\n");
+    fflush(stdout);
 
     if(ms < 0)
     {
@@ -257,10 +254,27 @@ bool run_batched_transpose(ck_tile::ArgParser args)
         rtn &= ck_tile::check_err(
             y_host, y_ref, std::string("y Error: Incorrect results!"), rtol, atol);
     }
-    std::printf("-----------------------------------------------------------------------valid:%s--------"
-                "--------------------------------------------------------------------\n",
-                rtn ? "y" : "n");
-    std::fflush(stdout);
+    printf("-----------------------------------------------------------------------valid:%s--------"
+           "--------------------------------------------------------------------\n",
+           rtn ? "y" : "n");
+    fflush(stdout);
+
+    if(args.get_int("json") == 1)
+    {
+        dump_batched_transpose_json(args.get_str("jsonfile"),
+                                    N,
+                                    C,
+                                    H,
+                                    W,
+                                    layout_in,
+                                    layout_out,
+                                    prec,
+                                    ms,
+                                    0,
+                                    gb_per_sec,
+                                    rtn);
+    }
+
     return rtn;
 }
 
@@ -268,7 +282,7 @@ int main(int argc, char** argv)
 {
     auto [result, args] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
     std::string prec = args.get_str("pr");
 
     bool r = true;
@@ -285,5 +299,5 @@ int main(int argc, char** argv)
         r &= run_batched_transpose<ck_tile::bf16_t>(args);
     }
 
-    return r ? EXIT_SUCCESS : EXIT_FAILURE;
+    return r ? 0 : -1;
 }

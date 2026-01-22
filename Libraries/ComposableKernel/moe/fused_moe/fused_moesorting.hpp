@@ -21,12 +21,10 @@
 // SOFTWARE.
 
 #pragma once
-
-#include <ck_tile/core.hpp>
-#include <ck_tile/host.hpp>
-#include <ck_tile/ops/fused_moe.hpp>
-
 #include <string>
+#include "ck_tile/core.hpp"
+#include "ck_tile/host.hpp"
+#include "ck_tile/ops/fused_moe.hpp"
 
 struct fused_moesorting_trait
 {

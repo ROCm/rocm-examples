@@ -20,19 +20,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "fused_moe.hpp"
-
-#include <ck_tile/host.hpp>
-
 #include <algorithm>
-#include <cstdint>
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <set>
-#include <string>
-#include <tuple>
+#include <cstring>
+#include <unordered_set>
 #include <vector>
+#include <set>
+
+#include "ck_tile/host.hpp"
+#include "ck_tile/utility/json_dump.hpp"
+#include "fused_moe.hpp"
 
 // different threshold for different dtype
 template <typename DataType>
@@ -157,7 +153,9 @@ auto create_args(int argc, char* argv[])
                 "normalized(slow)")
         .insert("seed", "11939", "seed used to do random")
         .insert("warmup", "5", "cold iter")
-        .insert("repeat", "20", "hot iter");
+        .insert("repeat", "20", "hot iter")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "fused_moe.json", "json file name to dump results");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -200,14 +198,14 @@ bool run(const ck_tile::ArgParser& arg_parser)
     int balance               = arg_parser.get_int("balance");
     int tp                    = arg_parser.get_int("tp");
     int init                  = arg_parser.get_int("init");
-    std::uint32_t seed        = arg_parser.get_uint32("seed");
+    uint32_t seed             = arg_parser.get_uint32("seed");
     bool local_expert_masking = false; // TODO...
 
     // w0 (Gate+Up or Gate only, N size)
     ck_tile::index_t shared_intermediate_size_0 = intermediate_size * (gate_only ? 1 : 2) / tp;
     // w1 (Down, N size)
     ck_tile::index_t shared_intermediate_size_1 = intermediate_size / tp;
-    
+
     bool is_local_token = local_tokens >= 0 && local_tokens < tokens;
 
     if(local_tokens > tokens)
@@ -244,7 +242,7 @@ bool run(const ck_tile::ArgParser& arg_parser)
         else
             return std::string(", st:") + std::to_string(stride);
     }();
-    
+
     std::cout << "[" << api_str << "|" << prec_str << "]" << " t:" << tokens;
 
     if(is_local_token)
@@ -540,6 +538,29 @@ bool run(const ck_tile::ArgParser& arg_parser)
             std::cout << ", valid:" << (pass ? "y" : "n") << std::flush;
         }
         std::cout << std::flush << std::endl;
+
+        if(arg_parser.get_int("json") == 1)
+        {
+            dump_fused_moe_json(arg_parser.get_str("jsonfile"),
+                                api_str,
+                                prec_str,
+                                tokens,
+                                is_local_token,
+                                local_tokens,
+                                experts,
+                                topk,
+                                hidden_size,
+                                intermediate_size,
+                                stride,
+                                block_m,
+                                activation,
+                                gate_only,
+                                fused_quant,
+                                pass,
+                                ave_time,
+                                cal_tflops(ave_time),
+                                cal_tbps(ave_time));
+        }
         return pass;
     }
     else if(api == 1)
@@ -646,6 +667,29 @@ bool run(const ck_tile::ArgParser& arg_parser)
         }
         std::cout << std::flush << std::endl;
 
+        if(arg_parser.get_int("json") == 1)
+        {
+            dump_fused_moe_json(arg_parser.get_str("jsonfile"),
+                                api_str,
+                                prec_str,
+                                tokens,
+                                is_local_token,
+                                local_tokens,
+                                experts,
+                                topk,
+                                hidden_size,
+                                intermediate_size,
+                                stride,
+                                block_m,
+                                activation,
+                                gate_only,
+                                fused_quant,
+                                pass,
+                                ave_time,
+                                cal_tflops(ave_time),
+                                cal_tbps(ave_time));
+        }
+
         return pass;
     }
     return false;
@@ -655,7 +699,7 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
 
     std::string prec_i  = arg_parser.get_str("prec_i");
     std::string prec_w  = arg_parser.get_str("prec_w");
@@ -674,16 +718,16 @@ int main(int argc, char* argv[])
     {
         return run<ck_tile::bf16_t, ck_tile::bf16_t, ck_tile::bf16_t, float, float, float, float>(
                    arg_parser)
-                   ? EXIT_SUCCESS
-                   : EXIT_FAILURE;
+                   ? 0
+                   : -2;
     }
     else if(prec_i == "fp16" && prec_w == "fp16" && prec_o == "fp16" && prec_kw == "fp32")
     {
         return run<ck_tile::fp16_t, ck_tile::fp16_t, ck_tile::fp16_t, float, float, float, float>(
                    arg_parser)
-                   ? EXIT_SUCCESS
-                   : EXIT_FAILURE;
+                   ? 0
+                   : -2;
     }
 
-    return EXIT_FAILURE;
+    return -3;
 }

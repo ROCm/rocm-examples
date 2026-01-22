@@ -19,20 +19,11 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-
 #include "batched_transpose_example.hpp"
-
-#include <ck_tile/core.hpp>
-#include <ck_tile/host.hpp>
-
-#include <hip/hip_runtime.h>
-
-#include <cstdint>
-#include <cstdio>
 
 namespace {
 
-template <std::int32_t pipeline_id>
+template <int32_t pipeline_id>
 struct kernel_traits;
 
 template <>
@@ -85,7 +76,7 @@ struct BatchedTransposeConfig
 template <typename Config>
 float batched_transpose_dispatch(batched_transpose_kargs& a, ck_tile::stream_config& s)
 {
-    std::uint32_t dim_stride = a.height * a.width;
+    uint32_t dim_stride = a.height * a.width;
 
     a.dim_stride  = dim_stride;
     a.dim_block_h = Config::kBlockY;
@@ -102,13 +93,13 @@ float batched_transpose_dispatch(batched_transpose_kargs& a, ck_tile::stream_con
 
     auto kargs = kernel::MakeKargs(a);
 
-    const dim3 grids      = kernel::GridSize(a);
-    constexpr dim3 blocks = kernel::BlockSize();
+    const dim3 grids  = kernel::GridSize(a);
+    const dim3 blocks = kernel::BlockSize();
 
-    std::printf("Pipeline: %d\n", Config::kPipelineId);
-    std::printf("Grid: x=%u y=%u z=%u\n", grids.x, grids.y, grids.z);
-    std::printf("Block: x=%u y=%u z=%u\n", blocks.x, blocks.y, blocks.z);
-    std::printf(
+    printf("Pipeline: %d\n", Config::kPipelineId);
+    printf("Grid: x=%u y=%u z=%u\n", grids.x, grids.y, grids.z);
+    printf("Block: x=%u y=%u z=%u\n", blocks.x, blocks.y, blocks.z);
+    printf(
         "Host args: batch=%d, height=%d, width=%d, dim_stride=%d, dim_block_h=%d, dim_block_w=%d\n",
         a.batch,
         a.height,
@@ -116,18 +107,18 @@ float batched_transpose_dispatch(batched_transpose_kargs& a, ck_tile::stream_con
         a.dim_stride,
         a.dim_block_h,
         a.dim_block_w);
-    std::printf("kargs: kargs.batch=%d kargs.height=%d kargs.width=%d kargs.dim_stride=%d\n",
-                kargs.batch,
-                kargs.height,
-                kargs.width,
-                kargs.dim_stride);
+    printf("kargs: kargs.batch=%d kargs.height=%d kargs.width=%d kargs.dim_stride=%d\n",
+           kargs.batch,
+           kargs.height,
+           kargs.width,
+           kargs.dim_stride);
 
-    std::printf("Launching Kernel...\n");
+    printf("Launching Kernel...\n");
 
-    float ave_time = ck_tile::launch_kernel(
-        s, ck_tile::make_kernel<blocks.x, 1>(kernel{}, grids, blocks, 0, kargs));
+    float ave_time =
+        ck_tile::launch_kernel(s, ck_tile::make_kernel<1>(kernel{}, grids, blocks, 0, kargs));
 
-    std::printf("Kernel finished...\n");
+    printf("Kernel finished...\n");
 
     return ave_time;
 }

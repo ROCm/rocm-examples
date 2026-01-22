@@ -28,6 +28,9 @@ set(example_fwd_script test_ck_tile_fmha_fwd.sh)
 set(example_bwd ${example_name}_bwd)
 set(example_bwd_script test_ck_tile_fmha_bwd.sh)
 
+set(example_fwd_v3 ${example_name}_fwd_v3)
+set(example_fwd_v3_script test_ck_tile_fmha_fwd_v3.sh)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
@@ -42,10 +45,12 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FilterHIPArchitectures.cmake")
-filter_hip_architectures("CK Tile FMHA examples" "gfx942" SHOULD_SKIP)
+filter_hip_architectures("CK Tile FMHA examples" "gfx908;gfx90a;gfx942;gfx950;gfx1200;gfx1201" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
 endif()
+
+list(JOIN CMAKE_HIP_ARCHITECTURES , GENERATOR_TARGETS)
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "Composable Kernel examples are not supported for CUDA.")
@@ -86,8 +91,9 @@ add_executable(${example_fwd})
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd
+        --targets ${GENERATOR_TARGETS}
         --optdim 64
-        --filter "*fp16_group*"
+        --filter *fp16_group*
         --receipt 2
         --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt
     RESULT_VARIABLE ret
@@ -98,13 +104,15 @@ file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt EXAMPLE_FWD_GEN_SRCS)
 add_custom_target(fmha_fwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api fwd
+        --targets ${GENERATOR_TARGETS}
         --optdim 64
-        --filter "*fp16_group*"
+        --filter *fp16_group*
         --receipt 2
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/fwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
     BYPRODUCTS ${EXAMPLE_FWD_GEN_SRCS}
     COMMENT "Generating FMHA forward pass source files"
+    VERBATIM
 )
 
 add_dependencies(${example_fwd} fmha_fwd_gen_srcs)
@@ -120,7 +128,7 @@ target_include_directories(${example_fwd} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_fwd} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_fwd} PRIVATE fmha_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
 
-add_test(${example_fwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_fwd_script} $<TARGET_FILE:${example_fwd}>")
+add_test(${example_fwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_fwd_script}" "$<TARGET_FILE:${example_fwd}>")
 
 ########################################################################################################################
 # BWD
@@ -130,8 +138,9 @@ add_executable(${example_bwd})
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
+        --targets ${GENERATOR_TARGETS}
         --optdim 64
-        --filter "*fp16_group*"
+        --filter *fp16_group*
         --receipt 3
         --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
     RESULT_VARIABLE ret
@@ -142,22 +151,24 @@ file(STRINGS ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt EXAMPLE_BWD_GEN_SRCS)
 add_custom_target(fmha_bwd_gen_srcs
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
+        --targets ${GENERATOR_TARGETS}
         --optdim 64
-        --filter "*fp16_group*"
+        --filter *fp16_group*
         --receipt 3
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
     BYPRODUCTS ${EXAMPLE_BWD_GEN_SRCS}
     COMMENT "Generating FMHA backward pass source files"
+    VERBATIM
 )
 
 add_dependencies(${example_bwd} fmha_bwd_gen_srcs)
-
+target_compile_definitions(${example_bwd} PRIVATE CK_TILE_FLOAT_TO_BFLOAT16_DEFAULT=3)
+target_compile_features(${example_bwd} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_fwd} PRIVATE -Wno-float-equal
                                               -Wno-undefined-func-template
                                               -fgpu-flush-denormals-to-zero
 )
-target_compile_features(${example_bwd} PRIVATE cxx_std_17 hip_std_17)
 target_include_directories(${example_bwd} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_bwd} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_bwd} PRIVATE fmha_bwd.cpp ${EXAMPLE_BWD_GEN_SRCS})
@@ -165,4 +176,4 @@ target_sources(${example_bwd} PRIVATE fmha_bwd.cpp ${EXAMPLE_BWD_GEN_SRCS})
 set_source_files_properties(fmha_bwd.cpp ${EXAMPLE_BWD_GEN_SRCS}
                             PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-add_test(${example_bwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_bwd_script} $<TARGET_FILE:${example_bwd}>")
+add_test(${example_bwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_bwd_script}" "$<TARGET_FILE:${example_bwd}>")

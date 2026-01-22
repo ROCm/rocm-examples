@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,22 +20,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include "moe_sorting_api.hpp"
-
-#include <ck_tile/core.hpp>
-#include <ck_tile/ops/reduce.hpp>
-
-#include <cstddef>
-#include <cstdint>
-#include <cstdio>
-#include <cstdlib>
-#include <ctime>
-#include <iostream>
 #include <set>
-#include <stdexcept>
-#include <string>
-#include <tuple>
 #include <vector>
+#include <iostream>
+#include <numeric>
+#include <cassert>
+#include <cstdlib>
+#include <iostream>
+#include <time.h>
+#include <unordered_set>
+
+#include "ck_tile/core.hpp"
+#include "ck_tile/ops/reduce.hpp"
+#include "moe_sorting_api.hpp"
+#include "ck_tile/utility/json_dump.hpp"
 
 auto create_args(int argc, char* argv[])
 {
@@ -81,7 +79,9 @@ auto create_args(int argc, char* argv[])
                 "invoking this example")
         .insert("kname", "0", "prints the kernel name when set to 1")
         .insert("warmup", "5", "number of iterations before benchmark the kernel")
-        .insert("repeat", "20", "number of iterations to benchmark the kernel");
+        .insert("repeat", "20", "number of iterations to benchmark the kernel")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "moe_sorting.json", "json file name to dump results");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -91,11 +91,11 @@ template <typename IndexType>
 void topid_unique_gen(
     std::vector<IndexType>& host_tensor, int tokens, int topk, int num_expert, int seed)
 {
-    std::size_t total_size = topk * tokens;
+    size_t total_size = topk * tokens;
     std::srand(seed);
     std::set<IndexType> unique_set;
     IndexType current_v;
-    for(std::size_t i = 0; i < total_size; i++)
+    for(size_t i = 0; i < total_size; i++)
     {
         if(i % topk == 0)
         {
@@ -114,26 +114,26 @@ void topid_unique_gen(
 template <typename WeightType, typename IndexType = ck_tile::index_t>
 bool test_moe_sorting(ck_tile::ArgParser args)
 {
-    int validate              = args.get_int("v");
-    std::string index_prec    = args.get_str("pr_i");
-    std::string weight_prec   = args.get_str("pr_w");
-    int tokens                = args.get_int("t");
-    int local_tokens          = args.get_int("local_t");
-    int num_experts           = args.get_int("e");
-    int topk                  = args.get_int("k");
-    int seed                  = args.get_int("seed");
-    int unit_size             = args.get_int("unit");
+    int validate            = args.get_int("v");
+    std::string index_prec  = args.get_str("pr_i");
+    std::string weight_prec = args.get_str("pr_w");
+    int tokens              = args.get_int("t");
+    int local_tokens        = args.get_int("local_t");
+    int num_experts         = args.get_int("e");
+    int topk                = args.get_int("k");
+    int seed                = args.get_int("seed");
+    int unit_size           = args.get_int("unit");
 #if MOE_SORTING_FMOE_2D_BUF
-    int moe_buf_interm_dim    = args.get_int("moe_buf_interm_dim");
-    int moe_buf_elem_bytes    = args.get_int("moe_buf_elem_bytes");
+    int moe_buf_interm_dim = args.get_int("moe_buf_interm_dim");
+    int moe_buf_elem_bytes = args.get_int("moe_buf_elem_bytes");
 #else
-    std::int64_t moe_buf_size = static_cast<std::int64_t>(args.get_uint64("moe_buf_size"));
+    int64_t moe_buf_size = static_cast<int64_t>(args.get_uint64("moe_buf_size"));
 #endif
-    int kname                 = args.get_int("kname");
-    int warmup                = args.get_int("warmup");
-    int repeat                = args.get_int("repeat");
-    bool clear_inside         = args.get_int("ci") != 0;
-    int dispatch_policy       = args.get_int("dispatch");
+    int kname           = args.get_int("kname");
+    int warmup          = args.get_int("warmup");
+    int repeat          = args.get_int("repeat");
+    bool clear_inside   = args.get_int("ci") != 0;
+    int dispatch_policy = args.get_int("dispatch");
 
     int max_output_ids =
         ck_tile::integer_least_multiple(topk * tokens + num_experts * unit_size - topk, unit_size);
@@ -145,12 +145,12 @@ bool test_moe_sorting(ck_tile::ArgParser args)
 
     if(topk > num_experts)
     {
-        std::printf("topk:%d value should be smaller than, or equal to number of num_experts:%d\n",
-                    topk,
-                    num_experts);
+        printf("topk:%d value should be smaller than, or equal to number of num_experts:%d\n",
+               topk,
+               num_experts);
         return false;
     }
-    
+
     // if local_tokens == tokens, not local_token, but better avoid this since no meaning for such
     // case
     bool is_local_token = local_tokens >= 0 && local_tokens < tokens;
@@ -284,7 +284,7 @@ bool test_moe_sorting(ck_tile::ArgParser args)
 
 #if 0
     {
-        ck_tile::HostTensor<char> ws_host({workspace_size}, {1});
+    ck_tile::HostTensor<char> ws_host({workspace_size}, {1});
         moe_sorting_ws.FromDevice(ws_host.data());
 
         int * p_mesh = reinterpret_cast<int*>(ws_host.data());
@@ -294,80 +294,80 @@ bool test_moe_sorting(ck_tile::ArgParser args)
 
         int * p_topk_ids = reinterpret_cast<int*>(topk_ids_host.data());
         for(int i_token = 0; i_token < tokens; i_token++) {
-            std::printf("[t:%2d]", i_token);
+            printf("[t:%2d]", i_token);
             for(int i_topk = 0; i_topk < topk; i_topk++) {
-                std::printf("%d, ",p_topk_ids[i_token * topk + i_topk] );
+                printf("%d, ",p_topk_ids[i_token * topk + i_topk] );
             }
-            std::printf("\n");
+            printf("\n");
         }
-        std::printf("----------------\n");
+        printf("----------------\n");
 
         std::vector<int> l_cumsum (num_experts + 1, 0);
         for(int i_expert = 0; i_expert < num_experts; i_expert++  ) {
-            std::printf("[e:%2d]", i_expert);
+            printf("[e:%2d]", i_expert);
             int e_cnt = 0;
             for(int i_token = 0; i_token < tokens; i_token++) {
                 auto v_mesh = p_mesh[i_expert * row_size + i_token];
                 e_cnt += v_mesh != 0 ? 1 : 0;
-                std::printf("%d, ", v_mesh); 
+                printf("%d, ", v_mesh); 
             }
             int e_cnt_unit = (e_cnt + unit_size - 1) / unit_size;
-            std::printf("[%d/%d]", e_cnt, e_cnt_unit);
-            std::printf("\n");
+            printf("[%d/%d]", e_cnt, e_cnt_unit);
+            printf("\n");
             l_cumsum[i_expert + 1] = l_cumsum[i_expert] + e_cnt_unit;
         }
 
-        std::printf("----------------\n");
-        std::printf("cumsum:\n");
+        printf("----------------\n");
+        printf("cumsum:\n");
         for(int i_cc= 0; i_cc < num_experts + 1; i_cc++) {
-            std::printf("%2d, ", l_cumsum[i_cc]);
+            printf("%2d, ", l_cumsum[i_cc]);
         }
-        std::printf("\n");
-        std::printf("----------------\n");
+        printf("\n");
+        printf("----------------\n");
 
         int * p_cumsum = p_mesh + ck_tile::impl::moe_sorting_mp_mesh_elem(tokens, num_experts);
         for(int i_expert = 0; i_expert < num_experts + 1; i_expert++  ) {
-            std::printf("%2d(%d), ",p_cumsum[i_expert], p_cumsum[i_expert] / unit_size);
+            printf("%2d(%d), ",p_cumsum[i_expert], p_cumsum[i_expert] / unit_size);
         }
-        std::printf("\n");
+        printf("\n");
     }
 #endif
 
-    std::printf("[%s|%s|%s|%d]tokens:%d",
-                index_prec.c_str(),
-                weight_prec.c_str(),
-                workspace_size == 0 ? "cx" : (clear_inside ? "ci" : "co"),
-                dispatch_policy,
-                tokens);
+    printf("[%s|%s|%s|%d]tokens:%d",
+           index_prec.c_str(),
+           weight_prec.c_str(),
+           workspace_size == 0 ? "cx" : (clear_inside ? "ci" : "co"),
+           dispatch_policy,
+           tokens);
     if(is_local_token)
     {
-        std::printf("(%d)", local_tokens);
+        printf("(%d)", local_tokens);
     }
-    std::printf(", num_experts:%d, topk:%d, mp:%d, ", num_experts, topk, workspace_size != 0 ? 1 : 0);
+    printf(", num_experts:%d, topk:%d, mp:%d, ", num_experts, topk, workspace_size != 0 ? 1 : 0);
 
     if(local_expert_masking)
     {
-        std::printf("local_eid:%s, ", args.get_str("local_eid").c_str());
+        printf("local_eid:%s, ", args.get_str("local_eid").c_str());
     }
 
     if(moe_buf_bytes > 0)
     {
 #if MOE_SORTING_FMOE_2D_BUF
-        std::printf("moe_buf:%lu(%d,%d), ",
-                    static_cast<std::uint64_t>(moe_buf_bytes),
-                    moe_buf_interm_dim,
-                    moe_buf_elem_bytes);
+        printf("moe_buf:%lu(%d,%d), ",
+               static_cast<uint64_t>(moe_buf_bytes),
+               moe_buf_interm_dim,
+               moe_buf_elem_bytes);
 #else
 
-        printf("moe_buf:%lu, ", static_cast<std::uint64_t>(moe_buf_bytes));
+        printf("moe_buf:%lu, ", static_cast<uint64_t>(moe_buf_bytes));
 #endif
     }
 
     if(ms < 0)
-        std::printf("not supported\n");
+        printf("not supported\n");
     else
-        std::printf("ms:%f, ", ms);
-    std::fflush(stdout);
+        printf("ms:%f, ", ms);
+    fflush(stdout);
     if(ms < 0)
     {
         return false;
@@ -402,12 +402,12 @@ bool test_moe_sorting(ck_tile::ArgParser args)
                                                               is_local_token ? local_tokens
                                                                              : tokens,
                                                               local_expert_masking);
-        std::printf("total_tokens_post_pad:%d(%d), ",
-                    ref_total_tokens_post_pad,
-                    sorted_id_cnt_host.mData[0]);
+        printf("total_tokens_post_pad:%d(%d), ",
+               ref_total_tokens_post_pad,
+               sorted_id_cnt_host.mData[0]);
         if(ref_total_tokens_post_pad == sorted_id_cnt_host.mData[0])
         {
-            std::size_t slen = ref_total_tokens_post_pad;
+            size_t slen = ref_total_tokens_post_pad;
             rtn &= ck_tile::check_err(sorted_ids_host.slice({0}, {slen}),
                                       sorted_ids_ref.slice({0}, {slen}),
                                       std::string("OUT Error: Incorrect ids!"),
@@ -436,14 +436,14 @@ bool test_moe_sorting(ck_tile::ArgParser args)
         }
         else
         {
-            std::printf("(token size not equal!!)");
+            printf("(token size not equal!!)");
             rtn = false;
         }
 
         if(moe_buf_bytes)
         {
 #if MOE_SORTING_FMOE_2D_BUF
-            ck_tile::HostTensor<std::int8_t> moe_buf_ref({moe_buf_bytes});
+            ck_tile::HostTensor<int8_t> moe_buf_ref({moe_buf_bytes});
 #else
             ck_tile::HostTensor<WeightType> moe_buf_ref({moe_buf_size});
 #endif
@@ -453,12 +453,29 @@ bool test_moe_sorting(ck_tile::ArgParser args)
         // rtn &= ref_total_tokens_post_pad == sorted_id_cnt_host.mData[0];
     }
 
-    std::printf("valid:%s", rtn ? "y" : "n");
-    std::fflush(stdout);
+    printf("valid:%s", rtn ? "y" : "n");
+    fflush(stdout);
     if(!rtn)
-        std::printf(", (%d)", seed);
-    std::printf("\n");
-    std::fflush(stdout);
+        printf(", (%d)", seed);
+    printf("\n");
+    fflush(stdout);
+
+    if(args.get_int("json") == 1)
+    {
+        dump_moe_sorting_json(args.get_str("jsonfile"),
+                              index_prec,
+                              weight_prec,
+                              workspace_size == 0 ? "cx" : (clear_inside ? "ci" : "co"),
+                              dispatch_policy,
+                              tokens,
+                              num_experts,
+                              topk,
+                              ms,
+                              0,
+                              0,
+                              rtn);
+    }
+
     return rtn;
 }
 
@@ -468,7 +485,7 @@ int main(int argc, char** argv)
     {
         auto [result, args] = create_args(argc, argv);
         if(!result)
-            return EXIT_FAILURE;
+            return -1;
 
         std::string index_prec  = args.get_str("pr_i");
         std::string weight_prec = args.get_str("pr_w");
@@ -478,7 +495,8 @@ int main(int argc, char** argv)
         {
             r &= test_moe_sorting<float, ck_tile::index_t>(args);
         }
-        return r ? EXIT_SUCCESS : EXIT_FAILURE;
+
+        return r ? 0 : -1;
     }
     catch(const std::runtime_error& e)
     {
