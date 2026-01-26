@@ -14,8 +14,8 @@ on:
 
 env:
     DEBIAN_FRONTEND: noninteractive
-    ROCM_VERSION: '7.0'
-    AMDGPU_INSTALLER_VERSION: 7.0.70000-1
+    ROCM_VERSION: '7.2'
+    AMDGPU_INSTALLER_VERSION: 7.2.70200-1
 
 jobs:
     build:
