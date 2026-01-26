@@ -261,6 +261,12 @@ The following options are available when building with CMake.
       - [low_precision_float_fp16](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Reference/Low-Precision-Floating-Point-Types/low_precision_float_fp16): Shows how to perform an addition of two 16-bit `__half` values and store the result as single-precision `float`.
   - [Tutorial](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials) hosts the examples from the HIP documentation's Tutorials section.
     - [graph_api](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/graph_api): Shows how to convert an existing stream-based application to a graph-based application.
+    - [Programming-Patterns](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns): Shows fundamental algorithmic structures that enable efficient parallel computation on GPUs.
+      - [bfs](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns/bfs): Coordinating multiple GPU kernels to solve complex problems.
+      - [histogram_atomics](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns/histogram_atomics): Shows how to ensure data integrity during concurrent memory access.
+      - [image_convolution](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns/image_convolution): Shows how to update array elements based on neighboring values.
+      - [kmeans](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns/kmeans): Shows how to distribute work between CPU and GPU.
+      - [matrix_multiplication](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns/matrix_multiplication): Demonstrates how to process grid-structured data using a matrix multiplication example.
 - [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/README.md) for details.
 - [Docs](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/)
   - [CONTRIBUTING.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
