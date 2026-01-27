@@ -21,14 +21,9 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(ComposableKernel_ck_tile_basic_examples LANGUAGES CXX)
+project(ComposableKernel_ck_tile_pooling_examples LANGUAGES CXX)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-add_subdirectory(batched_transpose)
-add_subdirectory(copy)
-add_subdirectory(elementwise)
-add_subdirectory(img2col)
-add_subdirectory(permute)
-add_subdirectory(reduce)
+add_subdirectory(pool3d)

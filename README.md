@@ -272,10 +272,13 @@ The following options are available when building with CMake.
       - [topk_softmax](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/attention/topk_softmax): Demonstrates a topk-softmax kernel.
     - [Basic](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic): Basic examples intended as introduction to Composable Kernel.
       - [batched_transpose](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/batched_transpose): Shows how to perform a batched tensor transpose.
+      - [copy](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/copy): Getting started tutorial demonstrating basic tile copy operations and CK Tile fundamentals.
       - [elementwise](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/elementwise): Demonstrates how to perform various elementwise operations.
       - [img2col](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/img2col): Demonstrates how to perform the $\text{im2col}$ operation.
       - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/permute): Shows how to perform a tensor permutation.
       - [reduce](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/reduce): Shows how to perform parallel reduction on tensors.
+    - [Contraction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/contraction): Tensor contraction examples using the CK Tile programming model.
+      - [batched_contraction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/contraction/batched_contraction): Demonstrates multi-dimensional batched tensor contraction with support for arbitrary contraction patterns.
     - [Convolution](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/convolution): Convolution examples using the CK Tile programming model.
       - [grouped_convolution](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/convolution): Demonstrates how to perform a grouped convolution operation (forward pass).
     - [GEMM](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm): GEMM examples using the CK Tile programming model.
@@ -283,8 +286,10 @@ The following options are available when building with CMake.
       - [block_scale_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/block_scale_gemm): Showcases a block-scale GEMM operation.
       - [flatmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/flatmm): Shows how to perform a FLATMM operation.
       - [gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm): Illustrates how to perform a regular GEMM operation.
+      - [gemm_multi_abd](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm_multi_abd): Demonstrates Multiple ABD GEMM with auxiliary input tensors for complex fusion patterns.
       - [gemm_multi_d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/gemm_multi_d): Demonstrates how to perform a Multiple D GEMM operation.
       - [grouped_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/grouped_gemm): Shows how to perform a grouped GEMM operation.
+      - [streamk_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/gemm/streamk_gemm): Illustrates Stream-K GEMM with improved load balancing and performance optimization.
     - [MoE](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe): MoE examples using the CK Tile programming model.
       - [fused_moe](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/fused_moe): Shows how to implement the fused MoE block operator.
       - [moe_smoothquant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/moe/moe_smoothquant): Demonstrates how to implement MoE-SmoothQuant.
@@ -293,6 +298,8 @@ The following options are available when building with CMake.
       - [add_rmsnorm2d_quant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/add_rmsnorm2d_quant): Demonstrates how to perform add + RMSNorm2D + row-wise dynamic quantization forward operations.
       - [layernorm2d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/layernorm2d): Show how to perform the forward pass of the Layernorm2D operation.
       - [rmsnorm2d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/normalization/rmsnorm2d): Illustrates how to perform the forward pass of RMSNorm2D.
+    - [Pooling](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/pooling): Pooling examples using the CK Tile programming model.
+      - [pool3d](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/pooling/pool3d): Demonstrates 2D and 3D pooling operations for downsampling feature maps in neural networks.
     - [Quantization](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/quantization): Quantization examples using the CK Tile programming model.
       - [smoothquant](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/quantization/smoothquant): Demonstrates how to implement SmoothQuant.
   - [hipBLAS](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipBLAS/)
