@@ -2,7 +2,12 @@
 
 ## Description
 
-This example demonstrates how to perform a GEMM operation with the CK Tile programming model.
+This example demonstrates how to perform a grouped GEMM operation with the CK Tile programming model. Multiple variants are provided:
+
+* **Basic Grouped GEMM**: Standard grouped matrix multiplication (`grouped_gemm.cpp`)
+* **Grouped GEMM Multi-D**: Multiple D tensors support (`grouped_gemm_multi_d.cpp`)
+* **Grouped GEMM Preshuffle**: With weight preshuffling optimization (`grouped_gemm_preshuffle.cpp`)
+* **Quantized Grouped GEMM**: With quantization support (`quant_grouped_gemm.cpp`)
 
 ### Supported architectures
 

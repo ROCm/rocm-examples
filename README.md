@@ -268,6 +268,7 @@ The following options are available when building with CMake.
   - [Composable Kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/)
     - [Attention](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/attention): Examples focusing on attention operations.
       - [fmha](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/attention/fmha): Shows how to perform forward and backward passes of the fused multi-head attention operation.
+      - [fmha_fwd_v3](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/attention/fmha_fwd_v3): Demonstrates the forward pass of fused multi-head attention with variable-length sequence support.
       - [topk_softmax](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/attention/topk_softmax): Demonstrates a topk-softmax kernel.
     - [Basic](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic): Basic examples intended as introduction to Composable Kernel.
       - [batched_transpose](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/basic/batched_transpose): Shows how to perform a batched tensor transpose.

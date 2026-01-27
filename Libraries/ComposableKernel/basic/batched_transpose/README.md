@@ -11,8 +11,7 @@ Currently, the example supports batched transpose operations in two directions:
 * NCHW to NHWC
 * NHWC to NCHW
 
-This enables two transpose patterns from NCHW: either NHWC or NWCH. The current implementation performs transpose
-operations with single data point reads. Vectorized transpose support will be added in a future release.
+This enables two transpose patterns from NCHW: either NHWC or NWCH. The implementation supports multiple data types including `fp8`, `fp16`, and `bf16`. On `gfx950` architecture, an LDS-accelerated pipeline mode is available for improved performance. The current implementation performs transpose operations with single data point reads. Vectorized transpose support will be added in a future release.
 
 The example performs the following computation:
 
