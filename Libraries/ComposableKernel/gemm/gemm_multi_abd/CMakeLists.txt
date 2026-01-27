@@ -20,21 +20,17 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name ComposableKernel_ck_tile_gemm_multi_abd)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(ComposableKernel_examples LANGUAGES CXX)
+project(${example_name} LANGUAGES CXX)
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "Composable Kernel examples are supported on Linux only.")
+    message(STATUS "Composable Kernel examples are supported only on Linux.")
     return()
 endif()
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
-
-
-include(CTest)
-
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
@@ -43,9 +39,6 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "Composable Kernel examples are not supported for CUDA.")
     return()
 endif()
-
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -63,17 +56,13 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(composable_kernel)
-if(NOT composable_kernel_FOUND)
-    message(STATUS "Composable Kernel could not be found, not building Composable Kernel examples")
-else()
-    add_subdirectory(attention)
-    add_subdirectory(basic)
-    add_subdirectory(contraction)
-    add_subdirectory(convolution)
-    add_subdirectory(gemm)
-    add_subdirectory(moe)
-    add_subdirectory(normalization)
-    add_subdirectory(pooling)
-    add_subdirectory(quantization)
-endif()
+find_package(composable_kernel REQUIRED)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
+
+find_package(hip REQUIRED)
+
+add_executable(${example_name} gemm_multi_abd_fp16.cpp)
+add_test(${example_name} COMMAND ${example_name})
+set_source_files_properties(gemm_multi_abd_fp16.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
+target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
