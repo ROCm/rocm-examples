@@ -25,6 +25,11 @@ set(example_streams ${PROJECT_NAME}_streams)
 set(example_graph_capture ${PROJECT_NAME}_graph_capture)
 set(example_graph_creation ${PROJECT_NAME}_graph_creation)
 
+file(RELATIVE_PATH folder_bin_long ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+cmake_path(GET folder_bin_long PARENT_PATH folder_bin) # Place the binaries in 'bin', not 'bin/src'
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+
 include(FetchContent)
 
 find_package(TIFF COMPONENTS CXX)
