@@ -3,9 +3,13 @@
 ## Description
 
 This example demonstrates how to perform a GEMM operation with the CK Tile
-programming model. Three variants are shown: one with a `basic` pipeline, one
-with a memory bound pipeline (`universal`) and one with extra weighting and
-preshuffling steps (`weight_preshuffle`).
+programming model. Five variants are shown:
+
+* **Basic**: Basic GEMM pipeline (`gemm_basic.cpp`)
+* **Universal**: Memory bound pipeline optimized for various problem sizes (`universal_gemm.cpp`)
+* **Weight Preshuffle**: Includes extra weighting and preshuffling steps (`gemm_weight_preshuffle.cpp`)
+* **Split-K Reduce**: Reduction kernel for split-K GEMM (`gemm_splitk_two_stage_reduce.cpp`)
+* **Split-K Two-Stage**: Two-stage split-K GEMM implementation (`gemm_splitk_two_stage.cpp`)
 
 ### Supported architectures
 

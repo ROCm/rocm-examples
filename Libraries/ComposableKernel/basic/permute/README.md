@@ -20,10 +20,7 @@ $\mathbf{X}$ is a tensor of shape $[d_0, d_1, \ldots, d_{n - 1}]$ and $\pi$ is a
 
 ### Supported architectures
 
-The example is available for
-[all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus),
-while the alternative implementation is only supported for the following
-architectures:
+Both the generic and alternative implementations are supported for the following GPU architectures:
 
 * `gfx908`
 * `gfx90a`

@@ -2,7 +2,11 @@
 
 ## Description
 
-This example demonstrates how to perform a FLATMM operation with the CK Tile programming model.
+This example demonstrates how to perform a FLATMM operation with the CK Tile programming model. Multiple variants are provided:
+
+* **Basic FLATMM**: Standard flat matrix multiplication operation
+* **MOE FLATMM**: FLATMM optimized for Mixture-of-Experts workloads
+* **Grouped FLATMM**: FLATMM with grouped execution for batched operations
 
 ### Supported architectures
 

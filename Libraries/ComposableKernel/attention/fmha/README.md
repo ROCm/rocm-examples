@@ -5,9 +5,11 @@
 This example demonstrates how to perform FMHA (fused multi-head attention) with the CK Tile programming model. The files
 with the `_fwd` suffix contain the algorithm's forward pass, while the `_bwd` files show the backward pass.
 
+The forward pass supports the following data types: `fp32`, `fp16`, `bf16`, `fp8`, `fp8bf16`, and `fp8fp32`. The backward pass supports: `fp32`, `fp16`, and `bf16`. Both batch and group modes are available.
+
 ### Supported architectures
 
-The example is only supported for the `gfx942` architecture.
+The example supports the following architectures: `gfx908`, `gfx90a`, `gfx942`, `gfx950`, `gfx1200`, and `gfx1201`.
 
 ### Application flow
 
