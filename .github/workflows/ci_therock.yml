@@ -46,7 +46,9 @@ jobs:
     name: "TheRock - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: ubuntu:22.04
+      # Base image with Python venv, GLFW, Vulkan SDK pre-installed
+      # ROCm installation delegated to workflow (wheel or tarball)
+      image: ghcr.io/sshi-amd/rocm-examples-base:ubuntu22.04-rocm
       options:
         --group-add video
         --device /dev/kfd
@@ -62,23 +64,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install dependencies
-        shell: bash
-        run: |
-          apt-get update -qq &&
-          apt-get install -y git wget curl build-essential python3.11 python3.11-venv libdw-dev libglfw3-dev libvulkan-dev glslang-tools libtiff-dev libopencv-dev
-
-      - name: Setup virtual environment
-        shell: bash
-        run: |
-          python3.11 -m venv $GITHUB_WORKSPACE/.venv
-          source $GITHUB_WORKSPACE/.venv/bin/activate
-          pip install pyyaml cmake
-          
-          # persist the virtual environment
-          echo "PATH=$PATH" >> $GITHUB_ENV
-          echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> $GITHUB_ENV
 
       - name: Install TheRock Python wheel
         if: ${{ matrix.install_method == 'wheel' }}
