@@ -1,8 +1,8 @@
 FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
-ENV GPU_TARGET=gfx1100
-ENV THEROCK_FAMILY=gfx110X-all
+
+# GPU_TARGET and THEROCK_FAMILY are set at workflow runtime, not in the base image
 
 # Install system dependencies
 RUN apt-get update -qq && \

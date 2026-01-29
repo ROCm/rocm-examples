@@ -3,8 +3,7 @@ FROM registry.suse.com/suse/sle15:15.7
 ARG VULKAN_SDK_VERSION=1.4.335.0
 ARG GLFW_VERSION=3.4
 
-ENV GPU_TARGET=gfx1100
-ENV THEROCK_FAMILY=gfx110X-all
+# GPU_TARGET and THEROCK_FAMILY are set at workflow runtime, not in the base image
 ENV VULKAN_SDK_VERSION=${VULKAN_SDK_VERSION}
 
 RUN zypper -qni update -y && \
