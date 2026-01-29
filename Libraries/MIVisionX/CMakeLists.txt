@@ -56,5 +56,6 @@ if(NOT OpenVX_LIBRARY)
 endif()
 
 add_subdirectory(canny)
-add_subdirectory(mv_objdetect)
+# Disable this test until Jira ticket ROCM-1771 is resolved
+#add_subdirectory(mv_objdetect)
 add_subdirectory(opencv_orb)
