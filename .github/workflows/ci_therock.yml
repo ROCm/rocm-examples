@@ -2,7 +2,7 @@ name: Build ROCm Examples
 
 on:
   push:
-    branches: [ amd-staging, amd-mainline, release/** ]
+    branches: [ amd-staging, amd-mainline, release/**, image-ci ]
     paths:
       - 'Applications/**'
       - 'HIP-Basic/**'
@@ -16,7 +16,7 @@ on:
       - 'Makefile'
       - '.github/workflows/**'
   pull_request:
-    branches: [ amd-staging, amd-mainline, release/** ]
+    branches: [ amd-staging, amd-mainline, release/**, image-ci ]
     paths:
       - 'Applications/**'
       - 'HIP-Basic/**'
