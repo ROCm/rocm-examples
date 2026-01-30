@@ -170,6 +170,7 @@ struct device_dispatch
     PFN_vkUnmapMemory                 unmap_memory;
     PFN_vkCmdBindVertexBuffers        cmd_bind_vertex_buffers;
     PFN_vkCmdBindIndexBuffer          cmd_bind_index_buffer;
+    PFN_vkDeviceWaitIdle              device_wait_idle;
 #ifdef _WIN64
     PFN_vkGetMemoryWin32HandleKHR    get_memory_win32_handle;
     PFN_vkGetSemaphoreWin32HandleKHR get_semaphore_win32_handle;

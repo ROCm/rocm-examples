@@ -641,8 +641,6 @@ struct frame
 
     /// The semaphore that guards the use of the swapchain image before it is ready.
     VkSemaphore image_acquired;
-    /// The semaphore that guards the present before the image is rendered.
-    VkSemaphore render_finished;
     /// A fence that allows us to synchronize on CPU until this frame is ready
     /// to be re-rendered again after it has been submitted to the GPU.
     VkFence frame_fence;
@@ -657,7 +655,6 @@ struct frame
     explicit frame(const graphics_context& ctx) : ctx(ctx)
     {
         this->image_acquired  = create_semaphore(ctx);
-        this->render_finished = create_semaphore(ctx);
 
         VkFenceCreateInfo fence_create_info = {VK_STRUCTURE_TYPE_FENCE_CREATE_INFO};
         fence_create_info.flags             = VK_FENCE_CREATE_SIGNALED_BIT;
@@ -682,7 +679,6 @@ struct frame
         this->ctx.vkd->destroy_command_pool(this->ctx.dev, this->cmd_pool, nullptr);
         this->ctx.vkd->destroy_fence(this->ctx.dev, this->frame_fence, nullptr);
         this->ctx.vkd->destroy_semaphore(this->ctx.dev, this->image_acquired, nullptr);
-        this->ctx.vkd->destroy_semaphore(this->ctx.dev, this->render_finished, nullptr);
     }
 
     /// \brief Wait until the GPU-work for this frame has been completed, so that we
@@ -735,6 +731,12 @@ struct renderer
     std::vector<frame> frames;
     /// The index of the frame we are currently rendering to.
     uint32_t frame_index = 0;
+
+    /// The semaphore that guards the present before the image is rendered. The required number
+    /// is based on the swapchain image count instead of the frame count because vkQueuePresentKHR
+    /// is given ownership of this until the next vkAcquireNextImageKHR.
+    std::vector<VkSemaphore> render_semaphores;
+
     /// The Vulkan frame buffers to render to - each corresponds to a swapchain
     /// image with the same index in <tt>sc</tt>
     std::vector<VkFramebuffer> framebuffers;
@@ -825,6 +827,12 @@ struct renderer
         {
             this->frames.emplace_back(ctx);
         }
+
+        for(size_t i = 0; i < this->sc.images.size(); ++i)
+        {
+            this->render_semaphores.emplace_back(create_semaphore(ctx));
+        }
+
         this->sc.recreate_framebuffers(this->render_pass, this->framebuffers);
 
         // Initialize timing information for performance measurement
@@ -899,6 +907,12 @@ struct renderer
             this->ctx.vkd->destroy_pipeline(this->ctx.dev, this->pipeline, nullptr);
         if(this->pipeline_layout)
             this->ctx.vkd->destroy_pipeline_layout(this->ctx.dev, this->pipeline_layout, nullptr);
+
+        // Destroy Vulkan semaphores
+        for(const VkSemaphore semaphore : this->render_semaphores)
+        {
+            this->ctx.vkd->destroy_semaphore(this->ctx.dev, semaphore, nullptr);
+        }
 
         // Destroy framebuffers
         for(const VkFramebuffer fb : this->framebuffers)
@@ -1338,7 +1352,7 @@ struct renderer
 
         // Setup semaphores to signal after rendering
         std::vector<VkSemaphore> signal_semaphores;
-        signal_semaphores.push_back(current_frame.render_finished);
+        signal_semaphores.push_back(this->render_semaphores[this->sc.image_index]);
 #if USE_EXTERNAL_SEMAPHORES == 1
         signal_semaphores.push_back(this->image_ready_for_hip);
 #endif
@@ -1360,7 +1374,7 @@ struct renderer
 
         // Present the rendered image
         const swapchain::present_state present_state
-            = this->sc.present(current_frame.render_finished);
+            = this->sc.present(this->render_semaphores[this->sc.image_index]);
         if(present_state != swapchain::present_state::optimal)
         {
             this->swapchain_out_of_date = true;
