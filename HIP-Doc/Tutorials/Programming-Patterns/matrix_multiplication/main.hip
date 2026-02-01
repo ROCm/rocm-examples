@@ -111,11 +111,8 @@ int main() {
     dim3 blocksPerGrid(n_blocks, n_blocks);
     
     std::cout << "Computing matrix multiplication on GPU..." << std::endl;
-    hipLaunchKernelGGL(gpu_matrix_multiplication,
-                       blocksPerGrid,
-                       threadsPerBlock,
-                       0, 0,
-                       d_a, d_b, d_c, N);
+    gpu_matrix_multiplication<<<blocksPerGrid, threadsPerBlock, 0, 0>>>(d_a, d_b, d_c, N);
+
     HIP_CHECK(hipGetLastError());
     HIP_CHECK(hipDeviceSynchronize());
     
