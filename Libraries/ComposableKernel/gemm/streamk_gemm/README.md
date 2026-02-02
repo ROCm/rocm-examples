@@ -2,17 +2,20 @@
 
 ## Description
 
-This example demonstrates how to perform a Stream-K GEMM operation using the CK Tile programming model. Stream-K is an advanced GEMM algorithm that provides improved load balancing and performance for matrix multiplication operations.
+This example demonstrates how to perform a Stream-K GEMM operation using CK
+Tile. Stream-K is an advanced GEMM algorithm that provides improved load
+balancing and performance for matrix multiplication operations.
 
 ### Supported architectures
 
-The example is available for
+This example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus)
 
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
-2. Buffers for the input matrices A and B and the output matrix C are created on the host.
+2. Buffers for the input matrices (A and B) and the output matrix (C) are
+   created on the host.
 3. The input matrices are initialized with random values based on the specified initialization strategy.
 4. Buffers are created on the device and input data is copied to the device.
 5. CK Tile's Stream-K GEMM kernel is instantiated and launched on the device.
@@ -24,12 +27,12 @@ The example is available for
 
 ### CK Tile architecture
 
-The example makes use of the CK Tile programming model's key components:
+The example makes use of CK Tile's key components:
 
-* A **shape** defines the hierarchical tile structure and memory layout.
-* A **problem** combines data types with the shape configuration.
-* A **pipeline** schedules the sequence of operations for a kernel, including Stream-K specific optimizations.
-* A **kernel** implements the actual computation using the problem and pipeline definitions.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel, including Stream-K specific optimizations.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
 
 ### Stream-K optimization
 
