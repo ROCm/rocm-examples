@@ -9,9 +9,24 @@ on:
     paths:
       - '.github/workflows/**'
   workflow_dispatch:
+    inputs:
+      gpu_config:
+        description: "GPU configuration"
+        required: true
+        default: gfx1100
+        type: string
+      install_method:
+        description: "Installation method"
+        required: true
+        default: wheel
+        type: choice
+        options: 
+        - wheel
+        - tarball
 
 permissions:
   contents: read
+  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -21,8 +36,26 @@ env:
   DEBIAN_FRONTEND: noninteractive
 
 jobs:
+  setup:
+    name: "Setup CI"
+    runs-on: ubuntu-latest
+    outputs:
+      gpu_configs: ${{ steps.config.outputs.gpu_configs }}
+      install_methods: ${{ steps.config.outputs.install_methods }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CI
+        id: config
+        env:
+          GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
+          INSTALL_METHOD: ${{ github.event.inputs.install_method }}
+        run: python3 .github/build_tools/configure_ci.py
+
   build:
     name: "SLES 15.7 - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
+    needs: [setup]
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
       # Base image with Python venv, GLFW, Vulkan SDK pre-installed
@@ -36,10 +69,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        install_method: ['wheel', 'tarball']
-        gpu_config:
-          - gpu_target: gfx1100
-            therock_family: gfx110X-all
+        install_method: ${{ fromJson(needs.setup.outputs.install_methods) }}
+        gpu_config: ${{ fromJson(needs.setup.outputs.gpu_configs) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
