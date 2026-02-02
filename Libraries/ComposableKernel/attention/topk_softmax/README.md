@@ -11,7 +11,7 @@ Supported input data types include `fp16` and `bf16`.
 
 ### Supported architectures
 
-The example is available for
+This example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus).
 
 ### Application flow
@@ -31,14 +31,17 @@ The example is available for
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **problem** combines data types with the shape configuration. In this example the shapes are defined by the tokens,
-  experts and strides of the tensors. These are passed to CK Tile's `TopkSoftmaxWarpPerRowProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
-  storage phases. In this example it is set to CK Tile's `TopkSoftmaxWarpPerRowPipeline`.
-* A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
-  `TopkSoftmaxKernel` is used.
+The CK Tile framework is built around four key architectural components:
+
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ## Used API surface
 

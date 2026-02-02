@@ -13,7 +13,7 @@ variants are shown:
 
 ### Supported architectures
 
-The example is supported for the following architectures:
+This example works with the following architectures:
 
 * `gfx908`
 * `gfx90a`
@@ -41,20 +41,15 @@ kernel instantation parameters.
 
 ### CK Tile architecture
 
-The example makes use of four key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout. In this
-  example it is set to CK Tile's `TileGemmShape`.
-* A **problem** combines data types with the shape configuration. In this
-  example the problems are set to CK Tile's `GemmPipelineProblem` (basic
-  example) and `UniversalGemmPipelineProblem` (other examples).
-* A **pipeline** schedules the sequence of operations for a kernel, such as the
-  data loading, computation, and storage phases. In this example the pipelines
-  are set to `GemmPipelineAGmemBGmemCRegV1` (basic example),
-  `GemmPipelineAgBgCrCompV3` (universal example), and
-  `WeightPreshufflePipelineAGmemBGmemCRegV2` (`weight_preshuffle` example).
-* A **kernel** implements the actual computation using the problem and policy
-  definitions. In this example CK Tile's `GemmKernel` is used.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ## Used API surface
 

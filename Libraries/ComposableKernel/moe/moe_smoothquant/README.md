@@ -10,7 +10,7 @@ corresponding expert from the current top-k results, and expand both the output 
 
 ### Supported architectures
 
-The example is supported for the following architectures:
+This example works with the following architectures:
 
 * `gfx908`
 * `gfx90a`
@@ -32,17 +32,15 @@ The example is supported for the following architectures:
 
 ### CK Tile architecture
 
-The example makes use of four key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout. In this example it is set to CK Tile's
-  `Generic2dBlockShape`.
-* A **problem** combines data types with the shape configuration. In this example the problem is set to CK Tile's
-  `SmoothquantPipelineProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
-  storage phases. In this example the pipeline is set to either `SmoothquantPipelineOnePass` or
-  `SmoothquantPipelineTwoPass`, depending on the chosen parameters.
-* A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
-  `MoeSmoothquant` is used.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ## Used API surface
 
