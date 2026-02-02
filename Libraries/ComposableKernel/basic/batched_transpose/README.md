@@ -30,7 +30,7 @@ $$
 
 ### Supported architectures
 
-The example is supported for the following GPU architectures:
+This example works with the following GPU architectures:
 
 * `gfx908`
 * `gfx90a`
@@ -53,13 +53,17 @@ The example is supported for the following GPU architectures:
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **problem** combines data types using CK Tile's `BatchedTransposeProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
-  storage phases. In this example it is set to CK Tile's `BatchedTransposePipeline`.
-* A **kernel** implements the actual computation using the problem definition. The example implementation uses
-  CK Tile's `BatchedTransposeKernel` kernel.
+The CK Tile framework is built around four key architectural components:
+
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ### Tile programming model
 
