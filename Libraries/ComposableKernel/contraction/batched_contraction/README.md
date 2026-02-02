@@ -3,12 +3,13 @@
 ## Description
 
 This example demonstrates how to perform batched tensor contraction operations
-using the CK Tile programming model. Batched contraction generalizes matrix multiplication to multi-dimensional tensors, supporting arbitrary contraction
-patterns across batch, M, N, and K dimensions.
+using CK Tile. Batched contraction generalizes matrix multiplication to
+multi-dimensional tensors, supporting arbitrary contraction patterns across
+batch, M, N, and K dimensions.
 
 ### Supported architectures
 
-The example is available for
+This example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus)
 
 ### Application flow
@@ -31,12 +32,12 @@ The example is available for
 
 ### CK Tile architecture
 
-The example makes use of the CK Tile programming model's key components:
+The CK Tile framework is built around four key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout.
-* A **problem** combines data types with the shape configuration.
-* A **pipeline** schedules the sequence of operations for a kernel.
-* A **kernel** implements the actual computation using the problem and pipeline definitions.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
 
 ### Tensor contraction
 
