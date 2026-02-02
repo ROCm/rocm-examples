@@ -14,7 +14,9 @@ on:
         description: "GPU configuration"
         required: true
         default: gfx1100
-        type: string
+        type: choice
+        options: 
+        - gfx1100
       install_method:
         description: "Installation method"
         required: true
@@ -58,8 +60,6 @@ jobs:
     needs: [setup]
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      # Base image with Python venv, GLFW, Vulkan SDK pre-installed
-      # ROCm installation delegated to workflow (wheel or tarball)
       image: ghcr.io/sshi-amd/rocm-examples-base:sles15.7-rocm
       options:
         --group-add video

@@ -12,9 +12,17 @@ on:
       - 'Dockerfiles/**'
       - '.github/workflows/**'
 
+permissions:
+  contents: read
+  packages: write
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
   cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_PREFIX: ${{ github.repository }}
 
 jobs:  
     find-dockerfiles:  
@@ -42,6 +50,7 @@ jobs:
         # (needed for self-hosted runners)
         - name: Clean the workspace
           run: find $GITHUB_WORKSPACE -mindepth 1 -delete
+
     build:  
       name: Build Docker Images
       runs-on: self-hosted  
@@ -56,13 +65,31 @@ jobs:
         - name: Set up Docker Buildx  
           uses: docker/setup-buildx-action@v3  
 
-        - name: Build Docker image for ${{matrix.file}}  
-          uses: docker/build-push-action@v4  
+        - name: Generate image tag
+          id: image-tag
+          run: |
+            # Extract image name from Dockerfile name (e.g., "ubuntu-22.04-rocm.Dockerfile" -> "ubuntu-22.04-rocm")
+            IMAGE_NAME=$(echo "${{ matrix.file }}" | sed 's/\.Dockerfile$//' | tr '[:upper:]' '[:lower:]')
+            echo "name=$IMAGE_NAME" >> $GITHUB_OUTPUT
+            echo "Image name: $IMAGE_NAME"
+
+        - name: Log in to GHCR
+          if: github.event_name == 'push'
+          uses: docker/login-action@v3
+          with:
+            registry: ${{ env.REGISTRY }}
+            username: ${{ github.actor }}
+            password: ${{ secrets.GITHUB_TOKEN }}
+
+        - name: Build and push Docker image for ${{ matrix.file }}
+          uses: docker/build-push-action@v5
           with:  
             context: Dockerfiles/ 
-            file: Dockerfiles/${{matrix.file}} 
-            push: false          
-            tags: rocm-examples/dockerci:latest
+            file: Dockerfiles/${{ matrix.file }}
+            push: ${{ github.event_name == 'push' }}
+            tags: |
+              ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}:${{ steps.image-tag.outputs.name }}
+              ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}:${{ steps.image-tag.outputs.name }}-${{ github.sha }}
 
         # Clean the workspace here since other jobs may not have the permissions to do so later
         # (needed for self-hosted runners)

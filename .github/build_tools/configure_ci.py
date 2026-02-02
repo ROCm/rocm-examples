@@ -11,8 +11,7 @@ GPU_CONFIG_MAP = {
 }
 
 # Default configurations for automated runs (push/PR)
-DEFAULT_GPU_TARGETS = ["gfx1100"]
-DEFAULT_INSTALL_METHODS = ["wheel", "tarball"]
+ALLOWED_INSTALL_METHODS = ["wheel", "tarball"]
 
 
 def main():
@@ -20,21 +19,25 @@ def main():
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
 
+
+
     # Determine GPU configurations
     if gpu_input:
-        # Manual dispatch: use the single provided value
+        if gpu_input not in GPU_CONFIG_MAP:
+            raise ValueError(f"Invalid GPU target: {gpu_input}. Allowed: {list(GPU_CONFIG_MAP.keys())}")
         gpu_targets = [gpu_input]
     else:
-        # Automated run: use all defaults
-        gpu_targets = DEFAULT_GPU_TARGETS
+        # Automated run: use all allowed targets
+        gpu_targets = list(GPU_CONFIG_MAP.keys())
 
     # Determine install methods
     if install_input:
-        # Manual dispatch: use the single provided value
+        if install_input not in ALLOWED_INSTALL_METHODS:
+            raise ValueError(f"Invalid install method: {install_input}. Allowed: {ALLOWED_INSTALL_METHODS}")
         install_methods = [install_input]
     else:
-        # Automated run: use all defaults
-        install_methods = DEFAULT_INSTALL_METHODS
+        # Automated run: use all allowed methods
+        install_methods = ALLOWED_INSTALL_METHODS
 
     # Build gpu_config array with both gpu_target and therock_family
     gpu_configs = []
