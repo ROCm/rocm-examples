@@ -30,11 +30,10 @@ This example works with
 
 The CK Tile framework is built around four key architectural components:
 
-* **Shape** - Defines the hierarchical tile structure and memory layout of the
-  kernel, including BlockWaves, BlockTile, WaveTile, and ThreadTile.
-* **Problem** - Combines data types with the shape configuration.
-* **Policy** - Defines the memory access patterns and distribution strategies.
-* **Pipeline** - Defines the execution flow and memory movement patterns.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
 
 ### Hierarchical tile structure
 
@@ -46,6 +45,9 @@ The CK Tile framework organizes work hierarchically:
    CDNA, 32 threads on RDNA)
 3. **BlockTile** - Number of elements covered by one block (typically mapped to one CU)
 4. **BlockWaves** - Number of concurrent waves active in a block
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ### Copy kernel implementation
 

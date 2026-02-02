@@ -39,6 +39,9 @@ The CK Tile framework is built around four key architectural components:
 * The **pipeline** schedules the sequence of operations for a kernel.
 * The **kernel** implements the actual computation using the problem and pipeline definitions.
 
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
+
 ### Tensor contraction
 
 The batched contraction operation supports:

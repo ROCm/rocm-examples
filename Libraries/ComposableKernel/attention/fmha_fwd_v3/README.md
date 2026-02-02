@@ -10,7 +10,7 @@ have different effective lengths.
 
 ### Supported architectures
 
-The example works on the `gfx950` architecture only.
+This example works with the `gfx950` architecture only.
 
 ### Application flow
 
@@ -35,14 +35,17 @@ The example works on the `gfx950` architecture only.
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* The **shape** defines the hierarchical tile structure and memory layout. In this example it is set to a custom
-  shape based on the sequence length.
-* The **problem** combines data types with the shape configuration. In this example its components are set individually
-  by specifying the individual tensors' dimensions, strides, etc. as part of the arguments to the kernel.
-* The **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
-  `fmha_fwd_v3` is used.
+The CK Tile framework is built around four key architectural components:
+
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ### Variable-length sequence support
 

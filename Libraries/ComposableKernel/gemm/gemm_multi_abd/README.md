@@ -28,12 +28,15 @@ The example works with
 
 ### CK Tile architecture
 
-The example makes use CK Tile's key components:
+The CK Tile framework is built around four key architectural components:
 
 * The **shape** defines the hierarchical tile structure and memory layout.
 * The **problem** combines data types with the shape configuration.
 * The **pipeline** schedules the sequence of operations for a kernel.
 * The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ## Building
 
