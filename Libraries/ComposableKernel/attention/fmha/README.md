@@ -9,7 +9,14 @@ The forward pass supports the following data types: `fp32`, `fp16`, `bf16`, `fp8
 
 ### Supported architectures
 
-The example supports the following architectures: `gfx908`, `gfx90a`, `gfx942`, `gfx950`, `gfx1200`, and `gfx1201`.
+The example works with the following architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+* `gfx1200`
+* `gfx1201`
 
 ### Application flow
 
