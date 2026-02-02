@@ -20,19 +20,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "ck_tile/host.hpp"
 #include "layernorm2d_fwd.hpp"
-
-#include <ck_tile/host.hpp>
-
+#include "ck_tile/utility/json_dump.hpp"
 #include <algorithm>
-#include <cstddef>
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <string>
-#include <tuple>
-#include <type_traits>
-#include <vector>
+#include <cstring>
 
 // different threshold for different dtype
 template <typename DataType>
@@ -84,7 +76,9 @@ auto create_args(int argc, char* argv[])
         .insert("fadd", "0", "fused-add, 0:no fused add, 1:preadd+store, 2:preadd only")
         .insert("fquant", "0", "fused-quant, 0:no, 1:smooth-dynamic-quant, 2:dynamic-quant")
         .insert("warmup", "5", "cold iter")
-        .insert("repeat", "20", "hot iter");
+        .insert("repeat", "20", "hot iter")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "layernorm2d_fwd.json", "json file name to dump results");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -436,6 +430,24 @@ bool run(const ck_tile::ArgParser& arg_parser)
         std::cout << ", valid:" << (pass ? "y" : "n") << std::flush << std::endl;
     }
 
+    if(arg_parser.get_int("json") == 1)
+    {
+        dump_layernorm2d_fwd_json_results(arg_parser.get_str("jsonfile"),
+                                          prec_i,
+                                          prec_o,
+                                          prec_sm,
+                                          prec_sy,
+                                          m,
+                                          n,
+                                          x_stride,
+                                          xr_stride,
+                                          y_stride,
+                                          yr_stride,
+                                          pass,
+                                          ave_time,
+                                          0,
+                                          gb_per_sec);
+    }
     return pass;
 }
 
@@ -443,7 +455,7 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
 
     std::string prec_i  = arg_parser.get_str("prec_i");
     std::string prec_o  = arg_parser.get_str("prec_o");
@@ -467,45 +479,45 @@ int main(int argc, char* argv[])
     // no dynamic quant case
     if(prec_i == "fp16" && prec_o == "fp16" && prec_sm == "fp32" && prec_sy == "fp32" && save_mv)
     {
-        return run<ck_tile::half_t, ck_tile::half_t, float, float, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t, ck_tile::half_t, float, float, true>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "fp16" && prec_o == "fp16" && prec_sm == "fp32" && prec_sy == "fp32" &&
             !save_mv)
     {
-        return run<ck_tile::half_t, ck_tile::half_t, float, float, false>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t, ck_tile::half_t, float, float, false>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "bf16" && prec_o == "bf16" && prec_sm == "fp32" && prec_sy == "fp32" &&
             save_mv)
     {
-        return run<ck_tile::bf16_t, ck_tile::bf16_t, float, float, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::bf16_t, ck_tile::bf16_t, float, float, true>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "bf16" && prec_o == "bf16" && prec_sm == "fp32" && prec_sy == "fp32" &&
             !save_mv)
     {
-        return run<ck_tile::bf16_t, ck_tile::bf16_t, float, float, true>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::bf16_t, ck_tile::bf16_t, float, float, true>(arg_parser) ? 0 : -2;
     }
 
     // dynamic quant case, only in inference
     else if(prec_i == "fp16" && prec_o == "int8" && prec_sm == "fp32" && prec_sy == "fp32" &&
             !save_mv)
     {
-        return run<ck_tile::half_t, ck_tile::int8_t, float, float, false>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t, ck_tile::int8_t, float, float, false>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "bf16" && prec_o == "int8" && prec_sm == "fp32" && prec_sy == "fp32" &&
             !save_mv)
     {
-        return run<ck_tile::bf16_t, ck_tile::int8_t, float, float, false>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::bf16_t, ck_tile::int8_t, float, float, false>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "fp16" && prec_o == "fp8" && prec_sm == "fp32" && prec_sy == "fp32" &&
             !save_mv)
     {
-        return run<ck_tile::half_t, ck_tile::fp8_t, float, float, false>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t, ck_tile::fp8_t, float, float, false>(arg_parser) ? 0 : -2;
     }
     else if(prec_i == "bf16" && prec_o == "fp8" && prec_sm == "fp32" && prec_sy == "fp32" &&
             !save_mv)
     {
-        return run<ck_tile::bf16_t, ck_tile::fp8_t, float, float, false>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::bf16_t, ck_tile::fp8_t, float, float, false>(arg_parser) ? 0 : -2;
     }
 
-    return EXIT_FAILURE;
+    return -3;
 }

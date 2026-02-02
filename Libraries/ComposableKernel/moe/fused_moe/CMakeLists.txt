@@ -67,20 +67,25 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
-add_executable(${example_name} fused_moe_api.cpp
-                               fused_moegemm_api.cpp
-                               fused_moegemm_bf16_m32.cpp
-                               fused_moegemm_fp16_m32.cpp
-                               fused_moesorting_api.cpp
-                               main.cpp)
+add_executable(${example_name}
+    instances/fused_moe_api.cpp
+    instances/fused_moegemm_api.cpp
+    instances/fused_moegemm_bf16_m32.cpp
+    instances/fused_moegemm_fp16_m32.cpp
+    instances/fused_moesorting_api.cpp
+    main.cpp
+)
+target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 add_test(${example_name} COMMAND ${example_name})
-set_source_files_properties(fused_moe_api.cpp
-                            fused_moegemm_api.cpp
-                            fused_moegemm_bf16_m32.cpp
-                            fused_moegemm_fp16_m32.cpp
-                            fused_moesorting_api.cpp
-                            main.cpp
-                            PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(
+    instances/fused_moe_api.cpp
+    instances/fused_moegemm_api.cpp
+    instances/fused_moegemm_bf16_m32.cpp
+    instances/fused_moegemm_fp16_m32.cpp
+    instances/fused_moesorting_api.cpp
+    main.cpp
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
+)
 target_compile_definitions(${example_name} PRIVATE CK_TILE_BUFFER_LOAD_AGPR=1
                                                    CK_TILE_FLOAT_TO_BFLOAT16_DEFAULT=4
 )

@@ -9,7 +9,7 @@ Given a tensor $\mathbf{X}$ and a reduction axis, the performed computation is $
 
 ### Supported architectures
 
-The example is available for
+This example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus)
 
 ### Application flow
@@ -26,13 +26,17 @@ The example is available for
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout. In this example, it is set to a custom
-  `Reduce2dShape`.
-* A **problem** combines data types with the shape configuration using a custom `Reduce2dProblem`.
-* A **kernel** implements the actual computation using the problem definition. The example implementation uses a custom
-  `Reduce` kernel.
+The CK Tile framework is built around four key architectural components:
+
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ### Tile programming model
 

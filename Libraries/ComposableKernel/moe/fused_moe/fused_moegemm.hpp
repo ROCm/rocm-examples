@@ -22,11 +22,9 @@
 
 #pragma once
 
-#include <ck_tile/core.hpp>
-#include <ck_tile/host/kernel_launch.hpp>
-#include <ck_tile/ops/fused_moe.hpp>
-
-#include <cstdint>
+#include "ck_tile/core.hpp"
+#include "ck_tile/host/kernel_launch.hpp"
+#include "ck_tile/ops/fused_moe.hpp"
 #include <string>
 
 // this is only a convenient structure for creating an example
@@ -72,7 +70,7 @@ struct FusedMoeGemmTypeConfig<ck_tile::int8_t, ck_tile::int8_t, ck_tile::bf16_t,
     using ADataType            = ck_tile::int8_t;
     using GDataType            = ck_tile::int8_t;
     using DDataType            = ck_tile::int8_t;
-    using AccDataType          = std::int32_t;
+    using AccDataType          = int32_t;
     using ODataType            = ck_tile::bf16_t;
     using AScaleDataType       = ck_tile::remove_cvref_t<ST>;
     using GScaleDataType       = ck_tile::remove_cvref_t<SW>;

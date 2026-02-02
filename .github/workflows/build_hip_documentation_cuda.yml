@@ -14,15 +14,15 @@ on:
 
 env:
     DEBIAN_FRONTEND: noninteractive
-    ROCM_VERSION: '7.0'
-    AMDGPU_INSTALLER_VERSION: 7.0.70000-1
+    ROCM_VERSION: '7.2'
+    AMDGPU_INSTALLER_VERSION: 7.2.70200-1
 
 jobs:
     build:
         name: "Build HIP Documentation CUDA"
         runs-on: ubuntu-latest
         container:
-            image: nvidia/cuda:12.6.3-cudnn-devel-ubuntu22.04
+            image: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 
         steps:
           - uses: actions/checkout@v4

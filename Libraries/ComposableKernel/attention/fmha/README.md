@@ -5,9 +5,18 @@
 This example demonstrates how to perform FMHA (fused multi-head attention) with the CK Tile programming model. The files
 with the `_fwd` suffix contain the algorithm's forward pass, while the `_bwd` files show the backward pass.
 
+The forward pass supports the following data types: `fp32`, `fp16`, `bf16`, `fp8`, `fp8bf16`, and `fp8fp32`. The backward pass supports: `fp32`, `fp16`, and `bf16`. Both batch and group modes are available.
+
 ### Supported architectures
 
-The example is only supported for the `gfx942` architecture.
+This example works with the following architectures:
+
+* `gfx908`
+* `gfx90a`
+* `gfx942`
+* `gfx950`
+* `gfx1200`
+* `gfx1201`
 
 ### Application flow
 
@@ -37,14 +46,15 @@ The example is only supported for the `gfx942` architecture.
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout. In this example it is set to a custom
-  shape based on the sequence length.
-* A **problem** combines data types with the shape configuration. In this example its components are set individually
-  by specifying the individual tensors' dimensions, strides, etc. as part of the arguments to the kernel.
-* A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
-  `fmha_fwd` and `fmha_bwd` are used.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ## Used API surface
 

@@ -22,10 +22,9 @@
 
 #pragma once
 
-#include <ck_tile/core.hpp>
-#include <ck_tile/host/kernel_launch.hpp>
-#include <ck_tile/ops/permute.hpp>
-
+#include "ck_tile/core.hpp"
+#include "ck_tile/host/kernel_launch.hpp"
+#include "ck_tile/ops/permute.hpp"
 #include <string>
 
 struct permute_traits

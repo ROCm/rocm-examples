@@ -20,10 +20,7 @@ $\mathbf{X}$ is a tensor of shape $[d_0, d_1, \ldots, d_{n - 1}]$ and $\pi$ is a
 
 ### Supported architectures
 
-The example is available for
-[all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus),
-while the alternative implementation is only supported for the following
-architectures:
+This example works with the following GPU architectures:
 
 * `gfx908`
 * `gfx90a`
@@ -60,14 +57,17 @@ architectures:
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* **Shape** defines the hierarchical tile structure and memory layout and is passed into the application as a
-  user-defined parameter.
-* **Problem** is only used for the generic implementation. It combines data types with the shape configuration using
-  CK Tile's `GenericPermuteProblem`.
-* **Kernel** implements the actual computation using the problem definition. The generic implementation uses
-  `GenericPermute`, while the alterative implementation uses a custom kernel.
+The CK Tile framework is built around four key architectural components:
+
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ### Tile programming model
 

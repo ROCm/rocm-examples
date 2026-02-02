@@ -7,7 +7,7 @@ model.
 
 ### Supported architectures
 
-The example is supported for the following GPU architectures:
+This example works with the following GPU architectures:
 
 * `gfx908`
 * `gfx90a`
@@ -29,17 +29,15 @@ The example is supported for the following GPU architectures:
 
 ### CK Tile architecture
 
-The example makes use of four key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **shape** defines the hierarchical tile structure and memory layout. In this example it is set to CK Tile's
-  `Generic2dBlockShape`.
-* A **problem** combines data types with the shape configuration. In this example it is set to CK Tile's
-  `Layernorm2dFwdPipelineProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
-  storage phases. In this example it is set to CK Tile's `Layernorm2dFwdPipelineOnePass` or
-  `Layernorm2dFwdPipelineTwoPass`, depending on the chosen parameters.
-* A **kernel** implements the actual computation using the problem and policy definitions. In this example CK Tile's
-  `Layernorm2dFwd` kernel is used.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ## Used API surface
 

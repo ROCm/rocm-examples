@@ -2,22 +2,27 @@
 
 ## Description
 
-This example demonstrates batched tensor transpose using the CK Tile programming model. It supports common layout
-conversions such as NCHW to NHWC and NHWC to NCHW, which are essential for deep learning frameworks and hardware
-accelerators.
+This example demonstrates batched tensor transpose CK Tile. It supports common
+layout conversions such as NCHW to NHWC and NHWC to NCHW, which are essential
+for deep learning frameworks and hardware accelerators.
 
 Currently, the example supports batched transpose operations in two directions:
 
 * NCHW to NHWC
 * NHWC to NCHW
 
-This enables two transpose patterns from NCHW: either NHWC or NWCH. The current implementation performs transpose
-operations with single data point reads. Vectorized transpose support will be added in a future release.
+This enables two transpose patterns from NCHW: NCHW to NHWC, or NCHW to NWCH.
+The implementation supports multiple data types including `fp8`, `fp16`, and
+`bf16`. On `gfx950` architecture, an LDS-accelerated pipeline mode is available
+for improved performance. The current implementation performs transpose
+operations with single data point reads. Vectorized transpose support will be
+added in a future release.
 
 The example performs the following computation:
 
-Given a batch of tensors $\mathbf{X}$ of shape $[N, C, H, W]$, the transpose operation rearranges axes to produce
-$\mathbf{Y}$ of shape $[N, H, W, C]$ (NCHW to NHWC) or other permutations. For each element:
+Given a batch of tensors $\mathbf{X}$ of shape $[N, C, H, W]$, the transpose
+operation rearranges axes to produce $\mathbf{Y}$ of shape $[N, H, W, C]$
+(NCHW to NHWC) or other permutations. For each element:
 
 $$
 Y_{n, h, w, c} = X_{n, c, h, w}
@@ -25,7 +30,7 @@ $$
 
 ### Supported architectures
 
-The example is supported for the following GPU architectures:
+This example works with the following GPU architectures:
 
 * `gfx908`
 * `gfx90a`
@@ -48,13 +53,17 @@ The example is supported for the following GPU architectures:
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* A **problem** combines data types using CK Tile's `BatchedTransposeProblem`.
-* A **pipeline** schedules the sequence of operations for a kernel, such as the data loading, computation, and
-  storage phases. In this example it is set to CK Tile's `BatchedTransposePipeline`.
-* A **kernel** implements the actual computation using the problem definition. The example implementation uses
-  CK Tile's `BatchedTransposeKernel` kernel.
+The CK Tile framework is built around four key architectural components:
+
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ### Tile programming model
 

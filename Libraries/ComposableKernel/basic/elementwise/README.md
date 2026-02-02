@@ -12,7 +12,7 @@ tensors using the CK Tile programming model:
 
 ### Supported architectures
 
-The example is available for
+This example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus)
 
 ### Application flow
@@ -36,15 +36,15 @@ parameters for the kernel instantiation.
 
 ### CK Tile architecture
 
-The example makes use of three key architectural components:
+The CK Tile framework is built around four key architectural components:
 
-* **Shape** defines the hierarchical tile structure and memory layout. In this
-  application, it is set to CK Tile's `ElementWiseShape` which is part of
-  CK Tile.
-* **Problem** combines data types with the shape configuration using CK Tile's
-  `ElementWisePipelineProblem`.
-* **Kernel** implements the actual computation using the problem definition.
-  The example implementation uses CK Tile's `ElementWiseKernel`.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
+
+For more information on CK Tile terminology, refer to the
+[Composable Kernel Glossary](https://rocm.docs.amd.com/projects/composable_kernel/en/latest/reference/Composable-Kernel-Glossary.html).
 
 ### Tile Programming Model
 

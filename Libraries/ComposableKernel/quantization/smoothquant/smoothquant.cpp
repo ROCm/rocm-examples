@@ -20,17 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include "ck_tile/host.hpp"
 #include "smoothquant.hpp"
-
-#include <ck_tile/host.hpp>
-
-#include <cstdlib>
-#include <iostream>
-#include <ostream>
-#include <string>
-#include <thread>
-#include <tuple>
-#include <vector>
+#include "ck_tile/utility/json_dump.hpp"
+#include <cstring>
 
 // different threshold for different dtype
 template <typename DataType>
@@ -69,7 +62,9 @@ auto create_args(int argc, char* argv[])
         .insert("kname", "1", "print kernel name or not")
         .insert("prec", "fp16", "precision")
         .insert("warmup", "5", "cold iter")
-        .insert("repeat", "20", "hot iter");
+        .insert("repeat", "20", "hot iter")
+        .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
+        .insert("jsonfile", "smoothquant.json", "json file name to dump results");
 
     bool result = arg_parser.parse(argc, argv);
     return std::make_tuple(result, arg_parser);
@@ -232,6 +227,19 @@ bool run(const ck_tile::ArgParser& arg_parser)
         std::cout << ", valid:" << (pass ? "y" : "n") << std::flush << std::endl;
     }
 
+    if(arg_parser.get_int("json") == 1)
+    {
+        dump_smoothquant_json(arg_parser.get_str("jsonfile"),
+                              data_type,
+                              m,
+                              n,
+                              x_stride,
+                              y_stride,
+                              ave_time,
+                              0,
+                              gb_per_sec,
+                              pass);
+    }
     return pass;
 }
 
@@ -239,17 +247,17 @@ int main(int argc, char* argv[])
 {
     auto [result, arg_parser] = create_args(argc, argv);
     if(!result)
-        return EXIT_FAILURE;
+        return -1;
 
     const std::string data_type = arg_parser.get_str("prec");
     if(data_type == "fp16")
     {
-        return run<ck_tile::half_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::half_t>(arg_parser) ? 0 : -2;
     }
     else if(data_type == "bf16")
     {
-        return run<ck_tile::bf16_t>(arg_parser) ? EXIT_SUCCESS : EXIT_FAILURE;
+        return run<ck_tile::bf16_t>(arg_parser) ? 0 : -2;
     }
 
-    return EXIT_FAILURE;
+    return -3;
 }

@@ -68,7 +68,8 @@ find_package(composable_kernel REQUIRED)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
 
 add_executable(${example_name} batched_transpose_api.cpp batched_transpose_example.cpp)
-add_test(${example_name} COMMAND "${example_script} $<TARGET_FILE:${example_name}>")
+target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/)
+add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
 set_source_files_properties(batched_transpose_api.cpp batched_transpose_example.cpp
                             PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
