@@ -2,21 +2,27 @@
 
 ## Description
 
-This example demonstrates batched tensor transpose using the CK Tile programming model. It supports common layout
-conversions such as NCHW to NHWC and NHWC to NCHW, which are essential for deep learning frameworks and hardware
-accelerators.
+This example demonstrates batched tensor transpose CK Tile. It supports common
+layout conversions such as NCHW to NHWC and NHWC to NCHW, which are essential
+for deep learning frameworks and hardware accelerators.
 
 Currently, the example supports batched transpose operations in two directions:
 
 * NCHW to NHWC
 * NHWC to NCHW
 
-This enables two transpose patterns from NCHW: either NHWC or NWCH. The implementation supports multiple data types including `fp8`, `fp16`, and `bf16`. On `gfx950` architecture, an LDS-accelerated pipeline mode is available for improved performance. The current implementation performs transpose operations with single data point reads. Vectorized transpose support will be added in a future release.
+This enables two transpose patterns from NCHW: NCHW to NHWC, or NCHW to NWCH.
+The implementation supports multiple data types including `fp8`, `fp16`, and
+`bf16`. On `gfx950` architecture, an LDS-accelerated pipeline mode is available
+for improved performance. The current implementation performs transpose
+operations with single data point reads. Vectorized transpose support will be
+added in a future release.
 
 The example performs the following computation:
 
-Given a batch of tensors $\mathbf{X}$ of shape $[N, C, H, W]$, the transpose operation rearranges axes to produce
-$\mathbf{Y}$ of shape $[N, H, W, C]$ (NCHW to NHWC) or other permutations. For each element:
+Given a batch of tensors $\mathbf{X}$ of shape $[N, C, H, W]$, the transpose
+operation rearranges axes to produce $\mathbf{Y}$ of shape $[N, H, W, C]$
+(NCHW to NHWC) or other permutations. For each element:
 
 $$
 Y_{n, h, w, c} = X_{n, c, h, w}

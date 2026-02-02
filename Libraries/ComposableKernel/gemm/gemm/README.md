@@ -2,8 +2,8 @@
 
 ## Description
 
-This example demonstrates how to perform a GEMM operation with the CK Tile
-programming model. Five variants are shown:
+This example demonstrates how to perform a GEMM operation using CK Tile. Five
+variants are shown:
 
 * **Basic**: Basic GEMM pipeline (`gemm_basic.cpp`)
 * **Universal**: Memory bound pipeline optimized for various problem sizes (`universal_gemm.cpp`)

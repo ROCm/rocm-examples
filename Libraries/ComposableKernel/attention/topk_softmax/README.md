@@ -2,9 +2,12 @@
 
 ## Description
 
-This example demonstrates how to launch a topk-softmax kernel with the CK Tile programming model. The input is a
-`token*expert` 2D matrix. The operation will apply an activation function (softmax or sigmoid) per row (`expert`), then find the `topk` value for each row.
-The output is a `token*topk` weight tensor (usually single-precision) and an index tensor (32-bit integer). Supported input data types include `fp16` and `bf16`.
+This example demonstrates how to launch a topk-softmax kernel with the CK Tile
+programming model. The input is a `token*expert` 2D matrix. The operation will
+apply one activation function (either softmax or sigmoid) per row (`expert`),
+then find the `topk` value for each row. The output is a `token*topk` weight
+tensor (usually single-precision) and an index tensor (32-bit integer).
+Supported input data types include `fp16` and `bf16`.
 
 ### Supported architectures
 

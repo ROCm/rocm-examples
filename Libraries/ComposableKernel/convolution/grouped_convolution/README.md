@@ -2,13 +2,16 @@
 
 ## Description
 
-This example demonstrates how to perform a grouped convolution operation with the CK Tile programming model. Multiple variants are provided:
+This example demonstrates how to perform a grouped convolution operation with CK
+Tile. Multiple variants are provided:
 
 * **Forward pass**: Basic grouped convolution forward operation
 * **Forward pass with large tensors**: Optimized for larger tensor dimensions
-* **Forward pass with bias and clamp**: Includes bias addition and value clamping
+* **Forward pass with bias and clamp**: Includes bias addition and value
+  clamping
 * **Backward pass (weight)**: Computes gradients with respect to weights
-* **Backward pass (weight, two-stage)**: Two-stage algorithm for weight gradients
+* **Backward pass (weight, two-stage)**: Two-stage algorithm for weight
+  gradients
 * **Backward pass (data)**: Computes gradients with respect to input data
 
 ### Supported architectures
