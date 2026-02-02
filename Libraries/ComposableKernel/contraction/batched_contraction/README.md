@@ -16,16 +16,16 @@ This example works with
 
 1. Command line arguments are parsed to configure tensor dimensions across G
    (batch), M, N, and K dimensions.
-2. Host memory is allocated for input tensors A and B, auxiliary tensors D, and output 
-   tensor E.
+2. Host memory is allocated for input tensors A and B, auxiliary tensors D, and
+   output tensor E.
 3. Input tensors are initialized with random values.
 4. Device memory is allocated and input data is copied to the device.
 5. CK Tile's batched contraction kernel is instantiated and launched on the
    device.
-6. If validation is enabled, the results are compared against a CPU reference 
+6. If validation is enabled, the results are compared against a CPU reference
    implementation.
-7. Performance metrics including execution time, TFLOPS, and memory bandwidth are 
-   reported.
+7. Performance metrics including execution time, TFLOPS, and memory bandwidth
+   are reported.
 8. All buffers are freed automatically.
 
 ## Key APIs and concepts
