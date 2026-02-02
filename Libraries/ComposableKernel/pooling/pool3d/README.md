@@ -2,34 +2,37 @@
 
 ## Description
 
-This example demonstrates how to perform 3D pooling operations using the CK Tile programming model. The pooling kernel supports both 2D and 3D pooling operations for downsampling feature maps in neural networks.
+This example demonstrates how to perform 3D pooling operations using CK Tile.
+The pooling kernel supports both 2D and 3D pooling operations for downsampling
+feature maps in neural networks.
 
 ### Supported architectures
 
-The example is available for
+This example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus)
 
 ### Application flow
 
-1. Command line arguments are parsed to configure input dimensions, pooling window size, stride, dilation, and padding parameters.
+1. Command line arguments are parsed to configure the input dimensions, pooling
+   window size, stride, dilation, and padding parameters.
 2. Host memory is allocated for input and output tensors.
-3. Input tensor is initialized with random values.
+3. The input tensor is initialized with random values.
 4. Device memory is allocated and input data is copied to the device.
 5. CK Tile's 3D pooling kernel is instantiated and launched on the device.
 6. If validation is enabled, the results are compared against a CPU reference implementation.
-7. Performance metrics including execution time are reported.
+7. Performance metrics, including execution time, are reported.
 8. All buffers are freed automatically.
 
 ## Key APIs and concepts
 
 ### CK Tile architecture
 
-The example makes use of the CK Tile programming model's key components:
+The example makes use of the CK Tile's key components:
 
-* A **shape** defines the hierarchical tile structure and memory layout.
-* A **problem** combines data types with the shape configuration.
-* A **pipeline** schedules the sequence of operations for a kernel.
-* A **kernel** implements the actual computation using the problem and pipeline definitions.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
 
 ### Pooling operations
 

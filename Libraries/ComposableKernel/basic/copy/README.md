@@ -5,11 +5,11 @@
 This is a minimal CK Tile memory copy implementation demonstrating the basic
 setup required to write a kernel in CK Tile. This experimental kernel is
 intended for novice CK developers. It introduces the building blocks of CK Tile
-and rovides a sandbox for experimenting with kernel parameters.
+and provides a sandbox for experimenting with kernel parameters.
 
 ### Supported architectures
 
-The example is available for
+This example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus)
 
 ### Application flow
@@ -17,11 +17,11 @@ The example is available for
 1. Command line arguments are parsed to configure matrix dimensions and
    execution parameters.
 2. Host memory is allocated for input and output tensors.
-3. Input tensor is initialized with random values.
+3. The input tensor is initialized with random values.
 4. Device memory is allocated and input data is copied to the device.
 5. CK Tile's copy kernel is instantiated and launched on the device.
 6. If validation is enabled, the results are compared against the input data.
-7. Performance metrics including execution time are reported.
+7. Performance metrics, including execution time, are reported.
 8. All buffers are freed automatically.
 
 ## Key APIs and concepts
@@ -49,12 +49,12 @@ The CK Tile framework organizes work hierarchically:
 
 ### Copy kernel implementation
 
-The copy kernel demonstrates:
+Copy kernel demonstrates:
 
 * Creating tensor views with specified dimensions and strides
-* Creating tile windows into specific regions of tensors
-* Loading data from global memory to registers
-* Storing data from registers to global memory
+* Instantiating tile windows that provide views into specific tensor regions
+* Loading global memory data into registers
+* Storing register data in global memory
 * Moving tile windows to process larger tensors
 
 ## Building

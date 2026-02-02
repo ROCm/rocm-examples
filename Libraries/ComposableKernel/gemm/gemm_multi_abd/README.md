@@ -2,19 +2,24 @@
 
 ## Description
 
-This example demonstrates how to perform a Multiple ABD GEMM operation using the CK Tile programming model. The Multiple ABD GEMM performs matrix multiplication with multiple auxiliary input tensors, allowing for more complex fusion patterns.
+This example demonstrates how to perform a Multiple ABD GEMM operation using CK
+Tile. The Multiple ABD GEMM performs matrix multiplication with multiple
+auxiliary input tensors, allowing for more complex fusion patterns.
 
 ### Supported architectures
 
-The example is available for
+The example works with
 [all supported GPU architectures](https://rocm.docs.amd.com/projects/install-on-linux/en/latest/reference/system-requirements.html#supported-gpus)
 
 ### Application flow
 
 1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
-2. Buffers for the input matrices (A, B) and auxiliary tensors (D) and output matrix (E) are created on the host.
-3. The input matrices and tensors are initialized with random values.
-4. Buffers are created on the device and input data is copied to the device.
+2. Buffers for the input matrices (A, B), auxiliary tensor (D), and output
+   matrix (E) are created on the host.
+3. The input matrices and auxiliary tensors are initialized with random values.
+4. Buffers for the input matrices (A, B), auxiliary tensor (D), and output
+   matrix (E) are created on the device. A, B, and D are copied to the
+   device while E is initialized to 0.
 5. CK Tile's Multiple ABD GEMM kernel is instantiated and launched on the device.
 6. If validation is enabled, the results are compared against a CPU reference implementation.
 7. All buffers are freed automatically.
@@ -23,12 +28,12 @@ The example is available for
 
 ### CK Tile architecture
 
-The example makes use of the CK Tile programming model's key components:
+The example makes use CK Tile's key components:
 
-* A **shape** defines the hierarchical tile structure and memory layout.
-* A **problem** combines data types with the shape configuration.
-* A **pipeline** schedules the sequence of operations for a kernel.
-* A **kernel** implements the actual computation using the problem and pipeline definitions.
+* The **shape** defines the hierarchical tile structure and memory layout.
+* The **problem** combines data types with the shape configuration.
+* The **pipeline** schedules the sequence of operations for a kernel.
+* The **kernel** implements the actual computation using the problem and pipeline definitions.
 
 ## Building
 
