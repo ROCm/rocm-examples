@@ -41,7 +41,9 @@ on:
         required: true
         default: wheel
         type: choice
-        choices: [wheel, tarball]
+        options: 
+        - wheel
+        - tarball
 
 permissions:
   contents: read
