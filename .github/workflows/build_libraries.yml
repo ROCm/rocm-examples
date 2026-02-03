@@ -89,4 +89,5 @@ jobs:
           # Clean the workspace here since other jobs may not have the permissions to do so later
           # (needed for self-hosted runners)
           - name: Clean the workspace
-            run: find $GITHUB_WORKSPACE -mindepth 1 -delete
+            if: always()
+            run: find "$GITHUB_WORKSPACE" -mindepth 1 -delete
