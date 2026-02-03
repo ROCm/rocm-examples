@@ -65,6 +65,7 @@ jobs:
                     rocwmma-dev \
                     migraphx-dev \
                     hipsparselt-dev \
+                    hipsparse-dev \
                     mivisionx-dev \
                     composablekernel-dev
                   rm -rf /var/lib/apt/lists/*
