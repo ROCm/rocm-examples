@@ -22,8 +22,8 @@
 
 EXAMPLES := \
 	canny \
-	mv_objdetect \
-	opencv_orb
+	mv_objdetect
+# opencv_orb
 
 all: $(EXAMPLES)
 
