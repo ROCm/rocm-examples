@@ -11,6 +11,9 @@ on:
     paths:
       - 'Libraries/**'
       - '.github/workflows/**'
+  schedule:
+    # Nightly at 2 AM UTC
+    - cron: '0 2 * * *'
 
 env:
     DEBIAN_FRONTEND: noninteractive
@@ -62,6 +65,7 @@ jobs:
                     rocwmma-dev \
                     migraphx-dev \
                     hipsparselt-dev \
+                    hipsparse-dev \
                     mivisionx-dev \
                     composablekernel-dev
                   rm -rf /var/lib/apt/lists/*
@@ -69,18 +73,34 @@ jobs:
                   echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
                   echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
                   apt-get autoclean
+          - uses: dorny/paths-filter@v3
+            id: changes
+            with:
+              filters: |
+                ck:
+                  - 'Libraries/ComposableKernel/**'
+          - name: Set CK build flag
+            run: |
+              # Enable CK for: scheduled runs OR CK files changed
+              if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ steps.changes.outputs.ck }}" == "true" ]; then
+                ENABLE_CK=ON
+              else
+                ENABLE_CK=OFF
+              fi
+              echo "ENABLE_CK=${ENABLE_CK}" >> $GITHUB_ENV
+              echo "ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK}"
           - name: CMake Configure and Build
             shell: bash
             run: |
               cd Libraries
-              cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=ON -S . -B build
+              cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -S . -B build
               cmake --build build --parallel $(nproc)
           - name: Make
             shell: bash
             run: |
               sed -i '/rocCV/d' Libraries/Makefile
               cd Libraries
-              make -j $(nproc) ROCM_EXAMPLES_ENABLE_CK=ON HIP_ARCHITECTURES="${GPU_TARGETS}"
+              make -j $(nproc) ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} HIP_ARCHITECTURES="${GPU_TARGETS}"
 
           # Clean the workspace here since other jobs may not have the permissions to do so later
           # (needed for self-hosted runners)
