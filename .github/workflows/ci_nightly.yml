@@ -88,8 +88,8 @@ jobs:
         shell: bash
         run: |
           ROCM_VERSION=$(rocm-sdk version)
-          echo "rocm_version=$ROCM_VERSION" >> $GITHUB_OUTPUT
-          echo "## ROCm Version: $ROCM_VERSION" >> $GITHUB_STEP_SUMMARY
+          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
           rocm-sdk init
           rocm-sdk test
         continue-on-error: true
@@ -99,38 +99,41 @@ jobs:
         shell: bash
         run: |
           ROCM_PATH=$(rocm-sdk path --root)
-          echo "ROCM_PATH=$ROCM_PATH" >> $GITHUB_ENV
-          echo "HIP_PATH=$ROCM_PATH" >> $GITHUB_ENV
+          echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
-          echo "HIP_DEVICE_LIB_PATH=$ROCM_PATH/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
-          echo "PATH=$ROCM_PATH/bin:$ROCM_PATH/llvm/bin:$PATH" >> $GITHUB_ENV
+          echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
+          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
 
       - name: Install TheRock tarball
         if: ${{ matrix.install_method == 'tarball' }}
         id: install-tarball
         shell: bash
         run: |
-          LATEST_TARBALL=$(curl -s https://rocm.nightlies.amd.com/tarball/ | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" | tail -1)
+          LATEST_TARBALL=$(curl -s "https://rocm.nightlies.amd.com/tarball/" \
+            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" \
+            | sort -V \
+            | tail -1)
           mkdir /therock-tarball && cd /therock-tarball
-          wget https://rocm.nightlies.amd.com/tarball/$LATEST_TARBALL
+          wget "https://rocm.nightlies.amd.com/tarball/${LATEST_TARBALL}"
           mkdir install
-          tar -xzf $LATEST_TARBALL -C install
+          tar -xzf "${LATEST_TARBALL}" -C install
 
-          ROCM_VERSION=$(echo $LATEST_TARBALL | grep -oE "[0-9]+\.[0-9]+\.\w+")
-          echo "rocm_version=$ROCM_VERSION" >> $GITHUB_OUTPUT
-          echo "## ROCm Version: $ROCM_VERSION" >> $GITHUB_STEP_SUMMARY
-          echo "## Tarball link: https://rocm.nightlies.amd.com/tarball/$LATEST_TARBALL" >> $GITHUB_STEP_SUMMARY
+          ROCM_VERSION=$(echo "${LATEST_TARBALL}" | grep -oE "[0-9]+\.[0-9]+\.\w+")
+          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "## Tarball link: https://rocm.nightlies.amd.com/tarball/${LATEST_TARBALL}" >> $GITHUB_STEP_SUMMARY
 
       - name: Setup environment variables (tarball)
         if: ${{ matrix.install_method == 'tarball' }}
         shell: bash
         run: |
           ROCM_PATH=/therock-tarball/install
-          echo "ROCM_PATH=$ROCM_PATH" >> $GITHUB_ENV
-          echo "HIP_PATH=$ROCM_PATH" >> $GITHUB_ENV
+          echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
-          echo "HIP_DEVICE_LIB_PATH=$ROCM_PATH/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
-          echo "PATH=$ROCM_PATH/bin:$ROCM_PATH/llvm/bin:$PATH" >> $GITHUB_ENV
+          echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
+          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
 
       - name: CMake configure
         shell: bash
@@ -154,8 +157,8 @@ jobs:
 
           echo "| Status | Count |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
-          echo "| Warnings | $WARNINGS |" >> $GITHUB_STEP_SUMMARY
-          echo "| Errors | $ERRORS |" >> $GITHUB_STEP_SUMMARY
+          echo "| Warnings | ${WARNINGS} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Errors | ${ERRORS} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
 
           # Show details if there are warnings/errors
@@ -208,7 +211,7 @@ jobs:
           FAILED=$(grep -c "Failed" ctest_output.log || true)
 
           # Show failed tests if any
-          if [ "$FAILED" -gt 0 ]; then
+          if [ "${FAILED}" -gt 0 ]; then
             echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
@@ -217,3 +220,9 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
+
+        # Clean the workspace here since other jobs may not have the permissions to do so later
+        # (needed for self-hosted runners)
+      - name: Clean the workspace
+        if: always()
+        run: find "$GITHUB_WORKSPACE" -mindepth 1 -delete
