@@ -70,4 +70,4 @@ target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_colored.jpg ${CMAKE_BINARY_DIR}/test_colored.jpg COPYONLY)
 
 install(TARGETS ${example_name})
-install(FILES test.jpg DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES test_colored.jpg DESTINATION ${CMAKE_INSTALL_PREFIX})
