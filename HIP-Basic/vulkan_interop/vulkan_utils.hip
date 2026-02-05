@@ -138,6 +138,7 @@ device_dispatch::device_dispatch(const instance_dispatch& dispatch, VkDevice dev
     load(this->unmap_memory, "vkUnmapMemory");
     load(this->cmd_bind_vertex_buffers, "vkCmdBindVertexBuffers");
     load(this->cmd_bind_index_buffer, "vkCmdBindIndexBuffer");
+    load(this->device_wait_idle, "vkDeviceWaitIdle");
 #ifdef _WIN64
     load(this->get_memory_win32_handle, "vkGetMemoryWin32HandleKHR");
     load(this->get_semaphore_win32_handle, "vkGetSemaphoreWin32HandleKHR");
