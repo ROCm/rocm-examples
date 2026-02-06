@@ -61,7 +61,7 @@ ENV HIP_PLATFORM=amd
 # Create virtual environment with base packages
 RUN python3.13 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install pyyaml cmake
+    /opt/venv/bin/pip install pyyaml
 
 # Set up virtual environment in PATH
 ENV PATH="/opt/venv/bin:${PATH}"

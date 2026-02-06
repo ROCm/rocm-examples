@@ -1,16 +1,17 @@
 name: Build Docker
 
 on:
+  workflow_dispatch:
   push:
-    branches: [ amd-staging, amd-mainline, release/** ]
+    branches: [ amd-staging ]
     paths:
       - 'Dockerfiles/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_docker.yml'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Dockerfiles/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_docker.yml'
 
 permissions:
   contents: read
@@ -25,53 +26,49 @@ env:
   IMAGE_PREFIX: ${{ github.repository }}
 
 jobs:  
-    find-dockerfiles:  
+    find-dockerfiles:
       name: Find Dockerfiles
       runs-on: ubuntu-latest
-      outputs:  
+      outputs:
         files: ${{ steps.find-files.outputs.files }}  
-      steps:  
-        - name: Checkout repository  
-          uses: actions/checkout@v4  
-        - name: Find Dockerfiles  
-          id: find-files  
-          run: |  
-            echo "## Finding all Dockerfiles in the 'Dockerfiles/' directory"  
-            FILES=$(find Dockerfiles/ -type f -printf "%f\n" | grep .*Dockerfile)  
-            echo "Found Dockerfiles:"  
-            echo "$FILES"  
-            # Convert the array to JSON array  
-            JSON_ARRAY=$(printf '%s\n' "${FILES[@]}" | jq -R . | jq -s . | jq -c .)  
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+        - name: Find Dockerfiles
+          id: find-files
+          run: |
+            echo "## Finding all Dockerfiles in the 'Dockerfiles/' directory"
+            FILES=$(find Dockerfiles/ -type f -printf "%f\n" | grep .*Dockerfile)
+            echo "Found Dockerfiles:"
+            echo "${FILES}"
+            # Convert the array to JSON array
+            JSON_ARRAY=$(printf '%s\n' "${FILES[@]}" | jq -R . | jq -s . | jq -c .)
             echo "JSON_ARRAY is"
-            echo $JSON_ARRAY
-            echo "files=$JSON_ARRAY"  >> $GITHUB_OUTPUT 
-
-        # Clean the workspace here since other jobs may not have the permissions to do so later
-        # (needed for self-hosted runners)
-        - name: Clean the workspace
-          run: find $GITHUB_WORKSPACE -mindepth 1 -delete
+            echo "${JSON_ARRAY}"
+            echo "files=${JSON_ARRAY}"  >> $GITHUB_OUTPUT
 
     build:  
       name: Build Docker Images
-      runs-on: self-hosted  
+      runs-on: ubuntu-latest
       needs: find-dockerfiles
       strategy:
+        fail-fast: false
         matrix: 
           file: ${{fromJson(needs.find-dockerfiles.outputs.files)}}
       steps:
-        - name: Checkout repository  
-          uses: actions/checkout@v4  
+        - name: Checkout repository
+          uses: actions/checkout@v4
 
-        - name: Set up Docker Buildx  
-          uses: docker/setup-buildx-action@v3  
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
 
         - name: Generate image tag
           id: image-tag
           run: |
-            # Extract image name from Dockerfile name (e.g., "ubuntu-22.04-rocm.Dockerfile" -> "ubuntu-22.04-rocm")
+            # Extract image name from Dockerfile name (e.g., "ubuntu-22.04.Dockerfile" -> "ubuntu-22.04")
             IMAGE_NAME=$(echo "${{ matrix.file }}" | sed 's/\.Dockerfile$//' | tr '[:upper:]' '[:lower:]')
-            echo "name=$IMAGE_NAME" >> $GITHUB_OUTPUT
-            echo "Image name: $IMAGE_NAME"
+            echo "name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
+            echo "Image name: ${IMAGE_NAME}"
 
         - name: Log in to GHCR
           if: github.event_name == 'push'
@@ -81,18 +78,19 @@ jobs:
             username: ${{ github.actor }}
             password: ${{ secrets.GITHUB_TOKEN }}
 
+        - name: Extract metadata (tags, labels) for Docker
+          id: meta
+          uses: docker/metadata-action@v5
+          with:
+            images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.image-tag.outputs.name }}
+            tags: |
+              type=raw,value=latest,enable={{is_default_branch}}
+
         - name: Build and push Docker image for ${{ matrix.file }}
           uses: docker/build-push-action@v5
-          with:  
+          with:
             context: Dockerfiles/ 
             file: Dockerfiles/${{ matrix.file }}
             push: ${{ github.event_name == 'push' }}
-            tags: |
-              ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}:${{ steps.image-tag.outputs.name }}
-              ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}:${{ steps.image-tag.outputs.name }}-${{ github.sha }}
-
-        # Clean the workspace here since other jobs may not have the permissions to do so later
-        # (needed for self-hosted runners)
-        - name: Clean the workspace
-          if: always()
-          run: find "$GITHUB_WORKSPACE" -mindepth 1 -delete  
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}

@@ -60,7 +60,7 @@ function(filter_hip_architectures EXAMPLE_NAME SUPPORTED_ARCHS SHOULD_SKIP_VAR)
     endif()
 
     if(NOT FILTERED_HIP_ARCHITECTURES)
-        message(STATUS "${EXAMPLE_NAME}: No supported architectures found. Not building ${EXAMPLE_NAME}")
+        message(WARNING "${EXAMPLE_NAME}: No supported architectures found. Not building ${EXAMPLE_NAME}")
         set(${SHOULD_SKIP_VAR} TRUE PARENT_SCOPE)
     else()
         # Override CMAKE_HIP_ARCHITECTURES for this directory scope

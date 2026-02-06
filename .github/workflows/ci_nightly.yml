@@ -17,6 +17,10 @@ on:
         type: choice
         options: 
         - gfx1100
+        - gfx1151
+        - gfx1201
+        - gfx90a
+        - gfx942
       install_method:
         description: "Installation method"
         required: true

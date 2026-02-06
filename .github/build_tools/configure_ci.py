@@ -6,20 +6,19 @@ import json
 # GPU target to TheRock family mapping
 GPU_CONFIG_MAP = {
     "gfx1100": "gfx110X-all",
-    "gfx90a": "gfx90X-dcgpu",
-    "gfx942": "gfx94X-dcgpu",
+    "gfx1151": "gfx1151",
+    # "gfx1201": "gfx120X-all",
+    # "gfx90a": "gfx90X-dcgpu",
+    # "gfx942": "gfx94X-dcgpu",
 }
 
 # Default configurations for automated runs (push/PR)
-ALLOWED_INSTALL_METHODS = ["wheel", "tarball"]
-
+INSTALL_METHODS = ["wheel", "tarball"]
 
 def main():
     # Read inputs from environment (set by workflow)
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
-
-
 
     # Determine GPU configurations
     if gpu_input:
@@ -32,12 +31,12 @@ def main():
 
     # Determine install methods
     if install_input:
-        if install_input not in ALLOWED_INSTALL_METHODS:
-            raise ValueError(f"Invalid install method: {install_input}. Allowed: {ALLOWED_INSTALL_METHODS}")
+        if install_input not in INSTALL_METHODS:
+            raise ValueError(f"Invalid install method: {install_input}. Allowed: {INSTALL_METHODS}")
         install_methods = [install_input]
     else:
         # Automated run: use all allowed methods
-        install_methods = ALLOWED_INSTALL_METHODS
+        install_methods = INSTALL_METHODS
 
     # Build gpu_config array with both gpu_target and therock_family
     gpu_configs = []
@@ -54,12 +53,9 @@ def main():
         with open(github_output, "a") as f:
             f.write(f"gpu_configs={json.dumps(gpu_configs)}\n")
             f.write(f"install_methods={json.dumps(install_methods)}\n")
-        print(f"Wrote outputs to {github_output}")
-    else:
-        # Local testing
-        print(f"gpu_configs={json.dumps(gpu_configs)}")
-        print(f"install_methods={json.dumps(install_methods)}")
 
+    print(f"gpu_configs={json.dumps(gpu_configs)}")
+    print(f"install_methods={json.dumps(install_methods)}")
 
 if __name__ == "__main__":
     main()  
