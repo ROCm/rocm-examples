@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26124.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "image_convolution_vs2017", "image_convolution_vs2017.vcxproj", "{9CBB1DA1-B800-490A-A47C-972E6B281659}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CBB1DA1-B800-490A-A47C-972E6B281659}.Debug|x64.ActiveCfg = Debug|x64
+		{9CBB1DA1-B800-490A-A47C-972E6B281659}.Debug|x64.Build.0 = Debug|x64
+		{9CBB1DA1-B800-490A-A47C-972E6B281659}.Release|x64.ActiveCfg = Release|x64
+		{9CBB1DA1-B800-490A-A47C-972E6B281659}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B0C1D5E6-4F8A-7B9C-3E2D-6F0A9B8C1D7E}
+	EndGlobalSection
+EndGlobal

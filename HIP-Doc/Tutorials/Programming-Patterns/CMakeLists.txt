@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,13 +21,13 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Tutorials LANGUAGES CXX)
-
-include(CTest)
+project(HIP-Doc-Programming-Guide LANGUAGES CXX)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-add_subdirectory(graph_api)
-add_subdirectory(Programming-Patterns)
+add_subdirectory(bfs)
+add_subdirectory(histogram_atomics)
+add_subdirectory(image_convolution)
+add_subdirectory(kmeans)
+add_subdirectory(matrix_multiplication)

@@ -1,0 +1,24 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28701.123
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "histogram_atomics_vs2019", "histogram_atomics_vs2019.vcxproj", "{838EFF0D-FAB2-4FFA-9457-4932757089F9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{838EFF0D-FAB2-4FFA-9457-4932757089F9}.Debug|x64.ActiveCfg = Debug|x64
+		{838EFF0D-FAB2-4FFA-9457-4932757089F9}.Debug|x64.Build.0 = Debug|x64
+		{838EFF0D-FAB2-4FFA-9457-4932757089F9}.Release|x64.ActiveCfg = Release|x64
+		{838EFF0D-FAB2-4FFA-9457-4932757089F9}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D0E1F2A3-6B7C-8D9E-5F0A-1C2B9D0E4A3F}
+	EndGlobalSection
+EndGlobal

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,14 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Tutorials LANGUAGES CXX)
+EXAMPLE := hip_image_convolution
+GPU_RUNTIME := HIP
 
-include(CTest)
+# HIP variables
+ROCM_INSTALL_DIR := /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 
-add_subdirectory(graph_api)
-add_subdirectory(Programming-Patterns)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -I.
+ILDFLAGS  :=
+ILDLIBS   :=
+
+ifeq ($(GPU_RUNTIME), CUDA)
+	ICXXFLAGS += -x cu
+	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+	CXXFLAGS ?= -Wall -Wextra
+else
+	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip image.h stb_image.h stb_image_write.h
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip $(ILDLIBS)
+
+clean:
+	$(RM) $(EXAMPLE) test_out.jpg
+
+.PHONY: clean
