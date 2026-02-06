@@ -34,6 +34,7 @@ endif()
 # Check for C++20 features we use in the tutorial
 include(CheckIncludeFileCXX)
 set(CMAKE_REQUIRED_QUIET TRUE)
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 check_include_file_cxx(numbers HAVE_NUMBERS)
 if(NOT HAVE_NUMBERS)
     message(WARNING "<numbers> not found. Not building the HIP Graph API tutorial examples.")
