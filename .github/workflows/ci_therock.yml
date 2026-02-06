@@ -30,9 +30,26 @@ on:
       - 'Makefile'
       - '.github/workflows/**'
   workflow_dispatch:
+    inputs:
+      gpu_config:
+        description: "GPU configuration"
+        required: true
+        default: gfx1100
+        type: choice
+        options: 
+        - gfx1100
+      install_method:
+        description: "Installation method"
+        required: true
+        default: wheel
+        type: choice
+        options: 
+        - wheel
+        - tarball
 
 permissions:
   contents: read
+  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -42,11 +59,29 @@ env:
   DEBIAN_FRONTEND: noninteractive
 
 jobs:
+  setup:
+    name: "Setup CI"
+    runs-on: ubuntu-latest
+    outputs:
+      gpu_configs: ${{ steps.config.outputs.gpu_configs }}
+      install_methods: ${{ steps.config.outputs.install_methods }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CI
+        id: config
+        env:
+          GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
+          INSTALL_METHOD: ${{ github.event.inputs.install_method }}
+        run: python3 .github/build_tools/configure_ci.py
+
   build:
     name: "TheRock - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
+    needs: [setup]
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: ubuntu:22.04
+      image: ghcr.io/sshi-amd/rocm-examples-base:ubuntu22.04-rocm
       options:
         --group-add video
         --device /dev/kfd
@@ -55,30 +90,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        install_method: ['wheel', 'tarball']
-        gpu_config:
-          - gpu_target: gfx1100
-            therock_family: gfx110X-all
+        install_method: ${{ fromJson(needs.setup.outputs.install_methods) }}
+        gpu_config: ${{ fromJson(needs.setup.outputs.gpu_configs) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install dependencies
-        shell: bash
-        run: |
-          apt-get update -qq &&
-          apt-get install -y git wget curl build-essential python3.11 python3.11-venv libdw-dev libglfw3-dev libvulkan-dev glslang-tools libtiff-dev libopencv-dev
-
-      - name: Setup virtual environment
-        shell: bash
-        run: |
-          python3.11 -m venv $GITHUB_WORKSPACE/.venv
-          source $GITHUB_WORKSPACE/.venv/bin/activate
-          pip install pyyaml cmake
-          
-          # persist the virtual environment
-          echo "PATH=${PATH}" >> $GITHUB_ENV
-          echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> $GITHUB_ENV
 
       - name: Install TheRock Python wheel
         if: ${{ matrix.install_method == 'wheel' }}

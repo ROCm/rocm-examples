@@ -9,9 +9,26 @@ on:
     paths:
       - '.github/workflows/**'
   workflow_dispatch:
+    inputs:
+      gpu_config:
+        description: "GPU configuration"
+        required: true
+        default: gfx1100
+        type: choice
+        options: 
+        - gfx1100
+      install_method:
+        description: "Installation method"
+        required: true
+        default: wheel
+        type: choice
+        options: 
+        - wheel
+        - tarball
 
 permissions:
   contents: read
+  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -21,11 +38,29 @@ env:
   DEBIAN_FRONTEND: noninteractive
 
 jobs:
+  setup:
+    name: "Setup CI"
+    runs-on: ubuntu-latest
+    outputs:
+      gpu_configs: ${{ steps.config.outputs.gpu_configs }}
+      install_methods: ${{ steps.config.outputs.install_methods }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CI
+        id: config
+        env:
+          GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
+          INSTALL_METHOD: ${{ github.event.inputs.install_method }}
+        run: python3 .github/build_tools/configure_ci.py
+
   build:
     name: "SLES 15.7 - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
+    needs: [setup]
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: registry.suse.com/suse/sle15:15.7
+      image: ghcr.io/sshi-amd/rocm-examples-base:sles15.7-rocm
       options:
         --group-add video
         --device /dev/kfd
@@ -34,50 +69,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        install_method: ['wheel', 'tarball']
-        gpu_config:
-          - gpu_target: gfx1100
-            therock_family: gfx110X-all
+        install_method: ${{ fromJson(needs.setup.outputs.install_methods) }}
+        gpu_config: ${{ fromJson(needs.setup.outputs.gpu_configs) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Install dependencies
-        shell: bash
-        run: |
-          zypper -qni update -y
-          zypper -qni install -y awk unzip xz cmake gcc gcc-c++ wget git python313 libdw-devel Mesa-libGL-devel wayland-devel libxkbcommon-devel libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
-
-          # build and install GLFW 3.4
-          wget https://github.com/glfw/glfw/releases/download/3.4/glfw-3.4.zip
-          unzip glfw-3.4.zip
-          cmake -S glfw-3.4 -B glfw-3.4/build -DGLFW_BUILD_EXAMPLES=OFF -DGLFW_BUILD_TESTS=OFF -DGLFW_BUILD_DOCS=OFF
-          cmake --build glfw-3.4/build --target install
-          
-          # build and install Vulkan SDK 1.4.335.0
-          wget https://sdk.lunarg.com/sdk/download/1.4.335.0/linux/vulkansdk-linux-x86_64-1.4.335.0.tar.xz
-          tar -xvf vulkansdk-linux-x86_64-1.4.335.0.tar.xz -C $GITHUB_WORKSPACE
-
-          VULKAN_SDK=$GITHUB_WORKSPACE/1.4.335.0/x86_64
-          echo "VULKAN_SDK=${VULKAN_SDK}" >> $GITHUB_ENV
-          echo "PATH=${VULKAN_SDK}/bin:${PATH}" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=${VULKAN_SDK}/lib${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}" >> $GITHUB_ENV
-          echo "VK_ADD_LAYER_PATH=${VULKAN_SDK}/share/vulkan/explicit_layer.d" >> $GITHUB_ENV
-          echo "PKG_CONFIG_PATH=${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}" >> $GITHUB_ENV
-
-      - name: Setup virtual environment
-        shell: bash
-        run: |
-          python3.13 -m venv $GITHUB_WORKSPACE/.venv
-          source $GITHUB_WORKSPACE/.venv/bin/activate
-          pip install pyyaml cmake
-          
-          # issue https://github.com/actions/runner/issues/3210:
-          # using $GITHUB_PATH breaks subsequent steps if base image does not have $PATH
-          
-          # persist the virtual environment
-          echo "PATH=${PATH}" >> $GITHUB_ENV
-          echo "VIRTUAL_ENV=$GITHUB_WORKSPACE/.venv" >> $GITHUB_ENV
 
       - name: Install TheRock Python wheel
         if: ${{ matrix.install_method == 'wheel' }}
@@ -142,8 +138,8 @@ jobs:
       - name: CMake configure
         shell: bash
         run: |
-          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="${ROCM_PATH}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -Wno-dev 2> >(tee cmake_error.log >&2)
-          
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="$ROCM_PATH" -DCMAKE_BUILD_RPATH="$ROCM_PATH/lib" -Wno-dev 2> >(tee cmake_error.log >&2)
+
       - name: CMake configure error summary
         if: ${{ !cancelled() }}
         shell: bash
@@ -154,17 +150,17 @@ jobs:
 
           echo "## CMake Configure" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Count warnings and errors
           WARNINGS=$(grep -ci "warning" cmake_error.log || true)
           ERRORS=$(grep -ci "error" cmake_error.log || true)
-          
+
           echo "| Status | Count |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Warnings | ${WARNINGS} |" >> $GITHUB_STEP_SUMMARY
           echo "| Errors | ${ERRORS} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Show details if there are warnings/errors
           if [ -s cmake_error.log ]; then
             echo "<details><summary>CMake error log</summary>" >> $GITHUB_STEP_SUMMARY
@@ -206,21 +202,21 @@ jobs:
           # Generate summary
           echo "## Test summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          
+
           # Parse test result
           SUMMARY=$(grep "tests passed" ctest_output.log)
-          echo "**${SUMMARY}**" >> $GITHUB_STEP_SUMMARY
-          
+          echo "**$SUMMARY**" >> $GITHUB_STEP_SUMMARY
+
           # Count passed/failed
           FAILED=$(grep -c "Failed" ctest_output.log || true)
-          
+
           # Show failed tests if any
           if [ "${FAILED}" -gt 0 ]; then
             echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             # Extract failed test output
-            awk '/^[[:space:]]*Start[[:space:]]+[0-9]+:/ {found=0; next} /\*\*\*/ && !/Passed/ {found=1} found' ctest_output.log >> $GITHUB_STEP_SUMMARY            
+            awk '/^[[:space:]]*Start[[:space:]]+[0-9]+:/ {found=0; next} /\*\*\*/ && !/Passed/ {found=1} found' ctest_output.log >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
