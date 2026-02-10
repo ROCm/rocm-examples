@@ -28,17 +28,36 @@ jobs:
         container:
             image: ubuntu:22.04
         steps:
-          - uses: actions/checkout@v4
           - name: Install dependencies
             run: |
                   apt-get update -qq &&
-                  apt-get install -y build-essential g++ glslang-tools \
+                  apt-get install -y git build-essential g++ glslang-tools \
                     python3 python3-pip libglfw3-dev libvulkan-dev locales wget pkg-config \
                     protobuf-compiler libprotoc-dev libopencv-dev \
                     libavcodec-dev libavformat-dev libavutil-dev
                   python3 -m pip install --upgrade pip
                   python3 -m pip install cmake future==1.0.0 pytz==2022.1 numpy==1.23.0 \
                   google==3.0.0 protobuf==3.12.4
+          # see https://github.com/dorny/paths-filter/issues/212
+          - uses: actions/checkout@v4
+          - name: Trust git directory
+            run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          - uses: dorny/paths-filter@v3
+            id: changes
+            with:
+              filters: |
+                ck:
+                  - 'Libraries/ComposableKernel/**'
+          - name: Set CK build flag
+            run: |
+              # Enable CK for: scheduled runs OR CK files changed
+              if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ steps.changes.outputs.ck }}" == "true" ]; then
+                ENABLE_CK=ON
+              else
+                ENABLE_CK=OFF
+              fi
+              echo "ENABLE_CK=${ENABLE_CK}" >> $GITHUB_ENV
+              echo "ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK}"
           - name: Install ROCm Dev
             run: |
                   wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
@@ -73,22 +92,6 @@ jobs:
                   echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
                   echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
                   apt-get autoclean
-          - uses: dorny/paths-filter@v3
-            id: changes
-            with:
-              filters: |
-                ck:
-                  - 'Libraries/ComposableKernel/**'
-          - name: Set CK build flag
-            run: |
-              # Enable CK for: scheduled runs OR CK files changed
-              if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ steps.changes.outputs.ck }}" == "true" ]; then
-                ENABLE_CK=ON
-              else
-                ENABLE_CK=OFF
-              fi
-              echo "ENABLE_CK=${ENABLE_CK}" >> $GITHUB_ENV
-              echo "ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK}"
           - name: CMake Configure and Build
             shell: bash
             run: |
