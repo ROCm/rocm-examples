@@ -31,6 +31,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
+
 add_subdirectory(Applications)
 add_subdirectory(HIP-Basic)
 add_subdirectory(HIP-Doc)
