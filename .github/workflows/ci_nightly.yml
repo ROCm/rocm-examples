@@ -64,7 +64,7 @@ jobs:
     needs: [setup]
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: ghcr.io/sshi-amd/rocm-examples-base:sles15.7-rocm
+      image: ghcr.io/rocm/rocm-examples-sles-15.7:latest
       options:
         --group-add video
         --device /dev/kfd
