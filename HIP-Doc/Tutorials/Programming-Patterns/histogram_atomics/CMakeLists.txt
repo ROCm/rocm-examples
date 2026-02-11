@@ -52,8 +52,18 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 add_executable(${example_name} main.hip)
+
+set(example_work_dir $<TARGET_FILE_DIR:${example_name}>)
+
+# Copy test image to executable output directory
+add_custom_command(TARGET ${example_name} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/test_colored.jpg ${example_work_dir}
+    WORKING_DIRECTORY ${example_work_dir}
+    COMMENT "Copying test image to ${example_work_dir}"
+)
+
 # Make example runnable using ctest
-add_test(NAME ${example_name} COMMAND ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name} WORKING_DIRECTORY ${example_work_dir})
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
@@ -65,9 +75,6 @@ target_include_directories(${example_name} PRIVATE
     $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>
 )
 target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda_driver>)
-
-# Copy test image to build directory
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/test_colored.jpg ${CMAKE_BINARY_DIR}/test_colored.jpg COPYONLY)
 
 install(TARGETS ${example_name})
 install(FILES test_colored.jpg DESTINATION ${CMAKE_INSTALL_PREFIX})
