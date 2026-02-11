@@ -12,6 +12,10 @@ on:
       - amd-mainline
       - 'release/rocm-rel*'
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
 env:
   DEBIAN_FRONTEND: noninteractive
   CLANG_FORMAT: /usr/lib/llvm-18/bin/clang-format

@@ -1,0 +1,252 @@
+name: Build ROCm Examples
+
+on:
+  push:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Applications/**'
+      - 'HIP-Basic/**'
+      - 'HIP-Doc/**'
+      - 'Libraries/**'
+      - 'Programming-Guide/**'
+      - 'Tools/**'
+      - 'Tutorials/**'
+      - 'Common/**'
+      - 'CMakeLists.txt'
+      - 'Makefile'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Applications/**'
+      - 'HIP-Basic/**'
+      - 'HIP-Doc/**'
+      - 'Libraries/**'
+      - 'Programming-Guide/**'
+      - 'Tools/**'
+      - 'Tutorials/**'
+      - 'Common/**'
+      - 'CMakeLists.txt'
+      - 'Makefile'
+      - '.github/workflows/**'
+  workflow_dispatch:
+    inputs:
+      gpu_config:
+        description: "GPU configuration"
+        required: true
+        default: gfx1100
+        type: choice
+        options: 
+        - gfx1100
+        - gfx1151
+        - gfx1201
+        - gfx90a
+        - gfx942
+      install_method:
+        description: "Installation method"
+        required: true
+        default: wheel
+        type: choice
+        options: 
+        - wheel
+        - tarball
+
+permissions:
+  contents: read
+  packages: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+env:
+  DEBIAN_FRONTEND: noninteractive
+
+jobs:
+  setup:
+    name: "Setup CI"
+    runs-on: ubuntu-latest
+    outputs:
+      gpu_configs: ${{ steps.config.outputs.gpu_configs }}
+      install_methods: ${{ steps.config.outputs.install_methods }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure CI
+        id: config
+        env:
+          GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
+          INSTALL_METHOD: ${{ github.event.inputs.install_method }}
+        run: python3 .github/build_tools/configure_ci.py
+
+  build:
+    name: "TheRock - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
+    needs: [setup]
+    runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
+    container:
+      image: ghcr.io/sshi-amd/rocm-examples-base:ubuntu22.04-rocm
+      options:
+        --group-add video
+        --device /dev/kfd
+        --device /dev/dri
+        --security-opt seccomp=unconfined
+    strategy:
+      fail-fast: false
+      matrix:
+        install_method: ${{ fromJson(needs.setup.outputs.install_methods) }}
+        gpu_config: ${{ fromJson(needs.setup.outputs.gpu_configs) }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install TheRock Python wheel
+        if: ${{ matrix.install_method == 'wheel' }}
+        shell: bash
+        run: |
+          pip install --no-cache-dir --index-url https://rocm.nightlies.amd.com/v2/${{ matrix.gpu_config.therock_family }}/ \
+            "rocm[libraries,devel]"
+
+      - name: Wheel sanity check
+        if: ${{ matrix.install_method == 'wheel' }}
+        id: sanity-check
+        shell: bash
+        run: |
+          ROCM_VERSION=$(rocm-sdk version)
+          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
+          rocm-sdk init
+          rocm-sdk test
+
+      - name: Setup environment variables (wheel)
+        if: ${{ matrix.install_method == 'wheel' }}
+        shell: bash
+        run: |
+          ROCM_PATH=$(rocm-sdk path --root)
+          echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
+          echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
+          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
+
+      - name: Install TheRock tarball
+        if: ${{ matrix.install_method == 'tarball' }}
+        id: install-tarball
+        shell: bash
+        run: |
+          LATEST_TARBALL=$(curl -s https://rocm.nightlies.amd.com/tarball/ \
+            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" \
+            | sort -V \
+            | tail -1)
+          mkdir /therock-tarball && cd /therock-tarball
+          wget "https://rocm.nightlies.amd.com/tarball/${LATEST_TARBALL}"
+          mkdir install
+          tar -xzf "${LATEST_TARBALL}" -C install
+
+          ROCM_VERSION=$(echo "${LATEST_TARBALL}" | grep -oE "[0-9]+\.[0-9]+\.\w+")
+          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
+          echo "## Tarball link: https://rocm.nightlies.amd.com/tarball/${LATEST_TARBALL}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Setup environment variables (tarball)
+        if: ${{ matrix.install_method == 'tarball' }}
+        shell: bash
+        run: |
+          ROCM_PATH=/therock-tarball/install
+          echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
+          echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
+          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
+
+      - name: CMake configure
+        shell: bash
+        run: |
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="${ROCM_PATH}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -Wno-dev 2> >(tee cmake_error.log >&2)
+          
+      - name: CMake configure error summary
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          if [ ! -f cmake_error.log ]; then
+            exit 0
+          fi
+
+          echo "## CMake Configure" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Count warnings and errors
+          WARNINGS=$(grep -ci "warning" cmake_error.log || true)
+          ERRORS=$(grep -ci "error" cmake_error.log || true)
+          
+          echo "| Status | Count |" >> $GITHUB_STEP_SUMMARY
+          echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Warnings | ${WARNINGS} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Errors | ${ERRORS} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Show details if there are warnings/errors
+          if [ -s cmake_error.log ]; then
+            echo "<details><summary>CMake error log</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat cmake_error.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Clean configure - no warnings or errors" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: CMake build
+        shell: bash
+        run: |
+          cmake --build build -j
+
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rocm-examples-build-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          path: build/
+
+      - name: Run tests
+        shell: bash
+        run: |
+          ctest --test-dir build --output-on-failure 2>&1 | tee ctest_output.log
+
+      - name: Test summary
+        if: ${{ !cancelled() }}
+        shell: bash
+        run: |
+          if [ ! -f ctest_output.log ]; then
+            exit 0
+          fi
+
+          # Generate summary
+          echo "## Test summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          
+          # Parse test result
+          SUMMARY=$(grep "tests passed" ctest_output.log)
+          echo "**${SUMMARY}**" >> $GITHUB_STEP_SUMMARY
+          
+          # Count passed/failed
+          FAILED=$(grep -c "Failed" ctest_output.log || true)
+                    
+          # Show failed tests if any
+          if [ "${FAILED}" -gt 0 ]; then
+            echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            # Extract failed test output
+            awk '/^[[:space:]]*Start[[:space:]]+[0-9]+:/ {found=0; next} /\*\*\*/ && !/Passed/ {found=1} found' ctest_output.log >> $GITHUB_STEP_SUMMARY            
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "</details>" >> $GITHUB_STEP_SUMMARY
+          fi
+
+        # Clean the workspace here since other jobs may not have the permissions to do so later
+        # (needed for self-hosted runners)
+      - name: Clean the workspace
+        if: always()
+        run: find "$GITHUB_WORKSPACE" -mindepth 1 -delete

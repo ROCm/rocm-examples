@@ -28,3 +28,12 @@ Dockerfile: [hip-libraries-cuda-ubuntu.Dockerfile](hip-libraries-cuda-ubuntu.Doc
 This is environment is based on Ubuntu targeting the CUDA platform. It has the
 HIP runtime and the ROCm libraries installed. CMake is also installed in the image.
 It can be used with the samples that support the CUDA target.
+
+### CI base images
+
+Lightweight base images for CI workflows based on various supported Linux distributions. The images include a Python virtual environment and complete system dependencies to build rocm-examples from source, but they **do not include  any ROCm installation**.
+
+Dockerfiles:
+
+- [ubuntu-22.04.Dockerfile](ubuntu-22.04.Dockerfile)
+- [sles-15.7.Dockerfile](sles-15.7.Dockerfile)
