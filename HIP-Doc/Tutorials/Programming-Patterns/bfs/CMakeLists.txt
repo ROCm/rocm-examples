@@ -70,12 +70,18 @@ target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda
 add_executable(graphgen graphgen.cpp)
 target_compile_features(graphgen PRIVATE cxx_std_17)
 
-# Make example runnable using ctest
-add_test(NAME ${example_name} COMMAND ${example_name} ${CMAKE_CURRENT_SOURCE_DIR}/graph4096.txt)
+set(example_work_dir $<TARGET_FILE_DIR:${example_name}>)
 
-# Copy test graphs to build directory
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/graph4096.txt ${CMAKE_BINARY_DIR}/graph4096.txt COPYONLY)
-configure_file(${CMAKE_CURRENT_SOURCE_DIR}/graph65536.txt ${CMAKE_BINARY_DIR}/graph65536.txt COPYONLY)
+# Copy test image to executable output directory
+add_custom_command(TARGET ${example_name} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/graph4096.txt ${example_work_dir}
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different ${CMAKE_CURRENT_SOURCE_DIR}/graph65536.txt ${example_work_dir}
+    WORKING_DIRECTORY ${example_work_dir}
+    COMMENT "Copying test graphs to ${example_work_dir}"
+)
+
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name} graph4096.txt WORKING_DIRECTORY ${example_work_dir})
 
 install(TARGETS ${example_name} graphgen)
 install(FILES graph4096.txt graph65536.txt DESTINATION ${CMAKE_INSTALL_PREFIX})
