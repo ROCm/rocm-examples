@@ -116,8 +116,11 @@ target_compile_options(${example_name} PRIVATE
     -D__HIP_PLATFORM_AMD__
 )
 
-# Add link options
-target_link_options(${example_name} PRIVATE -Wl,-rpath,${ROCM_ROOT}/lib)
+# Add link options - do not remove the -fopenmp flag. It is still required
+# despite us linking to OpenMP::OpenMP_CXX above because we're using the
+# rocProfiler-SDK compiler wrapper and CMake fails to add the necessary OpenMP
+# flags to the link step.
+target_link_options(${example_name} PRIVATE -fopenmp -Wl,-rpath,${ROCM_ROOT}/lib)
 
 # Add offload architecture flags for each GPU target
 foreach(_TARGET ${OPENMP_GPU_TARGETS})
