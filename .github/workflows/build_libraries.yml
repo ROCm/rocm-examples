@@ -1,6 +1,7 @@
 name: Build Libraries
 
 on:
+  workflow_dispatch:
   push:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
