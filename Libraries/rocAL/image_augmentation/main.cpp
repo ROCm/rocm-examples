@@ -109,7 +109,7 @@ bool setup_augmentation_pipeline(RocalContext       handle,
                                            ROCAL_USE_USER_GIVEN_SIZE_RESTRICTED,
                                            output_width,
                                            output_height,
-                                           RocalDecoderType::ROCAL_DECODER_OPENCV);
+                                           RocalDecoderType::ROCAL_DECODER_TJPEG);
     }
 
     if(rocalGetStatus(handle) != ROCAL_OK)

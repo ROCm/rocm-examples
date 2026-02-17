@@ -56,12 +56,25 @@ find_library(ROCAL_LIBRARY
 
 find_package(OpenCV REQUIRED)
 
+find_path(TurboJPEG_INCLUDE_DIR turbojpeg.h)
+find_library(TurboJPEG_LIBRARY NAMES turbojpeg)
+
+include(FindPackageHandleStandardArgs)
+find_package_handle_standard_args(TurboJPEG
+    REQUIRED_VARS TurboJPEG_INCLUDE_DIR TurboJPEG_LIBRARY
+)
+
+if(TurboJPEG_FOUND)
+    set(TurboJPEG_LIBRARIES ${TurboJPEG_LIBRARY})
+    set(TurboJPEG_INCLUDE_DIRS ${TurboJPEG_INCLUDE_DIR})
+endif()
+
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to rocAL library
-target_link_libraries(${example_name} PRIVATE ${ROCAL_LIBRARY} ${OpenCV_LIBS})
+target_link_libraries(${example_name} PRIVATE ${ROCAL_LIBRARY} ${TurboJPEG_LIBRARY} ${OpenCV_LIBS})
 
 # Include directories
 target_include_directories(

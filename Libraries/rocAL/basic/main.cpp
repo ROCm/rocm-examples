@@ -63,7 +63,7 @@ bool setup_augmentation_pipeline(RocalContext       handle,
         = (use_rgb != 0) ? RocalImageColor::ROCAL_COLOR_RGB24 : RocalImageColor::ROCAL_COLOR_U8;
 
     // Set the rocAL decoder type (OpenCV only for simplicity)
-    RocalDecoderType rocal_decoder_type = RocalDecoderType::ROCAL_DECODER_OPENCV;
+    RocalDecoderType rocal_decoder_type = RocalDecoderType::ROCAL_DECODER_TJPEG;
 
     std::cout << "Loading images from: " << input_path << std::endl;
 

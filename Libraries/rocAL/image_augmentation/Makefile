@@ -38,7 +38,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -isystem $(ROCAL_INCLUDE_DIR) -isystem $(OPENCV_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
-ILDLIBS   := -lrocal -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -lopencv_highgui
+ILDLIBS   := -lrocal -lturbojpeg -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -lopencv_highgui
 
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
