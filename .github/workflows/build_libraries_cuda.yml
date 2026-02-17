@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: ghcr.io/sshi-amd/rocm-examples-hip-libraries-cuda-ubuntu:latest
+      options: --user root
 
     steps:
       - name: Checkout Repository
