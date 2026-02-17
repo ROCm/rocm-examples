@@ -56,7 +56,7 @@ add_subdirectory(intercept_table)
 if(ROCM_EXAMPLES_ENABLE_OPENMP)
     add_subdirectory(openmp_target)
 else()
-    message(STATUS "OpenMP offloading target examples are disabled. Skipping rocProfiler-SDK OpenMP target example.")
+    message(WARNING "OpenMP offloading target examples are disabled. Skipping rocProfiler-SDK OpenMP target example.")
 endif()
 add_subdirectory(pc_sampling)
 # Disabled until feature is released in future ROCm
