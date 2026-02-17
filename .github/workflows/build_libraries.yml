@@ -5,15 +5,21 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
+      - 'Dockerfiles/**'
       - '.github/workflows/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
+      - 'Dockerfiles/**'
       - '.github/workflows/**'
   schedule:
     # Nightly at 2 AM UTC
     - cron: '0 2 * * *'
+
+permissions:
+  contents: read
+  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -21,8 +27,6 @@ concurrency:
 
 env:
     DEBIAN_FRONTEND: noninteractive
-    ROCM_VERSION: '7.2'
-    AMDGPU_INSTALLER_VERSION: 7.2.70200-1
     GPU_TARGETS: gfx908;gfx90a;gfx942;gfx950;gfx1030;gfx1100;gfx1101;gfx1200;gfx1201
 
 jobs:
@@ -30,15 +34,10 @@ jobs:
         name: "Build Libraries Examples"
         runs-on: self-hosted
         container:
-            image: ubuntu:22.04
+            image: ghcr.io/sshi-amd/rocm-examples-hip-libraries-rocm-ubuntu:latest
         steps:
-          - name: Install dependencies
+          - name: Install Python packages
             run: |
-                  apt-get update -qq &&
-                  apt-get install -y git build-essential g++ glslang-tools \
-                    python3 python3-pip libglfw3-dev libvulkan-dev locales wget pkg-config \
-                    protobuf-compiler libprotoc-dev libopencv-dev \
-                    libavcodec-dev libavformat-dev libavutil-dev
                   python3 -m pip install --upgrade pip
                   python3 -m pip install cmake future==1.0.0 pytz==2022.1 numpy==1.23.0 \
                   google==3.0.0 protobuf==3.12.4
@@ -62,40 +61,6 @@ jobs:
               fi
               echo "ENABLE_CK=${ENABLE_CK}" >> $GITHUB_ENV
               echo "ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK}"
-          - name: Install ROCm Dev
-            run: |
-                  wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
-                  apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
-                  apt-get update -qq &&
-                  apt-get install -y \
-                    rocm-dev rocm-llvm half \
-                    rocrand-dev hiprand-dev \
-                    rocprim-dev hipcub-dev \
-                    rocblas-dev hipblas-dev \
-                    rocsolver-dev hipsolver-dev \
-                    rocfft-dev hipfft-dev \
-                    rocal-dev \
-                    rocalution-dev \
-                    rocdecode-dev \
-                    rocjpeg-dev \
-                    rocsparse-dev \
-                    rocthrust-dev \
-                    rpp-dev \
-                    libdw-dev rocprofiler-sdk \
-                    rccl-dev \
-                    hipblaslt-dev \
-                    hiptensor-dev \
-                    rocwmma-dev \
-                    migraphx-dev \
-                    hipsparselt-dev \
-                    hipsparse-dev \
-                    mivisionx-dev \
-                    composablekernel-dev
-                  rm -rf /var/lib/apt/lists/*
-                  echo "/opt/rocm/bin" >> $GITHUB_PATH
-                  echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
-                  echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
-                  apt-get autoclean
           - name: CMake Configure and Build
             shell: bash
             run: |
