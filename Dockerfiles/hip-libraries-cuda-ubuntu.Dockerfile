@@ -38,7 +38,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     && printf 'Package: *\nPin: origin "repo.radeon.com"\nPin-Priority: 9001\n' > /etc/apt/preferences.d/radeon.pref \
     && apt-get update -qq \
     && apt-get install -y hip-base hipify-clang rocm-core hipcc hip-dev rocm-llvm-dev \
-        hipsparselt-dev rocrand-dev \
+        hipsparse-dev hipsparselt-dev rocrand-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install CMake via pip for a modern version
