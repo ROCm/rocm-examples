@@ -322,7 +322,7 @@ void run_migrate(int rank, int tid, hipStream_t stream, int, char** argv)
         itr = init_v;
     }
 
-    auto page_data_dev_ptr = reinterpret_cast<data_type*>(nullptr);
+    auto page_data_dev_ptr = static_cast<data_type*>(nullptr);
     HIP_CHECK(hipHostGetDevicePointer(&page_data_dev_ptr, page_data.data(), 0));
 
     test_page_migrate<<<1, 1024, 0, stream>>>(page_data_dev_ptr, incr_v);
