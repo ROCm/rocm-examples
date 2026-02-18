@@ -27,7 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image:  nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
-
+    defaults:
+      run:
+        shell: bash
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -46,7 +48,6 @@ jobs:
           apt-get install -y hip-dev rocm-cmake
 
       - name: Setup ROCm Libraries monorepo
-        shell: bash
         run: |
           git clone --no-checkout --depth=1 --filter=tree:0 https://github.com/ROCm/rocm-libraries.git
           cd rocm-libraries
@@ -55,7 +56,6 @@ jobs:
           git checkout develop
 
       - name: Build and install hipCUB
-        shell: bash
         run: |
           cd rocm-libraries/projects/hipcub; mkdir build; cd build
           HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
@@ -63,13 +63,11 @@ jobs:
           make install
 
       - name: Build hipCUB example
-        shell: bash
         run: |
           cd Libraries/hipCUB
           make GPU_RUNTIME=CUDA -j
 
       - name: Build and install hipFFT
-        shell: bash
         run: |
           cd rocm-libraries/projects/hipfft; mkdir build; cd build
           HIP_PLATFORM=nvidia ROCM_PATH=/opt/rocm cmake -LH -DBUILD_WITH_LIB=cuda ..
@@ -77,29 +75,24 @@ jobs:
           make install
 
       - name: Build hipFFT example
-        shell: bash
         run: |
           cd Libraries/hipFFT
           make GPU_RUNTIME=CUDA -j
 
       - name: Install hipSPARSELt
-        shell: bash
         run: |
           apt-get install -y hipsparselt-dev
 
       - name: Build hipSPARSELt examples
-        shell: bash
         run: |
           cd Libraries/hipSPARSELt
           make GPU_RUNTIME=CUDA -j
 
       - name: Install rocRAND
-        shell: bash
         run: |
           apt-get install -y rocrand-dev
 
       - name: Build rocRAND example
-        shell: bash
         run: |
           cd Libraries/rocRAND
           make GPU_RUNTIME=CUDA -j

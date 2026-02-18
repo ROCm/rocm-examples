@@ -31,6 +31,9 @@ jobs:
         runs-on: self-hosted
         container:
             image: ubuntu:22.04
+        defaults:
+            run:
+                shell: bash
         steps:
           - name: Install dependencies
             run: |
@@ -97,13 +100,11 @@ jobs:
                   echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
                   apt-get autoclean
           - name: CMake Configure and Build
-            shell: bash
             run: |
               cd Libraries
               cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -DROCM_EXAMPLES_ENABLE_OPENMP=ON -S . -B build
               cmake --build build --parallel $(nproc)
           - name: Make
-            shell: bash
             run: |
               sed -i '/rocCV/d' Libraries/Makefile
               cd Libraries
