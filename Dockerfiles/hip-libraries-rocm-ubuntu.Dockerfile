@@ -48,35 +48,13 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     && apt-get -y install ./amdgpu-install_${AMDGPU_INSTALLER_VERSION}_all.deb \
     && rm -f ./amdgpu-install_${AMDGPU_INSTALLER_VERSION}_all.deb \
     && apt-get update -qq \
-    && apt-get install -y \
-        hip-base hipify-clang rocm-core hipcc \
-        hip-dev rocm-hip-runtime-dev rocm-llvm-dev \
-        rocm-dev half \
-        rocrand-dev hiprand-dev \
-        rocprim-dev hipcub-dev \
-        rocblas-dev hipblas-dev \
-        rocsolver-dev hipsolver-dev \
-        rocfft-dev hipfft-dev \
-        rocsparse-dev hipsparse-dev \
-        rocthrust-dev \
-        rocal-dev \
-        rocalution-dev \
-        rocdecode-dev \
-        rocjpeg-dev \
-        rpp-dev \
-        libdw-dev rocprofiler-sdk \
-        rccl-dev \
-        hipblaslt-dev \
-        hiptensor-dev \
-        rocwmma-dev \
-        migraphx-dev \
-        hipsparselt-dev \
-        mivisionx-dev \
-        composablekernel-dev \
+    && apt-get install -y rocm rocm-llvm-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install CMake via pip for a modern version
-RUN python3 -m pip install --no-cache-dir cmake
+# Install Python packages (cmake and deps for Libraries build)
+RUN python3 -m pip install --no-cache-dir --upgrade pip \
+    && python3 -m pip install --no-cache-dir cmake future==1.0.0 pytz==2022.1 numpy==1.23.0 \
+        google==3.0.0 protobuf==3.12.4
 
 ENV PATH="/opt/rocm/bin:${PATH}"
 

@@ -37,8 +37,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     && echo "deb [arch=amd64, signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/$ROCM_VERSION_APT/ jammy main" > /etc/apt/sources.list.d/rocm.list \
     && printf 'Package: *\nPin: origin "repo.radeon.com"\nPin-Priority: 9001\n' > /etc/apt/preferences.d/radeon.pref \
     && apt-get update -qq \
-    && apt-get install -y hip-base hipify-clang rocm-core hipcc hip-dev rocm-llvm-dev \
-        hipsparse-dev hipsparselt-dev rocrand-dev \
+    && apt-get install -y rocm rocm-llvm-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install CMake via pip for a modern version

@@ -37,11 +37,6 @@ jobs:
         container:
             image: ghcr.io/sshi-amd/rocm-examples-hip-libraries-rocm-ubuntu:latest
         steps:
-          - name: Install Python packages
-            run: |
-                  python3 -m pip install --upgrade pip
-                  python3 -m pip install cmake future==1.0.0 pytz==2022.1 numpy==1.23.0 \
-                  google==3.0.0 protobuf==3.12.4
           # see https://github.com/dorny/paths-filter/issues/212
           - uses: actions/checkout@v4
           - name: Trust git directory
