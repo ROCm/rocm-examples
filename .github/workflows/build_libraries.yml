@@ -6,13 +6,11 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
-      - 'Dockerfiles/**'
       - '.github/workflows/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
-      - 'Dockerfiles/**'
       - '.github/workflows/**'
   schedule:
     # Nightly at 2 AM UTC
