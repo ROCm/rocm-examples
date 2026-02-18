@@ -52,6 +52,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(rocprofiler-sdk REQUIRED)
 find_package(rocprofiler-sdk-roctx REQUIRED)
+find_package(OpenMP COMPONENTS CXX REQUIRED)
 find_package(Threads REQUIRED)
 
 # Find the rocprofiler launcher
@@ -101,6 +102,7 @@ target_link_libraries(${example_name} PRIVATE
     Threads::Threads
     rocprofiler-sdk-roctx::rocprofiler-sdk-roctx
     ${example_name}_client
+    OpenMP::OpenMP_CXX
     ${CXX_FS_LIBRARY}
 )
 
@@ -111,11 +113,13 @@ target_include_directories(${example_name} PRIVATE
 
 # Add compile options
 target_compile_options(${example_name} PRIVATE
-    -fopenmp
     -D__HIP_PLATFORM_AMD__
 )
 
-# Add link options
+# Add link options - do not remove the -fopenmp flag. It is still required
+# despite us linking to OpenMP::OpenMP_CXX above because we're using the
+# rocProfiler-SDK compiler wrapper and CMake fails to add the necessary OpenMP
+# flags to the link step.
 target_link_options(${example_name} PRIVATE -fopenmp -Wl,-rpath,${ROCM_ROOT}/lib)
 
 # Add offload architecture flags for each GPU target
