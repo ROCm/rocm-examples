@@ -33,7 +33,7 @@ jobs:
         name: "Build Libraries Examples"
         runs-on: self-hosted
         container:
-            image: ghcr.io/sshi-amd/rocm-examples-hip-libraries-rocm-ubuntu:latest
+            image: ghcr.io/sshi-amd/rocm-examples-hip-libraries-rocm-ubuntu:latest-test
         steps:
           # see https://github.com/dorny/paths-filter/issues/212
           - uses: actions/checkout@v4
