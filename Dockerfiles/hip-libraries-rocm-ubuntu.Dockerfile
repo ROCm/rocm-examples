@@ -48,7 +48,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     && apt-get -y install ./amdgpu-install_${AMDGPU_INSTALLER_VERSION}_all.deb \
     && rm -f ./amdgpu-install_${AMDGPU_INSTALLER_VERSION}_all.deb \
     && apt-get update -qq \
-    && apt-get install -y rocm rocm-llvm-dev \
+    && apt-get install -y rocm-dev rocm-llvm-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python packages (cmake and deps for Libraries build)
