@@ -32,14 +32,10 @@
  */
 
 #include "client.hpp"
+#include "rocprofiler_utils.hpp"
 
 #include <rocprofiler-sdk/registration.h>
 #include <rocprofiler-sdk/rocprofiler.h>
-
-#include "common/call_stack.hpp"
-#include "common/defines.hpp"
-#include "common/filesystem.hpp"
-#include "common/name_info.hpp"
 
 #include <atomic>
 #include <cassert>
