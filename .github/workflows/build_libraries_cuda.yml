@@ -1,6 +1,7 @@
 name: Build Libraries CUDA
 
 on:
+  workflow_dispatch:
   push:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
@@ -12,85 +13,42 @@ on:
       - 'Libraries/**'
       - '.github/workflows/**'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
   cancel-in-progress: true
 
 env:
     DEBIAN_FRONTEND: noninteractive
-    ROCM_VERSION: '7.2'
-    AMDGPU_INSTALLER_VERSION: 7.0.70200-1
 
 jobs:
   build:
     name: "Build Libraries CUDA"
     runs-on: ubuntu-latest
     container:
-      image:  nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
-    defaults:
-      run:
-        shell: bash
+      image: ghcr.io/rocm/rocm-examples-hip-libraries-cuda-ubuntu
+      options: --user root
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - name: Install System Dependencies
-        run: |
-          apt-get update -qq &&
-          apt-get install -y build-essential g++ glslang-tools python3 python3-pip libglfw3-dev libvulkan-dev locales wget git
-          python3 -m pip install --upgrade pip
-          python3 -m pip install cmake
-
-      - name: Install Hip for CUDA
-        run: |
-          wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
-          apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
-          apt-get update -qq &&
-          apt-get install -y hip-dev rocm-cmake
-
-      - name: Setup ROCm Libraries monorepo
-        run: |
-          git clone --no-checkout --depth=1 --filter=tree:0 https://github.com/ROCm/rocm-libraries.git
-          cd rocm-libraries
-          git sparse-checkout init --cone
-          git sparse-checkout set projects/hipcub projects/hiprand projects/hipfft projects/rocrand
-          git checkout develop
-
-      - name: Build and install hipCUB
-        run: |
-          cd rocm-libraries/projects/hipcub; mkdir build; cd build
-          HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
-          make -j
-          make install
 
       - name: Build hipCUB example
         run: |
           cd Libraries/hipCUB
           make GPU_RUNTIME=CUDA -j
 
-      - name: Build and install hipFFT
-        run: |
-          cd rocm-libraries/projects/hipfft; mkdir build; cd build
-          HIP_PLATFORM=nvidia ROCM_PATH=/opt/rocm cmake -LH -DBUILD_WITH_LIB=cuda ..
-          make -j
-          make install
-
       - name: Build hipFFT example
         run: |
           cd Libraries/hipFFT
           make GPU_RUNTIME=CUDA -j
 
-      - name: Install hipSPARSELt
-        run: |
-          apt-get install -y hipsparselt-dev
-
       - name: Build hipSPARSELt examples
         run: |
           cd Libraries/hipSPARSELt
           make GPU_RUNTIME=CUDA -j
-
-      - name: Install rocRAND
-        run: |
-          apt-get install -y rocrand-dev
 
       - name: Build rocRAND example
         run: |
