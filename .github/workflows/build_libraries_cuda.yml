@@ -28,7 +28,7 @@ jobs:
     name: "Build Libraries CUDA"
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/sshi-amd/rocm-examples-hip-libraries-cuda-ubuntu:latest-test-2
+      image: ghcr.io/rocm/rocm-examples-hip-libraries-cuda-ubuntu
       options: --user root
 
     steps:
