@@ -27,7 +27,9 @@ jobs:
         runs-on: ubuntu-latest
         container:
             image: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
-
+        defaults:
+            run:
+                shell: bash
         steps:
           - uses: actions/checkout@v4
 
@@ -50,7 +52,6 @@ jobs:
               echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
           - name: Setup ROCm Libraries monorepo
-            shell: bash
             run: |
               git clone --no-checkout --depth=1 --filter=tree:0 https://github.com/ROCm/rocm-libraries.git
               cd rocm-libraries
@@ -59,7 +60,6 @@ jobs:
               git checkout develop
 
           - name: Build and install hipCUB
-            shell: bash
             run: |
               cd rocm-libraries/projects/hipcub; mkdir build; cd build
               HIP_PLATFORM=nvidia cmake -DCMAKE_CXX_COMPILER=nvcc ..
@@ -67,7 +67,6 @@ jobs:
               make install
 
           - name: Build and install hipRAND
-            shell: bash
             run: |
               cd rocm-libraries/projects/hiprand; mkdir build; cd build
               HIP_PLATFORM=nvidia CXX=g++ cmake -DBUILD_WITH_LIB=CUDA -DHIP_CUDA_lowest_cc=60 ..
@@ -75,7 +74,6 @@ jobs:
               make install
 
           - name: Configure and Build
-            shell: bash
             run: |
               cd Applications && mkdir build && cd build
               cmake -DGPU_RUNTIME=CUDA ..

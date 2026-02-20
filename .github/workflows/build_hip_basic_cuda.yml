@@ -27,7 +27,9 @@ jobs:
         runs-on: ubuntu-latest
         container:
             image: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
-
+        defaults:
+            run:
+                shell: bash
         steps:
           - uses: actions/checkout@v4
 
@@ -47,7 +49,6 @@ jobs:
               apt-get install -y hip-dev hipify-clang
 
           - name: Configure and Build
-            shell: bash
             run: |
               cd HIP-Basic && mkdir build && cd build
               cmake -DGPU_RUNTIME=CUDA ..

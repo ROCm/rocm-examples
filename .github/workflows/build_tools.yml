@@ -27,6 +27,9 @@ jobs:
         runs-on: ubuntu-latest
         container:
             image: ubuntu:22.04
+        defaults:
+            run:
+                shell: bash
         steps:
           - uses: actions/checkout@v4
           - name: Install dependencies
@@ -50,13 +53,11 @@ jobs:
           - name: Install rocprof-compute dependencies
             run: python3 -m pip install -r /opt/rocm/libexec/rocprofiler-compute/requirements.txt
           - name: CMake Configure and Build
-            shell: bash
             run: |
               cd Tools
               cmake -DGPU_TARGETS="${GPU_TARGETS}" -S . -B build
               cmake --build build -j
           - name: Make
-            shell: bash
             run: |
               cd Tools
               make -j

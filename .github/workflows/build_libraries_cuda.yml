@@ -36,25 +36,21 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Build hipCUB example
-        shell: bash
         run: |
           cd Libraries/hipCUB
           make GPU_RUNTIME=CUDA -j
 
       - name: Build hipFFT example
-        shell: bash
         run: |
           cd Libraries/hipFFT
           make GPU_RUNTIME=CUDA -j
 
       - name: Build hipSPARSELt examples
-        shell: bash
         run: |
           cd Libraries/hipSPARSELt
           make GPU_RUNTIME=CUDA -j
 
       - name: Build rocRAND example
-        shell: bash
         run: |
           cd Libraries/rocRAND
           make GPU_RUNTIME=CUDA -j

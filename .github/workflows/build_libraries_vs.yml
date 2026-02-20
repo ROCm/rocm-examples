@@ -31,19 +31,19 @@ jobs:
             config: [Debug, Release]
             vsversion: [2017, 2019, 2022]
         runs-on: windows-latest
+        defaults:
+          run:
+            shell: pwsh
         steps:
           - uses: actions/checkout@v4
           - uses: microsoft/setup-msbuild@v2
           - name: Install Python dependencies
-            shell: pwsh
             run: |
                   python3 -m pip install rich
           - name: Check GUID
-            shell: pwsh
             run: |
                   python3 Scripts/VisualStudio/check_vs_files.py
           - name: Install HIP SDK
-            shell: pwsh
             run: |
                   $ProgressPreference = 'SilentlyContinue'
                   Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe"
@@ -61,14 +61,12 @@ jobs:
                       Exit 1
                   }
           - name: Apply patch
-            shell: pwsh
             run: |
                   Write-Host "Applying patches $(Get-ChildItem -File Scripts\VisualStudio\0002-Revert-Rename-hipblas-dll-for-HIP-SDK-7.1.patch)"
                   git apply (Get-ChildItem -File Scripts\VisualStudio\0002-Revert-Rename-hipblas-dll-for-HIP-SDK-7.1.patch).FullName
                   Write-Host "Patches applied. Showing diff"
                   git diff
           - name: Build ${{ matrix.config }} x64 ${{ matrix.vsversion }}
-            shell: pwsh
             run: |
                   Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang .\..' | Select-Object -First 1).Matches.Value) with HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}"
                   Get-ChildItem -Recurse -File | Where-Object { Select-String -Pattern 'HIP clang .\..' -Path $_ } | ForEach-Object {

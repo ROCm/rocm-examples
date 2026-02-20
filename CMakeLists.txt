@@ -31,6 +31,8 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
+option(ROCM_EXAMPLES_ENABLE_OPENMP "Enable OpenMP offloading targets" OFF)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_subdirectory(Applications)

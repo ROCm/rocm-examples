@@ -66,6 +66,9 @@ jobs:
   setup:
     name: "Setup CI"
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     outputs:
       gpu_configs: ${{ steps.config.outputs.gpu_configs }}
       install_methods: ${{ steps.config.outputs.install_methods }}
@@ -91,6 +94,9 @@ jobs:
         --device /dev/kfd
         --device /dev/dri
         --security-opt seccomp=unconfined
+    defaults:
+      run:
+        shell: bash
     strategy:
       fail-fast: false
       matrix:
@@ -102,7 +108,6 @@ jobs:
 
       - name: Install TheRock Python wheel
         if: ${{ matrix.install_method == 'wheel' }}
-        shell: bash
         run: |
           pip install --no-cache-dir --index-url https://rocm.nightlies.amd.com/v2/${{ matrix.gpu_config.therock_family }}/ \
             "rocm[libraries,devel]"
@@ -110,7 +115,6 @@ jobs:
       - name: Wheel sanity check
         if: ${{ matrix.install_method == 'wheel' }}
         id: sanity-check
-        shell: bash
         run: |
           ROCM_VERSION=$(rocm-sdk version)
           echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
@@ -120,7 +124,6 @@ jobs:
 
       - name: Setup environment variables (wheel)
         if: ${{ matrix.install_method == 'wheel' }}
-        shell: bash
         run: |
           ROCM_PATH=$(rocm-sdk path --root)
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
@@ -128,11 +131,12 @@ jobs:
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
           echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems" >> $GITHUB_ENV
+          echo "ENABLE_OPENMP=OFF" >> $GITHUB_ENV
 
       - name: Install TheRock tarball
         if: ${{ matrix.install_method == 'tarball' }}
         id: install-tarball
-        shell: bash
         run: |
           LATEST_TARBALL=$(curl -s https://rocm.nightlies.amd.com/tarball/ \
             | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" \
@@ -150,7 +154,6 @@ jobs:
 
       - name: Setup environment variables (tarball)
         if: ${{ matrix.install_method == 'tarball' }}
-        shell: bash
         run: |
           ROCM_PATH=/therock-tarball/install
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
@@ -158,15 +161,15 @@ jobs:
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
           echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems" >> $GITHUB_ENV
+          echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
 
       - name: CMake configure
-        shell: bash
         run: |
-          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="${ROCM_PATH}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -Wno-dev 2> >(tee cmake_error.log >&2)
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="${ROCM_PATH}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -Wno-dev 2> >(tee cmake_error.log >&2)
           
       - name: CMake configure error summary
         if: ${{ !cancelled() }}
-        shell: bash
         run: |
           if [ ! -f cmake_error.log ]; then
             exit 0
@@ -199,7 +202,6 @@ jobs:
           fi
 
       - name: CMake build
-        shell: bash
         run: |
           cmake --build build -j
 
@@ -211,13 +213,25 @@ jobs:
           path: build/
 
       - name: Run tests
-        shell: bash
         run: |
-          ctest --test-dir build --output-on-failure 2>&1 | tee ctest_output.log
+          python3 .github/build_tools/generate_skip_tests.py --target ${{ matrix.gpu_config.gpu_target }}
+
+          SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
+          if [ -s "${SKIP_FILE}" ]; then
+            echo "## Skipped tests" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "${SKIP_FILE}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No tests skipped." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          ctest --test-dir build --output-on-failure --exclude-from-file "${SKIP_FILE}" 2>&1 | tee ctest_output.log
 
       - name: Test summary
         if: ${{ !cancelled() }}
-        shell: bash
         run: |
           if [ ! -f ctest_output.log ]; then
             exit 0
@@ -236,6 +250,13 @@ jobs:
                     
           # Show failed tests if any
           if [ "${FAILED}" -gt 0 ]; then
+            echo "## Failed tests" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat build/Testing/Temporary/LastTestsFailed.log >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
             echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY

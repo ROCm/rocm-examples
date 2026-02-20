@@ -28,6 +28,9 @@ jobs:
   cmake-formatting:
     name: CMake File Formatting
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
@@ -47,6 +50,9 @@ jobs:
   make-formatting:
     name: Makefile Formatting
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - name: Check indentation
@@ -56,6 +62,9 @@ jobs:
   source-formatting:
     name: Source Code Formatting
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
     steps:
       - uses: actions/checkout@v4
       - name: Install dependencies
