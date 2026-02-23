@@ -49,9 +49,9 @@ def main():
     if distro_input:
         if distro_input not in DISTRO_IMAGE_MAP:
             raise ValueError(f"Invalid Linux distribution: {distro_input}. Allowed: {list(DISTRO_IMAGE_MAP.keys())}")
+        distros = [DISTRO_IMAGE_MAP[distro_input]]
     else:
-        distro_input = list(DISTRO_IMAGE_MAP.keys())[0]
-    distro_image = DISTRO_IMAGE_MAP[distro_input]
+        distros = list(DISTRO_IMAGE_MAP.values())
 
     gpu_configs = []
     for target in gpu_targets:
@@ -66,11 +66,11 @@ def main():
         with open(github_output, "a") as f:
             f.write(f"gpu_configs={json.dumps(gpu_configs)}\n")
             f.write(f"install_methods={json.dumps(install_methods)}\n")
-            f.write(f"distro={distro_image}\n")
+            f.write(f"distros={json.dumps(distros)}\n")
 
     print(f"gpu_configs={json.dumps(gpu_configs)}")
     print(f"install_methods={json.dumps(install_methods)}")
-    print(f"distro={distro_image}")
+    print(f"distros={json.dumps(distros)}")
     
 if __name__ == "__main__":
     main()  
