@@ -1,0 +1,355 @@
+// MIT License
+//
+// Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+#include "example_utils.hpp"
+#include "hipblaslt_utils.hpp"
+
+void calculate_k_for_swizzling(hipDataType datatype, size_t& mik, size_t& mikv, size_t& pack_k)
+{
+    switch(datatype)
+    {
+        case HIP_R_32F:
+            mik  = 4;
+            mikv = 1;
+            break;
+        case HIP_R_16F:
+        case HIP_R_16BF:
+            mik  = 16;
+            mikv = 4;
+            break;
+        case HIP_R_8F_E4M3_FNUZ:
+        case HIP_R_8F_E5M2_FNUZ:
+            mik  = 32;
+            mikv = 8;
+            break;
+        default: std::cerr << "unsupported datatype in calculate_k_for_swizzling" << '\n';
+    }
+
+    pack_k = 16 / mikv / real_datatype_size(datatype);
+}
+
+template<typename T>
+void swizzle_tensor(T* dst, const T* src, size_t n, size_t k, bool col_maj)
+{
+    using namespace tensor_manipulation;
+    size_t min = 16;
+    size_t mik = 0, mikv = 0, pack_k = 0;
+    calculate_k_for_swizzling(hipblaslt_type_to_datatype<T>(), mik, mikv, pack_k);
+    auto tmp_tensor = tensor::create<T>({n, k});
+    std::copy(src, src + n * k, tmp_tensor.template as<T>());
+
+    if(col_maj)
+    {
+        auto org_tensor = tensor::create<T>({k, n});
+        std::copy(src, src + n * k, org_tensor.template as<T>());
+        tmp_tensor = permute_tensor<T>(org_tensor, {1, 0});
+    }
+
+    tmp_tensor.reshape({n / min, min, k / (mik * pack_k), mik / mikv, mikv * pack_k});
+    tensor permuted = permute_tensor<T>(tmp_tensor, {0, 2, 3, 1, 4});
+    std::copy(permuted.template as<T>(), permuted.template as<T>() + n * k, dst);
+}
+
+void gemm(hipblasLtHandle_t  handle,
+          hipblasOperation_t trans_a,
+          hipblasOperation_t trans_b,
+          int64_t            m,
+          int64_t            n,
+          int64_t            k,
+          int64_t            batch_count,
+          float&             alpha,
+          float&             beta,
+          void*              d_a,
+          void*              d_b,
+          void*              d_c,
+          void*              d_d,
+          void*              d_workspace,
+          int64_t            max_workspace_size,
+          hipDataType        TiAB,
+          bool               swizzle_b,
+          hipStream_t        stream);
+
+int main()
+{
+    constexpr int64_t m{1280};
+    constexpr int64_t n{1024};
+    constexpr int64_t k{512};
+
+    // Non-swizzle runner: TN, batch count = 1, alpha, beta = 1.0f
+    runner<hipblasLtHalf, hipblasLtHalf, hipblasLtHalf, float, float>
+        runner_inst(m, n, k, 1, 1.f, 1.f, 32 * 128 * 128);
+
+    runner_inst.run(
+        [&runner_inst]
+        {
+            gemm(runner_inst.handle,
+                 HIPBLAS_OP_T,
+                 HIPBLAS_OP_N,
+                 runner_inst.m,
+                 runner_inst.n,
+                 runner_inst.k,
+                 runner_inst.batch_count,
+                 runner_inst.alpha,
+                 runner_inst.beta,
+                 runner_inst.d_a,
+                 runner_inst.d_b,
+                 runner_inst.d_c,
+                 runner_inst.d_d,
+                 runner_inst.d_workspace,
+                 runner_inst.max_workspace_size,
+                 HIP_R_16F,
+                 false,
+                 runner_inst.stream);
+        });
+
+    // swizzleB runner: TN, batch count = 1, alpha, beta = 1.0f
+    runner<hipblasLtHalf, hipblasLtHalf, hipblasLtHalf, float, float>
+        swizzle_runner_inst(m, n, k, 1, 1.f, 1.f, 32 * 128 * 128);
+
+    swizzle_runner_inst.run(
+        [&swizzle_runner_inst, &runner_inst, m, n, k]
+        {
+            // copy inputs from first runner for comparison and validation
+            HIP_CHECK(hipMemcpy(swizzle_runner_inst.d_a,
+                                runner_inst.d_a,
+                                m * k * sizeof(hipblasLtHalf),
+                                hipMemcpyDeviceToDevice));
+            HIP_CHECK(hipMemcpy(swizzle_runner_inst.d_b,
+                                runner_inst.d_b,
+                                n * k * sizeof(hipblasLtHalf),
+                                hipMemcpyDeviceToDevice));
+            HIP_CHECK(hipMemcpy(swizzle_runner_inst.d_c,
+                                runner_inst.d_c,
+                                m * n * sizeof(hipblasLtHalf),
+                                hipMemcpyDeviceToDevice));
+
+            /** This is an example with swizzle-B
+         *  a = (k, m). lda = k
+         *  b = (k, n). ldb = k
+         *  c = d = (m, n). ldc = ldd = m
+         */
+            gemm(swizzle_runner_inst.handle,
+                 HIPBLAS_OP_T,
+                 HIPBLAS_OP_N,
+                 swizzle_runner_inst.m,
+                 swizzle_runner_inst.n,
+                 swizzle_runner_inst.k,
+                 swizzle_runner_inst.batch_count,
+                 swizzle_runner_inst.alpha,
+                 swizzle_runner_inst.beta,
+                 swizzle_runner_inst.d_a,
+                 swizzle_runner_inst.d_b,
+                 swizzle_runner_inst.d_c,
+                 swizzle_runner_inst.d_d,
+                 swizzle_runner_inst.d_workspace,
+                 swizzle_runner_inst.max_workspace_size,
+                 HIP_R_16F,
+                 true,
+                 swizzle_runner_inst.stream);
+        });
+
+    // Compare results from non-swizzling with swizzling
+    const hipblasLtHalf* regular_cpu_d  = static_cast<hipblasLtHalf*>(runner_inst.d);
+    const hipblasLtHalf* swizzled_cpu_d = static_cast<hipblasLtHalf*>(swizzle_runner_inst.d);
+
+    for(size_t i = 0; i < m * n; ++i)
+    {
+        const auto diff = std::abs(float(regular_cpu_d[i] - float(swizzled_cpu_d[i])));
+        if(diff > 1e-5)
+        {
+            std::cerr << "Swizzle Validation Error at index: " << i << ", diff: " << diff << '\n';
+            break;
+        }
+    }
+
+    std::cout << "Matrix multiplication and validation completed successfully." << std::endl;
+
+    return 0;
+}
+
+void gemm(hipblasLtHandle_t  handle,
+          hipblasOperation_t trans_a,
+          hipblasOperation_t trans_b,
+          int64_t            m,
+          int64_t            n,
+          int64_t            k,
+          int64_t            batch_count,
+          float&             alpha,
+          float&             beta,
+          void*              d_a,
+          void*              d_b,
+          void*              d_c,
+          void*              d_d,
+          void*              d_workspace,
+          int64_t            max_workspace_size,
+          hipDataType        TiAB,
+          bool               swizzle_b,
+          hipStream_t        stream)
+{
+    hipblasLtMatrixLayout_t mat_a, mat_b, mat_c, mat_d;
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutCreate(&mat_a, TiAB, k, m, k));
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutCreate(&mat_b, TiAB, k, n, k));
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutCreate(&mat_c, HIP_R_16F, m, n, m));
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutCreate(&mat_d, HIP_R_16F, m, n, m));
+
+    // swizzle case and input = FP16
+    if(swizzle_b && TiAB == HIP_R_16F)
+    {
+        hipblasLtOrder_t order_b = HIPBLASLT_ORDER_COL16_4R8;
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutSetAttribute(mat_b,
+                                                          HIPBLASLT_MATRIX_LAYOUT_ORDER,
+                                                          &order_b,
+                                                          sizeof(order_b)));
+        std::vector<hipblasLtHalf> src(n * k, 0);
+        std::vector<hipblasLtHalf> dst(n * k, 0);
+
+        // pre-shuffle input data in host memory
+        HIP_CHECK(hipMemcpy(src.data(), d_b, n * k * sizeof(hipblasLtHalf), hipMemcpyDeviceToHost));
+        swizzle_tensor(dst.data(), src.data(), n, k, false);
+        HIP_CHECK(hipMemcpy(d_b, dst.data(), n * k * sizeof(hipblasLtHalf), hipMemcpyHostToDevice));
+    }
+
+    if(batch_count > 1)
+    {
+        int64_t stride_a = m * k;
+        int64_t stride_b = k * n;
+        int64_t stride_c = m * n;
+        int64_t stride_d = m * n;
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutSetAttribute(mat_a,
+                                                          HIPBLASLT_MATRIX_LAYOUT_BATCH_COUNT,
+                                                          &batch_count,
+                                                          sizeof(batch_count)));
+        HIPBLASLT_CHECK(
+            hipblasLtMatrixLayoutSetAttribute(mat_a,
+                                              HIPBLASLT_MATRIX_LAYOUT_STRIDED_BATCH_OFFSET,
+                                              &stride_a,
+                                              sizeof(stride_a)));
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutSetAttribute(mat_b,
+                                                          HIPBLASLT_MATRIX_LAYOUT_BATCH_COUNT,
+                                                          &batch_count,
+                                                          sizeof(batch_count)));
+        HIPBLASLT_CHECK(
+            hipblasLtMatrixLayoutSetAttribute(mat_b,
+                                              HIPBLASLT_MATRIX_LAYOUT_STRIDED_BATCH_OFFSET,
+                                              &stride_b,
+                                              sizeof(stride_b)));
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutSetAttribute(mat_c,
+                                                          HIPBLASLT_MATRIX_LAYOUT_BATCH_COUNT,
+                                                          &batch_count,
+                                                          sizeof(batch_count)));
+        HIPBLASLT_CHECK(
+            hipblasLtMatrixLayoutSetAttribute(mat_c,
+                                              HIPBLASLT_MATRIX_LAYOUT_STRIDED_BATCH_OFFSET,
+                                              &stride_c,
+                                              sizeof(stride_c)));
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutSetAttribute(mat_d,
+                                                          HIPBLASLT_MATRIX_LAYOUT_BATCH_COUNT,
+                                                          &batch_count,
+                                                          sizeof(batch_count)));
+        HIPBLASLT_CHECK(
+            hipblasLtMatrixLayoutSetAttribute(mat_d,
+                                              HIPBLASLT_MATRIX_LAYOUT_STRIDED_BATCH_OFFSET,
+                                              &stride_d,
+                                              sizeof(stride_d)));
+    }
+
+    hipblasLtMatmulDesc_t matmul;
+    HIPBLASLT_CHECK(hipblasLtMatmulDescCreate(&matmul, HIPBLAS_COMPUTE_32F, HIP_R_32F));
+    HIPBLASLT_CHECK(hipblasLtMatmulDescSetAttribute(matmul,
+                                                    HIPBLASLT_MATMUL_DESC_TRANSA,
+                                                    &trans_a,
+                                                    sizeof(int32_t)));
+    HIPBLASLT_CHECK(hipblasLtMatmulDescSetAttribute(matmul,
+                                                    HIPBLASLT_MATMUL_DESC_TRANSB,
+                                                    &trans_b,
+                                                    sizeof(int32_t)));
+
+    hipblasLtEpilogue_t epilogue = HIPBLASLT_EPILOGUE_DEFAULT;
+    HIPBLASLT_CHECK(hipblasLtMatmulDescSetAttribute(matmul,
+                                                    HIPBLASLT_MATMUL_DESC_EPILOGUE,
+                                                    &epilogue,
+                                                    sizeof(epilogue)));
+
+    // Set User Preference attributes
+    hipblasLtMatmulPreference_t pref;
+    HIPBLASLT_CHECK(hipblasLtMatmulPreferenceCreate(&pref));
+    HIPBLASLT_CHECK(hipblasLtMatmulPreferenceSetAttribute(pref,
+                                                          HIPBLASLT_MATMUL_PREF_MAX_WORKSPACE_BYTES,
+                                                          &max_workspace_size,
+                                                          sizeof(max_workspace_size)));
+
+    const int                        request_solutions = 1;
+    hipblasLtMatmulHeuristicResult_t heuristic_result[request_solutions];
+    int                              returned_algo_count = 0;
+    HIPBLASLT_CHECK(hipblasLtMatmulAlgoGetHeuristic(handle,
+                                                    matmul,
+                                                    mat_a,
+                                                    mat_b,
+                                                    mat_c,
+                                                    mat_d,
+                                                    pref,
+                                                    request_solutions,
+                                                    heuristic_result,
+                                                    &returned_algo_count));
+
+    if(returned_algo_count == 0)
+    {
+        std::cerr << "No valid solution found!" << std::endl;
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_a));
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_b));
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_c));
+        HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_d));
+        HIPBLASLT_CHECK(hipblasLtMatmulDescDestroy(matmul));
+        HIPBLASLT_CHECK(hipblasLtMatmulPreferenceDestroy(pref));
+        return;
+    }
+
+    uint64_t workspace_size = 0;
+    for(int i = 0; i < returned_algo_count; i++)
+        workspace_size = std::max(workspace_size, heuristic_result[i].workspaceSize);
+
+    HIPBLASLT_CHECK(hipblasLtMatmul(handle,
+                                    matmul,
+                                    &alpha,
+                                    d_a,
+                                    mat_a,
+                                    d_b,
+                                    mat_b,
+                                    &beta,
+                                    d_c,
+                                    mat_c,
+                                    d_d,
+                                    mat_d,
+                                    &heuristic_result[0].algo,
+                                    d_workspace,
+                                    workspace_size,
+                                    stream));
+
+    // Clean up resources
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_a));
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_b));
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_c));
+    HIPBLASLT_CHECK(hipblasLtMatrixLayoutDestroy(mat_d));
+    HIPBLASLT_CHECK(hipblasLtMatmulDescDestroy(matmul));
+    HIPBLASLT_CHECK(hipblasLtMatmulPreferenceDestroy(pref));
+    return;
+}
