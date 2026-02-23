@@ -12,6 +12,12 @@ GPU_CONFIG_MAP = {
     # "gfx942": "gfx94X-dcgpu",
 }
 
+# Linux distribution to base image mapping
+DISTRO_IMAGE_MAP = {
+    "ubuntu-22.04": "ghcr.io/rocm/rocm-examples-ubuntu-22.04:latest",
+    "sles-15.7": "ghcr.io/rocm/rocm-examples-sles-15.7:latest",
+}
+
 # Default configurations for automated runs (push/PR)
 INSTALL_METHODS = ["wheel", "tarball"]
 
@@ -19,6 +25,8 @@ def main():
     # Read inputs from environment (set by workflow)
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
+    distro_input = os.getenv("DISTRO", "")
+
 
     # Determine GPU configurations
     if gpu_input:
@@ -38,7 +46,13 @@ def main():
         # Automated run: use all allowed methods
         install_methods = INSTALL_METHODS
 
-    # Build gpu_config array with both gpu_target and therock_family
+    if distro_input:
+        if distro_input not in DISTRO_IMAGE_MAP:
+            raise ValueError(f"Invalid Linux distribution: {distro_input}. Allowed: {list(DISTRO_IMAGE_MAP.keys())}")
+    else:
+        distro_input = list(DISTRO_IMAGE_MAP.keys())[0]
+    distro_image = DISTRO_IMAGE_MAP[distro_input]
+
     gpu_configs = []
     for target in gpu_targets:
         family = GPU_CONFIG_MAP.get(target, "gfx110X-all")
@@ -47,15 +61,16 @@ def main():
             "therock_family": family
         })
 
-    # Write outputs to $GITHUB_OUTPUT
     github_output = os.getenv("GITHUB_OUTPUT")
     if github_output:
         with open(github_output, "a") as f:
             f.write(f"gpu_configs={json.dumps(gpu_configs)}\n")
             f.write(f"install_methods={json.dumps(install_methods)}\n")
+            f.write(f"distro={distro_image}\n")
 
     print(f"gpu_configs={json.dumps(gpu_configs)}")
     print(f"install_methods={json.dumps(install_methods)}")
-
+    print(f"distro={distro_image}")
+    
 if __name__ == "__main__":
     main()  

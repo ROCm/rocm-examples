@@ -1,73 +1,34 @@
-name: Nightly CI
+name: Build ROCm Examples
 
 on:
-  schedule:
-    # Run nightly at 2 AM UTC
-    - cron: '0 2 * * *'
-  pull_request:
-    branches: [ amd-staging, amd-mainline, release/** ]
-    paths:
-      - '.github/workflows/**'
-  workflow_dispatch:
+  workflow_call:
     inputs:
-      gpu_config:
-        description: "GPU configuration"
+      gpu_configs:
+        description: "JSON array of gpu_config objects (from configure_ci.py)"
         required: true
-        default: gfx1100
-        type: choice
-        options: 
-        - gfx1100
-        - gfx1151
-        - gfx1201
-        - gfx90a
-        - gfx942
-      install_method:
-        description: "Installation method"
+        type: string
+      install_methods:
+        description: "JSON array of install methods (from configure_ci.py)"
         required: true
-        default: wheel
-        type: choice
-        options: 
-        - wheel
-        - tarball
+        type: string
+      distro:
+        description: "Container image URL (from configure_ci.py)"
+        required: true
+        type: string
 
 permissions:
   contents: read
   packages: read
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
-  cancel-in-progress: true
-
 env:
   DEBIAN_FRONTEND: noninteractive
 
 jobs:
-  setup:
-    name: "Setup CI"
-    runs-on: ubuntu-latest
-    defaults:
-      run:
-        shell: bash
-    outputs:
-      gpu_configs: ${{ steps.config.outputs.gpu_configs }}
-      install_methods: ${{ steps.config.outputs.install_methods }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Configure CI
-        id: config
-        env:
-          GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
-          INSTALL_METHOD: ${{ github.event.inputs.install_method }}
-        run: python3 .github/build_tools/configure_ci.py
-
   build:
-    name: "SLES 15.7 - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
-    needs: [setup]
+    name: "TheRock - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: ghcr.io/rocm/rocm-examples-sles-15.7:latest
+      image: ${{ inputs.distro }}
       options:
         --group-add video
         --device /dev/kfd
@@ -79,8 +40,8 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        install_method: ${{ fromJson(needs.setup.outputs.install_methods) }}
-        gpu_config: ${{ fromJson(needs.setup.outputs.gpu_configs) }}
+        install_method: ${{ fromJson(inputs.install_methods) }}
+        gpu_config: ${{ fromJson(inputs.gpu_configs) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -100,7 +61,6 @@ jobs:
           echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
           rocm-sdk init
           rocm-sdk test
-        continue-on-error: true
 
       - name: Setup environment variables (wheel)
         if: ${{ matrix.install_method == 'wheel' }}
@@ -118,7 +78,7 @@ jobs:
         if: ${{ matrix.install_method == 'tarball' }}
         id: install-tarball
         run: |
-          LATEST_TARBALL=$(curl -s "https://rocm.nightlies.amd.com/tarball/" \
+          LATEST_TARBALL=$(curl -s https://rocm.nightlies.amd.com/tarball/ \
             | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" \
             | sort -V \
             | tail -1)
@@ -146,8 +106,8 @@ jobs:
 
       - name: CMake configure
         run: |
-          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="$ROCM_PATH" -DCMAKE_BUILD_RPATH="$ROCM_PATH/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -Wno-dev 2> >(tee cmake_error.log >&2)
-
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="${ROCM_PATH}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -Wno-dev 2> >(tee cmake_error.log >&2)
+          
       - name: CMake configure error summary
         if: ${{ !cancelled() }}
         run: |
@@ -157,17 +117,17 @@ jobs:
 
           echo "## CMake Configure" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-
+          
           # Count warnings and errors
           WARNINGS=$(grep -ci "warning" cmake_error.log || true)
           ERRORS=$(grep -ci "error" cmake_error.log || true)
-
+          
           echo "| Status | Count |" >> $GITHUB_STEP_SUMMARY
           echo "|--------|-------|" >> $GITHUB_STEP_SUMMARY
           echo "| Warnings | ${WARNINGS} |" >> $GITHUB_STEP_SUMMARY
           echo "| Errors | ${ERRORS} |" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-
+          
           # Show details if there are warnings/errors
           if [ -s cmake_error.log ]; then
             echo "<details><summary>CMake error log</summary>" >> $GITHUB_STEP_SUMMARY
@@ -220,14 +180,14 @@ jobs:
           # Generate summary
           echo "## Test summary" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-
+          
           # Parse test result
           SUMMARY=$(grep "tests passed" ctest_output.log)
-          echo "**$SUMMARY**" >> $GITHUB_STEP_SUMMARY
-
+          echo "**${SUMMARY}**" >> $GITHUB_STEP_SUMMARY
+          
           # Count passed/failed
           FAILED=$(grep -c "Failed" ctest_output.log || true)
-
+                    
           # Show failed tests if any
           if [ "${FAILED}" -gt 0 ]; then
             echo "## Failed tests" >> $GITHUB_STEP_SUMMARY
@@ -241,7 +201,7 @@ jobs:
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             # Extract failed test output
-            awk '/^[[:space:]]*Start[[:space:]]+[0-9]+:/ {found=0; next} /\*\*\*/ && !/Passed/ {found=1} found' ctest_output.log >> $GITHUB_STEP_SUMMARY
+            awk '/^[[:space:]]*Start[[:space:]]+[0-9]+:/ {found=0; next} /\*\*\*/ && !/Passed/ {found=1} found' ctest_output.log >> $GITHUB_STEP_SUMMARY            
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
