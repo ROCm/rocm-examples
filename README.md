@@ -598,6 +598,7 @@ The following options are available when building with CMake.
     - [hiprtc_gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/hiprtc_gemm/) : Showcases a simple matrix-matrix multiplication via hipRTC.
     - [perf_dgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/perf_dgemm/) : Showcases a performant double-precision matrix-matrix multiplication.
     - [perf_hgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/perf_hgemm/) : Showcases a performant half-precision matrix-matrix multiplication.
+    - [perf_i8gemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/perf_i8gemm/) : Showcases a performant integer 8-bit matrix-matrix multiplication.
     - [perf_sgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/perf_sgemm/) : Showcases a performant single-precision matrix-matrix multiplication.
     - [simple_dgemm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_dgemm/) : Showcases a simple double-precision matrix-matrix multiplication.
     - [simple_dgemv](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocWMMA/simple_dgemv/) : Showcases a simple double-precision matrix-vector multiplication.

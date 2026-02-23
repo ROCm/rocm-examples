@@ -24,6 +24,7 @@ EXAMPLES := \
   hiprtc_gemm \
   perf_dgemm \
   perf_hgemm \
+  perf_i8gemm \
   perf_sgemm \
   simple_dgemm \
   simple_dgemv \

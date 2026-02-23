@@ -20,16 +20,25 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(rocWMMA_examples LANGUAGES CXX)
+set(example_name rocwmma_perf_i8gemm)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX HIP)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FilterHIPArchitectures.cmake")
+filter_hip_architectures("rocWMMA perf_i8gemm example" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201" SHOULD_SKIP)
+if(SHOULD_SKIP)
+    return()
+endif()
 
 if(GPU_RUNTIME STREQUAL "CUDA")
     message(STATUS "rocWMMA examples do not support the CUDA runtime")
     return()
 endif()
+
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -44,38 +53,30 @@ else()
         "Root directory of the ROCm installation"
     )
 endif()
-
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-find_package(hip)
+find_package(hip REQUIRED)
 # Try to find rocWMMA as a package first
 find_package(rocwmma QUIET)
 
-# Remove OpenMP dependency from rocwmma on Windows
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    if(TARGET roc::rocwmma)
-        get_target_property(ROCWMMA_LINK_LIBS roc::rocwmma INTERFACE_LINK_LIBRARIES)
-        if(ROCWMMA_LINK_LIBS)
-            list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
-            set_target_properties(roc::rocwmma PROPERTIES
-                INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
-            )
-        endif()
-    elseif(TARGET rocwmma)
-        get_target_property(ROCWMMA_LINK_LIBS rocwmma INTERFACE_LINK_LIBRARIES)
-        if(ROCWMMA_LINK_LIBS)
-            list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
-            set_target_properties(rocwmma PROPERTIES
-                INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
-            )
-        endif()
-    endif()
-endif()
-
+# Remove unnecessary OpenMP dependency from rocwmma
 if(TARGET roc::rocwmma)
+    get_target_property(ROCWMMA_LINK_LIBS roc::rocwmma INTERFACE_LINK_LIBRARIES)
+    if(ROCWMMA_LINK_LIBS)
+        list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+        set_target_properties(roc::rocwmma PROPERTIES
+            INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
+        )
+    endif()
     set(ROCWMMA_TARGET roc::rocwmma)
 elseif(TARGET rocwmma)
-    # Fallback for legacy naming
+    get_target_property(ROCWMMA_LINK_LIBS rocwmma INTERFACE_LINK_LIBRARIES)
+    if(ROCWMMA_LINK_LIBS)
+        list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+        set_target_properties(rocwmma PROPERTIES
+            INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
+        )
+    endif()
     set(ROCWMMA_TARGET rocwmma)
 endif()
 
@@ -88,8 +89,7 @@ if(NOT ROCWMMA_TARGET AND NOT rocwmma_FOUND)
     )
 
     if(NOT ROCWMMA_INCLUDE_DIR)
-        message(WARNING "rocWMMA headers not found. Not building rocWMMA examples. Please install rocWMMA or set ROCWMMA_INCLUDE_DIR")
-        return()
+        message(FATAL_ERROR "rocWMMA headers not found. Please install rocWMMA or set ROCWMMA_INCLUDE_DIR")
     endif()
 
     # Create imported target for header-only library
@@ -98,14 +98,16 @@ if(NOT ROCWMMA_TARGET AND NOT rocwmma_FOUND)
     set(ROCWMMA_TARGET rocwmma)
 endif()
 
-add_subdirectory(hiprtc_gemm)
-add_subdirectory(perf_dgemm)
-add_subdirectory(perf_hgemm)
-add_subdirectory(perf_i8gemm)
-add_subdirectory(perf_sgemm)
-add_subdirectory(simple_dgemm)
-add_subdirectory(simple_dgemv)
-add_subdirectory(simple_dlrm)
-add_subdirectory(simple_hgemm)
-add_subdirectory(simple_sgemm)
-add_subdirectory(simple_sgemv)
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+# Link to example library
+target_link_libraries(${example_name} PRIVATE ${ROCWMMA_TARGET})
+
+target_include_directories(
+    ${example_name}
+    PRIVATE "../../../Common" "../../../External"
+)
+
+install(TARGETS ${example_name})
