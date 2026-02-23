@@ -30,6 +30,7 @@ on:
       - 'Makefile'
       - '.github/workflows/**'
   schedule:
+      # Run nightly at 2 AM UTC
     - cron: '0 2 * * *'
   workflow_dispatch:
     inputs:
@@ -63,7 +64,6 @@ on:
 
 permissions:
   contents: read
-  packages: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -271,7 +271,9 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
-
+          
+        # Clean the workspace here since other jobs may not have the permissions to do so later
+        # (needed for self-hosted runners)
       - name: Clean the workspace
         if: always()
         run: find "$GITHUB_WORKSPACE" -mindepth 1 -delete
