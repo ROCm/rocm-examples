@@ -49,9 +49,10 @@ def main():
     if distro_input:
         if distro_input not in DISTRO_IMAGE_MAP:
             raise ValueError(f"Invalid Linux distribution: {distro_input}. Allowed: {list(DISTRO_IMAGE_MAP.keys())}")
-        distros = [DISTRO_IMAGE_MAP[distro_input]]
+        distro_keys = [distro_input]
     else:
-        distros = list(DISTRO_IMAGE_MAP.values())
+        distro_keys = list(DISTRO_IMAGE_MAP.keys())
+    distros = [{"name": k, "image": DISTRO_IMAGE_MAP[k]} for k in distro_keys]
 
     gpu_configs = []
     for target in gpu_targets:

@@ -96,11 +96,11 @@ jobs:
         run: python3 .github/build_tools/configure_ci.py
 
   build:
-    name: "TheRock - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }} - ${{ matrix.distro }}"
+    name: "TheRock - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }} - ${{ matrix.distro.name }}"
     needs: [setup]
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: ${{ matrix.distro }}
+      image: ${{ matrix.distro.image }}
       options:
         --group-add video
         --device /dev/kfd
@@ -220,7 +220,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}-${{ matrix.distro }}
+          name: rocm-examples-build-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}-${{ matrix.distro.name }}
           path: build/
 
       - name: Run tests
