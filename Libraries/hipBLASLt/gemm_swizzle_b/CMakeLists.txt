@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name hipblaslt_gemm_swizzle_a_scale_a_b_vector)
+set(example_name hipblaslt_gemm_swizzle_b)
 
 cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)

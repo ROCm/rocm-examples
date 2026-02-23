@@ -52,7 +52,7 @@ EXAMPLES := \
   gemm_mix_precision_with_amax_ext \
   gemm_swish_bias \
   gemm_swizzle_a \
-  gemm_swizzle_a_scale_a_b_vector \
+  gemm_swizzle_b \
   gemm_tuning_splitk_ext \
   gemm_tuning_wgm_ext \
   gemm_with_scale_a_b \
