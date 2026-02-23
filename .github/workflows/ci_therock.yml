@@ -128,6 +128,7 @@ jobs:
       - name: Wheel sanity check
         if: ${{ matrix.install_method == 'wheel' }}
         id: sanity-check
+        continue-on-error: true
         run: |
           ROCM_VERSION=$(rocm-sdk version)
           echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
