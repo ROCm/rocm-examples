@@ -31,6 +31,9 @@ jobs:
     build:
         name: "Build Libraries Examples"
         runs-on: self-hosted
+        defaults:
+          run:
+            shell: bash
         container:
             image: ghcr.io/rocm/rocm-examples-hip-libraries-rocm-ubuntu
         steps:
