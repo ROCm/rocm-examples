@@ -26,7 +26,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX HIP)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FilterHIPArchitectures.cmake")
-filter_hip_architectures("rocWMMA simple_hgemm example" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1200;gfx1201" SHOULD_SKIP)
+filter_hip_architectures("rocWMMA simple_hgemm example" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
 endif()
