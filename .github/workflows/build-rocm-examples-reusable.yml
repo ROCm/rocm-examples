@@ -4,7 +4,11 @@ on:
   workflow_call:
     inputs:
       distro:
-        description: 'JSON object with keys: key, image, label'
+        description: "Distro key (e.g. ubuntu-22.04)"
+        required: true
+        type: string
+      distro_map:
+        description: "JSON map of distro key to {image, label}"
         required: true
         type: string
       gpu_configs:
@@ -21,10 +25,10 @@ env:
 
 jobs:
   build:
-    name: "${{ fromJson(inputs.distro).label }} - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
+    name: "${{ fromJson(inputs.distro_map)[inputs.distro].label }} - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: ${{ fromJson(inputs.distro).image }}
+      image: ${{ fromJson(inputs.distro_map)[inputs.distro].image }}
       options:
         --group-add video
         --device /dev/kfd
@@ -144,12 +148,12 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ fromJson(inputs.distro).key }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Run tests
         run: |
-          python3 .github/build_tools/generate_skip_tests.py --target ${{ matrix.gpu_config.gpu_target }} --distro ${{ fromJson(inputs.distro).key }}
+          python3 .github/build_tools/generate_skip_tests.py --target ${{ matrix.gpu_config.gpu_target }} --distro ${{ inputs.distro }}
 
           SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
           if [ -s "${SKIP_FILE}" ]; then

@@ -34,9 +34,10 @@ on:
       gpu_config:
         description: "GPU configuration"
         required: true
-        default: gfx1100
+        default: all
         type: choice
-        options: 
+        options:
+        - all
         - gfx1100
         - gfx1151
         - gfx1201
@@ -45,13 +46,14 @@ on:
       install_method:
         description: "Installation method"
         required: true
-        default: wheel
+        default: all
         type: choice
-        options: 
+        options:
+        - all
         - wheel
         - tarball
       distro:
-        description: "Distro to build (all = every distro)"
+        description: "Distro to build"
         required: true
         default: all
         type: choice
@@ -79,6 +81,7 @@ jobs:
       gpu_configs: ${{ steps.config.outputs.gpu_configs }}
       install_methods: ${{ steps.config.outputs.install_methods }}
       distros: ${{ steps.config.outputs.distros }}
+      distro_map: ${{ steps.config.outputs.distro_map }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -99,7 +102,8 @@ jobs:
         distro: ${{ fromJson(needs.setup.outputs.distros) }}
     uses: ./.github/workflows/build-rocm-examples-reusable.yml
     with:
-      distro: ${{ toJson(matrix.distro) }}
+      distro: ${{ matrix.distro }}
+      distro_map: ${{ needs.setup.outputs.distro_map }}
       gpu_configs: ${{ needs.setup.outputs.gpu_configs }}
       install_methods: ${{ needs.setup.outputs.install_methods }}
     secrets: inherit
