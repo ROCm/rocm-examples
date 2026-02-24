@@ -89,9 +89,9 @@ jobs:
       - name: Configure CI
         id: config
         env:
-          GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
-          INSTALL_METHOD: ${{ github.event.inputs.install_method }}
-          DISTRO: ${{ github.event.inputs.distro }}
+          GPU_CONFIG: ${{ github.event.inputs.gpu_config || 'all' }}
+          INSTALL_METHOD: ${{ github.event.inputs.install_method || 'all' }}
+          DISTRO: ${{ github.event.inputs.distro || 'ubuntu-22.04' }}
         run: python3 .github/build_tools/configure_ci.py
 
   build:
