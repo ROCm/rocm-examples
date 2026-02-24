@@ -15,16 +15,18 @@ GPU_CONFIG_MAP = {
 # Default configurations for automated runs (push/PR)
 INSTALL_METHODS = ["wheel", "tarball"]
 
-# Distros to build against. Add new entries here to enable more distros.
-DISTROS = [
-    {"key": "ubuntu-22.04", "image": "ghcr.io/rocm/rocm-examples-ubuntu-22.04:latest", "label": "Ubuntu 22.04"},
-    {"key": "sles-15.7", "image": "ghcr.io/rocm/rocm-examples-sles-15.7:latest", "label": "SLES 15.7"},
-]
+# Distros to build against – keyed by short name.
+# Add new entries here to enable more distros (also add to workflow_dispatch options).
+DISTRO_MAP = {
+    "ubuntu-22.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-22.04:latest", "label": "Ubuntu 22.04"},
+    "sles-15.7":    {"image": "ghcr.io/rocm/rocm-examples-sles-15.7:latest",    "label": "SLES 15.7"},
+}
 
 def main():
     # Read inputs from environment (set by workflow)
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
+    distro_input = os.getenv("DISTRO", "")
 
     # Determine GPU configurations
     if gpu_input:
@@ -44,6 +46,16 @@ def main():
         # Automated run: use all allowed methods
         install_methods = INSTALL_METHODS
 
+    # Determine distros
+    if distro_input and distro_input != "all":
+        if distro_input not in DISTRO_MAP:
+            raise ValueError(f"Invalid distro: {distro_input}. Allowed: {list(DISTRO_MAP.keys())}")
+        distro_keys = [distro_input]
+    else:
+        distro_keys = list(DISTRO_MAP.keys())
+
+    distros = [{"key": k, **DISTRO_MAP[k]} for k in distro_keys]
+
     # Build gpu_config array with both gpu_target and therock_family
     gpu_configs = []
     for target in gpu_targets:
@@ -59,11 +71,11 @@ def main():
         with open(github_output, "a") as f:
             f.write(f"gpu_configs={json.dumps(gpu_configs)}\n")
             f.write(f"install_methods={json.dumps(install_methods)}\n")
-            f.write(f"distros={json.dumps(DISTROS)}\n")
+            f.write(f"distros={json.dumps(distros)}\n")
 
     print(f"gpu_configs={json.dumps(gpu_configs)}")
     print(f"install_methods={json.dumps(install_methods)}")
-    print(f"distros={json.dumps(DISTROS)}")
+    print(f"distros={json.dumps(distros)}")
 
 if __name__ == "__main__":
     main()  

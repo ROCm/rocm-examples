@@ -50,6 +50,15 @@ on:
         options: 
         - wheel
         - tarball
+      distro:
+        description: "Distro to build (all = every distro)"
+        required: true
+        default: all
+        type: choice
+        options:
+        - all
+        - ubuntu-22.04
+        - sles-15.7
 
 permissions:
   contents: read
@@ -79,6 +88,7 @@ jobs:
         env:
           GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
           INSTALL_METHOD: ${{ github.event.inputs.install_method }}
+          DISTRO: ${{ github.event.inputs.distro }}
         run: python3 .github/build_tools/configure_ci.py
 
   build:
@@ -89,9 +99,7 @@ jobs:
         distro: ${{ fromJson(needs.setup.outputs.distros) }}
     uses: ./.github/workflows/build-rocm-examples-reusable.yml
     with:
-      distro_image: ${{ matrix.distro.image }}
-      distro_label: ${{ matrix.distro.label }}
-      distro_key: ${{ matrix.distro.key }}
+      distro: ${{ toJson(matrix.distro) }}
       gpu_configs: ${{ needs.setup.outputs.gpu_configs }}
       install_methods: ${{ needs.setup.outputs.install_methods }}
     secrets: inherit
