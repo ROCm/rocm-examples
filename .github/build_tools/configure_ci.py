@@ -15,6 +15,12 @@ GPU_CONFIG_MAP = {
 # Default configurations for automated runs (push/PR)
 INSTALL_METHODS = ["wheel", "tarball"]
 
+# Distros to build against. Add new entries here to enable more distros.
+DISTROS = [
+    {"key": "ubuntu-22.04", "image": "ghcr.io/rocm/rocm-examples-ubuntu-22.04:latest", "label": "Ubuntu 22.04"},
+    {"key": "sles-15.7", "image": "ghcr.io/rocm/rocm-examples-sles-15.7:latest", "label": "SLES 15.7"},
+]
+
 def main():
     # Read inputs from environment (set by workflow)
     gpu_input = os.getenv("GPU_CONFIG", "")
@@ -53,9 +59,11 @@ def main():
         with open(github_output, "a") as f:
             f.write(f"gpu_configs={json.dumps(gpu_configs)}\n")
             f.write(f"install_methods={json.dumps(install_methods)}\n")
+            f.write(f"distros={json.dumps(DISTROS)}\n")
 
     print(f"gpu_configs={json.dumps(gpu_configs)}")
     print(f"install_methods={json.dumps(install_methods)}")
+    print(f"distros={json.dumps(DISTROS)}")
 
 if __name__ == "__main__":
     main()  
