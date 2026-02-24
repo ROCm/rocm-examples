@@ -98,6 +98,7 @@ jobs:
   build:
     name: "TheRock - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }} - ${{ matrix.distro.name }}"
     needs: [setup]
+    timeout-minutes: 60
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
       image: ${{ matrix.distro.image }}
@@ -220,7 +221,7 @@ jobs:
         if: success()
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}-${{ matrix.distro.name }}
+          name: rocm-examples-build-${{ matrix.gpu_config.gpu_target }}-${{ matrix.install_method }}-${{ matrix.distro.name }}
           path: build/
 
       - name: Run tests
@@ -271,7 +272,7 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
-          
+
         # Clean the workspace here since other jobs may not have the permissions to do so later
         # (needed for self-hosted runners)
       - name: Clean the workspace
