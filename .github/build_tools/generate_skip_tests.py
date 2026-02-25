@@ -26,6 +26,13 @@ SKIP_TESTS = {
     # "gfx1100": [],
 }
 
+# Tests to skip for a specific GPU target + distro combination.
+# Keys are "<gpu_target>:<distro_key>", e.g. "gfx1151:sles-15.7".
+DISTRO_SKIP_TESTS = {
+    # Example:
+    # "gfx1151:sles-15.7": ["some_test"],
+}
+
 
 def main():
     parser = argparse.ArgumentParser(
@@ -41,9 +48,21 @@ def main():
         required=True,
         help="GPU target whose skip list to write (e.g. gfx1151)",
     )
+    parser.add_argument(
+        "--distro",
+        default="",
+        help="Distro key for distro-specific skips (e.g. sles-15.7)",
+    )
     args = parser.parse_args()
 
-    lines = SKIP_TESTS.get(args.target, [])
+    lines = list(SKIP_TESTS.get(args.target, []))
+
+    if args.distro:
+        combo_key = f"{args.target}:{args.distro}"
+        distro_lines = DISTRO_SKIP_TESTS.get(combo_key, [])
+        for test in distro_lines:
+            if test not in lines:
+                lines.append(test)
 
     os.makedirs(args.output_dir, exist_ok=True)
     path = os.path.join(args.output_dir, "skip_tests.txt")
@@ -51,10 +70,15 @@ def main():
         if lines:
             f.write("\n".join(lines))
             f.write("\n")
+
+    label = args.target
+    if args.distro:
+        label = f"{args.target} + {args.distro}"
+
     if not lines:
-        print(f"No tests to skip for {args.target}.")
+        print(f"No tests to skip for {label}.")
     else:
-        print(f"Wrote {path} ({len(lines)} tests for {args.target})")
+        print(f"Wrote {path} ({len(lines)} tests for {label})")
 
 
 if __name__ == "__main__":
