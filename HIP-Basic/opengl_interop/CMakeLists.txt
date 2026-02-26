@@ -25,21 +25,14 @@ set(example_name hip_opengl_interop)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
-set(GPU_RUNTIMES "HIP" "CUDA")
-set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    set(ERROR_MESSAGE
-        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP or CUDA."
-    )
-    message(FATAL_ERROR ${ERROR_MESSAGE})
-endif()
-
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -60,7 +53,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 add_executable(${example_name} main.hip ../../External/glad/glad.cpp)
 
 set(include_dirs "../../Common" "../../External")
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()
 
@@ -73,7 +66,7 @@ if(UNIX)
     target_link_libraries(${example_name} PRIVATE ${CMAKE_DL_LIBS})
 endif()
 
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
-set_source_files_properties(vulkan_utils.hip PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(vulkan_utils.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
