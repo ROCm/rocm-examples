@@ -31,7 +31,7 @@ if(SHOULD_SKIP)
     return()
 endif()
 
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocWMMA examples do not support the CUDA runtime")
     return()
 endif()
