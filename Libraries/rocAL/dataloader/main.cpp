@@ -79,7 +79,7 @@ int thread_func(const char*     path,
 
     color_format              = RocalImageColor::ROCAL_COLOR_RGB24;
     int              gpu_id   = (gpu_mode < 0) ? 0 : gpu_mode;
-    RocalDecoderType dec_type = RocalDecoderType::ROCAL_DECODER_OPENCV;
+    RocalDecoderType dec_type = RocalDecoderType::ROCAL_DECODER_TJPEG;
 
     lck.lock();
     // looks like OpenVX has some issue loading kernels from multiple threads at the same time
