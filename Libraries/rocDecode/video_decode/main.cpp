@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,18 +32,15 @@ THE SOFTWARE.
 #include <string>
 #include <sys/stat.h>
 #include <vector>
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-    #include <filesystem>
-#else
-    #include <experimental/filesystem>
-#endif
-
-#include "ffmpeg_video_dec.h"
 #include "rocdecode/roc_bitstream_reader.h"
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 
 #include "rocdecode_utils.hpp"
+
+#if ENABLE_HOST_DECODE
+    #include "ffmpeg_video_dec.h"
+#endif
 
 //hardcoding for host based decoder creation if demux is not available
 #define DEFAULT_WIDTH 2912
@@ -392,7 +389,7 @@ int main(int argc, char** argv)
             for(int i = 0; i < n_frame_returned; i++)
             {
                 pframe = viddec->GetFrame(&pts);
-                if(b_generate_md5)
+                if(b_generate_md5 && pframe)
                 {
                     md5_generator->UpdateMd5ForFrame(pframe, surf_info);
                 }
@@ -493,6 +490,10 @@ int main(int argc, char** argv)
         else if(bs_reader)
         {
             rocDecDestroyBitstreamReader(bs_reader);
+        }
+        if (viddec) {
+            delete viddec;
+            viddec = nullptr;
         }
     }
     catch(const std::exception& ex)

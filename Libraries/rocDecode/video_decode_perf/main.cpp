@@ -30,12 +30,9 @@ THE SOFTWARE.
 #include <sys/stat.h>
 #include <thread>
 #include <vector>
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-    #include <filesystem>
-#else
-    #include <experimental/filesystem>
+#if ENABLE_HOST_DECODE
+    #include "ffmpeg_video_dec.h"
 #endif
-#include "ffmpeg_video_dec.h"
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 

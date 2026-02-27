@@ -20,7 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "md5.h"
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 #include "video_post_process.h"

@@ -25,6 +25,7 @@ set(example_name rocdecode_video_decode_pic_files)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 include("../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
@@ -48,65 +49,37 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
+find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
+find_package(rocdecode-host 1.0.0 QUIET)
+find_package(FFmpeg REQUIRED)
+find_package(rocprofiler-register REQUIRED)
+find_package(Threads REQUIRED)
 
-# Try to find the host library directly (handles both naming conventions)
-find_library(ROCDECODE_HOST_LIB
-    NAMES rocdecode-host rocdecodehost
-    PATHS ${ROCM_ROOT}/lib
-    NO_DEFAULT_PATH
+set(SOURCES
+    main.cpp
+    "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp"
 )
 
-# Find FFmpeg libraries
-find_library(AVCODEC_LIBRARY avcodec REQUIRED)
-find_library(AVFORMAT_LIBRARY avformat REQUIRED)
-find_library(AVUTIL_LIBRARY avutil REQUIRED)
-
-find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h REQUIRED)
-find_path(AVFORMAT_INCLUDE_DIR libavformat/avformat.h REQUIRED)
-find_path(AVUTIL_INCLUDE_DIR libavutil/avutil.h REQUIRED)
-
-# Check FFmpeg version for compatibility using pkg-config (same as Makefile)
-execute_process(
-    COMMAND pkg-config --modversion libavcodec
-    OUTPUT_VARIABLE AVCODEC_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-)
-
-# If pkg-config fails, try to get version from header as fallback
-if(NOT AVCODEC_VERSION AND AVCODEC_INCLUDE_DIR)
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MAJOR_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MAJOR")
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MINOR_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MINOR")
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MICRO_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MICRO")
-
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MAJOR[ \t]+([0-9]+).*$" "\\1" AVCODEC_MAJOR "${AVCODEC_VERSION_MAJOR_LINE}")
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MINOR[ \t]+([0-9]+).*$" "\\1" AVCODEC_MINOR "${AVCODEC_VERSION_MINOR_LINE}")
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MICRO[ \t]+([0-9]+).*$" "\\1" AVCODEC_MICRO "${AVCODEC_VERSION_MICRO_LINE}")
-
-    set(AVCODEC_VERSION "${AVCODEC_MAJOR}.${AVCODEC_MINOR}.${AVCODEC_MICRO}")
+if(rocdecode-host_FOUND)
+    list(APPEND SOURCES "${ROCM_ROOT}/share/rocdecode/utils/ffmpegvideodecode/ffmpeg_video_dec.cpp")
 endif()
 
-add_executable(${example_name}
-    main.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/ffmpegvideodecode/ffmpeg_video_dec.cpp
-)
+add_executable(${example_name} ${SOURCES})
 
 target_link_libraries(${example_name}
     PRIVATE
+    hip::host
     rocdecode::rocdecode
-    ${AVCODEC_LIBRARY}
-    ${AVFORMAT_LIBRARY}
-    ${AVUTIL_LIBRARY}
+    rocprofiler-register::rocprofiler-register
+    ${FFMPEG_LIBRARIES}
+    Threads::Threads
 )
 
-# Link host library if found
-if(ROCDECODE_HOST_LIB)
-    target_link_libraries(${example_name} PRIVATE ${ROCDECODE_HOST_LIB})
+# Add rocdecode host utils if host library found
+if(rocdecode-host_FOUND)
+    target_include_directories(${example_name} PRIVATE "${rocdecode-host_INCLUDE_DIR}" "${ROCM_ROOT}/share/rocdecode/utils/ffmpegvideodecode")
+    target_link_libraries(${example_name} PRIVATE rocdecode::rocdecode-host)
     target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=1)
 else()
     target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=0)
@@ -119,24 +92,16 @@ target_include_directories(
     "../../../External"
     "${ROCM_ROOT}/share/rocdecode/utils"
     "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode"
-    "${ROCM_ROOT}/share/rocdecode/utils/ffmpegvideodecode"
-    ${AVCODEC_INCLUDE_DIR}
-    ${AVFORMAT_INCLUDE_DIR}
-    ${AVUTIL_INCLUDE_DIR}
+    "${FFMPEG_INCLUDE_DIR}"
 )
 
 # FFMPEG multi-version support
-if(AVCODEC_VERSION VERSION_LESS_EQUAL 58.134.100)
+if(_FFMPEG_AVCODEC_VERSION VERSION_LESS_EQUAL 58.134.100)
     target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=0)
 else()
     target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=1)
 endif()
 
-set_source_files_properties(
-    main.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/ffmpegvideodecode/ffmpeg_video_dec.cpp
-    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
-)
+set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})

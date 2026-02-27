@@ -30,11 +30,6 @@ THE SOFTWARE.
 #include <string>
 #include <sys/stat.h>
 #include <vector>
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-    #include <filesystem>
-#else
-    #include <experimental/filesystem>
-#endif
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 

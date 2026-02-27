@@ -39,8 +39,12 @@ THE SOFTWARE.
 
 #if __cplusplus >= 201703L && __has_include(<filesystem>)
     #include <filesystem>
-#else
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
     #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    static_assert(false, "filesystem not available");
 #endif
 
 #include "roc_video_dec.h"
@@ -287,19 +291,11 @@ int main(int argc, char** argv)
     bool        b_dump_output_frames = false;
     if(!output_folder_path.empty())
     {
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-        if(std::filesystem::is_directory(output_folder_path))
+        if(fs::is_directory(output_folder_path))
         {
-            std::filesystem::remove_all(output_folder_path);
+            fs::remove_all(output_folder_path);
         }
-        std::filesystem::create_directory(output_folder_path);
-#else
-        if(std::experimental::filesystem::is_directory(output_folder_path))
-        {
-            std::experimental::filesystem::remove_all(output_folder_path);
-        }
-        std::experimental::filesystem::create_directory(output_folder_path);
-#endif
+        fs::create_directory(output_folder_path);
         b_dump_output_frames = true;
     }
 
@@ -327,14 +323,8 @@ int main(int argc, char** argv)
 
     try
     {
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-        for(const auto& entry : std::filesystem::directory_iterator(input_folder_path))
+        for(const auto& entry : fs::directory_iterator(input_folder_path))
         {
-#else
-        for(const auto& entry :
-            std::experimental::filesystem::directory_iterator(input_folder_path))
-        {
-#endif
             input_file_names.push_back(entry.path());
             num_files++;
         }
