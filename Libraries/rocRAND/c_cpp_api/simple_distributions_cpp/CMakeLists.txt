@@ -25,18 +25,10 @@ set(example_name rocrand_simple_distributions_cpp)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
-set(GPU_RUNTIMES "HIP" "CUDA")
-set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
+select_gpu_language()
 
-if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    message(
-        FATAL_ERROR
-        "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}"
-    )
-endif()
-
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     set(LANG "CUDA")
     enable_language(CUDA)
 else()
@@ -56,7 +48,7 @@ find_package(rocrand REQUIRED)
 add_executable(${example_name} main.cpp)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     target_link_libraries(${example_name} PRIVATE roc::rocrand)
     set_source_files_properties(main.cpp PROPERTIES LANGUAGE CUDA)
 else()
