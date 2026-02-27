@@ -15,47 +15,63 @@ GPU_CONFIG_MAP = {
 # Default configurations for automated runs (push/PR)
 INSTALL_METHODS = ["wheel", "tarball"]
 
+# Distros to build against – keyed by short name.
+# Add new entries here to enable more distros (also add to workflow_dispatch options).
+DISTRO_MAP = {
+    "ubuntu-22.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-22.04:latest", "label": "Ubuntu 22.04"},
+    "sles-15.7":    {"image": "ghcr.io/rocm/rocm-examples-sles-15.7:latest",    "label": "SLES 15.7"},
+}
+
+def _is_all(value):
+    """Return True when the input means 'use everything'."""
+    return not value or value == "all"
+
 def main():
-    # Read inputs from environment (set by workflow)
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
+    distro_input = os.getenv("DISTRO", "")
 
     # Determine GPU configurations
-    if gpu_input:
+    if _is_all(gpu_input):
+        gpu_targets = list(GPU_CONFIG_MAP.keys())
+    else:
         if gpu_input not in GPU_CONFIG_MAP:
             raise ValueError(f"Invalid GPU target: {gpu_input}. Allowed: {list(GPU_CONFIG_MAP.keys())}")
         gpu_targets = [gpu_input]
-    else:
-        # Automated run: use all allowed targets
-        gpu_targets = list(GPU_CONFIG_MAP.keys())
 
     # Determine install methods
-    if install_input:
+    if _is_all(install_input):
+        install_methods = INSTALL_METHODS
+    else:
         if install_input not in INSTALL_METHODS:
             raise ValueError(f"Invalid install method: {install_input}. Allowed: {INSTALL_METHODS}")
         install_methods = [install_input]
+
+    # Determine distros
+    if _is_all(distro_input):
+        distro_keys = list(DISTRO_MAP.keys())
     else:
-        # Automated run: use all allowed methods
-        install_methods = INSTALL_METHODS
+        if distro_input not in DISTRO_MAP:
+            raise ValueError(f"Invalid distro: {distro_input}. Allowed: {list(DISTRO_MAP.keys())}")
+        distro_keys = [distro_input]
 
-    # Build gpu_config array with both gpu_target and therock_family
-    gpu_configs = []
-    for target in gpu_targets:
-        family = GPU_CONFIG_MAP.get(target, "gfx110X-all")
-        gpu_configs.append({
-            "gpu_target": target,
-            "therock_family": family
-        })
+    gpu_configs = [
+        {"gpu_target": t, "therock_family": GPU_CONFIG_MAP.get(t, "gfx110X-all")}
+        for t in gpu_targets
+    ]
 
-    # Write outputs to $GITHUB_OUTPUT
     github_output = os.getenv("GITHUB_OUTPUT")
     if github_output:
         with open(github_output, "a") as f:
             f.write(f"gpu_configs={json.dumps(gpu_configs)}\n")
             f.write(f"install_methods={json.dumps(install_methods)}\n")
+            f.write(f"distros={json.dumps(distro_keys)}\n")
+            f.write(f"distro_map={json.dumps(DISTRO_MAP)}\n")
 
     print(f"gpu_configs={json.dumps(gpu_configs)}")
     print(f"install_methods={json.dumps(install_methods)}")
+    print(f"distros={json.dumps(distro_keys)}")
+    print(f"distro_map={json.dumps(DISTRO_MAP)}")
 
 if __name__ == "__main__":
-    main()  
+    main()
