@@ -22,7 +22,7 @@
 
 project(reduction_tests LANGUAGES CXX)
 
-if("${GPU_RUNTIME}" STREQUAL "CUDA")
+if("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
     cmake_minimum_required(VERSION 3.25.2)
     # Allow __device__ or __host__ annotated lambdas
     set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} --extended-lambda")
@@ -32,21 +32,14 @@ else()
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
-set(GPU_RUNTIMES "HIP" "CUDA")
-set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    set(ERROR_MESSAGE
-        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP or CUDA."
-    )
-    message(FATAL_ERROR ${ERROR_MESSAGE})
-endif()
-
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 20)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 20)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -67,7 +60,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 set(include_dirs "../../Common" "../../External")
 list(APPEND include_dirs "${PROJECT_SOURCE_DIR}")
 
-if("${GPU_RUNTIME}" STREQUAL "CUDA")
+if("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
     # For examples targeting NVIDIA, include the HIP header directory.
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 
@@ -179,10 +172,10 @@ foreach(VER RANGE 1 10)
             $<$<TARGET_EXISTS:TBB::tbb>:TBB::tbb>
     )
 
-    if("${GPU_RUNTIME}" STREQUAL "CUDA")
+    if("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
         set_source_files_properties(
             ${Sources}
-            PROPERTIES LANGUAGE ${GPU_RUNTIME}
+            PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
         )
         set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ROCM_ROOT}/cmake)
         find_package(HIP MODULE REQUIRED)

@@ -45,7 +45,7 @@ See [CMake build options](#cmake-build-options) for an overview of build options
 
 - `$ git clone https://github.com/ROCm/rocm-examples.git`
 - `$ cd rocm-examples`
-- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
+- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
 - `$ cmake --build build`
 - `$ cmake --install build --prefix install`
 
@@ -55,7 +55,7 @@ Beware that only a subset of the examples support building via Make.
 
 - `$ git clone https://github.com/ROCm/rocm-examples.git`
 - `$ cd rocm-examples`
-- `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
+- `$ make` (on ROCm) or `$ make ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
 
 ### Linux with Docker
 
@@ -69,7 +69,7 @@ The following instructions showcase building the Docker image and full example s
 - `$ docker run -it --device /dev/kfd --device /dev/dri rocm-examples bash` (on ROCm) or `$ docker run -it --gpus=all rocm-examples bash` (on CUDA)
 - `# git clone https://github.com/ROCm/rocm-examples.git`
 - `# cd rocm-examples`
-- `# cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
+- `# cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
 - `# cmake --build build`
 
 The built executables can be found and run in the `build` directory:
@@ -126,7 +126,7 @@ The following options are available when building with CMake.
 
 | Option                     | Relevant to | Default value    | Description                                                                                             |
 |:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
-| `GPU_RUNTIME`              | HIP / CUDA  | `"HIP"`          | GPU runtime to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.     |
+| `ROCM_EXAMPLES_GPU_LANGUAGE` | HIP / CUDA  | `"HIP"`          | GPU language to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.  |
 | `CMAKE_HIP_ARCHITECTURES`  | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
 | `CMAKE_CUDA_ARCHITECTURES` | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capibility 50 and 72.                 |
 
