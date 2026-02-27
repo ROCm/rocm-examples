@@ -27,7 +27,7 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocFFT examples do not support the CUDA runtime")
     return()
 endif()
