@@ -68,6 +68,7 @@ jobs:
         run: |
           ROCM_PATH=$(rocm-sdk path --root)
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "ROCM_INSTALL_DIR=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
@@ -98,6 +99,7 @@ jobs:
         run: |
           ROCM_PATH=/therock-tarball/install
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "ROCM_INSTALL_DIR=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
@@ -216,6 +218,10 @@ jobs:
         with:
           name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
+
+      - name: Makefile build
+        run: |
+          make -j ROCM_INSTALL_DIR="${ROCM_PATH}" HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
 
       - name: Clean the workspace
         if: always()
