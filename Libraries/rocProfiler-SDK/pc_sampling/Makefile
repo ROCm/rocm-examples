@@ -60,7 +60,7 @@ $(CLIENT_LIB): client.cpp pcs.cpp $(COMMON_INCLUDE_DIR)/rocprofiler_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) -fPIC -shared -o $@ client.cpp pcs.cpp $(ILDFLAGS) $(ILDLIBS)
 
 $(EXAMPLE): $(CLIENT_LIB) main.cpp
-	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.cpp -L. -l$(EXAMPLE)_client -Wl,-rpath,'$$ORIGIN'
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.cpp -L. -l$(EXAMPLE)_client -Wl,-rpath,'$$ORIGIN' -lpthread
 
 clean:
 	$(RM) $(EXAMPLE) $(CLIENT_LIB)
