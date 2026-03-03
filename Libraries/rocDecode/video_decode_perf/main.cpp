@@ -243,7 +243,7 @@ int main(int argc, char** argv)
                 std::cout
                     << "Error: RocDecode HOST library is not found and backend is not supported!"
                     << std::endl;
-                return 0;
+                return 1;
 #endif
             }
 
@@ -324,7 +324,7 @@ int main(int argc, char** argv)
     catch(const std::exception& ex)
     {
         std::cout << ex.what() << std::endl;
-        exit(1);
+        return 1;
     }
 
     return 0;

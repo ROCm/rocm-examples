@@ -273,14 +273,14 @@ int main(int argc, char** argv)
 #else
             std::cout << "Error: RocDecode HOST library is not found and backend is not supported!"
                       << std::endl;
-            return 0;
+            return 1;
 #endif
         }
 
         if(!viddec->CodecSupported(device_id, rocdec_codec_id, bit_depth))
         {
             std::cerr << "rocDecode doesn't support codec!" << std::endl;
-            return 0;
+            return 1;
         }
         std::string device_name, gcn_arch_name;
         int         pci_bus_id, pci_domain_id, pci_device_id;

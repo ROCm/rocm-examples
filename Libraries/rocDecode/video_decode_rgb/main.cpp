@@ -340,7 +340,7 @@ int main(int argc, char** argv)
         if(!viddec.CodecSupported(device_id, rocdec_codec_id, demuxer.GetBitDepth()))
         {
             std::cerr << "GPU doesn't support codec!" << std::endl;
-            return 0;
+            return 1;
         }
         VideoPostProcess post_process;
         MD5Generator*    md5_generator = nullptr;

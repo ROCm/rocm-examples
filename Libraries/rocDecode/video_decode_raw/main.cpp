@@ -213,7 +213,7 @@ int main(int argc, char** argv)
         if(!viddec.CodecSupported(device_id, rocdec_codec_id, bit_depth))
         {
             std::cerr << "GPU doesn't support codec!" << std::endl;
-            return 0;
+            return 1;
         }
         std::string device_name, gcn_arch_name;
         int         pci_bus_id, pci_domain_id, pci_device_id;
@@ -331,7 +331,7 @@ int main(int argc, char** argv)
     catch(const std::exception& ex)
     {
         std::cout << ex.what() << std::endl;
-        exit(1);
+        return 1;
     }
 
     return 0;
