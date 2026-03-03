@@ -42,7 +42,7 @@
 
 __global__ void simpleKernel(double *data, std::size_t elems)
 {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    std::size_t idx = blockIdx.x * blockDim.x + threadIdx.x;
     if(idx < elems)
         data[idx] = idx * 2.0;
 }
@@ -64,6 +64,25 @@ int main()
 
     int deviceId0 = 0;
     int deviceId1 = 1;
+
+    // Check whether peer-to-peer access is supported between the two devices.
+    int canAccessPeer01 = 0;
+    int canAccessPeer10 = 0;
+    HIP_CHECK(hipDeviceCanAccessPeer(&canAccessPeer01, deviceId0, deviceId1));
+    HIP_CHECK(hipDeviceCanAccessPeer(&canAccessPeer10, deviceId1, deviceId0));
+    if(!canAccessPeer01 || !canAccessPeer10)
+    {
+        hipDeviceProp_t props0{};
+        hipDeviceProp_t props1{};
+        HIP_CHECK(hipGetDeviceProperties(&props0, deviceId0));
+        HIP_CHECK(hipGetDeviceProperties(&props1, deviceId1));
+        std::cout << "Peer-to-peer access is not supported between device " << deviceId0
+                  << " (arch: " << props0.gcnArchName << ")"
+                  << " and device " << deviceId1
+                  << " (arch: " << props1.gcnArchName << ")"
+                  << ". Skipping example." << std::endl;
+        return EXIT_SUCCESS;
+    }
 
     // Enable peer access to the memory (allocated and future) on the peer device.
     // Ensure the device is active before enabling peer access.
