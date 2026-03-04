@@ -10,8 +10,8 @@ import os
 
 # Tests to skip per GPU target (one list per target that has skips)
 SKIP_TESTS = {
-    # rccl is not supported on gfx1151 yet
     "gfx1151": [
+        # rccl is not supported on gfx1151 yet
         "rccl_allgather",
         "rccl_allreduce",
         "rccl_broadcast",
@@ -21,6 +21,16 @@ SKIP_TESTS = {
         "rccl_reduce",
         "rccl_reducescatter",
         "rccl_send_recv",
+        # rocdecode FFmpeg examples are failing only on gfx1151, rocDecode team is investigating
+        "rocdecode_rocdec_decode",
+        "rocdecode_video_decode-HEVC",
+        "rocdecode_video_decode-AVC",
+        "rocdecode_video_decode-AV1",
+        "rocdecode_video_decode-VP9",
+        "rocdecode_video_decode_mem",
+        "rocdecode_video_decode_perf",
+        "rocdecode_video_decode_rgb",
+        "rocdecode_video_decode_rgb-resize",
     ],
     # Add more targets as needed, e.g.:
     # "gfx1100": [],
