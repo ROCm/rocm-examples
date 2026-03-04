@@ -48,41 +48,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
+find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
-
-# Find FFmpeg libraries
-find_library(AVCODEC_LIBRARY avcodec REQUIRED)
-find_library(AVFORMAT_LIBRARY avformat REQUIRED)
-find_library(AVUTIL_LIBRARY avutil REQUIRED)
-find_library(SWRESAMPLE_LIBRARY swresample REQUIRED)
-
-find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h REQUIRED)
-find_path(AVFORMAT_INCLUDE_DIR libavformat/avformat.h REQUIRED)
-find_path(AVUTIL_INCLUDE_DIR libavutil/avutil.h REQUIRED)
-
-# Check FFmpeg version for compatibility using pkg-config (same as Makefile)
-execute_process(
-    COMMAND pkg-config --modversion libavcodec
-    OUTPUT_VARIABLE AVCODEC_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-)
-
-# If pkg-config fails, try to get version from header as fallback
-if(NOT AVCODEC_VERSION AND AVCODEC_INCLUDE_DIR)
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MAJOR_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MAJOR")
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MINOR_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MINOR")
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MICRO_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MICRO")
-
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MAJOR[ \t]+([0-9]+).*$" "\\1" AVCODEC_MAJOR "${AVCODEC_VERSION_MAJOR_LINE}")
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MINOR[ \t]+([0-9]+).*$" "\\1" AVCODEC_MINOR "${AVCODEC_VERSION_MINOR_LINE}")
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MICRO[ \t]+([0-9]+).*$" "\\1" AVCODEC_MICRO "${AVCODEC_VERSION_MICRO_LINE}")
-
-    set(AVCODEC_VERSION "${AVCODEC_MAJOR}.${AVCODEC_MINOR}.${AVCODEC_MICRO}")
-endif()
+find_package(rocprofiler-register REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(${example_name}
     main.cpp
@@ -91,11 +60,10 @@ add_executable(${example_name}
 
 target_link_libraries(${example_name}
     PRIVATE
+    hip::host
     rocdecode::rocdecode
-    ${AVCODEC_LIBRARY}
-    ${AVFORMAT_LIBRARY}
-    ${AVUTIL_LIBRARY}
-    ${SWRESAMPLE_LIBRARY}
+    rocprofiler-register::rocprofiler-register
+    Threads::Threads
 )
 
 target_include_directories(
@@ -105,22 +73,40 @@ target_include_directories(
     "../../../External"
     "${ROCM_ROOT}/share/rocdecode/utils"
     "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode"
-    ${AVCODEC_INCLUDE_DIR}
-    ${AVFORMAT_INCLUDE_DIR}
-    ${AVUTIL_INCLUDE_DIR}
 )
-
-# FFMPEG multi-version support
-if(AVCODEC_VERSION VERSION_LESS_EQUAL 58.134.100)
-    target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=0)
-else()
-    target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=1)
-endif()
 
 set_source_files_properties(
     main.cpp
     ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
+
+set(ROCDECODE_TEST_VIDEO_RAW_HEVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H265.265")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_RAW_HEVC}")
+    add_test(NAME ${example_name}-HEVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_RAW_HEVC}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_RAW_HEVC} not found, skipping ${example_name}-HEVC test")
+endif()
+
+set(ROCDECODE_TEST_VIDEO_RAW_AVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H264.264")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_RAW_AVC}")
+    add_test(NAME ${example_name}-AVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_RAW_AVC}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_RAW_AVC} not found, skipping ${example_name}-AVC test")
+endif()
+
+set(ROCDECODE_TEST_VIDEO_RAW_AV1 "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-AV1.ivf")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_RAW_AV1}")
+    add_test(NAME ${example_name}-AV1 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_RAW_AV1}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_RAW_AV1} not found, skipping ${example_name}-AV1 test")
+endif()
+
+set(ROCDECODE_TEST_VIDEO_RAW_VP9 "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-VP9.ivf")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_RAW_VP9}")
+    add_test(NAME ${example_name}-VP9 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_RAW_VP9}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_RAW_VP9} not found, skipping ${example_name}-VP9 test")
+endif()
 
 install(TARGETS ${example_name})

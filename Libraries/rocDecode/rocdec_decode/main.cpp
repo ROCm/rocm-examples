@@ -1,5 +1,5 @@
 /*
-Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+Copyright (c) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -28,12 +28,22 @@ THE SOFTWARE.
 #include <fstream>
 #include <vector>
 #include <algorithm>
-#include <filesystem>
+
+#if __cplusplus >= 201703L && __has_include(<filesystem>)
+    #include <filesystem>
+    namespace fs = std::filesystem;
+#elif __has_include(<experimental/filesystem>)
+    #include <experimental/filesystem>
+    namespace fs = std::experimental::filesystem;
+#else
+    static_assert(false, "filesystem not available");
+#endif
+
 #include <rocdecode/rocdecode.h>
-#include <rocdecode/rocdecode_host.h>
-
-namespace fs = std::filesystem;
-
+#include <rocdecode/rocparser.h>
+#if ENABLE_HOST_DECODE
+    #include <rocdecode/rocdecode_host.h>
+#endif
 
 __attribute__((visibility("hidden"))) inline bool is_error(rocDecStatus status)
 {
@@ -61,7 +71,7 @@ __attribute__((visibility("hidden"))) inline void report_error(
                 << file_name << ":" << line)
      << ... << std::forward<Args>(args))
         << std::endl;
-    std::abort();
+    std::exit(EXIT_FAILURE);
 }
 
 //hardcoding for this sample
@@ -402,11 +412,12 @@ void create_decoder(decoder_info& dec_info)
     // this will get changed in reconfigure when the sequence header is parsed from the stream to detect the actual video parameters
     create_info.chroma_format = rocDecVideoChromaFormat_420;
     create_info.output_format = rocDecVideoSurfaceFormat_NV12;
-    create_info.bit_depth_minus_8 = 2;
+    create_info.bit_depth_minus_8 = 0;
     create_info.num_output_surfaces = 1;
     CHECK(rocDecCreateDecoder(&dec_info.decoder, &create_info));
 }
 
+#if ENABLE_HOST_DECODE
 int ROCDECAPI handle_video_sequence_host(void* user_data, RocdecVideoFormatHost* format_host)
 {
     decoder_info *p_dec_info = static_cast<decoder_info *>(user_data);
@@ -499,6 +510,7 @@ void create_decoder_host(decoder_info& dec_info)
     CHECK(rocDecCreateDecoderHost(&dec_info.decoder, &create_info));
     dec_info.backend = DECODER_BACKEND_HOST;
 }
+#endif
 
 int ROCDECAPI handle_video_sequence(void* user_data, RocdecVideoFormat* format)
 {
@@ -614,6 +626,7 @@ void decode_frames(decoder_info& dec_info, const std::vector<std::vector<uint8_t
             CHECK(rocDecParseVideoData(dec_info.parser, &packet));
         }
     }
+#if ENABLE_HOST_DECODE
     else if (dec_info.backend == DECODER_BACKEND_HOST)
     {
         for (int i=0; i < static_cast<int>(frames.size()); ++i)
@@ -628,18 +641,24 @@ void decode_frames(decoder_info& dec_info, const std::vector<std::vector<uint8_t
             CHECK(rocDecDecodeFrameHost(dec_info.decoder, &pic_params));
         }
     }
+#endif
 }
 
 void destroy_decoder(decoder_info& dec_info)
 {
+    if (dec_info.decoder == nullptr)
+        return;
     if (dec_info.backend == DECODER_BACKEND_DEVICE)
     {
         CHECK(rocDecDestroyDecoder(dec_info.decoder));
     }
+#if ENABLE_HOST_DECODE
     else if (dec_info.backend == DECODER_BACKEND_HOST)
     {
         CHECK(rocDecDestroyDecoderHost(dec_info.decoder));
     }
+#endif
+    dec_info.decoder = nullptr;
 }
 
 void destroy_parser(decoder_info& dec_info)
@@ -728,14 +747,14 @@ int main(int argc, char** argv)
     }
 
     bool b_sort_filenames = false;
-    if (std::filesystem::is_directory(input_file_path))
+    if (fs::is_directory(input_file_path))
     {
-        for (const auto& entry : std::filesystem::directory_iterator(input_file_path))
+        for (const auto& entry : fs::directory_iterator(input_file_path))
         {
             if (entry.is_directory())
             {
                 std::vector<std::string> file_names_sub_folder;
-                for (const auto& sub_entry : std::filesystem::directory_iterator(entry))
+                for (const auto& sub_entry : fs::directory_iterator(entry))
                 {
                     file_names_sub_folder.push_back(sub_entry.path());
                 }
@@ -775,10 +794,12 @@ int main(int argc, char** argv)
         create_parser(dec_info);
         create_decoder(dec_info);
     }
+#if ENABLE_HOST_DECODE
     else
     {
         create_decoder_host(dec_info);
     }
+#endif
     dec_info.dump_decoded_frames = dump_output_frames;
     auto input_frames = read_frames(input_file_names);
     auto start = std::chrono::high_resolution_clock::now();

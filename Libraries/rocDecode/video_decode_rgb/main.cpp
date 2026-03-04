@@ -20,7 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include "md5.h"
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 #include "video_post_process.h"
@@ -341,7 +340,7 @@ int main(int argc, char** argv)
         if(!viddec.CodecSupported(device_id, rocdec_codec_id, demuxer.GetBitDepth()))
         {
             std::cerr << "GPU doesn't support codec!" << std::endl;
-            return 0;
+            return 1;
         }
         VideoPostProcess post_process;
         MD5Generator*    md5_generator = nullptr;

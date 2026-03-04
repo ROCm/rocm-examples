@@ -42,7 +42,7 @@ list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(rocdecode QUIET)
 if(NOT rocdecode_FOUND)
-    message(STATUS "rocDecode could not be found, not building rocDecode examples")
+    message(WARNING "rocDecode could not be found, not building rocDecode examples")
     return()
 endif()
 
