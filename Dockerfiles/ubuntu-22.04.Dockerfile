@@ -19,7 +19,8 @@ RUN apt-get update -qq && \
         libvulkan-dev \
         glslang-tools \
         libtiff-dev \
-        libopencv-dev && \
+        # libopencv-dev also installs FFmpeg dev packages
+        libopencv-dev \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
