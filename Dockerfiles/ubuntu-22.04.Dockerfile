@@ -19,7 +19,10 @@ RUN apt-get update -qq && \
         libvulkan-dev \
         glslang-tools \
         libtiff-dev \
-        libopencv-dev && \
+        libopencv-dev \
+        libavcodec-dev \
+        libavformat-dev \
+        libavutil-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

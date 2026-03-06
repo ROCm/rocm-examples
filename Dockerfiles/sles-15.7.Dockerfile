@@ -17,6 +17,7 @@ RUN zypper -qni update -y && \
         wget \
         git \
         curl \
+        nasm \
         python313 \
         libdw-devel \
         Mesa-libGL-devel \
@@ -64,6 +65,16 @@ ENV PATH="${VULKAN_SDK}/bin:${PATH}"
 ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib"
 ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
+
+# build ffmpeg from source
+WORKDIR /tmp
+RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
+    tar -xvf ffmpeg-4.4.6.tar.xz && \
+    cd ffmpeg-4.4.6 && \
+    ./configure --enable-pic --enable-shared && \
+    make -j$(nproc) && \
+    make install && \
+    rm -rf /tmp/ffmpeg-4.4.6*
 
 ENV HIP_PLATFORM=amd
 
