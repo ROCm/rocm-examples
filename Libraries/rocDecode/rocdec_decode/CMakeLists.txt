@@ -59,16 +59,28 @@ add_executable(${example_name} main.cpp)
 
 target_link_libraries(${example_name} PRIVATE hip::host rocdecode::rocdecode ${CXX_FS_LIBRARY})
 
+# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
+set(USING_THE_ROCK OFF)
+if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
+  set(USING_THE_ROCK ON)
+endif()
+
 # Link FFmpeg and host library if found
-if(FFMPEG_FOUND)
+if(FFMPEG_FOUND AND NOT USING_THE_ROCK)
     target_include_directories(${example_name} PRIVATE "${FFMPEG_INCLUDE_DIR}")
     target_link_libraries(${example_name} PRIVATE ${FFMPEG_LIBRARIES})
 endif()
 
-if(rocdecode-host_FOUND)
+if(rocdecode-host_FOUND AND NOT USING_THE_ROCK)
     # rocdecode-host
     target_include_directories(${example_name} PRIVATE "${rocdecode-host_INCLUDE_DIR}")
     target_link_libraries(${example_name} PRIVATE rocdecode::rocdecode-host)
+endif()
+
+if(FFMPEG_FOUND AND rocdecode-host_FOUND AND NOT USING_THE_ROCK)
+    target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=1)
+else()
+    target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=0)
 endif()
 
 target_include_directories(
