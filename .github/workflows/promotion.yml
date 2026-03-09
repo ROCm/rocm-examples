@@ -13,6 +13,9 @@ on:
 jobs:
   Promotion:
     runs-on: self-hosted
+    defaults:
+      run:
+        shell: bash
     env:  
       staging_branch: amd-staging
       mainline_branch: amd-mainline

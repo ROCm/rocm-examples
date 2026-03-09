@@ -306,7 +306,7 @@ int main(int argc, char** argv)
                 for(int j = 0; j < n_frame_returned; j++)
                 {
                     pframe = viddec->GetFrame(&pts);
-                    if(b_generate_md5)
+                    if(b_generate_md5 && pframe)
                     {
                         md5_generator->UpdateMd5ForFrame(pframe, surf_info);
                     }
@@ -399,8 +399,10 @@ int main(int argc, char** argv)
             }
             delete md5_generator;
         }
-
-        delete viddec;
+        if (viddec) {
+            delete viddec;
+            viddec = nullptr;
+        }
     }
     catch(const std::exception& ex)
     {

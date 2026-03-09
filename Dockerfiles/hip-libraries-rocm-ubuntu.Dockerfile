@@ -6,8 +6,9 @@ FROM ubuntu:22.04
 
 # The ROCm versions that this image is based of.
 # Always write this down as major.minor.patch
-ENV ROCM_VERSION=6.4.0
+ENV ROCM_VERSION=7.2.0
 ENV ROCM_VERSION_APT=${ROCM_VERSION%.0}
+ENV AMDGPU_INSTALLER_VERSION=7.2.70200-1
 
 # Base packages that are required for the installation
 RUN export DEBIAN_FRONTEND=noninteractive; \
@@ -18,6 +19,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         locales-all \
         make \
         python3 \
+        python3-pip \
         ssh \
         sudo \
         wget \
@@ -28,36 +30,38 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         libglfw3-dev \
         gnupg \
         g++ \
+        protobuf-compiler \
+        libprotoc-dev \
+        libopencv-dev \
+        libavcodec-dev \
+        libavformat-dev \
+        libavutil-dev \
     && rm -rf /var/lib/apt/lists/*
 
-ENV LANG en_US.utf8
+ENV LANG=en_US.utf8
 
 # Install the HIP compiler and libraries from the ROCm repositories
+# Use amdgpu-install to set up both the amdgpu and ROCm repos
 RUN export DEBIAN_FRONTEND=noninteractive; \
-    mkdir -p /etc/apt/keyrings \
-    && wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | gpg --dearmor > /etc/apt/keyrings/rocm.gpg \
-    && echo "deb [arch=amd64, signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/$ROCM_VERSION_APT/ jammy main" > /etc/apt/sources.list.d/rocm.list \
-    && printf 'Package: *\nPin: origin "repo.radeon.com"\nPin-Priority: 9001\n' > /etc/apt/preferences.d/radeon.pref \
+    wget https://repo.radeon.com/amdgpu-install/$ROCM_VERSION_APT/ubuntu/jammy/amdgpu-install_${AMDGPU_INSTALLER_VERSION}_all.deb \
     && apt-get update -qq \
-    && apt-get install --no-install-recommends -y \
-        hip-base hipify-clang rocm-core hipcc \
-        hip-dev rocm-hip-runtime-dev rocm-llvm-dev \
-        rocrand-dev hiprand-dev \
-        rocprim-dev hipcub-dev \
-        rocblas-dev hipblas-dev \
-        rocsolver-dev hipsolver-dev \
-        rocfft-dev hipfft-dev \
-        rocsparse-dev \
-        rocthrust-dev \
+    && apt-get -y install ./amdgpu-install_${AMDGPU_INSTALLER_VERSION}_all.deb \
+    && rm -f ./amdgpu-install_${AMDGPU_INSTALLER_VERSION}_all.deb \
+    && apt-get update -qq \
+    && apt-get install -y \
+        rocm \
+        rocal-dev \
+        rocdecode-dev \
+        rocjpeg-dev \
+        libdw-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install CMake
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.7/cmake-3.21.7-linux-x86_64.sh \
-    && mkdir /cmake \
-    && sh cmake-3.21.7-linux-x86_64.sh --skip-license --prefix=/cmake \
-    && rm cmake-3.21.7-linux-x86_64.sh
+# Install Python packages (cmake and deps for Libraries build)
+RUN python3 -m pip install --no-cache-dir --upgrade pip \
+    && python3 -m pip install --no-cache-dir cmake future==1.0.0 pytz==2022.1 numpy==1.23.0 \
+        google==3.0.0 protobuf==3.12.4
 
-ENV PATH="/cmake/bin:/opt/rocm/bin:${PATH}"
+ENV PATH="/opt/rocm/bin:${PATH}"
 
 RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
     && ldconfig

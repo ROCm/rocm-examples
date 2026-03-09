@@ -32,11 +32,6 @@ THE SOFTWARE.
 #include <string>
 #include <sys/stat.h>
 #include <vector>
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-    #include <filesystem>
-#else
-    #include <experimental/filesystem>
-#endif
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 
@@ -328,7 +323,7 @@ int main(int argc, char** argv)
     catch(const std::exception& ex)
     {
         std::cout << ex.what() << std::endl;
-        exit(1);
+        return 1;
     }
 
     return 0;

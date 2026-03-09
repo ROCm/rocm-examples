@@ -2,11 +2,11 @@
 # Above is required for substitutions in environment variables
 
 # CUDA based docker image
-FROM nvidia/cuda:12.6.0-devel-ubuntu22.04
+FROM nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
 
 # The ROCm versions that this image is based of.
 # Always write this down as major.minor.patch
-ENV ROCM_VERSION=6.4.0
+ENV ROCM_VERSION=7.2.0
 ENV ROCM_VERSION_APT=${ROCM_VERSION%.0}
 
 # Base packages that are required for the installation
@@ -27,6 +27,7 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         vulkan-validationlayers \
         libglfw3-dev \
         gfortran \
+        python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
 # Install the HIP compiler and libraries from the ROCm repositories
@@ -36,16 +37,13 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
     && echo "deb [arch=amd64, signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/$ROCM_VERSION_APT/ jammy main" > /etc/apt/sources.list.d/rocm.list \
     && printf 'Package: *\nPin: origin "repo.radeon.com"\nPin-Priority: 9001\n' > /etc/apt/preferences.d/radeon.pref \
     && apt-get update -qq \
-    && apt-get install -y hip-base hipify-clang rocm-core hipcc hip-dev rocm-llvm-dev \
+    && apt-get install -y rocm \
     && rm -rf /var/lib/apt/lists/*
 
-# Install CMake
-RUN wget https://github.com/Kitware/CMake/releases/download/v3.21.7/cmake-3.21.7-linux-x86_64.sh \
-    && mkdir /cmake \
-    && sh cmake-3.21.7-linux-x86_64.sh --skip-license --prefix=/cmake \
-    && rm cmake-3.21.7-linux-x86_64.sh
+# Install CMake via pip for a modern version
+RUN python3 -m pip install --no-cache-dir cmake
 
-ENV PATH="/cmake/bin:/opt/rocm/bin:${PATH}"
+ENV PATH="/opt/rocm/bin:${PATH}"
 
 RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
     && ldconfig

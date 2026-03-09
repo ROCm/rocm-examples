@@ -26,7 +26,7 @@ EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -57,6 +57,13 @@ ifeq ($(GPU_RUNTIME), HIP)
 		CPPFLAGS += -DENABLE_HOST_DECODE=1
 	else
 		CPPFLAGS += -DENABLE_HOST_DECODE=0
+	endif
+
+	# Optional FFmpeg
+	FFMPEG_FOUND := $(shell pkg-config --exists libavcodec libavformat libavutil 2>/dev/null && echo 1)
+	ifeq ($(FFMPEG_FOUND),1)
+		ICPPFLAGS += $(shell pkg-config --cflags libavcodec libavformat libavutil)
+		ILDLIBS   += $(shell pkg-config --libs libavcodec libavformat libavutil)
 	endif
 
 	COMPILER := $(HIPCXX)

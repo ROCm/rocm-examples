@@ -11,9 +11,9 @@ RUN zypper -qni update -y && \
         awk \
         unzip \
         xz \
-        cmake \
         gcc \
         gcc-c++ \
+        make \
         wget \
         git \
         curl \
@@ -27,6 +27,20 @@ RUN zypper -qni update -y && \
         libXinerama-devel \
         libXrandr-devel && \
     zypper clean -a
+
+# ============================================================================
+# Python virtual environment (ready for ROCm wheel or tarball installation)
+# ROCm installation is delegated to the CI workflow to support both methods
+# ============================================================================
+
+# Create virtual environment with base packages
+RUN python3.13 -m venv /opt/venv && \
+    /opt/venv/bin/pip install --upgrade pip && \
+    /opt/venv/bin/pip install pyyaml cmake
+
+# Set up virtual environment in PATH
+ENV PATH="/opt/venv/bin:${PATH}"
+ENV VIRTUAL_ENV="/opt/venv"
 
 # Build GLFW from source (not available in SLES repos)
 WORKDIR /tmp
@@ -52,20 +66,6 @@ ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
 
 ENV HIP_PLATFORM=amd
-
-# ============================================================================
-# Python virtual environment (ready for ROCm wheel or tarball installation)
-# ROCm installation is delegated to the CI workflow to support both methods
-# ============================================================================
-
-# Create virtual environment with base packages
-RUN python3.13 -m venv /opt/venv && \
-    /opt/venv/bin/pip install --upgrade pip && \
-    /opt/venv/bin/pip install pyyaml
-
-# Set up virtual environment in PATH
-ENV PATH="/opt/venv/bin:${PATH}"
-ENV VIRTUAL_ENV="/opt/venv"
 
 WORKDIR /workspace
 
