@@ -20,7 +20,7 @@ RUN apt-get update -qq && \
         glslang-tools \
         libtiff-dev \
         # libopencv-dev also installs FFmpeg dev packages
-        libopencv-dev \
+        libopencv-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
