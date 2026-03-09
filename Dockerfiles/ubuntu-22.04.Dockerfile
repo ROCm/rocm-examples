@@ -6,7 +6,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install system dependencies
 RUN apt-get update -qq && \
-    apt-get install -y \
+    apt-get install --dry-run \
         git \
         wget \
         curl \
@@ -19,7 +19,8 @@ RUN apt-get update -qq && \
         libvulkan-dev \
         glslang-tools \
         libtiff-dev \
-        libopencv-dev && \
+        # libopencv-dev also installs ffmpeg dev packages
+        libopencv-dev && \ 
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
