@@ -105,16 +105,6 @@ endif()
 
 set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
-if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
-    if(rocdecode-host_FOUND)
-        add_test(NAME ${example_name}-HEVC-host COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
-    endif()
-    add_test(NAME ${example_name}-HEVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
-else()
-    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
-endif()
-
 # disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
 # Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
 set(USING_THE_ROCK OFF)
@@ -123,6 +113,16 @@ if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
 endif()
 
 if (NOT USING_THE_ROCK)
+    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
+    if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
+        if(rocdecode-host_FOUND)
+            add_test(NAME ${example_name}-HEVC-host COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
+        endif()
+        add_test(NAME ${example_name}-HEVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
+    else()
+        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
+    endif()
+
     set(ROCDECODE_TEST_VIDEO_AVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H264.mp4")
     if(EXISTS "${ROCDECODE_TEST_VIDEO_AVC}")
         add_test(NAME ${example_name}-AVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_AVC}")
