@@ -39,26 +39,11 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
-ILDLIBS   := -lrocdecode -lavcodec -lavformat -lavutil -lswresample
+ILDLIBS   := -lrocdecode
 
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
 	CPPFLAGS += -D__HIP_PLATFORM_AMD__
-
-	# FFmpeg version detection
-	AVCODEC_VERSION := $(shell pkg-config --modversion libavcodec 2>/dev/null || echo "0")
-	AVCODEC_MAJOR := $(shell echo $(AVCODEC_VERSION) | cut -d. -f1)
-	AVCODEC_MINOR := $(shell echo $(AVCODEC_VERSION) | cut -d. -f2)
-	AVCODEC_PATCH := $(shell echo $(AVCODEC_VERSION) | cut -d. -f3)
-
-	# Compare version (58.134.100)
-	ifeq ($(shell test $(AVCODEC_MAJOR) -lt 58 || \
-	              (test $(AVCODEC_MAJOR) -eq 58 && test $(AVCODEC_MINOR) -lt 134) || \
-	              (test $(AVCODEC_MAJOR) -eq 58 && test $(AVCODEC_MINOR) -eq 134 && test $(AVCODEC_PATCH) -le 100); echo $$?),0)
-		CPPFLAGS += -DUSE_AVCODEC_GREATER_THAN_58_134=0
-	else
-		CPPFLAGS += -DUSE_AVCODEC_GREATER_THAN_58_134=1
-	endif
 
 	COMPILER := $(HIPCXX)
 else

@@ -82,7 +82,7 @@ target_include_directories(
 )
 
 # FFMPEG multi-version support
-if(AVCODEC_VERSION VERSION_LESS_EQUAL 58.134.100)
+if(_FFMPEG_AVCODEC_VERSION VERSION_LESS_EQUAL 58.134.100)
     target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=0)
 else()
     target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=1)
