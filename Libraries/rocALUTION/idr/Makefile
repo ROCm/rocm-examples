@@ -31,7 +31,7 @@ endif
 
 # Common variables and flags
 CXX ?= g++
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 
 ROCALUTION_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include
 

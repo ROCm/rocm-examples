@@ -33,7 +33,7 @@ ifneq ($(GPU_RUNTIME), HIP)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
 ROCWMMA_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

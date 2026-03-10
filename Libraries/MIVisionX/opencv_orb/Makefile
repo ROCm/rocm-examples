@@ -25,7 +25,7 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 
 # ROCm installation directory
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 
 # MIVisionX and OpenCV include directories
 MIVISIONX_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include/mivisionx

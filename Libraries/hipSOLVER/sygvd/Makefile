@@ -25,7 +25,7 @@ COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 CUDA_INSTALL_DIR ?= /usr/local/cuda
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include

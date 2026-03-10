@@ -27,7 +27,7 @@ EXTERNAL_DIR := ../../../../External
 GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
 ROCPROFILER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

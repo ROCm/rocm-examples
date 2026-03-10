@@ -29,7 +29,7 @@ ifneq ($(GPU_RUNTIME), HIP)
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 
 HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
 ROCSPARSE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

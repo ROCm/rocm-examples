@@ -24,7 +24,7 @@ EXAMPLE := cuda_block_reduction
 GPU_RUNTIME ?= CUDA
 
 # HIP variables
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
