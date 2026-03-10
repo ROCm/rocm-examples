@@ -11,6 +11,7 @@ RUN apt-get update -qq && \
         wget \
         curl \
         xz-utils \
+        pkgconf \
         build-essential \
         python3.11 \
         python3.11-venv \
@@ -19,8 +20,10 @@ RUN apt-get update -qq && \
         libvulkan-dev \
         glslang-tools \
         libtiff-dev \
-        # libopencv-dev also installs FFmpeg dev packages
-        libopencv-dev && \
+        libopencv-dev \
+        libavcodec-dev \
+        libavformat-dev \
+        libavutil-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

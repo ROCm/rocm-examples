@@ -18,6 +18,7 @@ RUN zypper -qni update -y && \
         git \
         curl \
         nasm \
+        pkg-config \
         python313 \
         libdw-devel \
         Mesa-libGL-devel \
