@@ -54,6 +54,7 @@ find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
 find_package(FFmpeg REQUIRED)
 find_package(rocprofiler-register REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(${example_name}
     main.cpp
@@ -67,6 +68,7 @@ target_link_libraries(${example_name}
     rocprofiler-register::rocprofiler-register
     ${FFMPEG_LIBRARIES}
     ${CXX_FS_LIBRARY}
+    Threads::Threads
 )
 
 target_include_directories(
