@@ -29,11 +29,29 @@ SKIP_TESTS = {
 # Tests to skip for a specific GPU target + distro combination.
 # Keys are "<gpu_target>:<distro_key>", e.g. "gfx1151:sles-15.7".
 DISTRO_SKIP_TESTS = {
-    # rocjpeg and rocprofiler-sdk segfault on RHEL 8 with TheRock nightlies
+    # RHEL 8: segfaults in HIP, rocjpeg, rocprofiler-sdk with TheRock nightlies;
+    # rocdecode FFmpeg tests fail due to libswresample not in ld cache
     "gfx1100:rhel-8": [
+        # HIP segfaults on RHEL 8
+        "applications_fdtd",
+        "hip_module_api",
+        "hip_linker_apis_file",
+        # rocjpeg segfaults
         "rocjpeg_decode",
         "rocjpeg_decode_batched",
         "rocjpeg_decode_perf",
+        # rocdecode FFmpeg tests (libswresample.so.3 not found)
+        "rocdecode_rocdec_decode",
+        "rocdecode_video_decode-HEVC",
+        "rocdecode_video_decode-AVC",
+        "rocdecode_video_decode-AV1",
+        "rocdecode_video_decode-VP9",
+        "rocdecode_video_decode_batch",
+        "rocdecode_video_decode_mem",
+        "rocdecode_video_decode_perf",
+        "rocdecode_video_decode_rgb",
+        "rocdecode_video_decode_rgb-resize",
+        # rocprofiler-sdk segfaults
         "rocprofiler-sdk_api_buffered_tracing",
         "rocprofiler-sdk_api_callback_tracing",
         "rocprofiler-sdk_code_object_isa_decode",
@@ -50,9 +68,22 @@ DISTRO_SKIP_TESTS = {
         "rocprofiler-sdk_pc_sampling",
     ],
     "gfx1151:rhel-8": [
+        "applications_fdtd",
+        "hip_module_api",
+        "hip_linker_apis_file",
         "rocjpeg_decode",
         "rocjpeg_decode_batched",
         "rocjpeg_decode_perf",
+        "rocdecode_rocdec_decode",
+        "rocdecode_video_decode-HEVC",
+        "rocdecode_video_decode-AVC",
+        "rocdecode_video_decode-AV1",
+        "rocdecode_video_decode-VP9",
+        "rocdecode_video_decode_batch",
+        "rocdecode_video_decode_mem",
+        "rocdecode_video_decode_perf",
+        "rocdecode_video_decode_rgb",
+        "rocdecode_video_decode_rgb-resize",
         "rocprofiler-sdk_api_buffered_tracing",
         "rocprofiler-sdk_api_callback_tracing",
         "rocprofiler-sdk_code_object_isa_decode",
