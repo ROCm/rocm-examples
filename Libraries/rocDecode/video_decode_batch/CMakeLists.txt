@@ -94,12 +94,20 @@ set_source_files_properties(
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
+# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
+# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
+set(USING_THE_ROCK OFF)
+if(EXISTS "${ROCM_ROOT}/lib/rocm_sysdeps/lib")
+  set(USING_THE_ROCK ON)
+endif()
 
-set(ROCDECODE_TEST_VIDEO_DIR "${ROCM_ROOT}/share/rocdecode/video")
-if(EXISTS "${ROCDECODE_TEST_VIDEO_DIR}")
-    add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_DIR}" -t 2)
-else()
-    message(WARNING "rocDecode test video directory ${ROCDECODE_TEST_VIDEO_DIR} not found, skipping ${example_name} test")
+if (NOT USING_THE_ROCK)
+    set(ROCDECODE_TEST_VIDEO_DIR "${ROCM_ROOT}/share/rocdecode/video")
+    if(EXISTS "${ROCDECODE_TEST_VIDEO_DIR}")
+        add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_DIR}" -t 2)
+    else()
+        message(WARNING "rocDecode test video directory ${ROCDECODE_TEST_VIDEO_DIR} not found, skipping ${example_name} test")
+    endif()
 endif()
 
 install(TARGETS ${example_name})
