@@ -49,7 +49,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
   HIPLIBS   += -L$(CUDA_INSTALL_DIR)/lib64 -lcudart
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS  ?= -Wall -Wextra
-  LIBFLAGS  += --emit-static-lib -fPIC
+  LIBFLAGS  += -c -fPIC
   HIPLIBS   += -L$(ROCM_INSTALL_DIR)/lib -lamdhip64
   HOSTFLAGS += $(CXXFLAGS)
 else
