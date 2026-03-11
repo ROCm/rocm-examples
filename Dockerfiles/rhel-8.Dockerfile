@@ -88,6 +88,7 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
     ./configure --enable-pic --enable-shared && \
     make -j$(nproc) && \
     make install && \
+    ldconfig && \
     rm -rf /tmp/ffmpeg-4.4.6*
 
 ENV HIP_PLATFORM=amd

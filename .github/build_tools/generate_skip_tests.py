@@ -29,8 +29,45 @@ SKIP_TESTS = {
 # Tests to skip for a specific GPU target + distro combination.
 # Keys are "<gpu_target>:<distro_key>", e.g. "gfx1151:sles-15.7".
 DISTRO_SKIP_TESTS = {
-    # Example:
-    # "gfx1151:sles-15.7": ["some_test"],
+    # rocjpeg and rocprofiler-sdk segfault on RHEL 8 with TheRock nightlies
+    "gfx1100:rhel-8": [
+        "rocjpeg_decode",
+        "rocjpeg_decode_batched",
+        "rocjpeg_decode_perf",
+        "rocprofiler-sdk_api_buffered_tracing",
+        "rocprofiler-sdk_api_callback_tracing",
+        "rocprofiler-sdk_code_object_isa_decode",
+        "rocprofiler-sdk_code_object_tracing",
+        "rocprofiler-sdk_counter_collection_buffer",
+        "rocprofiler-sdk_counter_collection_buffer_device_serialization",
+        "rocprofiler-sdk_counter_collection_callback",
+        "rocprofiler-sdk_counter_collection_print_functional_counters",
+        "rocprofiler-sdk_counter_collection_device_profiling",
+        "rocprofiler-sdk_counter_collection_device_profiling_sync",
+        "rocprofiler-sdk_external_correlation_id_request",
+        "rocprofiler-sdk_intercept_table",
+        "rocprofiler-sdk_openmp_target",
+        "rocprofiler-sdk_pc_sampling",
+    ],
+    "gfx1151:rhel-8": [
+        "rocjpeg_decode",
+        "rocjpeg_decode_batched",
+        "rocjpeg_decode_perf",
+        "rocprofiler-sdk_api_buffered_tracing",
+        "rocprofiler-sdk_api_callback_tracing",
+        "rocprofiler-sdk_code_object_isa_decode",
+        "rocprofiler-sdk_code_object_tracing",
+        "rocprofiler-sdk_counter_collection_buffer",
+        "rocprofiler-sdk_counter_collection_buffer_device_serialization",
+        "rocprofiler-sdk_counter_collection_callback",
+        "rocprofiler-sdk_counter_collection_print_functional_counters",
+        "rocprofiler-sdk_counter_collection_device_profiling",
+        "rocprofiler-sdk_counter_collection_device_profiling_sync",
+        "rocprofiler-sdk_external_correlation_id_request",
+        "rocprofiler-sdk_intercept_table",
+        "rocprofiler-sdk_openmp_target",
+        "rocprofiler-sdk_pc_sampling",
+    ],
 }
 
 
