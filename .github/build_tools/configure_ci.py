@@ -20,6 +20,7 @@ INSTALL_METHODS = ["wheel", "tarball"]
 DISTRO_MAP = {
     "ubuntu-22.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-22.04:latest", "label": "Ubuntu 22.04"},
     "sles-15.7":    {"image": "ghcr.io/rocm/rocm-examples-sles-15.7:latest",    "label": "SLES 15.7"},
+    "rhel-8":       {"image": "ghcr.io/sshi-amd/rocm-examples-rhel-8:latest",   "label": "RHEL 8"},
 }
 
 def _is_all(value):
