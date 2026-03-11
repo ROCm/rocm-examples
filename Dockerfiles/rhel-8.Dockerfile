@@ -15,6 +15,8 @@ RUN dnf install -y dnf-plugins-core && \
         xz \
         gcc \
         gcc-c++ \
+        gcc-toolset-13-gcc-c++ \
+        gcc-toolset-13-libstdc++-devel \
         make \
         wget \
         git \
@@ -32,6 +34,12 @@ RUN dnf install -y dnf-plugins-core && \
         libXrandr-devel \
         libatomic && \
     dnf clean all
+
+# GCC 8's libstdc++fs has an ABI-incompatible std::filesystem::path layout vs
+# the one expected by TheRock's libhsa-runtime64.so (built with a newer GCC).
+# GCC 13 from gcc-toolset-13 provides a compatible implementation.
+ENV PATH="/opt/rh/gcc-toolset-13/root/usr/bin:${PATH}" \
+    LD_LIBRARY_PATH="/opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13"
 
 # ============================================================================
 # Python virtual environment (ready for ROCm wheel or tarball installation)
@@ -76,7 +84,7 @@ RUN mkdir -p /opt/vulkan-sdk && \
     cp /usr/local/bin/glslangValidator ${VULKAN_SDK}/bin/glslangValidator
 
 ENV PATH="${VULKAN_SDK}/bin:${PATH}"
-ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib"
+ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib:${LD_LIBRARY_PATH}"
 ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
 
