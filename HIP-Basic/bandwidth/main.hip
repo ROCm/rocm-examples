@@ -250,9 +250,10 @@ std::vector<double>
 }
 
 /// \brief Run device to device transfer, bandwidth calculated for the specified configuration
-std::vector<double> run_bandwidth_device_device(std::vector<size_t> memory_copy_measurement_sizes,
-                                                const int           device,
-                                                const unsigned int  trails)
+std::vector<double> run_bandwidth_device_device(std::vector<size_t>          memory_copy_measurement_sizes,
+                                                const int                    device,
+                                                const unsigned int           trails,
+                                                std::vector<unsigned char*>* retained_d_out = nullptr)
 {
 
     // The bandwidths calculated will be stored in bandwidth_measurements
@@ -322,11 +323,110 @@ std::vector<double> run_bandwidth_device_device(std::vector<size_t> memory_copy_
 
         bandwidth_measurements.emplace_back(bandwidth_achieved);
 
-        // Free the device output memory
-        HIP_CHECK(hipFree(d_out));
+        // Free or retain device output memory for reuse by D2H
+        if(retained_d_out != nullptr)
+        {
+            retained_d_out->push_back(d_out);
+        }
+        else
+        {
+            HIP_CHECK(hipFree(d_out));
+        }
 
-        // Free the memory
+        // Free the input memory
         HIP_CHECK(hipFree(d_in));
+    }
+    std::cout << std::endl;
+
+    return bandwidth_measurements;
+}
+
+/// \brief Run device to host transfer reusing device data from a previous D2D run
+std::vector<double>
+    run_bandwidth_dtoh_with_device_data(const std::vector<size_t>&         memory_copy_measurement_sizes,
+                                        const int                           device,
+                                        const std::vector<unsigned char*>&  d_srcs,
+                                        const MemoryMode                    memory_mode,
+                                        const unsigned int                  trails)
+{
+    std::vector<double> bandwidth_measurements;
+
+    // Flush buffer for CPU cache
+    constexpr size_t  flush_size = 256 * 1024 * 1024;
+    std::vector<char> flush_buffer(flush_size);
+
+    HIP_CHECK(hipSetDevice(device));
+    std::cout << "Measuring Device to Host Bandwidth (reusing d2d data): " << std::flush;
+
+    for(size_t idx = 0; idx < memory_copy_measurement_sizes.size(); idx++)
+    {
+        const size_t   size          = memory_copy_measurement_sizes[idx];
+        const size_t   size_in_bytes = sizeof(unsigned char) * size;
+        unsigned char* src           = d_srcs[idx]; // reuse d_out from D2D
+
+        std::cout << "[" << size << "] " << std::flush;
+
+        if(memory_mode == MemoryMode::PAGED)
+        {
+            std::vector<unsigned char> h_out(size);
+            unsigned char*             dst = h_out.data();
+
+            const unsigned long long   cache_clear_size = 1 << 24;
+            std::vector<unsigned char> h_cache_block_1(cache_clear_size);
+            std::vector<unsigned char> h_cache_block_2(cache_clear_size);
+            for(unsigned int i = 0; i < h_cache_block_1.size(); i++)
+            {
+                h_cache_block_1[i] = static_cast<unsigned char>(i & 0xff);
+                h_cache_block_2[i] = static_cast<unsigned char>(0xff - (i & 0xff));
+            }
+
+            HostClock host_clock;
+
+            for(unsigned int i = 0; i < 5; i++)
+            {
+                HIP_CHECK(hipMemcpy(dst, src, size_in_bytes, hipMemcpyDeviceToHost));
+                std::memset(flush_buffer.data(), i, flush_buffer.size());
+            }
+            for(unsigned int i = 0; i < trails; i++)
+            {
+                host_clock.start_timer();
+                HIP_CHECK(hipMemcpy(dst, src, size_in_bytes, hipMemcpyDeviceToHost));
+                host_clock.stop_timer();
+                std::memset(flush_buffer.data(), i, flush_buffer.size());
+            }
+
+            const double bandwidth_achieved
+                = ((size_in_bytes * trails) / 1e9) / host_clock.get_elapsed_time();
+            bandwidth_measurements.emplace_back(bandwidth_achieved);
+        }
+        else if(memory_mode == MemoryMode::PINNED)
+        {
+            unsigned char* h_out = nullptr;
+            HIP_CHECK(hipHostMalloc(&h_out, size_in_bytes));
+
+            unsigned char* dst = h_out;
+
+            for(unsigned int i = 0; i < 5; i++)
+            {
+                HIP_CHECK(hipMemcpyAsync(dst, src, size_in_bytes, hipMemcpyDeviceToHost));
+            }
+            HIP_CHECK(hipDeviceSynchronize());
+
+            HostClock host_clock;
+            host_clock.start_timer();
+            for(unsigned int i = 0; i < trails; i++)
+            {
+                HIP_CHECK(hipMemcpyAsync(dst, src, size_in_bytes, hipMemcpyDeviceToHost));
+            }
+            HIP_CHECK(hipDeviceSynchronize());
+            host_clock.stop_timer();
+
+            const double bandwidth_achieved
+                = ((size_in_bytes * trails) / 1e9) / host_clock.get_elapsed_time();
+            bandwidth_measurements.emplace_back(bandwidth_achieved);
+
+            HIP_CHECK(hipHostFree(h_out));
+        }
     }
     std::cout << std::endl;
 
@@ -438,7 +538,7 @@ void configure_parser(cli::Parser& parser)
         "\t0,1,2,...,n for using any particular available devices");
     parser.set_optional<std::vector<std::string>>("memcpy",
                                                   "memcpy",
-                                                  {"htod", "dtoh", "dtod"},
+                                                  {"dtod", "htod", "dtoh"},
                                                   "Space-separated list of memory copy kind.\n"
                                                   "\thtod is host to device\n"
                                                   "\tdtoh is device to host\n"
@@ -591,46 +691,72 @@ int main(int argc, char** argv)
               << "\n\n";
 
     // Run the bandwidth tests on devices
+    // Run the bandwidth tests on devices in fixed order: H2D -> D2D -> D2H
+    // D2H reuses the device output data left by D2D (no extra upload needed)
     for(auto device : devices)
     {
         hipDeviceProp_t devProp;
         HIP_CHECK(hipSetDevice(device));
         HIP_CHECK(hipGetDeviceProperties(&devProp, device));
 
-        for(auto memcpy_kind : memcpy_kinds)
-        {
-            std::string print_text;
-            if(memory_allocation == MemoryMode::PAGED)
-            {
-                print_text = "Paged Bandwidth ";
-            }
-            else if(memory_allocation == MemoryMode::PINNED)
-            {
-                print_text = "Pinned Bandwidth ";
-            }
-            if(memcpy_kind.first == hipMemcpyDeviceToDevice)
-            {
-                print_text = "Bandwidth ";
-            }
+        const std::string bw_prefix = (memory_allocation == MemoryMode::PAGED) ? "Paged Bandwidth "
+                                    : (memory_allocation == MemoryMode::PINNED) ? "Pinned Bandwidth "
+                                    : "";
 
-            std::vector<double> bandwidth_measurements;
-            if(memcpy_kind.first == hipMemcpyDeviceToDevice)
+        // Collect D2D output pointers for D2H reuse
+        std::vector<unsigned char*> d2d_output_ptrs;
+
+        // 1. Host to Device
+        if(memcpy_kinds.count(hipMemcpyHostToDevice))
+        {
+            auto bw = run_bandwidth_host_device(memory_copy_measurement_sizes,
+                                                device,
+                                                hipMemcpyHostToDevice,
+                                                memory_allocation,
+                                                trials);
+            std::cout << "\nDevice ID [" << device << "] Device Name [" << devProp.name
+                      << "]: " << bw_prefix << "Host to Device (GB/s): "
+                      << format_range(bw.begin(), bw.end()) << "\n\n";
+        }
+
+        // 2. Device to Device (retain output ptrs so D2H can reuse them)
+        if(memcpy_kinds.count(hipMemcpyDeviceToDevice))
+        {
+            const bool need_for_dtoh = memcpy_kinds.count(hipMemcpyDeviceToHost) > 0;
+            auto bw = run_bandwidth_device_device(memory_copy_measurement_sizes,
+                                                  device,
+                                                  trials,
+                                                  need_for_dtoh ? &d2d_output_ptrs : nullptr);
+            std::cout << "\nDevice ID [" << device << "] Device Name [" << devProp.name
+                      << "]: Bandwidth Device to Device (GB/s): "
+                      << format_range(bw.begin(), bw.end()) << "\n\n";
+        }
+
+        // 3. Device to Host (reuse D2D output if available, else fall back to normal path)
+        if(memcpy_kinds.count(hipMemcpyDeviceToHost))
+        {
+            std::vector<double> bw;
+            if(!d2d_output_ptrs.empty())
             {
-                bandwidth_measurements
-                    = run_bandwidth_device_device(memory_copy_measurement_sizes, device, trials);
+                bw = run_bandwidth_dtoh_with_device_data(memory_copy_measurement_sizes,
+                                                         device,
+                                                         d2d_output_ptrs,
+                                                         memory_allocation,
+                                                         trials);
+                for(auto ptr : d2d_output_ptrs)
+                    HIP_CHECK(hipFree(ptr));
             }
             else
             {
-                bandwidth_measurements = run_bandwidth_host_device(memory_copy_measurement_sizes,
-                                                                   device,
-                                                                   memcpy_kind.first,
-                                                                   memory_allocation,
-                                                                   trials);
+                bw = run_bandwidth_host_device(memory_copy_measurement_sizes,
+                                               device,
+                                               hipMemcpyDeviceToHost,
+                                               memory_allocation,
+                                               trials);
             }
             std::cout << "\nDevice ID [" << device << "] Device Name [" << devProp.name
-                      << "]: " << print_text << memcpy_kind.second << " (GB/s): "
-                      << format_range(bandwidth_measurements.begin(), bandwidth_measurements.end())
-                      << "\n\n";
+                      << "]: " << bw_prefix << "Device to Host (GB/s): "
+                      << format_range(bw.begin(), bw.end()) << "\n\n";
         }
     }
 }
