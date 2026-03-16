@@ -10,8 +10,8 @@ import os
 
 # Tests to skip per GPU target (one list per target that has skips)
 SKIP_TESTS = {
-    # rccl is not supported on gfx1151 yet
     "gfx1151": [
+        # rccl is not supported on gfx1151 yet
         "rccl_allgather",
         "rccl_allreduce",
         "rccl_broadcast",

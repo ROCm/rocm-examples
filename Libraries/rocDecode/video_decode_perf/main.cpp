@@ -30,12 +30,9 @@ THE SOFTWARE.
 #include <sys/stat.h>
 #include <thread>
 #include <vector>
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-    #include <filesystem>
-#else
-    #include <experimental/filesystem>
+#if ENABLE_HOST_DECODE
+    #include "ffmpeg_video_dec.h"
 #endif
-#include "ffmpeg_video_dec.h"
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 
@@ -246,7 +243,7 @@ int main(int argc, char** argv)
                 std::cout
                     << "Error: RocDecode HOST library is not found and backend is not supported!"
                     << std::endl;
-                return 0;
+                return 1;
 #endif
             }
 
@@ -327,7 +324,7 @@ int main(int argc, char** argv)
     catch(const std::exception& ex)
     {
         std::cout << ex.what() << std::endl;
-        exit(1);
+        return 1;
     }
 
     return 0;

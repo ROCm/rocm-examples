@@ -49,6 +49,7 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 find_package(rocjpeg REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
@@ -56,7 +57,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
-target_link_libraries(${example_name} PRIVATE rocjpeg::rocjpeg ${CXX_FS_LIBRARY})
+target_link_libraries(${example_name} PRIVATE rocjpeg::rocjpeg ${CXX_FS_LIBRARY} Threads::Threads)
 
 target_include_directories(
     ${example_name}

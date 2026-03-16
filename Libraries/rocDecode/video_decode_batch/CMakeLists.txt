@@ -25,6 +25,8 @@ set(example_name rocdecode_video_decode_batch)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
+include("../../../Common/FindFilesystem.cmake")
 include("../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
@@ -48,42 +50,11 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
+find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
 find_package(rocprofiler-register REQUIRED)
 find_package(Threads REQUIRED)
-
-# Find FFmpeg libraries
-find_library(AVCODEC_LIBRARY avcodec REQUIRED)
-find_library(AVFORMAT_LIBRARY avformat REQUIRED)
-find_library(AVUTIL_LIBRARY avutil REQUIRED)
-
-find_path(AVCODEC_INCLUDE_DIR libavcodec/avcodec.h REQUIRED)
-find_path(AVFORMAT_INCLUDE_DIR libavformat/avformat.h REQUIRED)
-find_path(AVUTIL_INCLUDE_DIR libavutil/avutil.h REQUIRED)
-
-# Check FFmpeg version for compatibility using pkg-config (same as Makefile)
-execute_process(
-    COMMAND pkg-config --modversion libavcodec
-    OUTPUT_VARIABLE AVCODEC_VERSION
-    OUTPUT_STRIP_TRAILING_WHITESPACE
-    ERROR_QUIET
-)
-
-# If pkg-config fails, try to get version from header as fallback
-if(NOT AVCODEC_VERSION AND AVCODEC_INCLUDE_DIR)
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MAJOR_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MAJOR")
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MINOR_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MINOR")
-    file(STRINGS "${AVCODEC_INCLUDE_DIR}/libavcodec/version.h" AVCODEC_VERSION_MICRO_LINE
-         REGEX "^#define LIBAVCODEC_VERSION_MICRO")
-
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MAJOR[ \t]+([0-9]+).*$" "\\1" AVCODEC_MAJOR "${AVCODEC_VERSION_MAJOR_LINE}")
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MINOR[ \t]+([0-9]+).*$" "\\1" AVCODEC_MINOR "${AVCODEC_VERSION_MINOR_LINE}")
-    string(REGEX REPLACE "^#define LIBAVCODEC_VERSION_MICRO[ \t]+([0-9]+).*$" "\\1" AVCODEC_MICRO "${AVCODEC_VERSION_MICRO_LINE}")
-
-    set(AVCODEC_VERSION "${AVCODEC_MAJOR}.${AVCODEC_MINOR}.${AVCODEC_MICRO}")
-endif()
+find_package(FFmpeg REQUIRED)
 
 add_executable(${example_name}
     main.cpp
@@ -92,13 +63,12 @@ add_executable(${example_name}
 
 target_link_libraries(${example_name}
     PRIVATE
+    hip::host
     rocdecode::rocdecode
     rocprofiler-register::rocprofiler-register
-    ${AVCODEC_LIBRARY}
-    ${AVFORMAT_LIBRARY}
-    ${AVUTIL_LIBRARY}
+    ${FFMPEG_LIBRARIES}
     Threads::Threads
-    stdc++fs
+    ${CXX_FS_LIBRARY}
 )
 
 target_include_directories(
@@ -108,13 +78,11 @@ target_include_directories(
     "../../../External"
     "${ROCM_ROOT}/share/rocdecode/utils"
     "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode"
-    ${AVCODEC_INCLUDE_DIR}
-    ${AVFORMAT_INCLUDE_DIR}
-    ${AVUTIL_INCLUDE_DIR}
+    "${FFMPEG_INCLUDE_DIR}"
 )
 
 # FFMPEG multi-version support
-if(AVCODEC_VERSION VERSION_LESS_EQUAL 58.134.100)
+if(_FFMPEG_AVCODEC_VERSION VERSION_LESS_EQUAL 58.134.100)
     target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=0)
 else()
     target_compile_definitions(${example_name} PRIVATE USE_AVCODEC_GREATER_THAN_58_134=1)
@@ -125,5 +93,21 @@ set_source_files_properties(
     ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
+
+# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
+# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
+set(USING_THE_ROCK OFF)
+if(EXISTS "${ROCM_ROOT}/lib/rocm_sysdeps/lib")
+  set(USING_THE_ROCK ON)
+endif()
+
+if (NOT USING_THE_ROCK)
+    set(ROCDECODE_TEST_VIDEO_DIR "${ROCM_ROOT}/share/rocdecode/video")
+    if(EXISTS "${ROCDECODE_TEST_VIDEO_DIR}")
+        add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_DIR}" -t 2)
+    else()
+        message(WARNING "rocDecode test video directory ${ROCDECODE_TEST_VIDEO_DIR} not found, skipping ${example_name} test")
+    endif()
+endif()
 
 install(TARGETS ${example_name})

@@ -172,7 +172,9 @@ jobs:
       - name: Test summary
         if: ${{ !cancelled() }}
         run: |
-          if [ ! -f ctest_output.log ]; then
+          LAST_TEST_LOG="build/Testing/Temporary/LastTest.log"
+          if [ ! -f ctest_output.log ] || [ ! -f "${LAST_TEST_LOG}" ]; then
+            echo "No test logs found." >> $GITHUB_STEP_SUMMARY
             exit 0
           fi
 
@@ -182,23 +184,38 @@ jobs:
           SUMMARY=$(grep "tests passed" ctest_output.log)
           echo "**${SUMMARY}**" >> $GITHUB_STEP_SUMMARY
 
-          FAILED=$(grep -c "Failed" ctest_output.log || true)
-
-          if [ "${FAILED}" -gt 0 ]; then
+          FAILED_LOG="build/Testing/Temporary/LastTestsFailed.log"
+          if [ -s "${FAILED_LOG}" ]; then
             echo "## Failed tests" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            cat build/Testing/Temporary/LastTestsFailed.log >> $GITHUB_STEP_SUMMARY
+            cat "${FAILED_LOG}" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
 
             echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            awk '/^[[:space:]]*Start[[:space:]]+[0-9]+:/ {found=0; next} /\*\*\*/ && !/Passed/ {found=1} found' ctest_output.log >> $GITHUB_STEP_SUMMARY
+            
+            awk '
+              /^[0-9]+\/[0-9]+ Testing: / { if (inblock && failed) print block; block = $0; inblock = 1; failed = 0; seen_result = 0; next }
+              inblock { block = block "\n" $0 }
+              /^Test Failed\.$/ { failed = 1; seen_result = 1 }
+              /^Test Passed\.$/ { seen_result = 1 }
+              /^-+$/ { if (inblock && seen_result) { if (failed) print block; inblock = 0 } }
+              END { if (inblock && failed) print block }
+            ' "${LAST_TEST_LOG}" >> $GITHUB_STEP_SUMMARY
+            
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Upload test logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          path: build/Testing/Temporary/
 
       - name: Clean the workspace
         if: always()

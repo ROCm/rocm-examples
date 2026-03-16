@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,8 @@ set(example_name rocdecode_rocdec_decode)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
+include("../../../Common/FindFilesystem.cmake")
 include("../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
@@ -48,22 +50,34 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
+find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
-
-# Try to find the host library directly (handles both naming conventions)
-find_library(ROCDECODE_HOST_LIB
-    NAMES rocdecode-host rocdecodehost
-    PATHS ${ROCM_ROOT}/lib
-    NO_DEFAULT_PATH
-)
+find_package(rocdecode-host 1.0.0 QUIET)
+find_package(FFmpeg QUIET)
 
 add_executable(${example_name} main.cpp)
 
-target_link_libraries(${example_name} PRIVATE rocdecode::rocdecode)
+target_link_libraries(${example_name} PRIVATE hip::host rocdecode::rocdecode ${CXX_FS_LIBRARY})
 
-# Link host library if found
-if(ROCDECODE_HOST_LIB)
-    target_link_libraries(${example_name} PRIVATE ${ROCDECODE_HOST_LIB})
+# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
+set(USING_THE_ROCK OFF)
+if(EXISTS "${ROCM_ROOT}/lib/rocm_sysdeps/lib")
+  set(USING_THE_ROCK ON)
+endif()
+
+# Link FFmpeg and host library if found
+if(FFMPEG_FOUND AND NOT USING_THE_ROCK)
+    target_include_directories(${example_name} PRIVATE "${FFMPEG_INCLUDE_DIR}")
+    target_link_libraries(${example_name} PRIVATE ${FFMPEG_LIBRARIES})
+endif()
+
+if(rocdecode-host_FOUND AND NOT USING_THE_ROCK)
+    # rocdecode-host
+    target_include_directories(${example_name} PRIVATE "${rocdecode-host_INCLUDE_DIR}")
+    target_link_libraries(${example_name} PRIVATE rocdecode::rocdecode-host)
+endif()
+
+if(FFMPEG_FOUND AND rocdecode-host_FOUND AND NOT USING_THE_ROCK)
     target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=1)
 else()
     target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=0)
@@ -75,5 +89,12 @@ target_include_directories(
 )
 
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+
+set(ROCDECODE_TEST_FRAMES_DIR "${ROCM_ROOT}/share/rocdecode/frames")
+if(EXISTS "${ROCDECODE_TEST_FRAMES_DIR}")
+    add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_FRAMES_DIR}")
+else()
+    message(WARNING "rocDecode test frames directory ${ROCDECODE_TEST_FRAMES_DIR} not found, skipping ${example_name} test")
+endif()
 
 install(TARGETS ${example_name})

@@ -30,11 +30,6 @@ THE SOFTWARE.
 #include <string>
 #include <sys/stat.h>
 #include <vector>
-#if __cplusplus >= 201703L && __has_include(<filesystem>)
-    #include <filesystem>
-#else
-    #include <experimental/filesystem>
-#endif
 #include "roc_video_dec.h"
 #include "video_demuxer.h"
 
@@ -187,7 +182,7 @@ int main(int argc, char** argv)
         if(!viddec.CodecSupported(device_id, rocdec_codec_id, demuxer.GetBitDepth()))
         {
             std::cerr << "GPU doesn't support codec!" << std::endl;
-            return 0;
+            return 1;
         }
 
         std::string device_name, gcn_arch_name;
@@ -323,7 +318,7 @@ int main(int argc, char** argv)
     catch(const std::exception& ex)
     {
         std::cout << ex.what() << std::endl;
-        exit(1);
+        return 1;
     }
 
     return 0;

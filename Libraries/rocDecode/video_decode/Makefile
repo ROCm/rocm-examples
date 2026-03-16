@@ -26,7 +26,7 @@ EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_INSTALL_DIR ?= /opt/rocm
 UTILS_DIR := ${ROCM_INSTALL_DIR}/share/rocdecode/utils
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
@@ -44,7 +44,7 @@ ROCDECODE_HOST_LIB := $(shell if [ -f $(ROCM_INSTALL_DIR)/lib/librocdecode-host.
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I .. -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode -I $(UTILS_DIR)/ffmpegvideodecode
+ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I .. -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
 ILDLIBS   := -lrocdecode -lrocprofiler-register -lavcodec -lavformat -lavutil -lpthread
 
@@ -56,6 +56,7 @@ ifeq ($(GPU_RUNTIME), HIP)
 	ifneq ($(ROCDECODE_HOST_LIB),)
 		ILDLIBS  += -l$(ROCDECODE_HOST_LIB)
 		CPPFLAGS += -DENABLE_HOST_DECODE=1
+		ICPPFLAGS += -I $(UTILS_DIR)/ffmpegvideodecode
 	else
 		CPPFLAGS += -DENABLE_HOST_DECODE=0
 	endif
@@ -85,7 +86,11 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp $(UTILS_DIR)/ffmpegvideodecode/ffmpeg_video_dec.cpp
+SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp
+
+ifneq ($(ROCDECODE_HOST_LIB),)
+	SOURCES += $(UTILS_DIR)/ffmpegvideodecode/ffmpeg_video_dec.cpp
+endif
 
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
