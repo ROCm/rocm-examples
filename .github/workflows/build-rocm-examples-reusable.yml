@@ -75,8 +75,6 @@ jobs:
           LD_LIB="${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems"
           if [ -d "${ROCM_PATH}/lib/rocm_sysdeps/lib" ]; then
             LD_LIB="${LD_LIB}:${ROCM_PATH}/lib/rocm_sysdeps/lib"
-            echo "LIBVA_DRIVERS_PATH=${ROCM_PATH}/lib/rocm_sysdeps/lib" >> $GITHUB_ENV
-            echo "LIBVA_DRIVER_NAME=radeonsi" >> $GITHUB_ENV
           fi
           echo "LD_LIBRARY_PATH=${LD_LIB}" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=OFF" >> $GITHUB_ENV
@@ -111,8 +109,6 @@ jobs:
           LD_LIB="${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems"
           if [ -d "${ROCM_PATH}/lib/rocm_sysdeps/lib" ]; then
             LD_LIB="${LD_LIB}:${ROCM_PATH}/lib/rocm_sysdeps/lib"
-            echo "LIBVA_DRIVERS_PATH=${ROCM_PATH}/lib/rocm_sysdeps/lib" >> $GITHUB_ENV
-            echo "LIBVA_DRIVER_NAME=radeonsi" >> $GITHUB_ENV
           fi
           echo "LD_LIBRARY_PATH=${LD_LIB}" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
