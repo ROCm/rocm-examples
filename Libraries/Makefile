@@ -47,8 +47,7 @@ LIBRARIES += \
   rocSOLVER \
   rocSPARSE \
   rocThrust \
-  rocWMMA \
-  RPP
+  rocWMMA
 
 # Only build libraries whose headers are present
 ifneq ($(wildcard $(INCLUDE_DIR)/hiptensor/hiptensor.hpp),)
@@ -73,6 +72,10 @@ endif
 
 ifneq ($(wildcard $(INCLUDE_DIR)/roccv/core/tensor.hpp),)
 LIBRARIES += rocCV
+endif
+
+ifneq ($(wildcard $(INCLUDE_DIR)/rpp/rpp.h),)
+LIBRARIES += RPP
 endif
 
 endif

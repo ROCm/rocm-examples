@@ -28,8 +28,11 @@ EXAMPLES := \
   counter_collection \
   external_correlation_id_request \
   intercept_table \
-  openmp_target \
   pc_sampling
+
+ifneq ($(ENABLE_OPENMP), OFF)
+EXAMPLES += openmp_target
+endif
 
 all: $(EXAMPLES)
 
