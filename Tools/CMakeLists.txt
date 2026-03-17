@@ -44,7 +44,7 @@ endif()
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
 # The HIP tools are supported neither on Windows nor on CUDA.
-if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA"))
+if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA"))
 
     find_program(ROCGDB_EXEC NAMES rocgdb)
     if(NOT ROCGDB_EXEC)

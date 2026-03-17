@@ -32,7 +32,7 @@ option(ROCM_EXAMPLES_ENABLE_CK "Enable Composable Kernel examples (disabled by d
 # CMake configuration files for CUDA versions of HIP libraries are not yet
 # included under the HIP SDK for Windows.
 if(
-    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${GPU_RUNTIME}" STREQUAL "CUDA")
+    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
 )
     if(ROCM_EXAMPLES_ENABLE_CK)
         add_subdirectory(ComposableKernel)

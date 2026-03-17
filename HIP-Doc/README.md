@@ -36,7 +36,7 @@ All examples in the `HIP-Doc` subdirectory can either be built by a single CMake
 independently.
 
 - `$ cd HIP-Doc`
-- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
+- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
 - `$ cmake --build build`
 
 #### Using Make
@@ -44,7 +44,7 @@ independently.
 All examples can be built by a single invocation to Make or be built independently.
 
 - `$ cd HIP-Doc`
-- `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
+- `$ make` (on ROCm) or `$ make ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
 
 ### Windows
 

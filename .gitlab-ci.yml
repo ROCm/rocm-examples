@@ -183,7 +183,7 @@ build:make-cuda:
     - build
   needs: []
   script:
-    - cd $CI_PROJECT_DIR && make CXXFLAGS="$CUDA_FLAGS" GPU_RUNTIME=CUDA -j $(nproc)
+    - cd $CI_PROJECT_DIR && make CXXFLAGS="$CUDA_FLAGS" ROCM_EXAMPLES_GPU_LANGUAGE=CUDA -j $(nproc)
 
 ########################
 # Ubuntu cmake         #
@@ -233,7 +233,7 @@ build:cmake-cuda:
     - cmake
       -S $CI_PROJECT_DIR
       -B $CI_PROJECT_DIR/build
-      -D GPU_RUNTIME=CUDA
+      -D ROCM_EXAMPLES_GPU_LANGUAGE=CUDA
       -D CMAKE_CXX_FLAGS="$CXX_FLAGS"
       -D CMAKE_CUDA_FLAGS="$CUDA_FLAGS"
       -D CMAKE_MODULE_PATH=/opt/rocm/lib/cmake/hip
@@ -477,6 +477,6 @@ test:windows-nvcc-cmake:
       -D CMAKE_TOOLCHAIN_FILE="C:/Tools/Microsoft/vcpkg/scripts/buildsystems/vcpkg.cmake"
       -D CMAKE_BUILD_TYPE="$BUILD_TYPE"
       -D CMAKE_CXX_COMPILER="cl.exe"
-      -D GPU_RUNTIME=CUDA
+      -D ROCM_EXAMPLES_GPU_LANGUAGE=CUDA
       2>&1 | Tee-Object -filepath cmake_log.txt
     - !reference [.test:windows-cmake, script]

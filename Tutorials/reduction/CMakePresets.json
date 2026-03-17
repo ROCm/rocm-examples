@@ -209,7 +209,7 @@
 				"tooling-compile-commands-vcpkg-ci"
 			],
 			"cacheVariables": {
-				"GPU_RUNTIME": "CUDA"
+				"ROCM_EXAMPLES_GPU_LANGUAGE": "CUDA"
 			},
 			"condition": {
 				"type": "equals",
@@ -246,7 +246,7 @@
 				"tooling-compile-commands-vcpkg-ci"
 			],
 			"cacheVariables": {
-				"GPU_RUNTIME": "CUDA"
+				"ROCM_EXAMPLES_GPU_LANGUAGE": "CUDA"
 			},
 			"condition": {
 				"type": "equals",
