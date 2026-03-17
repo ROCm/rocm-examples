@@ -61,6 +61,7 @@ on:
         - all
         - ubuntu-22.04
         - sles-15.7
+        - almalinux-8
 
 permissions:
   contents: read

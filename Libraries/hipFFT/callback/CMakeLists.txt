@@ -24,7 +24,7 @@ set(example_name hipfft_callback)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "hipFFT callback example does not support the CUDA runtime")
     return()
 endif()

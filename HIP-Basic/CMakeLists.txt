@@ -49,7 +49,7 @@ file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 # Only supported on HIP (not CUDA)
-if(NOT "${GPU_RUNTIME}" STREQUAL "CUDA")
+if(NOT "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
     # Make sure the dependencies can be found before building.
     find_program(
         LLVM_DIS_COMMAND
@@ -121,7 +121,7 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
         message(WARNING "Perl not found, not building hipify example")
     endif()
 endif()
-if("${GPU_RUNTIME}" STREQUAL "CUDA")
+if("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
     add_subdirectory(hello_world_cuda)
 endif()
 

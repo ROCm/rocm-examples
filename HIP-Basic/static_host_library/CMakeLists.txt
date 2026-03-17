@@ -25,21 +25,14 @@ set(example_name hip_static_host_library)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
-set(GPU_RUNTIMES "HIP" "CUDA")
-set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    set(ERROR_MESSAGE
-        "GPU_RUNTIME is set to \"${GPU_RUNTIME}\".\nGPU_RUNTIME must be either HIP or CUDA."
-    )
-    message(FATAL_ERROR ${ERROR_MESSAGE})
-endif()
-
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -61,7 +54,7 @@ set(library_name hip_static_host)
 set(example_name_cxx ${example_name}_cxx)
 
 set(include_dirs "../../Common" "../../External")
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_ROOT}/include")
 endif()
 
@@ -72,7 +65,7 @@ target_include_directories(${library_name} PUBLIC library)
 set_target_properties(${library_name} PROPERTIES POSITION_INDEPENDENT_CODE ON)
 set_source_files_properties(
     library/library.hip
-    PROPERTIES LANGUAGE ${GPU_RUNTIME}
+    PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
 # Create a driver executable using ROCm's bundled version of clang.
@@ -82,7 +75,7 @@ target_link_libraries(${example_name} PRIVATE ${library_name})
 # We are creating a regular, non-HIP, executable, and so we don't need to pass
 # a list of devices for this target.
 set_target_properties(${example_name} PROPERTIES HIP_ARCHITECTURES FALSE)
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 # Copy main.cpp so we don't use the same source file properties as above target
 file(COPY_FILE main.cpp ${CMAKE_CURRENT_BINARY_DIR}/main_copy.cpp)

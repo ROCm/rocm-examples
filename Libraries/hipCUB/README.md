@@ -39,7 +39,7 @@ Make sure that the dependencies are installed, or use one of the [provided Docke
 All examples in the `hipCUB` subdirectory can either be built by a single CMake project or be built independently.
 
 - `$ cd Libraries/hipCUB`
-- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D GPU_RUNTIME=CUDA` (on CUDA)
+- `$ cmake -S . -B build` (on ROCm) or `$ cmake -S . -B build -D ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
 - `$ cmake --build build`
 
 #### Using Make
@@ -47,7 +47,7 @@ All examples in the `hipCUB` subdirectory can either be built by a single CMake 
 All examples can be built by a single invocation to Make or be built independently.
 
 - `$ cd Libraries/hipCUB`
-- `$ make` (on ROCm) or `$ make GPU_RUNTIME=CUDA` (on CUDA)
+- `$ make` (on ROCm) or `$ make ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
 
 ### Windows
 

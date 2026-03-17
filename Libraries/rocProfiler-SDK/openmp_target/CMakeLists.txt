@@ -24,7 +24,10 @@ set(example_name rocprofiler-sdk_openmp_target)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
-if(GPU_RUNTIME STREQUAL "CUDA")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+select_gpu_language()
+
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocProfiler-SDK examples do not support the CUDA runtime")
     return()
 endif()

@@ -26,7 +26,7 @@ project(rocWMMA_examples LANGUAGES CXX)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocWMMA examples do not support the CUDA runtime")
     return()
 endif()
@@ -57,6 +57,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         get_target_property(ROCWMMA_LINK_LIBS roc::rocwmma INTERFACE_LINK_LIBRARIES)
         if(ROCWMMA_LINK_LIBS)
             list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+            list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::omp)
             set_target_properties(roc::rocwmma PROPERTIES
                 INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
             )
@@ -65,6 +66,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
         get_target_property(ROCWMMA_LINK_LIBS rocwmma INTERFACE_LINK_LIBRARIES)
         if(ROCWMMA_LINK_LIBS)
             list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::OpenMP_CXX)
+            list(REMOVE_ITEM ROCWMMA_LINK_LIBS OpenMP::omp)
             set_target_properties(rocwmma PROPERTIES
                 INTERFACE_LINK_LIBRARIES "${ROCWMMA_LINK_LIBS}"
             )

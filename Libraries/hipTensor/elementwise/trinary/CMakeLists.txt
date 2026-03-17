@@ -74,6 +74,6 @@ target_include_directories(
     ${example_name}
     PRIVATE "../../../../Common" "../../../../External"
 )
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
