@@ -31,16 +31,14 @@ LIBRARIES := \
 	hipRAND
 
 ifneq ($(GPU_RUNTIME), CUDA)
+
+ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include
+
 LIBRARIES += \
   hipBLASLt \
-  hipTensor \
-  MIGraphX \
-  MIVisionX \
   RCCL \
-  rocAL \
-  rocALUTION \
   rocBLAS \
-  rocCV \
   rocDecode \
   rocFFT \
   rocJPEG \
@@ -51,6 +49,32 @@ LIBRARIES += \
   rocThrust \
   rocWMMA \
   RPP
+
+# Only build libraries whose headers are present
+ifneq ($(wildcard $(INCLUDE_DIR)/hiptensor/hiptensor.hpp),)
+LIBRARIES += hipTensor
+endif
+
+ifneq ($(wildcard $(INCLUDE_DIR)/migraphx/migraphx.hpp),)
+LIBRARIES += MIGraphX
+endif
+
+ifneq ($(wildcard $(INCLUDE_DIR)/mivisionx/VX/vx.h),)
+LIBRARIES += MIVisionX
+endif
+
+ifneq ($(wildcard $(INCLUDE_DIR)/rocal/rocal_api.h),)
+LIBRARIES += rocAL
+endif
+
+ifneq ($(wildcard $(INCLUDE_DIR)/rocalution/rocalution.hpp),)
+LIBRARIES += rocALUTION
+endif
+
+ifneq ($(wildcard $(INCLUDE_DIR)/roccv/core/tensor.hpp),)
+LIBRARIES += rocCV
+endif
+
 endif
 
 all: $(LIBRARIES)
