@@ -25,7 +25,7 @@ set(example_name rocsparse_csric0)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-if(GPU_RUNTIME STREQUAL "CUDA")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocSPARSE examples do not support the CUDA runtime")
     return()
 endif()

@@ -65,6 +65,6 @@ add_subdirectory(sygvd)
 
 # this example currently does not work with CUDA
 # https://github.com/ROCm/hipSOLVER/issues/152
-if(NOT ("${GPU_RUNTIME}" STREQUAL "CUDA"))
+if(NOT ("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA"))
     add_subdirectory(sygvj)
 endif()

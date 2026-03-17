@@ -25,21 +25,14 @@ set(example_name hipsparse_axpyi)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(GPU_RUNTIME "HIP" CACHE STRING "Switches between HIP and CUDA")
-set(GPU_RUNTIMES "HIP" "CUDA")
-set_property(CACHE GPU_RUNTIME PROPERTY STRINGS ${GPU_RUNTIMES})
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-if(NOT "${GPU_RUNTIME}" IN_LIST GPU_RUNTIMES)
-    message(
-        FATAL_ERROR
-        "Only the following values are accepted for GPU_RUNTIME: ${GPU_RUNTIMES}"
-    )
-endif()
-
-enable_language(${GPU_RUNTIME})
-set(CMAKE_${GPU_RUNTIME}_STANDARD 17)
-set(CMAKE_${GPU_RUNTIME}_EXTENSIONS OFF)
-set(CMAKE_${GPU_RUNTIME}_STANDARD_REQUIRED ON)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -70,15 +63,15 @@ target_include_directories(
     ${example_name}
     PRIVATE "../../../Common" "../../../External"
 )
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::hipsparse)
-    if(GPU_RUNTIME STREQUAL "HIP")
+    if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
         find_package(rocsparse REQUIRED)
         install(IMPORTED_RUNTIME_ARTIFACTS roc::rocsparse)
-    elseif(GPU_RUNTIME STREQUAL "CUDA")
+    elseif(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
         find_package(CUDAToolkit REQUIRED)
         install(IMPORTED_RUNTIME_ARTIFACTS CUDA::cusparse)
     endif()

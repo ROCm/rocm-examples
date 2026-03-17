@@ -76,5 +76,5 @@ jobs:
           - name: Configure and Build
             run: |
               cd Applications && mkdir build && cd build
-              cmake -DGPU_RUNTIME=CUDA ..
+              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA ..
               cmake --build . -j

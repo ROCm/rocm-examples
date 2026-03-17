@@ -63,7 +63,7 @@ add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${GPU_RUNTIME})
+set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 target_link_libraries(${example_name} PRIVATE hip::hiprand)
 
