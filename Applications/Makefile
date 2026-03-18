@@ -26,8 +26,11 @@ EXAMPLES := \
   fdtd \
   floyd_warshall \
   histogram \
-  prefix_sum \
-  sobel_filter
+  prefix_sum
+
+ifneq ($(shell pkg-config --exists glfw3 2>/dev/null && echo yes),)
+  EXAMPLES += sobel_filter
+endif
 
 ifneq ($(GPU_RUNTIME), CUDA)
   EXAMPLES += \

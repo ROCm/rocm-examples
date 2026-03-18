@@ -39,15 +39,21 @@ LIBRARIES += \
   hipBLASLt \
   RCCL \
   rocBLAS \
-  rocDecode \
   rocFFT \
-  rocJPEG \
   rocPRIM \
   rocProfiler-SDK \
   rocSOLVER \
   rocSPARSE \
   rocThrust \
   rocWMMA
+
+ifneq ($(wildcard $(INCLUDE_DIR)/rocdecode/rocdecode.h),)
+LIBRARIES += rocDecode
+endif
+
+ifneq ($(wildcard $(INCLUDE_DIR)/rocjpeg/rocjpeg.h),)
+LIBRARIES += rocJPEG
+endif
 
 # Only build libraries whose headers are present
 ifneq ($(wildcard $(INCLUDE_DIR)/hiptensor/hiptensor.hpp),)
