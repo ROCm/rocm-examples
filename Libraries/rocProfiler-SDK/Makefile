@@ -31,7 +31,10 @@ EXAMPLES := \
   pc_sampling
 
 ifneq ($(ENABLE_OPENMP), OFF)
-EXAMPLES += openmp_target
+  _ROCM_DIR := $(or $(ROCM_PATH),/opt/rocm)
+  ifneq ($(wildcard $(_ROCM_DIR)/bin/amdclang++),)
+    EXAMPLES += openmp_target
+  endif
 endif
 
 all: $(EXAMPLES)
