@@ -1,5 +1,8 @@
 # MIVisionX ORB Feature Detection
 
+> [!WARNING]
+> This example is deprecated. OpenCV support from MIVisionX will be removed in future releases, this example will only work on Ubuntu 22.04 with MIVisionX built from source with OpenCV support. For more details on how to build MIVisionX, please see https://github.com/ROCm/MIVisionX and https://github.com/ROCm/MIVisionX/pull/1575
+
 ## Description
 
 This example demonstrates ORB (Oriented FAST and Rotated BRIEF) feature detection using OpenVX with OpenCV extensions. The example processes images or live camera feeds to detect and extract keypoint features, which are useful for object recognition, image matching, and tracking applications.

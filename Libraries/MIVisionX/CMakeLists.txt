@@ -58,4 +58,8 @@ endif()
 add_subdirectory(canny)
 # Disable this test until Jira ticket ROCM-1771 is resolved
 #add_subdirectory(mv_objdetect)
-add_subdirectory(opencv_orb)
+
+# OpenCV support will be removed in future releases
+# this example will only work on ubuntu 22.04 with MIVisionX built from source with OpenCV support
+# see https://github.com/ROCm/MIVisionX/pull/1575
+# add_subdirectory(opencv_orb)
