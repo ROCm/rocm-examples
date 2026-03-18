@@ -133,13 +133,7 @@ add_subdirectory(occupancy)
 add_subdirectory(runtime_compilation)
 add_subdirectory(saxpy)
 add_subdirectory(shared_memory)
-# We cannot build the static library on Windows as the HIP SDK does not include CMAKE_AR.
-if(
-    NOT CMAKE_SYSTEM_NAME MATCHES "Windows"
-    AND NOT "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "HIP"
-)
-    add_subdirectory(static_host_library)
-endif()
+add_subdirectory(static_host_library)
 add_subdirectory(streams)
 add_subdirectory(texture_management)
 add_subdirectory(warp_shuffle)
