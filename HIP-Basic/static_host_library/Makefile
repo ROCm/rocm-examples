@@ -29,8 +29,9 @@ ROCM_INSTALL_DIR ?= /opt/rocm
 CUDA_INSTALL_DIR ?= /usr/local/cuda
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 CXX    ?= g++
+HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+AR     ?= ar
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -63,6 +64,7 @@ ILDLIBS    += $(LDLIBS)
 
 EXAMPLE_CXX := $(EXAMPLE)_cxx
 EXAMPLE_LIB := hip_static_host
+LIBOBJ      := lib$(EXAMPLE_LIB).o
 LIBEXAMPLE  := lib$(EXAMPLE_LIB).a
 
 all: $(EXAMPLE) $(EXAMPLE_CXX)
@@ -73,10 +75,13 @@ $(EXAMPLE): main.cpp $(LIBEXAMPLE)
 $(EXAMPLE_CXX): main.cpp $(LIBEXAMPLE)
 	$(CXX) $(HOSTFLAGS) $(ICPPFLAGS) -L. $(ILDFLAGS) -o $@ $< -l$(EXAMPLE_LIB) $(HIPLIBS) $(ILDLIBS)
 
-$(LIBEXAMPLE): library/library.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+$(LIBOBJ): library/library.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) $(LIBFLAGS) -o $@ $< $(ILDLIBS)
 
+$(LIBEXAMPLE): $(LIBOBJ)
+	$(AR) rcs $@ $(LIBOBJ)
+
 clean:
-	$(RM) $(EXAMPLE_CXX) $(EXAMPLE) $(LIBEXAMPLE)
+	$(RM) $(EXAMPLE_CXX) $(EXAMPLE) $(LIBEXAMPLE) $(LIBOBJ)
 
 .PHONY: all clean

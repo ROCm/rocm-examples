@@ -21,7 +21,8 @@ This example shows how to create a static library that exports hosts functions. 
 A HIP static host library is built the same as a regular application. Additionally, the library should be compiled with position independent code enabled:
 
 ```shell
-hipcc library/library.hip -o liblibrary.a -c -fPIC
+hipcc library/library.hip -o liblibrary.o -c -fPIC
+ar rcs liblibrary.a liblibrary.o
 ```
 
 Linking the static library with another library or object is done in the same way as a regular library:
