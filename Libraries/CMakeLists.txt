@@ -63,7 +63,14 @@ if(
     add_subdirectory(rocALUTION)
     add_subdirectory(rocBLAS)
     add_subdirectory(rocCV)
-    add_subdirectory(rocDecode)
+
+    option(ENABLE_ROCDECODE "Enable rocDecode examples (enabled by default)" ON)
+    if(ENABLE_ROCDECODE)
+        add_subdirectory(rocDecode)
+    else()
+        message(STATUS "rocDecode examples disabled, not building rocDecode examples.")
+    endif()
+
     add_subdirectory(rocJPEG)
     add_subdirectory(rocFFT)
     add_subdirectory(rocPRIM)
