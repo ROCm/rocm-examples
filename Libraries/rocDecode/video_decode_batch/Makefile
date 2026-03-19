@@ -25,6 +25,12 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
+# Dependency checking
+REQUIRED_DEPS := FFMPEG
+include $(COMMON_INCLUDE_DIR)/require_deps.mk
+
+ifneq ($(SKIP_BUILD),1)
+
 # HIP variables
 ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
 UTILS_DIR := ${ROCM_INSTALL_DIR}/share/rocdecode/utils
@@ -79,3 +85,9 @@ clean:
 	$(RM) $(EXAMPLE)
 
 .PHONY: clean
+
+else
+all:
+clean:
+.PHONY: all clean
+endif
