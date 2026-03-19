@@ -28,7 +28,7 @@ EXAMPLES := \
   histogram \
   prefix_sum
 
-ifneq ($(shell pkg-config --exists glfw3 2>/dev/null && echo yes),)
+ifneq ($(wildcard /usr/include/GLFW/glfw3.h),)
   EXAMPLES += sobel_filter
 endif
 

@@ -44,9 +44,9 @@ EXAMPLES := \
   texture_management \
   warp_shuffle
 
-ifneq ($(shell pkg-config --exists glfw3 2>/dev/null && echo yes),)
+ifneq ($(wildcard /usr/include/GLFW/glfw3.h),)
   EXAMPLES += opengl_interop
-  ifneq ($(shell pkg-config --exists vulkan 2>/dev/null && echo yes),)
+  ifneq ($(wildcard /usr/include/vulkan/vulkan.h),)
     EXAMPLES += vulkan_interop
   endif
 endif
