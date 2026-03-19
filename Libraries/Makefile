@@ -48,7 +48,9 @@ LIBRARIES += \
   rocWMMA
 
 ifneq ($(wildcard $(INCLUDE_DIR)/rocdecode/rocdecode.h),)
+ifneq ($(wildcard /usr/include/libavcodec/avcodec.h),)
 LIBRARIES += rocDecode
+endif
 endif
 
 ifneq ($(wildcard $(INCLUDE_DIR)/rocjpeg/rocjpeg.h),)
