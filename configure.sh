@@ -155,6 +155,30 @@ VULKAN_CFLAGS := ${VULKAN_CFLAGS}
 VULKAN_LIBS := ${VULKAN_LIBS}
 EOF
 
+# --- libdw (elfutils) ---
+HAVE_LIBDW=0
+if pkg_check libdw; then
+    HAVE_LIBDW=1
+elif [ -f /usr/include/elfutils/libdw.h ] || [ -f /usr/include/dwarf.h ]; then
+    HAVE_LIBDW=1
+fi
+echo "  libdw: $([ ${HAVE_LIBDW} -eq 1 ] && echo yes || echo no)"
+cat >> "${CONFIG_MK}" << EOF
+HAVE_LIBDW := ${HAVE_LIBDW}
+EOF
+
+# --- amd_comgr ---
+HAVE_AMD_COMGR=0
+if [ -f "${ROCM_PATH}/include/amd_comgr/amd_comgr.h" ] || [ -f "${ROCM_PATH}/lib/libamd_comgr.so" ]; then
+    HAVE_AMD_COMGR=1
+elif pkg_check amd_comgr; then
+    HAVE_AMD_COMGR=1
+fi
+echo "  amd_comgr: $([ ${HAVE_AMD_COMGR} -eq 1 ] && echo yes || echo no)"
+cat >> "${CONFIG_MK}" << EOF
+HAVE_AMD_COMGR := ${HAVE_AMD_COMGR}
+EOF
+
 # --- glslangValidator ---
 HAVE_GLSLANG_VALIDATOR=0
 if command -v glslangValidator >/dev/null 2>&1; then

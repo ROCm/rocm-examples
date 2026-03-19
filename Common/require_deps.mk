@@ -100,6 +100,21 @@ ifndef HAVE_FFMPEG
     VULKAN_LIBS :=
   endif
 
+  # libdw (elfutils)
+  _LIBDW_CHECK := $(shell pkg-config --exists libdw 2>/dev/null && echo 1 || echo 0)
+  ifeq ($(_LIBDW_CHECK),0)
+    _LIBDW_CHECK := $(if $(or $(wildcard /usr/include/elfutils/libdw.h),$(wildcard /usr/include/dwarf.h)),1,0)
+  endif
+  HAVE_LIBDW := $(_LIBDW_CHECK)
+
+  # amd_comgr
+  ROCM_INSTALL_DIR ?= $(or $(ROCM_PATH),/opt/rocm)
+  _AMD_COMGR_CHECK := $(if $(or $(wildcard $(ROCM_INSTALL_DIR)/include/amd_comgr/amd_comgr.h),$(wildcard $(ROCM_INSTALL_DIR)/lib/libamd_comgr.so)),1,0)
+  ifeq ($(_AMD_COMGR_CHECK),0)
+    _AMD_COMGR_CHECK := $(shell pkg-config --exists amd_comgr 2>/dev/null && echo 1 || echo 0)
+  endif
+  HAVE_AMD_COMGR := $(_AMD_COMGR_CHECK)
+
   # glslangValidator
   _GLSLANG_CHECK := $(shell command -v glslangValidator >/dev/null 2>&1 && echo 1 || echo 0)
   HAVE_GLSLANG_VALIDATOR := $(_GLSLANG_CHECK)
