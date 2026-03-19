@@ -36,20 +36,20 @@ select_hip_platform()
 verify_hip_platform(PLATFORMS "amd")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
     set(GPU_ARCHITECTURES "all" CACHE STRING "GPU architectures to compile for")
@@ -83,7 +83,7 @@ find_program(
     LLVM_DIS_COMMAND
     llvm-dis
     PATH_SUFFIXES bin
-    PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    PATHS ${ROCM_PATH}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED
     NO_DEFAULT_PATH
 )
@@ -139,7 +139,7 @@ find_program(
     OFFLOAD_BUNDLER_COMMAND
     clang-offload-bundler
     PATH_SUFFIXES bin
-    PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    PATHS ${ROCM_PATH}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED
     NO_DEFAULT_PATH
 )
@@ -189,7 +189,7 @@ find_program(
     LLVM_MC_COMMAND
     llvm-mc
     PATH_SUFFIXES bin
-    PATHS ${ROCM_ROOT}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
+    PATHS ${ROCM_PATH}/llvm ${CMAKE_INSTALL_PREFIX}/llvm
     REQUIRED
     NO_DEFAULT_PATH
 )

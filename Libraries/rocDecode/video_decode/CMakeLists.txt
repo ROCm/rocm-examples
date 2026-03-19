@@ -40,14 +40,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocDecode examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
@@ -58,11 +58,11 @@ find_package(Threads REQUIRED)
 
 set(SOURCES
     main.cpp
-    "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp"
+    "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp"
 )
 
 if(rocdecode-host_FOUND)
-    list(APPEND SOURCES "${ROCM_ROOT}/share/rocdecode/utils/ffmpegvideodecode/ffmpeg_video_dec.cpp")
+    list(APPEND SOURCES "${ROCM_PATH}/share/rocdecode/utils/ffmpegvideodecode/ffmpeg_video_dec.cpp")
 endif()
 
 add_executable(${example_name} ${SOURCES})
@@ -82,14 +82,14 @@ target_include_directories(
     "../../../Common"
     "../../../External"
     ".."
-    "${ROCM_ROOT}/share/rocdecode/utils"
-    "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode"
+    "${ROCM_PATH}/share/rocdecode/utils"
+    "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode"
     "${FFMPEG_INCLUDE_DIR}"
 )
 
 # Add rocdecode host utils if host library found
 if(rocdecode-host_FOUND)
-    target_include_directories(${example_name} PRIVATE "${rocdecode-host_INCLUDE_DIR}" "${ROCM_ROOT}/share/rocdecode/utils/ffmpegvideodecode")
+    target_include_directories(${example_name} PRIVATE "${rocdecode-host_INCLUDE_DIR}" "${ROCM_PATH}/share/rocdecode/utils/ffmpegvideodecode")
     target_link_libraries(${example_name} PRIVATE rocdecode::rocdecode-host)
     target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=1)
 else()
@@ -108,12 +108,12 @@ set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_L
 # disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
 # Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
 set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_ROOT}/lib/rocm_sysdeps/lib")
+if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
   set(USING_THE_ROCK ON)
 endif()
 
 if (NOT USING_THE_ROCK)
-    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
+    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
     if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
         if(rocdecode-host_FOUND)
             add_test(NAME ${example_name}-HEVC-host COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
@@ -123,21 +123,21 @@ if (NOT USING_THE_ROCK)
         message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
     endif()
 
-    set(ROCDECODE_TEST_VIDEO_AVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H264.mp4")
+    set(ROCDECODE_TEST_VIDEO_AVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H264.mp4")
     if(EXISTS "${ROCDECODE_TEST_VIDEO_AVC}")
         add_test(NAME ${example_name}-AVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_AVC}")
     else()
         message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_AVC} not found, skipping ${example_name}-AVC test")
     endif()
 
-    set(ROCDECODE_TEST_VIDEO_AV1 "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-AV1.mp4")
+    set(ROCDECODE_TEST_VIDEO_AV1 "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-AV1.mp4")
     if(EXISTS "${ROCDECODE_TEST_VIDEO_AV1}")
         add_test(NAME ${example_name}-AV1 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_AV1}")
     else()
         message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_AV1} not found, skipping ${example_name}-AV1 test")
     endif()
 
-    set(ROCDECODE_TEST_VIDEO_VP9 "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-VP9.ivf")
+    set(ROCDECODE_TEST_VIDEO_VP9 "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-VP9.ivf")
     if(EXISTS "${ROCDECODE_TEST_VIDEO_VP9}")
         add_test(NAME ${example_name}-VP9 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_VP9}")
     else()

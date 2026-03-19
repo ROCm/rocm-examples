@@ -42,27 +42,27 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 set(include_dirs "../../Common" "../../External")
 list(APPEND include_dirs "${PROJECT_SOURCE_DIR}")
 
 if("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
     # For examples targeting NVIDIA, include the HIP header directory.
-    list(APPEND include_dirs "${ROCM_ROOT}/include")
+    list(APPEND include_dirs "${ROCM_PATH}/include")
 
     # Some CUDA versions have issues when compiling for C++20 on Windows, check if we are using those
     if(CMAKE_SYSTEM_NAME MATCHES "Windows")
@@ -177,7 +177,7 @@ foreach(VER RANGE 1 10)
             ${Sources}
             PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
         )
-        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ROCM_ROOT}/cmake)
+        set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${ROCM_PATH}/cmake)
         find_package(HIP MODULE REQUIRED)
         target_include_directories(
             ${TargetName}

@@ -35,26 +35,26 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
 if(WIN32)
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 add_executable(${example_name} main.hip vulkan_utils.hip)
 
 set(include_dirs "../../Common")
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    list(APPEND include_dirs "${ROCM_ROOT}/include")
+    list(APPEND include_dirs "${ROCM_PATH}/include")
 endif()
 
 find_package(Vulkan REQUIRED COMPONENTS glslangValidator)

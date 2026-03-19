@@ -26,21 +26,21 @@ EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_PATH := /opt/rocm
 
-HIP_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 RPP_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 OPENCV_INCLUDE := $(shell pkg-config --cflags opencv4 2>/dev/null || pkg-config --cflags opencv)
 ICPPFLAGS := -isystem $(RPP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) \
-             $(OPENCV_INCLUDE) -I $(ROCM_INSTALL_DIR)/include/rpp \
+             $(OPENCV_INCLUDE) -I $(ROCM_PATH)/include/rpp \
              -DEXAMPLE_DATA_DIR=\"$(CURDIR)/../data/images\"
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lrpp -lopencv_core -lopencv_imgcodecs -lopencv_imgproc -fopenmp
 
 ifeq ($(GPU_RUNTIME), HIP)

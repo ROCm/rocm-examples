@@ -36,18 +36,18 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "MIVisionX examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_library(OpenVX_LIBRARY
     NAMES openvx
-    PATHS "${ROCM_ROOT}/lib"
+    PATHS "${ROCM_PATH}/lib"
 )
 
 if(NOT OpenVX_LIBRARY)

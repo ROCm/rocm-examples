@@ -24,10 +24,10 @@ EXAMPLE := hip_pinned_host_memory
 GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR ?= /opt/rocm
-HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+ROCM_PATH ?= /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -41,7 +41,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS  ?= -Wall -Wextra
   ICXXFLAGS += -D__HIP_PLATFORM_AMD__
-  ILDFLAGS  += -L $(ROCM_INSTALL_DIR)/lib
+  ILDFLAGS  += -L $(ROCM_PATH)/lib
   ILDLIBS   += -lamdhip64
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)

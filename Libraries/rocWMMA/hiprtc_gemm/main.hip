@@ -160,7 +160,7 @@ int main()
 
     // Determine the rocm path to use for build
     std::string rocm_path
-        = (std::getenv("ROCM_PATH") != nullptr) ? std::getenv("ROCM_PATH") : ROCM_ROOT_PATH;
+        = (std::getenv("ROCM_PATH") != nullptr) ? std::getenv("ROCM_PATH") : ROCM_DEFAULT_PATH;
     std::string rocwmma_include_path = std::string("-I") + rocm_path + std::string("/include");
 
     // 2. Compile kernel with hipRTC

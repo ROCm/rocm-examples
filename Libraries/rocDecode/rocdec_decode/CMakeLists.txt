@@ -41,14 +41,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocDecode examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
@@ -61,7 +61,7 @@ target_link_libraries(${example_name} PRIVATE hip::host rocdecode::rocdecode ${C
 
 # Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
 set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_ROOT}/lib/rocm_sysdeps/lib")
+if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
   set(USING_THE_ROCK ON)
 endif()
 
@@ -90,7 +90,7 @@ target_include_directories(
 
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-set(ROCDECODE_TEST_FRAMES_DIR "${ROCM_ROOT}/share/rocdecode/frames")
+set(ROCDECODE_TEST_FRAMES_DIR "${ROCM_PATH}/share/rocdecode/frames")
 if(EXISTS "${ROCDECODE_TEST_FRAMES_DIR}")
     add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_FRAMES_DIR}")
 else()

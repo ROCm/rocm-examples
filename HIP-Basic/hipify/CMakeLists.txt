@@ -44,26 +44,26 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 # find hipify-perl
-if(EXISTS "${ROCM_ROOT}/libexec/hipify/hipify-perl")
-    set(HIPIFY_PERL ${ROCM_ROOT}/libexec/hipify/hipify-perl)
+if(EXISTS "${ROCM_PATH}/libexec/hipify/hipify-perl")
+    set(HIPIFY_PERL ${ROCM_PATH}/libexec/hipify/hipify-perl)
 else()
-    set(HIPIFY_PERL ${ROCM_ROOT}/bin/hipify-perl)
+    set(HIPIFY_PERL ${ROCM_PATH}/bin/hipify-perl)
 endif()
 
 # create main.hip
@@ -81,7 +81,7 @@ add_executable(${example_name} ${CMAKE_CURRENT_BINARY_DIR}/main.hip)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    set(include_dirs "${ROCM_ROOT}/include")
+    set(include_dirs "${ROCM_PATH}/include")
 endif()
 
 target_include_directories(${example_name} PRIVATE ${include_dirs})

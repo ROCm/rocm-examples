@@ -35,9 +35,9 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
+set(ROCM_PATH "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 add_executable(${example_name} main.hip)
 
@@ -49,6 +49,6 @@ set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LAN
 set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
                                                  $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
 target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
-target_include_directories(${example_name} PRIVATE ${include_dirs} $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
+target_include_directories(${example_name} PRIVATE ${include_dirs} $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
 
 install(TARGETS ${example_name})

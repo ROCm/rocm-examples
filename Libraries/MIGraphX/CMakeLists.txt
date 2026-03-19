@@ -32,13 +32,13 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-set(ROCM_ROOT
+set(ROCM_PATH
     "/opt/rocm"
     CACHE PATH
     "Root directory of the ROCm installation"
 )
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(migraphx QUIET)
 if(NOT migraphx_FOUND)

@@ -28,20 +28,20 @@ include("${CMAKE_CURRENT_LIST_DIR}/../Common/FindFilesystem.cmake")
 
 # ROCm installation path
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
-    set(ROCM_LLVM_ROOT ${ROCM_ROOT})
+    set(ROCM_LLVM_ROOT ${ROCM_PATH})
     set(PREFIX_LLVM_ROOT ${CMAKE_INSTALL_PREFIX})
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
-    set(ROCM_LLVM_ROOT "${ROCM_ROOT}/llvm")
+    set(ROCM_LLVM_ROOT "${ROCM_PATH}/llvm")
     set(PREFIX_LLVM_ROOT "${CMAKE_INSTALL_PREFIX}/llvm")
 endif()
 

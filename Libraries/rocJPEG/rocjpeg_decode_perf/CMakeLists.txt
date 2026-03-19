@@ -39,14 +39,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocJPEG examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(rocjpeg REQUIRED)
 find_package(Threads REQUIRED)

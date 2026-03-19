@@ -25,10 +25,10 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 
 # ROCm installation directory
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_PATH := /opt/rocm
 
 # MIVisionX and OpenCV include directories
-MIVISIONX_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include/mivisionx
+MIVISIONX_INCLUDE_DIR := $(ROCM_PATH)/include/mivisionx
 OPENCV_INCLUDE_DIR := /usr/include/opencv4
 
 CXX ?= g++
@@ -38,7 +38,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(MIVISIONX_INCLUDE_DIR) -I $(OPENCV_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ICPPFLAGS += -DEXAMPLE_DATA_DIR=\"$(CURDIR)/../images\"
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lopenvx -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio
 
 CXXFLAGS ?= -Wall -Wextra

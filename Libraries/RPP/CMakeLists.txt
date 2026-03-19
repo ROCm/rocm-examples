@@ -31,14 +31,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "RPP examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 # Try to find RPP using find_package first
 find_package(rpp QUIET)
@@ -50,7 +50,7 @@ if(NOT rpp_FOUND)
     # Search for the RPP library
     find_library(RPP_LIBRARY
         NAMES rpp librpp
-        PATHS ${ROCM_ROOT}/lib
+        PATHS ${ROCM_PATH}/lib
         DOC "Path to RPP library"
     )
 
@@ -58,8 +58,8 @@ if(NOT rpp_FOUND)
     find_path(RPP_INCLUDE_DIR
         NAMES rpp.h rppi.h
         PATHS
-            ${ROCM_ROOT}/include
-            ${ROCM_ROOT}/include/rpp
+            ${ROCM_PATH}/include
+            ${ROCM_PATH}/include/rpp
         DOC "Path to RPP include directory"
     )
 

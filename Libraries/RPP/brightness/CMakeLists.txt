@@ -39,22 +39,22 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "RPP examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(OpenCV REQUIRED)
 
 find_library(OMP_LIBRARY
     NAMES omp
     PATHS
-        "${ROCM_ROOT}/lib/llvm/lib"
-        "${ROCM_ROOT}/lib"
+        "${ROCM_PATH}/lib/llvm/lib"
+        "${ROCM_PATH}/lib"
     PATH_SUFFIXES lib lib64
     REQUIRED
 )
@@ -78,7 +78,7 @@ target_compile_definitions(
 
 target_include_directories(
     ${example_name}
-    PRIVATE "../../../Common" "../../../External" ${OpenCV_INCLUDE_DIRS} "${ROCM_ROOT}/include/rpp"
+    PRIVATE "../../../Common" "../../../External" ${OpenCV_INCLUDE_DIRS} "${ROCM_PATH}/include/rpp"
 )
 
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})

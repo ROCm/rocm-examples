@@ -36,20 +36,20 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
 endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 add_executable(${example_name} main.hip)
 
@@ -72,7 +72,7 @@ set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA
 target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
 target_include_directories(${example_name} PRIVATE 
     ${CMAKE_CURRENT_SOURCE_DIR}
-    $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>
+    $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>
 )
 target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda_driver>)
 

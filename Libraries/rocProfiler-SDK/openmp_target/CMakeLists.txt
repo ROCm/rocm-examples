@@ -36,7 +36,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocProfiler-SDK examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
@@ -51,7 +51,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(rocprofiler-sdk REQUIRED)
 find_package(rocprofiler-sdk-roctx REQUIRED)
@@ -62,8 +62,8 @@ find_package(Threads REQUIRED)
 find_program(
     ROCPROFILER_SDK_COMPILE_LAUNCHER
     NAMES rocprofiler-sdk-launch-compiler
-    HINTS ${ROCM_ROOT}
-    PATHS ${ROCM_ROOT}
+    HINTS ${ROCM_PATH}
+    PATHS ${ROCM_PATH}
     PATH_SUFFIXES libexec/rocprofiler-sdk
     REQUIRED
 )
@@ -72,8 +72,8 @@ find_program(
 find_program(
     AMDCLANG_COMPILER
     NAMES amdclang++
-    HINTS ${ROCM_ROOT}
-    PATHS ${ROCM_ROOT}
+    HINTS ${ROCM_PATH}
+    PATHS ${ROCM_PATH}
     PATH_SUFFIXES bin llvm/bin
     REQUIRED
 )
@@ -123,7 +123,7 @@ target_compile_options(${example_name} PRIVATE
 # despite us linking to OpenMP::OpenMP_CXX above because we're using the
 # rocProfiler-SDK compiler wrapper and CMake fails to add the necessary OpenMP
 # flags to the link step.
-target_link_options(${example_name} PRIVATE -fopenmp -Wl,-rpath,${ROCM_ROOT}/lib)
+target_link_options(${example_name} PRIVATE -fopenmp -Wl,-rpath,${ROCM_PATH}/lib)
 
 # Add offload architecture flags for each GPU target
 foreach(_TARGET ${OPENMP_GPU_TARGETS})

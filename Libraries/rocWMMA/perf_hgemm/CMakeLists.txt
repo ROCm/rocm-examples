@@ -41,19 +41,19 @@ set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(hip REQUIRED)
 # Try to find rocWMMA as a package first
@@ -86,7 +86,7 @@ if(NOT ROCWMMA_TARGET AND NOT rocwmma_FOUND)
     # If package not found, try to find headers manually
     find_path(ROCWMMA_INCLUDE_DIR
         NAMES rocwmma/rocwmma.hpp
-        PATHS ${ROCM_ROOT}/include
+        PATHS ${ROCM_PATH}/include
         DOC "rocWMMA include directory"
     )
 

@@ -38,18 +38,18 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocAL examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_library(ROCAL_LIBRARY
     NAMES rocal
-    PATHS"${ROCM_ROOT}/lib"
+    PATHS"${ROCM_PATH}/lib"
     PATH_SUFFIXES lib lib64
     REQUIRED
 )
@@ -66,7 +66,7 @@ target_link_libraries(${example_name} PRIVATE ${ROCAL_LIBRARY} ${OpenCV_LIBS})
 # Include directories
 target_include_directories(
     ${example_name}
-    PRIVATE "../../../External" ${ROCM_ROOT}/include ${ROCM_ROOT}/include/rocal ${OpenCV_INCLUDE_DIRS}
+    PRIVATE "../../../External" ${ROCM_PATH}/include ${ROCM_PATH}/include/rocal ${OpenCV_INCLUDE_DIRS}
 )
 
 # Set example data directory as compile definition

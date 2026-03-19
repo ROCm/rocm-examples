@@ -33,14 +33,14 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "MIVisionX examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 # Model configuration
 set(MODEL_URL "https://github.com/kiritigowda/YoloV2NCS/raw/master/models/caffemodels/yoloV2Tiny20.caffemodel")
@@ -48,7 +48,7 @@ set(MODEL_FILE "${CMAKE_CURRENT_BINARY_DIR}/yoloV2Tiny20.caffemodel")
 set(BATCH_SIZE "1" CACHE STRING "Batch size for model compilation")
 
 # Check for mv_compile
-find_program(MV_COMPILE mv_compile PATHS ${ROCM_ROOT}/bin REQUIRED)
+find_program(MV_COMPILE mv_compile PATHS ${ROCM_PATH}/bin REQUIRED)
 if(NOT MV_COMPILE)
     message(FATAL_ERROR "mv_compile not found. Please install MIVisionX with model compiler support")
     return()
@@ -83,8 +83,8 @@ set(GENERATED_FILES
 add_custom_command(
     OUTPUT ${GENERATED_FILES}
     COMMAND ${CMAKE_COMMAND} -E env
-            "MIVISIONX_MODEL_COMPILER_PATH=${ROCM_ROOT}/libexec/mivisionx/model_compiler"
-            "ROCM_PATH=${ROCM_ROOT}"
+            "MIVISIONX_MODEL_COMPILER_PATH=${ROCM_PATH}/libexec/mivisionx/model_compiler"
+            "ROCM_PATH=${ROCM_PATH}"
             ${MV_COMPILE} --model ${MODEL_FILE} --install_folder . --input_dims ${BATCH_SIZE},3,416,416
     DEPENDS ${MODEL_FILE}
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/tmp
@@ -110,8 +110,8 @@ add_dependencies(${example_name} generate_model_files)
 target_include_directories(
     ${example_name}
     PRIVATE
-        "${ROCM_ROOT}/include"
-        "${ROCM_ROOT}/include/mivisionx"
+        "${ROCM_PATH}/include"
+        "${ROCM_PATH}/include/mivisionx"
         "${CMAKE_CURRENT_SOURCE_DIR}"
         "${CMAKE_CURRENT_BINARY_DIR}/tmp/mv_extras"
         "${CMAKE_CURRENT_BINARY_DIR}/tmp"
@@ -122,7 +122,7 @@ target_include_directories(
 target_link_directories(
     ${example_name}
     PRIVATE
-        "${ROCM_ROOT}/lib"
+        "${ROCM_PATH}/lib"
         "${CMAKE_CURRENT_BINARY_DIR}/tmp/lib"
 )
 

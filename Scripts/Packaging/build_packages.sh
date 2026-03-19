@@ -36,14 +36,14 @@ BUILD_DIR="$SRC_DIR/build"
 DEB_DIR="$BUILD_DIR/deb"
 RPM_DIR="$BUILD_DIR/rpm"
 PACKGEN="" # Default is both DEB and RPM
-ROCM_ROOT="/opt/rocm"
+ROCM_PATH="/opt/rocm"
 
 PACKAGE_CONTACT="ROCm Developer Support <rocm-dev.support@amd.com>"
 PACKAGE_DESCRIPTION_SUMMARY="A collection of examples for the ROCm software stack"
 PACKAGE_HOMEPAGE_URL="https://github.com/ROCm/ROCm-examples"
 
 # Getopt argument parsing
-VALID_ARGS=$(getopt -o h --long help,pkgname:,version:,deb-release:,rpm-release:,install-prefix:,test-install-prefix:,src-dir:,build-dir:,deb-dir:,rpm-dir:,packgen:,rocm-root: -- "$@")
+VALID_ARGS=$(getopt -o h --long help,pkgname:,version:,deb-release:,rpm-release:,install-prefix:,test-install-prefix:,src-dir:,build-dir:,deb-dir:,rpm-dir:,packgen:,rocm-path: -- "$@")
 if [[ $? -ne 0 ]]; then
     echo "Invalid arguments"
     exit 1
@@ -67,7 +67,7 @@ while [ : ]; do
       echo "  --deb-dir <path>                 Set the DEB directory"
       echo "  --rpm-dir <path>                 Set the RPM directory"
       echo "  --packgen <format>               Specify the package format. Options 'DEB' or 'RPM'. Default: '', which generates both."      
-      echo "  --rocm-root <path>               Set the ROCM_ROOT directory"
+      echo "  --rocm-path <path>               Set the ROCM_PATH directory"
       exit 0
       ;;
     --pkgname)
@@ -114,8 +114,8 @@ while [ : ]; do
       PACKGEN="$2"
       shift 2
       ;;
-    --rocm-root)
-      ROCM_ROOT="$2"
+    --rocm-path)
+      ROCM_PATH="$2"
       shift 2
       ;;
     --)
@@ -160,7 +160,7 @@ print_input_variables() {
     echo "DEB_DIR=$DEB_DIR"
     echo "RPM_DIR=$RPM_DIR"
     echo "PACKGEN=$PACKGEN"
-    echo "ROCM_ROOT=$ROCM_ROOT"
+    echo "ROCM_PATH=$ROCM_PATH"
     echo "************************************"
 }
 
@@ -168,7 +168,7 @@ build_project() {
     echo "** Building the project **"
     mkdir -p "$BUILD_DIR"
     pushd "$BUILD_DIR" || exit
-    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$SRC_DIR" -DROCM_ROOT="$ROCM_ROOT"
+    cmake -DCMAKE_INSTALL_PREFIX="$PACKAGE_INSTALL_PREFIX" -DGPU_ARCHITECTURES=all "$SRC_DIR" -DROCM_PATH="$ROCM_PATH"
     make -j$(nproc)
     popd || exit
 }

@@ -29,18 +29,18 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocAL examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_library(ROCAL_LIBRARY
     NAMES rocal
-    PATHS "${ROCM_ROOT}/lib"
+    PATHS "${ROCM_PATH}/lib"
     PATH_SUFFIXES lib lib64
 )
 

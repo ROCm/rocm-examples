@@ -25,7 +25,7 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 
 # ROCm installation directory
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_PATH := /opt/rocm
 
 # Batch size configuration (can be overridden: make BATCH_SIZE=4)
 BATCH_SIZE := 1
@@ -38,7 +38,7 @@ MODEL_URL := https://github.com/kiritigowda/YoloV2NCS/raw/master/models/caffemod
 MODEL_FILE := $(BUILD_DIR)/yoloV2Tiny20.caffemodel
 
 # MIVisionX and OpenCV include directories
-MIVISIONX_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include/mivisionx
+MIVISIONX_INCLUDE_DIR := $(ROCM_PATH)/include/mivisionx
 OPENCV_INCLUDE_DIR := /usr/include/opencv4
 
 CXX ?= g++
@@ -46,11 +46,11 @@ CXX ?= g++
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD) -msse4.2 -mf16c
-ICPPFLAGS := -I $(ROCM_INSTALL_DIR)/include -I $(MIVISIONX_INCLUDE_DIR) -I $(OPENCV_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
+ICPPFLAGS := -I $(ROCM_PATH)/include -I $(MIVISIONX_INCLUDE_DIR) -I $(OPENCV_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ICPPFLAGS += -I . -I $(BUILD_DIR)/mv_extras -I $(BUILD_DIR)
 ICPPFLAGS += -DENABLE_MVDEPLOY=1 -DENABLE_OPENCV=1
 ICPPFLAGS += -DEXAMPLE_DATA_DIR=\"$(CURDIR)/data\" -DMV_INSTALL_FOLDER=\"$(CURDIR)/$(BUILD_DIR)\"
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib -L $(BUILD_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib -L $(BUILD_DIR)/lib
 ILDLIBS   := -lopenvx -lvx_nn -lvx_amd_media -lmv_deploy -lopencv_core -lopencv_imgproc -lopencv_highgui -lopencv_imgcodecs -lopencv_videoio -lpthread -ldl
 
 CXXFLAGS ?= -Wall -Wextra
@@ -61,7 +61,7 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 # Check if mv_compile exists
-MV_COMPILE := $(ROCM_INSTALL_DIR)/bin/mv_compile
+MV_COMPILE := $(ROCM_PATH)/bin/mv_compile
 ifeq (,$(wildcard $(MV_COMPILE)))
     $(error mv_compile not found at $(MV_COMPILE). Please install MIVisionX with model compiler support)
 endif

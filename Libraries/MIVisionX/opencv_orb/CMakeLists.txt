@@ -33,19 +33,19 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "MIVisionX examples are only available on Linux")
     return()
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(OpenCV REQUIRED)
 find_library(OpenVX_LIBRARY
     NAMES openvx
-    PATHS "${ROCM_ROOT}/lib"
+    PATHS "${ROCM_PATH}/lib"
     REQUIRED
 )
 
@@ -54,12 +54,12 @@ add_executable(${example_name} main.cpp)
 target_include_directories(
     ${example_name}
     PRIVATE
-        "${ROCM_ROOT}/include/mivisionx"
+        "${ROCM_PATH}/include/mivisionx"
         "../../../Common"
         "../../../External"
 )
 
-target_link_directories(${example_name} PRIVATE "${ROCM_ROOT}/lib")
+target_link_directories(${example_name} PRIVATE "${ROCM_PATH}/lib")
 
 target_link_libraries(
     ${example_name}

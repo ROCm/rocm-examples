@@ -35,20 +35,20 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 select_hip_platform()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "$ENV{HIP_PATH}"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 else()
-    set(ROCM_ROOT
+    set(ROCM_PATH
         "/opt/rocm"
         CACHE PATH
         "Root directory of the ROCm installation"
     )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 add_executable(${example_name} main.hip ../../External/glad/glad.cpp)
 
@@ -57,7 +57,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 set(include_dirs "../../Common" "../../External")
 
 if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
-    list(APPEND include_dirs "${ROCM_ROOT}/include")
+    list(APPEND include_dirs "${ROCM_PATH}/include")
 endif()
 
 find_package(glfw3 REQUIRED)
