@@ -29,8 +29,14 @@ SKIP_TESTS = {
 # Tests to skip for a specific GPU target + distro combination.
 # Keys are "<gpu_target>:<distro_key>", e.g. "gfx1151:sles-15.7".
 DISTRO_SKIP_TESTS = {
-    # Example:
-    # "gfx1151:sles-15.7": ["some_test"],
+    # AlmaLinux 8 has glibc 2.28; binaries compiled against 2.34+ fail at runtime
+    "gfx1100:almalinux-8": [
+        "hip_template_warp_size_reduction",
+        "hip_warp_size_reduction",
+        # hipSPARSELt Tensile library files not packaged for this target
+        "hipsparselt_spmm",
+        "hipsparselt_spmm_advanced",
+    ],
 }
 
 

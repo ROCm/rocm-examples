@@ -21,6 +21,7 @@
 # SOFTWARE.
 
 EXAMPLE := hip_bfs
+TEST_ARGS := graph4096.txt
 GRAPHGEN := graphgen
 GPU_RUNTIME := HIP
 

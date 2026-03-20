@@ -70,7 +70,7 @@ is_skipped() {
 
 TESTS_LIST="/tmp/makefile_tests_list_$$.txt"
 
-# Find all Makefiles with EXAMPLE definitions, extract name and directory
+# Find all Makefiles with EXAMPLE definitions, extract name, directory, and test args
 find "${SCRIPT_DIR}" -name Makefile -path '*/Makefile' | sort | while IFS= read -r makefile; do
     dir=$(dirname "$makefile")
     example_name=$(grep '^EXAMPLE := ' "$makefile" 2>/dev/null | head -1 | sed 's/^EXAMPLE := //')
@@ -81,7 +81,10 @@ find "${SCRIPT_DIR}" -name Makefile -path '*/Makefile' | sort | while IFS= read 
     # Skip if executable wasn't built
     [ ! -x "${dir}/${example_name}" ] && continue
 
-    echo "${dir}|${example_name}"
+    # Extract TEST_ARGS if defined (e.g. TEST_ARGS := graph4096.txt)
+    test_args=$(grep '^TEST_ARGS := ' "$makefile" 2>/dev/null | head -1 | sed 's/^TEST_ARGS := //')
+
+    echo "${dir}|${example_name}|${test_args}"
 done > "${TESTS_LIST}"
 
 # Count total tests upfront
@@ -101,7 +104,7 @@ CURRENT=0
 FAILED_TESTS=""
 
 # Run tests
-while IFS='|' read -r dir example_name; do
+while IFS='|' read -r dir example_name test_args; do
     CURRENT=$((CURRENT + 1))
 
     if is_skipped "${example_name}"; then
@@ -110,9 +113,9 @@ while IFS='|' read -r dir example_name; do
         continue
     fi
 
-    # Run the test with timeout
+    # Run the test from its own directory (so data files are found)
     printf "(%d/%d) RUN     %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
-    if timeout "${TIMEOUT}" "${dir}/${example_name}" > "/tmp/test_${example_name}.log" 2>&1; then
+    if (cd "${dir}" && timeout "${TIMEOUT}" "./${example_name}" ${test_args}) > "/tmp/test_${example_name}.log" 2>&1; then
         PASSED=$((PASSED + 1))
         printf "(%d/%d) PASS    %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
     else
