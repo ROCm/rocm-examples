@@ -75,14 +75,25 @@ pkg_libs() {
 
 # Helper: verify that libraries from pkg-config can actually be linked.
 # On some distros (e.g. SLES), .pc files exist but -dev packages are missing.
-# Uses the C compiler to do a link test.
+# Tries CC, cc, gcc, clang in order; if none found, assumes not linkable.
 can_link() {
     _libs="$(pkg_libs "$@")"
     if [ -z "$_libs" ]; then
         return 1
     fi
-    _cc="${CC:-cc}"
-    echo "int main(){return 0;}" | "$_cc" -x c - $_libs -o /dev/null 2>/dev/null
+    _test_cc=""
+    for _try_cc in "${CC}" cc gcc clang "${ROCM_PATH}/lib/llvm/bin/clang"; do
+        [ -z "$_try_cc" ] && continue
+        if command -v "$_try_cc" >/dev/null 2>&1; then
+            _test_cc="$_try_cc"
+            break
+        fi
+    done
+    if [ -z "$_test_cc" ]; then
+        # No C compiler found — conservatively say not linkable
+        return 1
+    fi
+    echo "int main(){return 0;}" | "$_test_cc" -x c - $_libs -o /dev/null 2>/dev/null
 }
 
 # Start writing config.mk
