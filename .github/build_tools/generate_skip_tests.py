@@ -8,6 +8,13 @@ Run from repo root or with --output-dir pointing at .github/build_tools.
 import argparse
 import os
 
+# Tests to always skip in Makefile runs. These require test data or arguments
+# that are only set up by the CMake build system (e.g. ROCDECODE_TEST_FRAMES_DIR).
+# ctest handles them via add_test() COMMAND args; the Makefile runner cannot.
+MAKEFILE_SKIP_TESTS = [
+    "rocdecode_rocdec_decode",
+]
+
 # Tests to skip per GPU target (one list per target that has skips)
 SKIP_TESTS = {
     "gfx1151": [
@@ -59,9 +66,19 @@ def main():
         default="",
         help="Distro key for distro-specific skips (e.g. sles-15.7)",
     )
+    parser.add_argument(
+        "--makefile",
+        action="store_true",
+        help="Include Makefile-only skips (tests needing CMake test data)",
+    )
     args = parser.parse_args()
 
     lines = list(SKIP_TESTS.get(args.target, []))
+
+    if args.makefile:
+        for test in MAKEFILE_SKIP_TESTS:
+            if test not in lines:
+                lines.append(test)
 
     if args.distro:
         combo_key = f"{args.target}:{args.distro}"

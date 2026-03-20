@@ -229,7 +229,13 @@ jobs:
           ctest --test-dir build -N | grep '  Test #' | sed 's/.*: //' > /tmp/ctest_test_names.txt
           echo "ctest registered $(wc -l < /tmp/ctest_test_names.txt) tests"
 
+          # Generate skip list with --makefile to include tests that need CMake test data
+          python3 .github/build_tools/generate_skip_tests.py \
+            --target ${{ matrix.gpu_config.gpu_target }} \
+            --distro ${{ inputs.distro }} \
+            --makefile
           SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
+
           ./run_makefile_tests.sh \
             --allow-file=/tmp/ctest_test_names.txt \
             --skip-file="${SKIP_FILE}" \
