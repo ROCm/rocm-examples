@@ -27,9 +27,10 @@
 # with a timeout, and reports pass/fail results.
 #
 # Usage:
-#   ./run_makefile_tests.sh [--skip-file FILE] [--timeout SECONDS]
+#   ./run_makefile_tests.sh [--skip-file=FILE] [--timeout=SECONDS]
 #
 # The skip file should contain one test name per line (the EXAMPLE name).
+# This is the same format produced by generate_skip_tests.py.
 
 set -u
 
@@ -47,6 +48,10 @@ for arg in "$@"; do
             ;;
         --help|-h)
             echo "Usage: $0 [--skip-file=FILE] [--timeout=SECONDS]"
+            echo ""
+            echo "  --skip-file=FILE   File with test names to skip (one per line)."
+            echo "                     Same format as generate_skip_tests.py output."
+            echo "  --timeout=SECONDS  Per-test timeout (default: 120)"
             exit 0
             ;;
     esac
@@ -63,11 +68,7 @@ is_skipped() {
     echo "${SKIP_LIST}" | grep -qx "${test_name}" 2>/dev/null
 }
 
-PASSED=0
-FAILED=0
-SKIPPED=0
-TOTAL=0
-FAILED_TESTS=""
+TESTS_LIST="/tmp/makefile_tests_list_$$.txt"
 
 # Find all Makefiles with EXAMPLE definitions, extract name and directory
 find "${SCRIPT_DIR}" -name Makefile -path '*/Makefile' | sort | while IFS= read -r makefile; do
@@ -81,48 +82,61 @@ find "${SCRIPT_DIR}" -name Makefile -path '*/Makefile' | sort | while IFS= read 
     [ ! -x "${dir}/${example_name}" ] && continue
 
     echo "${dir}|${example_name}"
-done > /tmp/makefile_tests_list.txt
+done > "${TESTS_LIST}"
 
-# Count and run
+# Count total tests upfront
+NUM_TESTS=$(wc -l < "${TESTS_LIST}")
+
+echo ""
+echo "Found ${NUM_TESTS} Makefile-built test(s)"
+if [ -n "${SKIP_FILE}" ] && [ -f "${SKIP_FILE}" ] && [ -s "${SKIP_FILE}" ]; then
+    echo "Skip file: ${SKIP_FILE} ($(wc -l < "${SKIP_FILE}") entries)"
+fi
+echo ""
+
+PASSED=0
+FAILED=0
+SKIPPED=0
+CURRENT=0
+FAILED_TESTS=""
+
+# Run tests
 while IFS='|' read -r dir example_name; do
-    TOTAL=$((TOTAL + 1))
+    CURRENT=$((CURRENT + 1))
 
     if is_skipped "${example_name}"; then
         SKIPPED=$((SKIPPED + 1))
-        printf "  SKIP  %s\n" "${example_name}"
+        printf "(%d/%d) SKIP    %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
         continue
     fi
 
     # Run the test with timeout
-    printf "  RUN   %s\n" "${example_name}"
+    printf "(%d/%d) RUN     %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
     if timeout "${TIMEOUT}" "${dir}/${example_name}" > "/tmp/test_${example_name}.log" 2>&1; then
         PASSED=$((PASSED + 1))
-        printf "  PASS  %s\n" "${example_name}"
+        printf "(%d/%d) PASS    %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
     else
         exit_code=$?
         FAILED=$((FAILED + 1))
         FAILED_TESTS="${FAILED_TESTS} ${example_name}"
         if [ "${exit_code}" -eq 124 ]; then
-            printf "  TIMEOUT %s (after %ss)\n" "${example_name}" "${TIMEOUT}"
+            printf "(%d/%d) TIMEOUT %s (after %ss)\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}" "${TIMEOUT}"
         else
-            printf "  FAIL  %s (exit code %d)\n" "${example_name}" "${exit_code}"
+            printf "(%d/%d) FAIL    %s (exit code %d)\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}" "${exit_code}"
         fi
         # Print last 20 lines of output for failed tests
         echo "--- output (last 20 lines) ---"
         tail -20 "/tmp/test_${example_name}.log"
         echo "--- end output ---"
     fi
-done < /tmp/makefile_tests_list.txt
+done < "${TESTS_LIST}"
 
-rm -f /tmp/makefile_tests_list.txt
+rm -f "${TESTS_LIST}"
 
 echo ""
 echo "=========================================="
-echo "Makefile test results:"
-echo "  Total:   ${TOTAL}"
-echo "  Passed:  ${PASSED}"
-echo "  Failed:  ${FAILED}"
-echo "  Skipped: ${SKIPPED}"
+RAN=$((PASSED + FAILED))
+echo "Makefile test results: ${RAN} tests ran, ${PASSED} passed, ${FAILED} failed, ${SKIPPED} skipped (${NUM_TESTS} total)"
 echo "=========================================="
 
 if [ -n "${FAILED_TESTS}" ]; then
