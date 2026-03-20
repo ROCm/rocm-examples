@@ -114,13 +114,6 @@ jobs:
           ./configure.sh --rocm-path="${ROCM_PATH}"
           make -j ROCM_INSTALL_DIR="${ROCM_PATH}" HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
 
-      - name: Makefile tests
-        if: ${{ !cancelled() }}
-        run: |
-          python3 .github/build_tools/generate_skip_tests.py --target ${{ matrix.gpu_config.gpu_target }} --distro ${{ inputs.distro }}
-          SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
-          ./run_makefile_tests.sh --skip-file="${SKIP_FILE}" --timeout=120
-
       - name: CMake configure
         if: ${{ !cancelled() }}
         run: |
@@ -228,6 +221,19 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
+
+      - name: Makefile tests
+        if: ${{ !cancelled() }}
+        run: |
+          # Extract the list of registered ctest test names
+          ctest --test-dir build -N | grep '  Test #' | sed 's/.*: //' > /tmp/ctest_test_names.txt
+          echo "ctest registered $(wc -l < /tmp/ctest_test_names.txt) tests"
+
+          SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
+          ./run_makefile_tests.sh \
+            --allow-file=/tmp/ctest_test_names.txt \
+            --skip-file="${SKIP_FILE}" \
+            --timeout=120
 
       - name: Upload test logs
         if: ${{ !cancelled() }}

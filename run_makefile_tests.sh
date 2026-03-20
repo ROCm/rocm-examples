@@ -27,19 +27,30 @@
 # with a timeout, and reports pass/fail results.
 #
 # Usage:
-#   ./run_makefile_tests.sh [--skip-file=FILE] [--timeout=SECONDS]
+#   ./run_makefile_tests.sh [--allow-file=FILE] [--skip-file=FILE] [--timeout=SECONDS]
 #
-# The skip file should contain one test name per line (the EXAMPLE name).
-# This is the same format produced by generate_skip_tests.py.
+# Options:
+#   --allow-file=FILE  Only run tests listed in this file (one name per line).
+#                      Use to mirror the ctest test list so Makefile tests run
+#                      exactly the same set as CMake. Tests not in the allow
+#                      list are silently skipped.
+#   --skip-file=FILE   Skip tests listed in this file (one name per line).
+#                      Same format as generate_skip_tests.py output.
+#                      Applied after allow-file filtering.
+#   --timeout=SECONDS  Per-test timeout (default: 120).
 
 set -u
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+ALLOW_FILE=""
 SKIP_FILE=""
 TIMEOUT=120
 
 for arg in "$@"; do
     case "$arg" in
+        --allow-file=*)
+            ALLOW_FILE="${arg#--allow-file=}"
+            ;;
         --skip-file=*)
             SKIP_FILE="${arg#--skip-file=}"
             ;;
@@ -47,21 +58,31 @@ for arg in "$@"; do
             TIMEOUT="${arg#--timeout=}"
             ;;
         --help|-h)
-            echo "Usage: $0 [--skip-file=FILE] [--timeout=SECONDS]"
-            echo ""
-            echo "  --skip-file=FILE   File with test names to skip (one per line)."
-            echo "                     Same format as generate_skip_tests.py output."
-            echo "  --timeout=SECONDS  Per-test timeout (default: 120)"
+            echo "Usage: $0 [--allow-file=FILE] [--skip-file=FILE] [--timeout=SECONDS]"
             exit 0
             ;;
     esac
 done
 
-# Load skip list into a string for matching
+# Load allow list (if provided, only tests in this list will run)
+ALLOW_LIST=""
+USE_ALLOW_LIST=0
+if [ -n "${ALLOW_FILE}" ] && [ -f "${ALLOW_FILE}" ]; then
+    ALLOW_LIST=$(cat "${ALLOW_FILE}")
+    USE_ALLOW_LIST=1
+fi
+
+# Load skip list
 SKIP_LIST=""
 if [ -n "${SKIP_FILE}" ] && [ -f "${SKIP_FILE}" ]; then
     SKIP_LIST=$(cat "${SKIP_FILE}")
 fi
+
+is_allowed() {
+    test_name="$1"
+    [ "${USE_ALLOW_LIST}" -eq 0 ] && return 0
+    echo "${ALLOW_LIST}" | grep -qx "${test_name}" 2>/dev/null
+}
 
 is_skipped() {
     test_name="$1"
@@ -87,11 +108,26 @@ find "${SCRIPT_DIR}" -name Makefile -path '*/Makefile' | sort | while IFS= read 
     echo "${dir}|${example_name}|${test_args}"
 done > "${TESTS_LIST}"
 
-# Count total tests upfront
+NUM_BUILT=$(wc -l < "${TESTS_LIST}")
+
+# Filter to only allowed tests (if allow list provided)
+if [ "${USE_ALLOW_LIST}" -eq 1 ]; then
+    FILTERED_LIST="/tmp/makefile_tests_filtered_$$.txt"
+    while IFS='|' read -r dir example_name test_args; do
+        if is_allowed "${example_name}"; then
+            echo "${dir}|${example_name}|${test_args}"
+        fi
+    done < "${TESTS_LIST}" > "${FILTERED_LIST}"
+    mv "${FILTERED_LIST}" "${TESTS_LIST}"
+fi
+
 NUM_TESTS=$(wc -l < "${TESTS_LIST}")
 
 echo ""
-echo "Found ${NUM_TESTS} Makefile-built test(s)"
+echo "Found ${NUM_BUILT} Makefile-built executable(s)"
+if [ "${USE_ALLOW_LIST}" -eq 1 ]; then
+    echo "Allow file: ${ALLOW_FILE} ($(wc -l < "${ALLOW_FILE}") ctest entries, ${NUM_TESTS} matched)"
+fi
 if [ -n "${SKIP_FILE}" ] && [ -f "${SKIP_FILE}" ] && [ -s "${SKIP_FILE}" ]; then
     echo "Skip file: ${SKIP_FILE} ($(wc -l < "${SKIP_FILE}") entries)"
 fi
