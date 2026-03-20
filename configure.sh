@@ -89,9 +89,6 @@ if pkg_check libavcodec libavformat libavutil; then
     HAVE_FFMPEG=1
     FFMPEG_CFLAGS="$(pkg_cflags libavcodec libavformat libavutil)"
     FFMPEG_LIBS="$(pkg_libs libavcodec libavformat libavutil)"
-elif [ -f /usr/include/libavcodec/avcodec.h ] && ldconfig -p 2>/dev/null | grep -q libavcodec; then
-    HAVE_FFMPEG=1
-    FFMPEG_LIBS="-lavcodec -lavformat -lavutil"
 fi
 echo "  FFmpeg: $([ ${HAVE_FFMPEG} -eq 1 ] && echo yes || echo no)"
 cat >> "${CONFIG_MK}" << EOF
@@ -144,9 +141,6 @@ if pkg_check vulkan; then
     HAVE_VULKAN=1
     VULKAN_CFLAGS="$(pkg_cflags vulkan)"
     VULKAN_LIBS="$(pkg_libs vulkan)"
-elif [ -f /usr/include/vulkan/vulkan.h ] && ldconfig -p 2>/dev/null | grep -q libvulkan; then
-    HAVE_VULKAN=1
-    VULKAN_LIBS="-lvulkan"
 fi
 echo "  Vulkan: $([ ${HAVE_VULKAN} -eq 1 ] && echo yes || echo no)"
 cat >> "${CONFIG_MK}" << EOF

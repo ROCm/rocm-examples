@@ -52,9 +52,6 @@ ifndef HAVE_FFMPEG
 
   # FFmpeg
   _FFMPEG_CHECK := $(shell pkg-config --exists libavcodec libavformat libavutil 2>/dev/null && echo 1 || echo 0)
-  ifeq ($(_FFMPEG_CHECK),0)
-    _FFMPEG_CHECK := $(if $(and $(wildcard /usr/include/libavcodec/avcodec.h),$(shell ldconfig -p 2>/dev/null | grep -q libavcodec && echo y)),1,0)
-  endif
   HAVE_FFMPEG := $(_FFMPEG_CHECK)
   ifeq ($(HAVE_FFMPEG),1)
     FFMPEG_CFLAGS := $(shell pkg-config --cflags libavcodec libavformat libavutil 2>/dev/null)
@@ -88,9 +85,6 @@ ifndef HAVE_FFMPEG
 
   # Vulkan
   _VULKAN_CHECK := $(shell pkg-config --exists vulkan 2>/dev/null && echo 1 || echo 0)
-  ifeq ($(_VULKAN_CHECK),0)
-    _VULKAN_CHECK := $(if $(and $(wildcard /usr/include/vulkan/vulkan.h),$(shell ldconfig -p 2>/dev/null | grep -q libvulkan && echo y)),1,0)
-  endif
   HAVE_VULKAN := $(_VULKAN_CHECK)
   ifeq ($(HAVE_VULKAN),1)
     VULKAN_CFLAGS := $(shell pkg-config --cflags vulkan 2>/dev/null)
