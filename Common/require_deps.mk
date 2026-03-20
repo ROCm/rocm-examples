@@ -50,8 +50,10 @@ _REPO_ROOT := $(dir $(COMMON_INCLUDE_DIR))
 ifndef HAVE_FFMPEG
   # Fallback: detect dependencies via pkg-config / file existence
 
-  # FFmpeg
-  _FFMPEG_CHECK := $(shell pkg-config --exists libavcodec libavformat libavutil 2>/dev/null && echo 1 || echo 0)
+  # FFmpeg (pkg-config + link test to catch missing -dev packages)
+  _FFMPEG_CHECK := $(shell pkg-config --exists libavcodec libavformat libavutil 2>/dev/null \
+    && echo 'int main(){return 0;}' | $${CC:-cc} -x c - $$(pkg-config --libs libavcodec libavformat libavutil) -o /dev/null 2>/dev/null \
+    && echo 1 || echo 0)
   HAVE_FFMPEG := $(_FFMPEG_CHECK)
   ifeq ($(HAVE_FFMPEG),1)
     FFMPEG_CFLAGS := $(shell pkg-config --cflags libavcodec libavformat libavutil 2>/dev/null)
@@ -61,8 +63,10 @@ ifndef HAVE_FFMPEG
     FFMPEG_LIBS :=
   endif
 
-  # OpenCV
-  _OPENCV_CHECK := $(shell pkg-config --exists opencv4 2>/dev/null && echo 1 || (pkg-config --exists opencv 2>/dev/null && echo 1 || echo 0))
+  # OpenCV (pkg-config + link test)
+  _OPENCV_CHECK := $(shell (pkg-config --exists opencv4 2>/dev/null && echo 'int main(){return 0;}' | $${CC:-cc} -x c - $$(pkg-config --libs opencv4) -o /dev/null 2>/dev/null && echo 1) \
+    || (pkg-config --exists opencv 2>/dev/null && echo 'int main(){return 0;}' | $${CC:-cc} -x c - $$(pkg-config --libs opencv) -o /dev/null 2>/dev/null && echo 1) \
+    || echo 0)
   HAVE_OPENCV := $(_OPENCV_CHECK)
   ifeq ($(HAVE_OPENCV),1)
     OPENCV_CFLAGS := $(shell pkg-config --cflags opencv4 2>/dev/null || pkg-config --cflags opencv)
@@ -72,8 +76,10 @@ ifndef HAVE_FFMPEG
     OPENCV_LIBS :=
   endif
 
-  # GLFW3
-  _GLFW3_CHECK := $(shell pkg-config --exists glfw3 2>/dev/null && echo 1 || echo 0)
+  # GLFW3 (pkg-config + link test)
+  _GLFW3_CHECK := $(shell pkg-config --exists glfw3 2>/dev/null \
+    && echo 'int main(){return 0;}' | $${CC:-cc} -x c - $$(pkg-config --libs glfw3) -o /dev/null 2>/dev/null \
+    && echo 1 || echo 0)
   HAVE_GLFW3 := $(_GLFW3_CHECK)
   ifeq ($(HAVE_GLFW3),1)
     GLFW3_CFLAGS := $(shell pkg-config --cflags glfw3 2>/dev/null)
@@ -83,8 +89,10 @@ ifndef HAVE_FFMPEG
     GLFW3_LIBS :=
   endif
 
-  # Vulkan
-  _VULKAN_CHECK := $(shell pkg-config --exists vulkan 2>/dev/null && echo 1 || echo 0)
+  # Vulkan (pkg-config + link test)
+  _VULKAN_CHECK := $(shell pkg-config --exists vulkan 2>/dev/null \
+    && echo 'int main(){return 0;}' | $${CC:-cc} -x c - $$(pkg-config --libs vulkan) -o /dev/null 2>/dev/null \
+    && echo 1 || echo 0)
   HAVE_VULKAN := $(_VULKAN_CHECK)
   ifeq ($(HAVE_VULKAN),1)
     VULKAN_CFLAGS := $(shell pkg-config --cflags vulkan 2>/dev/null)
