@@ -25,14 +25,8 @@ COMMON_INCLUDE_DIR := ../../Common
 EXTERNAL_DIR := ../../External
 GPU_RUNTIME ?= HIP
 
-# Dependency checking
-REQUIRED_DEPS := GLFW3
-include $(COMMON_INCLUDE_DIR)/require_deps.mk
-
-ifneq ($(SKIP_BUILD),1)
-
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_INSTALL_DIR ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
 
 HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
@@ -40,9 +34,9 @@ HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) $(GLFW3_CFLAGS)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) $(shell pkg-config --cflags glfw3)
 ILDFLAGS  :=
-ILDLIBS   :=  $(GLFW3_LIBS) -ldl
+ILDLIBS   :=  $(shell pkg-config --libs glfw3) -ldl
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
@@ -71,9 +65,3 @@ clean:
 	$(RM) $(EXAMPLE)
 
 .PHONY: clean
-
-else
-all:
-clean:
-.PHONY: all clean
-endif

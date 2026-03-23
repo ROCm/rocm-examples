@@ -25,14 +25,8 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
-# Dependency checking
-REQUIRED_DEPS := FFMPEG
-include $(COMMON_INCLUDE_DIR)/require_deps.mk
-
-ifneq ($(SKIP_BUILD),1)
-
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_INSTALL_DIR ?= /opt/rocm
 UTILS_DIR := ${ROCM_INSTALL_DIR}/share/rocdecode/utils
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
@@ -45,7 +39,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode
 ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
-ILDLIBS   := -lrocdecode $(FFMPEG_LIBS)
+ILDLIBS   := -lrocdecode $(shell pkg-config --libs libavcodec libavformat libavutil 2>/dev/null || echo "-lavcodec -lavformat -lavutil")
 
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
@@ -85,9 +79,3 @@ clean:
 	$(RM) $(EXAMPLE)
 
 .PHONY: clean
-
-else
-all:
-clean:
-.PHONY: all clean
-endif

@@ -25,14 +25,8 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME ?= HIP
 
-# Dependency checking
-REQUIRED_DEPS := LIBDW AMD_COMGR
-include $(COMMON_INCLUDE_DIR)/require_deps.mk
-
-ifneq ($(SKIP_BUILD),1)
-
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_INSTALL_DIR ?= /opt/rocm
 
 HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
 ROCPROFILER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -66,9 +60,3 @@ clean:
 	$(RM) $(EXAMPLE)
 
 .PHONY: clean
-
-else
-all:
-clean:
-.PHONY: all clean
-endif

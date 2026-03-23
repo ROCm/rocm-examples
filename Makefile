@@ -30,13 +30,10 @@ SUB_PROJECTS := \
 
 all: $(SUB_PROJECTS)
 
-configure:
-	./configure.sh --rocm-path="$(or $(ROCM_PATH),/opt/rocm)"
-
 clean: TARGET=clean
 clean: all
 
 $(SUB_PROJECTS):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all configure clean $(SUB_PROJECTS)
+.PHONY: all clean $(SUB_PROJECTS)

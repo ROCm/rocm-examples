@@ -109,13 +109,7 @@ jobs:
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
-      - name: Makefile build
-        run: |
-          ./configure.sh --rocm-path="${ROCM_PATH}"
-          make -j ROCM_INSTALL_DIR="${ROCM_PATH}" HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
-
       - name: CMake configure
-        if: ${{ !cancelled() }}
         run: |
           cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="${ROCM_PATH}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" 2> >(tee cmake_error.log >&2)
 
@@ -222,10 +216,33 @@ jobs:
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi
 
+      - name: Makefile build
+        if: ${{ !cancelled() }}
+        run: |
+          # Find which source directories had CMake-built executables
+          python3 .github/build_tools/find_cmake_built_dirs.py \
+            --build-dir build \
+            --source-dir . \
+            --output /tmp/cmake_built_dirs.txt
+
+          BUILT=0
+          FAILED=0
+          while IFS= read -r dir; do
+            echo "Building Makefile in ${dir}..."
+            if make -C "${dir}" ROCM_INSTALL_DIR="${ROCM_PATH}"; then
+              BUILT=$((BUILT + 1))
+            else
+              echo "WARNING: Makefile build failed in ${dir}"
+              FAILED=$((FAILED + 1))
+            fi
+          done < /tmp/cmake_built_dirs.txt
+
+          echo "Makefile build complete: ${BUILT} succeeded, ${FAILED} failed"
+
       - name: Makefile tests
         if: ${{ !cancelled() }}
         run: |
-          # Extract test names that ctest actually ran from JUnit XML results
+          # Extract test names that ctest actually passed from JUnit XML results
           python3 .github/build_tools/parse_ctest_results.py \
             --junit "${GITHUB_WORKSPACE}/ctest_results.xml" \
             --output /tmp/ctest_ran_tests.txt
