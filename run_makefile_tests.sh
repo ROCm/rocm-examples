@@ -121,47 +121,94 @@ if [ "${USE_ALLOW_LIST}" -eq 1 ]; then
     mv "${FILTERED_LIST}" "${TESTS_LIST}"
 fi
 
+# Filter out skipped tests (matching ctest --exclude-from-file behavior)
+FILTERED_LIST="/tmp/makefile_tests_filtered_$$.txt"
+while IFS='|' read -r dir example_name test_args; do
+    if ! is_skipped "${example_name}"; then
+        echo "${dir}|${example_name}|${test_args}"
+    fi
+done < "${TESTS_LIST}" > "${FILTERED_LIST}"
+SKIPPED_COUNT=$(($(wc -l < "${TESTS_LIST}") - $(wc -l < "${FILTERED_LIST}")))
+mv "${FILTERED_LIST}" "${TESTS_LIST}"
+
 NUM_TESTS=$(wc -l < "${TESTS_LIST}")
 
 echo ""
-echo "Found ${NUM_BUILT} Makefile-built executable(s)"
-if [ "${USE_ALLOW_LIST}" -eq 1 ]; then
-    echo "Allow file: ${ALLOW_FILE} ($(wc -l < "${ALLOW_FILE}") ctest entries, ${NUM_TESTS} matched)"
-fi
-if [ -n "${SKIP_FILE}" ] && [ -f "${SKIP_FILE}" ] && [ -s "${SKIP_FILE}" ]; then
-    echo "Skip file: ${SKIP_FILE} ($(wc -l < "${SKIP_FILE}") entries)"
+echo "Found ${NUM_BUILT} Makefile-built executable(s), ${NUM_TESTS} to run"
+if [ "${SKIPPED_COUNT}" -gt 0 ]; then
+    echo "Excluded ${SKIPPED_COUNT} test(s) via skip list"
 fi
 echo ""
 
 PASSED=0
 FAILED=0
-SKIPPED=0
 CURRENT=0
 FAILED_TESTS=""
+LINE_WIDTH=72
+START_TIME=$(date +%s)
+
+# Helper: print ctest-style result line with dot padding
+# Format: "N/total Test #N: name .....   Passed    X.XX sec"
+print_result() {
+    _current="$1"
+    _total="$2"
+    _num="$3"
+    _name="$4"
+    _result="$5"
+    _time="$6"
+    _prefix=$(printf "%d/%d Test #%d: %s " "$_current" "$_total" "$_num" "$_name")
+    _suffix=$(printf "   %s %8s sec" "$_result" "$_time")
+    _prefix_len=$(printf "%s" "$_prefix" | wc -c)
+    _suffix_len=$(printf "%s" "$_suffix" | wc -c)
+    _dots_needed=$((LINE_WIDTH - _prefix_len - _suffix_len))
+    if [ "$_dots_needed" -lt 3 ]; then
+        _dots_needed=3
+    fi
+    _dots=$(printf '%*s' "$_dots_needed" '' | tr ' ' '.')
+    printf "%s%s%s\n" "$_prefix" "$_dots" "$_suffix"
+}
 
 # Run tests
 while IFS='|' read -r dir example_name test_args; do
     CURRENT=$((CURRENT + 1))
 
-    if is_skipped "${example_name}"; then
-        SKIPPED=$((SKIPPED + 1))
-        printf "(%d/%d) SKIP    %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
-        continue
-    fi
+    # Print "Start" line (ctest style)
+    printf "        Start %d: %s\n" "${CURRENT}" "${example_name}"
 
     # Run the test from its own directory (so data files are found)
-    printf "(%d/%d) RUN     %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
+    test_start=$(date +%s%N 2>/dev/null || date +%s)
     if (cd "${dir}" && timeout "${TIMEOUT}" "./${example_name}" ${test_args}) > "/tmp/test_${example_name}.log" 2>&1; then
+        test_end=$(date +%s%N 2>/dev/null || date +%s)
+        # Calculate elapsed time in seconds with 2 decimal places
+        if [ ${#test_start} -gt 10 ]; then
+            elapsed=$(( (test_end - test_start) ))
+            elapsed_sec=$((elapsed / 1000000000))
+            elapsed_ms=$(( (elapsed % 1000000000) / 10000000 ))
+            elapsed_fmt=$(printf "%d.%02d" "$elapsed_sec" "$elapsed_ms")
+        else
+            elapsed_fmt=$(( test_end - test_start ))
+            elapsed_fmt="${elapsed_fmt}.00"
+        fi
         PASSED=$((PASSED + 1))
-        printf "(%d/%d) PASS    %s\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}"
+        print_result "${CURRENT}" "${NUM_TESTS}" "${CURRENT}" "${example_name}" "Passed" "${elapsed_fmt}"
     else
         exit_code=$?
+        test_end=$(date +%s%N 2>/dev/null || date +%s)
+        if [ ${#test_start} -gt 10 ]; then
+            elapsed=$(( (test_end - test_start) ))
+            elapsed_sec=$((elapsed / 1000000000))
+            elapsed_ms=$(( (elapsed % 1000000000) / 10000000 ))
+            elapsed_fmt=$(printf "%d.%02d" "$elapsed_sec" "$elapsed_ms")
+        else
+            elapsed_fmt=$(( test_end - test_start ))
+            elapsed_fmt="${elapsed_fmt}.00"
+        fi
         FAILED=$((FAILED + 1))
         FAILED_TESTS="${FAILED_TESTS} ${example_name}"
         if [ "${exit_code}" -eq 124 ]; then
-            printf "(%d/%d) TIMEOUT %s (after %ss)\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}" "${TIMEOUT}"
+            print_result "${CURRENT}" "${NUM_TESTS}" "${CURRENT}" "${example_name}" "Timeout" "${elapsed_fmt}"
         else
-            printf "(%d/%d) FAIL    %s (exit code %d)\n" "${CURRENT}" "${NUM_TESTS}" "${example_name}" "${exit_code}"
+            print_result "${CURRENT}" "${NUM_TESTS}" "${CURRENT}" "${example_name}" "***Failed" "${elapsed_fmt}"
         fi
         # Print last 20 lines of output for failed tests
         echo "--- output (last 20 lines) ---"
@@ -172,14 +219,34 @@ done < "${TESTS_LIST}"
 
 rm -f "${TESTS_LIST}"
 
+END_TIME=$(date +%s)
+TOTAL_TIME=$((END_TIME - START_TIME))
+
 echo ""
-echo "=========================================="
 RAN=$((PASSED + FAILED))
-echo "Makefile test results: ${RAN} tests ran, ${PASSED} passed, ${FAILED} failed, ${SKIPPED} skipped (${NUM_TESTS} total)"
-echo "=========================================="
+if [ "${FAILED}" -eq 0 ]; then
+    PERCENT=100
+elif [ "${RAN}" -gt 0 ]; then
+    PERCENT=$(( (PASSED * 100) / RAN ))
+else
+    PERCENT=0
+fi
+
+if [ "${FAILED}" -eq 0 ]; then
+    printf "%d%% tests passed, %d tests failed out of %d\n" "${PERCENT}" "${FAILED}" "${RAN}"
+else
+    printf "%d%% tests passed, %d tests failed out of %d\n" "${PERCENT}" "${FAILED}" "${RAN}"
+    echo ""
+    echo "The following tests FAILED:"
+    _fail_num=0
+    for t in ${FAILED_TESTS}; do
+        _fail_num=$((_fail_num + 1))
+        printf "        %d - %s (Failed)\n" "${_fail_num}" "$t"
+    done
+fi
+
+printf "\nTotal Test time (real) = %d.00 sec\n" "${TOTAL_TIME}"
 
 if [ -n "${FAILED_TESTS}" ]; then
-    echo ""
-    echo "Failed tests:${FAILED_TESTS}"
     exit 1
 fi
