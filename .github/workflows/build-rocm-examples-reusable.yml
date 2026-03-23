@@ -179,7 +179,7 @@ jobs:
             echo "No tests skipped." >> $GITHUB_STEP_SUMMARY
           fi
 
-          ctest --test-dir build --output-on-failure --exclude-from-file "${SKIP_FILE}" --output-junit build/ctest_results.xml 2>&1 | tee ctest_output.log
+          ctest --test-dir build --output-on-failure --exclude-from-file "${SKIP_FILE}" --output-junit "${GITHUB_WORKSPACE}/ctest_results.xml" 2>&1 | tee ctest_output.log
 
       - name: Test summary
         if: ${{ !cancelled() }}
@@ -227,7 +227,7 @@ jobs:
         run: |
           # Extract test names that ctest actually ran from JUnit XML results
           python3 .github/build_tools/parse_ctest_results.py \
-            --junit build/ctest_results.xml \
+            --junit "${GITHUB_WORKSPACE}/ctest_results.xml" \
             --output /tmp/ctest_ran_tests.txt
 
           # Generate skip list with --makefile to include tests that need CMake test data

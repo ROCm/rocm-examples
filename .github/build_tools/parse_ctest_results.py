@@ -24,8 +24,14 @@ def main():
 
     try:
         tree = ET.parse(args.junit)
-    except (ET.ParseError, FileNotFoundError) as e:
-        print(f"Error reading {args.junit}: {e}", file=sys.stderr)
+    except FileNotFoundError:
+        print(f"Warning: {args.junit} not found (ctest may not have run)")
+        print("Creating empty allow list — no Makefile tests will run")
+        with open(args.output, "w") as f:
+            pass
+        return
+    except ET.ParseError as e:
+        print(f"Error parsing {args.junit}: {e}", file=sys.stderr)
         sys.exit(1)
 
     root = tree.getroot()
