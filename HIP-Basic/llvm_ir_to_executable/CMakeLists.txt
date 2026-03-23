@@ -35,21 +35,7 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 select_hip_platform()
 verify_hip_platform(PLATFORMS "amd")
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_PATH
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_PATH
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
 if(NOT DEFINED CMAKE_HIP_ARCHITECTURES)
     set(GPU_ARCHITECTURES "all" CACHE STRING "GPU architectures to compile for")

@@ -40,9 +40,7 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     find_package(CUDAToolkit REQUIRED)
 endif()
 
-set(ROCM_PATH "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/ROCmPath.cmake")
 
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest

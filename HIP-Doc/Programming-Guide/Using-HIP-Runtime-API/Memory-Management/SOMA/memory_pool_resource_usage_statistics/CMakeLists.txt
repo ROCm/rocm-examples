@@ -34,9 +34,7 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-set(ROCM_PATH "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/ROCmPath.cmake")
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
     set(USED_LANGUAGE "CXX")

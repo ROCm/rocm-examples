@@ -30,21 +30,7 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_PATH
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_PATH
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     find_package(CUDAToolkit REQUIRED) # We must explicitly link the CUDA driver library.

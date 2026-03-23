@@ -35,14 +35,9 @@ endif()
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocProfiler-SDK examples are only available on Linux")
     return()
-else()
-    set(ROCM_PATH
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 project(${example_name} LANGUAGES CXX)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
@@ -50,8 +45,6 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
 
 find_package(rocprofiler-sdk REQUIRED)
 find_package(rocprofiler-sdk-roctx REQUIRED)

@@ -44,15 +44,9 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocProfiler-SDK examples are only available on Linux")
     return()
-else()
-    set(ROCM_PATH
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 find_package(rocprofiler-sdk REQUIRED)
 find_package(libdw REQUIRED)

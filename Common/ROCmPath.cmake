@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,32 +20,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-set(example_name hip_device_globals)
+include_guard(GLOBAL)
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(${example_name} LANGUAGES CXX)
+# Resolve the ROCm installation path with the following priority:
+#   1. Existing cache value (-DROCM_PATH=... or previous configure)
+#   2. $ENV{ROCM_PATH}  (TheRock / standard ROCm)
+#   3. $ENV{HIP_PATH}   (Windows HIP SDK, also set on Linux by some CI)
+#   4. /opt/rocm         (hardcoded fallback)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
-select_gpu_language()
-enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
-select_hip_platform()
-
-set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
-set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
-set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
-
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
-
-add_executable(${example_name} main.hip)
-# Make example runnable using ctest
-add_test(NAME ${example_name} COMMAND ${example_name})
-
-set(include_dirs "../../Common" "../../External")
-if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    list(APPEND include_dirs "${ROCM_PATH}/include")
+if(NOT DEFINED CACHE{ROCM_PATH})
+    if(NOT "$ENV{ROCM_PATH}" STREQUAL "")
+        set(_rocm_path_default "$ENV{ROCM_PATH}")
+    elseif(NOT "$ENV{HIP_PATH}" STREQUAL "")
+        set(_rocm_path_default "$ENV{HIP_PATH}")
+    else()
+        set(_rocm_path_default "/opt/rocm")
+    endif()
+else()
+    set(_rocm_path_default "$CACHE{ROCM_PATH}")
 endif()
 
-target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(ROCM_PATH "${_rocm_path_default}" CACHE PATH "Root directory of the ROCm installation")
+unset(_rocm_path_default)
 
-install(TARGETS ${example_name})
+list(FIND CMAKE_PREFIX_PATH "${ROCM_PATH}" _rocm_path_idx)
+if(_rocm_path_idx EQUAL -1)
+    list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
+endif()
+unset(_rocm_path_idx)
