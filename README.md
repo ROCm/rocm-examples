@@ -51,11 +51,27 @@ See [CMake build options](#cmake-build-options) for an overview of build options
 
 #### Make
 
-Beware that only a subset of the examples support building via Make.
+Only a subset of the examples support building via Make. Some examples depend on external libraries (e.g. FFmpeg, OpenCV, GLFW3, Vulkan). Run `configure.sh` before building to detect which dependencies are available — examples with missing dependencies will be skipped automatically.
 
 - `$ git clone https://github.com/ROCm/rocm-examples.git`
 - `$ cd rocm-examples`
+- `$ ./configure.sh`
 - `$ make` (on ROCm) or `$ make ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
+
+The configure script writes a `config.mk` file that each Makefile includes to check for required dependencies. To rebuild after installing new libraries, re-run `./configure.sh` and then `make clean && make`.
+
+#### Makefile Testing
+
+After building, you can run the Makefile-built examples as tests:
+
+```
+$ ./run_makefile_tests.sh --timeout=120
+```
+
+Options:
+- `--allow-file=FILE` — only run tests listed in this file (one name per line)
+- `--skip-file=FILE` — skip tests listed in this file
+- `--timeout=SECONDS` — per-test timeout (default: 120)
 
 ### Linux with Docker
 
