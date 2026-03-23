@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-include_guard(GLOBAL)
+include_guard(DIRECTORY)
 
 # Resolve the ROCm installation path with the following priority:
 #   1. Existing cache value (-DROCM_PATH=... or previous configure)

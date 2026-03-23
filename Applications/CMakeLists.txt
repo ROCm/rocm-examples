@@ -29,6 +29,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 include("${CMAKE_CURRENT_LIST_DIR}/../Common/FindFilesystem.cmake")
 include("${CMAKE_CURRENT_LIST_DIR}/../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../Common/ROCmPath.cmake")
 select_gpu_language()
 # select_hip_platform requires the language to be enabled
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
