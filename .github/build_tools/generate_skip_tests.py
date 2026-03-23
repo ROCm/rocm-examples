@@ -46,6 +46,8 @@ SKIP_TESTS = {
 DISTRO_SKIP_TESTS = {
     # AlmaLinux 8 has glibc 2.28; binaries compiled against 2.34+ fail at runtime
     "gfx1100:almalinux-8": [
+        # glibc 2.28 too old — binaries compiled against 2.34+ fail at runtime
+        "hip_calling_global_functions",
         "hip_template_warp_size_reduction",
         "hip_warp_size_reduction",
         # hipSPARSELt Tensile library files not packaged for this target
