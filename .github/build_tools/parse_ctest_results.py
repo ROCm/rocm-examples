@@ -35,17 +35,24 @@ def main():
         sys.exit(1)
 
     root = tree.getroot()
-    test_names = []
+    passed = []
+    failed = []
     for testcase in root.iter("testcase"):
         name = testcase.get("name")
-        if name:
-            test_names.append(name)
+        if not name:
+            continue
+        # In JUnit XML, failed tests have a <failure> child element
+        if testcase.find("failure") is not None:
+            failed.append(name)
+        else:
+            passed.append(name)
 
     with open(args.output, "w") as f:
-        for name in test_names:
+        for name in passed:
             f.write(name + "\n")
 
-    print(f"Extracted {len(test_names)} test names from ctest JUnit results")
+    total = len(passed) + len(failed)
+    print(f"Extracted {len(passed)} passed tests from {total} ctest results ({len(failed)} failed, excluded)")
 
 
 if __name__ == "__main__":
