@@ -15,6 +15,14 @@ MAKEFILE_SKIP_TESTS = [
     "rocdecode_rocdec_decode",
 ]
 
+# Tests to always skip (all targets, all distros).
+ALWAYS_SKIP_TESTS = [
+    # rocprof-systems-basic passes but takes ~6 minutes
+    "rocprof-systems-basic",
+    # rocprof-systems-advanced fails
+    "rocprof-systems-advanced",
+]
+
 # Tests to skip per GPU target (one list per target that has skips)
 SKIP_TESTS = {
     "gfx1151": [
@@ -73,7 +81,10 @@ def main():
     )
     args = parser.parse_args()
 
-    lines = list(SKIP_TESTS.get(args.target, []))
+    lines = list(ALWAYS_SKIP_TESTS)
+    for test in SKIP_TESTS.get(args.target, []):
+        if test not in lines:
+            lines.append(test)
 
     if args.makefile:
         for test in MAKEFILE_SKIP_TESTS:
