@@ -1,27 +1,72 @@
 #!/usr/bin/env python3
-"""Find source directories where CMake produced executables.
+"""Find source directories whose Makefile examples were also built by CMake.
 
-Scans the CMake build tree for executables and maps them back to source
-directories that contain a Makefile. Used to selectively build only the
-Makefile examples whose dependencies CMake confirmed are available.
+Scans all Makefiles for 'EXAMPLE := <name>', then checks if that executable
+exists anywhere in the CMake build tree. Outputs the list of source directories
+whose Makefile targets have a matching CMake-built executable.
+
+This lets us selectively build only Makefiles for examples whose dependencies
+CMake confirmed are available, without requiring the directory structures to
+match between source and build trees.
 """
 
 import argparse
 import os
+import re
 import stat
-import sys
+
+
+def find_makefile_examples(source_dir):
+    """Walk source tree, find Makefiles with 'EXAMPLE := <name>'.
+
+    Returns dict mapping example_name -> relative source directory.
+    """
+    examples = {}
+    for root, _dirs, files in os.walk(source_dir):
+        if "Makefile" not in files:
+            continue
+        makefile_path = os.path.join(root, "Makefile")
+        try:
+            with open(makefile_path) as f:
+                for line in f:
+                    m = re.match(r"^EXAMPLE\s*:=\s*(\S+)", line)
+                    if m:
+                        name = m.group(1)
+                        rel = os.path.relpath(root, source_dir)
+                        examples[name] = rel
+                        break
+        except OSError:
+            continue
+    return examples
+
+
+def find_cmake_executables(build_dir):
+    """Walk CMake build tree and collect names of executable files."""
+    executables = set()
+    for root, _dirs, files in os.walk(build_dir):
+        for fname in files:
+            fpath = os.path.join(root, fname)
+            try:
+                st = os.stat(fpath)
+            except OSError:
+                continue
+            if not (st.st_mode & stat.S_IXUSR):
+                continue
+            # Skip non-executable artifacts
+            if fname.endswith((".so", ".a", ".cmake", ".sh", ".py", ".txt")):
+                continue
+            if fname.startswith("lib"):
+                continue
+            executables.add(fname)
+    return executables
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Find source dirs where CMake built executables."
+        description="Find source dirs whose Makefile examples were built by CMake."
     )
-    parser.add_argument(
-        "--build-dir", required=True, help="CMake build directory"
-    )
-    parser.add_argument(
-        "--source-dir", required=True, help="Source root directory"
-    )
+    parser.add_argument("--build-dir", required=True, help="CMake build directory")
+    parser.add_argument("--source-dir", required=True, help="Source root directory")
     parser.add_argument(
         "--output", required=True, help="Output file (one directory per line)"
     )
@@ -30,36 +75,22 @@ def main():
     build_dir = os.path.abspath(args.build_dir)
     source_dir = os.path.abspath(args.source_dir)
 
-    dirs = set()
-    for root, _dirnames, filenames in os.walk(build_dir):
-        for fname in filenames:
-            fpath = os.path.join(root, fname)
-            # Skip non-executable files
-            try:
-                st = os.stat(fpath)
-            except OSError:
-                continue
-            if not (st.st_mode & stat.S_IXUSR):
-                continue
-            # Skip shared libraries, scripts, cmake files, etc.
-            if fname.endswith((".so", ".a", ".cmake", ".sh", ".py", ".txt")):
-                continue
-            if fname.startswith("lib"):
-                continue
+    makefile_examples = find_makefile_examples(source_dir)
+    cmake_executables = find_cmake_executables(build_dir)
 
-            # Map build path back to source path
-            rel = os.path.relpath(root, build_dir)
-            source_candidate = os.path.join(source_dir, rel)
-            makefile = os.path.join(source_candidate, "Makefile")
-            if os.path.isfile(makefile):
-                dirs.add(rel)
+    matched_dirs = []
+    for name, rel_dir in sorted(makefile_examples.items()):
+        if name in cmake_executables:
+            matched_dirs.append(rel_dir)
 
-    sorted_dirs = sorted(dirs)
     with open(args.output, "w") as f:
-        for d in sorted_dirs:
+        for d in matched_dirs:
             f.write(d + "\n")
 
-    print(f"Found {len(sorted_dirs)} source directories with Makefiles matching CMake build targets")
+    print(
+        f"Found {len(matched_dirs)} Makefile directories matching CMake-built "
+        f"executables (out of {len(makefile_examples)} Makefiles total)"
+    )
 
 
 if __name__ == "__main__":
