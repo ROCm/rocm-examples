@@ -17,10 +17,6 @@ MAKEFILE_SKIP_TESTS = [
 
 # Tests to always skip (all targets, all distros).
 ALWAYS_SKIP_TESTS = [
-    # rocprof-systems-basic passes but takes ~6 minutes
-    "rocprof-systems-basic",
-    # rocprof-systems-advanced fails
-    "rocprof-systems-advanced",
 ]
 
 # Tests to skip per GPU target (one list per target that has skips)
@@ -44,16 +40,6 @@ SKIP_TESTS = {
 # Tests to skip for a specific GPU target + distro combination.
 # Keys are "<gpu_target>:<distro_key>", e.g. "gfx1151:sles-15.7".
 DISTRO_SKIP_TESTS = {
-    # AlmaLinux 8 has glibc 2.28; binaries compiled against 2.34+ fail at runtime
-    "gfx1100:almalinux-8": [
-        # glibc 2.28 too old — binaries compiled against 2.34+ fail at runtime
-        "hip_calling_global_functions",
-        "hip_template_warp_size_reduction",
-        "hip_warp_size_reduction",
-        # hipSPARSELt Tensile library files not packaged for this target
-        "hipsparselt_spmm",
-        "hipsparselt_spmm_advanced",
-    ],
 }
 
 
