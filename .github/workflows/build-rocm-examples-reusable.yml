@@ -115,26 +115,6 @@ jobs:
           ./configure.sh --rocm-path="${ROCM_PATH}"
           make -j ROCM_INSTALL_DIR="${ROCM_PATH}" HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
 
-      - name: Collect Makefile build artifacts
-        if: ${{ !cancelled() }}
-        run: |
-          mkdir -p /tmp/makefile_build
-          find . -name Makefile -not -path './build/*' | while IFS= read -r makefile; do
-            dir=$(dirname "$makefile")
-            example_name=$(grep '^EXAMPLE := ' "$makefile" 2>/dev/null | head -1 | sed 's/^EXAMPLE := //')
-            if [ -n "${example_name}" ] && [ -x "${dir}/${example_name}" ]; then
-              mkdir -p "/tmp/makefile_build/${dir}"
-              cp "${dir}/${example_name}" "/tmp/makefile_build/${dir}/"
-            fi
-          done
-
-      - name: Upload Makefile build artifacts
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v4
-        with:
-          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
-          path: /tmp/makefile_build/
-
       - name: CMake configure
         if: ${{ !cancelled() }}
         run: |
@@ -176,12 +156,32 @@ jobs:
         run: |
           cmake --build build -j
 
-      - name: Upload build artifacts
+      - name: Collect Makefile build artifacts
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p /tmp/makefile_build
+          find . -name Makefile -not -path './build/*' | while IFS= read -r makefile; do
+            dir=$(dirname "$makefile")
+            example_name=$(grep '^EXAMPLE := ' "$makefile" 2>/dev/null | head -1 | sed 's/^EXAMPLE := //')
+            if [ -n "${example_name}" ] && [ -x "${dir}/${example_name}" ]; then
+              mkdir -p "/tmp/makefile_build/${dir}"
+              cp "${dir}/${example_name}" "/tmp/makefile_build/${dir}/"
+            fi
+          done
+
+      - name: Upload CMake build artifacts
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
+
+      - name: Upload Makefile build artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          path: /tmp/makefile_build/
 
       - name: Run tests
         if: ${{ !cancelled() }}
