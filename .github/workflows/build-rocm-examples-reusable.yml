@@ -187,6 +187,25 @@ jobs:
 
           echo "Makefile build complete: ${BUILT} succeeded, ${FAILED} failed"
 
+      - name: Collect Makefile build artifacts
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p /tmp/makefile_build
+          while IFS= read -r dir; do
+            example_name=$(grep '^EXAMPLE := ' "${dir}/Makefile" 2>/dev/null | head -1 | sed 's/^EXAMPLE := //')
+            if [ -n "${example_name}" ] && [ -x "${dir}/${example_name}" ]; then
+              mkdir -p "/tmp/makefile_build/${dir}"
+              cp "${dir}/${example_name}" "/tmp/makefile_build/${dir}/"
+            fi
+          done < /tmp/cmake_built_dirs.txt
+
+      - name: Upload Makefile build artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          path: /tmp/makefile_build/
+
       - name: Makefile tests
         if: ${{ !cancelled() }}
         run: |
