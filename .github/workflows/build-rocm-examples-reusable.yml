@@ -110,6 +110,7 @@ jobs:
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
       - name: Makefile build
+        if: ${{ !cancelled() }}
         run: |
           ./configure.sh --rocm-path="${ROCM_PATH}"
           make -j ROCM_INSTALL_DIR="${ROCM_PATH}" HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
