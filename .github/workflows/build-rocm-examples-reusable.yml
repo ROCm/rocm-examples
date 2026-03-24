@@ -168,59 +168,7 @@ jobs:
           python3 .github/build_tools/generate_skip_tests.py --target ${{ matrix.gpu_config.gpu_target }} --distro ${{ inputs.distro }}
 
           SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
-          if [ -s "${SKIP_FILE}" ]; then
-            echo "## Skipped tests" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat "${SKIP_FILE}" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No tests skipped." >> $GITHUB_STEP_SUMMARY
-          fi
-
           ctest --test-dir build --output-on-failure --exclude-from-file "${SKIP_FILE}" --output-junit "${GITHUB_WORKSPACE}/ctest_results.xml" 2>&1 | tee ctest_output.log
-
-      - name: Test summary
-        if: ${{ !cancelled() }}
-        run: |
-          LAST_TEST_LOG="build/Testing/Temporary/LastTest.log"
-          if [ ! -f ctest_output.log ] || [ ! -f "${LAST_TEST_LOG}" ]; then
-            echo "No test logs found." >> $GITHUB_STEP_SUMMARY
-            exit 0
-          fi
-
-          echo "## Test summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-
-          SUMMARY=$(grep "tests passed" ctest_output.log)
-          echo "**${SUMMARY}**" >> $GITHUB_STEP_SUMMARY
-
-          FAILED_LOG="build/Testing/Temporary/LastTestsFailed.log"
-          if [ -s "${FAILED_LOG}" ]; then
-            echo "## Failed tests" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat "${FAILED_LOG}" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-
-            echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-
-            awk '
-              /^[0-9]+\/[0-9]+ Testing: / { if (inblock && failed) print block; block = $0; inblock = 1; failed = 0; seen_result = 0; next }
-              inblock { block = block "\n" $0 }
-              /^Test Failed\.$/ { failed = 1; seen_result = 1 }
-              /^Test Passed\.$/ { seen_result = 1 }
-              /^-+$/ { if (inblock && seen_result) { if (failed) print block; inblock = 0 } }
-              END { if (inblock && failed) print block }
-            ' "${LAST_TEST_LOG}" >> $GITHUB_STEP_SUMMARY
-
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "</details>" >> $GITHUB_STEP_SUMMARY
-          fi
 
       - name: Makefile tests
         if: ${{ !cancelled() }}
@@ -240,14 +188,99 @@ jobs:
           ./run_makefile_tests.sh \
             --allow-file=/tmp/ctest_ran_tests.txt \
             --skip-file="${SKIP_FILE}" \
-            --timeout=120
+            --timeout=120 2>&1 | tee makefile_test_output.log
 
-      - name: Upload test logs
+      - name: Test summary
+        if: ${{ !cancelled() }}
+        run: |
+          # --- CMake test summary ---
+          echo "## CMake Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f ctest_output.log ]; then
+            SUMMARY=$(grep "tests passed" ctest_output.log || echo "No ctest results found")
+            echo "**${SUMMARY}**" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "No ctest output log found." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          FAILED_LOG="build/Testing/Temporary/LastTestsFailed.log"
+          if [ -s "${FAILED_LOG}" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "### Failed CMake tests" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "${FAILED_LOG}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+
+            LAST_TEST_LOG="build/Testing/Temporary/LastTest.log"
+            if [ -f "${LAST_TEST_LOG}" ]; then
+              echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+
+              awk '
+                /^[0-9]+\/[0-9]+ Testing: / { if (inblock && failed) print block; block = $0; inblock = 1; failed = 0; seen_result = 0; next }
+                inblock { block = block "\n" $0 }
+                /^Test Failed\.$/ { failed = 1; seen_result = 1 }
+                /^Test Passed\.$/ { seen_result = 1 }
+                /^-+$/ { if (inblock && seen_result) { if (failed) print block; inblock = 0 } }
+                END { if (inblock && failed) print block }
+              ' "${LAST_TEST_LOG}" >> $GITHUB_STEP_SUMMARY
+
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "</details>" >> $GITHUB_STEP_SUMMARY
+            fi
+          fi
+
+          # --- Makefile test summary ---
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "## Makefile Test Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+          if [ -f makefile_test_output.log ]; then
+            MAKEFILE_SUMMARY=$(grep "tests passed\|tests failed" makefile_test_output.log | tail -1 || echo "No Makefile test results found")
+            echo "**${MAKEFILE_SUMMARY}**" >> $GITHUB_STEP_SUMMARY
+
+            # Show any failed Makefile tests
+            MAKEFILE_FAILURES=$(grep "Failed" makefile_test_output.log | grep -v "^[[:space:]]*$" || true)
+            if [ -n "${MAKEFILE_FAILURES}" ]; then
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo "### Failed Makefile tests" >> $GITHUB_STEP_SUMMARY
+              echo "" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+              echo "${MAKEFILE_FAILURES}" >> $GITHUB_STEP_SUMMARY
+              echo '```' >> $GITHUB_STEP_SUMMARY
+            fi
+          else
+            echo "No Makefile test output found." >> $GITHUB_STEP_SUMMARY
+          fi
+
+          # --- Skipped tests ---
+          SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
+          if [ -s "${SKIP_FILE}" ]; then
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo "## Skipped tests" >> $GITHUB_STEP_SUMMARY
+            echo "" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            cat "${SKIP_FILE}" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Upload CMake test logs
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
+
+      - name: Upload Makefile test logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          path: makefile_test_output.log
 
       - name: Clean the workspace
         if: always()
