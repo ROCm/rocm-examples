@@ -175,17 +175,24 @@ jobs:
 
           BUILT=0
           FAILED=0
+          FAILED_DIRS=""
           while IFS= read -r dir; do
             echo "Building Makefile in ${dir}..."
-            if make -C "${dir}" ROCM_INSTALL_DIR="${ROCM_PATH}"; then
+            if make -C "${dir}" ROCM_INSTALL_DIR="${ROCM_PATH}" HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"; then
               BUILT=$((BUILT + 1))
             else
-              echo "WARNING: Makefile build failed in ${dir}"
+              echo "ERROR: Makefile build failed in ${dir}"
               FAILED=$((FAILED + 1))
+              FAILED_DIRS="${FAILED_DIRS}  ${dir}\n"
             fi
           done < /tmp/cmake_built_dirs.txt
 
           echo "Makefile build complete: ${BUILT} succeeded, ${FAILED} failed"
+          if [ "${FAILED}" -gt 0 ]; then
+            echo "Failed directories:"
+            echo -e "${FAILED_DIRS}"
+            exit 1
+          fi
 
       - name: Collect Makefile build artifacts
         if: ${{ !cancelled() }}
