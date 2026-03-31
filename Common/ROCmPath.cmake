@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,39 +20,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := rocsparse_ellmv
-COMMON_INCLUDE_DIR := ../../../../Common
-GPU_RUNTIME ?= HIP
+include_guard(DIRECTORY)
 
-ifneq ($(GPU_RUNTIME), HIP)
-  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
-endif
+# Resolve the ROCm installation path with the following priority:
+#   1. Existing cache value (-DROCM_PATH=... or previous configure)
+#   2. $ENV{ROCM_PATH}  (TheRock / standard ROCm)
+#   3. $ENV{HIP_PATH}   (Windows HIP SDK, also set on Linux by some CI)
+#   4. /opt/rocm         (hardcoded fallback)
 
-ROCM_PATH ?= /opt/rocm
+if(NOT DEFINED CACHE{ROCM_PATH})
+    if(NOT "$ENV{ROCM_PATH}" STREQUAL "")
+        set(_rocm_path_default "$ENV{ROCM_PATH}")
+    elseif(NOT "$ENV{HIP_PATH}" STREQUAL "")
+        set(_rocm_path_default "$ENV{HIP_PATH}")
+    else()
+        set(_rocm_path_default "/opt/rocm")
+    endif()
+else()
+    set(_rocm_path_default "$CACHE{ROCM_PATH}")
+endif()
 
-HIP_INCLUDE_DIR     := $(ROCM_PATH)/include
-ROCSPARSE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+set(ROCM_PATH "${_rocm_path_default}" CACHE PATH "Root directory of the ROCm installation")
+unset(_rocm_path_default)
 
-CXX ?= g++
-
-# Common variables and flags
-CXX_STD   := c++17
-ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -isystem $(ROCSPARSE_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__
-ILDFLAGS  := -L $(ROCM_PATH)/lib -Wl,-rpath,$(ROCM_PATH)/lib
-ILDLIBS   := -lrocsparse -lamdhip64
-
-CXXFLAGS ?= -Wall -Wextra
-
-ICXXFLAGS += $(CXXFLAGS)
-ICPPFLAGS += $(CPPFLAGS)
-ILDFLAGS += $(LDFLAGS)
-ILDLIBS += $(LDLIBS)
-
-$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocsparse_utils.hpp
-	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
-
-clean:
-	$(RM) $(EXAMPLE)
-
-.PHONY: clean
+list(FIND CMAKE_PREFIX_PATH "${ROCM_PATH}" _rocm_path_idx)
+if(_rocm_path_idx EQUAL -1)
+    list(APPEND CMAKE_PREFIX_PATH "${ROCM_PATH}")
+endif()
+unset(_rocm_path_idx)

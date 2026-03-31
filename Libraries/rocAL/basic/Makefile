@@ -25,9 +25,9 @@ EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := /opt/rocm
+ROCM_PATH := /opt/rocm
 
-HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 ROCAL_INCLUDE_DIR := $(HIP_INCLUDE_DIR)/rocal
 OPENCV_INCLUDE_DIR := /usr/include/opencv4
 
@@ -37,7 +37,7 @@ CXX ?= g++
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -isystem $(ROCAL_INCLUDE_DIR) -isystem $(OPENCV_INCLUDE_DIR) -I $(EXTERNAL_DIR)
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lrocal -lturbojpeg -lopencv_core -lopencv_imgproc -lopencv_imgcodecs -lopencv_highgui
 
 ifeq ($(GPU_RUNTIME), HIP)

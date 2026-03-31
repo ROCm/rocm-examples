@@ -26,10 +26,10 @@ EXTERNAL_DIR := ../../../../External
 GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_PATH ?= /opt/rocm
 CUDA_INSTALL_DIR ?= /usr/local/cuda
 
-HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR     := $(ROCM_PATH)/include
 ROCRAND_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
 CXX     ?= g++
@@ -39,7 +39,7 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCRAND_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lrocrand
 
 ifeq ($(GPU_RUNTIME), CUDA)

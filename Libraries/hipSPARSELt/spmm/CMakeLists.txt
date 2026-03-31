@@ -44,21 +44,7 @@ foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
     endif()
 endforeach()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 find_package(hip REQUIRED)
 find_package(hipsparselt REQUIRED)
@@ -73,7 +59,7 @@ set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA
                                                  $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
 target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
 target_include_directories(${example_name} PRIVATE "${CMAKE_CURRENT_LIST_DIR}/../../../Common"
-                                                   $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
+                                                   $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE hip::host roc::hipsparselt)

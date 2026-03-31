@@ -34,20 +34,7 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 # Duplicate 'find_package(hipfft)' calls do not convert to 'nop' properly.
 if(NOT hipfft_FOUND)

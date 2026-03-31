@@ -34,28 +34,14 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
 set(library_name hip_static_host)
 set(example_name_cxx ${example_name}_cxx)
 
 set(include_dirs "../../Common" "../../External")
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    list(APPEND include_dirs "${ROCM_ROOT}/include")
+    list(APPEND include_dirs "${ROCM_PATH}/include")
 endif()
 
 # Create the HIP static host library.

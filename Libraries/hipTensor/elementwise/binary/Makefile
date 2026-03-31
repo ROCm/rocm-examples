@@ -26,18 +26,18 @@ EXTERNAL_DIR := ../../../../External
 GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR ?= /opt/rocm
+ROCM_PATH ?= /opt/rocm
 
-HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 HIPBLASLT_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(HIPBLASLT_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lhiptensor
 
 ifeq ($(GPU_RUNTIME), HIP)

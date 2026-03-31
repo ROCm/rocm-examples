@@ -39,15 +39,9 @@ verify_hip_platform(PLATFORMS "amd")
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocDecode examples are only available on Linux")
     return()
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("../../../Common/ROCmPath.cmake")
 
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
@@ -56,7 +50,7 @@ find_package(FFmpeg REQUIRED)
 
 add_executable(${example_name}
     main.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
 )
 
 target_link_libraries(${example_name}
@@ -72,8 +66,8 @@ target_include_directories(
     PRIVATE
     "../../../Common"
     "../../../External"
-    "${ROCM_ROOT}/share/rocdecode/utils"
-    "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode"
+    "${ROCM_PATH}/share/rocdecode/utils"
+    "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode"
     "${FFMPEG_INCLUDE_DIR}"
 )
 
@@ -86,7 +80,7 @@ endif()
 
 set_source_files_properties(
     main.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 

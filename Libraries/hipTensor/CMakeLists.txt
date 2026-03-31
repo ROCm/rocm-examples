@@ -40,15 +40,9 @@ endforeach()
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "hipTensor examples are only available on Linux")
     return()
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
 find_package(hiptensor QUIET)
 if(NOT hiptensor_FOUND)

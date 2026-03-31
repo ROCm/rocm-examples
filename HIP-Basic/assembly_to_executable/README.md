@@ -29,7 +29,7 @@ Building HIP executables from device assembly can be useful for example to exper
 This example creates a HIP file from device assembly code, however, such assembly files can also be created from HIP source code using `hipcc`. This can be done by passing `-S` and `--cuda-device-only` to hipcc. The former flag instructs the compiler to generate human-readable assembly instead of machine code, and the latter instruct the compiler to only compile the device part of the program. The assembly files for this example were generated as follows:
 
 ```shell
-$ROCM_INSTALL_DIR/bin/hipcc -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx950 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102 --offload-arch=gfx1151 --offload-arch=gfx1201 main.hip
+$ROCM_PATH/bin/hipcc -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx950 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102 --offload-arch=gfx1151 --offload-arch=gfx1201 main.hip
 ```
 
 The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
@@ -41,21 +41,21 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
 1. The `main.hip` file is compiled to an object file that only contains host code with `hipcc` by using the `--cuda-host-only` option. `main.hip` is a program that launches a simple kernel to compute the square of each element of a vector. The `-c` option is required to prevent the compiler from creating an executable, and make it create an object file containing the compiled host code instead.
 
     ```shell
-    $ROCM_INSTALL_DIR/bin/hipcc -c --cuda-host-only main.hip
+    $ROCM_PATH/bin/hipcc -c --cuda-host-only main.hip
     ```
 
 2. Each device assembly file is compiled to a device object file using `clang`. This requires specifying the correct architecture using `-target amdgcn-amd-amdhsa`, and the target architecture that should be assembled for using `-mcpu`:
 
     ```shell
-    $ROCM_INSTALL_DIR/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=gfx1030 main_gfx1030.s -o main_gfx1030.o
-    $ROCM_INSTALL_DIR/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=<arch> main_<arch>.s -o main_<arch>.o
+    $ROCM_PATH/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=gfx1030 main_gfx1030.s -o main_gfx1030.o
+    $ROCM_PATH/llvm/bin/clang -target amdgcn-amd-amdhsa -mcpu=<arch> main_<arch>.s -o main_<arch>.o
     ...
     ```
 
 3. The device object files are combined into an offload bundle using `clang-offload-bundler`. This requires specifying the target as well as the offload kind for each device, in the form `<offload-kind>-<target>[-<target id>[:<target features>]]`. For HIP device code, `<offload-kind>` is `hipv4`. Note that this command requires an (empty) entry for the host to also be present, with `<offload-kind>` `host`. The order of targets and inputs must match. `<target>` is an LLVM target 4-tuple, which is specified as `<arch>-<vendor>-<os>-<env>`.
 
     ```shell
-    $ROCM_INSTALL_DIR/llvm/bin/clang-offload-bundler -type=o -bundle-align=4096 \
+    $ROCM_PATH/llvm/bin/clang-offload-bundler -type=o -bundle-align=4096 \
             -targets=host-x86_64-unknown-linux-gnu,hipv4-amdgcn-amd-amdhsa--gfx1030,hipv4-... \
             -input=/dev/null \
             -input=main_gfx1030.o -input=... \
@@ -82,7 +82,7 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
     This file can then be assembled using `llvm-mc` as follows:
 
     ```shell
-    $ROCM_INSTALL_DIR/llvm/bin/llvm-mc -triple <host target> -o main_device.o hip_obj_gen.mcin --filetype=obj
+    $ROCM_PATH/llvm/bin/llvm-mc -triple <host target> -o main_device.o hip_obj_gen.mcin --filetype=obj
     ```
 
 5. Finally, using the system linker, hipcc, or clang, the host object and device objects are linked into an executable:

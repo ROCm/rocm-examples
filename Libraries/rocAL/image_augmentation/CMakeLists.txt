@@ -37,19 +37,13 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocAL examples are only available on Linux")
     return()
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 find_library(ROCAL_LIBRARY
     NAMES rocal
-    PATHS"${ROCM_ROOT}/lib"
+    PATHS"${ROCM_PATH}/lib"
     PATH_SUFFIXES lib lib64
     REQUIRED
 )
@@ -79,7 +73,7 @@ target_link_libraries(${example_name} PRIVATE ${ROCAL_LIBRARY} ${TurboJPEG_LIBRA
 # Include directories
 target_include_directories(
     ${example_name}
-    PRIVATE "../../../External" ${ROCM_ROOT}/include ${ROCM_ROOT}/include/rocal ${OpenCV_INCLUDE_DIRS}
+    PRIVATE "../../../External" ${ROCM_PATH}/include ${ROCM_PATH}/include/rocal ${OpenCV_INCLUDE_DIRS}
 )
 
 # Set example data directory as compile definition

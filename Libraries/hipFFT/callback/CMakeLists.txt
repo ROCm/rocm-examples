@@ -46,9 +46,7 @@ set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
-set(ROCM_ROOT "/opt/rocm" CACHE PATH "Root directory of the ROCm installation")
-
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 find_package(hipfft REQUIRED)
 
