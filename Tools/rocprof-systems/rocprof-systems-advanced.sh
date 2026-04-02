@@ -59,7 +59,7 @@ echo "==========================================================================
 # Binary-rewrite our executable to include instrumentation points
 $EXAMPLE_INSTRUMENTER --output ${EXAMPLE_BIN}.inst -- $EXAMPLE_BIN
 # Restrict our experiment to HIP API calls, ignore everything else
-$EXAMPLE_RUNNER --profile --trace --rocm-domains hip_api -- ./${EXAMPLE_BIN}.inst
+$EXAMPLE_RUNNER --profile --trace --enable-categories rocm_hip_api -- ./${EXAMPLE_BIN}.inst
 
 echo "==============================================================================="
 echo "Instrumenting CPU performance counters"
