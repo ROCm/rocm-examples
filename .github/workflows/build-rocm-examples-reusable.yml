@@ -161,7 +161,7 @@ jobs:
           mkdir -p /tmp/makefile_build
           find . -name Makefile -not -path './build/*' | while IFS= read -r makefile; do
             dir=$(dirname "$makefile")
-            example_name=$(grep '^EXAMPLE := ' "$makefile" 2>/dev/null | head -1 | sed 's/^EXAMPLE := //')
+            example_name=$(grep '^EXAMPLE := ' "$makefile" 2>/dev/null | head -1 | sed 's/^EXAMPLE := //' || true)
             if [ -n "${example_name}" ] && [ -x "${dir}/${example_name}" ]; then
               mkdir -p "/tmp/makefile_build/${dir}"
               cp "${dir}/${example_name}" "/tmp/makefile_build/${dir}/"
