@@ -23,6 +23,7 @@
 EXAMPLE := hip_linker_apis_file
 GPU_RUNTIME ?= HIP
 
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
@@ -34,7 +35,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS :=
 ILDFLAGS  :=
-ILDLIBS   := -lstdc++fs
+ILDLIBS   := $(CXX_FS_LIB)
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
