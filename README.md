@@ -60,18 +60,6 @@ Only a subset of the examples support building via Make. Some examples depend on
 
 The configure script writes a `config.mk` file that each Makefile includes to check for required dependencies. To rebuild after installing new libraries, re-run `./configure.sh` and then `make clean && make`.
 
-#### Makefile Testing
-
-After building, you can run the Makefile-built examples as tests:
-
-```
-$ ./run_makefile_tests.sh --timeout=120
-```
-
-Options:
-- `--allow-file=FILE` — only run tests listed in this file (one name per line)
-- `--skip-file=FILE` — skip tests listed in this file
-- `--timeout=SECONDS` — per-test timeout (default: 120)
 
 ### Linux with Docker
 
