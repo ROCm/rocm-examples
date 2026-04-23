@@ -30,6 +30,8 @@ EXAMPLES := \
   intercept_table \
   pc_sampling
 
+SKIP_FROM_TEST :=
+
 ifneq ($(ENABLE_OPENMP), OFF)
   _ROCM_DIR := $(or $(ROCM_PATH),/opt/rocm)
   ifneq ($(wildcard $(_ROCM_DIR)/bin/amdclang++),)
@@ -45,4 +47,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

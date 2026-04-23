@@ -59,8 +59,11 @@ $(EXAMPLE): main.cpp myKernel.ptx
 myKernel.ptx: myKernel.hip
 	$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) myKernel.hsaco
 endif
 
-.PHONY: clean
+.PHONY: clean test

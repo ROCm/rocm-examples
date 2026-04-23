@@ -58,7 +58,10 @@ main.hip: main.cu
 $(EXAMPLE): main.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) main.hip *.o
 
-.PHONY: clean
+.PHONY: clean test

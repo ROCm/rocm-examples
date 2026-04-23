@@ -44,6 +44,8 @@ EXAMPLES := \
   texture_management \
   warp_shuffle
 
+SKIP_FROM_TEST :=
+
 ifneq ($(wildcard /usr/include/GLFW/glfw3.h),)
   EXAMPLES += opengl_interop
   ifneq ($(wildcard /usr/include/vulkan/vulkan.h),)
@@ -68,4 +70,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

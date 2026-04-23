@@ -82,6 +82,9 @@ main_%.s: main.hip
 main_%.o: main_%.s
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	rm -f \
 	  main_*.o \
@@ -90,4 +93,4 @@ clean:
 	  main.o \
 	  $(EXAMPLE)
 
-.PHONY: clean $(EXAMPLE)
+.PHONY: clean $(EXAMPLE) test

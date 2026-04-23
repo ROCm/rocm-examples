@@ -53,7 +53,10 @@ $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp module.co
 module.co: module.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) module.co
 
-.PHONY: clean
+.PHONY: clean test

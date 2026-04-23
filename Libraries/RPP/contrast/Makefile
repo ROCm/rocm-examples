@@ -65,13 +65,17 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rpp_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test
 
 else
 all:
 clean:
-.PHONY: all clean
+test:
+.PHONY: all clean test
 endif

@@ -53,7 +53,10 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.hip image.h stb_image.h
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test

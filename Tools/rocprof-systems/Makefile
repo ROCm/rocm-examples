@@ -57,7 +57,10 @@ $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 $(EXAMPLE_ROCTX): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(USER_API_DEFS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS) $(USER_API_LIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) $(EXAMPLE_ROCTX)
 
-.PHONY: clean
+.PHONY: clean test

@@ -74,7 +74,7 @@ GENERATED_FILES := $(BUILD_DIR)/lib/libmv_deploy.so \
                    $(BUILD_DIR)/weights.bin \
                    $(BUILD_DIR)/mv_extras/mv_extras_postproc.cpp
 
-.PHONY: all clean
+.PHONY: all clean test
 
 all: $(EXAMPLE)
 
@@ -97,6 +97,8 @@ $(GENERATED_FILES): $(MODEL_FILE)
 # Build the example
 $(EXAMPLE): main.cpp visualize.cpp $(BUILD_DIR)/mvdeploy_api.cpp $(BUILD_DIR)/mv_extras/mv_extras_postproc.cpp $(COMMON_INCLUDE_DIR)/mivisionx_utils.hpp $(GENERATED_FILES)
 	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.cpp visualize.cpp $(BUILD_DIR)/mvdeploy_api.cpp $(BUILD_DIR)/mv_extras/mv_extras_postproc.cpp $(ILDLIBS)
+
+test:
 
 clean:
 	$(RM) $(EXAMPLE)

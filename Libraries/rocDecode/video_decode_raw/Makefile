@@ -61,7 +61,10 @@ SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test

@@ -53,7 +53,10 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) kmeans_results.txt
 
-.PHONY: clean
+.PHONY: clean test

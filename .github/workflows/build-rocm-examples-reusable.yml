@@ -247,6 +247,18 @@ jobs:
           name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
 
+      - name: Makefile test
+        if: ${{ !cancelled() }}
+        run: |
+          make test 2>&1 | tee makefile_test_output.log
+
+      - name: Upload Makefile test logs
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          path: makefile_test_output.log
+
       - name: Clean the workspace
         if: always()
         run: find "$GITHUB_WORKSPACE" -mindepth 1 -delete

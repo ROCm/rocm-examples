@@ -59,8 +59,11 @@ $(EXAMPLE): main.cpp vcpy_isa.ptx
 vcpy_isa.ptx: vcpy.hip
 	$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) vcpy_isa.ptx
 endif
 
-.PHONY: clean
+.PHONY: clean test

@@ -29,6 +29,8 @@ EXAMPLES := \
   gpsv \
   gtsv
 
+SKIP_FROM_TEST :=
+
 all: $(EXAMPLES)
 
 clean: TARGET=clean
@@ -37,4 +39,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

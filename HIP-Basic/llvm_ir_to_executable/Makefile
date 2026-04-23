@@ -86,6 +86,9 @@ main_%.ll: main_%.bc
 main_%.bc: main.hip
 	$(HIPCXX) --cuda-device-only -c -emit-llvm --offload-arch=$* -o $@ -I ../../Common -std=c++17 $<
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	rm -f \
 	  main_device*.o \
@@ -96,4 +99,4 @@ clean:
 	  main_*.ll \
 	  $(EXAMPLE)
 
-.PHONY: clean $(EXAMPLE)
+.PHONY: clean $(EXAMPLE) test

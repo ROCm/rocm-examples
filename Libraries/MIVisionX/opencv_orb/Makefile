@@ -51,7 +51,9 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/mivisionx_utils.hpp
 	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+test:
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test

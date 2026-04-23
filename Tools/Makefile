@@ -23,6 +23,8 @@
 TOOLS :=
 
 ifneq ($(GPU_RUNTIME), CUDA)
+
+SKIP_FROM_TEST :=
 TOOLS += \
 	ROCgdb \
 	rocprof-compute \
@@ -38,4 +40,7 @@ clean: all
 $(TOOLS):
 	$(MAKE) -C $@
 
-.PHONY: all clean $(TOOLS)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(TOOLS))
+
+.PHONY: all clean test $(TOOLS)

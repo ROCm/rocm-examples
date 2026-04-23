@@ -67,13 +67,16 @@ $(EXTERNAL_DIR)/glad/glad.h: $(EXTERNAL_DIR)/KHR/khrplatform.h
 
 $(EXTERNAL_DIR)/glad/glad.cpp: $(EXTERNAL_DIR)/glad/glad.h
 
+test:
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test
 
 else
 all:
 clean:
-.PHONY: all clean
+test:
+.PHONY: all clean test
 endif

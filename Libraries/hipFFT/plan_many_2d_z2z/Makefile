@@ -61,7 +61,10 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test
