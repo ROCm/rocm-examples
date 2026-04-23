@@ -32,12 +32,12 @@ include $(COMMON_INCLUDE_DIR)/require_deps.mk
 ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_PATH := /opt/rocm
 
-HIP_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 ROCCV_INCLUDE_DIR := $(HIP_INCLUDE_DIR)/roccv
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # OpenCV variables
 OPENCV_CXXFLAGS := $(OPENCV_CFLAGS)
@@ -47,7 +47,7 @@ OPENCV_LDFLAGS := $(OPENCV_LIBS)
 CXX_STD   := c++20
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCCV_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -DEXAMPLE_DATA_DIR=\"$(CURDIR)/../data\"
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lroccv
 
 ifeq ($(GPU_RUNTIME), HIP)

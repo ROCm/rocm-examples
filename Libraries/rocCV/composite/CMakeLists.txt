@@ -38,19 +38,13 @@ verify_hip_platform(PLATFORMS "amd")
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocCV examples are only available on Linux")
     return()
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("../../../Common/ROCmPath.cmake")
 
 find_library(ROCCV_LIBRARY
     NAMES roccv
-    PATHS"${ROCM_ROOT}/lib"
+    PATHS"${ROCM_PATH}/lib"
     PATH_SUFFIXES lib lib64
     REQUIRED
 )
@@ -66,7 +60,7 @@ target_link_libraries(${example_name} PRIVATE ${ROCCV_LIBRARY} ${OpenCV_LIBS})
 
 target_include_directories(
     ${example_name}
-    PRIVATE "../../../Common" "../../../External" ${ROCM_ROOT}/include/roccv ${OpenCV_INCLUDE_DIRS}
+    PRIVATE "../../../Common" "../../../External" ${ROCM_PATH}/include/roccv ${OpenCV_INCLUDE_DIRS}
 )
 
 # Set default data directory

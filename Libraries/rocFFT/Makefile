@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_PATH ?= /opt/rocm
 
 EXAMPLES := \
   callback \

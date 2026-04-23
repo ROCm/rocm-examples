@@ -35,20 +35,7 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    set(ROCM_ROOT
-        "$ENV{HIP_PATH}"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
-endif()
-
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 add_executable(${example_name} main.hip)
 
 # Make example runnable using ctest
@@ -57,7 +44,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 # Make the HIP runtime headers accessible
 target_include_directories(
     ${example_name}
-    PRIVATE "${ROCM_ROOT}/include" "${CMAKE_CURRENT_SOURCE_DIR}/../../Common"
+    PRIVATE "${ROCM_PATH}/include" "${CMAKE_CURRENT_SOURCE_DIR}/../../Common"
 )
 
 # Set up the compilation language for the source file.

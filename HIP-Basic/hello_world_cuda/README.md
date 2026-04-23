@@ -16,7 +16,7 @@ This example showcases a simple HIP program that is compiled on the CUDA platfor
 - This example showcases setting up a HIP program to be compiled to the CUDA platform using CMake.
   - Since CMake (as of version 3.21) does not support compiling to CUDA in HIP language mode, CUDA language mode has to be used. Thereby the project language is specified as `CUDA`.
   - Additionally, we must "teach" CMake to compile the source file `main.hip` in CUDA language mode, because it cannot guess that from the file extension. This is done by `set_source_files_properties(main.hip PROPERTIES LANGUAGE CUDA)`.
-  - The HIP "runtime" on the CUDA platform is header only. Thereby there is no need to link to a library, but the HIP include directory have to be added to the search paths. This is performed by `target_include_directories(${example_name} PRIVATE "${ROCM_ROOT}/include"`.
+  - The HIP "runtime" on the CUDA platform is header only. Thereby there is no need to link to a library, but the HIP include directory have to be added to the search paths. This is performed by `target_include_directories(${example_name} PRIVATE "${ROCM_PATH}/include"`.
 
 ## Demonstrated API Calls
 

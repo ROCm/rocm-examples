@@ -32,18 +32,18 @@ include $(COMMON_INCLUDE_DIR)/require_deps.mk
 ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
-UTILS_DIR := ${ROCM_INSTALL_DIR}/share/rocdecode/utils
+ROCM_PATH ?= /opt/rocm
+UTILS_DIR := ${ROCM_PATH}/share/rocdecode/utils
 
-HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Detect which rocdecode host library is available
-ROCDECODE_HOST_LIB := $(shell if [ -f $(ROCM_INSTALL_DIR)/lib/librocdecode-host.so ]; then \
+ROCDECODE_HOST_LIB := $(shell if [ -f $(ROCM_PATH)/lib/librocdecode-host.so ]; then \
                                   echo "rocdecode-host"; \
-                              elif [ -f $(ROCM_INSTALL_DIR)/lib/librocdecodehost.so ]; then \
+                              elif [ -f $(ROCM_PATH)/lib/librocdecodehost.so ]; then \
                                   echo "rocdecodehost"; \
                               fi)
 
@@ -51,8 +51,8 @@ ROCDECODE_HOST_LIB := $(shell if [ -f $(ROCM_INSTALL_DIR)/lib/librocdecode-host.
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
-ILDLIBS   := -lrocdecode $(FFMPEG_LIBS) -lpthread
+ILDFLAGS  := -L $(ROCM_PATH)/lib
+ILDLIBS   := -lrocdecode -lavcodec -lavformat -lavutil -lpthread
 
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra

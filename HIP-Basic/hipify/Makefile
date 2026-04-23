@@ -24,10 +24,10 @@ EXAMPLE := hip_hipify
 GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
-HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+ROCM_PATH ?= /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -53,7 +53,7 @@ ILDLIBS   += $(LDLIBS)
 all: $(EXAMPLE)
 # Step
 main.hip: main.cu
-	$(ROCM_INSTALL_DIR)/bin/hipify-perl $< -o $@
+	$(ROCM_PATH)/bin/hipify-perl $< -o $@
 
 $(EXAMPLE): main.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)

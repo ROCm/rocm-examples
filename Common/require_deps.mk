@@ -110,8 +110,8 @@ ifndef HAVE_FFMPEG
   HAVE_LIBDW := $(_LIBDW_CHECK)
 
   # amd_comgr
-  ROCM_INSTALL_DIR ?= $(or $(ROCM_PATH),/opt/rocm)
-  _AMD_COMGR_CHECK := $(if $(or $(wildcard $(ROCM_INSTALL_DIR)/include/amd_comgr/amd_comgr.h),$(wildcard $(ROCM_INSTALL_DIR)/lib/libamd_comgr.so)),1,0)
+  ROCM_PATH ?= /opt/rocm
+  _AMD_COMGR_CHECK := $(if $(or $(wildcard $(ROCM_PATH)/include/amd_comgr/amd_comgr.h),$(wildcard $(ROCM_PATH)/lib/libamd_comgr.so)),1,0)
   ifeq ($(_AMD_COMGR_CHECK),0)
     _AMD_COMGR_CHECK := $(shell pkg-config --exists amd_comgr 2>/dev/null && echo 1 || echo 0)
   endif

@@ -29,9 +29,9 @@ ifneq ($(GPU_RUNTIME), HIP)
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
 
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_PATH ?= /opt/rocm
 
-HIP_INCLUDE_DIR     := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR     := $(ROCM_PATH)/include
 ROCBLAS_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
 CXX ?= g++
@@ -40,7 +40,7 @@ CXX ?= g++
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib -Wl,-rpath,$(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib -Wl,-rpath,$(ROCM_PATH)/lib
 ILDLIBS   := -lrocblas
 
 CXXFLAGS ?= -Wall -Wextra

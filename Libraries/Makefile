@@ -32,8 +32,8 @@ LIBRARIES := \
 
 ifneq ($(GPU_RUNTIME), CUDA)
 
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
-INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include
+ROCM_PATH ?= /opt/rocm
+INCLUDE_DIR := $(ROCM_PATH)/include
 
 LIBRARIES += \
   hipBLASLt \

@@ -33,18 +33,18 @@ ifneq ($(GPU_RUNTIME), HIP)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_PATH ?= /opt/rocm
 
-HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCWMMA_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
-ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCWMMA_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS) -DROCM_ROOT_PATH=\"$(ROCM_INSTALL_DIR)\"
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCWMMA_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS) -DROCM_DEFAULT_PATH=\"$(ROCM_PATH)\"
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := -lhiprtc
 

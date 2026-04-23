@@ -68,7 +68,6 @@ jobs:
         run: |
           ROCM_PATH=$(rocm-sdk path --root)
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
-          echo "ROCM_INSTALL_DIR=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
@@ -100,7 +99,6 @@ jobs:
         run: |
           ROCM_PATH=/therock-tarball/install
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
-          echo "ROCM_INSTALL_DIR=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
@@ -112,12 +110,12 @@ jobs:
       - name: Makefile build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
-          make -j ROCM_INSTALL_DIR="${ROCM_PATH}" HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
+          make -j HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
 
       - name: CMake configure
         if: ${{ !cancelled() }}
         run: |
-          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DROCM_ROOT="${ROCM_PATH}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" 2> >(tee cmake_error.log >&2)
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" 2> >(tee cmake_error.log >&2)
 
       - name: CMake configure error summary
         if: ${{ !cancelled() }}

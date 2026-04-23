@@ -25,12 +25,12 @@ COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME ?= HIP
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_PATH ?= /opt/rocm
 CUDA_INSTALL_DIR ?= /usr/local/cuda
-HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
 CXX    ?= g++
-HIPCXX ?= $(ROCM_INSTALL_DIR)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 AR     ?= ar
 
 # Common variables and flags
@@ -51,7 +51,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS  ?= -Wall -Wextra
   LIBFLAGS  += -c -fPIC
-  HIPLIBS   += -L$(ROCM_INSTALL_DIR)/lib -lamdhip64
+  HIPLIBS   += -L$(ROCM_PATH)/lib -lamdhip64
   HOSTFLAGS += $(CXXFLAGS)
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)

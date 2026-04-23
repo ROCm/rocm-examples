@@ -30,19 +30,13 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocCV examples are only available on Linux")
     return()
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
 find_library(ROCCV_LIBRARY
     NAMES roccv
-    PATHS "${ROCM_ROOT}/lib"
+    PATHS "${ROCM_PATH}/lib"
     PATH_SUFFIXES lib lib64
 )
 

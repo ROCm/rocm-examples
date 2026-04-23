@@ -39,15 +39,9 @@ verify_hip_platform(PLATFORMS "amd")
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "rocDecode examples are only available on Linux")
     return()
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("../../../Common/ROCmPath.cmake")
 
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
@@ -57,9 +51,9 @@ find_package(Threads REQUIRED)
 
 add_executable(${example_name}
     main.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/colorspace_kernels.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/resize_kernels.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/colorspace_kernels.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/resize_kernels.cpp
 )
 
 target_link_libraries(${example_name}
@@ -76,8 +70,8 @@ target_include_directories(
     PRIVATE
     "../../../Common"
     "../../../External"
-    "${ROCM_ROOT}/share/rocdecode/utils"
-    "${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode"
+    "${ROCM_PATH}/share/rocdecode/utils"
+    "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode"
     "${FFMPEG_INCLUDE_DIR}"
 )
 
@@ -90,21 +84,21 @@ endif()
 
 set_source_files_properties(
     main.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/colorspace_kernels.cpp
-    ${ROCM_ROOT}/share/rocdecode/utils/resize_kernels.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/colorspace_kernels.cpp
+    ${ROCM_PATH}/share/rocdecode/utils/resize_kernels.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
 # disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
 # Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
 set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_ROOT}/lib/rocm_sysdeps/lib")
+if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
   set(USING_THE_ROCK ON)
 endif()
 
 if (NOT USING_THE_ROCK)
-    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_ROOT}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
+    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
     if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
         add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -of rgb)
         add_test(NAME ${example_name}-resize COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -resize 640x360 -of rgb)

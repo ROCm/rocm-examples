@@ -38,15 +38,9 @@ verify_hip_platform(PLATFORMS "amd")
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(STATUS "RCCL examples are only available on Linux")
     return()
-else()
-    set(ROCM_ROOT
-        "/opt/rocm"
-        CACHE PATH
-        "Root directory of the ROCm installation"
-    )
 endif()
 
-list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+include("../../../Common/ROCmPath.cmake")
 
 find_package(rccl REQUIRED)
 

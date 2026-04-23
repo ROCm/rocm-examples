@@ -29,13 +29,13 @@ ifneq ($(GPU_RUNTIME), HIP)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
-HIP_INCLUDE_DIR  := $(ROCM_INSTALL_DIR)/include
+ROCM_PATH ?= /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX                ?= $(ROCM_INSTALL_DIR)/bin/hipcc
-CLANG                 ?= $(ROCM_INSTALL_DIR)/llvm/bin/clang
-LLVM_MC               ?= $(ROCM_INSTALL_DIR)/llvm/bin/llvm-mc
-CLANG_OFFLOAD_BUNDLER ?= $(ROCM_INSTALL_DIR)/llvm/bin/clang-offload-bundler
+HIPCXX                ?= $(ROCM_PATH)/bin/hipcc
+CLANG                 ?= $(ROCM_PATH)/llvm/bin/clang
+LLVM_MC               ?= $(ROCM_PATH)/llvm/bin/llvm-mc
+CLANG_OFFLOAD_BUNDLER ?= $(ROCM_PATH)/llvm/bin/clang-offload-bundler
 
 # Common variables and flags
 CXX_STD   := c++17

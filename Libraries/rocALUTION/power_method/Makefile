@@ -31,15 +31,15 @@ endif
 
 # Common variables and flags
 CXX ?= g++
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_PATH ?= /opt/rocm
 
-ROCALUTION_INCLUDE_DIR := $(ROCM_INSTALL_DIR)/include
+ROCALUTION_INCLUDE_DIR := $(ROCM_PATH)/include
 
 CXX_STD   := c++17
 CXXFLAGS ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
 ICPPFLAGS := -isystem $(ROCALUTION_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -DEXAMPLE_DATA_DIR=\"$(CURDIR)/../data\"
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lrocalution
 
 $(EXAMPLE): main.cpp

@@ -30,9 +30,9 @@ ifneq ($(GPU_RUNTIME), HIP)
 endif
 
 # HIP variables
-ROCM_INSTALL_DIR := $(or $(ROCM_PATH),/opt/rocm)
+ROCM_PATH ?= /opt/rocm
 
-HIP_INCLUDE_DIR       := $(ROCM_INSTALL_DIR)/include
+HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCBLAS_INCLUDE_DIR   := $(HIP_INCLUDE_DIR)
 ROCSOLVER_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
@@ -42,7 +42,7 @@ CXX ?= g++
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCBLAS_INCLUDE_DIR) -isystem $(ROCSOLVER_INCLUDE_DIR) -isystem $(HIP_INCLUDE_DIR)  -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
-ILDFLAGS  := -L $(ROCM_INSTALL_DIR)/lib -Wl,-rpath,$(ROCM_INSTALL_DIR)/lib
+ILDFLAGS  := -L $(ROCM_PATH)/lib -Wl,-rpath,$(ROCM_PATH)/lib
 ILDLIBS   := -lrocblas -lrocsolver -lamdhip64
 
 CXXFLAGS  ?= -Wall -Wextra
