@@ -32,7 +32,7 @@ include $(COMMON_INCLUDE_DIR)/require_deps.mk
 ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
-ROCM_PATH := /opt/rocm
+ROCM_PATH ?= /opt/rocm
 
 HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 RPP_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

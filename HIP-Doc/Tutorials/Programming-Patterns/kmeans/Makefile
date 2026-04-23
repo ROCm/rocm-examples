@@ -24,7 +24,7 @@ EXAMPLE := hip_kmeans
 GPU_RUNTIME := HIP
 
 # HIP variables
-ROCM_PATH := /opt/rocm
+ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
 HIPCXX ?= $(ROCM_PATH)/bin/hipcc
