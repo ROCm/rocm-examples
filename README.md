@@ -60,7 +60,6 @@ Only a subset of the examples support building via Make. Some examples depend on
 
 The configure script writes a `config.mk` file that each Makefile includes to check for required dependencies. To rebuild after installing new libraries, re-run `./configure.sh` and then `make clean && make`.
 
-
 ### Linux with Docker
 
 Alternatively, instead of installing the prerequisites on the system, the [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/) in this repository can be used to build images that provide all required prerequisites. Note, that the ROCm kernel GPU driver still needs to be installed on the host system.
