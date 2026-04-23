@@ -20,7 +20,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hip_calling_global_functions
+EXAMPLE := hip_identifying_host_device_compilation_pass
 GPU_RUNTIME ?= HIP
 
 # HIP variables
