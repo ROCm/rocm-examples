@@ -28,6 +28,7 @@ GPU_RUNTIME := HIP
 # Load dependency detection (FFmpeg is optional for this example)
 include $(COMMON_INCLUDE_DIR)/require_deps.mk
 
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 
@@ -48,8 +49,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_PATH)/lib
-ILDLIBS   := -lrocdecode
-
+ILDLIBS   := -lrocdecode $(CXX_FS_LIB)
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
 	CPPFLAGS += -D__HIP_PLATFORM_AMD__

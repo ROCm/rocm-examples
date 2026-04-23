@@ -29,6 +29,7 @@ GPU_RUNTIME := HIP
 REQUIRED_DEPS := FFMPEG
 include $(COMMON_INCLUDE_DIR)/require_deps.mk
 
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
@@ -52,8 +53,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode
 ILDFLAGS  := -L $(ROCM_PATH)/lib
-ILDLIBS   := -lrocdecode -lavcodec -lavformat -lavutil -lpthread
-
+ILDLIBS   := -lrocdecode -lavcodec -lavformat -lavutil -lpthread $(CXX_FS_LIB)
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
 	CPPFLAGS += -D__HIP_PLATFORM_AMD__
