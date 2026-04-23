@@ -1,7 +1,7 @@
 #!/bin/sh
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,8 @@ for arg in "$@"; do
 done
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-CONFIG_MK="${SCRIPT_DIR}/config.mk"
+REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
+CONFIG_MK="${REPO_ROOT}/config.mk"
 
 echo "configure: detecting dependencies (ROCm path: ${ROCM_PATH})"
 

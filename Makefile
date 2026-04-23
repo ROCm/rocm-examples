@@ -31,7 +31,7 @@ SUB_PROJECTS := \
 all: $(SUB_PROJECTS)
 
 configure:
-	./configure.sh --rocm-path="$(or $(ROCM_PATH),/opt/rocm)"
+	./Scripts/configure.sh --rocm-path="$(or $(ROCM_PATH),/opt/rocm)"
 
 clean: TARGET=clean
 clean: all
