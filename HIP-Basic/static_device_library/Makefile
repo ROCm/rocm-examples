@@ -55,7 +55,9 @@ $(LIBEXAMPLE): library.o
 library.o: library/library.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c -o $@ $< -fgpu-rdc
 
+test:
+
 clean:
 	$(RM) $(EXAMPLE) $(LIBEXAMPLE) library.o
 
-.PHONY: all clean
+.PHONY: all clean test

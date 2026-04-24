@@ -26,6 +26,8 @@ SUBDIRECTORIES := \
   HIP-Math-API \
   Low-Precision-Floating-Point-Types
 
+SKIP_FROM_TEST :=
+
 all: $(SUBDIRECTORIES)
 
 clean: TARGET=clean
@@ -34,4 +36,7 @@ clean: all
 $(SUBDIRECTORIES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(SUBDIRECTORIES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(SUBDIRECTORIES))
+
+.PHONY: all clean test $(SUBDIRECTORIES)

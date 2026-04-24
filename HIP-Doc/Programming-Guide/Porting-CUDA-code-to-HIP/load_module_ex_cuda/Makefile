@@ -55,7 +55,10 @@ $(EXAMPLE): main.cpp myKernel.ptx
 myKernel.ptx: myKernel.cu
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) myKernel.ptx
 
-.PHONY: clean
+.PHONY: clean test

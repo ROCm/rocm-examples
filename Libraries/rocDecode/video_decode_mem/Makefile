@@ -81,13 +81,23 @@ SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
+# Mirrors the single ctest invocation; skips cleanly if the test video isn't present.
+test: $(EXAMPLE)
+	@V=$(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4; \
+	if [ -e "$$V" ]; then \
+	    echo "==> ./$(EXAMPLE) -i $$V"; ./$(EXAMPLE) -i "$$V"; \
+	else \
+	    echo "==> Skipping (not found): $$V"; \
+	fi
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test
 
 else
 all:
 clean:
-.PHONY: all clean
+test:
+.PHONY: all clean test
 endif

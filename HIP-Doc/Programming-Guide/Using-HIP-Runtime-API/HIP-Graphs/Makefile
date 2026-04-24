@@ -22,7 +22,9 @@
 
 EXAMPLES := \
   graph_capture \
-  graph_creation   
+  graph_creation
+
+SKIP_FROM_TEST :=
 
 all: $(EXAMPLES)
 
@@ -32,4 +34,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

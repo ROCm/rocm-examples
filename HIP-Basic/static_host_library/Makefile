@@ -81,7 +81,10 @@ $(LIBOBJ): library/library.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 $(LIBEXAMPLE): $(LIBOBJ)
 	$(AR) rcs $@ $(LIBOBJ)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE_CXX) $(EXAMPLE) $(LIBEXAMPLE) $(LIBOBJ)
 
-.PHONY: all clean
+.PHONY: all clean test

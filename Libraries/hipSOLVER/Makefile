@@ -32,6 +32,8 @@ EXAMPLES := \
   syevj_batched \
   sygvd
 
+SKIP_FROM_TEST :=
+
 # this example currently does not work with CUDA
 # https://github.com/ROCm/hipSOLVER/issues/152
 ifneq ($(GPU_RUNTIME), CUDA)
@@ -47,4 +49,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

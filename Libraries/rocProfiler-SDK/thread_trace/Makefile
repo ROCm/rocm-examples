@@ -25,6 +25,7 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME ?= HIP
 
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 
@@ -38,7 +39,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCPROFILER_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_PATH)/lib
-ILDLIBS   := -lrocprofiler-sdk -lrocprofiler-sdk-roctx -ldw -lamd_comgr -lstdc++fs
+ILDLIBS   := -lrocprofiler-sdk -lrocprofiler-sdk-roctx -ldw -lamd_comgr $(CXX_FS_LIB)
 
 ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
@@ -56,7 +57,10 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.cpp client.cpp $(COMMON_INCLUDE_DIR)/rocprofiler_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test

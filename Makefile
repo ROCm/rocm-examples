@@ -28,6 +28,8 @@ SUB_PROJECTS := \
   Programming-Guide \
   Tools
 
+SKIP_FROM_TEST :=
+
 all: $(SUB_PROJECTS)
 
 configure:
@@ -39,4 +41,7 @@ clean: all
 $(SUB_PROJECTS):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all configure clean $(SUB_PROJECTS)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(SUB_PROJECTS))
+
+.PHONY: all configure clean test $(SUB_PROJECTS)

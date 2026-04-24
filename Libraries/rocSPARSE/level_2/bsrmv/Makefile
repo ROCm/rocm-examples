@@ -52,7 +52,10 @@ ILDLIBS += $(LDLIBS)
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/rocsparse_utils.hpp
 	$(CXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test

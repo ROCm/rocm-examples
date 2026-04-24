@@ -28,6 +28,8 @@ EXAMPLES := \
   static_unified_memory \
   unified_memory_advice
 
+SKIP_FROM_TEST :=
+
 ifeq ($(HSA_XNACK), 1)
   EXAMPLES += standard_unified_memory 
 endif
@@ -40,4 +42,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

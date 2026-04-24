@@ -31,6 +31,8 @@ EXAMPLES := \
   per_thread_default_stream \
   pointer_memory_type
 
+SKIP_FROM_TEST :=
+
 ifeq ($(GPU_RUNTIME), CUDA)
   EXAMPLES += load_module_ex_cuda
 endif
@@ -43,4 +45,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

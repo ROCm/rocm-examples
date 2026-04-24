@@ -30,6 +30,8 @@ LIBRARIES := \
 	rocRAND \
 	hipRAND
 
+SKIP_FROM_TEST :=
+
 ifneq ($(GPU_RUNTIME), CUDA)
 
 ROCM_PATH ?= /opt/rocm
@@ -94,4 +96,7 @@ clean: all
 $(LIBRARIES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(LIBRARIES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(LIBRARIES))
+
+.PHONY: all clean test $(LIBRARIES)

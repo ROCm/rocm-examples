@@ -25,6 +25,7 @@ COMMON_INCLUDE_DIR := ../../Common
 EXTERNAL_DIR := ../../External
 GPU_RUNTIME ?= HIP
 
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
@@ -36,7 +37,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  :=
-ILDLIBS   := -lstdc++fs
+ILDLIBS   := $(CXX_FS_LIB)
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
@@ -55,7 +56,10 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp $(EXTERNAL_DIR)/CmdParser/cmdparser.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test

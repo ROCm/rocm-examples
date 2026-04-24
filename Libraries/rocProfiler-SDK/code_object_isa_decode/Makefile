@@ -29,6 +29,7 @@ GPU_RUNTIME ?= HIP
 REQUIRED_DEPS := LIBDW AMD_COMGR
 include $(COMMON_INCLUDE_DIR)/require_deps.mk
 
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
@@ -44,7 +45,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCPROFILER_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_PATH)/lib
-ILDLIBS   := -lrocprofiler-sdk -ldw -lamd_comgr -lstdc++fs
+ILDLIBS   := -lrocprofiler-sdk -ldw -lamd_comgr $(CXX_FS_LIB)
 
 ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
@@ -62,13 +63,17 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.cpp client.cpp $(COMMON_INCLUDE_DIR)/rocprofiler_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE)
 
-.PHONY: clean
+.PHONY: clean test
 
 else
 all:
 clean:
-.PHONY: all clean
+test:
+.PHONY: all clean test
 endif

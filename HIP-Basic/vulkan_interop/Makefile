@@ -74,13 +74,16 @@ sinewave.vert.spv.h: sinewave.vert
 sinewave.frag.spv.h: sinewave.frag
 	glslangValidator $< -o $@ $(IGLSLFLAGS) --vn sinewave_frag
 
+test:
+
 clean:
 	$(RM) $(EXAMPLE) sinewave.frag.spv.h sinewave.vert.spv.h
 
-.PHONY: clean
+.PHONY: clean test
 
 else
 all:
 clean:
-.PHONY: all clean
+test:
+.PHONY: all clean test
 endif

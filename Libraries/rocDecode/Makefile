@@ -32,6 +32,14 @@ EXAMPLES := \
 	video_decode_rgb \
 	video_to_sequence
 
+# All rocDecode tests are skipped by default: they require test data
+# (videos under $(ROCM_PATH)/share/rocdecode/) that ctest guards behind
+# `if(EXISTS …)` checks. Encoding the same conditional logic in Make is
+# possible but noisy; for now skip the whole subtree so `make test` from
+# root stays clean. To run rocDecode tests manually, cd into the leaf
+# Makefile and run `make test`.
+SKIP_FROM_TEST := $(EXAMPLES)
+
 all: $(EXAMPLES)
 
 clean: TARGET=clean
@@ -40,4 +48,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)

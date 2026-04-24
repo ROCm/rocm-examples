@@ -24,6 +24,7 @@ EXAMPLE := hip_module_api
 COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME ?= HIP
 
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 ifneq ($(GPU_RUNTIME), HIP)
     $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
 endif
@@ -40,7 +41,7 @@ CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR)
 ILDFLAGS  :=
-ILDLIBS   :=  -lstdc++fs
+ILDLIBS   :=  $(CXX_FS_LIB)
 
 ICXXFLAGS += $(CXXFLAGS)
 ICPPFLAGS += $(CPPFLAGS)
@@ -53,7 +54,10 @@ $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp module.co
 module.co: module.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) module.co
 
-.PHONY: clean
+.PHONY: clean test

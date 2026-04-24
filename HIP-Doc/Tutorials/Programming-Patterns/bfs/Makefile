@@ -22,6 +22,7 @@
 
 EXAMPLE := hip_bfs
 GRAPHGEN := graphgen
+TEST_ARGS := graph4096.txt
 GPU_RUNTIME := HIP
 
 # HIP variables
@@ -55,7 +56,7 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-.PHONY: all clean
+.PHONY: all clean test
 
 all: $(EXAMPLE) $(GRAPHGEN)
 
@@ -64,6 +65,9 @@ $(EXAMPLE): main.hip
 
 $(GRAPHGEN): graphgen.cpp
 	$(HOSTCXX) $(HOSTCXXFLAGS) -o $@ $<
+
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
 
 clean:
 	$(RM) $(EXAMPLE) $(GRAPHGEN) result.txt

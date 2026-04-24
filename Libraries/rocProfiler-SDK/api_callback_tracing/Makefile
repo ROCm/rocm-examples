@@ -62,7 +62,10 @@ $(CLIENT_LIB): client.cpp $(COMMON_INCLUDE_DIR)/rocprofiler_utils.hpp
 $(EXAMPLE): $(CLIENT_LIB) main.cpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.cpp -L. -lrocprofiler-sdk-roctx -l$(EXAMPLE)_client -Wl,-rpath,'$$ORIGIN' -lpthread
 
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
 clean:
 	$(RM) $(EXAMPLE) $(CLIENT_LIB)
 
-.PHONY: all clean
+.PHONY: all clean test

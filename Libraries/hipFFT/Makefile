@@ -28,6 +28,8 @@ EXAMPLES := \
   plan_z2z \
   setworkarea
 
+SKIP_FROM_TEST :=
+
 ifneq ($(GPU_RUNTIME), CUDA)
   EXAMPLES += \
     callback
@@ -41,4 +43,7 @@ clean: all
 $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
-.PHONY: all clean $(EXAMPLES)
+test: TARGET=test
+test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+
+.PHONY: all clean test $(EXAMPLES)
