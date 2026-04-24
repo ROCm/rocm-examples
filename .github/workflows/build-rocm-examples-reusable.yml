@@ -250,7 +250,7 @@ jobs:
       - name: Makefile test
         if: ${{ !cancelled() }}
         run: |
-          make test 2>&1 | tee makefile_test_output.log
+          make test HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" 2>&1 | tee makefile_test_output.log
 
       - name: Upload Makefile test logs
         if: ${{ !cancelled() }}

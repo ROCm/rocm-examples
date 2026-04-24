@@ -21,9 +21,11 @@
 # SOFTWARE.
 
 EXAMPLE := hip_linker_apis_file
+COMMON_INCLUDE_DIR := ../../../../Common
 GPU_RUNTIME ?= HIP
 
 include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
+
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
