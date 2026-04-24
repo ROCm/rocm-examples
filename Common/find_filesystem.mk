@@ -20,40 +20,24 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLE := hip_image_convolution
-GPU_RUNTIME := HIP
+# Detect whether linking std::experimental::filesystem requires -lstdc++fs.
+# Older toolchains (GCC <= 8 / SLES default) ship the implementation in a
+# separate static library; GCC >= 9 has it merged into libstdc++ proper.
+#
+# Mirrors the behavior of Common/FindFilesystem.cmake for the Make build path.
+#
+# Usage in leaf Makefiles:
+#   include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
+#   ...
+#   ILDLIBS := -lrocdecode ... $(CXX_FS_LIB)
+#
+# Output variable:
+#   CXX_FS_LIB - either "-lstdc++fs" or empty.
 
-# HIP variables
-ROCM_PATH ?= /opt/rocm
-HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
-
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
-
-# Common variables and flags
-CXX_STD   := c++17
-ICXXFLAGS := -std=$(CXX_STD)
-ICPPFLAGS := -I.
-ILDFLAGS  :=
-ILDLIBS   :=
-
-ifeq ($(GPU_RUNTIME), CUDA)
-	ICXXFLAGS += -x cu
-	ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
-else ifeq ($(GPU_RUNTIME), HIP)
-	CXXFLAGS ?= -Wall -Wextra
-else
-	$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+_FS_OK_BARE := $(shell { echo '#include <experimental/filesystem>'; echo 'int main(){std::experimental::filesystem::path p; return 0;}'; } | $${CXX:-c++} -x c++ -std=c++17 - -o /dev/null 2>/dev/null && echo 1 || echo 0)
+ifeq ($(_FS_OK_BARE),0)
+  _FS_OK_WITH_LIB := $(shell { echo '#include <experimental/filesystem>'; echo 'int main(){std::experimental::filesystem::path p; return 0;}'; } | $${CXX:-c++} -x c++ -std=c++17 - -lstdc++fs -o /dev/null 2>/dev/null && echo 1 || echo 0)
+  ifeq ($(_FS_OK_WITH_LIB),1)
+    CXX_FS_LIB := -lstdc++fs
+  endif
 endif
-
-ICXXFLAGS += $(CXXFLAGS)
-ICPPFLAGS += $(CPPFLAGS)
-ILDFLAGS  += $(LDFLAGS)
-ILDLIBS   += $(LDLIBS)
-
-$(EXAMPLE): main.hip image.h stb_image.h stb_image_write.h
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip $(ILDLIBS)
-
-clean:
-	$(RM) $(EXAMPLE) test_out.jpg
-
-.PHONY: clean

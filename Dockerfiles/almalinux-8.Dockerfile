@@ -22,6 +22,7 @@ RUN dnf install -y dnf-plugins-core && \
         git \
         curl \
         nasm \
+        pkgconf-pkg-config \
         python3.11 \
         python3.11-pip \
         elfutils-devel \
@@ -86,7 +87,7 @@ RUN mkdir -p /opt/vulkan-sdk && \
 ENV PATH="${VULKAN_SDK}/bin:${PATH}"
 ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib:${LD_LIBRARY_PATH}"
 ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
-ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
+ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
 
 # Build FFmpeg from source (not available in RHEL 8 repos)
 WORKDIR /tmp

@@ -7,3 +7,4 @@
 *.pdb
 CMakeUserPresets.json
 .cline_storage
+config.mk

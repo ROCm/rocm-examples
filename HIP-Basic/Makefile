@@ -36,15 +36,20 @@ EXAMPLES := \
   moving_average \
   multi_gpu_data_transfer \
   occupancy \
-  opengl_interop \
   runtime_compilation \
   saxpy \
   shared_memory \
   streams \
   static_host_library \
   texture_management \
-  vulkan_interop \
   warp_shuffle
+
+ifneq ($(wildcard /usr/include/GLFW/glfw3.h),)
+  EXAMPLES += opengl_interop
+  ifneq ($(wildcard /usr/include/vulkan/vulkan.h),)
+    EXAMPLES += vulkan_interop
+  endif
+endif
 
 # Only supported on HIP (not CUDA).
 ifneq ($(GPU_RUNTIME), CUDA)

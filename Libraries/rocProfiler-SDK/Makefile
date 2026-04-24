@@ -28,8 +28,14 @@ EXAMPLES := \
   counter_collection \
   external_correlation_id_request \
   intercept_table \
-  openmp_target \
   pc_sampling
+
+ifneq ($(ENABLE_OPENMP), OFF)
+  _ROCM_DIR := $(or $(ROCM_PATH),/opt/rocm)
+  ifneq ($(wildcard $(_ROCM_DIR)/bin/amdclang++),)
+    EXAMPLES += openmp_target
+  endif
+endif
 
 all: $(EXAMPLES)
 

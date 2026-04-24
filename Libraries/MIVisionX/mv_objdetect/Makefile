@@ -25,7 +25,7 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 
 # ROCm installation directory
-ROCM_PATH := /opt/rocm
+ROCM_PATH ?= /opt/rocm
 
 # Batch size configuration (can be overridden: make BATCH_SIZE=4)
 BATCH_SIZE := 1

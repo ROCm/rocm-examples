@@ -26,8 +26,11 @@ EXAMPLES := \
   fdtd \
   floyd_warshall \
   histogram \
-  prefix_sum \
-  sobel_filter
+  prefix_sum
+
+ifneq ($(wildcard /usr/include/GLFW/glfw3.h),)
+  EXAMPLES += sobel_filter
+endif
 
 ifneq ($(GPU_RUNTIME), CUDA)
   EXAMPLES += \

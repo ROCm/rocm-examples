@@ -25,8 +25,14 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
+# Dependency checking
+REQUIRED_DEPS := OPENCV
+include $(COMMON_INCLUDE_DIR)/require_deps.mk
+
+ifneq ($(SKIP_BUILD),1)
+
 # HIP variables
-ROCM_PATH := /opt/rocm
+ROCM_PATH ?= /opt/rocm
 
 HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 RPP_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
@@ -36,7 +42,7 @@ HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
-OPENCV_INCLUDE := $(shell pkg-config --cflags opencv4 2>/dev/null || pkg-config --cflags opencv)
+OPENCV_INCLUDE := $(OPENCV_CFLAGS)
 ICPPFLAGS := -isystem $(RPP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) \
              $(OPENCV_INCLUDE) -I $(ROCM_PATH)/include/rpp \
              -DEXAMPLE_DATA_DIR=\"$(CURDIR)/../data/images\"
@@ -63,3 +69,9 @@ clean:
 	$(RM) $(EXAMPLE)
 
 .PHONY: clean
+
+else
+all:
+clean:
+.PHONY: all clean
+endif

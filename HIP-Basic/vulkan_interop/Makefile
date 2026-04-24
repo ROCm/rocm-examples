@@ -24,6 +24,12 @@ EXAMPLE := hip_vulkan_interop
 COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME ?= HIP
 
+# Dependency checking
+REQUIRED_DEPS := GLFW3 VULKAN GLSLANG_VALIDATOR
+include $(COMMON_INCLUDE_DIR)/require_deps.mk
+
+ifneq ($(SKIP_BUILD),1)
+
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 CUDA_INSTALL_DIR ?= /usr/local/cuda
@@ -36,9 +42,9 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 # Common variables and flags
 CXX_STD    := c++17
 ICXXFLAGS  := -std=$(CXX_STD)
-ICPPFLAGS  := -I $(COMMON_INCLUDE_DIR) $(shell pkg-config --cflags glfw3 vulkan)
+ICPPFLAGS  := -I $(COMMON_INCLUDE_DIR) $(GLFW3_CFLAGS) $(VULKAN_CFLAGS)
 ILDFLAGS   :=
-ILDLIBS    := $(shell pkg-config --libs glfw3)
+ILDLIBS    := $(GLFW3_LIBS)
 IGLSLFLAGS := -V100
 
 ifeq ($(GPU_RUNTIME), CUDA)
@@ -72,3 +78,9 @@ clean:
 	$(RM) $(EXAMPLE) sinewave.frag.spv.h sinewave.vert.spv.h
 
 .PHONY: clean
+
+else
+all:
+clean:
+.PHONY: all clean
+endif

@@ -25,6 +25,10 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME := HIP
 
+# Load dependency detection (FFmpeg is optional for this example)
+include $(COMMON_INCLUDE_DIR)/require_deps.mk
+
+include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 
@@ -45,8 +49,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_PATH)/lib
-ILDLIBS   := -lrocdecode
-
+ILDLIBS   := -lrocdecode $(CXX_FS_LIB)
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
 	CPPFLAGS += -D__HIP_PLATFORM_AMD__
@@ -59,11 +62,10 @@ ifeq ($(GPU_RUNTIME), HIP)
 		CPPFLAGS += -DENABLE_HOST_DECODE=0
 	endif
 
-	# Optional FFmpeg
-	FFMPEG_FOUND := $(shell pkg-config --exists libavcodec libavformat libavutil 2>/dev/null && echo 1)
-	ifeq ($(FFMPEG_FOUND),1)
-		ICPPFLAGS += $(shell pkg-config --cflags libavcodec libavformat libavutil)
-		ILDLIBS   += $(shell pkg-config --libs libavcodec libavformat libavutil)
+	# Optional FFmpeg (uses HAVE_FFMPEG from config.mk / require_deps.mk)
+	ifeq ($(HAVE_FFMPEG),1)
+		ICPPFLAGS += $(FFMPEG_CFLAGS)
+		ILDLIBS   += $(FFMPEG_LIBS)
 	endif
 
 	COMPILER := $(HIPCXX)

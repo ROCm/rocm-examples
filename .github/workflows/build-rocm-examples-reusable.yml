@@ -74,6 +74,7 @@ jobs:
           echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=OFF" >> $GITHUB_ENV
+          echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
       - name: Install TheRock tarball
         if: ${{ matrix.install_method == 'tarball' }}
@@ -104,8 +105,15 @@ jobs:
           echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
           echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
+          echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
+
+      - name: Makefile build
+        run: |
+          ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
+          make -j HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
 
       - name: CMake configure
+        if: ${{ !cancelled() }}
         run: |
           cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" 2> >(tee cmake_error.log >&2)
 
@@ -141,17 +149,39 @@ jobs:
           fi
 
       - name: CMake build
+        if: ${{ !cancelled() }}
         run: |
           cmake --build build -j
 
-      - name: Upload build artifacts
-        if: success()
+      - name: Collect Makefile build artifacts
+        if: ${{ !cancelled() }}
+        run: |
+          mkdir -p /tmp/makefile_build
+          find . -name Makefile -not -path './build/*' | while IFS= read -r makefile; do
+            dir=$(dirname "$makefile")
+            example_name=$(grep '^EXAMPLE := ' "$makefile" 2>/dev/null | head -1 | sed 's/^EXAMPLE := //' || true)
+            if [ -n "${example_name}" ] && [ -x "${dir}/${example_name}" ]; then
+              mkdir -p "/tmp/makefile_build/${dir}"
+              cp "${dir}/${example_name}" "/tmp/makefile_build/${dir}/"
+            fi
+          done
+
+      - name: Upload CMake build artifacts
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
+      - name: Upload Makefile build artifacts
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          path: /tmp/makefile_build/
+
       - name: Run tests
+        if: ${{ !cancelled() }}
         run: |
           python3 .github/build_tools/generate_skip_tests.py --target ${{ matrix.gpu_config.gpu_target }} --distro ${{ inputs.distro }}
 
@@ -196,7 +226,7 @@ jobs:
             echo "<details><summary>Failed tests output</summary>" >> $GITHUB_STEP_SUMMARY
             echo "" >> $GITHUB_STEP_SUMMARY
             echo '```' >> $GITHUB_STEP_SUMMARY
-            
+
             awk '
               /^[0-9]+\/[0-9]+ Testing: / { if (inblock && failed) print block; block = $0; inblock = 1; failed = 0; seen_result = 0; next }
               inblock { block = block "\n" $0 }
@@ -205,7 +235,7 @@ jobs:
               /^-+$/ { if (inblock && seen_result) { if (failed) print block; inblock = 0 } }
               END { if (inblock && failed) print block }
             ' "${LAST_TEST_LOG}" >> $GITHUB_STEP_SUMMARY
-            
+
             echo '```' >> $GITHUB_STEP_SUMMARY
             echo "</details>" >> $GITHUB_STEP_SUMMARY
           fi

@@ -51,11 +51,14 @@ See [CMake build options](#cmake-build-options) for an overview of build options
 
 #### Make
 
-Beware that only a subset of the examples support building via Make.
+Only a subset of the examples support building via Make. Some examples depend on external libraries (e.g. FFmpeg, OpenCV, GLFW3, Vulkan). Run `configure.sh` before building to detect which dependencies are available — examples with missing dependencies will be skipped automatically.
 
 - `$ git clone https://github.com/ROCm/rocm-examples.git`
 - `$ cd rocm-examples`
+- `$ ./configure.sh`
 - `$ make` (on ROCm) or `$ make ROCM_EXAMPLES_GPU_LANGUAGE=CUDA` (on CUDA)
+
+The configure script writes a `config.mk` file that each Makefile includes to check for required dependencies. To rebuild after installing new libraries, re-run `./configure.sh` and then `make clean && make`.
 
 ### Linux with Docker
 
