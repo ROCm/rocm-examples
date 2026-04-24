@@ -63,8 +63,8 @@ The configure script writes a `config.mk` file that each Makefile includes to ch
 `make test` from the repo root cascades through every leaf Makefile and runs each example binary as a smoke test. A leaf can declare its test invocation via the `TEST_ARGS` variable (e.g. `TEST_ARGS := graph4096.txt` in `HIP-Doc/Tutorials/Programming-Patterns/bfs/Makefile`); the default is no arguments. To override at runtime — for example to point a rocDecode test at custom video data — set `TEST_ARGS` on the command line or in the environment:
 
 ```sh
-$ make test TEST_ARGS="--size=8192 --verbose"     # one-off
-$ TEST_ARGS="-i /path/to/video.mp4" make test     # via environment
+make test TEST_ARGS="--size=8192 --verbose"     # one-off
+TEST_ARGS="-i /path/to/video.mp4" make test     # via environment
 ```
 
 Per-directory test exclusions live in each parent Makefile's `SKIP_FROM_TEST` list (e.g. `Libraries/rocDecode/Makefile` skips its leaves by default because they need test data not always installed).
