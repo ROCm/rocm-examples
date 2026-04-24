@@ -22,9 +22,9 @@
 
 EXAMPLES := \
   graph_capture \
+  graph_creation
 
 SKIP_FROM_TEST :=
-  graph_creation   
 
 all: $(EXAMPLES)
 
