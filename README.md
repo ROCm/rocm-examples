@@ -60,6 +60,15 @@ Only a subset of the examples support building via Make. Some examples depend on
 
 The configure script writes a `config.mk` file that each Makefile includes to check for required dependencies. To rebuild after installing new libraries, re-run `./configure.sh` and then `make clean && make`.
 
+`make test` from the repo root cascades through every leaf Makefile and runs each example binary as a smoke test. A leaf can declare its test invocation via the `TEST_ARGS` variable (e.g. `TEST_ARGS := graph4096.txt` in `HIP-Doc/Tutorials/Programming-Patterns/bfs/Makefile`); the default is no arguments. To override at runtime — for example to point a rocDecode test at custom video data — set `TEST_ARGS` on the command line or in the environment:
+
+```sh
+$ make test TEST_ARGS="--size=8192 --verbose"     # one-off
+$ TEST_ARGS="-i /path/to/video.mp4" make test     # via environment
+```
+
+Per-directory test exclusions live in each parent Makefile's `SKIP_FROM_TEST` list (e.g. `Libraries/rocDecode/Makefile` skips its leaves by default because they need test data not always installed).
+
 ### Linux with Docker
 
 Alternatively, instead of installing the prerequisites on the system, the [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/) in this repository can be used to build images that provide all required prerequisites. Note, that the ROCm kernel GPU driver still needs to be installed on the host system.

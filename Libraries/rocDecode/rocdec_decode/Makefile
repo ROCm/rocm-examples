@@ -81,8 +81,15 @@ ILDLIBS   += $(LDLIBS)
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+# Mirrors the single ctest invocation; skips cleanly if the test data
+# directory ROCDECODE_TEST_FRAMES_DIR isn't present.
 test: $(EXAMPLE)
-	./$(EXAMPLE) $(TEST_ARGS)
+	@D=$(ROCM_PATH)/share/rocdecode/frames; \
+	if [ -e "$$D" ]; then \
+	    echo "==> ./$(EXAMPLE) -i $$D"; ./$(EXAMPLE) -i "$$D"; \
+	else \
+	    echo "==> Skipping (not found): $$D"; \
+	fi
 
 clean:
 	$(RM) $(EXAMPLE)

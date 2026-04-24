@@ -82,8 +82,14 @@ SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
+# Mirrors the single ctest invocation; skips cleanly if the test video directory isn't present.
 test: $(EXAMPLE)
-	./$(EXAMPLE) $(TEST_ARGS)
+	@D=$(ROCM_PATH)/share/rocdecode/video; \
+	if [ -e "$$D" ]; then \
+	    echo "==> ./$(EXAMPLE) -i $$D -t 2"; ./$(EXAMPLE) -i "$$D" -t 2; \
+	else \
+	    echo "==> Skipping (not found): $$D"; \
+	fi
 
 clean:
 	$(RM) $(EXAMPLE)

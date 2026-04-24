@@ -81,8 +81,17 @@ SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp $(UTILS_DIR)/c
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
+# Mirrors ctest: default and -resize variants on the same HEVC video.
 test: $(EXAMPLE)
-	./$(EXAMPLE) $(TEST_ARGS)
+	@V=$(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4; \
+	if [ -e "$$V" ]; then \
+	    rc=0; \
+	    echo "==> default";  ./$(EXAMPLE) -i "$$V" -of rgb || rc=$$?; \
+	    echo "==> -resize";  ./$(EXAMPLE) -i "$$V" -resize 640x360 -of rgb || rc=$$?; \
+	    exit $$rc; \
+	else \
+	    echo "==> Skipping (not found): $$V"; \
+	fi
 
 clean:
 	$(RM) $(EXAMPLE)

@@ -61,8 +61,21 @@ SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
+# Mirrors ctest's per-codec test entries (HEVC, AVC, AV1, VP9 raw bitstreams).
+# Each variant is skipped cleanly if its test video isn't present.
 test: $(EXAMPLE)
-	./$(EXAMPLE) $(TEST_ARGS)
+	@rc=0; \
+	for v in $(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-H265.265 \
+	         $(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-H264.264 \
+	         $(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-AV1.ivf \
+	         $(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-VP9.ivf; do \
+	    if [ -e "$$v" ]; then \
+	        echo "==> ./$(EXAMPLE) -i $$v"; \
+	        ./$(EXAMPLE) -i "$$v" || rc=$$?; \
+	    else \
+	        echo "==> Skipping (not found): $$v"; \
+	    fi; \
+	done; exit $$rc
 
 clean:
 	$(RM) $(EXAMPLE)
