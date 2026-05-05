@@ -122,6 +122,27 @@ jobs:
           rm -rf elfutils-0.186*
           echo "LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
+      - name: Upgrade GCC (Ubuntu 22.04)
+        if: ${{ inputs.distro == 'ubuntu-22.04' }}
+        run: |
+          apt-get update -qq
+          apt-get install -y software-properties-common
+          add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          apt-get update -qq
+          apt-get install -y gcc-13 g++-13
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 \
+            --slave /usr/bin/g++ g++ /usr/bin/g++-13
+
+      - name: Upgrade GCC (SLES)
+        if: ${{ startsWith(inputs.distro, 'sles') }}
+        run: |
+          zypper -qni addrepo -G https://download.opensuse.org/distribution/leap/15.6/repo/oss/ leap-oss
+          zypper -qni install -y gcc13-c++ libstdc++6-devel-gcc13
+          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130
+          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130
+          update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 130
+          update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 130
+
       - name: Makefile build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"

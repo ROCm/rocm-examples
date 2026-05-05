@@ -370,6 +370,22 @@ The following options are available when building with CMake.
   - [hipCUB](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipCUB/)
     - [device_radix_sort](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipCUB/device_radix_sort/): Simple program that showcases `hipcub::DeviceRadixSort::SortPairs`.
     - [device_sum](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipCUB/device_sum/): Simple program that showcases `hipcub::DeviceReduce::Sum`.
+  - [hipDNN](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/) **(Beta)**
+    - [bn_inference](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/bn_inference/): Batch normalization inference using inverse variance.
+    - [bn_inference_with_variance](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/bn_inference_with_variance/): Batch normalization inference using variance.
+    - [bn_training](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/bn_training/): Batch normalization training forward pass.
+    - [bn_backward](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/bn_backward/): Batch normalization backward pass for gradient computation.
+    - [fused_bn_training_activ](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/fused_bn_training_activ/): Fused batch normalization training and ReLU activation.
+    - [fused_bn_inference_activ](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/fused_bn_inference_activ/): Fused batch normalization inference and ReLU activation.
+    - [fused_bn_inference_variance_activ](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/fused_bn_inference_variance_activ/): Fused batch normalization inference (with variance) and ReLU.
+    - [fused_bn_inf_drelu_bn_bwd](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/fused_bn_inf_drelu_bn_bwd/): Fused 3-operation graph: BN inference, ReLU backward, BN backward.
+    - [conv_fprop](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/conv_fprop/): 2D convolution forward pass.
+    - [conv_dgrad](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/conv_dgrad/): 2D convolution backward data gradient.
+    - [conv_wgrad](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/conv_wgrad/): 2D convolution backward filter gradient.
+    - [conv_fprop_deterministic](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/conv_fprop_deterministic/): Deterministic 2D convolution forward pass.
+    - [fused_conv_fprop_activ](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/fused_conv_fprop_activ/): Fused convolution forward and clamped ReLU activation.
+    - [fused_conv_fprop_bias_activ](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/fused_conv_fprop_bias_activ/): Fused convolution forward, bias addition, and ReLU activation.
+    - [matmul](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipDNN/matmul/): Batched matrix multiplication (GEMM).
   - [hipRAND](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/)
     - [c_cpp_api](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/c_cpp_api) Showcases the use of the hipRAND cpp API.
       - [simple_distributions_cpp](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipRAND/c_cpp_api/simple_distributions_cpp) Shows an example for a simple distribution.

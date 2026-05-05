@@ -49,6 +49,10 @@ LIBRARIES += \
   rocThrust \
   rocWMMA
 
+ifneq ($(wildcard $(INCLUDE_DIR)/hipdnn/frontend/hipdnn_frontend.hpp),)
+LIBRARIES += hipDNN
+endif
+
 ifneq ($(wildcard $(INCLUDE_DIR)/rocdecode/rocdecode.h),)
 LIBRARIES += rocDecode
 endif
