@@ -46,7 +46,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode
 ILDFLAGS  := -L $(ROCM_PATH)/lib
-ILDLIBS   := -lrocdecode -lavcodec -lavformat -lavutil -lswresample -lpthread $(CXX_FS_LIB)
+ILDLIBS   := -lrocdecode $(FFMPEG_LIBS) -lpthread $(CXX_FS_LIB)
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
 	CPPFLAGS += -D__HIP_PLATFORM_AMD__

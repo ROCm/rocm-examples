@@ -70,8 +70,13 @@ $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DI
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 endif
 
+ifeq ($(SKIP_BUILD),1)
+test:
+	@echo "Skipping $(EXAMPLE) test: no supported architectures"
+else
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)
+endif
 
 clean:
 	$(RM) $(EXAMPLE)

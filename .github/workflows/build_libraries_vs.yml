@@ -19,8 +19,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-    PLATFORM_TOOLSET_VERSION: 6.4
-    HIP_PATH: C:\Program Files\AMD\ROCm\6.4\
     HIPSDK_INSTALLER_VERSION: 25.Q3
 
 jobs:
@@ -30,7 +28,7 @@ jobs:
           matrix:
             config: [Debug, Release]
             vsversion: [2017, 2019, 2022]
-        runs-on: windows-latest
+        runs-on: windows-2022
         defaults:
           run:
             shell: pwsh
@@ -52,14 +50,19 @@ jobs:
                   Start-Process HIPSDK.exe -ArgumentList '-install','-log',"$((Get-Location).Path)\installer_log.txt" -NoNewWindow -Wait
                   Write-Host "Installer log:"
                   Get-Content "installer_log.txt"
-                  if (Test-Path -Path "${{ env.HIP_PATH }}") {
-                      Write-Host "HIP_PATH directory exists: ${{ env.HIP_PATH }}"
+                  $hip_path = [System.Environment]::GetEnvironmentVariable('HIP_PATH', 'Machine')
+                  if (Test-Path -Path "$hip_path") {
+                      Write-Host "HIP_PATH directory exists: $hip_path"
                       Write-Host "HIP SDK installed successfully"
                   } else {
-                      Write-Host "HIP_PATH directory DOES NOT exist: ${{ env.HIP_PATH }}"
+                      Write-Host "HIP_PATH directory DOES NOT exist: $hip_path"
                       Write-Host "HIP SDK installation failed"
                       Exit 1
                   }
+                  $version = (Split-Path $hip_path -Leaf)
+                  Write-Host "Detected HIP SDK version: $version"
+                  echo "HIP_PATH=$hip_path" >> $env:GITHUB_ENV
+                  echo "PLATFORM_TOOLSET_VERSION=$version" >> $env:GITHUB_ENV
           - name: Apply patch
             run: |
                   Write-Host "Applying patches $(Get-ChildItem -File Scripts\VisualStudio\0002-Revert-Rename-hipblas-dll-for-HIP-SDK-7.1.patch)"
