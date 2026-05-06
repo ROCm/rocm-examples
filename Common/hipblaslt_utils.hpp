@@ -161,8 +161,8 @@ inline std::size_t real_datatype_size(hipDataType dtype)
 {
     // These types were not defined in older versions of ROCm, so need to be handled specially here.
     auto const dtype_int = static_cast<int>(dtype);
-    if(dtype_int == HIP_R_4F_E2M1_EXT || dtype_int == HIP_R_6F_E2M3_EXT
-       || dtype_int == HIP_R_6F_E3M2_EXT)
+    if(dtype_int == HIP_R_4F_E2M1 || dtype_int == HIP_R_6F_E2M3
+       || dtype_int == HIP_R_6F_E3M2)
     {
         return 1;
     }
