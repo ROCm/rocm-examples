@@ -34,9 +34,13 @@
 # Output variable:
 #   CXX_FS_LIB - either "-lstdc++fs" or empty.
 
-_FS_OK_BARE := $(shell { echo '#include <experimental/filesystem>'; echo 'int main(){std::experimental::filesystem::path p; return 0;}'; } | $${CXX:-c++} -x c++ -std=c++17 - -o /dev/null 2>/dev/null && echo 1 || echo 0)
+# GNU Make 4.2 treats '#' as a comment even inside $(shell), hiding the
+# closing ')' from the parser.  Expand it via a variable instead.
+_FS_HASH := \#
+
+_FS_OK_BARE := $(shell { echo '$(_FS_HASH)include <experimental/filesystem>'; echo 'int main(){return std::experimental::filesystem::current_path().empty();}'; } | $${CXX:-c++} -x c++ -std=c++17 - -o /dev/null 2>/dev/null && echo 1 || echo 0)
 ifeq ($(_FS_OK_BARE),0)
-  _FS_OK_WITH_LIB := $(shell { echo '#include <experimental/filesystem>'; echo 'int main(){std::experimental::filesystem::path p; return 0;}'; } | $${CXX:-c++} -x c++ -std=c++17 - -lstdc++fs -o /dev/null 2>/dev/null && echo 1 || echo 0)
+  _FS_OK_WITH_LIB := $(shell { echo '$(_FS_HASH)include <experimental/filesystem>'; echo 'int main(){return std::experimental::filesystem::current_path().empty();}'; } | $${CXX:-c++} -x c++ -std=c++17 - -lstdc++fs -o /dev/null 2>/dev/null && echo 1 || echo 0)
   ifeq ($(_FS_OK_WITH_LIB),1)
     CXX_FS_LIB := -lstdc++fs
   endif
