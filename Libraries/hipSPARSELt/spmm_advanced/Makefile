@@ -24,6 +24,10 @@ EXAMPLE := hipsparselt_spmm_advanced
 COMMON_INCLUDE_DIR := ../../../Common
 GPU_RUNTIME ?= HIP
 
+# Supported GPU architectures for hipSPARSELt
+SUPPORTED_HIP_ARCHITECTURES := gfx942 gfx950
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 CUDA_INSTALL_DIR ?= /usr/local/cuda
@@ -58,8 +62,13 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
+ifeq ($(SKIP_BUILD),1)
+$(EXAMPLE):
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipsparselt_utils.hpp
-	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+endif
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)
