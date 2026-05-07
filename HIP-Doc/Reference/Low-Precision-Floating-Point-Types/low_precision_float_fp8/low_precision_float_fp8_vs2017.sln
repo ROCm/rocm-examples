@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.36217.24
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{37146556-DFD0-497F-879F-DC5A3D7F48EC}") = "low_precision_float_fp16_vs2017", "low_precision_float_fp16_vs2017.vcxproj", "{D2305B0C-52FC-4E68-8E73-AA903E853236}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D2305B0C-52FC-4E68-8E73-AA903E853236}.Debug|x64.ActiveCfg = Debug|x64
+		{D2305B0C-52FC-4E68-8E73-AA903E853236}.Debug|x64.Build.0 = Debug|x64
+		{D2305B0C-52FC-4E68-8E73-AA903E853236}.Release|x64.ActiveCfg = Release|x64
+		{D2305B0C-52FC-4E68-8E73-AA903E853236}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {75B867AC-1188-4752-9618-B332017ACFFC}
+	EndGlobalSection
+EndGlobal
