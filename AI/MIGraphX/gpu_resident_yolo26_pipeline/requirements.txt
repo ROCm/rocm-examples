@@ -1,0 +1,11 @@
+# Pinned versions used by the blog sample. PyTorch, MIGraphX, and rocDecode
+# come from the rocm/pytorch:rocm7.2.2_ubuntu22.04_py3.10_pytorch_release_2.10.0
+# container and are not installed via pip here.
+
+opencv-python-headless==4.10.0.84
+numpy==1.26.4
+rich==13.7.1
+
+# Required only by prepare_model.py (ONNX export).
+ultralytics==8.4.41
+onnx==1.16.2

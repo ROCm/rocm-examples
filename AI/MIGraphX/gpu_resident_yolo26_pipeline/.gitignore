@@ -1,0 +1,17 @@
+# Build artefacts
+*.mxr
+*.onnx
+yolo26s.pt
+
+# Run outputs
+output*.mp4
+_run_artifacts/
+
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
