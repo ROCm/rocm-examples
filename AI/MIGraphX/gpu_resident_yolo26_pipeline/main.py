@@ -79,28 +79,11 @@ class VideoInfo:
 
 @dataclass
 class Timings:
-    """Per-frame timing accumulator for one run.
-
-    Two-bucket design, symmetric across decoder backends:
-
-    * ``predict_s`` covers Step 2-4 (preprocess + inference +
-      postprocess) inside ``Detector.detect_on_gpu``. Identical scope
-      in both branches.
-    * ``pipeline_s`` is the wall-clock time of decode + ``predict``:
-      ``DemuxFrame + DecodeFrame + GetFrameRgb + DLPack-wrap +
-      detect_on_gpu`` for rocdecode, ``cap.read() + cvtColor +
-      detect_on_gpu`` for opencv.
-
-    Demo-only host-side work (raw-frame DtoH, ``cv2.cvtColor`` for the
-    writer, ``draw_detections``, ``writer.write``) is intentionally
-    excluded from both buckets: in a detection-only deployment those
-    steps disappear, and including them would conflate the
-    GPU-resident pipeline with the visualization harness.
-    """
+    """Per-frame timing accumulator: predict() and full decode+predict pipeline."""
 
     frames: int = 0
-    predict_s: float = 0.0     # time inside Detector.detect_on_gpu()
-    pipeline_s: float = 0.0    # wall-clock per frame (decode + predict + draw)
+    predict_s: float = 0.0     # Step 2-4 inside Detector.detect_on_gpu()
+    pipeline_s: float = 0.0    # decode + predict (host-side draw/write excluded)
 
     def report(self, pipeline_label: str, output_path: str | Path) -> None:
         """Print average ms/frame and fps for predict() and the full pipeline."""
@@ -217,27 +200,20 @@ class Detector:
         if not isinstance(rgb_tensor, torch.Tensor):
             rgb_tensor = torch.from_numpy(rgb_tensor).cuda()
 
-        # Step 2: Preprocessing (all on GPU, no host copies)
+        # Step 2: preprocess on GPU.
         assert rgb_tensor.is_cuda, "decoder returned a CPU tensor"
         chw = self.preprocess_color_layout(rgb_tensor)
         scale, pad_x, pad_y = self.letterbox_geometry(chw.shape[2], chw.shape[3])
         model_input = self.preprocess_spatial(chw)
-        assert model_input.is_cuda, "preprocess produced a CPU tensor"
 
-        # Step 3: Inference -> [1, 300, 6] = [x1, y1, x2, y2, conf, class_id]
+        # Step 3: inference -> [1, 300, 6] = [x1, y1, x2, y2, conf, class_id].
         raw = self.run_inference(model_input)
-        assert raw.is_cuda, "MIGraphX output is not on the GPU"
 
-        # Step 4: Postprocessing -> survivors moved off-device in one batched DtoH.
-        # YOLO26's end-to-end head already emits up to 300 final detections
-        # (no NMS needed); we only filter by confidence and undo letterbox.
-        # For YOLO11 and earlier, replace filter_predictions() with
-        # torchvision.ops.batched_nms or ultralytics.utils.ops.non_max_suppression.
+        # Step 4: postprocess on GPU; survivors copied to host in one batched DtoH.
         survivors = self.filter_predictions(raw, conf_thresh=self.conf_threshold)
         survivors = self.transform_coordinates(survivors, scale, pad_x, pad_y)
 
-        # MIGraphX writes via run_async on the active PyTorch stream; barrier
-        # ensures the output buffer is ready before the DtoH copy below.
+        # Wait for run_async to finish before reading the output buffer.
         torch.cuda.current_stream().synchronize()
         host = survivors.cpu().numpy()
 
@@ -327,8 +303,6 @@ def process_video_rocdecode(
             "pyRocVideoDecode is not available. Ensure rocdecode/rocPyDecode are installed and set PYTHONPATH=/opt/rocm/lib"
         ) from e
 
-    # cv2 is used only for metadata; the writer is sized from the first decoded
-    # frame to account for the rocPyDecode stride bug (may be 1 row shorter).
     cap, info = _open_video(input_path)
     cap.release()
     print(f"\nVideo info: {info}")
@@ -373,17 +347,14 @@ def process_video_rocdecode(
 
             rgb_tensor = decoded_rgb_view(packet)  # [H, W, 3] uint8, cuda
 
+            # Steps 2-4: preprocess (resize+letterbox) -> MIGraphX inference -> filter+remap, all on GPU.
             predict_start = time.perf_counter()
             detections = detector.detect_on_gpu(rgb_tensor)
             timings.predict_s += time.perf_counter() - predict_start
             timings.pipeline_s += time.perf_counter() - frame_process_start
             timings.frames += 1
 
-            # Demo-only host-side work, excluded from pipeline_s:
-            # the GPU-resident pipeline ends at detect_on_gpu (only
-            # survivors crossed the bus). The DtoH of the raw frame
-            # below exists solely so we can draw boxes and write an
-            # output MP4; a detection-only deployment drops it.
+            # Demo-only host-side work (raw-frame DtoH, draw, encode); excluded from pipeline_s.
             frame = cv2.cvtColor(rgb_tensor.cpu().numpy(), cv2.COLOR_RGB2BGR)
             draw_detections(frame, detections)
             if writer is None:
@@ -420,6 +391,7 @@ def process_video_opencv(
             break
         rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
 
+        # Steps 2-4: preprocess (resize+letterbox) -> MIGraphX inference -> filter+remap, all on GPU.
         predict_start = time.perf_counter()
         detections = detector.detect_on_gpu(rgb)
         timings.predict_s += time.perf_counter() - predict_start

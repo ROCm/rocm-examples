@@ -25,7 +25,7 @@ subprocess.check_call([
 ])
 
 # --- Step 0b: Compile ONNX -> MIGraphX .mxr (article snippet, verbatim)
-import migraphx
+import migraphx  # noqa: E402  (HIP must initialize after the export subprocess; see module docstring)
 
 model = migraphx.parse_onnx("yolo26s.onnx")
 
