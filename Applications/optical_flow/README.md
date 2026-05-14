@@ -66,6 +66,7 @@ Replace `<path-to-rocm-sdk>` and `<path-to-hipcc>` with the actual paths for you
 The binary expects two PPM images at `data/frame10.ppm` and `data/frame11.ppm` relative to the working directory. Sample frames from the Middlebury dataset work well.
 
 ```bash
+#!/bin/bash
 # From the optical_flow directory (Make build)
 ./optical_flow
 
@@ -75,7 +76,7 @@ The binary expects two PPM images at `data/frame10.ppm` and `data/frame11.ppm` r
 
 ### Expected Output
 
-```
+```text
 HSOpticalFlow Starting...
 
 Using device: <GPU name>
@@ -91,6 +92,6 @@ The program exits with `EXIT_SUCCESS` when the L1 error between the GPU and CPU 
 
 Both files use the [Middlebury `.flo` format](http://vision.middlebury.edu/flow/code/flow-code/README.txt) and can be visualized with tools such as `flowiz` or the Middlebury flow utilities.
 
-## Key Notes:
+## Key Notes
 
 - StrideAlignment is 64 since `hipResourceTypePitch2D` requires `pitchInBytes` to be a multiple of `256 bytes` (4 bytes * 64 floats = 256 bytes)
