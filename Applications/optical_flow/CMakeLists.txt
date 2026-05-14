@@ -20,42 +20,31 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name applications_optical_flow)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(Applications LANGUAGES CXX)
-include(CTest)
+project(${example_name} LANGUAGES CXX)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
-
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/FindFilesystem.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/HipPlatform.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()
-# select_hip_platform requires the language to be enabled
+
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 select_hip_platform()
 
-find_package(glfw3 QUIET)
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
-add_subdirectory(bitonic_sort)
-add_subdirectory(convolution)
-add_subdirectory(floyd_warshall)
-add_subdirectory(histogram)
-add_subdirectory(prefix_sum)
-add_subdirectory(optical_flow)
+add_executable(${example_name} main.hip flowGold.cpp)
+add_test(NAME ${example_name} COMMAND ${example_name})
 
-if(NOT CXX_FS_HEADER_FOUND)
-    message(WARNING "filesystem not found, not building fdtd example")
-else()
-    add_subdirectory(fdtd)
+set(include_dirs "../../Common")
+if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
+    list(APPEND include_dirs "${ROCM_PATH}/include")
 endif()
 
-if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"))
-    add_subdirectory(monte_carlo_pi)
-endif()
+target_include_directories(${example_name} PRIVATE ${include_dirs})
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-if(NOT glfw3_FOUND)
-    message(WARNING "GLFW not found, not building sobel filter example")
-else()
-    add_subdirectory(sobel_filter)
-endif()
+install(TARGETS ${example_name})
