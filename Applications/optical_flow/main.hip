@@ -79,7 +79,7 @@ void WriteFloFile(const char *name, int w, int h, int s, const float *u, const f
 /// \return true if image is successfully loaded or false otherwise
 ///////////////////////////////////////////////////////////////////////////////
 #define STB_IMAGE_IMPLEMENTATION
-#include "../../HIP-Doc/Tutorials/Programming-Patterns/image_convolution/stb_image.h"
+#include "stb_image.h"
 
 bool LoadImageAsFP32(float *&img_data, int &img_w, int &img_h, int &img_s, const char *name)
 {
