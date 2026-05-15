@@ -95,3 +95,9 @@ Both files use the [Middlebury `.flo` format](http://vision.middlebury.edu/flow/
 ## Key Notes
 
 - StrideAlignment is 64 since `hipResourceTypePitch2D` requires `pitchInBytes` to be a multiple of `256 bytes` (4 bytes * 64 floats = 256 bytes)
+- If you are running ROCm through Python packages and having trouble with compiling due to the program not being able to find dependencies, please run the following in your virtual environment:
+
+```bash
+#!/bin/bash
+export ROCM_PATH=PATH_TO_VENV/.venv/lib/python3.12/site-packages/_rocm_sdk_devel
+```

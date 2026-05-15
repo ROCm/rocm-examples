@@ -29,7 +29,38 @@
 #include "flowGold.h"
 #include "flowHIP.h"
 
+#include <string>
+#ifndef _WIN32
+#    include <unistd.h>
+#endif
+
 constexpr const char *SAMPLE_NAME = "HSOpticalFlow";
+
+// Resolve a data file path relative to this source file's directory.
+// Falls back to /proc/self/exe when __FILE__ is a bare basename (non-absolute
+// compiler invocation), which happens when hipcc is called with a relative path.
+static std::string data_path(const char *filename)
+{
+    std::string src = __FILE__;
+#ifdef _WIN32
+    char sep = src.find_last_of('/') == std::string::npos ? '\\' : '/';
+    if(src.find("optical_flow") == std::string::npos)
+    {
+        char buffer[MAX_PATH];
+        GetModuleFileNameA(NULL, buffer, MAX_PATH);
+        src = std::string(buffer);
+    }
+#else
+    constexpr char sep = '/';
+    if(src.find(sep) == std::string::npos)
+    {
+        char buf[4096] = {};
+        if(readlink("/proc/self/exe", buf, sizeof(buf) - 1) > 0)
+            src = std::string(buf);
+    }
+#endif
+    return src.substr(0, src.find_last_of(sep)) + sep + "data" + sep + filename;
+}
 
 // CPU-GPU discrepancy threshold for self-test
 constexpr float THRESHOLD = 0.05f;
@@ -163,14 +194,14 @@ int main()
     float *h_target; // target image, host memory
 
     // load image from file
-    if (!LoadImageAsFP32(h_source, width, height, stride, "data/frame10.ppm")) {
+    if (!LoadImageAsFP32(h_source, width, height, stride, data_path("frame10.ppm").c_str())) {
         exit(EXIT_FAILURE);
     }
 
     const int source_width  = width;
     const int source_height = height;
 
-    if (!LoadImageAsFP32(h_target, width, height, stride, "data/frame11.ppm")) {
+    if (!LoadImageAsFP32(h_target, width, height, stride, data_path("frame11.ppm").c_str())) {
         delete[] h_source;
         exit(EXIT_FAILURE);
     }
