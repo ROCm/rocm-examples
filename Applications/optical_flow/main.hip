@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,16 +20,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-const static char *const sSDKsample = "HSOpticalFlow";
-
-// CPU-GPU discrepancy threshold for self-test
-const float THRESHOLD = 0.05f;
-
+#include "example_utils.hpp"
 #include <hip/hip_runtime.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 
 #include "common.h"
-#include "flowHIP.h"
 #include "flowGold.h"
+#include "flowHIP.h"
+
+constexpr const char *SAMPLE_NAME = "HSOpticalFlow";
+
+// CPU-GPU discrepancy threshold for self-test
+constexpr float THRESHOLD = 0.05f;
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief save optical flow in format described on vision.middlebury.edu/flow
@@ -51,17 +54,20 @@ void WriteFloFile(const char *name, int w, int h, int s, const float *u, const f
     }
 
     float data = 202021.25f;
-    fwrite(&data, sizeof(float), 1, stream);
-    fwrite(&w, sizeof(w), 1, stream);
-    fwrite(&h, sizeof(h), 1, stream);
+    bool  ok   = (fwrite(&data, sizeof(float), 1, stream) == 1)
+              && (fwrite(&w, sizeof(w), 1, stream) == 1)
+              && (fwrite(&h, sizeof(h), 1, stream) == 1);
 
-    for (int i = 0; i < h; ++i) {
-        for (int j = 0; j < w; ++j) {
+    for (int i = 0; i < h && ok; ++i) {
+        for (int j = 0; j < w && ok; ++j) {
             const int pos = j + i * s;
-            fwrite(u + pos, sizeof(float), 1, stream);
-            fwrite(v + pos, sizeof(float), 1, stream);
+            ok            = (fwrite(u + pos, sizeof(float), 1, stream) == 1)
+               && (fwrite(v + pos, sizeof(float), 1, stream) == 1);
         }
     }
+
+    if (!ok)
+        printf("Write error saving flow to \"%s\"\n", name);
 
     fclose(stream);
 }
@@ -75,20 +81,16 @@ void WriteFloFile(const char *name, int w, int h, int s, const float *u, const f
 /// \param[out] img_h    image height
 /// \param[out] img_s    image row stride
 /// \param[in]  name     image file name
-/// \param[in]  exePath  executable file path
 /// \return true if image is successfully loaded or false otherwise
 ///////////////////////////////////////////////////////////////////////////////
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
-
 bool LoadImageAsFP32(float *&img_data, int &img_w, int &img_h, int &img_s, const char *name)
 {
     printf("Loading \"%s\" ...\n", name);
-    int channels;
+    int            channels;
     unsigned char *data = stbi_load(name, &img_w, &img_h, &channels, 3); // force RGB
-    if (!data) { 
-        printf("Failed to load image\n"); 
-        return false; 
+    if (!data) {
+        printf("Failed to load image\n");
+        return false;
     }
 
     img_s    = iAlignUp(img_w);
@@ -143,7 +145,7 @@ bool CompareWithGold(int          width,
 int main()
 {
     // welcome message
-    printf("%s Starting...\n\n", sSDKsample);
+    printf("%s Starting...\n\n", SAMPLE_NAME);
 
     // see which GPU is being used
     hipDeviceProp_t props;
@@ -165,7 +167,22 @@ int main()
         exit(EXIT_FAILURE);
     }
 
+    const int source_width  = width;
+    const int source_height = height;
+
     if (!LoadImageAsFP32(h_target, width, height, stride, "data/frame11.ppm")) {
+        delete[] h_source;
+        exit(EXIT_FAILURE);
+    }
+
+    if (width != source_width || height != source_height) {
+        printf("Frame dimension mismatch: frame10 is %dx%d but frame11 is %dx%d\n",
+               source_width,
+               source_height,
+               width,
+               height);
+        delete[] h_source;
+        delete[] h_target;
         exit(EXIT_FAILURE);
     }
 

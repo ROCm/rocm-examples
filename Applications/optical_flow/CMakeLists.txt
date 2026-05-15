@@ -29,6 +29,9 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
@@ -36,7 +39,7 @@ select_hip_platform()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
-add_executable(${example_name} main.hip flowGold.cpp)
+add_executable(${example_name} main.hip flowHIP.hip flowGold.cpp)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 set(include_dirs "../../Common")
@@ -45,6 +48,6 @@ if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
 endif()
 
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_source_files_properties(main.hip flowHIP.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})

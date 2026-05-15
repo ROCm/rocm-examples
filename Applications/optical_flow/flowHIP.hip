@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,6 +19,9 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
+#include "example_utils.hpp"
+#include <hip/hip_runtime.h>
 
 #include "common.h"
 
@@ -61,8 +64,8 @@ void ComputeFlowHIP(const float *I0,
     printf("Computing optical flow on GPU...\n");
 
     // pI0 and pI1 will hold device pointers
-    const float **pI0 = new const float *[nLevels];
-    const float **pI1 = new const float *[nLevels];
+    float **pI0 = new float *[nLevels];
+    float **pI1 = new float *[nLevels];
 
     int *pW = new int[nLevels];
     int *pH = new int[nLevels];
@@ -105,11 +108,11 @@ void ComputeFlowHIP(const float *I0,
 
     int currentLevel = nLevels - 1;
     // allocate GPU memory for input images
-    HIP_CHECK(hipMalloc(pI0 + currentLevel, dataSize));
-    HIP_CHECK(hipMalloc(pI1 + currentLevel, dataSize));
+    HIP_CHECK(hipMalloc(&pI0[currentLevel], dataSize));
+    HIP_CHECK(hipMalloc(&pI1[currentLevel], dataSize));
 
-    HIP_CHECK(hipMemcpy((void *)pI0[currentLevel], I0, dataSize, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy((void *)pI1[currentLevel], I1, dataSize, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(pI0[currentLevel], I0, dataSize, hipMemcpyHostToDevice));
+    HIP_CHECK(hipMemcpy(pI1[currentLevel], I1, dataSize, hipMemcpyHostToDevice));
 
     pW[currentLevel] = width;
     pH[currentLevel] = height;
@@ -120,8 +123,8 @@ void ComputeFlowHIP(const float *I0,
         int nh = pH[currentLevel] / 2;
         int ns = iAlignUp(nw);
 
-        HIP_CHECK(hipMalloc(pI0 + currentLevel - 1, ns * nh * sizeof(float)));
-        HIP_CHECK(hipMalloc(pI1 + currentLevel - 1, ns * nh * sizeof(float)));
+        HIP_CHECK(hipMalloc(&pI0[currentLevel - 1], ns * nh * sizeof(float)));
+        HIP_CHECK(hipMalloc(&pI1[currentLevel - 1], ns * nh * sizeof(float)));
 
         Downscale(pI0[currentLevel],
                   pW[currentLevel],
@@ -130,7 +133,7 @@ void ComputeFlowHIP(const float *I0,
                   nw,
                   nh,
                   ns,
-                  (float *)pI0[currentLevel - 1]);
+                  pI0[currentLevel - 1]);
 
         Downscale(pI1[currentLevel],
                   pW[currentLevel],
@@ -139,7 +142,7 @@ void ComputeFlowHIP(const float *I0,
                   nw,
                   nh,
                   ns,
-                  (float *)pI1[currentLevel - 1]);
+                  pI1[currentLevel - 1]);
 
         pW[currentLevel - 1] = nw;
         pH[currentLevel - 1] = nh;
@@ -223,8 +226,8 @@ void ComputeFlowHIP(const float *I0,
 
     // cleanup
     for (int i = 0; i < nLevels; ++i) {
-        HIP_CHECK(hipFree((void *)pI0[i]));
-        HIP_CHECK(hipFree((void *)pI1[i]));
+        HIP_CHECK(hipFree(pI0[i]));
+        HIP_CHECK(hipFree(pI1[i]));
     }
 
     delete[] pI0;

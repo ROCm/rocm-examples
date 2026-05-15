@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -20,54 +20,31 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-///////////////////////////////////////////////////////////////////////////////
-// Header for common includes and utility functions
-///////////////////////////////////////////////////////////////////////////////
+#pragma once
 
-#ifndef COMMON_H
-#define COMMON_H
-
-///////////////////////////////////////////////////////////////////////////////
-// Common includes
-///////////////////////////////////////////////////////////////////////////////
-
-#include <hip/hip_runtime.h>
-#include "example_utils.hpp"
 #include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 
-///////////////////////////////////////////////////////////////////////////////
-// Common constants
-///////////////////////////////////////////////////////////////////////////////
 // HIP hipResourceTypePitch2D requires pitchInBytes to be a multiple of 256 bytes.
 // 64 floats * 4 bytes = 256 bytes satisfies this
-const int StrideAlignment = 64;
+constexpr int STRIDE_ALIGNMENT = 64;
 
-///////////////////////////////////////////////////////////////////////////////
-// Common functions
-///////////////////////////////////////////////////////////////////////////////
-
-// Align up n to the nearest multiple of m
-inline int iAlignUp(int n, int m = StrideAlignment)
+inline int iAlignUp(int n, int m = STRIDE_ALIGNMENT)
 {
     int mod = n % m;
-
     if (mod)
         return n + m - mod;
     else
         return n;
 }
 
-// round up n/m
 inline int iDivUp(int n, int m) { return (n + m - 1) / m; }
 
-// swap two values
 template <typename T> inline void Swap(T &a, T &b)
 {
     T t = a;
     a   = b;
     b   = t;
 }
-#endif

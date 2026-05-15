@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2023-2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2023-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -359,8 +359,8 @@ void ComputeFlowGold(const float *I0,
     float *u0 = u;
     float *v0 = v;
 
-    const float **pI0 = new const float *[nLevels];
-    const float **pI1 = new const float *[nLevels];
+    float **pI0 = new float *[nLevels];
+    float **pI1 = new float *[nLevels];
 
     int *pW = new int[nLevels];
     int *pH = new int[nLevels];
@@ -381,8 +381,8 @@ void ComputeFlowGold(const float *I0,
 
     // prepare pyramid
     int currentLevel  = nLevels - 1;
-    pI0[currentLevel] = I0;
-    pI1[currentLevel] = I1;
+    pI0[currentLevel] = const_cast<float *>(I0);
+    pI1[currentLevel] = const_cast<float *>(I1);
 
     pW[currentLevel] = width;
     pH[currentLevel] = height;
@@ -402,7 +402,7 @@ void ComputeFlowGold(const float *I0,
                   nw,
                   nh,
                   ns,
-                  (float *)pI0[currentLevel - 1]);
+                  pI0[currentLevel - 1]);
 
         Downscale(pI1[currentLevel],
                   pW[currentLevel],
@@ -411,7 +411,7 @@ void ComputeFlowGold(const float *I0,
                   nw,
                   nh,
                   ns,
-                  (float *)pI1[currentLevel - 1]);
+                  pI1[currentLevel - 1]);
 
         pW[currentLevel - 1] = nw;
         pH[currentLevel - 1] = nh;
