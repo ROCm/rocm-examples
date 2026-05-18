@@ -25,6 +25,10 @@ set(example_name hip_low_precision_float_fp16)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
+if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
+    message(FATAL_ERROR "This example is not supported for the CUDA runtime.")
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(FATAL_ERROR "This example is not supported on Windows.")
 endif()
@@ -44,9 +48,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
-                                                 $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
-target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
-target_include_directories(${example_name} PRIVATE ${include_dirs} $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
+set_target_properties(${example_name} PROPERTIES HIP_EXTENSIONS OFF)
+target_compile_features(${example_name} PRIVATE hip_std_17)
 
 install(TARGETS ${example_name})
