@@ -25,6 +25,10 @@ COMMON_INCLUDE_DIR := ../../../Common
 EXTERNAL_DIR := ../../../External
 GPU_RUNTIME ?= HIP
 
+# Supported GPU architectures for hipTensor
+SUPPORTED_HIP_ARCHITECTURES := gfx908 gfx90a gfx942 gfx950
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 
@@ -53,11 +57,21 @@ ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
+ifeq ($(SKIP_BUILD),1)
+$(EXAMPLE):
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hiptensor_utils.hpp
-	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+endif
 
+ifeq ($(SKIP_BUILD),1)
+test:
+	@echo "Skipping $(EXAMPLE) test: no supported architectures"
+else
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)
+endif
 
 clean:
 	$(RM) $(EXAMPLE)

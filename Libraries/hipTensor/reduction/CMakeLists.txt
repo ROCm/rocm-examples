@@ -36,13 +36,12 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 find_package(hiptensor REQUIRED)
 
-# see https://rocm.docs.amd.com/projects/hipTensor/en/latest/install/installation.html#gpu-support
-foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
-    hiptensor_is_supported_architecture(${ARCH} IS_SUPPORTED)
-    if(NOT IS_SUPPORTED)
-        message(FATAL_ERROR "hipTensor does not support architecture: ${ARCH}, not building hipTensor examples")
-    endif()
-endforeach()
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FilterHIPArchitectures.cmake")
+hiptensor_get_supported_architectures(HIPTENSOR_SUPPORTED_ARCHS)
+filter_hip_architectures("hipTensor" "${HIPTENSOR_SUPPORTED_ARCHS}" SHOULD_SKIP)
+if(SHOULD_SKIP)
+    return()
+endif()
 
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
