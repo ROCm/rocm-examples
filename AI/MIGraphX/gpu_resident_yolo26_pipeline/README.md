@@ -67,9 +67,8 @@ cross the PCIe bus. An OpenCV CPU-decode path is provided as a baseline.
 
 ## Setup
 
-Run inside the official ROCm PyTorch container; PyTorch, MIGraphX, and
-rocDecode are pre-installed there. `pip` only installs the helpers in
-[`requirements.txt`](requirements.txt).
+Run inside the official ROCm PyTorch container. PyTorch and MIGraphX are
+pre-installed; rocDecode and its libva backend are installed below.
 
 ```bash
 docker run --rm -it \
@@ -77,6 +76,24 @@ docker run --rm -it \
     --group-add video --ipc=host --shm-size=8g \
     -v "$PWD":/workspace -w /workspace \
     rocm/pytorch:rocm7.2.2_ubuntu22.04_py3.10_pytorch_release_2.10.0
+```
+
+Inside the container:
+
+```bash
+# The AMDGPU "graphics" repo provides libva-amdgpu / mesa-amdgpu VA drivers
+# that rocDecode needs at runtime but the rocm/pytorch image does not ship.
+echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] \
+https://repo.radeon.com/graphics/7.2.3/ubuntu jammy main" \
+    > /etc/apt/sources.list.d/amdgpu-graphics.list
+
+apt-get update
+apt-get install -y --no-install-recommends \
+    rocdecode rocpydecode rocdecode-host \
+    libva-amdgpu-drm2 mesa-amdgpu-va-drivers
+
+# rocDecode Python bindings ship in /opt/rocm/lib.
+export PYTHONPATH=/opt/rocm/lib
 
 pip install -r requirements.txt
 python3 prepare_model.py    # exports YOLO26s ONNX, compiles to model.mxr
