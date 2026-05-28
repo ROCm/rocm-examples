@@ -72,7 +72,7 @@ jobs:
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
           echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=OFF" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
@@ -103,24 +103,9 @@ jobs:
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
           echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
-
-      - name: Upgrade elfutils (SLES)
-        if: ${{ startsWith(inputs.distro, 'sles') && matrix.install_method == 'tarball' }}
-        run: |
-          zypper -qni install -y bzip2 m4 zlib-devel
-          wget https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2
-          tar -xjf elfutils-0.186.tar.bz2
-          cd elfutils-0.186
-          ./configure --disable-debuginfod --disable-libdebuginfod
-          make -j$(nproc)
-          make install
-          ldconfig
-          cd ..
-          rm -rf elfutils-0.186*
-          echo "LD_LIBRARY_PATH=/usr/local/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
 
       - name: Upgrade GCC (Ubuntu 22.04)
         if: ${{ inputs.distro == 'ubuntu-22.04' }}
@@ -132,16 +117,6 @@ jobs:
           apt-get install -y gcc-13 g++-13
           update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 \
             --slave /usr/bin/g++ g++ /usr/bin/g++-13
-
-      - name: Upgrade GCC (SLES)
-        if: ${{ startsWith(inputs.distro, 'sles') }}
-        run: |
-          zypper -qni addrepo -G https://download.opensuse.org/distribution/leap/15.6/repo/oss/ leap-oss
-          zypper -qni install -y gcc13-c++ libstdc++6-devel-gcc13
-          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130
-          update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130
-          update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 130
-          update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 130
 
       - name: Makefile build
         run: |
