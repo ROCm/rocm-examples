@@ -34,6 +34,8 @@ endif()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+
 find_package(hiptensor REQUIRED)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FilterHIPArchitectures.cmake")
@@ -47,13 +49,6 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 select_hip_platform()
-
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(WARNING "hipTensor examples are only available on Linux")
-    return()
-endif()
-
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
@@ -69,3 +64,7 @@ target_include_directories(
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    install(IMPORTED_RUNTIME_ARTIFACTS hiptensor)
+endif()

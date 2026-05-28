@@ -27,11 +27,6 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(WARNING "hipTensor examples are only available on Linux")
-    return()
-endif()
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
 find_package(hiptensor QUIET)
