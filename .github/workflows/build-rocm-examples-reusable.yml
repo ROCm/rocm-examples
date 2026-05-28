@@ -107,17 +107,6 @@ jobs:
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
-      - name: Upgrade GCC (Ubuntu 22.04)
-        if: ${{ inputs.distro == 'ubuntu-22.04' }}
-        run: |
-          apt-get update -qq
-          apt-get install -y software-properties-common
-          add-apt-repository -y ppa:ubuntu-toolchain-r/test
-          apt-get update -qq
-          apt-get install -y gcc-13 g++-13
-          update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 \
-            --slave /usr/bin/g++ g++ /usr/bin/g++-13
-
       - name: Makefile build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
