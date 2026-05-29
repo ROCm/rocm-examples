@@ -177,7 +177,7 @@ rocSPARSE error encountered: "rocsparse_status_internal_error"
 
 ### Issue 3 — FFT / rocFFT callback kpack near-empty (all arches)
 
-**TheRock issue:** Tracked separately from prior investigation (see ROCM-25114).
+**TheRock issue:** None filed.
 
 `fft_lib_gfx1100.kpack` is **2.8 KB**; every other arch is identically 2.7–2.8 KB,
 confirming the FFT callback kpack is near-empty across all architectures. Callback
