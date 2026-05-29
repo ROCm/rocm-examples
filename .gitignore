@@ -9,4 +9,3 @@ CMakeUserPresets.json
 .cline_storage
 config.mk
 .claude/
-.venv/

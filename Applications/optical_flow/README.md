@@ -19,7 +19,7 @@ The program computes optical flow on both the CPU (`flowGold`) and GPU (`flowHIP
    - Run `nSolverIters` Jacobi iterations to solve for the incremental flow update.
    - Repeat for `nWarpIters` warping passes.
 4. Copy GPU results to host and compare against the CPU reference (L1 norm per pixel).
-5. Write `FlowGPU.flo` and `FlowCPU.flo` to disk.
+5. Write `FlowGPU.flo` and `FlowCPU.flo` to the working directory.
 
 ## Key APIs and Concepts
 
@@ -34,43 +34,68 @@ The program computes optical flow on both the CPU (`flowGold`) and GPU (`flowHIP
 
 ### Pitch Alignment Requirement
 
-ROCm requires `pitchInBytes` for `hipResourceTypePitch2D` to be a multiple of **256 bytes** (64 floats × 4 bytes). The `StrideAlignment` constant in `common.h` is set to `64` to satisfy this constraint. CUDA only requires 128 bytes (32 floats), so porting code that used `StrideAlignment = 32` will fail at texture creation.
+ROCm requires `pitchInBytes` for `hipResourceTypePitch2D` to be a multiple of **256 bytes** (64 floats × 4 bytes). The `STRIDE_ALIGNMENT` constant in `common.h` is set to `64` to satisfy this constraint. CUDA only requires 128 bytes (32 floats), so porting code that used `StrideAlignment = 32` will fail at texture creation.
 
 ## Prerequisites
 
 - A ROCm-capable AMD GPU
 - ROCm SDK installed ([installation guide](https://rocm.docs.amd.com/en/latest/index.html) or [TheRock releases](https://github.com/ROCm/TheRock/blob/main/RELEASES.md))
-- `hipcc` on your `PATH`
 
 ## Building
+
+Set `ROCM_PATH` to your ROCm installation root before building. For a standard system install:
+
+```bash
+export ROCM_PATH=/opt/rocm
+```
+
+For a Python venv-based install (e.g. TheRock):
+
+```bash
+export ROCM_PATH=/path/to/venv/lib/python3.12/site-packages/_rocm_sdk_devel
+```
 
 ### Make
 
 ```bash
 cd Applications/optical_flow
-make
+make ROCM_PATH=$ROCM_PATH
+```
+
+If your ROCm device libraries are not found automatically, pass their path explicitly:
+
+```bash
+make ROCM_PATH=$ROCM_PATH \
+     CXXFLAGS="--rocm-device-lib-path=$ROCM_PATH/lib/llvm/amdgcn/bitcode"
 ```
 
 ### CMake
 
+CMake 3.28 and later require passing `clang++` directly rather than the `hipcc` wrapper script:
+
 ```bash
 cd Applications/optical_flow
-cmake -B build -DROCM_PATH=<path-to-rocm-sdk> -DCMAKE_HIP_COMPILER=<path-to-hipcc>
+cmake -B build \
+  -DROCM_PATH=$ROCM_PATH \
+  -DCMAKE_HIP_COMPILER=$ROCM_PATH/lib/llvm/bin/clang++
 cmake --build build -j$(nproc)
 ```
 
-Replace `<path-to-rocm-sdk>` and `<path-to-hipcc>` with the actual paths for your ROCm installation, for example `/opt/rocm` and `/opt/rocm/bin/hipcc`.
-
 ## Running
 
-The binary expects two PPM images at `data/frame10.ppm` and `data/frame11.ppm` relative to the working directory. Sample frames from the Middlebury dataset work well.
+If ROCm is not installed to a standard system path, set `LD_LIBRARY_PATH` so the runtime libraries can be found:
 
 ```bash
-#!/bin/bash
-# From the optical_flow directory (Make build)
-./optical_flow
+export LD_LIBRARY_PATH=$ROCM_PATH/lib:$LD_LIBRARY_PATH
+```
 
-# Or if built with CMake
+The binary locates the sample frames (`data/frame10.ppm`, `data/frame11.ppm`) relative to the source directory automatically, so it can be run from any working directory:
+
+```bash
+# Make build
+./applications_optical_flow
+
+# CMake build
 ./build/applications_optical_flow
 ```
 
@@ -80,12 +105,14 @@ The binary expects two PPM images at `data/frame10.ppm` and `data/frame11.ppm` r
 HSOpticalFlow Starting...
 
 Using device: <GPU name>
-Loading "data/frame10.ppm" ...
-Loading "data/frame11.ppm" ...
+Loading "<source-dir>/data/frame10.ppm" ...
+Loading "<source-dir>/data/frame11.ppm" ...
+Computing optical flow on CPU...
+Computing optical flow on GPU...
 L1 error : 0.000xxx
 ```
 
-The program exits with `EXIT_SUCCESS` when the L1 error between the GPU and CPU results is below `0.05`. Two output files are written:
+The program exits with `EXIT_SUCCESS` when the L1 error between the GPU and CPU results is below `0.05`. Two output files are written to the current working directory:
 
 - `FlowGPU.flo` — GPU optical flow result
 - `FlowCPU.flo` — CPU reference result
@@ -94,10 +121,6 @@ Both files use the [Middlebury `.flo` format](http://vision.middlebury.edu/flow/
 
 ## Key Notes
 
-- StrideAlignment is 64 since `hipResourceTypePitch2D` requires `pitchInBytes` to be a multiple of `256 bytes` (4 bytes * 64 floats = 256 bytes)
-- If you are running ROCm through Python packages and having trouble with compiling due to the program not being able to find dependencies, please run the following in your virtual environment:
-
-```bash
-#!/bin/bash
-export ROCM_PATH=PATH_TO_VENV/.venv/lib/python3.12/site-packages/_rocm_sdk_devel
-```
+- `STRIDE_ALIGNMENT` is 64 because `hipResourceTypePitch2D` requires `pitchInBytes` to be a multiple of 256 bytes (4 bytes × 64 floats = 256 bytes).
+- CMake 3.28+ does not accept the `hipcc` wrapper as `CMAKE_HIP_COMPILER`. Pass the `clang++` binary from `$ROCM_PATH/lib/llvm/bin/clang++` instead.
+- The binary resolves the input image paths relative to the source file location at compile time (via `__FILE__`/`/proc/self/exe`), so no specific working directory is required at runtime.

@@ -105,8 +105,7 @@ void WriteFloFile(const char *name, int w, int h, int s, const float *u, const f
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief
-/// load 4-channel unsigned byte image
-/// and convert it to single channel FP32 image
+/// load RGB image and convert it to single channel FP32 image
 /// \param[out] img_data pointer to raw image data
 /// \param[out] img_w    image width
 /// \param[out] img_h    image height
