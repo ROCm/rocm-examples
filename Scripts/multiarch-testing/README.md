@@ -139,7 +139,7 @@ terminate called after throwing an instance of 'std::runtime_error'
 
 ---
 
-### Issue 2 — rocBLAS `blas_lib_gfx1100.kpack` near-empty
+### Issue 2 — rocBLAS `blas_lib_gfx1100.kpack` near-empty (affects rocSparse and hipSparse too)
 
 **TheRock issue:** None filed for gfx1100 specifically. Closest precedent:
 [#5179](https://github.com/ROCm/TheRock/issues/5179) (open) — same symptom for
@@ -153,31 +153,29 @@ As a result `TensileLibrary_lazy_gfx1100.dat` and `Kernels.so-000-gfx1100.hsaco`
 are never extracted into `rocblas/library/`, so rocBLAS cannot load kernels for
 gfx1100.
 
-**Tests affected:** all `rocblas_*`, `hipblas_*`, `hipsolver_*`, `rocsolver_*`
-(~30 tests)
+**rocSparse and hipSparse share this same root cause.** `librocsparse.so` embeds
+the kpack path `../.kpack/blas_lib_@GFXARCH@.kpack` — it loads the rocBLAS kpack
+for its own GPU kernels rather than a separate sparse kpack. When
+`blas_lib_gfx1100.kpack` is near-empty, `hipLaunchKernel` returns
+`hipErrorInvalidImage` for every rocsparse kernel launch. `libhipsparse.so` is a
+thin wrapper over librocsparse and inherits the same failure. There is no separate
+`sparse_lib_*.kpack` and no separate issue to file.
 
-**Error signature:**
+**Tests affected:** all `rocblas_*`, `hipblas_*`, `hipsolver_*`, `rocsolver_*`,
+`rocsparse_*`, `hipsparse_*` (~65 tests)
+
+**Error signatures:**
 ```
 rocBLAS error: Cannot read .../rocblas/library/TensileLibrary.dat:
   Illegal seek for GPU arch : gfx1100
+
+rocSPARSE error encountered: "rocsparse_status_internal_error"
+  (underlying: hipLaunchKernel returned hipErrorInvalidImage)
 ```
 
 ---
 
-### Issue 3 — rocSparse / hipSparse failures
-
-**TheRock issue:** None filed.
-
-All `rocsparse_*` and `hipsparse_*` tests fail. The `.kpack/` directory contains
-no `sparse_lib_*.kpack` entries for any arch, suggesting the sparse library either
-uses a different kernel delivery mechanism that is broken, or is missing from
-`device_artifact_filter` entirely.
-
-**Tests affected:** all `rocsparse_*` and `hipsparse_*` (~35 tests)
-
----
-
-### Issue 4 — FFT / rocFFT callback kpack near-empty (all arches)
+### Issue 3 — FFT / rocFFT callback kpack near-empty (all arches)
 
 **TheRock issue:** Tracked separately from prior investigation (see ROCM-25114).
 
