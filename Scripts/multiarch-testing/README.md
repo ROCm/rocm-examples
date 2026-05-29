@@ -1,45 +1,59 @@
-# Docker Testing Setup — Changes
+# Multi-Arch Testing with Docker
 
 ## Overview
 
-This documents changes made to support building and testing `rocm-examples` inside
-a Docker container using the ROCm multi-arch pip install (TheRock nightlies on
-Ubuntu 24.04).
+Docker environment for building and testing `rocm-examples` against the ROCm
+multi-arch pip wheel (TheRock nightlies) on Ubuntu 24.04.
 
----
+## Files
 
-## New Files
+- `Dockerfile` — Ubuntu 24.04 image with ROCm installed via multi-arch pip
+- `run-tests.sh` — builds the image and runs the full `ctest` suite with GPU access
 
-### `~/docker-stuff/Dockerfile`
+## Usage
 
-Ubuntu 24.04 image that installs ROCm via the multi-arch pip wheel
-(`https://rocm.nightlies.amd.com/whl-multi-arch/`) and sets up all environment
-variables required to build and run `rocm-examples`.
+From the repo root:
 
-Key design decisions:
-- ROCm installed into a Python venv (`/opt/rocm-venv`) via `pip install rocm[libraries,devel,device-all]` followed by `rocm-sdk init`.
+```bash
+# Run all tests (source dir auto-detected as repo root)
+Scripts/multiarch-testing/run-tests.sh
+
+# Explicit source path
+Scripts/multiarch-testing/run-tests.sh ~/rocm-examples
+
+# Run only tests matching a filter
+Scripts/multiarch-testing/run-tests.sh ~/rocm-examples 'hip_.*'
+```
+
+Or from within this directory:
+
+```bash
+cd Scripts/multiarch-testing
+./run-tests.sh
+./run-tests.sh ~/rocm-examples 'rocblas_.*'
+```
+
+The script auto-detects the host render group GID so `/dev/dri/renderD*` is
+accessible inside the container. GPU passthrough requires `/dev/kfd` and
+`/dev/dri` to be present on the host.
+
+## Dockerfile notes
+
+- ROCm is installed into `/opt/rocm-venv` via `pip install rocm[libraries,devel,device-all]` followed by `rocm-sdk init`.
 - `ROCM_PATH` points at `_rocm_sdk_devel` (headers, compiler, linker stubs).
 - `LD_LIBRARY_PATH` orders `_rocm_sdk_libraries/lib` before `_rocm_sdk_devel/lib`
-  so full libraries (with kpack archives) are loaded instead of the ~41 KB stubs.
-- Render group GID is parameterised (`ARG RENDER_GID=109`) and must match the
-  host's render group so `/dev/dri/renderD*` is accessible inside the container.
+  so full libraries (with kpack archives) are loaded instead of the ~41 KB linker stubs.
+- Render group GID is parameterised (`ARG RENDER_GID=109`) and passed in by `run-tests.sh`.
 - A non-root `developer` user is created and added to `video` and `render` groups.
 
-### `~/docker-stuff/run-tests.sh`
+To target a specific nightly date or a single GPU arch (faster/smaller image):
 
-Shell script that:
-1. Auto-detects the host render group GID.
-2. Builds the Docker image (passing `RENDER_GID`).
-3. Mounts the `rocm-examples` source tree read-only at `/workspace/rocm-examples`.
-4. Runs CMake configure → build → `ctest` inside the container.
-
-Usage:
 ```bash
-./run-tests.sh [/path/to/rocm-examples] [ctest-filter]
-# Examples:
-./run-tests.sh                            # run all tests
-./run-tests.sh ~/rocm-examples
-./run-tests.sh ~/rocm-examples 'hip_.*'  # only HIP tests
+docker build \
+  --build-arg ROCM_INDEX_URL=https://rocm.nightlies.amd.com/whl-multi-arch/ \
+  --build-arg ROCM_EXTRAS=libraries,devel,device-gfx1100 \
+  -t rocm-examples-test \
+  Scripts/multiarch-testing/
 ```
 
 ---
