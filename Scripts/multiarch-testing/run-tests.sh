@@ -14,7 +14,7 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 IMAGE_NAME="rocm-examples-test"
-EXAMPLES_DIR="${1:-${SCRIPT_DIR}/../rocm-examples}"
+EXAMPLES_DIR="${1:-${SCRIPT_DIR}/../../../rocm-examples}"
 CTEST_FILTER="${2:-}"
 
 if [[ ! -d "${EXAMPLES_DIR}" ]]; then
