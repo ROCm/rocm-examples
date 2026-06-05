@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,35 +20,42 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-  bitonic_sort \
-  convolution \
-  fdtd \
-  floyd_warshall \
-  histogram \
-  optical_flow \
-  prefix_sum
+EXAMPLE := applications_optical_flow
+COMMON_INCLUDE_DIR := ../../Common
+GPU_RUNTIME ?= HIP
 
-SKIP_FROM_TEST :=
+ROCM_PATH ?= /opt/rocm
+HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 
-ifneq ($(wildcard /usr/include/GLFW/glfw3.h),)
-  EXAMPLES += sobel_filter
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  :=
+ILDLIBS   :=
+
+ifeq ($(GPU_RUNTIME), CUDA)
+ICXXFLAGS += -x cu
+ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+CXXFLAGS ?= -Wall -Wextra
+else
+$(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
-ifneq ($(GPU_RUNTIME), CUDA)
-  EXAMPLES += \
-    monte_carlo_pi
-endif
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
-all: $(EXAMPLES)
+$(EXAMPLE): main.hip flowHIP.hip flowGold.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.hip flowHIP.hip flowGold.cpp $(ILDLIBS)
 
-clean: TARGET=clean
-clean: all
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+clean:
+	$(RM) $(EXAMPLE)
 
-test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
-
-.PHONY: all clean test $(EXAMPLES)
+.PHONY: clean test

@@ -151,6 +151,7 @@ The following options are available when building with CMake.
   - [floyd_warshall](https://github.com/ROCm/rocm-examples/tree/amd-staging/Applications/floyd_warshall/): Showcases a GPU implementation of the Floyd-Warshall algorithm for finding shortest paths in certain types of graphs.
   - [histogram](https://github.com/ROCm/rocm-examples/tree/amd-staging/Applications/histogram/): Histogram over a byte array with memory bank optimization.
   - [monte_carlo_pi](https://github.com/ROCm/rocm-examples/tree/amd-staging/Applications/monte_carlo_pi/): Monte Carlo estimation of $\pi$ using hipRAND for random number generation and hipCUB for evaluation.
+  - [optical_flow](https://github.com/ROCm/rocm-examples/tree/amd-staging/Applications/optical_flow/): GPU-accelerated Horn-Schunck variational optical flow using a Gaussian image pyramid, image warping, and Jacobi iteration.
   - [prefix_sum](https://github.com/ROCm/rocm-examples/tree/amd-staging/Applications/prefix_sum/): Showcases a GPU implementation of a prefix sum with a 2-kernel scan algorithm.
 - [Common](https://github.com/ROCm/rocm-examples/tree/amd-staging/Common/) contains common utility functionality shared between the examples.
 - [HIP-Basic](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/) hosts self-contained recipes showcasing HIP runtime functionality.
