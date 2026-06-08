@@ -42,13 +42,14 @@ RUN dnf install -y --setopt=install_weak_deps=false \
         ca-certificates \
         git \
         wget \
-        gcc \
-        gcc-c++ \
+        gcc-toolset-13-gcc \
+        gcc-toolset-13-gcc-c++ \
         make \
         cmake \
         ninja-build \
         python3.12 \
         pkgconf-pkg-config \
+        libatomic \
         elfutils-devel \
         glfw-devel \
         vulkan-devel \
@@ -100,7 +101,7 @@ open("/etc/rocm-sdk.env", "w").write("\n".join(lines) + "\n")
 PYEOF
 
 # ── Entrypoint: source ROCm env before every command ─────────────────────────
-RUN printf '#!/bin/bash\nset -a\n. /etc/rocm-sdk.env\nset +a\nexec "$@"\n' > /entrypoint.sh \
+RUN printf '#!/bin/bash\n. /opt/rh/gcc-toolset-13/enable\nset -a\n. /etc/rocm-sdk.env\nset +a\nexec "$@"\n' > /entrypoint.sh \
     && chmod +x /entrypoint.sh
 
 # ── Render group + non-root user ──────────────────────────────────────────────
