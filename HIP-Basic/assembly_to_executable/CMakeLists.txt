@@ -80,13 +80,13 @@ endif()
 # Generate device assemblies
 foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
     add_custom_command(
-        OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
+        OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.s
         COMMAND
             ${CMAKE_HIP_COMPILER} -S --cuda-device-only
             --offload-arch=${HIP_ARCHITECTURE} -I
             ${CMAKE_CURRENT_SOURCE_DIR}/../../Common
             ${CMAKE_CURRENT_SOURCE_DIR}/main.hip -o
-            ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
+            ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.s
         DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main.hip
         VERBATIM
         COMMENT "Generating ASM main_${HIP_ARCHITECTURE}.s"
@@ -102,9 +102,9 @@ foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
         COMMAND
             ${CMAKE_HIP_COMPILER} -fPIC -target amdgcn-amd-amdhsa
             -mcpu=${HIP_ARCHITECTURE}
-            ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s -o
+            ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.s -o
             ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.${OBJ_TYPE}
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/main_${HIP_ARCHITECTURE}.s
+        DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.s
         VERBATIM
         COMMENT "Compiling ASM main_${HIP_ARCHITECTURE}.${OBJ_TYPE}"
     )
