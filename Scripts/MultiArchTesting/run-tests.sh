@@ -47,6 +47,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+DOCKERFILE_DIR="$(cd "${SCRIPT_DIR}/../.." && pwd)/Dockerfiles"
 
 # ── Defaults ──────────────────────────────────────────────────────────────────
 DISTRO="ubuntu-24.04"
@@ -93,11 +94,11 @@ EXAMPLES_DIR="$(realpath "${EXAMPLES_DIR}")"
 BUILD_DIR="${EXAMPLES_DIR}/build-multiarch-${DISTRO}"
 
 # ── Validate distro ───────────────────────────────────────────────────────────
-DOCKERFILE="${SCRIPT_DIR}/Dockerfile.${DISTRO}"
+DOCKERFILE="${DOCKERFILE_DIR}/${DISTRO}-multiarch.Dockerfile"
 if [[ ! -f "${DOCKERFILE}" ]]; then
     VALID=()
-    for f in "${SCRIPT_DIR}"/Dockerfile.*; do
-        [[ -f "$f" ]] && VALID+=("${f##*Dockerfile.}")
+    for f in "${DOCKERFILE_DIR}"/*-multiarch.Dockerfile; do
+        [[ -f "$f" ]] && name="${f##*/}" && VALID+=("${name%-multiarch.Dockerfile}")
     done
     echo "ERROR: Unknown distro '${DISTRO}'. Valid options: ${VALID[*]}" >&2
     exit 1

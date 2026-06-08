@@ -16,19 +16,19 @@ From the repo root:
 
 ```bash
 # Run all tests (source dir auto-detected as repo root)
-Scripts/multiarch-testing/run-tests.sh
+Scripts/MultiArchTesting/run-tests.sh
 
 # Explicit source path
-Scripts/multiarch-testing/run-tests.sh ~/rocm-examples
+Scripts/MultiArchTesting/run-tests.sh ~/rocm-examples
 
 # Run only tests matching a filter
-Scripts/multiarch-testing/run-tests.sh ~/rocm-examples 'hip_.*'
+Scripts/MultiArchTesting/run-tests.sh ~/rocm-examples 'hip_.*'
 ```
 
 Or from within this directory:
 
 ```bash
-cd Scripts/multiarch-testing
+cd Scripts/MultiArchTesting
 ./run-tests.sh
 ./run-tests.sh ~/rocm-examples 'rocblas_.*'
 ```
@@ -53,7 +53,7 @@ docker build \
   --build-arg ROCM_INDEX_URL=https://rocm.nightlies.amd.com/whl-multi-arch/ \
   --build-arg ROCM_EXTRAS=libraries,devel,device-gfx1100 \
   -t rocm-examples-test \
-  Scripts/multiarch-testing/
+  Scripts/MultiArchTesting/
 ```
 
 ---
