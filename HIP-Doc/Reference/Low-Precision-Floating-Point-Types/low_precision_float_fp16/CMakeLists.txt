@@ -25,16 +25,16 @@ set(example_name hip_low_precision_float_fp16)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
-    message(FATAL_ERROR "This example is not supported for the CUDA runtime.")
-endif()
-
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(FATAL_ERROR "This example is not supported on Windows.")
 endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
 select_gpu_language()
+
+if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
+    message(FATAL_ERROR "This example is not supported for the CUDA runtime.")
+endif()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
