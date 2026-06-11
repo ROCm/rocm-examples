@@ -40,11 +40,8 @@ on:
         - all
         - gfx1100
         - gfx1151
-        - gfx1201
-        - gfx90a
-        - gfx942
       install_method:
-        description: "Installation method"
+        description: "Installation method (only applies to legacy distros; baked-ROCm distros ignore this)"
         required: true
         default: all
         type: choice
@@ -60,8 +57,13 @@ on:
         options:
         - all
         - ubuntu-22.04
+        - ubuntu-24.04
+        - ubuntu-26.04
         - sles-15.7
         - almalinux-8
+        - rocky-9
+        - rhel-10.1
+        - oracle-10
 
 permissions:
   contents: read

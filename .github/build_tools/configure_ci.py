@@ -3,24 +3,35 @@
 import os
 import json
 
-# GPU target to TheRock family mapping
+# GPU target to TheRock family mapping.
+# Only include targets that have self-hosted runners available.
+# To add a target: uncomment its entry AND ensure a runner with that label exists.
 GPU_CONFIG_MAP = {
     "gfx1100": "gfx110X-all",
     "gfx1151": "gfx1151",
-    # "gfx1201": "gfx120X-all",
-    # "gfx90a": "gfx90X-dcgpu",
-    # "gfx942": "gfx94X-dcgpu",
+    # "gfx1201": "gfx120X-all",  # no runner yet
+    # "gfx90a":  "gfx90X-dcgpu", # no runner yet
+    # "gfx942":  "gfx94X-dcgpu", # no runner yet
 }
 
-# Default configurations for automated runs (push/PR)
+# Install methods for legacy distros (ROCm installed at CI runtime).
 INSTALL_METHODS = ["wheel", "tarball"]
 
 # Distros to build against – keyed by short name.
+# "install_methods": omit to use the global INSTALL_METHODS list (legacy images).
+#                    Set to ["baked"] for images that ship ROCm pre-installed.
 # Add new entries here to enable more distros (also add to workflow_dispatch options).
 DISTRO_MAP = {
+    # Legacy images: ROCm installed at CI runtime (wheel or tarball)
     "ubuntu-22.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-22.04:latest", "label": "Ubuntu 22.04"},
     "sles-15.7":    {"image": "ghcr.io/rocm/rocm-examples-sles-15.7:latest",    "label": "SLES 15.7"},
     "almalinux-8":  {"image": "ghcr.io/rocm/rocm-examples-almalinux-8:latest",  "label": "AlmaLinux 8"},
+    # Multi-arch images: ROCm baked in from whl-multi-arch at image build time
+    "ubuntu-24.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest", "label": "Ubuntu 24.04", "install_methods": ["baked"]},
+    "ubuntu-26.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest", "label": "Ubuntu 26.04", "install_methods": ["baked"]},
+    "rocky-9":      {"image": "ghcr.io/rocm/rocm-examples-rocky-9-multiarch:latest",      "label": "Rocky Linux 9", "install_methods": ["baked"]},
+    "rhel-10.1":    {"image": "ghcr.io/rocm/rocm-examples-rhel-10.1-multiarch:latest",    "label": "RHEL 10.1",    "install_methods": ["baked"]},
+    "oracle-10":    {"image": "ghcr.io/rocm/rocm-examples-oracle-10-multiarch:latest",    "label": "Oracle Linux 10", "install_methods": ["baked"]},
 }
 
 def _is_all(value):
@@ -61,18 +72,28 @@ def main():
         for t in gpu_targets
     ]
 
+    # Build distro_map output: resolve per-distro install_methods, strip the key from output.
+    distro_map_out = {}
+    for key in distro_keys:
+        entry = DISTRO_MAP[key]
+        distro_map_out[key] = {
+            "image": entry["image"],
+            "label": entry["label"],
+            "install_methods": entry.get("install_methods", install_methods),
+        }
+
     github_output = os.getenv("GITHUB_OUTPUT")
     if github_output:
         with open(github_output, "a") as f:
             f.write(f"gpu_configs={json.dumps(gpu_configs)}\n")
             f.write(f"install_methods={json.dumps(install_methods)}\n")
             f.write(f"distros={json.dumps(distro_keys)}\n")
-            f.write(f"distro_map={json.dumps(DISTRO_MAP)}\n")
+            f.write(f"distro_map={json.dumps(distro_map_out)}\n")
 
     print(f"gpu_configs={json.dumps(gpu_configs)}")
     print(f"install_methods={json.dumps(install_methods)}")
     print(f"distros={json.dumps(distro_keys)}")
-    print(f"distro_map={json.dumps(DISTRO_MAP)}")
+    print(f"distro_map={json.dumps(distro_map_out)}")
 
 if __name__ == "__main__":
     main()

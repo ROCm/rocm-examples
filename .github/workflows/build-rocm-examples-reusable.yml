@@ -16,7 +16,7 @@ on:
         required: true
         type: string
       install_methods:
-        description: "JSON array of install methods"
+        description: "JSON array of install methods (fallback for distros without per-distro override)"
         required: true
         type: string
 
@@ -40,7 +40,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        install_method: ${{ fromJson(inputs.install_methods) }}
+        install_method: ${{ fromJson(fromJson(inputs.distro_map)[inputs.distro].install_methods) }}
         gpu_config: ${{ fromJson(inputs.gpu_configs) }}
     steps:
       - name: Checkout repository
@@ -107,6 +107,21 @@ jobs:
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
+      - name: Setup environment variables (baked)
+        if: ${{ matrix.install_method == 'baked' }}
+        id: baked-version
+        run: |
+          # ROCm env vars are baked into the image via /etc/rocm-sdk.env and the entrypoint.
+          # Expose them to subsequent GitHub Actions steps (entrypoint only runs for RUN commands).
+          while IFS='=' read -r key value; do
+            [[ -z "$key" || "$key" == \#* ]] && continue
+            echo "${key}=${value}" >> $GITHUB_ENV
+          done < /etc/rocm-sdk.env
+          ROCM_VERSION=$(rocm-sdk version 2>/dev/null || echo "baked")
+          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "## ROCm Version: ${ROCM_VERSION} (baked)" >> $GITHUB_STEP_SUMMARY
+          echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
+
       - name: Makefile build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
@@ -170,14 +185,14 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Upload Makefile build artifacts
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
 
       - name: Run tests
@@ -244,7 +259,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
 
       - name: Makefile test
@@ -256,7 +271,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
 
       - name: Clean the workspace
