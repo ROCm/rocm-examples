@@ -46,6 +46,17 @@ include("../../../Common/ROCmPath.cmake")
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
 find_package(rocprofiler-register REQUIRED)
+# disable FFmpeg build and tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
+# TheRock ships static FFmpeg libs not compiled with -fPIC, which lld rejects
+set(USING_THE_ROCK OFF)
+if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
+  set(USING_THE_ROCK ON)
+endif()
+if(USING_THE_ROCK)
+    message(STATUS "TheRock detected: skipping ${example_name} build (FFmpeg static libs not compiled with -fPIC)")
+    return()
+endif()
+
 find_package(FFmpeg REQUIRED)
 
 add_executable(${example_name}
@@ -83,13 +94,6 @@ set_source_files_properties(
     ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
-
-# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
-# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
-set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
-  set(USING_THE_ROCK ON)
-endif()
 
 if (NOT USING_THE_ROCK)
     set(ROCDECODE_TEST_VIDEO "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")

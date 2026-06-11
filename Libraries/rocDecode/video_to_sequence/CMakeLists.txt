@@ -46,6 +46,17 @@ include("../../../Common/ROCmPath.cmake")
 
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
+# disable FFmpeg build and tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
+# TheRock ships static FFmpeg libs not compiled with -fPIC, which lld rejects
+set(USING_THE_ROCK OFF)
+if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
+  set(USING_THE_ROCK ON)
+endif()
+if(USING_THE_ROCK)
+    message(STATUS "TheRock detected: skipping ${example_name} build (FFmpeg static libs not compiled with -fPIC)")
+    return()
+endif()
+
 find_package(FFmpeg REQUIRED)
 find_package(rocprofiler-register REQUIRED)
 find_package(Threads REQUIRED)
