@@ -34,10 +34,10 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
 
 add_executable(${example_name}
     no-bufregister-write.cpp
-    ../../../common/examples_common.cpp
+    ../../common/examples_common.cpp
 )
 
-set_source_files_properties(no-bufregister-write.cpp ../../../common/examples_common.cpp
+set_source_files_properties(no-bufregister-write.cpp ../../common/examples_common.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
@@ -45,7 +45,7 @@ target_compile_features(${example_name} PRIVATE cxx_std_17)
 
 target_include_directories(${example_name}
     PRIVATE
-        "${CMAKE_CURRENT_LIST_DIR}/../../../common"
+        "${CMAKE_CURRENT_LIST_DIR}/../../common"
         $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>
         $<$<COMPILE_LANGUAGE:CUDA>:${CUFILE_INCLUDE_DIR}>
 )
