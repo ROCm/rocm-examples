@@ -52,7 +52,7 @@ find_package(Threads REQUIRED)
 
 add_executable(${example_name}
     main.cpp
-    ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
+    ../utils/rocvideodecode/roc_video_dec.cpp
 )
 
 target_link_libraries(${example_name}
@@ -70,8 +70,8 @@ target_include_directories(
     PRIVATE
     "../../../Common"
     "../../../External"
-    "${ROCM_PATH}/share/rocdecode/utils"
-    "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode"
+    "../utils"
+    "../utils/rocvideodecode"
     "${FFMPEG_INCLUDE_DIR}"
 )
 
@@ -84,7 +84,7 @@ endif()
 
 set_source_files_properties(
     main.cpp
-    ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
+    ../utils/rocvideodecode/roc_video_dec.cpp
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 

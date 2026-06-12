@@ -52,11 +52,11 @@ find_package(Threads REQUIRED)
 
 set(SOURCES
     main.cpp
-    "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp"
+    "../utils/rocvideodecode/roc_video_dec.cpp"
 )
 
 if(rocdecode-host_FOUND)
-    list(APPEND SOURCES "${ROCM_PATH}/share/rocdecode/utils/ffmpegvideodecode/ffmpeg_video_dec.cpp")
+    list(APPEND SOURCES "../utils/ffmpegvideodecode/ffmpeg_video_dec.cpp")
 endif()
 
 add_executable(${example_name} ${SOURCES})
@@ -76,14 +76,14 @@ target_include_directories(
     "../../../Common"
     "../../../External"
     ".."
-    "${ROCM_PATH}/share/rocdecode/utils"
-    "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode"
+    "../utils"
+    "../utils/rocvideodecode"
     "${FFMPEG_INCLUDE_DIR}"
 )
 
 # Add rocdecode host utils if host library found
 if(rocdecode-host_FOUND)
-    target_include_directories(${example_name} PRIVATE "${rocdecode-host_INCLUDE_DIR}" "${ROCM_PATH}/share/rocdecode/utils/ffmpegvideodecode")
+    target_include_directories(${example_name} PRIVATE "${rocdecode-host_INCLUDE_DIR}" "../utils/ffmpegvideodecode")
     target_link_libraries(${example_name} PRIVATE rocdecode::rocdecode-host)
     target_compile_definitions(${example_name} PRIVATE ENABLE_HOST_DECODE=1)
 else()
