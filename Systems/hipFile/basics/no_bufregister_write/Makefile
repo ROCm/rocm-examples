@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 EXAMPLE     := hipfile_no_bufregister_write
-COMMON_DIR  := ../../../common
+COMMON_DIR  := ../../common
 GPU_RUNTIME ?= HIP
 
 ROCM_PATH ?= /opt/rocm
