@@ -107,20 +107,47 @@ jobs:
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
-      - name: Setup environment variables (baked)
-        if: ${{ matrix.install_method == 'baked' }}
-        id: baked-version
+      - name: Install ROCm (whl-multi-arch)
+        if: ${{ matrix.install_method == 'whl-multi-arch' }}
         run: |
-          # ROCm env vars are baked into the image via /etc/rocm-sdk.env and the entrypoint.
-          # Expose them to subsequent GitHub Actions steps (entrypoint only runs for RUN commands).
-          while IFS='=' read -r key value; do
-            [[ -z "$key" || "$key" == \#* ]] && continue
-            echo "${key}=${value}" >> $GITHUB_ENV
-          done < /etc/rocm-sdk.env
-          ROCM_VERSION=$(rocm-sdk version 2>/dev/null || echo "baked")
-          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
-          echo "## ROCm Version: ${ROCM_VERSION} (baked)" >> $GITHUB_STEP_SUMMARY
-          echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
+          echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
+          pip install --no-cache-dir --upgrade pip
+          pip install --no-cache-dir \
+            --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ \
+            "rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+          rocm-sdk init
+
+      - name: Setup environment variables (whl-multi-arch)
+        if: ${{ matrix.install_method == 'whl-multi-arch' }}
+        id: whl-multiarch-version
+        run: |
+          python3 - <<'PYEOF'
+          import sysconfig, os, subprocess
+          venv = os.environ.get("VIRTUAL_ENV", "/opt/rocm-venv")
+          site = sysconfig.get_path("purelib", vars={"base": venv, "platbase": venv})
+          rocm = site + "/_rocm_sdk_devel"
+          core = site + "/_rocm_sdk_core/lib"
+          libs = site + "/_rocm_sdk_libraries/lib"
+          github_env = os.environ["GITHUB_ENV"]
+          github_output = os.environ["GITHUB_OUTPUT"]
+          github_step_summary = os.environ["GITHUB_STEP_SUMMARY"]
+          with open(github_env, "a") as f:
+              f.write(f"ROCM_PATH={rocm}\n")
+              f.write(f"HIP_PLATFORM=amd\n")
+              f.write(f"HIP_PATH={rocm}\n")
+              f.write(f"HIP_DEVICE_LIB_PATH={rocm}/lib/llvm/amdgcn/bitcode\n")
+              f.write(f"PATH={rocm}/bin:{rocm}/llvm/bin:{venv}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n")
+              f.write(f"CPATH={rocm}/include\n")
+              f.write(f"PKG_CONFIG_PATH={rocm}/lib/pkgconfig\n")
+              f.write(f"LIBRARY_PATH={rocm}/lib:{rocm}/lib64\n")
+              f.write(f"LD_LIBRARY_PATH={core}:{libs}:{rocm}/lib:{rocm}/llvm/lib\n")
+              f.write("ENABLE_OPENMP=ON\n")
+          rocm_version = subprocess.check_output(["rocm-sdk", "version"], text=True).strip()
+          with open(github_output, "a") as f:
+              f.write(f"rocm_version={rocm_version}\n")
+          with open(github_step_summary, "a") as f:
+              f.write(f"## ROCm Version: {rocm_version} (whl-multi-arch)\n")
+          PYEOF
 
       - name: Makefile build
         run: |
@@ -185,14 +212,14 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.whl-multiarch-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Upload Makefile build artifacts
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.whl-multiarch-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
 
       - name: Run tests
@@ -259,7 +286,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.whl-multiarch-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
 
       - name: Makefile test
@@ -271,7 +298,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.baked-version.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version || steps.whl-multiarch-version.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
 
       - name: Clean the workspace
