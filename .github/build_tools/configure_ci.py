@@ -30,7 +30,7 @@ DISTRO_MAP = {
     # Multi-arch images: ROCm installed at CI runtime from whl-multi-arch with device-specific extras
     "ubuntu-24.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest", "label": "Ubuntu 24.04", "install_methods": ["whl-multi-arch"]},
     "ubuntu-26.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest", "label": "Ubuntu 26.04", "install_methods": ["whl-multi-arch"]},
-    # Disabled until CI validation is complete — Dockerfiles exist in Dockerfiles/
+    # Disabled until CI validation is complete — Dockerfiles in Scripts/MultiArch/
     # "rocky-9":   {"image": "ghcr.io/rocm/rocm-examples-rocky-9-multiarch:latest",    "label": "Rocky Linux 9",   "install_methods": ["whl-multi-arch"]},
     # "rhel-10.1": {"image": "ghcr.io/rocm/rocm-examples-rhel-10.1-multiarch:latest",  "label": "RHEL 10.1",       "install_methods": ["whl-multi-arch"]},
     # "oracle-10": {"image": "ghcr.io/rocm/rocm-examples-oracle-10-multiarch:latest",  "label": "Oracle Linux 10", "install_methods": ["whl-multi-arch"]},
