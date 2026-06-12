@@ -44,7 +44,7 @@ target_include_directories(${example_name}
     PRIVATE
         $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
 
-target_link_libraries(${example_name} PRIVATE hip::hipFile)
+target_link_libraries(${example_name} PRIVATE hip::hipfile)
 
 # Generate a 1 MiB random source file before running aiscp.
 add_test(

@@ -50,7 +50,7 @@ target_include_directories(${example_name}
         "${CMAKE_CURRENT_LIST_DIR}/../../common"
         $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
 
-target_link_libraries(${example_name} PRIVATE hip::hipFile)
+target_link_libraries(${example_name} PRIVATE hip::hipfile)
 
 # This example requires HIPFILE_ALLOW_COMPAT_MODE=1 to succeed at runtime.
 add_test(
