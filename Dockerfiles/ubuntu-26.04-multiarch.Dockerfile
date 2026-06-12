@@ -70,12 +70,5 @@ ENV PATH="${VENV}/bin:${PATH}"
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir pyyaml cmake
 
-# ── Render group + non-root user ──────────────────────────────────────────────
-ARG RENDER_GID=109
-RUN groupadd --system --gid ${RENDER_GID} render 2>/dev/null || true && \
-    useradd -m -G video,render developer && \
-    mkdir -p /workspace && chown developer:developer /workspace
-
-USER developer
 WORKDIR /workspace
 CMD ["/bin/bash"]
