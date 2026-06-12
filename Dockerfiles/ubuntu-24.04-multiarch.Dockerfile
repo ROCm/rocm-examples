@@ -60,61 +60,14 @@ RUN apt-get update -qq && \
     && rm -rf /var/lib/apt/lists/*
 
 # ── Python venv ───────────────────────────────────────────────────────────────
+# ROCm is installed at CI runtime (see build-rocm-examples-reusable.yml)
+# so the venv only needs pip tooling here.
 ENV VENV=/opt/rocm-venv
 RUN python3 -m venv ${VENV}
 ENV PATH="${VENV}/bin:${PATH}"
 
-# ── ROCm pip install ──────────────────────────────────────────────────────────
-# ROCM_INDEX_URL: override to pin a specific nightly date.
-# ROCM_EXTRAS: comma-separated pip extras; use device-gfxNNNN to target one arch.
-ARG ROCM_INDEX_URL=https://rocm.nightlies.amd.com/whl-multi-arch/
-ARG ROCM_EXTRAS=libraries,devel,device-all
-
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir pyyaml && \
-    pip install --no-cache-dir \
-        --index-url "${ROCM_INDEX_URL}" \
-        "rocm[${ROCM_EXTRAS}]" && \
-    rocm-sdk init
-
-# ── ROCm environment variables ────────────────────────────────────────────────
-# Computed at image build time from the actual venv layout, so this Dockerfile
-# works with any Python 3.x version without hardcoding the minor version.
-#
-# Multi-arch layout note:
-#   _rocm_sdk_devel/lib     — linker stubs (~41 KB each); GPU kernels externalized
-#   _rocm_sdk_libraries/lib — full libs with kpack archives in .kpack/
-#   _rocm_sdk_core/lib      — core runtime (HSA, OpenCL, etc.)
-#
-# _rocm_sdk_libraries/lib must appear before _rocm_sdk_devel/lib so the dynamic
-# linker loads full libs (which can resolve kpack) instead of stubs.
-RUN python3 - <<'PYEOF'
-import sysconfig
-venv = "/opt/rocm-venv"
-site = sysconfig.get_path("purelib", vars={"base": venv, "platbase": venv})
-rocm = site + "/_rocm_sdk_devel"
-core = site + "/_rocm_sdk_core/lib"
-libs = site + "/_rocm_sdk_libraries/lib"
-lines = [
-    "ROCM_PATH=" + rocm,
-    "HIP_PLATFORM=amd",
-    "HIP_PATH=" + rocm,
-    "HIP_CLANG_PATH=" + rocm + "/llvm/bin",
-    "HIP_INCLUDE_PATH=" + rocm + "/include",
-    "HIP_LIB_PATH=" + rocm + "/lib",
-    "HIP_DEVICE_LIB_PATH=" + rocm + "/lib/llvm/amdgcn/bitcode",
-    "PATH=" + rocm + "/bin:" + rocm + "/llvm/bin:/opt/rocm-venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-    "CPATH=" + rocm + "/include",
-    "PKG_CONFIG_PATH=" + rocm + "/lib/pkgconfig",
-    "LIBRARY_PATH=" + rocm + "/lib:" + rocm + "/lib64",
-    "LD_LIBRARY_PATH=" + core + ":" + libs + ":" + rocm + "/lib:" + rocm + "/llvm/lib",
-]
-open("/etc/rocm-sdk.env", "w").write("\n".join(lines) + "\n")
-PYEOF
-
-# ── Entrypoint: source ROCm env before every command ─────────────────────────
-RUN printf '#!/bin/bash\nset -a\n. /etc/rocm-sdk.env\nset +a\nexec "$@"\n' > /entrypoint.sh \
-    && chmod +x /entrypoint.sh
+    pip install --no-cache-dir pyyaml cmake
 
 # ── Render group + non-root user ──────────────────────────────────────────────
 # GID must match the host render group so /dev/dri/renderD* is accessible.
@@ -126,5 +79,4 @@ RUN groupadd --system --gid ${RENDER_GID} render 2>/dev/null || true && \
 
 USER developer
 WORKDIR /workspace
-ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/bin/bash"]
