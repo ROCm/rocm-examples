@@ -28,8 +28,8 @@ DISTRO_MAP = {
     "sles-15.7":    {"image": "ghcr.io/rocm/rocm-examples-sles-15.7:latest",    "label": "SLES 15.7"},
     "almalinux-8":  {"image": "ghcr.io/rocm/rocm-examples-almalinux-8:latest",  "label": "AlmaLinux 8"},
     # Multi-arch images: ROCm installed at CI runtime from whl-multi-arch with device-specific extras
-    "ubuntu-24.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest", "label": "Ubuntu 24.04", "install_methods": ["whl-multi-arch"]},
-    "ubuntu-26.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest", "label": "Ubuntu 26.04", "install_methods": ["whl-multi-arch"]},
+    "ubuntu-24.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest", "label": "Ubuntu 24.04", "install_methods": ["whl-multi-arch", "tarball-multi-arch"]},
+    "ubuntu-26.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest", "label": "Ubuntu 26.04", "install_methods": ["whl-multi-arch", "tarball-multi-arch"]},
     # Disabled until CI validation is complete — Dockerfiles in Scripts/MultiArch/
     # "rocky-9":   {"image": "ghcr.io/rocm/rocm-examples-rocky-9-multiarch:latest",    "label": "Rocky Linux 9",   "install_methods": ["whl-multi-arch"]},
     # "rhel-10.1": {"image": "ghcr.io/rocm/rocm-examples-rhel-10.1-multiarch:latest",  "label": "RHEL 10.1",       "install_methods": ["whl-multi-arch"]},
