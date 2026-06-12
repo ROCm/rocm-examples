@@ -32,6 +32,8 @@ select_hip_platform()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
 
+find_package(hipFile REQUIRED)
+
 add_executable(${example_name} get_version.cpp)
 
 set_source_files_properties(get_version.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -40,15 +42,9 @@ target_compile_features(${example_name} PRIVATE cxx_std_17)
 
 target_include_directories(${example_name}
     PRIVATE
-        $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>
-        $<$<COMPILE_LANGUAGE:CUDA>:${CUFILE_INCLUDE_DIR}>
-)
+        $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
 
-if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    target_link_libraries(${example_name} PRIVATE hipfile ${CUFILE_LIBRARY})
-else()
-    target_link_libraries(${example_name} PRIVATE hipfile)
-endif()
+target_link_libraries(${example_name} PRIVATE hip::hipFile)
 
 add_test(NAME ${example_name} COMMAND ${example_name})
 

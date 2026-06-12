@@ -40,26 +40,10 @@ select_hip_platform()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
-# When building for CUDA (NVIDIA), hipFile requires cuFile. Use FindCUDAToolkit
-# (available since CMake 3.17) to populate the standard toolkit variables before
-# searching for the cuFile header and library.
-if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    find_package(CUDAToolkit REQUIRED)
-    find_path(CUFILE_INCLUDE_DIR cufile.h
-        PATHS "${CUDAToolkit_INCLUDE_DIRS}" /usr/local/cuda/include
-    )
-    find_library(CUFILE_LIBRARY
-        NAMES cufile
-        PATHS "${CUDAToolkit_LIBRARY_DIR}" /usr/local/cuda/lib64
-    )
-    if(NOT CUFILE_INCLUDE_DIR OR NOT CUFILE_LIBRARY)
-        message(WARNING
-            "cuFile not found (header: ${CUFILE_INCLUDE_DIR}, lib: ${CUFILE_LIBRARY}). "
-            "hipFile CUDA examples will not be built. "
-            "Install the CUDA GDS package (e.g. cuda-gds) to enable them.")
-        return()
-    endif()
-    message(STATUS "Found cuFile: ${CUFILE_LIBRARY}")
+find_package(hipFile QUIET)
+if(NOT hipFile_FOUND)
+    message(STATUS "hipFile not found, skipping hipFile examples")
+    return()
 endif()
 
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Systems/hipFile/lib")
