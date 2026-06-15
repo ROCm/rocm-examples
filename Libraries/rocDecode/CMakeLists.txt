@@ -40,6 +40,13 @@ if(NOT rocdecode_FOUND)
     return()
 endif()
 
+# TheRock whl/tarball installs ship the rocdecode library but omit the utility
+# source files from _rocm_sdk_devel. Skip the examples rather than failing.
+if(NOT EXISTS "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp")
+    message(WARNING "rocDecode utility sources not found at ${ROCM_PATH}/share/rocdecode/utils, skipping rocDecode examples")
+    return()
+endif()
+
 add_subdirectory(rocdec_decode)
 add_subdirectory(video_decode)
 add_subdirectory(video_decode_batch)
