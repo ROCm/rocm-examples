@@ -20,6 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+# video_* examples need roc_video_dec.cpp from the rocDecode utility sources.
+# TheRock whl/tarball installs ship the library but omit these sources, so skip
+# the video_* subtree when the file is absent (mirrors the CMake guard).
+UTILS_SRC := $(ROCM_PATH)/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
+
+ifneq ($(wildcard $(UTILS_SRC)),)
 EXAMPLES := \
 	rocdec_decode \
 	video_decode \
@@ -31,6 +37,9 @@ EXAMPLES := \
 	video_decode_raw \
 	video_decode_rgb \
 	video_to_sequence
+else
+EXAMPLES := rocdec_decode
+endif
 
 # All rocDecode tests are skipped by default: they require test data
 # (videos under $(ROCM_PATH)/share/rocdecode/) that ctest guards behind
