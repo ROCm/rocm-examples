@@ -43,8 +43,8 @@ ENV PATH="/opt/rh/gcc-toolset-13/root/usr/bin:${PATH}" \
     LD_LIBRARY_PATH="/opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13"
 
 # ============================================================================
-# Python virtual environment (ready for ROCm wheel or tarball installation)
-# ROCm installation is delegated to the CI workflow to support both methods
+# Python virtual environment (ready for multi-arch ROCm installation)
+# ROCm installation is delegated to the CI workflow (whl-multi-arch or tarball-multi-arch)
 # ============================================================================
 
 RUN python3.11 -m venv /opt/venv && \
