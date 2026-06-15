@@ -19,18 +19,6 @@ GLOBAL_SKIP_TESTS = [
 
 # Tests to skip per GPU target (one list per target that has skips)
 SKIP_TESTS = {
-    "gfx1151": [
-        # rccl is not supported on gfx1151 yet
-        "rccl_allgather",
-        "rccl_allreduce",
-        "rccl_broadcast",
-        "rccl_buffer_registration",
-        "rccl_device_api",
-        "rccl_gradient_allreduce",
-        "rccl_reduce",
-        "rccl_reducescatter",
-        "rccl_send_recv",
-    ],
     # Add more targets as needed, e.g.:
     # "gfx1100": [],
 }
