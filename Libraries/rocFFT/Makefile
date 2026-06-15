@@ -30,7 +30,8 @@ EXAMPLES := \
   multi_gpu \
   real_complex
 
-SKIP_FROM_TEST :=
+# ROCm/rocm-systems#7263: static device symbols in rocFFT callbacks abort at runtime
+SKIP_FROM_TEST := callback
 
 all: $(EXAMPLES)
 
