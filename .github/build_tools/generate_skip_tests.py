@@ -64,7 +64,10 @@ def main():
     )
     args = parser.parse_args()
 
-    lines = list(SKIP_TESTS.get(args.target, []))
+    lines = list(GLOBAL_SKIP_TESTS)
+    for test in SKIP_TESTS.get(args.target, []):
+        if test not in lines:
+            lines.append(test)
 
     if args.distro:
         combo_key = f"{args.target}:{args.distro}"
