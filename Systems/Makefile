@@ -20,7 +20,16 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUBDIRECTORIES := hipFile
+ROCM_PATH ?= /opt/rocm
+INCLUDE_DIR := $(ROCM_PATH)/include
+
+SUBDIRECTORIES :=
+
+ifneq ($(wildcard $(INCLUDE_DIR)/hipfile.h),)
+SUBDIRECTORIES += hipFile
+else
+$(info hipFile not found ($(INCLUDE_DIR)/hipfile.h missing), skipping hipFile examples)
+endif
 
 SKIP_FROM_TEST :=
 
