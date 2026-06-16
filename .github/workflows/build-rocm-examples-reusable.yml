@@ -142,6 +142,7 @@ jobs:
               f.write(f"LIBRARY_PATH={rocm}/lib:{rocm}/lib64\n")
               f.write(f"LD_LIBRARY_PATH={core}:{libs}:{rocm}/lib:{rocm}/llvm/lib\n")
               f.write("ENABLE_OPENMP=OFF\n")  # whl-multi-arch omits amdllvm needed for OpenMP GPU offloading
+              f.write(f"CXX={rocm}/bin/amdclang++\n")  # hipDNN headers require C++20; system g++ on AlmaLinux 8 is too old
           rocm_version = subprocess.check_output(["rocm-sdk", "version"], text=True).strip()
           with open(github_output, "a") as f:
               f.write(f"rocm_version={rocm_version}\n")
