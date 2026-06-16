@@ -106,6 +106,7 @@ if(NOT TARGET benchmark::benchmark)
         OFF
     )
     option(BENCHMARK_ENABLE_INSTALL "Enable installation of benchmark." OFF)
+    option(BENCHMARK_ENABLE_WERROR "Build Release candidates with -Werror." OFF)
     include(FetchContent)
     FetchContent_Declare(
         googlebench
