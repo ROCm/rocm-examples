@@ -33,7 +33,8 @@ RUN dnf install -y dnf-plugins-core && \
         libXi-devel \
         libXinerama-devel \
         libXrandr-devel \
-        libatomic && \
+        libatomic \
+        libquadmath && \  # amdflang links against libquadmath.so.0 at runtime (TheRock#3290)
     dnf clean all
 
 # GCC 8's libstdc++fs has an ABI-incompatible std::filesystem::path layout vs

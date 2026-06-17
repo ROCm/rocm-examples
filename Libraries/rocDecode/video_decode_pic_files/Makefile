@@ -34,7 +34,7 @@ ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
 ROCM_PATH ?= /opt/rocm
-UTILS_DIR := ${ROCM_PATH}/share/rocdecode/utils
+UTILS_DIR := ../utils
 
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

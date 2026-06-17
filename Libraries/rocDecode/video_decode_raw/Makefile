@@ -29,7 +29,7 @@ include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 
 # HIP variables
 ROCM_PATH ?= /opt/rocm
-UTILS_DIR := ${ROCM_PATH}/share/rocdecode/utils
+UTILS_DIR := ../utils
 
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
