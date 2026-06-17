@@ -9,9 +9,6 @@ import json
 GPU_CONFIG_MAP = {
     "gfx1100": "gfx110X-all",
     "gfx1151": "gfx1151",
-    # "gfx1201": "gfx120X-all",  # no runner yet
-    # "gfx90a":  "gfx90X-dcgpu", # no runner yet
-    # "gfx942":  "gfx94X-dcgpu", # no runner yet
 }
 
 # Install methods for all distros (ROCm installed at CI runtime from TheRock nightlies).
@@ -26,10 +23,6 @@ DISTRO_MAP = {
     "almalinux-8":  {"image": "ghcr.io/rocm/rocm-examples-almalinux-8-multiarch:latest",  "label": "AlmaLinux 8"},
     "ubuntu-24.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest", "label": "Ubuntu 24.04"},
     "ubuntu-26.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest", "label": "Ubuntu 26.04"},
-    # Disabled until CI validation is complete — Dockerfiles in Scripts/MultiArch/
-    # "rocky-9":   {"image": "ghcr.io/rocm/rocm-examples-rocky-9-multiarch:latest",    "label": "Rocky Linux 9",   "install_methods": ["whl-multi-arch"]},
-    # "rhel-10.1": {"image": "ghcr.io/rocm/rocm-examples-rhel-10.1-multiarch:latest",  "label": "RHEL 10.1",       "install_methods": ["whl-multi-arch"]},
-    # "oracle-10": {"image": "ghcr.io/rocm/rocm-examples-oracle-10-multiarch:latest",  "label": "Oracle Linux 10", "install_methods": ["whl-multi-arch"]},
 }
 
 def _is_all(value):
