@@ -45,6 +45,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Install ROCm (whl-multi-arch)
+        if: ${{ matrix.install_method == 'whl-multi-arch' }}
+        run: |
+          echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
+          pip install --no-cache-dir --upgrade pip
+          pip install --no-cache-dir \
+            --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ \
+            "rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+          rocm-sdk init
+
       - name: Wheel sanity check
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
         id: sanity-check
@@ -55,16 +65,6 @@ jobs:
           echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
           rocm-sdk init
           rocm-sdk test
-
-      - name: Install ROCm (whl-multi-arch)
-        if: ${{ matrix.install_method == 'whl-multi-arch' }}
-        run: |
-          echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
-          pip install --no-cache-dir --upgrade pip
-          pip install --no-cache-dir \
-            --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ \
-            "rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
-          rocm-sdk init
 
       - name: Setup environment variables (whl-multi-arch)
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
