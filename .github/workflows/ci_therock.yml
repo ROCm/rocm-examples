@@ -60,12 +60,6 @@ on:
         - ubuntu-26.04
         - sles-15.7
         - almalinux-8
-      use_version_override:
-        description: "Pin to the stable ROCm version in stable_rocm_version.txt instead of latest nightly"
-        required: false
-        type: boolean
-        default: true
-
 permissions:
   contents: read
   packages: read
@@ -86,27 +80,9 @@ jobs:
       install_methods: ${{ steps.config.outputs.install_methods }}
       distros: ${{ steps.config.outputs.distros }}
       distro_map: ${{ steps.config.outputs.distro_map }}
-      rocm_version_override: ${{ steps.version.outputs.rocm_version_override }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Resolve ROCm version override
-        id: version
-        run: |
-          USE_OVERRIDE="${{ github.event.inputs.use_version_override }}"
-          EVENT="${{ github.event_name }}"
-          # Schedule always tests latest so auto-update works.
-          # push/PR/workflow_dispatch default to stable unless explicitly set to false.
-          if [ "${EVENT}" = "schedule" ]; then
-            echo "rocm_version_override=" >> $GITHUB_OUTPUT
-          elif [ "${USE_OVERRIDE}" != "false" ]; then
-            VERSION=$(cat .github/build_tools/stable_rocm_version.txt)
-            echo "rocm_version_override=${VERSION}" >> $GITHUB_OUTPUT
-            echo "Using pinned ROCm version: ${VERSION}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "rocm_version_override=" >> $GITHUB_OUTPUT
-          fi
 
       - name: Configure CI
         id: config
@@ -128,5 +104,4 @@ jobs:
       distro_map: ${{ needs.setup.outputs.distro_map }}
       gpu_configs: ${{ needs.setup.outputs.gpu_configs }}
       install_methods: ${{ needs.setup.outputs.install_methods }}
-      rocm_version_override: ${{ needs.setup.outputs.rocm_version_override }}
     secrets: inherit

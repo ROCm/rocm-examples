@@ -19,9 +19,6 @@ on:
         - all
         - gfx1100
         - gfx1151
-        - gfx1201
-        - gfx90a
-        - gfx942
       install_method:
         description: "Installation method"
         required: true
@@ -29,8 +26,8 @@ on:
         type: choice
         options:
         - all
-        - wheel
-        - tarball
+        - whl-multi-arch
+        - tarball-multi-arch
       distro:
         description: "Distro to build"
         required: true
@@ -38,15 +35,10 @@ on:
         type: choice
         options:
         - all
-        - ubuntu-22.04
+        - ubuntu-24.04
+        - ubuntu-26.04
         - sles-15.7
         - almalinux-8
-      use_version_override:
-        description: "Pin to the stable ROCm version in stable_rocm_version.txt instead of latest nightly"
-        required: false
-        type: boolean
-        default: true
-
 permissions:
   contents: read
   packages: read
@@ -67,27 +59,9 @@ jobs:
       install_methods: ${{ steps.config.outputs.install_methods }}
       distros: ${{ steps.config.outputs.distros }}
       distro_map: ${{ steps.config.outputs.distro_map }}
-      rocm_version_override: ${{ steps.version.outputs.rocm_version_override }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Resolve ROCm version override
-        id: version
-        run: |
-          USE_OVERRIDE="${{ github.event.inputs.use_version_override }}"
-          EVENT="${{ github.event_name }}"
-          # Schedule always tests latest so auto-update works.
-          # push/PR/workflow_dispatch default to stable unless explicitly set to false.
-          if [ "${EVENT}" = "schedule" ]; then
-            echo "rocm_version_override=" >> $GITHUB_OUTPUT
-          elif [ "${USE_OVERRIDE}" != "false" ]; then
-            VERSION=$(cat .github/build_tools/stable_rocm_version.txt)
-            echo "rocm_version_override=${VERSION}" >> $GITHUB_OUTPUT
-            echo "Using pinned ROCm version: ${VERSION}" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "rocm_version_override=" >> $GITHUB_OUTPUT
-          fi
 
       - name: Configure CI
         id: config
@@ -109,46 +83,4 @@ jobs:
       distro_map: ${{ needs.setup.outputs.distro_map }}
       gpu_configs: ${{ needs.setup.outputs.gpu_configs }}
       install_methods: ${{ needs.setup.outputs.install_methods }}
-      rocm_version_override: ${{ needs.setup.outputs.rocm_version_override }}
     secrets: inherit
-
-  update-stable-version:
-    name: "Update stable ROCm version"
-    needs: [build]
-    if: ${{ success() && github.event_name == 'schedule' && needs.setup.outputs.rocm_version_override == '' }}
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          ref: ${{ github.ref }}
-
-      - name: Get latest ROCm nightly version
-        id: version
-        run: |
-          VERSION=$(pip index versions \
-            --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ \
-            rocm 2>/dev/null | grep -oE "[0-9]+\.[0-9]+\.[0-9a-z]+" | head -1)
-          echo "version=${VERSION}" >> $GITHUB_OUTPUT
-
-      - name: Update stable_rocm_version.txt
-        run: |
-          CURRENT=$(cat .github/build_tools/stable_rocm_version.txt)
-          NEW="${{ steps.version.outputs.version }}"
-          if [ -z "${NEW}" ]; then
-            echo "Could not determine ROCm version from index, skipping update."
-            exit 0
-          fi
-          if [ "${NEW}" = "${CURRENT}" ]; then
-            echo "Stable version unchanged (${NEW}), no update needed."
-            exit 0
-          fi
-          echo "${NEW}" > .github/build_tools/stable_rocm_version.txt
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git config user.name "github-actions[bot]"
-          git add .github/build_tools/stable_rocm_version.txt
-          git commit -m "ci: update stable ROCm nightly to ${NEW}"
-          git push
-          echo "Updated stable ROCm version: ${CURRENT} → ${NEW}" >> $GITHUB_STEP_SUMMARY
