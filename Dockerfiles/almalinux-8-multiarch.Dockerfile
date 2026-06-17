@@ -7,6 +7,7 @@ ARG GLSLANG_VERSION=13.1.1
 # GPU_TARGET and THEROCK_FAMILY are set at workflow runtime, not in the base image
 ENV VULKAN_SDK_VERSION=${VULKAN_SDK_VERSION}
 
+# libquadmath: amdflang links against libquadmath.so.0 at runtime (TheRock#3290)
 RUN dnf install -y dnf-plugins-core && \
     dnf config-manager --set-enabled powertools && \
     dnf update -y && \
@@ -34,7 +35,7 @@ RUN dnf install -y dnf-plugins-core && \
         libXinerama-devel \
         libXrandr-devel \
         libatomic \
-        libquadmath && \  # amdflang links against libquadmath.so.0 at runtime (TheRock#3290)
+        libquadmath && \
     dnf clean all
 
 # GCC 8's libstdc++fs has an ABI-incompatible std::filesystem::path layout vs
