@@ -160,7 +160,7 @@ output by FNV-1a hash. They share the helpers in [`common`](common) and print `O
 
 All four take the same arguments:
 
-```
+```text
 PROGRAM READ_FILE WRITE_FILE [GPUID]
 ```
 
