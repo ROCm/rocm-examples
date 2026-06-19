@@ -1,0 +1,8 @@
+{
+  "scenario": "financial-risk-demo",
+  "features": {
+    "txn_count_7d": 42,
+    "risk_score": 0.18,
+    "region": "demo"
+  }
+}

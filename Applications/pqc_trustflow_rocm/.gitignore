@@ -1,0 +1,17 @@
+*.exe
+*.dll
+*.o
+*.obj
+*.pdb
+*.pyc
+__pycache__/
+*.demo_secret
+*receiver_sk*
+*ss_sender*
+*ss_receiver*
+outputs/
+logs/
+*.zip
+*.tar
+*.tar.gz
+*.bak*
