@@ -21,7 +21,7 @@ dw[k, c, r, s] = sum(sum(sum(dy[n, k, p, q] * x[n, c, h, w]
 4. Compute output gradient dimensions from input dimensions and convolution parameters.
 5. Create tensor attributes for the output gradient (`dy`) and input (`x`) tensors.
 6. Configure `ConvWgradAttributes` with pre-padding, post-padding, stride, and dilation, and add the backward filter convolution node to the graph.
-7. Mark the output tensor (`dw`) and build the graph.
+7. Set the output tensor (`dw`) dimensions to the original forward filter shape, mark it as an output, and build the graph.
 8. Allocate host tensors and initialize with random values.
 9. Create a variant pack, query workspace size, and allocate workspace memory.
 10. Execute the graph with the variant pack and workspace.
@@ -33,6 +33,7 @@ dw[k, c, r, s] = sum(sum(sum(dy[n, k, p, q] * x[n, c, h, w]
 - The [hipDNN Frontend graph API](https://github.com/ROCm/hipDNN) is used to construct and execute the operation graph. A `graph::Graph` is created, configured with data types, and built against a hipDNN handle before execution.
 - `graph::ConvWgradAttributes` configures the convolution backward filter operation, including pre-padding, post-padding, stride, and dilation parameters.
 - Like `ConvDgradAttributes`, this uses `set_pre_padding()` and `set_post_padding()` to specify asymmetric padding.
+- The `dw` dimensions are set explicitly because convolution backward filter output shape is not inferred from `dy`, `x`, and convolution parameters.
 - Workspace memory is required for convolution operations. The required size is queried with `graph->get_workspace_size()` and allocated before calling `graph->execute()`.
 
 ## Demonstrated API Calls
