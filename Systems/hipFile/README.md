@@ -20,7 +20,7 @@ library and require neither a GPU nor an `O_DIRECT` filesystem.
 ## Directory layout
 
 | Directory | What's in it |
-|-----------|--------------|
+| --------- | ------------ |
 | [`api`](api) | Minimal examples of the non-I/O API — calls that query or configure the library (e.g. `get_version`). No `O_DIRECT` filesystem or file arguments needed. |
 | [`basics`](basics) | Small, single-purpose programs that each exercise one facet of the synchronous API: buffer registration, the `O_DIRECT` fast path vs. compat fallback, chunked reads, device-buffer offsets, sub-region writes, GPU memory types, and a full round trip. |
 | [`async`](async) | Examples of the asynchronous, stream-based API (`hipFileReadAsync` / `hipFileWriteAsync`), including single-stream, non-blocking-stream, and concurrent multi-stream round trips. |
@@ -79,7 +79,7 @@ library rather than move data through the GPU. These do **not** require an `O_DI
 filesystem or file arguments.
 
 | Program | What it shows | Args |
-|---------|--------------|------|
+| ------- | ------------- | ---- |
 | [`get_version`](api/get_version) | Read the hipFile version both ways: the `HIPFILE_VERSION_*` header macros (compile-time) and `hipFileGetVersion()` (runtime). | none |
 
 ### Running
@@ -101,10 +101,10 @@ They drive the API directly from `main()` and use the shared helpers in
 success.
 
 | Program | What it shows | Args |
-|---------|--------------|------|
+| ------- | ------------- | ---- |
 | [`bufregister_write`](basics/bufregister_write) | Write a GPU buffer registered with `hipFileBufRegister` straight to disk (the fast path). | `OUTPUT [GPUID]` |
 | [`no_bufregister_write`](basics/no_bufregister_write) | Same write, but without registering the buffer — hipFile copies through its internal pool. | `OUTPUT [GPUID]` |
-| [`no_odirect_write`](basics/no_odirect_write) | Register a file opened *without* `O_DIRECT`. hipFile falls back to the POSIX compat path. Requires `HIPFILE_ALLOW_COMPAT_MODE=1`. | `OUTPUT [GPUID]` |
+| [`no_odirect_write`](basics/no_odirect_write) | Register a file opened *without* `O_DIRECT`. hipFile transparently reopens with `O_DIRECT` on capable filesystems; falls back to the POSIX compat path otherwise. | `OUTPUT [GPUID]` |
 | [`iterative_read`](basics/iterative_read) | Chunked read into GPU memory where the **host pointer** advances each iteration, then one write. | `INPUT OUTPUT [GPUID]` |
 | [`iterative_devmem_offset_read`](basics/iterative_devmem_offset_read) | Same chunked read, but the base device pointer is fixed and the **`buf_offset`** argument advances. | `INPUT OUTPUT [GPUID]` |
 | [`subregion_write`](basics/subregion_write) | Read a whole file, then write only the bytes at/after an offset using a non-zero `buffer_offset`. | `INPUT OUTPUT [GPUID]` |
@@ -152,7 +152,7 @@ output by FNV-1a hash. They share the helpers in [`common`](common) and print `O
 > or filesystem is `O_DIRECT`-capable. Fast-path async support is planned for the future.
 
 | Program | What it shows |
-|---------|--------------|
+| ------- | ------------- |
 | [`roundtrip_async`](async/roundtrip_async) | Async read + write on the **default stream**, a single `hipStreamSynchronize`, then verify. |
 | [`roundtrip_async_nonblocking_stream`](async/roundtrip_async_nonblocking_stream) | Same round trip on an explicit `hipStreamNonBlocking` stream (no implicit sync with the legacy default stream). |
 | [`roundtrip_async_multi_stream`](async/roundtrip_async_multi_stream) | `NUM_STREAMS` read/write pairs run concurrently, each on its own non-blocking stream covering a distinct file slice. |

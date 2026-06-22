@@ -4,15 +4,16 @@
  */
 
 /* no-odirect-write - Write a registered GPU buffer to a file opened without
- * O_DIRECT. hipFile falls back to its POSIX-IO path because the fast
- * GPU-direct path requires O_DIRECT.
+ * O_DIRECT. On an O_DIRECT-capable filesystem hipFile transparently reopens
+ * the file with O_DIRECT and still takes the GPU-direct fast path. On a
+ * filesystem that cannot do O_DIRECT it falls back to the POSIX compat path,
+ * which is enabled by default — set HIPFILE_ALLOW_COMPAT_MODE=true only if
+ * you previously disabled it.
  *
  * Usage: ./no_odirect_write OUTPUT [GPUID]
  *
  *   OUTPUT   Path to the output file. Created/truncated. Receives NOW_SIZE
- *            (default 128 KiB) bytes of generated test pattern via the
- *            compat/POSIX fallback path because the file is opened without
- *            O_DIRECT.
+ *            (default 128 KiB) bytes of generated test pattern.
  *   GPUID    GPU device index (optional, default 0).
  *
  * Steps:
@@ -20,12 +21,10 @@
  *   2. Build CPU pattern + copy to GPU
  *   3. hipFileBufRegister
  *   4. open file without O_DIRECT + hipFileHandleRegister
- *   5. hipFileWrite via POSIX fallback
+ *   5. hipFileWrite (hipFile reopens with O_DIRECT on capable filesystems,
+ *      or uses the POSIX compat fallback otherwise)
  *   6. ftruncate to exact size
  *   7. Hash verify
- *
- * Compat mode must be enabled via env var:
- *   HIPFILE_ALLOW_COMPAT_MODE=1 ./no_odirect_write OUTPUT
  */
 
 #include "examples_common.h"

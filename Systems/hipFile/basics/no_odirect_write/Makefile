@@ -54,9 +54,8 @@ SRCS := no-odirect-write.cpp $(COMMON_DIR)/examples_common.cpp
 $(EXAMPLE): $(SRCS)
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SRCS) $(ILDLIBS)
 
-# Requires HIPFILE_ALLOW_COMPAT_MODE=1 to succeed
 test: $(EXAMPLE)
-	HIPFILE_ALLOW_COMPAT_MODE=1 ./$(EXAMPLE) $(TEST_ARGS)
+	./$(EXAMPLE) $(TEST_ARGS)
 
 clean:
 	$(RM) $(EXAMPLE)

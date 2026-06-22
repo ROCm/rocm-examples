@@ -52,12 +52,9 @@ target_include_directories(${example_name}
 
 target_link_libraries(${example_name} PRIVATE hip::hipfile)
 
-# This example requires HIPFILE_ALLOW_COMPAT_MODE=1 to succeed at runtime.
 add_test(
     NAME ${example_name}
-    COMMAND ${CMAKE_COMMAND} -E env HIPFILE_ALLOW_COMPAT_MODE=1
-        $<TARGET_FILE:${example_name}>
-        "${CMAKE_CURRENT_BINARY_DIR}/no_odirect_write_out.bin"
+    COMMAND ${example_name} "${CMAKE_CURRENT_BINARY_DIR}/no_odirect_write_out.bin"
 )
 
 install(TARGETS ${example_name})
