@@ -106,6 +106,8 @@ if(NOT TARGET benchmark::benchmark)
         OFF
     )
     option(BENCHMARK_ENABLE_INSTALL "Enable installation of benchmark." OFF)
+    # Prevent googlebench from injecting -Werror into global CMAKE_CXX_FLAGS_RELEASE.
+    set(BENCHMARK_ENABLE_WERROR OFF CACHE BOOL "" FORCE)
     include(FetchContent)
     FetchContent_Declare(
         googlebench
@@ -113,6 +115,14 @@ if(NOT TARGET benchmark::benchmark)
         GIT_TAG v1.6.1
     )
     FetchContent_MakeAvailable(googlebench)
+    # googlebench unconditionally adds -pedantic-errors. amdclang++ ≥ 7.14.0a treats
+    # __COUNTER__ as a C2y extension, which -pedantic-errors escalates to a hard error.
+    # Suppress it directly on the benchmark targets.
+    foreach(_bench_tgt IN ITEMS benchmark benchmark_main)
+        if(TARGET ${_bench_tgt})
+            target_compile_options(${_bench_tgt} PRIVATE -Wno-c2y-extensions)
+        endif()
+    endforeach()
     if(NOT TARGET benchmark::benchmark)
         add_library(benchmark::benchmark ALIAS benchmark)
     endif()
