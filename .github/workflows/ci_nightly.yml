@@ -19,9 +19,6 @@ on:
         - all
         - gfx1100
         - gfx1151
-        - gfx1201
-        - gfx90a
-        - gfx942
       install_method:
         description: "Installation method"
         required: true
@@ -29,8 +26,8 @@ on:
         type: choice
         options:
         - all
-        - wheel
-        - tarball
+        - whl-multi-arch
+        - tarball-multi-arch
       distro:
         description: "Distro to build"
         required: true
@@ -38,10 +35,10 @@ on:
         type: choice
         options:
         - all
-        - ubuntu-22.04
+        - ubuntu-24.04
+        - ubuntu-26.04
         - sles-15.7
         - almalinux-8
-
 permissions:
   contents: read
   packages: read

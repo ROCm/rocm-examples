@@ -8,20 +8,17 @@ Run from repo root or with --output-dir pointing at .github/build_tools.
 import argparse
 import os
 
+# Tests to skip unconditionally on all targets/distros (upstream bugs in TheRock nightlies).
+GLOBAL_SKIP_TESTS = [
+    # ROCm/rocm-systems#7263: HIP CLR cannot resolve static device symbols via hipModuleGetGlobal.
+    # rocFFT's default store callback (store_cb_default_complex_double) is a static local
+    # function whose .static.<hash> mangled name causes an abort at runtime.
+    "hipfft_callback",
+    "rocfft_callback",
+]
+
 # Tests to skip per GPU target (one list per target that has skips)
 SKIP_TESTS = {
-    "gfx1151": [
-        # rccl is not supported on gfx1151 yet
-        "rccl_allgather",
-        "rccl_allreduce",
-        "rccl_broadcast",
-        "rccl_buffer_registration",
-        "rccl_device_api",
-        "rccl_gradient_allreduce",
-        "rccl_reduce",
-        "rccl_reducescatter",
-        "rccl_send_recv",
-    ],
     # Add more targets as needed, e.g.:
     # "gfx1100": [],
 }
@@ -55,7 +52,10 @@ def main():
     )
     args = parser.parse_args()
 
-    lines = list(SKIP_TESTS.get(args.target, []))
+    lines = list(GLOBAL_SKIP_TESTS)
+    for test in SKIP_TESTS.get(args.target, []):
+        if test not in lines:
+            lines.append(test)
 
     if args.distro:
         combo_key = f"{args.target}:{args.distro}"

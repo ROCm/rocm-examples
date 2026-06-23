@@ -58,16 +58,14 @@ RUN zypper -qni install -y bzip2 m4 zlib-devel && \
     zypper clean -a
 
 # ============================================================================
-# Python virtual environment (ready for ROCm wheel or tarball installation)
-# ROCm installation is delegated to the CI workflow to support both methods
+# Python virtual environment (ready for multi-arch ROCm installation)
+# ROCm installation is delegated to the CI workflow (whl-multi-arch or tarball-multi-arch)
 # ============================================================================
 
-# Create virtual environment with base packages
 RUN python3.13 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
     /opt/venv/bin/pip install pyyaml cmake
 
-# Set up virtual environment in PATH
 ENV PATH="/opt/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/opt/venv"
 
@@ -94,7 +92,7 @@ ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib"
 ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
 
-# build ffmpeg from source
+# Build FFmpeg from source (not available in SLES repos)
 WORKDIR /tmp
 RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
     tar -xvf ffmpeg-4.4.6.tar.xz && \
