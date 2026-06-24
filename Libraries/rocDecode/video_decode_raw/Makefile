@@ -31,6 +31,16 @@ include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
 ROCM_PATH ?= /opt/rocm
 UTILS_DIR := ${ROCM_PATH}/share/rocdecode/utils
 
+# rocDecode ships its shared utility sources under $(ROCM_PATH)/share/rocdecode/utils
+# (tarball) and with the amdrocm-decode-test package. They are not available with pip
+# wheels but are required to build this example; skip it if they are not installed.
+ifeq ($(wildcard $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp),)
+    $(info $(EXAMPLE): Skipping build — rocDecode utility sources not found under $(UTILS_DIR))
+    SKIP_BUILD := 1
+endif
+
+ifneq ($(SKIP_BUILD),1)
+
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
@@ -81,3 +91,10 @@ clean:
 	$(RM) $(EXAMPLE)
 
 .PHONY: clean test
+
+else
+all:
+clean:
+test:
+.PHONY: all clean test
+endif
