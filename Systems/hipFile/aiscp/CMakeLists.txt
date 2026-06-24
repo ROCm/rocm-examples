@@ -49,7 +49,7 @@ target_link_libraries(${example_name} PRIVATE hip::hipfile)
 # Generate a 1 MiB random source file before running aiscp.
 add_test(
     NAME ${example_name}_setup
-    COMMAND dd if=/dev/urandom of="${CMAKE_CURRENT_BINARY_DIR}/aiscp_src.bin" bs=1M count=1
+    COMMAND dd if=/dev/urandom of=${CMAKE_CURRENT_BINARY_DIR}/aiscp_src.bin bs=1M count=1
 )
 set_tests_properties(${example_name}_setup PROPERTIES FIXTURES_SETUP ${example_name}_fixture)
 

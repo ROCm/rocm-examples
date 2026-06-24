@@ -55,9 +55,9 @@ $(EXAMPLE): $(SRCS)
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SRCS) $(ILDLIBS)
 
 test: $(EXAMPLE)
-	./$(EXAMPLE) $(TEST_ARGS)
+	./$(EXAMPLE) no_bufregister_write_out.bin $(TEST_ARGS)
 
 clean:
-	$(RM) $(EXAMPLE)
+	$(RM) $(EXAMPLE) no_bufregister_write_out.bin
 
 .PHONY: clean test
