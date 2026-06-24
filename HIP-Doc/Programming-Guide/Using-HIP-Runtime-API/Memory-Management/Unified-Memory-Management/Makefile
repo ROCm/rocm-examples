@@ -21,17 +21,20 @@
 # SOFTWARE.
 
 EXAMPLES := \
-  data_prefetching \
-  dynamic_unified_memory \
-  explicit_memory \
-  memory_range_attributes \
-  static_unified_memory \
-  unified_memory_advice
+  explicit_memory
 
 SKIP_FROM_TEST :=
 
+# hipMallocManaged, __managed__, and hipMemPrefetchAsync require HSA_XNACK=1 on AMD GPUs.
+# Without it, hipDeviceSynchronize blocks indefinitely after the kernel faults.
 ifeq ($(HSA_XNACK), 1)
-  EXAMPLES += standard_unified_memory 
+  EXAMPLES += \
+    data_prefetching \
+    dynamic_unified_memory \
+    memory_range_attributes \
+    standard_unified_memory \
+    static_unified_memory \
+    unified_memory_advice
 endif
 
 all: $(EXAMPLES)
