@@ -35,6 +35,7 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS :=
 ILDFLAGS  :=
 ILDLIBS   := -lhipfile
+HIPFILE_TEST_DIR ?= /tmp
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
@@ -54,10 +55,10 @@ $(EXAMPLE): aiscp.cpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 test: $(EXAMPLE)
-	dd if=/dev/urandom of=aiscp_src.bin bs=1M count=1
-	./$(EXAMPLE) aiscp_src.bin aiscp_dst.bin $(TEST_ARGS)
+	dd if=/dev/urandom of=$(HIPFILE_TEST_DIR)/aiscp_src.bin bs=1M count=1
+	./$(EXAMPLE) $(HIPFILE_TEST_DIR)/aiscp_src.bin $(HIPFILE_TEST_DIR)/aiscp_dst.bin $(TEST_ARGS)
 
 clean:
-	$(RM) $(EXAMPLE) aiscp_src.bin aiscp_dst.bin
+	$(RM) $(EXAMPLE) $(HIPFILE_TEST_DIR)/aiscp_src.bin $(HIPFILE_TEST_DIR)/aiscp_dst.bin
 
 .PHONY: clean test

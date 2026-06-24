@@ -46,6 +46,12 @@ if(NOT hipFile_FOUND)
     return()
 endif()
 
+# Directory used for test I/O. Must be on a local filesystem that supports
+# O_DIRECT (ext4 or xfs). The GitHub Actions runner workspace is on an overlay
+# filesystem that does not support O_DIRECT, so we default to /tmp.
+set(HIPFILE_TEST_DIR "/tmp" CACHE PATH
+    "Directory for hipFile test I/O. Must be on an O_DIRECT-capable filesystem.")
+
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})

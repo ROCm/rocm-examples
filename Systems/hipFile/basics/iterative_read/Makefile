@@ -34,6 +34,7 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_DIR)
 ILDFLAGS  :=
 ILDLIBS   := -lhipfile
+HIPFILE_TEST_DIR ?= /tmp
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
@@ -56,10 +57,10 @@ $(EXAMPLE): $(SRCS)
 
 # Create a 1 MiB input file before running. The example accepts any file >= 1 block.
 test: $(EXAMPLE)
-	dd if=/dev/urandom of=iterative_read_input.bin bs=1M count=1 2>/dev/null
-	./$(EXAMPLE) iterative_read_input.bin iterative_read_output.bin $(TEST_ARGS)
+	dd if=/dev/urandom of=$(HIPFILE_TEST_DIR)/iterative_read_input.bin bs=1M count=1 2>/dev/null
+	./$(EXAMPLE) $(HIPFILE_TEST_DIR)/iterative_read_input.bin $(HIPFILE_TEST_DIR)/iterative_read_output.bin $(TEST_ARGS)
 
 clean:
-	$(RM) $(EXAMPLE) iterative_read_input.bin iterative_read_output.bin
+	$(RM) $(EXAMPLE) $(HIPFILE_TEST_DIR)/iterative_read_input.bin $(HIPFILE_TEST_DIR)/iterative_read_output.bin
 
 .PHONY: clean test

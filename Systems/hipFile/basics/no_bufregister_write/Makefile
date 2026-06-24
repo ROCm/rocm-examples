@@ -34,6 +34,7 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_DIR)
 ILDFLAGS  :=
 ILDLIBS   := -lhipfile
+HIPFILE_TEST_DIR ?= /tmp
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
@@ -55,9 +56,9 @@ $(EXAMPLE): $(SRCS)
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SRCS) $(ILDLIBS)
 
 test: $(EXAMPLE)
-	./$(EXAMPLE) no_bufregister_write_out.bin $(TEST_ARGS)
+	./$(EXAMPLE) $(HIPFILE_TEST_DIR)/no_bufregister_write_out.bin $(TEST_ARGS)
 
 clean:
-	$(RM) $(EXAMPLE) no_bufregister_write_out.bin
+	$(RM) $(EXAMPLE) $(HIPFILE_TEST_DIR)/no_bufregister_write_out.bin
 
 .PHONY: clean test

@@ -34,6 +34,7 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_DIR)
 ILDFLAGS  :=
 ILDLIBS   := -lhipfile
+HIPFILE_TEST_DIR ?= /tmp
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
@@ -56,10 +57,10 @@ $(EXAMPLE): $(SRCS)
 
 # Default: test with device memory (MODE=1). Pass MODE=2 or MODE=3 via TEST_ARGS.
 test: $(EXAMPLE)
-	dd if=/dev/urandom of=various_mem_rw_input.bin bs=1M count=1 2>/dev/null
-	./$(EXAMPLE) various_mem_rw_input.bin various_mem_rw_output.bin 1 $(TEST_ARGS)
+	dd if=/dev/urandom of=$(HIPFILE_TEST_DIR)/various_mem_rw_input.bin bs=1M count=1 2>/dev/null
+	./$(EXAMPLE) $(HIPFILE_TEST_DIR)/various_mem_rw_input.bin $(HIPFILE_TEST_DIR)/various_mem_rw_output.bin 1 $(TEST_ARGS)
 
 clean:
-	$(RM) $(EXAMPLE) various_mem_rw_input.bin various_mem_rw_output.bin
+	$(RM) $(EXAMPLE) $(HIPFILE_TEST_DIR)/various_mem_rw_input.bin $(HIPFILE_TEST_DIR)/various_mem_rw_output.bin
 
 .PHONY: clean test

@@ -55,8 +55,8 @@ target_link_libraries(${example_name} PRIVATE hip::hipfile)
 add_test(
     NAME ${example_name}
     COMMAND ${example_name}
-        "${CMAKE_CURRENT_BINARY_DIR}/roundtrip_async_read.bin"
-        "${CMAKE_CURRENT_BINARY_DIR}/roundtrip_async_write.bin"
+        "${HIPFILE_TEST_DIR}/roundtrip_async_read.bin"
+        "${HIPFILE_TEST_DIR}/roundtrip_async_write.bin"
 )
 
 install(TARGETS ${example_name})

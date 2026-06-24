@@ -34,6 +34,7 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -I $(COMMON_DIR)
 ILDFLAGS  :=
 ILDLIBS   := -lhipfile
+HIPFILE_TEST_DIR ?= /tmp
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
@@ -55,10 +56,10 @@ $(EXAMPLE): $(SRCS)
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SRCS) $(ILDLIBS)
 
 test: $(EXAMPLE)
-	dd if=/dev/urandom of=subregion_write_input.bin bs=1M count=1 2>/dev/null
-	./$(EXAMPLE) subregion_write_input.bin subregion_write_output.bin $(TEST_ARGS)
+	dd if=/dev/urandom of=$(HIPFILE_TEST_DIR)/subregion_write_input.bin bs=1M count=1 2>/dev/null
+	./$(EXAMPLE) $(HIPFILE_TEST_DIR)/subregion_write_input.bin $(HIPFILE_TEST_DIR)/subregion_write_output.bin $(TEST_ARGS)
 
 clean:
-	$(RM) $(EXAMPLE) subregion_write_input.bin subregion_write_output.bin
+	$(RM) $(EXAMPLE) $(HIPFILE_TEST_DIR)/subregion_write_input.bin $(HIPFILE_TEST_DIR)/subregion_write_output.bin
 
 .PHONY: clean test

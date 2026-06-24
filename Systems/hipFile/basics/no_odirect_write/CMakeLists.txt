@@ -54,7 +54,7 @@ target_link_libraries(${example_name} PRIVATE hip::hipfile)
 
 add_test(
     NAME ${example_name}
-    COMMAND ${example_name} "${CMAKE_CURRENT_BINARY_DIR}/no_odirect_write_out.bin"
+    COMMAND ${example_name} "${HIPFILE_TEST_DIR}/no_odirect_write_out.bin"
 )
 
 install(TARGETS ${example_name})

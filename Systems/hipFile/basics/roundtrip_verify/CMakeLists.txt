@@ -55,8 +55,8 @@ target_link_libraries(${example_name} PRIVATE hip::hipfile)
 add_test(
     NAME ${example_name}
     COMMAND ${example_name}
-        "${CMAKE_CURRENT_BINARY_DIR}/roundtrip_verify_created.bin"
-        "${CMAKE_CURRENT_BINARY_DIR}/roundtrip_verify_copied.bin"
+        "${HIPFILE_TEST_DIR}/roundtrip_verify_created.bin"
+        "${HIPFILE_TEST_DIR}/roundtrip_verify_copied.bin"
 )
 
 install(TARGETS ${example_name})

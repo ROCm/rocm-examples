@@ -54,15 +54,15 @@ target_link_libraries(${example_name} PRIVATE hip::hipfile)
 
 add_test(
     NAME ${example_name}_setup
-    COMMAND dd if=/dev/urandom of=${CMAKE_CURRENT_BINARY_DIR}/subregion_write_input.bin bs=1M count=1
+    COMMAND dd if=/dev/urandom of=${HIPFILE_TEST_DIR}/subregion_write_input.bin bs=1M count=1
 )
 set_tests_properties(${example_name}_setup PROPERTIES FIXTURES_SETUP ${example_name}_fixture)
 
 add_test(
     NAME ${example_name}
     COMMAND ${example_name}
-        "${CMAKE_CURRENT_BINARY_DIR}/subregion_write_input.bin"
-        "${CMAKE_CURRENT_BINARY_DIR}/subregion_write_output.bin"
+        "${HIPFILE_TEST_DIR}/subregion_write_input.bin"
+        "${HIPFILE_TEST_DIR}/subregion_write_output.bin"
 )
 set_tests_properties(${example_name} PROPERTIES FIXTURES_REQUIRED ${example_name}_fixture)
 
