@@ -89,7 +89,7 @@ jobs:
         env:
           GPU_CONFIG: ${{ github.event.inputs.gpu_config || 'all' }}
           INSTALL_METHOD: ${{ github.event.inputs.install_method || 'all' }}
-          DISTRO: ${{ github.event.inputs.distro || 'all' }}
+          DISTRO: ${{ github.event.inputs.distro || 'ubuntu-24.04' }}
         run: python3 .github/build_tools/configure_ci.py
 
   build:
