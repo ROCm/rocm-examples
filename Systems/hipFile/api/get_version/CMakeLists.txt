@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-  Applications \
-  HIP-Basic \
-  HIP-Doc \
-  Libraries \
-  Programming-Guide \
-  Systems \
-  Tools
+set(example_name hipfile_get_version)
 
-SKIP_FROM_TEST :=
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
 
-all: $(SUB_PROJECTS)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-configure:
-	./Scripts/configure.sh --rocm-path="$(or $(ROCM_PATH),/opt/rocm)"
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
 
-clean: TARGET=clean
-clean: all
+find_package(hipFile REQUIRED)
 
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
+add_executable(${example_name} get_version.cpp)
 
-test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(SUB_PROJECTS))
+set_source_files_properties(get_version.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-.PHONY: all configure clean test $(SUB_PROJECTS)
+target_compile_features(${example_name} PRIVATE cxx_std_17)
+
+target_include_directories(${example_name}
+    PRIVATE
+        $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
+
+target_link_libraries(${example_name} PRIVATE hip::hipfile)
+
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+install(TARGETS ${example_name})

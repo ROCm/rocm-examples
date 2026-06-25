@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,23 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-  Applications \
-  HIP-Basic \
-  HIP-Doc \
-  Libraries \
-  Programming-Guide \
-  Systems \
-  Tools
+SUBDIRECTORIES := \
+  aiscp \
+  api \
+  async \
+  basics
 
 SKIP_FROM_TEST :=
 
-all: $(SUB_PROJECTS)
-
-configure:
-	./Scripts/configure.sh --rocm-path="$(or $(ROCM_PATH),/opt/rocm)"
+all: $(SUBDIRECTORIES)
 
 clean: TARGET=clean
 clean: all
 
-$(SUB_PROJECTS):
+$(SUBDIRECTORIES):
 	$(MAKE) -C $@ $(TARGET)
 
 test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(SUB_PROJECTS))
+test: $(filter-out $(SKIP_FROM_TEST),$(SUBDIRECTORIES))
 
-.PHONY: all configure clean test $(SUB_PROJECTS)
+.PHONY: all clean test $(SUBDIRECTORIES)

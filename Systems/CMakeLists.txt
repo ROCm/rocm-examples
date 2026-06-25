@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,29 +20,11 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-SUB_PROJECTS := \
-  Applications \
-  HIP-Basic \
-  HIP-Doc \
-  Libraries \
-  Programming-Guide \
-  Systems \
-  Tools
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(Systems LANGUAGES CXX)
 
-SKIP_FROM_TEST :=
+file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-all: $(SUB_PROJECTS)
-
-configure:
-	./Scripts/configure.sh --rocm-path="$(or $(ROCM_PATH),/opt/rocm)"
-
-clean: TARGET=clean
-clean: all
-
-$(SUB_PROJECTS):
-	$(MAKE) -C $@ $(TARGET)
-
-test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(SUB_PROJECTS))
-
-.PHONY: all configure clean test $(SUB_PROJECTS)
+add_subdirectory(hipFile)
