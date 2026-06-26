@@ -2,7 +2,7 @@
 
 ## Description
 
-This program performs a complete GPU-mediated read-write round trip and verifies data integrity
+This example performs a complete GPU-mediated read-write round trip and verifies data integrity
 with hashing. It writes a known pattern to disk via hipFile, reads it back into the same GPU
 buffer, writes it to a second file, and then asserts both files have identical contents. This is
 the canonical correctness test for hipFile I/O.
@@ -32,9 +32,8 @@ the canonical correctness test for hipFile I/O.
 - `hipFileWrite` writes from GPU memory to a file. The file must be open with `O_DIRECT` for
   the GPU-direct path. Transfer sizes must be block-aligned; `ftruncate` corrects the file size.
 - `hipFileRead` reads from a file into GPU memory. The same block-alignment requirements apply.
-- Reusing the same GPU buffer for both the write and the subsequent read-back is intentional:
-  it confirms that the on-disk contents are exactly what was written, independent of any
-  in-memory state.
+- Reusing the same GPU buffer for both the write and the subsequent read-back confirms that the
+  on-disk contents are exactly what was written, independent of any in-memory state.
 - The `verify_files_match` helper (from `examples_common`) reads both files via buffered POSIX
   I/O and compares their FNV-1a hashes.
 

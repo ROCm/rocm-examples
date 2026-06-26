@@ -2,10 +2,10 @@
 
 ## Description
 
-This program demonstrates concurrent GPU-direct I/O using multiple independent HIP streams. Each
+This example demonstrates concurrent GPU-direct I/O using multiple independent HIP streams. Each
 stream processes a non-overlapping slice of the file, with its own GPU buffer. A read and a write
-are submitted on each stream, allowing the driver to execute slices in parallel. After all streams
-synchronize, the complete file (all slices concatenated) is verified against the input.
+are submitted on each stream, allowing the driver to process slices in parallel. After all streams
+synchronize, the complete file, with all slices concatenated, is verified against the input.
 
 ### Application flow
 
@@ -27,13 +27,13 @@ synchronize, the complete file (all slices concatenated) is verified against the
 
 ## Key APIs and Concepts
 
-- Multiple non-blocking streams allow hipFile operations from different slices to execute
-  concurrently in the driver, potentially overlapping I/O with computation or other I/O.
+- Multiple non-blocking streams allow hipFile operations from different slices to run
+  concurrently in the driver, overlapping I/O with computation or other I/O.
 - A shared `hipFileHandle_t` is safe to use across multiple concurrent streams for non-overlapping
   byte ranges. Each stream owns its own GPU buffer.
-- The `io_size`, `file_offset`, `buf_offset`, `bytes_read`, and `bytes_written` fields live in
-  per-stream state structs because the async API takes them by pointer and may write to them at
-  completion time, so they must outlive the `hipStreamSynchronize` call.
+- The async API calls take `io_size`, `file_offset`, `buf_offset`, `bytes_read`, and
+  `bytes_written` by pointer and might update them at completion time. These fields are stored in
+  per-stream state structs to ensure they remain valid until `hipStreamSynchronize` returns.
 - `SLICE_SIZE` must be a multiple of `BLOCK_ALIGN` (4 KiB) because the files are opened with
   `O_DIRECT`.
 

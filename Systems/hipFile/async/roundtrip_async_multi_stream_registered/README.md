@@ -2,7 +2,7 @@
 
 ## Description
 
-This program extends the `roundtrip_async_multi_stream` example by additionally registering each
+This example extends the `roundtrip_async_multi_stream` example by additionally registering each
 HIP stream with `hipFileStreamRegister`. Stream registration allows the hipFile driver to skip
 per-submission validation of fixed parameters (buffer offset, file offset, file size, and
 alignment), reducing submission overhead on latency-sensitive workloads.

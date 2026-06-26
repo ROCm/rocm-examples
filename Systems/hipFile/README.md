@@ -1,13 +1,13 @@
 # hipFile Examples
 
 This directory contains working examples of the hipFile API, grouped by what they demonstrate.
-Every program verifies its result with an FNV-1a hash and prints `OK …` on success.
+Every example verifies its result with an FNV-1a hash and prints `OK …` on success.
 
-Most examples move data through the GPU on hipFile's fast path, which opens files with `O_DIRECT`.
-Running them therefore requires an AMD GPU supported by ROCm and source/destination paths on an
+Most examples move data through the GPU using the hipFile fastpath backend, which opens files with `O_DIRECT`.
+Running them requires an AMD GPU supported by ROCm and source/destination paths on an
 `O_DIRECT`-capable local filesystem (ext4 mounted `data=ordered`, or xfs). `O_DIRECT` is not a
-hipFile requirement — files can be opened without it and routed through the POSIX compat path (see
-[`basics/no_odirect_write`](basics/no_odirect_write)). Verify fast-path support with
+hipFile requirement. Files can be opened without it and routed through the POSIX fallback backend (see
+[`basics/no_odirect_write`](basics/no_odirect_write)). Verify fastpath support with
 `/opt/rocm/bin/ais-check`. The [`api`](api) examples are the exception: they only query the
 library and require neither a GPU nor an `O_DIRECT` filesystem.
 
@@ -21,11 +21,11 @@ library and require neither a GPU nor an `O_DIRECT` filesystem.
 
 | Directory | What's in it |
 | --------- | ------------ |
-| [`api`](api) | Minimal examples of the non-I/O API — calls that query or configure the library (e.g. `get_version`). No `O_DIRECT` filesystem or file arguments needed. |
-| [`basics`](basics) | Small, single-purpose programs that each exercise one facet of the synchronous API: buffer registration, the `O_DIRECT` fast path vs. compat fallback, chunked reads, device-buffer offsets, sub-region writes, GPU memory types, and a full round trip. |
+| [`api`](api) | Minimal examples of the non-I/O API (calls that query or configure the library, e.g. `get_version`). No `O_DIRECT` filesystem or file arguments needed. |
+| [`basics`](basics) | Small, single-purpose programs that each use one facet of the synchronous API: buffer registration, the fastpath backend, the fallback backend, chunked reads, device-buffer offsets, sub-region writes, GPU memory types, and a full round trip. |
 | [`async`](async) | Examples of the asynchronous, stream-based API (`hipFileReadAsync` / `hipFileWriteAsync`), including single-stream, non-blocking-stream, and concurrent multi-stream round trips. |
 | [`aiscp`](aiscp) | A standalone `cp`-like utility built on hipFile (`hipfile_aiscp SOURCE DEST`). |
-| [`common`](common) | Shared helpers used by `basics` and `async` (alignment math, pattern fill, FNV-1a hashing, file open/register). Not an example — compiled directly into each example that needs it. |
+| [`common`](common) | Shared helpers used by `basics` and `async` (alignment math, pattern fill, FNV-1a hashing, file open/register). This is not an example in and of itself, but is compiled directly into each example that requires it. |
 
 ## Building
 
@@ -74,11 +74,11 @@ make -j $(nproc)
 
 ## `api`
 
-Minimal examples of the non-I/O parts of the hipFile API — calls that query or configure the
-library rather than move data through the GPU. These do **not** require an `O_DIRECT`-capable
+Minimal examples of the non-I/O parts of the hipFile API (calls that query or configure the
+library rather than move data through the GPU). These do **not** require an `O_DIRECT`-capable
 filesystem or file arguments.
 
-| Program | What it shows | Args |
+| Example | What it shows | Args |
 | ------- | ------------- | ---- |
 | [`get_version`](api/get_version) | Read the hipFile version both ways: the `HIPFILE_VERSION_*` header macros (compile-time) and `hipFileGetVersion()` (runtime). | none |
 
@@ -95,15 +95,15 @@ touched.
 
 ## `basics`
 
-Small, single-purpose programs that each exercise one facet of the synchronous hipFile C API.
+Small, single-purpose programs that each demonstrate one facet of the synchronous hipFile C API.
 They drive the API directly from `main()` and use the shared helpers in
 [`common`](common). Every example verifies its result with an FNV-1a hash and prints `OK …` on
 success.
 
-| Program | What it shows | Args |
+| Example | What it shows | Args |
 | ------- | ------------- | ---- |
 | [`bufregister_write`](basics/bufregister_write) | Write a GPU buffer registered with `hipFileBufRegister` straight to disk (the fast path). | `OUTPUT [GPUID]` |
-| [`no_bufregister_write`](basics/no_bufregister_write) | Same write, but without registering the buffer — hipFile copies through its internal pool. | `OUTPUT [GPUID]` |
+| [`no_bufregister_write`](basics/no_bufregister_write) | Same write, but without registering the buffer; hipFile copies through its internal pool. | `OUTPUT [GPUID]` |
 | [`no_odirect_write`](basics/no_odirect_write) | Register a file opened *without* `O_DIRECT`. hipFile transparently reopens with `O_DIRECT` on capable filesystems; falls back to the POSIX compat path otherwise. | `OUTPUT [GPUID]` |
 | [`iterative_read`](basics/iterative_read) | Chunked read into GPU memory where the **host pointer** advances each iteration, then one write. | `INPUT OUTPUT [GPUID]` |
 | [`iterative_devmem_offset_read`](basics/iterative_devmem_offset_read) | Same chunked read, but the base device pointer is fixed and the **`buf_offset`** argument advances. | `INPUT OUTPUT [GPUID]` |
@@ -147,11 +147,11 @@ Examples of hipFile's asynchronous, stream-based API (`hipFileReadAsync` /
 GPU-mediated read+write round trip on one or more HIP streams, synchronizes, and verifies the
 output by FNV-1a hash. They share the helpers in [`common`](common) and print `OK …` on success.
 
-> **Note:** The `O_DIRECT` fast path is not currently supported for asynchronous I/O — async
+> **Note:** The `O_DIRECT` fast path is not currently supported for asynchronous I/O; async
 > operations always run through the POSIX compat (fallback) path, regardless of whether the file
 > or filesystem is `O_DIRECT`-capable. Fast-path async support is planned for the future.
 
-| Program | What it shows |
+| Example | What it shows |
 | ------- | ------------- |
 | [`roundtrip_async`](async/roundtrip_async) | Async read + write on the **default stream**, a single `hipStreamSynchronize`, then verify. |
 | [`roundtrip_async_nonblocking_stream`](async/roundtrip_async_nonblocking_stream) | Same round trip on an explicit `hipStreamNonBlocking` stream (no implicit sync with the legacy default stream). |
@@ -198,13 +198,13 @@ SOURCE must be an existing file. DEST is created or overwritten. Both paths must
 
 ## `common`
 
-Not an example — a small collection of shared helpers used by `basics` and `async`:
+Not an example; a small collection of shared helpers used by `basics` and `async`:
 
-- `align_up` / `is_power_of_two` — alignment utilities
-- `fill_pattern` — fills a buffer with a deterministic byte pattern
-- `hash_buffer` / `hash_file_range` — FNV-1a hashing for verification
-- `seed_read_file` — creates a test input file via plain POSIX I/O
-- `verify_files_match` — hashes two files and asserts they are equal
-- `open_file` / `close_file` — wraps `open(2)` + `hipFileHandleRegister` / deregister
+- `align_up` / `is_power_of_two`: alignment utilities
+- `fill_pattern`: fills a buffer with a deterministic byte pattern
+- `hash_buffer` / `hash_file_range`: FNV-1a hashing for verification
+- `seed_read_file`: creates a test input file via plain POSIX I/O
+- `verify_files_match`: hashes two files and asserts they are equal
+- `open_file` / `close_file`: wraps `open(2)` + `hipFileHandleRegister` / deregister
 
 See [`common/examples_common.h`](common/examples_common.h) for the full documented API.
