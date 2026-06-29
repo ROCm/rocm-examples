@@ -13,8 +13,10 @@ library and require neither a GPU nor an `O_DIRECT` filesystem.
 
 ## Prerequisites
 
-- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 7.x)
-- hipFile (installed via the nightly `.deb` packages or built from source)
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) 7.2.0 or later
+  (stable releases), or ROCm 7.13 or later (preview releases). ROCm 7.9 through 7.12 are not
+  supported.
+- [hipFile](https://github.com/ROCm/rocm-systems/blob/develop/projects/hipfile/INSTALL.md)
 - CMake (at least version 3.21), or GNU Make
 
 ## Directory layout
