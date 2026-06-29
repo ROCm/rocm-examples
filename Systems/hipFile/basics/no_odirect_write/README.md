@@ -2,13 +2,13 @@
 
 ## Description
 
-This program demonstrates what happens when hipFile is used with a file opened *without*
+This example demonstrates what happens when hipFile is used with a file opened *without*
 `O_DIRECT`. On an `O_DIRECT`-capable filesystem, hipFile transparently reopens the file with
-`O_DIRECT` and still takes the GPU-direct fast path. On a filesystem that cannot support
-`O_DIRECT`, hipFile falls back to its POSIX-compatible I/O path instead.
+`O_DIRECT` and takes the GPU-direct fast path. On a filesystem that cannot support
+`O_DIRECT`, hipFile uses the POSIX-compatible fallback backend.
 
-The compat path is enabled by default. The environment variable `HIPFILE_ALLOW_COMPAT_MODE` only
-needs to be set to `true` if you previously disabled compat mode and want to re-enable it.
+The fallback path is enabled by default. It is only disabled if the `HIPFILE_ALLOW_COMPAT_MODE`
+environment variable was set to `false`. If this is the case, set it to `true` to re-enable it.
 
 ### Application flow
 
@@ -19,8 +19,8 @@ needs to be set to `true` if you previously disabled compat mode and want to re-
 4. The output file is opened **without** `O_DIRECT` and registered with hipFile via
    `hipFileHandleRegister`.
 5. `hipFileWrite` is called. On an `O_DIRECT`-capable filesystem, hipFile transparently reopens
-   the file with `O_DIRECT` and takes the fast path. On a filesystem that cannot support
-   `O_DIRECT`, hipFile routes the write through a POSIX-compatible bounce path.
+   the file with `O_DIRECT` and uses the fastpath backend. On a filesystem that cannot support
+   `O_DIRECT`, hipFile routes the write through the fallback backend.
 6. `ftruncate` trims the file to the exact logical payload size (defensive; the compat path can
    write the exact size, so the truncate is a no-op here).
 7. The written file is read back via plain POSIX I/O and its hash is compared against the expected
@@ -30,12 +30,12 @@ needs to be set to `true` if you previously disabled compat mode and want to re-
 ## Key APIs and Concepts
 
 - When a file is opened without `O_DIRECT`, hipFile first attempts to reopen it with `O_DIRECT` to
-  engage the GPU-direct fast path. If the filesystem does not support `O_DIRECT`, hipFile falls
-  back to the POSIX compatibility path, which performs an extra data copy through the kernel page
+  use the GPU-direct fastpath backend. If the filesystem does not support `O_DIRECT`, hipFile uses
+  the POSIX-compatible fallback backend, which performs an extra data copy through the kernel page
   cache.
-- The compat path is enabled by default. Set `HIPFILE_ALLOW_COMPAT_MODE=true` only if you have
-  previously disabled it and need to re-enable it.
-- Unlike the `O_DIRECT` path, the compat path does not require transfer sizes to be a multiple of
+- The fallback backend is enabled by default. It is only disabled when `HIPFILE_ALLOW_COMPAT_MODE`
+  is set to `false`.
+- Unlike the fastpath backend, the fallback backend does not require transfer sizes to be a multiple of
   the filesystem's logical block size, so the exact payload size can be written directly.
 
 ## Demonstrated API Calls

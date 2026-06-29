@@ -2,7 +2,7 @@
 
 ## Description
 
-This program demonstrates writing a GPU memory buffer to a file using hipFile with explicit buffer
+This example demonstrates writing a GPU memory buffer to a file using hipFile with explicit buffer
 registration. Registering the GPU buffer with `hipFileBufRegister` before calling `hipFileWrite`
 enables hipFile to take the GPU-direct I/O fast path, bypassing the internal pool copy that would
 otherwise be required for unregistered buffers.
@@ -16,7 +16,7 @@ otherwise be required for unregistered buffers.
 4. The output file is opened with `O_DIRECT` and registered with hipFile via
    `hipFileHandleRegister`.
 5. `hipFileWrite` writes the block-aligned buffer to the file.
-6. `ftruncate` trims the file to the exact logical payload size (the write may have been rounded up
+6. `ftruncate` trims the file to the exact logical payload size (the write might have been rounded up
    to the block boundary required by `O_DIRECT`).
 7. The CPU pattern is hashed and the written file is read back and hashed via plain POSIX I/O.
    The hashes are compared to verify the transfer was lossless.
