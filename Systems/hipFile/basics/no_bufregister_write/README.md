@@ -2,7 +2,7 @@
 
 ## Description
 
-This program demonstrates writing a GPU buffer to a file using hipFile *without* explicitly
+This example demonstrates writing a GPU buffer to a file using hipFile *without* explicitly
 registering the buffer with `hipFileBufRegister`. When the source buffer is unregistered, hipFile
 routes the data through its own internal pool buffer, performing an extra copy from device to the
 pool before the I/O is issued. The result is identical to the registered case but the transfer
@@ -18,7 +18,7 @@ or desired.
 2. A deterministic byte pattern (default 1 MiB) is generated in CPU memory and copied to a
    GPU buffer allocated with `hipMalloc`.
 3. The output file is opened with `O_DIRECT` and registered with hipFile via
-   `hipFileHandleRegister` (only the file handle is registered — the GPU buffer is not).
+   `hipFileHandleRegister` (only the file handle is registered, not the GPU buffer).
 4. `hipFileWrite` writes the block-aligned buffer to the file. Because the buffer is unregistered,
    hipFile copies through its internal pool buffer.
 5. `ftruncate` trims the file to the exact logical payload size.

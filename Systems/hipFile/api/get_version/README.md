@@ -2,8 +2,8 @@
 
 ## Description
 
-This program demonstrates how to query the hipFile library version at both compile time and runtime.
-It is the simplest possible hipFile program and a useful first check that the library is installed
+This example demonstrates how to query the hipFile library version at both compile time and runtime.
+This simple hipFile example is a useful first check that the library is installed
 and visible to the build system.
 
 ### Application flow
@@ -23,7 +23,7 @@ and visible to the build system.
   specific hipFile version.
 - `hipFileGetVersion` queries the runtime library for its version numbers. Comparing the compile-time
   and runtime versions is good practice when deploying to systems where the installed library version
-  may differ from the one used during development.
+  might differ from the one used during development.
 - `hipFileError_t` is the unified error type returned by most hipFile API calls. It bundles a
   hipFile-specific error code (`err`) with an underlying HIP driver error code (`hip_drv_err`).
 

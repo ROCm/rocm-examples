@@ -2,14 +2,14 @@
 
 ## Description
 
-This program demonstrates reading a file into a registered GPU buffer in fixed-size chunks by
+This example demonstrates reading a file into a registered GPU buffer in fixed-size chunks by
 advancing the `buf_offset` parameter on each call while keeping the base device pointer fixed.
 This is the registered-buffer counterpart to the `iterative_read` example, which advances the
 raw pointer instead.
 
-Using a fixed registered base pointer and advancing `buf_offset` is the preferred pattern when
-the buffer has been registered with `hipFileBufRegister`, because the driver can perform
-validation checks once at registration time rather than on every call.
+Because the driver can perform validation checks once at registration time rather than on every
+call, using a fixed registered base pointer and advancing `buf_offset` is preferred when the
+buffer has been registered with `hipFileBufRegister`.
 
 ### Application flow
 
@@ -34,9 +34,8 @@ validation checks once at registration time rather than on every call.
   modify the base pointer.
 - `buf_offset` in `hipFileRead` / `hipFileWrite` specifies the byte offset within the GPU buffer
   at which the transfer begins or ends. Advancing this parameter on each iteration is more
-  efficient for registered buffers than advancing the raw pointer, because the driver can cache
-  the registration metadata.
-- Compare with `iterative_read`, which advances the raw pointer without registration.
+  efficient for registered buffers than advancing the raw pointer (as `iterative_read` does)
+  because the driver can cache the registration metadata.
 
 ## Demonstrated API Calls
 
