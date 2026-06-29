@@ -7,6 +7,7 @@ ARG GLSLANG_VERSION=13.1.1
 # GPU_TARGET and THEROCK_FAMILY are set at workflow runtime, not in the base image
 ENV VULKAN_SDK_VERSION=${VULKAN_SDK_VERSION}
 
+# libquadmath: amdflang links against libquadmath.so.0 at runtime (TheRock#3290)
 RUN dnf install -y dnf-plugins-core && \
     dnf config-manager --set-enabled powertools && \
     dnf update -y && \
@@ -33,7 +34,8 @@ RUN dnf install -y dnf-plugins-core && \
         libXi-devel \
         libXinerama-devel \
         libXrandr-devel \
-        libatomic && \
+        libatomic \
+        libquadmath && \
     dnf clean all
 
 # GCC 8's libstdc++fs has an ABI-incompatible std::filesystem::path layout vs
@@ -43,8 +45,8 @@ ENV PATH="/opt/rh/gcc-toolset-13/root/usr/bin:${PATH}" \
     LD_LIBRARY_PATH="/opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13"
 
 # ============================================================================
-# Python virtual environment (ready for ROCm wheel or tarball installation)
-# ROCm installation is delegated to the CI workflow to support both methods
+# Python virtual environment (ready for multi-arch ROCm installation)
+# ROCm installation is delegated to the CI workflow (whl-multi-arch or tarball-multi-arch)
 # ============================================================================
 
 RUN python3.11 -m venv /opt/venv && \

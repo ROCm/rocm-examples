@@ -31,6 +31,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 option(ROCM_EXAMPLES_ENABLE_CK "Enable Composable Kernel examples (disabled by default)" OFF)
 option(ROCM_EXAMPLES_ENABLE_ROCDECODE "Enable rocDecode examples (enabled by default)" ON)
+option(ROCM_EXAMPLES_ENABLE_HIPDNN "Enable hipDNN examples (enabled by default)" ON)
 
 # CMake configuration files for CUDA versions of HIP libraries are not yet
 # included under the HIP SDK for Windows.
@@ -49,6 +50,15 @@ if(
         add_subdirectory(hipBLASLt)
     endif()
     add_subdirectory(hipCUB)
+    if(CMAKE_VERSION VERSION_LESS "3.25.2")
+        message(WARNING "CMake version < 3.25.2, not building hipDNN examples.")
+    else()
+        if (ROCM_EXAMPLES_ENABLE_HIPDNN)
+            add_subdirectory(hipDNN)
+        else()
+            message(STATUS "hipDNN examples disabled, not building hipDNN examples.")
+        endif()
+    endif()
     add_subdirectory(hipFFT)
     add_subdirectory(hipRAND)
     add_subdirectory(hipSOLVER)

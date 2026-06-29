@@ -28,7 +28,8 @@ EXAMPLES := \
   plan_z2z \
   setworkarea
 
-SKIP_FROM_TEST :=
+# ROCm/rocm-systems#7263: static device symbols in rocFFT callbacks abort at runtime
+SKIP_FROM_TEST := callback
 
 ifneq ($(GPU_RUNTIME), CUDA)
   EXAMPLES += \

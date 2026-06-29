@@ -26,6 +26,7 @@ EXAMPLES := \
   fdtd \
   floyd_warshall \
   histogram \
+  optical_flow \
   prefix_sum
 
 SKIP_FROM_TEST :=

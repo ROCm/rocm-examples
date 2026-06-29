@@ -26,6 +26,7 @@ SUB_PROJECTS := \
   HIP-Doc \
   Libraries \
   Programming-Guide \
+  Systems \
   Tools
 
 SKIP_FROM_TEST :=

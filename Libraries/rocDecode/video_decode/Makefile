@@ -30,16 +30,10 @@ REQUIRED_DEPS := FFMPEG
 include $(COMMON_INCLUDE_DIR)/require_deps.mk
 
 include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
-ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 UTILS_DIR := ${ROCM_PATH}/share/rocdecode/utils
-
-HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
-ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
-
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Detect which rocdecode host library is available
 ROCDECODE_HOST_LIB := $(shell if [ -f $(ROCM_PATH)/lib/librocdecode-host.so ]; then \
@@ -47,6 +41,28 @@ ROCDECODE_HOST_LIB := $(shell if [ -f $(ROCM_PATH)/lib/librocdecode-host.so ]; t
                               elif [ -f $(ROCM_PATH)/lib/librocdecodehost.so ]; then \
                                   echo "rocdecodehost"; \
                               fi)
+
+# rocDecode ships its shared utility sources under $(ROCM_PATH)/share/rocdecode/utils
+# (tarball) and with the amdrocm-decode-test package. They are not available with pip
+# wheels but are required to build this example; skip it if they are not installed.
+ifeq ($(wildcard $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp),)
+    $(info $(EXAMPLE): Skipping build — rocDecode utility sources not found under $(UTILS_DIR))
+    SKIP_BUILD := 1
+endif
+# When the host decode library is present, the host utility source is compiled in too.
+ifneq ($(ROCDECODE_HOST_LIB),)
+    ifeq ($(wildcard $(UTILS_DIR)/ffmpegvideodecode/ffmpeg_video_dec.cpp),)
+        $(info $(EXAMPLE): Skipping build — rocDecode host utility source ffmpeg_video_dec.cpp not found under $(UTILS_DIR))
+        SKIP_BUILD := 1
+    endif
+endif
+
+ifneq ($(SKIP_BUILD),1)
+
+HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
+ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 # Common variables and flags
 CXX_STD   := c++17

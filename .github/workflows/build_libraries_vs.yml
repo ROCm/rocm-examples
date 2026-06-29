@@ -63,12 +63,6 @@ jobs:
                   Write-Host "Detected HIP SDK version: $version"
                   echo "HIP_PATH=$hip_path" >> $env:GITHUB_ENV
                   echo "PLATFORM_TOOLSET_VERSION=$version" >> $env:GITHUB_ENV
-          - name: Apply patch
-            run: |
-                  Write-Host "Applying patches $(Get-ChildItem -File Scripts\VisualStudio\0002-Revert-Rename-hipblas-dll-for-HIP-SDK-7.1.patch)"
-                  git apply (Get-ChildItem -File Scripts\VisualStudio\0002-Revert-Rename-hipblas-dll-for-HIP-SDK-7.1.patch).FullName
-                  Write-Host "Patches applied. Showing diff"
-                  git diff
           - name: Build ${{ matrix.config }} x64 ${{ matrix.vsversion }}
             run: |
                   Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang .\..' | Select-Object -First 1).Matches.Value) with HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}"

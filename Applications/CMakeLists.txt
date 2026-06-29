@@ -42,6 +42,7 @@ add_subdirectory(convolution)
 add_subdirectory(floyd_warshall)
 add_subdirectory(histogram)
 add_subdirectory(prefix_sum)
+add_subdirectory(optical_flow)
 
 if(NOT CXX_FS_HEADER_FOUND)
     message(WARNING "filesystem not found, not building fdtd example")

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.36227.6
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D968C2EA-EF75-41F0-98E9-C63800D7F759}") = "low_precision_float_fp8_vs2019", "low_precision_float_fp8_vs2019.vcxproj", "{F2987142-A949-4600-B73E-E8098CE7A06D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Debug|x64.ActiveCfg = Debug|x64
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Debug|x64.Build.0 = Debug|x64
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Release|x64.ActiveCfg = Release|x64
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DA0266BC-A008-4335-AEF9-EA48CB2978CB}
+	EndGlobalSection
+EndGlobal

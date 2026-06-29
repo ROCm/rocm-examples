@@ -482,6 +482,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "kmeans_vs2019", "HIP-Doc\Tu
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "matrix_multiply_vs2019", "HIP-Doc\Tutorials\Programming-Patterns\matrix_multiplication\matrix_multiply_vs2019.vcxproj", "{D9432180-B518-41B6-8528-9B376AC64E38}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Low-Precision-Floating-Point-Types", "Low-Precision-Floating-Point-Types", "{0E26EE0A-F981-4C2F-A6C9-ABFF1C4073A3}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "low_precision_float_fp8_vs2019", "HIP-Doc\Reference\Low-Precision-Floating-Point-Types\low_precision_float_fp8\low_precision_float_fp8_vs2019.vcxproj", "{F2987142-A949-4600-B73E-E8098CE7A06D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -1240,6 +1244,10 @@ Global
 		{D9432180-B518-41B6-8528-9B376AC64E38}.Debug|x64.Build.0 = Debug|x64
 		{D9432180-B518-41B6-8528-9B376AC64E38}.Release|x64.ActiveCfg = Release|x64
 		{D9432180-B518-41B6-8528-9B376AC64E38}.Release|x64.Build.0 = Release|x64
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Debug|x64.ActiveCfg = Debug|x64
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Debug|x64.Build.0 = Debug|x64
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Release|x64.ActiveCfg = Release|x64
+		{F2987142-A949-4600-B73E-E8098CE7A06D}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1480,6 +1488,8 @@ Global
 		{4193637D-2E62-45D4-8B3A-76E976B9573F} = {F072C6D1-5BF9-45D8-849A-CED826ACDF3B}
 		{B7897A08-43B2-4663-BD32-C670B11BE591} = {F072C6D1-5BF9-45D8-849A-CED826ACDF3B}
 		{D9432180-B518-41B6-8528-9B376AC64E38} = {F072C6D1-5BF9-45D8-849A-CED826ACDF3B}
+		{0E26EE0A-F981-4C2F-A6C9-ABFF1C4073A3} = {A9331406-51A9-49FE-A738-F9A845800984}
+		{F2987142-A949-4600-B73E-E8098CE7A06D} = {0E26EE0A-F981-4C2F-A6C9-ABFF1C4073A3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {90580497-38BF-428E-A951-6EC6CFC68193}

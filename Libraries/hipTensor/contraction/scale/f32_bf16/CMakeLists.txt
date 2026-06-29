@@ -34,28 +34,21 @@ endif()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-# see https://rocm.docs.amd.com/projects/hipTensor/en/latest/install/installation.html#gpu-support
-set(HIPTENSOR_SUPPORTED_ARCH gfx908 gfx90a gfx942 gfx950)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/ROCmPath.cmake")
 
-foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
-    if(NOT ARCH IN_LIST HIPTENSOR_SUPPORTED_ARCH)
-        message(FATAL_ERROR "hipTensor does not support architecture: ${ARCH}, not building hipTensor examples")
-    endif()
-endforeach()
+find_package(hiptensor REQUIRED)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/FilterHIPArchitectures.cmake")
+hiptensor_get_supported_architectures(HIPTENSOR_SUPPORTED_ARCHS)
+filter_hip_architectures("hipTensor" "${HIPTENSOR_SUPPORTED_ARCHS}" SHOULD_SKIP)
+if(SHOULD_SKIP)
+    return()
+endif()
 
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 select_hip_platform()
-
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(STATUS "hipTensor examples are only available on Linux")
-    return()
-endif()
-
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/ROCmPath.cmake")
-
-find_package(hiptensor REQUIRED)
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
@@ -71,3 +64,7 @@ target_include_directories(
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    install(IMPORTED_RUNTIME_ARTIFACTS hiptensor)
+endif()

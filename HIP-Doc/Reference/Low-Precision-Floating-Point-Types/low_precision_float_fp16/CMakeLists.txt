@@ -32,6 +32,10 @@ endif()
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
 select_gpu_language()
 
+if(${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
+    message(FATAL_ERROR "This example is not supported for the CUDA runtime.")
+endif()
+
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
@@ -44,9 +48,7 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
-                                                 $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
-target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
-target_include_directories(${example_name} PRIVATE ${include_dirs} $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
+set_target_properties(${example_name} PROPERTIES HIP_EXTENSIONS OFF)
+target_compile_features(${example_name} PRIVATE hip_std_17)
 
 install(TARGETS ${example_name})

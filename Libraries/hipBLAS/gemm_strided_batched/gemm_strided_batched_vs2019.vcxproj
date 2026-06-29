@@ -26,13 +26,13 @@
     <ClInclude Include="..\..\..\External\CmdParser\cmdparser.hpp" />
   </ItemGroup>
   <ItemGroup Condition="'$(PlatformToolset)'=='HIP clang $(HIPVersion)'">
-    <Content Include="$(HIPExecutablePath)\libhipblas.dll">
+    <Content Include="$(HIPExecutablePath)\hipblas.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="$(HIPExecutablePath)\rocblas.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(HIPExecutablePath)\libhipblaslt.dll">
+    <Content Include="$(HIPExecutablePath)\hipblaslt.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <ContentWithTargetPath Include="$(HIPExecutablePath)\rocblas\**">

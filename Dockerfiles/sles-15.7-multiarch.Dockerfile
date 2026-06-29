@@ -30,17 +30,42 @@ RUN zypper -qni update -y && \
         libXrandr-devel && \
     zypper clean -a
 
+# GCC 7 (SLES 15 default) eagerly evaluates static_assert(false) in
+# uninstantiated templates, which breaks hipDNN SDK headers. GCC 13 defers
+# evaluation until instantiation (P2593R1).
+# gcc13-c++ is not in the SLES base image and SUSEConnect requires registration,
+# so we pull it from the openSUSE Leap 15.6 OSS repo (binary-compatible with SLE 15).
+RUN zypper -qni addrepo -G https://download.opensuse.org/distribution/leap/15.6/repo/oss/ leap-oss && \
+    zypper -qni install -y gcc13-c++ libstdc++6-devel-gcc13 && \
+    update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 && \
+    update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130 && \
+    update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 130 && \
+    update-alternatives --install /usr/bin/c++ c++ /usr/bin/g++-13 130 && \
+    zypper clean -a
+
+# TheRock's tarball builds require elfutils >= 0.186 but SLES 15.7 ships 0.177.
+WORKDIR /tmp
+RUN zypper -qni install -y bzip2 m4 zlib-devel && \
+    wget https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2 && \
+    tar -xjf elfutils-0.186.tar.bz2 && \
+    cd elfutils-0.186 && \
+    ./configure --disable-debuginfod --disable-libdebuginfod && \
+    make -j$(nproc) && \
+    make install && \
+    ldconfig && \
+    cd /tmp && \
+    rm -rf elfutils-0.186* && \
+    zypper clean -a
+
 # ============================================================================
-# Python virtual environment (ready for ROCm wheel or tarball installation)
-# ROCm installation is delegated to the CI workflow to support both methods
+# Python virtual environment (ready for multi-arch ROCm installation)
+# ROCm installation is delegated to the CI workflow (whl-multi-arch or tarball-multi-arch)
 # ============================================================================
 
-# Create virtual environment with base packages
 RUN python3.13 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
     /opt/venv/bin/pip install pyyaml cmake
 
-# Set up virtual environment in PATH
 ENV PATH="/opt/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/opt/venv"
 
@@ -67,7 +92,7 @@ ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib"
 ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
 
-# build ffmpeg from source
+# Build FFmpeg from source (not available in SLES repos)
 WORKDIR /tmp
 RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
     tar -xvf ffmpeg-4.4.6.tar.xz && \
