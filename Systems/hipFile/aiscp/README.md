@@ -2,7 +2,7 @@
 
 ## Description
 
-This program implements a minimal file-copy utility called **aiscp** (AMD Infinity Storage Copy).
+This example implements a minimal file-copy utility called **aiscp** (AMD Infinity Storage Copy).
 It copies a source file to a destination file by routing data through GPU memory using hipFile,
 demonstrating GPU-direct storage I/O in the most straightforward possible context.
 
@@ -19,7 +19,7 @@ the copy proceeds in chunks until the entire source has been transferred.
 5. The source is read chunk-by-chunk with `hipFileRead` into the GPU buffer. Each chunk is written
    in full to the destination with `hipFileWrite` before the next read begins.
 6. After all chunks are transferred, `ftruncate` trims the destination to the exact source size
-   (the final write may have been padded to satisfy the block-alignment requirement of O_DIRECT).
+   (the final write might have been padded to satisfy the block-alignment requirement of O_DIRECT).
 7. All resources are released in reverse order of acquisition.
 
 ## Key APIs and Concepts

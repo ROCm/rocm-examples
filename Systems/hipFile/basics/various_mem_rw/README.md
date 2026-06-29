@@ -2,7 +2,7 @@
 
 ## Description
 
-This program demonstrates that hipFile can transfer data through three different memory backing
+This example demonstrates that hipFile can transfer data through three different memory backing
 types: device memory (allocated with `hipMalloc`), managed memory (`hipMallocManaged`), and
 pinned host memory (`hipHostMalloc`). A command-line `MODE` argument selects the memory type at
 runtime. The transfer path (file → GPU buffer → file) and the verification step are identical
@@ -18,7 +18,7 @@ across all three modes.
 6. The output file is opened with `O_DIRECT` and registered. `hipFileWrite` writes the buffer to
    the output file in a single call. `ftruncate` trims the file to the logical payload size.
 7. Both files are hashed via plain POSIX I/O. The hashes are compared to verify correctness.
-8. All resources are released using the appropriate free function for the selected memory type.
+8. All resources are released.
 
 ## Key APIs and Concepts
 
@@ -26,7 +26,7 @@ across all three modes.
   reading into or writing from device memory. Explicit buffer registration is not required.
 - **Managed memory** (`hipMallocManaged`): Unified memory accessible from both CPU and GPU.
   hipFile transfers managed memory without requiring explicit buffer registration. Page migration
-  may occur depending on hardware and driver support.
+  might occur depending on hardware and driver support.
 - **Pinned host memory** (`hipHostMalloc`): Memory pinned in host physical RAM and accessible by
   the GPU via DMA. hipFile can use it for transfers without explicit buffer registration, though
   performance characteristics differ from device memory.

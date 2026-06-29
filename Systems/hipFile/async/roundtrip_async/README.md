@@ -2,10 +2,10 @@
 
 ## Description
 
-This program demonstrates asynchronous GPU-direct I/O using hipFile on the HIP default stream
-(stream 0). A read and a write are both submitted asynchronously on the same stream; HIP
-guarantees that operations on the same stream execute in submission order, so the write sees
-the data deposited by the read without an intermediate explicit synchronization.
+This example demonstrates asynchronous GPU-direct I/O using hipFile on the HIP default stream
+(stream 0). A read and a write are both submitted asynchronously on the same stream. HIP
+guarantees that operations on the same stream run in submission order. The write therefore
+operates on data already deposited by the read, with no intermediate explicit synchronization.
 
 ### Application flow
 
@@ -18,7 +18,7 @@ the data deposited by the read without an intermediate explicit synchronization.
 5. Both files are opened with `O_DIRECT` and registered with hipFile.
 6. `hipFileReadAsync` is submitted on the default stream (stream 0). `hipFileWriteAsync` is
    submitted on the same stream immediately after. Because both operations are on the same stream,
-   the write is guaranteed to execute after the read completes.
+   the write is guaranteed to start after the read completes.
 7. `hipStreamSynchronize(0)` blocks until both operations complete. The byte counts are checked.
 8. `ftruncate` trims the output file to the logical payload size.
 9. Both files are hashed via plain POSIX I/O and compared.
@@ -30,9 +30,9 @@ the data deposited by the read without an intermediate explicit synchronization.
   The operations complete asynchronously with respect to the host; call `hipStreamSynchronize`
   to wait for completion.
 - The `size`, `file_offset`, and `buf_offset` parameters to the async calls are taken **by
-  pointer** because the driver may update them at completion time. These values must stay valid
+  pointer** because the driver might update them at completion time. These values must stay valid
   (in scope and unmodified) until `hipStreamSynchronize` returns.
-- Submitting a read and a write on the **same stream** provides implicit ordering — the write
+- Submitting a read and a write on the **same stream** provides implicit ordering: the write
   will not begin until the read has finished. Submitting them on different streams would require
   an explicit synchronization event between them.
 - `hipFileBufRegister` is called before the async operations to ensure the GPU-direct path is

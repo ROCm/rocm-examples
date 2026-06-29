@@ -2,10 +2,10 @@
 
 ## Description
 
-This program demonstrates using hipFile's `buf_offset` parameter in `hipFileWrite` to write only
+This example demonstrates using hipFile's `buf_offset` parameter in `hipFileWrite` to write only
 a trailing sub-region of a GPU buffer to an output file. The full input file is first read into
 a registered GPU buffer, and then only the bytes at or after `SW_SUB_OFFSET` (default 8192 bytes)
-are written to the output — using `buf_offset` to skip the leading portion without moving data
+are written to the output, using `buf_offset` to skip the leading portion without moving data
 in the GPU buffer.
 
 ### Application flow
@@ -30,11 +30,10 @@ in the GPU buffer.
   which the transfer begins. Combined with a zero `file_offset`, this lets the caller write a
   contiguous sub-region of the GPU buffer to the beginning of the output file without any
   intermediate data movement.
-- `SW_SUB_OFFSET` must be a multiple of the filesystem's logical block size because the write is
-  issued with `O_DIRECT`. The alignment requirement applies to the effective start address in
-  the registered buffer, which is `base + buf_offset`.
+- Because the write is issued with `O_DIRECT`, `SW_SUB_OFFSET` must be a multiple of the
+  filesystem's logical block size.
 - `hipFileBufRegister` is required for non-zero `buf_offset` to work correctly on the GPU-direct
-  fast path.
+  fastpath backend.
 
 ## Demonstrated API Calls
 

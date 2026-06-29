@@ -2,8 +2,8 @@
 
 ## Description
 
-This program demonstrates reading a file into GPU memory in fixed-size chunks by advancing the
-destination pointer into the GPU buffer on each iteration — rather than using a fixed base
+This example demonstrates reading a file into GPU memory in fixed-size chunks by advancing the
+destination pointer into the GPU buffer on each iteration, rather than using a fixed base
 pointer with a varying `buf_offset`. After all chunks are read, the full GPU buffer is written to
 an output file in a single call, and the two files are verified to match.
 
@@ -29,8 +29,8 @@ the GPU buffer at one time, or when the caller wants to process each chunk indep
 
 - `hipFileRead` accepts a raw pointer into GPU memory, a transfer size, a `file_offset`, and a
   `buf_offset`. Advancing the raw pointer (`buf`) each iteration while keeping `buf_offset` at
-  zero is the unregistered-buffer pattern for iterative reads. For registered buffers, prefer
-  advancing `buf_offset` with a fixed base pointer (see `iterative_devmem_offset_read`).
+  zero is the unregistered-buffer pattern for iterative reads. Advancing `buf_offset` with a
+  fixed base pointer (see `iterative_devmem_offset_read`) is preferred for registered buffers.
 - Chunk sizes must be multiples of the filesystem's logical block size when `O_DIRECT` is in use.
 - `hipFileWrite` can write from a raw device pointer (no explicit buffer registration required),
   using the internal pool buffer if the pointer is unregistered.
