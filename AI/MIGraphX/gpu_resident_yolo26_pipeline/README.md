@@ -5,7 +5,7 @@
 ## Description
 
 This example keeps a video frame on the GPU from decode through to detection
-on AMD hardware. The on-chip VCN engine decodes the bitstream via
+on AMD Radeon™ and AMD Instinct™ hardware. The on-chip VCN engine decodes the bitstream via
 [rocDecode](https://rocm.docs.amd.com/projects/rocDecode/en/latest/),
 [DLPack](https://github.com/dmlc/dlpack) hands the decoded surface to PyTorch
 as a zero-copy view, YOLO preprocessing runs on the active HIP stream, and
@@ -51,12 +51,11 @@ cross the PCIe bus. An OpenCV CPU-decode path is provided as a baseline.
 - `decoder.DecodeFrame`, `decoder.GetFrameRgb`, `decoder.ReleaseFrame`
 - `demuxer.DemuxFrame`, `demuxer.GetCodecId`, `demuxer.GetBitDepth`
 
-### MIGraphX (Python)
+### MIGraphX
 
-- `migraphx.parse_onnx`, `migraphx.quantize_fp16`, `migraphx.save`,
-  `migraphx.load`
+- `migraphx-driver compile` (CLI: ONNX parse, FP16 quantize, GPU compile, save)
+- `migraphx.load` (Python)
 - `migraphx.program.run_async`, `migraphx.argument_from_pointer`
-- `migraphx.get_target`
 
 ### PyTorch and DLPack
 
@@ -96,15 +95,41 @@ apt-get install -y --no-install-recommends \
 export PYTHONPATH=/opt/rocm/lib
 
 pip install -r requirements.txt
-python3 prepare_model.py    # exports YOLO26s ONNX, compiles to model.mxr
+```
+
+### Compile the model
+
+The pipeline runs a compiled MIGraphX `.mxr` model, built from a YOLO26 detector
+exported to ONNX. Every variant of the Ultralytics
+[YOLO26 family](https://docs.ultralytics.com/models/yolo26/) shares the same
+end-to-end head, so the pipeline works with any of them. That head emits a
+`[1, 300, 6]` tensor (`[x1, y1, x2, y2, conf, class_id]` per row) and skips NMS.
+
+Ultralytics provides the tooling to export the model to ONNX format; see their
+[export documentation](https://docs.ultralytics.com/modes/export/) for details.
+
+With the exported ONNX graph in the working directory, compile it into a GPU-tuned
+MIGraphX `.mxr` binary with the `migraphx-driver` CLI. `--fp16` quantizes the graph
+to FP16 for faster inference:
+
+```bash
+migraphx-driver compile yolo26.onnx --onnx --gpu --fp16 --binary -o model.mxr
 ```
 
 ## Run
 
 ```bash
-python3 main.py --decoder rocdecode --input data/peloton_sample_ai_gen.mp4 --output output.mp4
-python3 main.py --decoder opencv    --input data/peloton_sample_ai_gen.mp4 --output output_cv.mp4
+python3 main.py --decoder rocdecode --model model.mxr --input data/peloton_sample_ai_gen.mp4 --output output.mp4
+python3 main.py --decoder opencv    --model model.mxr --input data/peloton_sample_ai_gen.mp4 --output output_cv.mp4
 ```
 
 `main.py --help` lists every flag. The script prints average per-frame
 `predict()` and full-pipeline latencies on exit.
+
+Note: The first `--decoder rocdecode` run might be slower while the rocDecode decoder session and the MIGraphX kernels initialize on the first frames; subsequent runs reflect steady-state performance.
+
+The bundled `data/peloton_sample_ai_gen.mp4` clip is fully AI-generated and
+provided for demonstration purposes only. Sample media generated using
+[Qwen-Image-2512](https://huggingface.co/Qwen/Qwen-Image-2512) and
+[Wan 2.2 I2V-A14B](https://huggingface.co/Wan-AI/Wan2.2-I2V-A14B) (Apache 2.0
+licensed models).
