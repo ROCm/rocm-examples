@@ -26,7 +26,7 @@ EXTERNAL_DIR := ../../../../External
 GPU_RUNTIME ?= HIP
 
 # Supported GPU architectures for hipTensor
-SUPPORTED_HIP_ARCHITECTURES := gfx908 gfx90a gfx942 gfx950
+SUPPORTED_HIP_ARCHITECTURES := gfx908 gfx90a gfx942 gfx950 gfx1100 gfx1101 gfx1102 gfx1103 gfx1150 gfx1151 gfx1152 gfx1153 gfx11-generic gfx1200 gfx1201 gfx1250 gfx12-generic
 include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 
 # HIP variables
