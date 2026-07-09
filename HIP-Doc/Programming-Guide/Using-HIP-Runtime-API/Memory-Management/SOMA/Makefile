@@ -21,6 +21,8 @@
 # SOFTWARE.
 
 EXAMPLES := \
+  ipc_memory_pool_device_pointer \
+  ipc_memory_pool_shareable_handle \
   memory_pool \
   memory_pool_resource_usage_statistics \
   memory_pool_threshold \

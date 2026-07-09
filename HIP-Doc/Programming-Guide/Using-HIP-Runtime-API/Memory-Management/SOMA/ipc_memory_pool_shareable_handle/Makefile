@@ -20,27 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-SOMA LANGUAGES CXX)
+EXAMPLE := hip_ipc_memory_pool_shareable_handle
+GPU_RUNTIME ?= HIP
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+# HIP variables
+ROCM_PATH ?= /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "The memory pool examples are available only on Linux.")
-else()
-    add_subdirectory(ipc_memory_pool_device_pointer)
-    add_subdirectory(ipc_memory_pool_shareable_handle)
-    add_subdirectory(memory_pool)
-    add_subdirectory(memory_pool_resource_usage_statistics)
-    add_subdirectory(memory_pool_threshold)
-    add_subdirectory(memory_pool_trim)
-endif()
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
-add_subdirectory(ordinary_memory_allocation)
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "The stream ordered memory allocation example is available only on Linux.")
-else()
-    add_subdirectory(stream_ordered_memory_allocation)
-endif()
+ifeq ($(GPU_RUNTIME), CUDA)
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+  CXXFLAGS ?= -Wall -Wextra
+else
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
+endif
+
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+test:
+	@echo "Note: $(EXAMPLE) requires two cooperating processes and the amdgpu-dkms driver. See README.md for instructions."
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean test
