@@ -20,27 +20,30 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name hip_ipc_memory_pool_device_pointer)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-SOMA LANGUAGES CXX)
+project(${example_name} LANGUAGES CXX)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
-
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "The memory pool examples are available only on Linux.")
-else()
-    add_subdirectory(ipc_memory_pool_device_pointer)
-    add_subdirectory(ipc_memory_pool_shareable_handle)
-    add_subdirectory(memory_pool)
-    add_subdirectory(memory_pool_resource_usage_statistics)
-    add_subdirectory(memory_pool_threshold)
-    add_subdirectory(memory_pool_trim)
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    message(FATAL_ERROR "The IPC memory pool API is available only on Linux with the amdgpu-dkms driver.")
 endif()
 
-add_subdirectory(ordinary_memory_allocation)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    message(STATUS "The stream ordered memory allocation example is available only on Linux.")
-else()
-    add_subdirectory(stream_ordered_memory_allocation)
-endif()
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../Common/ROCmPath.cmake")
+
+add_executable(${example_name} main.hip)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                 $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
+target_include_directories(${example_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>)
+
+# Note: no ctest entry. This example requires two cooperating processes and
+# the amdgpu-dkms driver. See README.md for manual run instructions.
+
+install(TARGETS ${example_name})
