@@ -52,6 +52,8 @@ if(
     add_subdirectory(hipCUB)
     if(CMAKE_VERSION VERSION_LESS "3.25.2")
         message(WARNING "CMake version < 3.25.2, not building hipDNN examples.")
+    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" AND CMAKE_CXX_COMPILER_VERSION VERSION_LESS "13")
+        message(WARNING "GCC version < 13, not building hipDNN examples.")
     else()
         if (ROCM_EXAMPLES_ENABLE_HIPDNN)
             add_subdirectory(hipDNN)
