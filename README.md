@@ -538,7 +538,6 @@ The following options are available when building with CMake.
     - [rocjpeg_decode_batched](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/rocjpeg_decode_batched): Program that showcases decoding a batch of JPEG images.
     - [rocjpeg_decode_perf](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocJPEG/rocjpeg_decode_perf): Program that showcases performant decoding of JPEG images.
   - [rocFFT](/Libraries/rocFFT/)
-    - [callback](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocFFT/callback/): Program that showcases the use of rocFFT `callback` functionality.
     - [complex_complex](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocFFT/complex_complex/): Program that showcases a Fast Fourier Transform from complex to complex numbers.
     - [complex_real](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocFFT/complex_real/): Program that showcases a Fast Fourier Transform from complex to real numbers.
     - [multi_gpu](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocFFT/multi_gpu/): Program that showcases the use of rocFFT multi-GPU functionality.

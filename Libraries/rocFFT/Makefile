@@ -24,14 +24,10 @@
 ROCM_PATH ?= /opt/rocm
 
 EXAMPLES := \
-  callback \
   complex_complex \
   complex_real \
   multi_gpu \
   real_complex
-
-# ROCm/rocm-systems#7263: static device symbols in rocFFT callbacks abort at runtime
-SKIP_FROM_TEST := callback
 
 all: $(EXAMPLES)
 
@@ -42,6 +38,6 @@ $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
 test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+test: $(EXAMPLES)
 
 .PHONY: all clean test $(EXAMPLES)

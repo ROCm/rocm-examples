@@ -40,7 +40,6 @@ if(NOT rocFFT_FOUND)
     return()
 endif()
 
-add_subdirectory(callback)
 add_subdirectory(complex_complex)
 add_subdirectory(complex_real)
 add_subdirectory(multi_gpu)

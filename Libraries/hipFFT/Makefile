@@ -28,14 +28,6 @@ EXAMPLES := \
   plan_z2z \
   setworkarea
 
-# ROCm/rocm-systems#7263: static device symbols in rocFFT callbacks abort at runtime
-SKIP_FROM_TEST := callback
-
-ifneq ($(GPU_RUNTIME), CUDA)
-  EXAMPLES += \
-    callback
-endif
-
 all: $(EXAMPLES)
 
 clean: TARGET=clean
@@ -45,6 +37,6 @@ $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
 test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+test: $(EXAMPLES)
 
 .PHONY: all clean test $(EXAMPLES)
