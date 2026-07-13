@@ -56,5 +56,12 @@ add_test(
     NAME ${example_name}
     COMMAND ${example_name} "${HIPFILE_TEST_DIR}/no_odirect_write_out.bin"
 )
+set_tests_properties(${example_name} PROPERTIES FIXTURES_REQUIRED ${example_name}_fixture)
+
+add_test(
+    NAME ${example_name}_cleanup
+    COMMAND ${CMAKE_COMMAND} -E rm -f "${HIPFILE_TEST_DIR}/no_odirect_write_out.bin"
+)
+set_tests_properties(${example_name}_cleanup PROPERTIES FIXTURES_CLEANUP ${example_name}_fixture)
 
 install(TARGETS ${example_name})
