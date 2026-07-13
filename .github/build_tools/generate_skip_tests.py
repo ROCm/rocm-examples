@@ -9,13 +9,7 @@ import argparse
 import os
 
 # Tests to skip unconditionally on all targets/distros (upstream bugs in TheRock nightlies).
-GLOBAL_SKIP_TESTS = [
-    # ROCm/rocm-systems#7263: HIP CLR cannot resolve static device symbols via hipModuleGetGlobal.
-    # rocFFT's default store callback (store_cb_default_complex_double) is a static local
-    # function whose .static.<hash> mangled name causes an abort at runtime.
-    "hipfft_callback",
-    "rocfft_callback",
-]
+GLOBAL_SKIP_TESTS = []
 
 # Tests to skip per GPU target (one list per target that has skips)
 SKIP_TESTS = {
