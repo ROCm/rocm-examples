@@ -163,6 +163,7 @@ The following options are available when building with CMake.
   - [device_query](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
   - [dynamic_shared](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
   - [events](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/events/): Measuring execution time and synchronizing with HIP events.
+  - [execution_context](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/execution_context/): Shows how to partition a device's compute units into execution contexts so a critical kernel has resources reserved for it.
   - [gpu_arch](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/gpu_arch/): Program that showcases how to implement GPU architecture-specific code.
   - [hello_world](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/hello_world): Simple program that showcases launching kernels and printing from the device.
   - [hello_world_cuda](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/hello_world_cuda): Simple HIP program that showcases setting up CMake to target the CUDA platform.
