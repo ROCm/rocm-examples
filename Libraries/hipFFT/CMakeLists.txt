@@ -35,7 +35,6 @@ if(NOT hipfft_FOUND)
     return()
 endif()
 
-add_subdirectory(callback)
 add_subdirectory(multi_gpu)
 add_subdirectory(plan_d2z)
 add_subdirectory(plan_many_2d_r2c)
