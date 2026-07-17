@@ -57,6 +57,7 @@ endif
 ifneq ($(GPU_RUNTIME), CUDA)
   EXAMPLES += \
     assembly_to_executable \
+    cooperative_groups_double_buffered_tile \
     llvm_ir_to_executable \
     module_api \
     static_device_library

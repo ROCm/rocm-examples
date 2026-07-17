@@ -93,6 +93,11 @@ endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     add_subdirectory(cooperative_groups)
+    # This cooperative groups example uses AMD-specific extensions
+    # (cooperative_groups::memcpy_async) that are not available on the CUDA backend.
+    if(NOT "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
+        add_subdirectory(cooperative_groups_double_buffered_tile)
+    endif()
 endif()
 
 add_subdirectory(bandwidth)
