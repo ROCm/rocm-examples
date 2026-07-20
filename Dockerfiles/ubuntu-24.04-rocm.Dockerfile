@@ -22,6 +22,8 @@
 
 FROM ubuntu:24.04
 
+ARG ROCM_VERSION=7.14
+
 ENV DEBIAN_FRONTEND=noninteractive
 
 # ── System packages ───────────────────────────────────────────────────────────
@@ -61,7 +63,7 @@ RUN mkdir --parents --mode=0755 /etc/apt/keyrings && \
     apt update
 
 # Install ROCm
-RUN apt install -y amdrocm-core-sdk7.14
+RUN apt install -y amdrocm-core-sdk${ROCM_VERSION}
 
 WORKDIR /workspace
 CMD ["/bin/bash"]
