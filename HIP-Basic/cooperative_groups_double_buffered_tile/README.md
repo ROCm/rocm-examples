@@ -3,12 +3,14 @@
 ## Description
 
 This program showcases a double-buffered tile load pipeline built from two cooperative groups
-APIs: the group-collective `cooperative_groups::memcpy_async` and the split barrier
-(`barrier_arrive` / `barrier_wait`) of a `thread_block`.
+APIs: the group-collective `cooperative_groups::memcpy_async` and the split barrier of a
+`thread_block`. A split barrier decomposes an ordinary block barrier into two phases,
+`barrier_arrive` and `barrier_wait`, so that independent work can run between them instead of every
+thread blocking immediately.
 
 A single block streams a 1D array through two LDS (shared memory) buffers, one tile at a time.
-The async load of the next tile is issued into the other buffer while the current tile is consumed,
-and a split barrier separates the moment a thread has finished reading a buffer from the moment the
+The async load of the next tile is issued into the second buffer while the current tile is consumed.
+A split barrier separates the moment a thread has finished reading a buffer from the moment the
 block guarantees that every thread is done. The kernel applies the element-wise operation
 `out[i] = scale * in[i] + bias`, which is trivial to validate against a CPU reference.
 
@@ -23,13 +25,11 @@ thread by the next iteration. The split barrier additionally lets the current ti
 run as independent work between `barrier_arrive` and `barrier_wait`. Correctness (no data races,
 validated output) is the top priority.
 
-This example targets the AMD/HIP (ROCm) backend: the NVIDIA path of
-`<hip/cooperative_groups/memcpy_async.h>` is not yet implemented (the header carries a TODO for it),
-and it requires a ROCm version recent enough to ship that public header.
+This example targets the AMD/HIP (ROCm) backend, and it requires a ROCm version recent enough to ship `hip/cooperative_groups/memcpy_async.h`.
 
 ### Application flow
 
-1. A number of compile-time constants define the tile size (also the block size), the number of
+1. A number of compile-time constants define the tile size and block size, the number of
    tiles, the total element count, and the constants of the element-wise operation.
 2. The input array is set up in host memory and the output array is allocated.
 3. The input is copied to the device.
@@ -53,9 +53,10 @@ and it requires a ROCm version recent enough to ship that public header.
   group-collective copy that is designed for global <-> LDS transfers. Every thread of the group
   must call it collectively. **In HIP the `count` argument is expressed in bytes** (here `tile_size *
   sizeof(float)`). The copy is asynchronous and HIP exposes no separate wait handle, so its
-  completion is enforced by a following group barrier (`block.sync()` or the split barrier's
-  `barrier_wait`). On hardware or compilers without the asynchronous LDS builtins it falls back to a
-  correct traditional per-thread copy, so it always produces correct results.
+  completion is enforced by a following group barrier (`block.sync()` or
+  `barrier_wait`). On hardware or compilers without the asynchronous LDS builtins
+  `cooperative_groups::memcpy_async()` falls back to a
+  traditional per-thread copy, so it always produces correct results.
 - The split barrier decomposes a block barrier into two phases. `thread_block::barrier_arrive`
   signals that a thread has reached the barrier and returns an `arrival_token`; it emits a release
   fence and does not block, which exposes a window for independent work. `thread_block::barrier_wait`
