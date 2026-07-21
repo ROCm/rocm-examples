@@ -20,28 +20,48 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+EXAMPLE := rocfft_callback
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME ?= HIP
+
+ifneq ($(GPU_RUNTIME), HIP)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
+
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 
-EXAMPLES := \
-  callback \
-  complex_complex \
-  complex_real \
-  multi_gpu \
-  real_complex
+HIP_INCLUDE_DIR     := $(ROCM_PATH)/include
+ROCFFT_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-# ROCm/rocm-systems#7263: static device symbols in rocFFT callbacks abort at runtime
-SKIP_FROM_TEST := callback
 
-all: $(EXAMPLES)
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
-clean: TARGET=clean
-clean: all
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS := -isystem $(ROCFFT_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
+ILDFLAGS  := -L $(ROCM_PATH)/lib
+ILDLIBS   := -lrocfft
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
 
-test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+CXXFLAGS  ?= -Wall -Wextra
+ICPPFLAGS += -D__HIP_PLATFORM_AMD__ -isystem $(HIP_INCLUDE_DIR)
+ILDLIBS   += -lamdhip64
+COMPILER  := $(HIPCXX)
 
-.PHONY: all clean test $(EXAMPLES)
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
+
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/rocfft_utils.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean test

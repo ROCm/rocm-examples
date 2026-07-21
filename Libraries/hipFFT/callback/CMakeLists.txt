@@ -1,0 +1,65 @@
+# MIT License
+#
+# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
+set(example_name hipfft_callback)
+
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    message(STATUS "hipFFT callback example does not support the CUDA runtime")
+    return()
+endif()
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    message(STATUS "hipFFT callback example does not support windows")
+    return()
+endif()
+
+project(hipfft_callback LANGUAGES CXX HIP)
+
+# Set default build type to Release
+# to workaround a compiler issue when building with -O0
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+
+find_package(hipfft REQUIRED)
+
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+set(include_dirs "../../../Common" "../../../External")
+
+target_link_libraries(${example_name} PRIVATE hip::hipfft)
+target_include_directories(${example_name} PRIVATE ${include_dirs})
+target_compile_options(${example_name} PRIVATE -fgpu-rdc)
+target_link_options(${example_name} PRIVATE -fgpu-rdc)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE HIP)
+
+install(TARGETS ${example_name})

@@ -20,25 +20,40 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name rocfft_callback)
+
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipFFT_examples LANGUAGES CXX)
-include(CTest)
+project(${example_name} LANGUAGES CXX HIP)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
-
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
-
-find_package(hipfft QUIET)
-if(NOT hipfft_FOUND)
-    message(WARNING "hipFFT could not be found, not building hipFFT examples")
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    message(STATUS "rocFFT examples do not support the CUDA runtime")
     return()
 endif()
 
-add_subdirectory(callback)
-add_subdirectory(multi_gpu)
-add_subdirectory(plan_d2z)
-add_subdirectory(plan_many_2d_r2c)
-add_subdirectory(plan_many_2d_z2z)
-add_subdirectory(plan_z2z)
-add_subdirectory(setworkarea)
+# Set default build type to Release
+# to workaround a compiler issue when building with -O0
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_HIP_STANDARD 17)
+set(CMAKE_HIP_EXTENSIONS OFF)
+set(CMAKE_HIP_STANDARD_REQUIRED ON)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+
+find_package(rocfft REQUIRED)
+
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+set(include_dirs "../../../Common" "../../../External")
+
+target_link_libraries(${example_name} PRIVATE roc::rocfft)
+target_include_directories(${example_name} PRIVATE ${include_dirs})
+target_compile_options(${example_name} PRIVATE -fgpu-rdc)
+target_link_options(${example_name} PRIVATE -fgpu-rdc)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE HIP)
+
+install(TARGETS ${example_name})
