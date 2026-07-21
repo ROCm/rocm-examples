@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2024-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -55,6 +55,7 @@ __device__ double2 load_callback(double2* input,
 // Can not give __device__ function to HIP_SYMBOL
 __device__ auto load_callback_dev = load_callback;
 
+// NOTE: Function pointer callbacks are about to be deprecated, in favor of JIT callbacks.
 int main()
 {
     constexpr size_t N = 8;
