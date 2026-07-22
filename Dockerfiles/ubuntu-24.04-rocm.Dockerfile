@@ -66,9 +66,18 @@ RUN mkdir --parents --mode=0755 /etc/apt/keyrings && \
 RUN apt install -y \
         amdrocm-core-sdk${ROCM_VERSION} \
         amdrocm-hiptensor-dev${ROCM_VERSION} \
-        amdrocm-hiptensor-host${ROCM_VERSION} \
+        amdrocm-hiptensor${ROCM_VERSION} \
         amdrocm-rocalution-dev${ROCM_VERSION} \
-        amdrocm-rocalution-host${ROCM_VERSION}
+        amdrocm-rocalution${ROCM_VERSION}
+
+# Setup ROCm environment
+ENV PATH="/opt/rocm/bin:${PATH}"
+RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
+    && ldconfig
+ENV ROCM_PATH="/opt/rocm"
+
+# Python packages required by ROCm tooling
+RUN python3 -m pip install --no-cache-dir --break-system-packages pyyaml
 
 WORKDIR /workspace
 CMD ["/bin/bash"]
