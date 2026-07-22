@@ -63,7 +63,12 @@ RUN mkdir --parents --mode=0755 /etc/apt/keyrings && \
     apt update
 
 # Install ROCm
-RUN apt install -y amdrocm-core-sdk${ROCM_VERSION}
+RUN apt install -y \
+        amdrocm-core-sdk${ROCM_VERSION} \
+        amdrocm-hiptensor-dev${ROCM_VERSION} \
+        amdrocm-hiptensor-host${ROCM_VERSION} \
+        amdrocm-rocalution-dev${ROCM_VERSION} \
+        amdrocm-rocalution-host${ROCM_VERSION}
 
 WORKDIR /workspace
 CMD ["/bin/bash"]
