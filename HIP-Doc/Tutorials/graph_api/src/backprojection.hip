@@ -84,7 +84,8 @@ __global__ void backprojection_kernel(
     float d_so
 )
 {
-#ifndef __GFX9__ // GFX9 devices don't support texture instructions
+    // Guard against devices without image / texture support
+#if !defined(__HIP_NO_IMAGE_SUPPORT) || (__HIP_NO_IMAGE_SUPPORT == 0)
     auto const x_in = blockIdx.x * blockDim.x + threadIdx.x;
     auto const y_in = blockIdx.y * blockDim.y + threadIdx.y;
     auto z_in = blockIdx.z * blockDim.z + threadIdx.z;
