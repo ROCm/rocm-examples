@@ -2,6 +2,11 @@ name: Build Docker
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_latest:
+        description: 'Tag pushed images as latest'
+        type: boolean
+        default: false
   push:
     branches: [ amd-staging ]
     paths:
@@ -100,7 +105,7 @@ jobs:
             images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.image-tag.outputs.name }}
             tags: |
               type=raw,value=latest,enable={{is_default_branch}}
-              type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
+              type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_latest }}
               type=raw,value=${{ steps.rocm-version.outputs.version }},enable=${{ matrix.file == 'ubuntu-24.04-rocm.Dockerfile' && steps.rocm-version.outputs.version != '' }}
 
         - name: Build and push Docker image for ${{ matrix.file }}
