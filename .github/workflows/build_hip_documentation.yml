@@ -36,7 +36,7 @@ jobs:
             run: |
               cd HIP-Doc
               export CMAKE_POLICY_VERSION_MINIMUM="3.5"
-              cmake -DGPU_TARGETS="${GPU_TARGETS}" -S . -B build
+              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -S . -B build
               cmake --build build -j
           - name: Make
             run: |

@@ -33,7 +33,7 @@ jobs:
           - name: CMake Configure and Build
             run: |
               cd Tools
-              cmake -DGPU_TARGETS="${GPU_TARGETS}" -S . -B build
+              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -S . -B build
               cmake --build build -j
           - name: Make
             run: |
