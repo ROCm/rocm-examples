@@ -582,10 +582,7 @@ tool_fini(void* tool_data)
     // rocprofiler uses), so genuine ordering bugs are still catchable in strict CI.
     if(temporal_ordering_violations > 0)
     {
-        const char* strict_ts_env = std::getenv("ROCPROFILER_CI_STRICT_TIMESTAMPS");
-        const bool  strict_timestamps
-            = (strict_ts_env != nullptr && strict_ts_env[0] != '\0' && strict_ts_env[0] != '0');
-        if(strict_timestamps)
+        if(common::get_env_bool("ROCPROFILER_CI_STRICT_TIMESTAMPS", false))
             throw std::runtime_error{"temporal ordering violation in correlation id retirement"};
         std::cerr << "warning: temporal ordering violations detected (tolerated; set "
                      "ROCPROFILER_CI_STRICT_TIMESTAMPS=1 to fail instead)\n"
