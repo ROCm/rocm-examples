@@ -78,7 +78,7 @@ The following instructions showcase building the Docker image and full example s
 
 - `$ git clone https://github.com/ROCm/rocm-examples.git`
 - `$ cd rocm-examples/Dockerfiles`
-- `$ docker build . -t rocm-examples -f hip-libraries-rocm-ubuntu.Dockerfile --build-arg GID="$(getent group render | cut -d':' -f 3)"` (on ROCm) or `$ docker build . -t rocm-examples -f hip-libraries-cuda-ubuntu.Dockerfile` (on CUDA)
+- `$ docker build . -t rocm-examples -f ubuntu-24.04-rocm.Dockerfile` (on ROCm) or `$ docker build . -t rocm-examples -f hip-libraries-cuda-ubuntu.Dockerfile` (on CUDA)
 - `$ docker run -it --device /dev/kfd --device /dev/dri rocm-examples bash` (on ROCm) or `$ docker run -it --gpus=all rocm-examples bash` (on CUDA)
 - `# git clone https://github.com/ROCm/rocm-examples.git`
 - `# cd rocm-examples`

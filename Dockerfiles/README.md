@@ -13,9 +13,9 @@ docker build . -f <dockerfile> -t <result image name>
 
 ## List of Dockerfiles
 
-### HIP libraries on the ROCm platform based on Ubuntu
+### ROCm on Ubuntu 24.04
 
-Dockerfile: [hip-libraries-rocm-ubuntu.Dockerfile](hip-libraries-rocm-ubuntu.Dockerfile)
+Dockerfile: [ubuntu-24.04-rocm.Dockerfile](ubuntu-24.04-rocm.Dockerfile)
 
 This is environment is based on Ubuntu targeting the ROCm platform. It has the
 HIP runtime and the ROCm libraries installed. CMake is also installed in the image.
