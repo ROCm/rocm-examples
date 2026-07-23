@@ -58,6 +58,7 @@ ifneq ($(GPU_RUNTIME), CUDA)
   EXAMPLES += \
     assembly_to_executable \
     cooperative_groups_double_buffered_tile \
+    cooperative_groups_prefix_sum \
     llvm_ir_to_executable \
     module_api \
     static_device_library

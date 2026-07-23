@@ -161,6 +161,7 @@ The following options are available when building with CMake.
   - [bit_extract](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/bit_extract): Program that showcases how to use HIP built-in bit extract.
   - [cooperative_groups](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/cooperative_groups): Showcases the cooperative groups programming model with a block- and partition-level reduction.
   - [cooperative_groups_double_buffered_tile](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/cooperative_groups_double_buffered_tile): Double-buffered tile pipeline over a 1D array combining `memcpy_async` with a split barrier.
+  - [cooperative_groups_prefix_sum](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/cooperative_groups_prefix_sum): Inclusive and exclusive prefix sums (scans) using warp-sized cooperative groups tiles.
   - [device_globals](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/device_globals): Show cases how to set global variables on the device from the host.
   - [device_query](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
   - [dynamic_shared](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
