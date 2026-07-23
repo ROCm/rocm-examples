@@ -44,14 +44,6 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 set(include_dirs "../../Common" "../../External")
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_PATH}/include")
-else()
-    # Add NDEBUG for HIP version >= 5.5 and < 6.0 due to a known bug in the cooperative groups header
-    if(
-        ${hip-lang_VERSION} VERSION_GREATER_EQUAL 5.5
-        AND ${hip-lang_VERSION} VERSION_LESS 6
-    )
-        add_compile_definitions(NDEBUG)
-    endif()
 endif()
 
 target_include_directories(${example_name} PRIVATE ${include_dirs})
