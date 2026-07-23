@@ -17,8 +17,6 @@ concurrency:
   cancel-in-progress: true
 
 env:
-    ROCM_VERSION: '7.2'
-    AMDGPU_INSTALLER_VERSION: 7.2.70200-1
     GPU_TARGETS: gfx908;gfx90a;gfx942;gfx950;gfx1030;gfx1100;gfx1101;gfx1200;gfx1201
 
 jobs:
@@ -26,32 +24,12 @@ jobs:
         name: "Build ROCm tool examples"
         runs-on: ubuntu-latest
         container:
-            image: ubuntu:22.04
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14
         defaults:
             run:
                 shell: bash
         steps:
           - uses: actions/checkout@v4
-          - name: Install dependencies
-            run: |
-                  apt-get update -qq &&
-                  apt-get install -y build-essential elfutils g++ git glslang-tools wget python3 python3-pip \
-                    libboost-dev libiberty-dev libpapi-dev libopenmpi-dev libsqlite3-dev libtbb-dev libunwind-dev
-                  python3 -m pip install --upgrade pip
-                  python3 -m pip install cmake
-          - name: Install ROCm Dev
-            run: |
-                  export DEBIAN_FRONTEND=noninteractive
-                  wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
-                  apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
-                  apt-get update -qq &&
-                  apt-get -y install rocm-dev rocm-llvm-dev rocprofiler-compute rocprofiler-systems
-                  echo "/opt/rocm/bin" >> $GITHUB_PATH
-                  echo "ROCM_PATH=/opt/rocm" >> $GITHUB_ENV
-                  echo "LD_LIBRARY_PATH=/opt/rocm/lib:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
-                  apt-get autoclean
-          - name: Install rocprof-compute dependencies
-            run: python3 -m pip install -r /opt/rocm/libexec/rocprofiler-compute/requirements.txt
           - name: CMake Configure and Build
             run: |
               cd Tools
