@@ -120,6 +120,5 @@ jobs:
             context: Dockerfiles/
             file: Dockerfiles/${{ matrix.file }}
             push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
-            build-args: ${{ matrix.file == 'ubuntu-24.04-rocm.Dockerfile' && format('ROCM_VERSION={0}', steps.rocm-version.outputs.version) || '' }}
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
