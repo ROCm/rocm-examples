@@ -51,7 +51,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
 find_package(composable_kernel)
 if(NOT composable_kernel_FOUND)
-    message(STATUS "Composable Kernel could not be found, not building Composable Kernel examples")
+    message(WARNING "Composable Kernel could not be found, not building Composable Kernel examples")
 else()
     add_subdirectory(attention)
     add_subdirectory(basic)

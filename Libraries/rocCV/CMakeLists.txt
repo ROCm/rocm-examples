@@ -41,7 +41,7 @@ find_library(ROCCV_LIBRARY
 )
 
 if(NOT ROCCV_LIBRARY)
-    message(STATUS "rocCV could not be found, not building rocCV examples")
+    message(WARNING "rocCV could not be found, not building rocCV examples")
     return()
 endif()
 
