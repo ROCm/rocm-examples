@@ -351,16 +351,25 @@ int main()
         return 0;
     }
 
+    // Partitions must be a multiple of the device's co-scheduled CU alignment
+    // (the WGP granularity on AMD, typically 2). Requesting an unaligned count
+    // makes the split fail, so read the alignment and snap requests to it.
+    unsigned int cu_alignment = all_cu_resources.sm.smCoscheduledAlignment;
+    if(cu_alignment < 1)
+    {
+        cu_alignment = 1;
+    }
+
     // Workload sizing. The background kernel launches many more blocks than the
     // device can run at once (deep oversubscription) and each block runs for a
     // long time, so it keeps every CU busy for the whole measurement. The
-    // critical kernel has a fixed amount of work; how fast it finishes depends on
-    // how many CUs it can use and whether it has to share them with the
-    // background kernel.
+    // critical kernel is kept small - a couple of thread blocks - so it fits
+    // inside even the smallest partition without oversubscribing it; that way its
+    // runtime reflects how long it waits for CUs, not how many CUs it has.
     workload wl;
     wl.block_size            = 256;
     wl.background_grid_size   = total_cus * 16;
-    wl.critical_grid_size     = total_cus; // fixed critical work across all cases
+    wl.critical_grid_size     = 2 * cu_alignment; // small, fits the smallest partition
     wl.background_iterations  = 2000000;
     wl.critical_iterations    = 500000; // fixed critical work across all cases
 
@@ -381,11 +390,12 @@ int main()
     HIP_CHECK(hipMalloc(&d_out_critical, sizeof(unsigned int) * wl.critical_grid_size));
 
     // Warm up the GPU so one-time costs (module load, first-launch setup) are not
-    // charged to the first measured case. The result is discarded.
+    // charged to the first measured case. Write into the background buffer, which
+    // is large enough for a full-device grid. The result is discarded.
     {
         hipStream_t warmup;
         HIP_CHECK(hipStreamCreateWithFlags(&warmup, hipStreamNonBlocking));
-        busy_kernel<<<dim3(total_cus), dim3(wl.block_size), 0, warmup>>>(d_out_critical, 1000);
+        busy_kernel<<<dim3(total_cus), dim3(wl.block_size), 0, warmup>>>(d_out_background, 1000);
         HIP_CHECK(hipGetLastError());
         HIP_CHECK(hipStreamSynchronize(warmup));
         HIP_CHECK(hipStreamDestroy(warmup));
@@ -423,17 +433,25 @@ int main()
               1.0f);
 
     // Sweep several partition sizes for the critical kernel: an eighth, a
-    // quarter, and half of the device. Each request is clamped so both groups
-    // keep at least two CUs, and duplicates (on small devices) are skipped.
+    // quarter, and half of the device. Each request is snapped to the CU
+    // alignment and clamped so both groups keep at least one aligned block of
+    // CUs; duplicates (on small devices) are skipped.
     const unsigned int candidates[]  = {total_cus / 8, total_cus / 4, total_cus / 2};
     unsigned int       last_critical = 0;
 
     for(const unsigned int candidate : candidates)
     {
-        unsigned int requested = candidate < 2 ? 2 : candidate;
-        if(requested > total_cus - 2)
+        // Round the request up to a multiple of the alignment, keeping at least
+        // one aligned block for the critical group and one for the background
+        // group.
+        unsigned int requested = ((candidate + cu_alignment - 1) / cu_alignment) * cu_alignment;
+        if(requested < cu_alignment)
         {
-            requested = total_cus - 2;
+            requested = cu_alignment;
+        }
+        if(requested > total_cus - cu_alignment)
+        {
+            requested = total_cus - cu_alignment;
         }
         // Skip a request that resolves to the same size as the previous one.
         if(requested == last_critical)
