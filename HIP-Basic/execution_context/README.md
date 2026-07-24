@@ -9,7 +9,7 @@ This example runs a fixed latency-sensitive workload against a saturated device 
 1. **Baseline (shared CUs)**: the two kernels run on ordinary streams and compete for all of the device's CUs, so the critical kernel waits behind the background kernel.
 2. **Partitioned (own CUs)**: the CUs are split into two execution contexts, the background kernel is confined to the larger group, and the critical kernel runs on its own group. This is repeated for a few partition sizes (roughly an eighth, a quarter, and half of the device).
 
-The program prints a table of the critical kernel's latency and its speedup over the baseline for each configuration. As the critical partition grows, its latency drops well below the contended baseline.
+The program prints a table with each configuration's critical- and background-kernel runtimes and the critical kernel's speedup over the baseline. As the critical partition grows, its runtime drops well below the contended baseline, while the background kernel (confined to fewer CUs) takes longer.
 
 Execution context resource partitioning is an AMD (HIP) feature. On the CUDA backend, where the required runtime support may be unavailable, only the shared-CU baseline runs; the partitioned sweep is guarded by `__HIP_PLATFORM_AMD__`.
 
@@ -50,6 +50,7 @@ Execution contexts carve a GPU's CUs into separate slices within one process, so
 - `hipStreamCreateWithFlags`
 - `hipStreamSynchronize`
 - `hipStreamDestroy`
+- `hipDeviceSynchronize`
 - `hipMalloc`
 - `hipFree`
 - `hipEventCreate`
