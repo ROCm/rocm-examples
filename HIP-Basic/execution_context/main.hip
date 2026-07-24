@@ -24,9 +24,44 @@
 
 #include <hip/hip_runtime.h>
 
+#ifndef __HIP_PLATFORM_AMD__
+    // On the CUDA backend, execution contexts map to CUDA green contexts, which
+    // are provided by the CUDA driver API (this header requires linking the CUDA
+    // driver library, -lcuda).
+    #include <cuda.h>
+#endif
+
+#include <cstdlib>
 #include <iomanip>
 #include <iostream>
 #include <string>
+
+#ifndef __HIP_PLATFORM_AMD__
+/// \brief Aborts on a failed CUDA driver API call, mirroring HIP_CHECK.
+#define CU_CHECK(condition)                                                                    \
+    {                                                                                          \
+        const CUresult error = (condition);                                                    \
+        if(error != CUDA_SUCCESS)                                                              \
+        {                                                                                      \
+            const char* name = nullptr;                                                        \
+            const char* desc = nullptr;                                                        \
+            cuGetErrorName(error, &name);                                                       \
+            cuGetErrorString(error, &desc);                                                     \
+            std::cerr << "CUDA driver error: " << (name ? name : "?") << " ("                   \
+                      << (desc ? desc : "?") << ") at " << __FILE__ << ':' << __LINE__          \
+                      << std::endl;                                                             \
+            std::exit(error_exit_code);                                                         \
+        }                                                                                      \
+    }
+#endif
+
+// The device SM/CU resource type differs between backends but is used the same
+// way, so alias it to keep the partitioning code uniform.
+#ifdef __HIP_PLATFORM_AMD__
+using device_sm_resource = hipDevResource;
+#else
+using device_sm_resource = CUdevResource;
+#endif
 
 /// \brief A kernel that keeps every thread block busy for a fixed number of
 /// iterations. It is used as a proxy for a compute-bound workload. The volatile
@@ -185,6 +220,80 @@ timings time_partitioned_case(int             device_id,
 
     return result;
 }
+#else
+/// \brief Creates a CUDA green context from a single SM resource group and a
+/// non-blocking stream on it. The stream is returned as a cudaStream_t so the
+/// runtime-API kernel launches (<<<>>>) and events used by the timing helper
+/// work unchanged.
+CUgreenCtx make_green_context(CUdevice cu_device, CUdevResource& group, cudaStream_t& out_stream)
+{
+    CUdevResourceDesc desc = {};
+    CU_CHECK(cuDevResourceGenerateDesc(&desc, &group, 1));
+
+    CUgreenCtx green_ctx = {};
+    CU_CHECK(cuGreenCtxCreate(&green_ctx, desc, cu_device, CU_GREEN_CTX_DEFAULT_STREAM));
+
+    CUstream cu_stream = {};
+    CU_CHECK(cuGreenCtxStreamCreate(&cu_stream, green_ctx, CU_STREAM_NON_BLOCKING, 0));
+    out_stream = reinterpret_cast<cudaStream_t>(cu_stream);
+
+    return green_ctx;
+}
+
+/// \brief CUDA counterpart of the partitioned measurement. Splits the device's
+/// SMs into two disjoint groups using green contexts - a critical group of
+/// (about) requested_critical_cus SMs and the remainder for the background
+/// kernel - times the critical kernel while the background kernel runs, then
+/// tears the green contexts down. The actual SM counts (which the split API may
+/// round for alignment) are written back through out_background_cus and
+/// out_critical_cus.
+timings time_partitioned_case(int             device_id,
+                              CUdevResource&  all_cu_resources,
+                              unsigned int    total_cus,
+                              unsigned int    requested_critical_cus,
+                              const workload& wl,
+                              unsigned int*   d_out_background,
+                              unsigned int*   d_out_critical,
+                              unsigned int&   out_background_cus,
+                              unsigned int&   out_critical_cus)
+{
+    (void)total_cus;
+
+    CUdevice cu_device;
+    CU_CHECK(cuDeviceGet(&cu_device, device_id));
+
+    // A single split carves the device into a critical group of the requested
+    // size and a disjoint remainder for the background kernel, so the two green
+    // contexts never share SMs.
+    CUdevResource critical_group   = {};
+    CUdevResource background_group = {};
+    unsigned int  group_count      = 1;
+    CU_CHECK(cuDevSmResourceSplitByCount(&critical_group,
+                                         &group_count,
+                                         &all_cu_resources,
+                                         &background_group /* remaining */,
+                                         0 /* flags */,
+                                         requested_critical_cus));
+    out_critical_cus   = critical_group.sm.smCount;
+    out_background_cus = background_group.sm.smCount;
+
+    cudaStream_t background_stream, critical_stream;
+    CUgreenCtx   ctx_background = make_green_context(cu_device, background_group, background_stream);
+    CUgreenCtx   ctx_critical   = make_green_context(cu_device, critical_group, critical_stream);
+
+    const timings result = time_critical_with_background(background_stream,
+                                                         critical_stream,
+                                                         d_out_background,
+                                                         d_out_critical,
+                                                         wl);
+
+    CU_CHECK(cuStreamDestroy(reinterpret_cast<CUstream>(background_stream)));
+    CU_CHECK(cuStreamDestroy(reinterpret_cast<CUstream>(critical_stream)));
+    CU_CHECK(cuGreenCtxDestroy(ctx_background));
+    CU_CHECK(cuGreenCtxDestroy(ctx_critical));
+
+    return result;
+}
 #endif
 
 /// \brief Prints one row of the results table.
@@ -207,25 +316,29 @@ int main()
     constexpr int device_id = 0;
     HIP_CHECK(hipSetDevice(device_id));
 
-    // Determine the number of compute units (CUs) on the device. On AMD this
-    // count drives how the CUs are partitioned; on other platforms it is only
-    // used to size the launch grids.
+    // Determine the number of compute units (CUs, called SMs on NVIDIA) on the
+    // device. This count drives both how the resources are partitioned and how
+    // the launch grids are sized.
     unsigned int total_cus = 0;
 
+    // The device SM/CU resource that partitioning is carved from. On AMD the
+    // field is named smCount for CUDA source compatibility; there it represents
+    // compute units.
+    device_sm_resource all_cu_resources = {};
+
 #ifdef __HIP_PLATFORM_AMD__
-    // Query the total number of CUs through the device resource. The device
-    // resource uses the field name smCount for CUDA source compatibility; on
-    // AMD GPUs it represents compute units.
-    hipDevResource all_cu_resources = {};
+    // Query the total number of CUs through the device resource.
     HIP_CHECK(hipDeviceGetDevResource(device_id, &all_cu_resources, hipDevResourceTypeSm));
     total_cus = all_cu_resources.sm.smCount;
 #else
-    // Execution context resource partitioning is an AMD feature. On other
-    // platforms this example only runs the shared-CU baseline, so read the
-    // CU-equivalent count from the device properties instead.
-    hipDeviceProp_t props = {};
-    HIP_CHECK(hipGetDeviceProperties(&props, device_id));
-    total_cus = static_cast<unsigned int>(props.multiProcessorCount);
+    // The CUDA green-context flow uses the driver API. Initialize it, get a
+    // driver device handle, and query its SM resource, which is the whole-device
+    // resource that the partition sweep splits below.
+    CU_CHECK(cuInit(0));
+    CUdevice cu_device;
+    CU_CHECK(cuDeviceGet(&cu_device, device_id));
+    CU_CHECK(cuDeviceGetDevResource(cu_device, &all_cu_resources, CU_DEV_RESOURCE_TYPE_SM));
+    total_cus = all_cu_resources.sm.smCount;
 #endif
 
     std::cout << "Compute units on device " << device_id << ": " << total_cus << std::endl;
@@ -309,7 +422,6 @@ int main()
               baseline.background_ms,
               1.0f);
 
-#ifdef __HIP_PLATFORM_AMD__
     // Sweep several partition sizes for the critical kernel: an eighth, a
     // quarter, and half of the device. Each request is clamped so both groups
     // keep at least two CUs, and duplicates (on small devices) are skipped.
@@ -361,11 +473,6 @@ int main()
                  "more CUs the partition holds, the lower its latency. The background kernel is\n"
                  "confined to fewer CUs as the critical partition grows, so its runtime rises."
               << std::endl;
-#else
-    std::cout << "\nExecution contexts are not available on this platform, so only the shared\n"
-                 "baseline was measured."
-              << std::endl;
-#endif
 
     HIP_CHECK(hipFree(d_out_background));
     HIP_CHECK(hipFree(d_out_critical));

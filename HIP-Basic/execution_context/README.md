@@ -11,18 +11,18 @@ This example runs a fixed latency-sensitive workload against a saturated device 
 
 The program prints a table with each configuration's critical- and background-kernel runtimes and the critical kernel's speedup over the baseline. As the critical partition grows, its runtime drops well below the contended baseline, while the background kernel (confined to fewer CUs) takes longer.
 
-Execution context resource partitioning is an AMD (HIP) feature. On the CUDA backend, where the required runtime support may be unavailable, only the shared-CU baseline runs; the partitioned sweep is guarded by `__HIP_PLATFORM_AMD__`.
+HIP execution contexts map directly to CUDA green contexts. On the AMD (HIP) backend the example uses the HIP execution-context API; on the CUDA backend it uses the equivalent CUDA driver-API green-context calls (`cuGreenCtxCreate`, `cuDevSmResourceSplitByCount`, `cuGreenCtxStreamCreate`). The backend-specific code is selected with `__HIP_PLATFORM_AMD__`, and the baseline and sweep behave the same on both.
 
 ### Application flow
 
 1. The device is selected with `hipSetDevice`.
-2. The number of compute units is determined. On the HIP (AMD) backend it comes from `hipDeviceGetDevResource` using the `hipDevResourceTypeSm` resource type. (The field is named `smCount` for CUDA source compatibility; on AMD GPUs it represents compute units.) On other backends it is read from `hipGetDeviceProperties`.
+2. The number of compute units (SMs on NVIDIA) is determined from the device's SM resource: `hipDeviceGetDevResource` with `hipDevResourceTypeSm` on the HIP backend, or `cuDeviceGetDevResource` with `CU_DEV_RESOURCE_TYPE_SM` on the CUDA backend. (The field is named `smCount` for CUDA source compatibility; on AMD GPUs it represents compute units.)
 3. **Baseline.** Two ordinary non-blocking streams are created with `hipStreamCreateWithFlags`. The background kernel is launched on one, and the critical kernel is launched and timed on the other with HIP events while the background kernel runs. Both share all CUs.
-4. **Partitioned sweep (HIP backend only).** For each candidate partition size, the CU resources are split into two groups with `hipDevSmResourceSplit`: a larger group for the background kernel and a smaller group dedicated to the critical kernel.
-5. A resource descriptor is generated for each group with `hipDevResourceGenerateDesc`.
-6. An execution context is created from each descriptor with `hipGreenCtxCreate`.
-7. A stream is created for each execution context with `hipExecutionCtxStreamCreate`, and the same background-plus-critical timing is repeated. The critical kernel runs on its own partitioned CUs. The contexts and streams are then destroyed with `hipExecutionCtxDestroy` and `hipStreamDestroy` before the next partition size.
-8. Each configuration's critical-kernel latency and speedup over the baseline are printed as a row in the results table.
+4. **Partitioned sweep.** For each candidate partition size, the SM resource is split into two disjoint groups - a group dedicated to the critical kernel and the remainder for the background kernel - with `hipDevSmResourceSplit` (HIP) or `cuDevSmResourceSplitByCount` (CUDA).
+5. A resource descriptor is generated for each group with `hipDevResourceGenerateDesc` / `cuDevResourceGenerateDesc`.
+6. An execution context (HIP) or green context (CUDA) is created from each descriptor with `hipGreenCtxCreate` / `cuGreenCtxCreate`.
+7. A stream is created on each context with `hipExecutionCtxStreamCreate` / `cuGreenCtxStreamCreate`, and the same background-plus-critical timing is repeated. The critical kernel runs on its own partitioned CUs. The contexts and streams are then destroyed before the next partition size.
+8. Each configuration's critical-kernel runtime and speedup over the baseline are printed as a row in the results table.
 9. The device output buffers are freed with `hipFree`.
 
 ## Key APIs and Concepts

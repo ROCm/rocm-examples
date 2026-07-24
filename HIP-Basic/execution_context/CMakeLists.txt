@@ -47,4 +47,10 @@ endif()
 target_include_directories(${example_name} PRIVATE ${include_dirs})
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    # The CUDA green-context path uses the CUDA driver API, so link libcuda.
+    find_package(CUDAToolkit REQUIRED)
+    target_link_libraries(${example_name} PRIVATE CUDA::cuda_driver)
+endif()
+
 install(TARGETS ${example_name})

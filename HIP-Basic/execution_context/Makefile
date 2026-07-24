@@ -40,6 +40,8 @@ ILDLIBS   :=
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+  # The CUDA green-context path uses the CUDA driver API, so link libcuda.
+  ILDLIBS   += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
 else
