@@ -24,8 +24,9 @@
 
 #include <hip/hip_runtime.h>
 
+#include <iomanip>
 #include <iostream>
-#include <vector>
+#include <string>
 
 /// \brief A kernel that keeps every thread block busy for a fixed number of
 /// iterations. It is used as a proxy for a compute-bound workload. The volatile
@@ -47,22 +48,30 @@ __global__ void busy_kernel(unsigned int* out, const unsigned int iterations)
     }
 }
 
-/// \brief Launches a long-running background kernel and a shorter critical
+/// \brief Sizing of the two concurrent workloads. The background kernel is a
+/// large, device-saturating job; the critical kernel is a small,
+/// latency-sensitive job whose completion time is what the example measures.
+struct workload
+{
+    unsigned int block_size;
+    unsigned int background_grid_size;
+    unsigned int critical_grid_size;
+    unsigned int background_iterations;
+    unsigned int critical_iterations;
+};
+
+/// \brief Launches the long-running background kernel and the shorter critical
 /// kernel on two separate streams so they execute concurrently, and returns the
 /// GPU time the critical kernel takes to finish while the background kernel is
 /// running. When the two streams share the device's compute units the critical
 /// kernel contends with the background kernel; when the streams belong to
 /// execution contexts backed by disjoint compute units the critical kernel runs
 /// undisturbed.
-float time_critical_with_background(hipStream_t        background_stream,
-                                    hipStream_t        critical_stream,
-                                    unsigned int*      d_out_background,
-                                    unsigned int*      d_out_critical,
-                                    const unsigned int background_grid_size,
-                                    const unsigned int critical_grid_size,
-                                    const unsigned int block_size,
-                                    const unsigned int background_iterations,
-                                    const unsigned int critical_iterations)
+float time_critical_with_background(hipStream_t     background_stream,
+                                    hipStream_t     critical_stream,
+                                    unsigned int*   d_out_background,
+                                    unsigned int*   d_out_critical,
+                                    const workload& wl)
 {
     hipEvent_t start, stop;
     HIP_CHECK(hipEventCreate(&start));
@@ -70,18 +79,18 @@ float time_critical_with_background(hipStream_t        background_stream,
 
     // Launch the long-running background kernel. The launch returns immediately
     // and the kernel keeps executing on its own stream, occupying the device.
-    busy_kernel<<<dim3(background_grid_size), dim3(block_size), 0, background_stream>>>(
+    busy_kernel<<<dim3(wl.background_grid_size), dim3(wl.block_size), 0, background_stream>>>(
         d_out_background,
-        background_iterations);
+        wl.background_iterations);
     HIP_CHECK(hipGetLastError());
 
     // Time the critical kernel on its stream while the background kernel runs.
     // The elapsed time includes any wait for compute units, which is exactly the
-    // latency the reserved-CU path is meant to remove.
+    // latency the partitioned path is meant to remove.
     HIP_CHECK(hipEventRecord(start, critical_stream));
-    busy_kernel<<<dim3(critical_grid_size), dim3(block_size), 0, critical_stream>>>(
+    busy_kernel<<<dim3(wl.critical_grid_size), dim3(wl.block_size), 0, critical_stream>>>(
         d_out_critical,
-        critical_iterations);
+        wl.critical_iterations);
     HIP_CHECK(hipGetLastError());
     HIP_CHECK(hipEventRecord(stop, critical_stream));
     HIP_CHECK(hipEventSynchronize(stop));
@@ -96,6 +105,85 @@ float time_critical_with_background(hipStream_t        background_stream,
     HIP_CHECK(hipEventDestroy(stop));
 
     return elapsed_ms;
+}
+
+#ifdef __HIP_PLATFORM_AMD__
+/// \brief Runs one partitioned measurement. Splits the device's CUs into a
+/// background group and a critical group of (about) requested_critical_cus CUs,
+/// creates an execution context and stream for each, times the critical kernel
+/// while the background kernel runs, then tears the contexts down. The actual CU
+/// counts (which the split API may adjust for alignment) are written back
+/// through out_background_cus and out_critical_cus.
+float time_partitioned_case(int             device_id,
+                            hipDevResource& all_cu_resources,
+                            unsigned int    total_cus,
+                            unsigned int    requested_critical_cus,
+                            const workload& wl,
+                            unsigned int*   d_out_background,
+                            unsigned int*   d_out_critical,
+                            unsigned int&   out_background_cus,
+                            unsigned int&   out_critical_cus)
+{
+    // Split the CUs into two groups: the rest for the background kernel and
+    // requested_critical_cus for the critical kernel. The split API can adjust
+    // the counts to satisfy architecture alignment requirements.
+    hipDevResource              groups[2]       = {};
+    hipDevSmResourceGroupParams group_params[2] = {
+        {/*smCount=*/total_cus - requested_critical_cus, 0, 0, 0},
+        {/*smCount=*/requested_critical_cus, 0, 0, 0}};
+
+    HIP_CHECK(hipDevSmResourceSplit(&groups[0],
+                                    2,
+                                    &all_cu_resources,
+                                    nullptr /* remainder */,
+                                    0 /* flags */,
+                                    &group_params[0]));
+
+    out_background_cus = groups[0].sm.smCount;
+    out_critical_cus   = groups[1].sm.smCount;
+
+    // Wrap each group in a descriptor and create an execution context from it.
+    hipDevResourceDesc_t desc_background = {};
+    hipDevResourceDesc_t desc_critical   = {};
+    HIP_CHECK(hipDevResourceGenerateDesc(&desc_background, &groups[0], 1));
+    HIP_CHECK(hipDevResourceGenerateDesc(&desc_critical, &groups[1], 1));
+
+    hipExecutionCtx_t ctx_background = {};
+    hipExecutionCtx_t ctx_critical   = {};
+    HIP_CHECK(hipGreenCtxCreate(&ctx_background, desc_background, device_id, 0));
+    HIP_CHECK(hipGreenCtxCreate(&ctx_critical, desc_critical, device_id, 0));
+
+    // A stream created on a context keeps its kernels inside that context's CUs.
+    hipStream_t background_stream, critical_stream;
+    HIP_CHECK(hipExecutionCtxStreamCreate(&background_stream, ctx_background, hipStreamDefault, 0));
+    HIP_CHECK(hipExecutionCtxStreamCreate(&critical_stream, ctx_critical, hipStreamDefault, 0));
+
+    const float elapsed_ms = time_critical_with_background(background_stream,
+                                                           critical_stream,
+                                                           d_out_background,
+                                                           d_out_critical,
+                                                           wl);
+
+    HIP_CHECK(hipStreamDestroy(background_stream));
+    HIP_CHECK(hipStreamDestroy(critical_stream));
+    HIP_CHECK(hipExecutionCtxDestroy(ctx_background));
+    HIP_CHECK(hipExecutionCtxDestroy(ctx_critical));
+
+    return elapsed_ms;
+}
+#endif
+
+/// \brief Prints one row of the results table.
+void print_row(const std::string& configuration,
+               const std::string& critical_cus,
+               const std::string& background_cus,
+               float              latency_ms,
+               float              speedup)
+{
+    std::cout << "  " << std::left << std::setw(22) << configuration << std::setw(14)
+              << critical_cus << std::setw(16) << background_cus << std::setw(15)
+              << (double_precision(latency_ms, 2) + " ms") << double_precision(speedup, 2) << "x"
+              << std::endl;
 }
 
 int main()
@@ -134,24 +222,34 @@ int main()
         return 0;
     }
 
-    // Reserve a quarter of the CUs for the critical work and give the rest to
-    // the long-running background work.
-    const unsigned int critical_cus = (total_cus >= 8) ? total_cus / 4 : 2;
+    // Workload sizing. The background kernel launches many more blocks than the
+    // device can run at once (deep oversubscription) and each block runs for a
+    // long time, so it keeps every CU busy for the whole measurement. The
+    // critical kernel has a fixed amount of work; how fast it finishes depends on
+    // how many CUs it can use and whether it has to share them with the
+    // background kernel.
+    workload wl;
+    wl.block_size            = 256;
+    wl.background_grid_size   = total_cus * 64;
+    wl.critical_grid_size     = total_cus; // fixed critical work across all cases
+    wl.background_iterations  = 2000000;
+    wl.critical_iterations    = 500000; // fixed critical work across all cases
 
-    // Workload sizing. The background kernel oversubscribes the whole device so
-    // it saturates the CUs; the critical kernel is deliberately small (one block
-    // per reserved CU) and does much less work, so on a dedicated partition it
-    // finishes quickly.
-    constexpr unsigned int block_size            = 256;
-    const unsigned int     background_grid_size  = total_cus * 4;
-    const unsigned int     critical_grid_size    = critical_cus;
-    const unsigned int     background_iterations = 2000000;
-    const unsigned int     critical_iterations   = 200000;
+    std::cout
+        << "\nThis example runs a small, latency-sensitive \"critical\" kernel at the same time\n"
+           "as a large \"background\" kernel that saturates the GPU, and measures how long the\n"
+           "critical kernel takes to complete. It first runs a baseline where both kernels share\n"
+           "all CUs, then sweeps several execution-context partitions that give the critical\n"
+           "kernel a growing slice of dedicated CUs. As the critical kernel gets more of its own\n"
+           "CUs, its latency drops well below the contended baseline.\n"
+        << std::endl;
 
+    // The critical buffer only needs one entry per critical block; the critical
+    // grid size is fixed, so this size is reused across every case.
     unsigned int* d_out_background = nullptr;
     unsigned int* d_out_critical   = nullptr;
-    HIP_CHECK(hipMalloc(&d_out_background, sizeof(unsigned int) * background_grid_size));
-    HIP_CHECK(hipMalloc(&d_out_critical, sizeof(unsigned int) * critical_grid_size));
+    HIP_CHECK(hipMalloc(&d_out_background, sizeof(unsigned int) * wl.background_grid_size));
+    HIP_CHECK(hipMalloc(&d_out_critical, sizeof(unsigned int) * wl.critical_grid_size));
 
     // Baseline: both kernels share all of the device's CUs. Two ordinary
     // non-blocking streams let them run concurrently and contend for CUs.
@@ -159,101 +257,79 @@ int main()
     HIP_CHECK(hipStreamCreateWithFlags(&shared_background, hipStreamNonBlocking));
     HIP_CHECK(hipStreamCreateWithFlags(&shared_critical, hipStreamNonBlocking));
 
-    std::cout << "\nBaseline: critical kernel shares all " << total_cus
-              << " CUs with the background kernel..." << std::endl;
-    const float shared_ms = time_critical_with_background(shared_background,
-                                                          shared_critical,
-                                                          d_out_background,
-                                                          d_out_critical,
-                                                          background_grid_size,
-                                                          critical_grid_size,
-                                                          block_size,
-                                                          background_iterations,
-                                                          critical_iterations);
+    const float baseline_ms = time_critical_with_background(shared_background,
+                                                            shared_critical,
+                                                            d_out_background,
+                                                            d_out_critical,
+                                                            wl);
 
     HIP_CHECK(hipStreamDestroy(shared_background));
     HIP_CHECK(hipStreamDestroy(shared_critical));
 
+    // Header for the results table.
+    std::cout << "Critical kernel latency while the background kernel runs:\n" << std::endl;
+    std::cout << "  " << std::left << std::setw(22) << "Configuration" << std::setw(14)
+              << "Critical CUs" << std::setw(16) << "Background CUs" << std::setw(15) << "Latency"
+              << "Speedup" << std::endl;
+    print_row("Baseline (shared)",
+              "all (" + std::to_string(total_cus) + ")",
+              "all (" + std::to_string(total_cus) + ")",
+              baseline_ms,
+              1.0f);
+
 #ifdef __HIP_PLATFORM_AMD__
-    // Partitioned: split the CUs into two groups. The larger group runs the
-    // background kernel; the smaller group is reserved for the critical kernel.
-    // The split API can adjust the counts to satisfy architecture alignment
-    // requirements.
-    hipDevResource              groups[2]       = {};
-    hipDevSmResourceGroupParams group_params[2] = {
-        {/*smCount=*/total_cus - critical_cus, 0, 0, 0},
-        {/*smCount=*/critical_cus, 0, 0, 0}};
+    // Sweep several partition sizes for the critical kernel: an eighth, a
+    // quarter, and half of the device. Each request is clamped so both groups
+    // keep at least two CUs, and duplicates (on small devices) are skipped.
+    const unsigned int candidates[]  = {total_cus / 8, total_cus / 4, total_cus / 2};
+    unsigned int       last_critical = 0;
 
-    HIP_CHECK(hipDevSmResourceSplit(&groups[0],
-                                    2,
-                                    &all_cu_resources,
-                                    nullptr /* remainder */,
-                                    0 /* flags */,
-                                    &group_params[0]));
+    for(const unsigned int candidate : candidates)
+    {
+        unsigned int requested = candidate < 2 ? 2 : candidate;
+        if(requested > total_cus - 2)
+        {
+            requested = total_cus - 2;
+        }
+        // Skip a request that resolves to the same size as the previous one.
+        if(requested == last_critical)
+        {
+            continue;
+        }
+        last_critical = requested;
 
-    const unsigned int background_cus = groups[0].sm.smCount;
-    const unsigned int reserved_cus   = groups[1].sm.smCount;
-    std::cout << "\nBackground execution context provisioned with " << background_cus << " CUs"
+        unsigned int background_cus = 0;
+        unsigned int critical_cus   = 0;
+        const float  latency_ms     = time_partitioned_case(device_id,
+                                                       all_cu_resources,
+                                                       total_cus,
+                                                       requested,
+                                                       wl,
+                                                       d_out_background,
+                                                       d_out_critical,
+                                                       background_cus,
+                                                       critical_cus);
+
+        const float speedup = latency_ms > 0.0f ? baseline_ms / latency_ms : 0.0f;
+        print_row("Partitioned",
+                  std::to_string(critical_cus),
+                  std::to_string(background_cus),
+                  latency_ms,
+                  speedup);
+    }
+
+    std::cout << "\nThe baseline critical kernel waits behind the background kernel for the shared\n"
+                 "CUs. With an execution context it runs on its own CUs and finishes sooner; the\n"
+                 "more CUs the partition holds, the lower its latency."
               << std::endl;
-    std::cout << "Critical execution context provisioned with " << reserved_cus << " CUs"
+#else
+    std::cout << "\nExecution contexts are not available on this platform, so only the shared\n"
+                 "baseline was measured."
               << std::endl;
-
-    // Generate a resource descriptor for each group.
-    hipDevResourceDesc_t desc_background = {};
-    hipDevResourceDesc_t desc_critical   = {};
-    HIP_CHECK(hipDevResourceGenerateDesc(&desc_background, &groups[0], 1));
-    HIP_CHECK(hipDevResourceGenerateDesc(&desc_critical, &groups[1], 1));
-
-    // Create an execution context from each descriptor.
-    hipExecutionCtx_t ctx_background = {};
-    hipExecutionCtx_t ctx_critical   = {};
-    HIP_CHECK(hipGreenCtxCreate(&ctx_background, desc_background, device_id, 0));
-    HIP_CHECK(hipGreenCtxCreate(&ctx_critical, desc_critical, device_id, 0));
-
-    // Create a stream belonging to each execution context. Kernels launched on
-    // these streams stay within the context's reserved CUs.
-    hipStream_t ctx_background_stream, ctx_critical_stream;
-    HIP_CHECK(
-        hipExecutionCtxStreamCreate(&ctx_background_stream, ctx_background, hipStreamDefault, 0));
-    HIP_CHECK(hipExecutionCtxStreamCreate(&ctx_critical_stream, ctx_critical, hipStreamDefault, 0));
-
-    std::cout << "\nPartitioned: critical kernel runs on its reserved " << reserved_cus
-              << " CUs while the background kernel runs on the other " << background_cus << "..."
-              << std::endl;
-    const float partitioned_ms = time_critical_with_background(ctx_background_stream,
-                                                               ctx_critical_stream,
-                                                               d_out_background,
-                                                               d_out_critical,
-                                                               background_grid_size,
-                                                               critical_grid_size,
-                                                               block_size,
-                                                               background_iterations,
-                                                               critical_iterations);
-
-    HIP_CHECK(hipStreamDestroy(ctx_background_stream));
-    HIP_CHECK(hipStreamDestroy(ctx_critical_stream));
-    HIP_CHECK(hipExecutionCtxDestroy(ctx_background));
-    HIP_CHECK(hipExecutionCtxDestroy(ctx_critical));
 #endif
 
     HIP_CHECK(hipFree(d_out_background));
     HIP_CHECK(hipFree(d_out_critical));
-
-    // Report the comparison.
-    std::cout << "\nCritical kernel latency while the background kernel runs:" << std::endl;
-    std::cout << "  Shared CUs (baseline):   " << double_precision(shared_ms, 2) << " ms"
-              << std::endl;
-#ifdef __HIP_PLATFORM_AMD__
-    std::cout << "  Reserved CUs (contexts): " << double_precision(partitioned_ms, 2) << " ms"
-              << std::endl;
-    if(partitioned_ms > 0.0f)
-    {
-        std::cout << "  Speedup for the critical kernel: "
-                  << double_precision(shared_ms / partitioned_ms, 2) << "x" << std::endl;
-    }
-#else
-    std::cout << "  Reserved CUs (contexts): not available on this platform" << std::endl;
-#endif
 
     std::cout << "\nExecution context example completed successfully." << std::endl;
 
