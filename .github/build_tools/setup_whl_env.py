@@ -15,11 +15,11 @@ with open(os.environ["GITHUB_ENV"], "a") as f:
     f.write(f"HIP_PLATFORM=amd\n")
     f.write(f"HIP_PATH={rocm}\n")
     f.write(f"HIP_DEVICE_LIB_PATH={rocm}/lib/llvm/amdgcn/bitcode\n")
-    f.write(f"PATH={rocm}/bin:{rocm}/llvm/bin:{venv}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n")
+    f.write(f"PATH={rocm}/bin:{rocm}/lib/llvm/bin:{venv}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n")
     f.write(f"CPATH={rocm}/include\n")
     f.write(f"PKG_CONFIG_PATH={rocm}/lib/pkgconfig\n")
     f.write(f"LIBRARY_PATH={rocm}/lib:{rocm}/lib64\n")
-    f.write(f"LD_LIBRARY_PATH={core}:{libs}:{rocm}/lib:{rocm}/llvm/lib\n")
+    f.write(f"LD_LIBRARY_PATH={core}:{libs}:{rocm}/lib:{rocm}/lib/llvm/lib\n")
     # whl-multi-arch omits amdllvm needed for OpenMP GPU offloading
     f.write("ENABLE_OPENMP=OFF\n")
     # hipDNN headers require C++20; system g++ on AlmaLinux 8 is too old
