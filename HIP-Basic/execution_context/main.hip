@@ -351,10 +351,16 @@ int main()
         return 0;
     }
 
-    // Partitions must be a multiple of the device's co-scheduled CU alignment
-    // (the WGP granularity on AMD, typically 2). Requesting an unaligned count
-    // makes the split fail, so read the alignment and snap requests to it.
+    // Partitions must be a multiple of the device's co-scheduled CU alignment.
+    // Requesting an unaligned count makes the split fail, so snap requests to it.
+#ifdef __HIP_PLATFORM_AMD__
+    // On AMD this is the WGP granularity (typically 2), reported by the resource.
     unsigned int cu_alignment = all_cu_resources.sm.smCoscheduledAlignment;
+#else
+    // The CUDA SM resource does not expose an alignment field, and
+    // cuDevSmResourceSplitByCount rounds internally, so use 1 (no snapping).
+    unsigned int cu_alignment = 1;
+#endif
     if(cu_alignment < 1)
     {
         cu_alignment = 1;
