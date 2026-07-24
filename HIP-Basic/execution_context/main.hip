@@ -246,7 +246,7 @@ int main()
     // background kernel.
     workload wl;
     wl.block_size            = 256;
-    wl.background_grid_size   = total_cus * 64;
+    wl.background_grid_size   = total_cus * 16;
     wl.critical_grid_size     = total_cus; // fixed critical work across all cases
     wl.background_iterations  = 2000000;
     wl.critical_iterations    = 500000; // fixed critical work across all cases
