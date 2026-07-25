@@ -12,6 +12,7 @@ The examples in this subdirectory showcase the functionality of the [rocDecode](
 - Or GNU Make - available via the distribution's package manager
 - [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.0)
 - [rocDecode](https://github.com/ROCm/rocDecode): `rocdecode` and `rocdecode-dev` packages available from [repo.radeon.com](https://repo.radeon.com/rocm/). The repository is added during the standard ROCm [install procedure](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html)
+- rocDecode shared utility sources and sample videos, installed under `${ROCM_PATH}/share/rocdecode/`. These are required to build the examples and to run their tests; examples missing them are skipped at configure time. They ship with a rocDecode tarball install or via the `amdrocm-decode-test` package, but are **not** included in the pip wheels.
 - [FFMPEG](https://ffmpeg.org/about.html) development libraries:
   - On Ubuntu: `sudo apt install libavcodec-dev libavformat-dev libavutil-dev`
   - On RHEL/SLES: Install FFMPEG development packages manually or use the [rocDecode-setup.py](https://github.com/ROCm/rocDecode/blob/develop/rocDecode-setup.py) script
