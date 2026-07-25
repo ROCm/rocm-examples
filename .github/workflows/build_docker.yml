@@ -2,6 +2,11 @@ name: Build Docker
 
 on:
   workflow_dispatch:
+    inputs:
+      tag_latest:
+        description: 'Tag pushed images as latest'
+        type: boolean
+        default: false
   push:
     branches: [ amd-staging ]
     paths:
@@ -76,6 +81,15 @@ jobs:
             echo "name=${IMAGE_NAME}" >> $GITHUB_OUTPUT
             echo "Image name: ${IMAGE_NAME}"
 
+        - name: Extract ROCm version
+          id: rocm-version
+          if: matrix.file == 'ubuntu-24.04-rocm.Dockerfile'
+          run: |
+            # Read the ARG ROCM_VERSION default from the Dockerfile (single source of truth)
+            VERSION=$(grep -oP 'ARG ROCM_VERSION=\K[0-9.]+' "Dockerfiles/${{ matrix.file }}")
+            echo "version=${VERSION}" >> $GITHUB_OUTPUT
+            echo "ROCm version: ${VERSION}"
+
         - name: Log in to GHCR
           if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
           uses: docker/login-action@v3
@@ -91,7 +105,14 @@ jobs:
             images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.image-tag.outputs.name }}
             tags: |
               type=raw,value=latest,enable={{is_default_branch}}
-              type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' }}
+              type=raw,value=latest,enable=${{ github.event_name == 'workflow_dispatch' && inputs.tag_latest }}
+              # Fallback so every push/dispatch has a tag: use the branch name whenever
+              # 'latest' is not applied (i.e. not the default branch and not an opt-in dispatch),
+              # so non-default builds never clobber latest.
+              type=ref,event=branch,enable=${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !(github.event_name == 'workflow_dispatch' && inputs.tag_latest) }}
+              # ROCm-version tag tracks the stable channel: apply it only alongside 'latest'
+              # (default branch, or an opt-in dispatch) so dev builds never clobber the shared 7.14 tag.
+              type=raw,value=${{ steps.rocm-version.outputs.version }},enable=${{ matrix.file == 'ubuntu-24.04-rocm.Dockerfile' && steps.rocm-version.outputs.version != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || (github.event_name == 'workflow_dispatch' && inputs.tag_latest)) }}
 
         - name: Build and push Docker image for ${{ matrix.file }}
           uses: docker/build-push-action@v5
