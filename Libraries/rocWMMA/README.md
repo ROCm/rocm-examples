@@ -13,7 +13,7 @@ The examples in this subdirectory showcase the functionality of the [rocWMMA](ht
 
 ## Building
 
-Ensure the dependencies are installed, or use the [provided Dockerfile](../../Dockerfiles/hip-libraries-rocm-ubuntu.Dockerfile) to build and run the examples in a containerized environment that has all prerequisites installed.
+Ensure the dependencies are installed, or use the [provided Dockerfile](../../Dockerfiles/ubuntu-24.04-rocm.Dockerfile) to build and run the examples in a containerized environment that has all prerequisites installed.
 
 ### Using CMake
 
