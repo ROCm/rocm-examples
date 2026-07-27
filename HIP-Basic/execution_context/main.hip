@@ -63,6 +63,7 @@ using device_sm_resource = hipDevResource;
 using device_sm_resource = CUdevResource;
 #endif
 
+// [busy-kernel-start]
 /// \brief A kernel that keeps every thread block busy for a fixed number of
 /// iterations. It is used as a proxy for a compute-bound workload. The volatile
 /// accumulator prevents the compiler from optimizing the loop away.
@@ -82,6 +83,7 @@ __global__ void busy_kernel(unsigned int* out, const unsigned int iterations)
         out[blockIdx.x] = acc;
     }
 }
+// [busy-kernel-end]
 
 /// \brief Sizing of the two concurrent workloads. The background kernel is a
 /// large, device-saturating job; the critical kernel is a small,
@@ -102,6 +104,7 @@ struct timings
     float critical_ms;
 };
 
+// [timing-helper-start]
 /// \brief Launches the long-running background kernel and the shorter critical
 /// kernel on two separate streams so they execute concurrently, and returns the
 /// GPU time each kernel takes. The critical kernel's time is the latency of
@@ -155,8 +158,10 @@ timings time_critical_with_background(hipStream_t     background_stream,
 
     return result;
 }
+// [timing-helper-end]
 
 #ifdef __HIP_PLATFORM_AMD__
+// [partitioned-start]
 /// \brief Runs one partitioned measurement. Splits the device's CUs into a
 /// background group and a critical group of (about) requested_critical_cus CUs,
 /// creates an execution context and stream for each, times the critical kernel
@@ -220,6 +225,7 @@ timings time_partitioned_case(int             device_id,
 
     return result;
 }
+// [partitioned-end]
 #else
 /// \brief Creates a CUDA green context from a single SM resource group and a
 /// non-blocking stream on it. The stream is returned as a cudaStream_t so the
@@ -407,6 +413,7 @@ int main()
         HIP_CHECK(hipStreamDestroy(warmup));
     }
 
+    // [baseline-start]
     // Baseline: both kernels share all of the device's CUs. Two ordinary
     // non-blocking streams let them run concurrently and contend for CUs.
     hipStream_t shared_background, shared_critical;
@@ -421,6 +428,7 @@ int main()
 
     HIP_CHECK(hipStreamDestroy(shared_background));
     HIP_CHECK(hipStreamDestroy(shared_critical));
+    // [baseline-end]
 
     // Make sure the device is fully idle before the first partitioned case
     // creates and destroys execution contexts.
