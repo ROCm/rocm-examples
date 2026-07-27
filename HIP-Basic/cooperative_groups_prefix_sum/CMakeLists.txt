@@ -30,10 +30,10 @@ select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+verify_hip_platform(PLATFORMS "amd")
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 
