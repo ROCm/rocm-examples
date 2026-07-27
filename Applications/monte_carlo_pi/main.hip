@@ -27,7 +27,6 @@
 #include <hipcub/device/device_reduce.hpp>
 #include <hiprand/hiprand.h>
 
-// CUB 3.0 removed hipcub's CUB-style iterators; use portable Thrust ones.
 #include <thrust/iterator/counting_iterator.h>
 #include <thrust/iterator/transform_iterator.h>
 
