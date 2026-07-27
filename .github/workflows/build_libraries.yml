@@ -18,6 +18,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
@@ -35,7 +36,7 @@ jobs:
           run:
             shell: bash
         container:
-            image: ghcr.io/rocm/rocm-examples-hip-libraries-rocm-ubuntu
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14
         steps:
           # see https://github.com/dorny/paths-filter/issues/212
           - uses: actions/checkout@v4
@@ -64,7 +65,6 @@ jobs:
               cmake --build build --parallel $(nproc)
           - name: Make
             run: |
-              sed -i '/rocCV/d' Libraries/Makefile
               cd Libraries
               make -j $(nproc) ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} HIP_ARCHITECTURES="${GPU_TARGETS}"
 

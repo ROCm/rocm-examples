@@ -33,6 +33,7 @@
 #include <atomic>
 #include <cassert>
 #include <chrono>
+#include <cctype>
 #include <cmath>
 #include <cstddef>
 #include <cstdint>
@@ -166,6 +167,28 @@
 
 namespace common
 {
+/// \brief Parse a boolean environment variable, mirroring rocprofiler-sdk's own
+///   get_env(env_id, bool) semantics: unset -> default; a purely numeric value
+///   is true when non-zero; the words off/false/no/n/f/0 (case-insensitive) are
+///   false; any other non-empty value is true.
+inline bool get_env_bool(const char* env_id, bool default_value)
+{
+    const char* env_var = std::getenv(env_id);
+    if(env_var == nullptr || env_var[0] == '\0') return default_value;
+
+    std::string value{env_var};
+    if(value.find_first_not_of("0123456789") == std::string::npos)
+        return std::stoi(value) != 0;
+
+    for(char& c : value)
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+
+    for(const char* falsy : {"off", "false", "no", "n", "f", "0"})
+        if(value == falsy) return false;
+
+    return true;
+}
+
 /// \brief Device information structure for HIP device management
 struct device_info
 {

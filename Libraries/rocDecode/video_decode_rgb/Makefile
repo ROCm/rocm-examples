@@ -30,11 +30,21 @@ REQUIRED_DEPS := FFMPEG
 include $(COMMON_INCLUDE_DIR)/require_deps.mk
 
 include $(COMMON_INCLUDE_DIR)/find_filesystem.mk
-ifneq ($(SKIP_BUILD),1)
 
 # HIP variables
 ROCM_PATH ?= /opt/rocm
 UTILS_DIR := ${ROCM_PATH}/share/rocdecode/utils
+
+# rocDecode ships its shared utility sources under $(ROCM_PATH)/share/rocdecode/utils
+# (tarball) and with the amdrocm-decode-test package. They are not available with pip
+# wheels but are required to build this example; skip it if any are not installed.
+ROCDECODE_UTILS := rocvideodecode/roc_video_dec.cpp colorspace_kernels.cpp resize_kernels.cpp
+ifneq ($(strip $(foreach util,$(ROCDECODE_UTILS),$(if $(wildcard $(UTILS_DIR)/$(util)),,$(util)))),)
+    $(info $(EXAMPLE): Skipping build — rocDecode utility sources not found under $(UTILS_DIR))
+    SKIP_BUILD := 1
+endif
+
+ifneq ($(SKIP_BUILD),1)
 
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)

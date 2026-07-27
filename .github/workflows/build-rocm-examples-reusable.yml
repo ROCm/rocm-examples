@@ -16,10 +16,9 @@ on:
         required: true
         type: string
       install_methods:
-        description: "JSON array of install methods"
+        description: "JSON array of install methods (fallback for distros without per-distro override)"
         required: true
         type: string
-
 env:
   DEBIAN_FRONTEND: noninteractive
 
@@ -40,20 +39,24 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        install_method: ${{ fromJson(inputs.install_methods) }}
+        install_method: ${{ fromJson(inputs.distro_map)[inputs.distro].install_methods }}
         gpu_config: ${{ fromJson(inputs.gpu_configs) }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install TheRock Python wheel
-        if: ${{ matrix.install_method == 'wheel' }}
+      - name: Install ROCm (whl-multi-arch)
+        if: ${{ matrix.install_method == 'whl-multi-arch' }}
         run: |
-          pip install --no-cache-dir --index-url https://rocm.nightlies.amd.com/v2/${{ matrix.gpu_config.therock_family }}/ \
-            "rocm[libraries,devel]"
+          echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
+          pip install --no-cache-dir --upgrade pip
+          pip install --no-cache-dir \
+            --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ \
+            "rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+          rocm-sdk init
 
       - name: Wheel sanity check
-        if: ${{ matrix.install_method == 'wheel' }}
+        if: ${{ matrix.install_method == 'whl-multi-arch' }}
         id: sanity-check
         continue-on-error: true
         run: |
@@ -63,47 +66,38 @@ jobs:
           rocm-sdk init
           rocm-sdk test
 
-      - name: Setup environment variables (wheel)
-        if: ${{ matrix.install_method == 'wheel' }}
-        run: |
-          ROCM_PATH=$(rocm-sdk path --root)
-          echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
-          echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
-          echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
-          echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
-          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
-          echo "ENABLE_OPENMP=OFF" >> $GITHUB_ENV
-          echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
+      - name: Setup environment variables (whl-multi-arch)
+        if: ${{ matrix.install_method == 'whl-multi-arch' }}
+        id: whl-multiarch-version
+        run: python3 .github/build_tools/setup_whl_env.py
 
-      - name: Install TheRock tarball
-        if: ${{ matrix.install_method == 'tarball' }}
-        id: install-tarball
+      - name: Install TheRock tarball (multi-arch)
+        if: ${{ matrix.install_method == 'tarball-multi-arch' }}
+        id: install-tarball-multi-arch
         run: |
-          LATEST_TARBALL=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" https://rocm.nightlies.amd.com/tarball/ \
-            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz" \
-            | sort -V \
-            | tail -1)
+          TARBALL_LISTING=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" https://rocm.nightlies.amd.com/tarball-multi-arch/ \
+            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
+          LATEST_TARBALL=$(echo "${TARBALL_LISTING}" | sort -V | tail -1)
           mkdir /therock-tarball && cd /therock-tarball
-          wget "https://rocm.nightlies.amd.com/tarball/${LATEST_TARBALL}"
+          wget "https://rocm.nightlies.amd.com/tarball-multi-arch/${LATEST_TARBALL}"
           mkdir install
           tar -xzf "${LATEST_TARBALL}" -C install
 
           ROCM_VERSION=$(echo "${LATEST_TARBALL}" | grep -oE "[0-9]+\.[0-9]+\.\w+")
           echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
           echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "## Tarball link: https://rocm.nightlies.amd.com/tarball/${LATEST_TARBALL}" >> $GITHUB_STEP_SUMMARY
+          echo "## Tarball link: https://rocm.nightlies.amd.com/tarball-multi-arch/${LATEST_TARBALL}" >> $GITHUB_STEP_SUMMARY
 
-      - name: Setup environment variables (tarball)
-        if: ${{ matrix.install_method == 'tarball' }}
+      - name: Setup environment variables (tarball-multi-arch)
+        if: ${{ matrix.install_method == 'tarball-multi-arch' }}
         run: |
           ROCM_PATH=/therock-tarball/install
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
-          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/lib/llvm/bin:${PATH}" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/lib/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
@@ -170,14 +164,14 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Upload Makefile build artifacts
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
 
       - name: Run tests
@@ -244,7 +238,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
 
       - name: Makefile test
@@ -256,7 +250,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.sanity-check.outputs.rocm_version || steps.install-tarball.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
 
       - name: Clean the workspace

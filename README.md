@@ -9,6 +9,7 @@ The examples are structured in several categories:
 - [HIP-Doc](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/) contains the example codes that are shown in the [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/)
 - [Libraries](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/) contains examples for ROCm-libraries, that provide higher-level functionality
 - [Applications](https://github.com/ROCm/rocm-examples/tree/amd-staging/Applications/) showcases some common applications, using HIP to accelerate them
+- [Systems](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/) contains examples for ROCm-systems, such as hipFile for GPU-direct storage I/O
 
 - [AI](https://github.com/ROCm/rocm-examples/tree/amd-staging/AI/) contains instructions on how to use ROCm for AI
 - [Tutorials](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tutorials/) contains the code accompanying the HIP Tutorials that can be found in [the HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/tutorial/saxpy.html).
@@ -77,7 +78,7 @@ The following instructions showcase building the Docker image and full example s
 
 - `$ git clone https://github.com/ROCm/rocm-examples.git`
 - `$ cd rocm-examples/Dockerfiles`
-- `$ docker build . -t rocm-examples -f hip-libraries-rocm-ubuntu.Dockerfile --build-arg GID="$(getent group render | cut -d':' -f 3)"` (on ROCm) or `$ docker build . -t rocm-examples -f hip-libraries-cuda-ubuntu.Dockerfile` (on CUDA)
+- `$ docker build . -t rocm-examples -f ubuntu-24.04-rocm.Dockerfile` (on ROCm) or `$ docker build . -t rocm-examples -f hip-libraries-cuda-ubuntu.Dockerfile` (on CUDA)
 - `$ docker run -it --device /dev/kfd --device /dev/dri rocm-examples bash` (on ROCm) or `$ docker run -it --gpus=all rocm-examples bash` (on CUDA)
 - `# git clone https://github.com/ROCm/rocm-examples.git`
 - `# cd rocm-examples`
@@ -241,6 +242,8 @@ The following options are available when building with CMake.
           - [pageable_host_memory](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/Host-Memory/pageable_host_memory): Shows how to allocate pageable memory on the host and transfer its contents to the device.
           - [pinned_host_memory](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/Host-Memory/pinned_host_memory): Shows how to allocate pinned memory on the host and transfer its contents to the device.
         - [SOMA](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/SOMA) contains the examples from the [Stream Ordered Memory Allocator](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/stream_ordered_allocator.html) page.
+          - [ipc_memory_pool_device_pointer](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/SOMA/ipc_memory_pool_device_pointer): Shows how to share a stream ordered memory allocation between two processes using `hipMemPoolExportPointer` and `hipMemPoolImportPointer`.
+          - [ipc_memory_pool_shareable_handle](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/SOMA/ipc_memory_pool_shareable_handle): Shows how to share a memory pool between two processes using `hipMemPoolExportToShareableHandle` and `hipMemPoolImportFromShareableHandle`.
           - [memory_pool](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/SOMA/memory_pool): Shows how to use the stream ordered memory allocation (SOMA) API to set up and manage a memory pool.
           - [memory_pool_resource_usage_statistics](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/SOMA/memory_pool_resource_usage_statistics): Shows how to query resource usage statistics for a memory pool.
           - [memory_pool_threshold](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Programming-Guide/Using-HIP-Runtime-API/Memory-Management/SOMA/memory_pool_threshold): Shows how to use the stream ordered memory allocation (SOMA) API to set up and manage a memory pool, while defining a threshold to specify an amount of memory to reserve.
@@ -655,5 +658,21 @@ The following options are available when building with CMake.
   - [rocprof-compute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/rocprof-compute): Shows how to use the ROCm Compute Profiler.
   - [rocprof-systems](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/rocprof-systems): Demonstrates how to use the ROCm Systems Profiler.
   - [rocprofv3](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tools/rocprofv3): Illustrates how to use the `rocprofv3` profiler.
+- [Systems](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/) contains examples for ROCm systems libraries.
+  - [hipFile](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/) contains examples for the hipFile GPU-direct storage I/O library. hipFile supports all ROCm-capable GPUs on Linux; NVIDIA GPUs are supported when cuFile is installed.
+    - [aiscp](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/aiscp/): Copies a file to another file by routing data through GPU memory using hipFile, demonstrating GPU-direct storage I/O in the simplest possible end-to-end context.
+    - [api/get_version](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/api/get_version/): Queries the hipFile library version at both compile time (via header macros) and runtime (via `hipFileGetVersion`).
+    - [basics/bufregister_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/bufregister_write/): Writes a registered GPU buffer to a file using `hipFileBufRegister` to enable the GPU-direct fast path.
+    - [basics/no_bufregister_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/no_bufregister_write/): Writes a GPU buffer to a file without explicit buffer registration; hipFile routes the data through its internal pool buffer.
+    - [basics/no_odirect_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/no_odirect_write/): Writes a registered GPU buffer to a file opened without `O_DIRECT`, triggering hipFile's POSIX-compatible fallback path.
+    - [basics/roundtrip_verify](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/roundtrip_verify/): Performs a write-read-write round trip via hipFile and verifies data integrity with FNV-1a hashing.
+    - [basics/iterative_read](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/iterative_read/): Reads a file into GPU memory in fixed-size chunks by advancing the device pointer on each `hipFileRead` call.
+    - [basics/iterative_devmem_offset_read](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/iterative_devmem_offset_read/): Reads a file into a registered GPU buffer in chunks by advancing the `buf_offset` parameter rather than the base pointer.
+    - [basics/various_mem_rw](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/various_mem_rw/): Round-trips a file through hipFile using device memory, managed memory, or pinned host memory, selectable at runtime.
+    - [basics/subregion_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/subregion_write/): Reads a full file into a registered GPU buffer and then writes only a trailing sub-region to an output file using a non-zero `buf_offset`.
+    - [async/roundtrip_async](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/async/roundtrip_async/): Async GPU-direct read and write on the HIP default stream using `hipFileReadAsync` and `hipFileWriteAsync`.
+    - [async/roundtrip_async_nonblocking_stream](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/async/roundtrip_async_nonblocking_stream/): Same async round trip on an explicit `hipStreamNonBlocking` stream that does not implicitly synchronize with the default stream.
+    - [async/roundtrip_async_multi_stream](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/async/roundtrip_async_multi_stream/): Submits concurrent async read+write pairs across multiple independent non-blocking streams, each processing a non-overlapping file slice.
+    - [async/roundtrip_async_multi_stream_registered](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/async/roundtrip_async_multi_stream_registered/): Extends the multi-stream example by registering each stream with `hipFileStreamRegister` and fixed-parameter hints to reduce per-submission driver overhead.
 - [Tutorials](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tutorials/): Showcases HIP Documentation Tutorials.
   - [reduction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Tutorials/reduction/): Showcases a reduction tutorial for HIP Documentation.

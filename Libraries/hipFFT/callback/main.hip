@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2024-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -53,6 +53,7 @@ __device__ hipfftDoubleComplex load_callback(hipfftDoubleComplex* input,
 // Can not give __device__ function to HIP_SYMBOL
 __device__ auto load_callback_dev = load_callback;
 
+// NOTE: Function pointer callbacks are about to be deprecated, in favor of JIT callbacks.
 int main()
 {
     std::cout << "hipfft 1D double-precision complex-to-complex transform with callback\n";

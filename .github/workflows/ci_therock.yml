@@ -9,6 +9,7 @@ on:
       - 'HIP-Doc/**'
       - 'Libraries/**'
       - 'Programming-Guide/**'
+      - 'Systems/**'
       - 'Tools/**'
       - 'Tutorials/**'
       - 'Common/**'
@@ -23,6 +24,7 @@ on:
       - 'HIP-Doc/**'
       - 'Libraries/**'
       - 'Programming-Guide/**'
+      - 'Systems/**'
       - 'Tools/**'
       - 'Tutorials/**'
       - 'Common/**'
@@ -40,9 +42,6 @@ on:
         - all
         - gfx1100
         - gfx1151
-        - gfx1201
-        - gfx90a
-        - gfx942
       install_method:
         description: "Installation method"
         required: true
@@ -50,8 +49,8 @@ on:
         type: choice
         options:
         - all
-        - wheel
-        - tarball
+        - whl-multi-arch
+        - tarball-multi-arch
       distro:
         description: "Distro to build"
         required: true
@@ -59,10 +58,10 @@ on:
         type: choice
         options:
         - all
-        - ubuntu-22.04
+        - ubuntu-24.04
+        - ubuntu-26.04
         - sles-15.7
         - almalinux-8
-
 permissions:
   contents: read
   packages: read
@@ -92,7 +91,7 @@ jobs:
         env:
           GPU_CONFIG: ${{ github.event.inputs.gpu_config || 'all' }}
           INSTALL_METHOD: ${{ github.event.inputs.install_method || 'all' }}
-          DISTRO: ${{ github.event.inputs.distro || 'ubuntu-22.04' }}
+          DISTRO: ${{ github.event.inputs.distro || 'ubuntu-24.04' }}
         run: python3 .github/build_tools/configure_ci.py
 
   build:

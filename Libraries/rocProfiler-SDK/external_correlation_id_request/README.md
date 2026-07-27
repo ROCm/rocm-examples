@@ -41,6 +41,7 @@ This example demonstrates how to use the rocProfiler SDK's external correlation 
 
 - **Data Validation**:
   - The `tool_fini` function performs rigorous checks to ensure that the correlation ID mechanism is working correctly, which is a good practice for tool developers.
+  - The temporal-ordering check between operation end timestamps and correlation ID retirement timestamps is reported but non-fatal by default, because GPU/CPU clock-domain skew on some hardware (for example RDNA3.5 APUs) produces benign timestamp inversions that rocprofiler itself only warns about. Set the environment variable `ROCPROFILER_CI_STRICT_TIMESTAMPS=1` to turn a violation into a hard failure.
 
 ## Demonstrated API Calls
 

@@ -1,3 +1,25 @@
+# MIT License
+#
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 FROM almalinux:8
 
 ARG VULKAN_SDK_VERSION=1.4.335.0
@@ -7,6 +29,7 @@ ARG GLSLANG_VERSION=13.1.1
 # GPU_TARGET and THEROCK_FAMILY are set at workflow runtime, not in the base image
 ENV VULKAN_SDK_VERSION=${VULKAN_SDK_VERSION}
 
+# libquadmath: amdflang links against libquadmath.so.0 at runtime (TheRock#3290)
 RUN dnf install -y dnf-plugins-core && \
     dnf config-manager --set-enabled powertools && \
     dnf update -y && \
@@ -33,7 +56,8 @@ RUN dnf install -y dnf-plugins-core && \
         libXi-devel \
         libXinerama-devel \
         libXrandr-devel \
-        libatomic && \
+        libatomic \
+        libquadmath && \
     dnf clean all
 
 # GCC 8's libstdc++fs has an ABI-incompatible std::filesystem::path layout vs
@@ -43,8 +67,8 @@ ENV PATH="/opt/rh/gcc-toolset-13/root/usr/bin:${PATH}" \
     LD_LIBRARY_PATH="/opt/rh/gcc-toolset-13/root/usr/lib/gcc/x86_64-redhat-linux/13"
 
 # ============================================================================
-# Python virtual environment (ready for ROCm wheel or tarball installation)
-# ROCm installation is delegated to the CI workflow to support both methods
+# Python virtual environment (ready for multi-arch ROCm installation)
+# ROCm installation is delegated to the CI workflow (whl-multi-arch or tarball-multi-arch)
 # ============================================================================
 
 RUN python3.11 -m venv /opt/venv && \

@@ -48,3 +48,52 @@ template <typename T> inline void Swap(T &a, T &b)
     a   = b;
     b   = t;
 }
+
+// Software bilinear sampler used on architectures that lack hardware texture
+// units (e.g. CDNA / MI300X). Replicates the behaviour of tex2D<float> with
+// normalizedCoords=true, hipFilterModeLinear, hipAddressModeMirror on both
+// axes. Guarded by __HIPCC__ so plain C++ translation units do not see the
+// __device__ keyword. Always compiled for all GPU targets so that *KernelSW
+// variants are available regardless of device architecture.
+#ifdef __HIPCC__
+
+__device__ inline float tex2D_mirror_coord(float u, int N)
+{
+    // Fold into [0, 2) then reflect the upper half back to [0, 1].
+    u = fabsf(u);
+    u = u - floorf(u * 0.5f) * 2.0f; // u in [0, 2)
+    if (u > 1.0f)
+        u = 2.0f - u; // u in [0, 1]
+    // Convert to continuous texel space; clamp for floating-point edge cases.
+    float p = u * (float)N - 0.5f;
+    if (p < 0.0f)
+        p = 0.0f;
+    if (p > (float)(N - 1))
+        p = (float)(N - 1);
+    return p;
+}
+
+__device__ inline float tex2D_bilinear(
+    const float* data, int width, int height, int stride, float u, float v)
+{
+    float px = tex2D_mirror_coord(u, width);
+    float py = tex2D_mirror_coord(v, height);
+
+    int x0 = (int)floorf(px);
+    int y0 = (int)floorf(py);
+    int x1 = x0 + 1 < width  ? x0 + 1 : width  - 1;
+    int y1 = y0 + 1 < height ? y0 + 1 : height - 1;
+
+    float ax = px - (float)x0;
+    float ay = py - (float)y0;
+
+    float v00 = data[y0 * stride + x0];
+    float v10 = data[y0 * stride + x1];
+    float v01 = data[y1 * stride + x0];
+    float v11 = data[y1 * stride + x1];
+
+    return (1.0f - ay) * ((1.0f - ax) * v00 + ax * v10)
+           + ay * ((1.0f - ax) * v01 + ax * v11);
+}
+
+#endif // __HIPCC__

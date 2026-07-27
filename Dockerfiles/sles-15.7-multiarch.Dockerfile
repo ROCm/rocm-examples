@@ -1,3 +1,25 @@
+# MIT License
+#
+# Copyright (c) 2026 Advanced Micro Devices, Inc. All rights reserved.
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 FROM registry.suse.com/suse/sle15:15.7
 
 ARG VULKAN_SDK_VERSION=1.4.335.0
@@ -58,16 +80,14 @@ RUN zypper -qni install -y bzip2 m4 zlib-devel && \
     zypper clean -a
 
 # ============================================================================
-# Python virtual environment (ready for ROCm wheel or tarball installation)
-# ROCm installation is delegated to the CI workflow to support both methods
+# Python virtual environment (ready for multi-arch ROCm installation)
+# ROCm installation is delegated to the CI workflow (whl-multi-arch or tarball-multi-arch)
 # ============================================================================
 
-# Create virtual environment with base packages
 RUN python3.13 -m venv /opt/venv && \
     /opt/venv/bin/pip install --upgrade pip && \
     /opt/venv/bin/pip install pyyaml cmake
 
-# Set up virtual environment in PATH
 ENV PATH="/opt/venv/bin:${PATH}"
 ENV VIRTUAL_ENV="/opt/venv"
 
@@ -94,7 +114,7 @@ ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib"
 ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
 
-# build ffmpeg from source
+# Build FFmpeg from source (not available in SLES repos)
 WORKDIR /tmp
 RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
     tar -xvf ffmpeg-4.4.6.tar.xz && \

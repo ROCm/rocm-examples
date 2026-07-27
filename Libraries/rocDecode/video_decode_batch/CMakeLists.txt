@@ -50,6 +50,14 @@ find_package(rocprofiler-register REQUIRED)
 find_package(Threads REQUIRED)
 find_package(FFmpeg REQUIRED)
 
+# rocDecode ships its shared utility sources under ${ROCM_PATH}/share/rocdecode/utils (tarball)
+# and with the amdrocm-decode-test package. The files are not available with pip wheels.
+# They are required to build this example; skip it if they are not installed.
+if(NOT EXISTS "${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp")
+    message(WARNING "rocDecode utility sources not found under ${ROCM_PATH}/share/rocdecode/utils, skipping ${example_name}")
+    return()
+endif()
+
 add_executable(${example_name}
     main.cpp
     ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp

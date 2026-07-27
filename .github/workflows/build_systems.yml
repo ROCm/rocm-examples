@@ -1,0 +1,42 @@
+name: Build Systems
+
+on:
+  push:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Systems/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches: [ amd-staging, amd-mainline, release/** ]
+    paths:
+      - 'Systems/**'
+      - '.github/workflows/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
+  cancel-in-progress: true
+
+env:
+    DEBIAN_FRONTEND: noninteractive
+    GPU_TARGETS: gfx908;gfx90a;gfx942;gfx950;gfx1030;gfx1100;gfx1101;gfx1200;gfx1201
+
+jobs:
+    build:
+        name: "Build Systems Examples"
+        runs-on: ubuntu-latest
+        container:
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14
+        defaults:
+            run:
+                shell: bash
+        steps:
+          - uses: actions/checkout@v4
+          - name: CMake Configure and Build
+            run: |
+              cd Systems
+              cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -S . -B build
+              cmake --build build -j $(nproc)
+          - name: Make
+            run: |
+              cd Systems
+              make -j $(nproc)

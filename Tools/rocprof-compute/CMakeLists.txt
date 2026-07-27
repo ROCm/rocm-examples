@@ -33,15 +33,6 @@ set(example_occupancy ${example_name}-occupancy)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-set(ROCPROF_COMPUTE_SUPPORTED_ARCH gfx908 gfx90a gfx940 gfx941 gfx942 gfx950)
-
-foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
-    if(NOT ARCH IN_LIST ROCPROF_COMPUTE_SUPPORTED_ARCH)
-        message(WARNING "${example_name} does not support architecture ${ARCH}. Not building ${example_name} examples")
-        return()
-    endif()
-endforeach()
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -49,6 +40,13 @@ select_hip_platform()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "${example_name} does not support CUDA accelerators. Not building ${example_name} examples.")
+    return()
+endif()
+
+set(ROCPROF_COMPUTE_SUPPORTED_ARCH gfx908 gfx90a gfx940 gfx941 gfx942 gfx950)
+include("${CMAKE_CURRENT_LIST_DIR}/../../Common/FilterHIPArchitectures.cmake")
+filter_hip_architectures("${example_name}" "${ROCPROF_COMPUTE_SUPPORTED_ARCH}" SHOULD_SKIP)
+if(SHOULD_SKIP)
     return()
 endif()
 
