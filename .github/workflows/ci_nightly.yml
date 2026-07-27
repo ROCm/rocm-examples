@@ -39,6 +39,7 @@ on:
         - ubuntu-26.04
         - sles-15.7
         - almalinux-8
+        - stable_release
 permissions:
   contents: read
   packages: read

@@ -101,6 +101,22 @@ jobs:
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
+      - name: Setup environment variables (preinstalled)
+        if: ${{ matrix.install_method == 'preinstalled' }}
+        id: preinstalled
+        run: |
+          ROCM_VERSION=$(cat /opt/rocm/core/.info/version)
+          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "## ROCm Version: ${ROCM_VERSION} (preinstalled)" >> $GITHUB_STEP_SUMMARY
+
+          ROCM_PATH=/opt/rocm
+          echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
+          echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
+          echo "ENABLE_CK=ON" >> $GITHUB_ENV
+          echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
+
       - name: Makefile build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
@@ -109,7 +125,7 @@ jobs:
       - name: CMake configure
         if: ${{ !cancelled() }}
         run: |
-          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" 2> >(tee cmake_error.log >&2)
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -DROCM_EXAMPLES_ENABLE_CK="${ENABLE_CK}" 2> >(tee cmake_error.log >&2)
 
       - name: CMake configure error summary
         if: ${{ !cancelled() }}
@@ -164,14 +180,14 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Upload Makefile build artifacts
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
 
       - name: Run tests
@@ -238,7 +254,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
 
       - name: Makefile test
@@ -250,7 +266,7 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
 
       - name: Clean the workspace
