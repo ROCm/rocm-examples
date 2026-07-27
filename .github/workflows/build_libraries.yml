@@ -58,15 +58,18 @@ jobs:
               fi
               echo "ENABLE_CK=${ENABLE_CK}" >> $GITHUB_ENV
               echo "ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK}"
+          - name: Generate skip lists
+            run: |
+              python3 .github/build_tools/generate_skip_tests.py --channel stable --target "${GPU_TARGETS%%;*}"
           - name: CMake Configure and Build
             run: |
               cd Libraries
-              cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -DROCM_EXAMPLES_ENABLE_OPENMP=ON -S . -B build
+              cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -DROCM_EXAMPLES_ENABLE_OPENMP=ON -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" -S . -B build
               cmake --build build --parallel $(nproc)
           - name: Make
             run: |
               cd Libraries
-              make -j $(nproc) ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} HIP_ARCHITECTURES="${GPU_TARGETS}"
+              make -j $(nproc) ROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} HIP_ARCHITECTURES="${GPU_TARGETS}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
 
           # Clean the workspace here since other jobs may not have the permissions to do so later
           # (needed for self-hosted runners)
