@@ -39,10 +39,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
 find_package(hipcub REQUIRED)
 find_package(hiprand REQUIRED)
 # Workaround for hipRAND, requires manual linking with backend.
+# rocThrust provides the iterators on AMD; NVIDIA gets Thrust from CUDAToolkit.
 if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
     find_package(CUDAToolkit REQUIRED)
 else()
     find_package(rocrand REQUIRED)
+    find_package(rocthrust REQUIRED)
 endif()
 
 add_executable(${example_name} main.hip)
@@ -53,7 +55,7 @@ target_link_libraries(${example_name} PRIVATE hip::hipcub hip::hiprand)
 if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia")
     target_link_libraries(${example_name} PRIVATE CUDA::curand)
 else()
-    target_link_libraries(${example_name} PRIVATE roc::rocrand)
+    target_link_libraries(${example_name} PRIVATE roc::rocrand roc::rocthrust)
 endif()
 target_include_directories(
     ${example_name}

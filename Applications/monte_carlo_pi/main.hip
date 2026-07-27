@@ -25,10 +25,11 @@
 #include "hiprand_utils.hpp"
 
 #include <hipcub/device/device_reduce.hpp>
-#include <hipcub/iterator/counting_input_iterator.hpp>
-#include <hipcub/iterator/discard_output_iterator.hpp>
-#include <hipcub/iterator/transform_input_iterator.hpp>
 #include <hiprand/hiprand.h>
+
+// CUB 3.0 removed hipcub's CUB-style iterators; use portable Thrust ones.
+#include <thrust/iterator/counting_iterator.h>
+#include <thrust/iterator/transform_iterator.h>
 
 #include <hip/hip_runtime.h>
 
@@ -66,13 +67,11 @@ float calculate_pi(int sample_count, float* d_data)
     // 4. Set up the input and output iterator for hipCUB's Sum.
 
     // Represents the samples' index.
-    auto input_counting = hipcub::CountingInputIterator<int>(0);
+    auto input_counting = thrust::counting_iterator<int>(0);
 
     // Converts the sample's index to a 0 or 1, indicating whether the sample lies within the disk.
     conversion_op convert_op(sample_count, d_data);
-    auto input = hipcub::TransformInputIterator<bool, conversion_op, decltype(input_counting)>(
-        input_counting,
-        convert_op);
+    auto          input = thrust::make_transform_iterator(input_counting, convert_op);
 
     int* d_output{};
     HIP_CHECK(hipMalloc(&d_output, sizeof(int)));
