@@ -60,9 +60,6 @@ jobs:
         id: sanity-check
         continue-on-error: true
         run: |
-          ROCM_VERSION=$(rocm-sdk version)
-          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
-          echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
           rocm-sdk init
           rocm-sdk test
 
@@ -184,19 +181,9 @@ jobs:
       - name: Run tests
         if: ${{ !cancelled() }}
         run: |
-          # skip_tests.txt was produced by the "Generate skip lists" step.
+          # skip_tests.txt was produced by the "Generate skip lists" step,
+          # which also reports the full skip manifest to the step summary.
           SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
-          if [ -s "${SKIP_FILE}" ]; then
-            echo "## Skipped tests" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat "${SKIP_FILE}" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No tests skipped." >> $GITHUB_STEP_SUMMARY
-          fi
-
           ctest --test-dir build --output-on-failure --exclude-from-file "${SKIP_FILE}" 2>&1 | tee ctest_output.log
 
       - name: Test summary
