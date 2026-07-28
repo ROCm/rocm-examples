@@ -33,7 +33,7 @@ import os
 from skip_manifest import SKIP_MANIFEST
 
 
-def _entry_applies(entry, channel, target, distro):
+def _entry_applies(entry, channel, target, distro, install_method):
     """Return True if this manifest entry applies to the requested context.
 
     A filter that is absent from the entry matches everything. A filter that is
@@ -44,6 +44,12 @@ def _entry_applies(entry, channel, target, distro):
     if target and "targets" in entry and target not in entry["targets"]:
         return False
     if distro and "distros" in entry and distro not in entry["distros"]:
+        return False
+    if (
+        install_method
+        and "install_methods" in entry
+        and install_method not in entry["install_methods"]
+    ):
         return False
     return True
 
@@ -74,12 +80,21 @@ def main():
         default="",
         help="Distro key for distro-specific skips (e.g. ubuntu-24.04)",
     )
+    parser.add_argument(
+        "--install-method",
+        default="",
+        help="Install method for method-specific skips (e.g. whl-multi-arch, "
+        "tarball-multi-arch, preinstalled). whl and tarball are both the "
+        "'nightly' channel but ship different payloads.",
+    )
     args = parser.parse_args()
 
     applicable = [
         e
         for e in SKIP_MANIFEST
-        if _entry_applies(e, args.channel, args.target, args.distro)
+        if _entry_applies(
+            e, args.channel, args.target, args.distro, args.install_method
+        )
     ]
 
     # Preserve manifest order, de-dup while keeping first occurrence.
@@ -138,6 +153,8 @@ def main():
         label_bits.append(f"target={args.target}")
     if args.distro:
         label_bits.append(f"distro={args.distro}")
+    if args.install_method:
+        label_bits.append(f"install_method={args.install_method}")
     label = ", ".join(label_bits)
 
     summary_lines = [f"### rocm-examples skip manifest ({label})", ""]

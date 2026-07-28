@@ -39,6 +39,10 @@ channels : list[str]  -- subset of {"stable", "nightly"}. "stable" = the pinned
     this to scope a skip to only one CI channel.
 targets  : list[str]  -- match against the --target value (e.g. "gfx1100").
 distros  : list[str]  -- match against the --distro value (e.g. "ubuntu-24.04").
+install_methods : list[str]  -- match against the --install-method value (e.g.
+    "whl-multi-arch", "tarball-multi-arch", "preinstalled"). Use this to scope a
+    skip to a specific packaging: whl and tarball are both the "nightly" channel
+    but ship different payloads, so this axis is orthogonal to ``channels``.
 
 How to add a skip
 -----------------
@@ -75,10 +79,14 @@ Then optionally narrow with channels / targets / distros (absent =
 applies everywhere). Always include a ``reason``.
 """
 
-# rocDecode leaf directories. All ten need the same test-only skip: they require
-# video test data under $ROCM_PATH/share/rocdecode that CI images don't carry.
-# ctest self-guards each on `if(EXISTS ...)`, so ctest key is None; only the
-# `make test` path needs the explicit skip.
+# rocDecode leaf directories. All ten need the video test data + utility sources
+# under $ROCM_PATH/share/rocdecode. The pinned stable image ships these via the
+# amdrocm-decode-test package, and the nightly tarball carries them too, so
+# rocDecode builds and its tests run in both. The nightly whl install does NOT
+# carry the data, so the make-test skip is scoped to that install method.
+# ctest self-guards each on `if(EXISTS ...)`, so the ctest key is None (ctest
+# auto-skips where the data is absent); only the `make test` path needs the
+# explicit, install-method-scoped skip.
 _ROCDECODE_DIRS = [
     "rocdec_decode",
     "video_decode",
@@ -108,27 +116,28 @@ SKIP_MANIFEST = [
         "scope": ["test"],
         "reason": "ROCm/rocm-systems#7263 static device symbol abort at runtime",
     },
-    # --- rocDecode: test-only, all channels, no ctest key -----------------
+    # --- rocDecode: test-only, nightly whl install only, no ctest key -----
+    # The stable image (amdrocm-decode-test) and the nightly tarball carry the
+    # video data, so their tests run; the nightly whl install doesn't, so skip
+    # make test only there.
     *[
         {
             "ctest": None,
             "path": f"Libraries/rocDecode/{d}",
             "scope": ["test"],
-            "reason": "requires video test data under $ROCM_PATH/share/rocdecode",
+            "channels": ["nightly"],
+            "install_methods": ["whl-multi-arch"],
+            "reason": "video test data absent from the TheRock nightly whl install (present on the stable image via amdrocm-decode-test and in the nightly tarball)",
         }
         for d in _ROCDECODE_DIRS
     ],
-    # --- Stable-only build skip (channel-scoping demonstrator) ------------
-    # NOTE: HIP-Basic/cooperative_groups_prefix_sum does not currently exist on
-    # amd-staging (only HIP-Basic/cooperative_groups). This entry is inert until
-    # that example lands; it documents the stable-only build-skip mechanism.
-    # hip_scan.h is absent from the pinned 7.14 stable image (version skew),
-    # so if/when the example is added it will not compile on that image.
+    # --- Stable-only build skip ------------
+    # hip_scan.h is absent from the pinned 7.14 stable image
     {
         "ctest": None,
         "path": "HIP-Basic/cooperative_groups_prefix_sum",
         "scope": ["build"],
         "channels": ["stable"],
-        "reason": "hip_scan.h not present in the pinned 7.14 stable image (version skew)",
+        "reason": "hip_scan.h not present in the pinned 7.14 stable image",
     },
 ]
