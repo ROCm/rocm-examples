@@ -32,15 +32,20 @@ EXAMPLES := \
 	video_decode_rgb \
 	video_to_sequence
 
-# All rocDecode tests are skipped by default: they require test data
-# (videos under $(ROCM_PATH)/share/rocdecode/) that ctest guards behind
-# `if(EXISTS …)` checks. Encoding the same conditional logic in Make is
-# possible but noisy; for now skip the whole subtree so `make test` from
-# root stays clean. To run rocDecode tests manually, cd into the leaf
-# Makefile and run `make test`.
-SKIP_FROM_TEST := $(EXAMPLES)
+# All rocDecode examples need video test data (under $(ROCM_PATH)/share/rocdecode)
+# that CI images don't carry, so every example is test-skipped. The skip is now
+# driven by .github/build_tools/skip_manifest.py: CI runs generate_skip_tests.py
+# and passes SKIP_FROM_TEST (all ten example paths) on the make command line,
+# overriding this default. skip_here matches only entries naming THIS directory's
+# examples. A bare local `make test` runs them; to skip manually, pass
+# SKIP_FROM_TEST or cd into a leaf and control it there. The `test` target honors
+# SKIP_FROM_BUILD too: an example that isn't built can't be tested, so build
+# skips imply test skips.
+SKIP_FROM_BUILD ?=
+SKIP_FROM_TEST ?=
+skip_here = $(foreach e,$(EXAMPLES),$(if $(filter %/$(notdir $(CURDIR))/$(e),$(1)),$(e)))
 
-all: $(EXAMPLES)
+all: $(filter-out $(call skip_here,$(SKIP_FROM_BUILD)),$(EXAMPLES))
 
 clean: TARGET=clean
 clean: all
@@ -49,6 +54,6 @@ $(EXAMPLES):
 	$(MAKE) -C $@ $(TARGET)
 
 test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+test: $(filter-out $(call skip_here,$(SKIP_FROM_TEST) $(SKIP_FROM_BUILD)),$(EXAMPLES))
 
 .PHONY: all clean test $(EXAMPLES)

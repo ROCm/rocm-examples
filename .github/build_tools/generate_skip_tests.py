@@ -1,84 +1,179 @@
 #!/usr/bin/env python3
-"""Generate skip_tests.txt for rocm-examples CI.
+"""Generate CI skip artifacts for rocm-examples from the unified manifest.
 
-Output file is used by ctest --exclude-from-file in the workflow.
-Run from repo root or with --output-dir pointing at .github/build_tools.
+Reads ``skip_manifest.SKIP_MANIFEST`` (the single source of truth) and, filtered
+by the requested channel/target/distro, emits:
+
+  * ``skip_tests.txt``  -- ctest names (scope contains "test", ctest key set).
+                           Consumed by ``ctest --exclude-from-file``.
+  * ``skip_build.txt``  -- repo-relative paths (scope contains "build").
+                           Consumed by ``Common/SkipExamples.cmake``.
+  * ``SKIP_FROM_TEST``  -- space-separated repo-relative leaf paths (scope test).
+  * ``SKIP_FROM_BUILD`` -- space-separated repo-relative leaf paths (scope build).
+
+``SKIP_FROM_*`` carry full paths (e.g. ``Libraries/hipFFT/callback``), not bare
+dir names, so a shared leaf name like ``callback`` — which exists under hipFFT,
+rocFFT, AND rocProfiler-SDK/counter_collection — only skips the intended one. The
+participating parent Makefiles match these paths against their own directory; all
+other Makefiles filter bare names and therefore ignore the path entries.
+
+The two ``SKIP_FROM_*`` values are echoed to stdout and, when running under
+GitHub Actions, appended to ``$GITHUB_ENV`` so the build/test steps can pass them
+on the ``make`` command line. A human-readable summary is printed and, when
+available, appended to ``$GITHUB_STEP_SUMMARY``.
+
+NOTE: a bare local ``make``/``make test`` (without running this generator) skips
+nothing — CI passes the generated lists explicitly. To reproduce a CI skip
+locally, run this script and pass the echoed SKIP_FROM_* on the make line.
 """
 
 import argparse
 import os
 
-# Tests to skip unconditionally on all targets/distros (upstream bugs in TheRock nightlies).
-GLOBAL_SKIP_TESTS = [
-    # ROCm/rocm-systems#7263: HIP CLR cannot resolve static device symbols via hipModuleGetGlobal.
-    # rocFFT's default store callback (store_cb_default_complex_double) is a static local
-    # function whose .static.<hash> mangled name causes an abort at runtime.
-    "hipfft_callback",
-    "rocfft_callback",
-]
+from skip_manifest import SKIP_MANIFEST
 
-# Tests to skip per GPU target (one list per target that has skips)
-SKIP_TESTS = {
-    # Add more targets as needed, e.g.:
-    # "gfx1100": [],
-}
 
-# Tests to skip for a specific GPU target + distro combination.
-# Keys are "<gpu_target>:<distro_key>", e.g. "gfx1151:sles-15.7".
-DISTRO_SKIP_TESTS = {
-    # Example:
-    # "gfx1151:sles-15.7": ["some_test"],
-}
+def _entry_applies(entry, channel, target, distro, install_method):
+    """Return True if this manifest entry applies to the requested context.
+
+    A filter that is absent from the entry matches everything. A filter that is
+    present must contain the requested value.
+    """
+    if "channels" in entry and channel not in entry["channels"]:
+        return False
+    if target and "targets" in entry and target not in entry["targets"]:
+        return False
+    if distro and "distros" in entry and distro not in entry["distros"]:
+        return False
+    if (
+        install_method
+        and "install_methods" in entry
+        and install_method not in entry["install_methods"]
+    ):
+        return False
+    return True
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description="Generate skip_tests.txt for rocm-examples CI."
+        description="Generate CI skip artifacts for rocm-examples."
     )
     parser.add_argument(
         "--output-dir",
         default=os.path.join(os.path.dirname(__file__)),
-        help="Directory to write skip_tests.txt (default: script dir)",
+        help="Directory to write skip_tests.txt / skip_build.txt (default: script dir)",
+    )
+    parser.add_argument(
+        "--channel",
+        required=True,
+        choices=["stable", "nightly"],
+        help="CI channel: 'stable' = pinned rocm:7.14 native workflows, "
+        "'nightly' = TheRock multi-arch reusable workflow",
     )
     parser.add_argument(
         "--target",
-        required=True,
-        help="GPU target whose skip list to write (e.g. gfx1151)",
+        default="",
+        help="GPU target for target-specific skips (e.g. gfx1100)",
     )
     parser.add_argument(
         "--distro",
         default="",
-        help="Distro key for distro-specific skips (e.g. sles-15.7)",
+        help="Distro key for distro-specific skips (e.g. ubuntu-24.04)",
+    )
+    parser.add_argument(
+        "--install-method",
+        default="",
+        help="Install method for method-specific skips (e.g. whl-multi-arch, "
+        "tarball-multi-arch, preinstalled). whl and tarball are both the "
+        "'nightly' channel but ship different payloads.",
     )
     args = parser.parse_args()
 
-    lines = list(GLOBAL_SKIP_TESTS)
-    for test in SKIP_TESTS.get(args.target, []):
-        if test not in lines:
-            lines.append(test)
+    applicable = [
+        e
+        for e in SKIP_MANIFEST
+        if _entry_applies(
+            e, args.channel, args.target, args.distro, args.install_method
+        )
+    ]
 
-    if args.distro:
-        combo_key = f"{args.target}:{args.distro}"
-        distro_lines = DISTRO_SKIP_TESTS.get(combo_key, [])
-        for test in distro_lines:
-            if test not in lines:
-                lines.append(test)
+    # Preserve manifest order, de-dup while keeping first occurrence.
+    def _unique(seq):
+        seen = set()
+        out = []
+        for x in seq:
+            if x not in seen:
+                seen.add(x)
+                out.append(x)
+        return out
+
+    skip_tests = _unique(
+        e["ctest"]
+        for e in applicable
+        if "test" in e["scope"] and e.get("ctest")
+    )
+    skip_build_paths = _unique(
+        e["path"] for e in applicable if "build" in e["scope"]
+    )
+    skip_from_test = _unique(
+        e["path"] for e in applicable if "test" in e["scope"]
+    )
+    skip_from_build = _unique(
+        e["path"] for e in applicable if "build" in e["scope"]
+    )
 
     os.makedirs(args.output_dir, exist_ok=True)
-    path = os.path.join(args.output_dir, "skip_tests.txt")
-    with open(path, "w") as f:
-        if lines:
-            f.write("\n".join(lines))
-            f.write("\n")
 
-    label = args.target
+    tests_path = os.path.join(args.output_dir, "skip_tests.txt")
+    with open(tests_path, "w") as f:
+        if skip_tests:
+            f.write("\n".join(skip_tests) + "\n")
+
+    build_path = os.path.join(args.output_dir, "skip_build.txt")
+    with open(build_path, "w") as f:
+        if skip_build_paths:
+            f.write("\n".join(skip_build_paths) + "\n")
+
+    skip_from_test_str = " ".join(skip_from_test)
+    skip_from_build_str = " ".join(skip_from_build)
+
+    # Echo the make variables so they can be captured / eyeballed.
+    print(f"SKIP_FROM_TEST={skip_from_test_str}")
+    print(f"SKIP_FROM_BUILD={skip_from_build_str}")
+
+    github_env = os.environ.get("GITHUB_ENV")
+    if github_env:
+        with open(github_env, "a") as f:
+            f.write(f"SKIP_FROM_TEST={skip_from_test_str}\n")
+            f.write(f"SKIP_FROM_BUILD={skip_from_build_str}\n")
+
+    # Human-readable summary.
+    label_bits = [f"channel={args.channel}"]
+    if args.target:
+        label_bits.append(f"target={args.target}")
     if args.distro:
-        label = f"{args.target} + {args.distro}"
+        label_bits.append(f"distro={args.distro}")
+    if args.install_method:
+        label_bits.append(f"install_method={args.install_method}")
+    label = ", ".join(label_bits)
 
-    if not lines:
-        print(f"No tests to skip for {label}.")
+    summary_lines = [f"### rocm-examples skip manifest ({label})", ""]
+    if applicable:
+        summary_lines.append("| example | scope | reason |")
+        summary_lines.append("| --- | --- | --- |")
+        for e in applicable:
+            summary_lines.append(
+                f"| `{e['path']}` | {'+'.join(e['scope'])} | {e['reason']} |"
+            )
     else:
-        print(f"Wrote {path} ({len(lines)} tests for {label})")
+        summary_lines.append("_No examples skipped._")
+    summary = "\n".join(summary_lines)
+    print(summary)
+
+    step_summary = os.environ.get("GITHUB_STEP_SUMMARY")
+    if step_summary:
+        with open(step_summary, "a") as f:
+            f.write(summary + "\n")
 
 
 if __name__ == "__main__":
