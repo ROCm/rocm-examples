@@ -111,7 +111,7 @@ jobs:
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
-          echo "ENABLE_CK=ON" >> $GITHUB_ENV
+          echo "ENABLE_CK=OFF" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
       - name: Generate skip lists
