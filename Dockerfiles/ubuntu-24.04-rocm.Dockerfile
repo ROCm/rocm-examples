@@ -85,7 +85,12 @@ RUN echo "/opt/rocm/lib" >> /etc/ld.so.conf.d/rocm.conf \
 ENV ROCM_PATH="/opt/rocm"
 
 # Python packages required by ROCm tooling
-RUN python3 -m pip install --no-cache-dir --break-system-packages pyyaml
+ENV VENV=/opt/rocm-venv
+RUN python3 -m venv ${VENV}
+ENV PATH="${VENV}/bin:${PATH}"
+
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir pyyaml cmake
 
 WORKDIR /workspace
 CMD ["/bin/bash"]
