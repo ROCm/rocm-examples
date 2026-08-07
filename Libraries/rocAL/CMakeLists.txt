@@ -39,7 +39,7 @@ find_library(ROCAL_LIBRARY
 )
 
 if(NOT ROCAL_LIBRARY)
-    message(STATUS "rocAL could not be found, not building rocAL examples")
+    message(WARNING "rocAL could not be found, not building rocAL examples")
     return()
 endif()
 

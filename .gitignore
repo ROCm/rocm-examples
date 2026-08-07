@@ -9,3 +9,8 @@ CMakeUserPresets.json
 .cline_storage
 config.mk
 .claude/
+
+# Generated at CI time by .github/build_tools/generate_skip_tests.py
+.github/build_tools/skip_tests.txt
+.github/build_tools/skip_build.txt
+__pycache__/

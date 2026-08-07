@@ -31,12 +31,15 @@ jobs:
                 shell: bash
         steps:
           - uses: actions/checkout@v4
+          - name: Generate skip lists
+            run: |
+              python3 .github/build_tools/generate_skip_tests.py --channel stable --target "${GPU_TARGETS%%;*}"
           - name: CMake Configure and Build
             run: |
               cd HIP-Basic
-              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -S . -B build
+              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" -S . -B build
               cmake --build build -j
           - name: Make
             run: |
               cd HIP-Basic
-              make -j
+              make -j SKIP_FROM_BUILD="$SKIP_FROM_BUILD"

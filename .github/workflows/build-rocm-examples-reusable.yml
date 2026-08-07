@@ -60,9 +60,6 @@ jobs:
         id: sanity-check
         continue-on-error: true
         run: |
-          ROCM_VERSION=$(rocm-sdk version)
-          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
-          echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
           rocm-sdk init
           rocm-sdk test
 
@@ -96,20 +93,44 @@ jobs:
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "HIP_DEVICE_LIB_PATH=${ROCM_PATH}/lib/llvm/amdgcn/bitcode" >> $GITHUB_ENV
-          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/llvm/bin:${PATH}" >> $GITHUB_ENV
-          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
+          echo "PATH=${ROCM_PATH}/bin:${ROCM_PATH}/lib/llvm/bin:${PATH}" >> $GITHUB_ENV
+          echo "LD_LIBRARY_PATH=${ROCM_PATH}/lib:${ROCM_PATH}/lib/llvm/lib:${ROCM_PATH}/lib/rocprofiler-systems:${LD_LIBRARY_PATH}" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
+
+      - name: Setup environment variables (preinstalled)
+        if: ${{ matrix.install_method == 'preinstalled' }}
+        id: preinstalled
+        run: |
+          ROCM_VERSION=$(cat /opt/rocm/core/.info/version)
+          echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "## ROCm Version: ${ROCM_VERSION} (preinstalled)" >> $GITHUB_STEP_SUMMARY
+
+          ROCM_PATH=/opt/rocm
+          echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
+          echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
+          echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
+          echo "ENABLE_CK=OFF" >> $GITHUB_ENV
+          echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
+
+      - name: Generate skip lists
+        run: |
+          python3 .github/build_tools/generate_skip_tests.py \
+            --channel nightly \
+            --target "${{ matrix.gpu_config.gpu_target }}" \
+            --distro "${{ inputs.distro }}" \
+            --install-method "${{ matrix.install_method }}"
 
       - name: Makefile build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
-          make -j HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}"
+          make -j HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
 
       - name: CMake configure
         if: ${{ !cancelled() }}
         run: |
-          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" 2> >(tee cmake_error.log >&2)
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -DROCM_EXAMPLES_ENABLE_CK="${ENABLE_CK}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" 2> >(tee cmake_error.log >&2)
 
       - name: CMake configure error summary
         if: ${{ !cancelled() }}
@@ -164,33 +185,22 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Upload Makefile build artifacts
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
 
       - name: Run tests
         if: ${{ !cancelled() }}
         run: |
-          python3 .github/build_tools/generate_skip_tests.py --target ${{ matrix.gpu_config.gpu_target }} --distro ${{ inputs.distro }}
-
+          # skip_tests.txt was produced by the "Generate skip lists" step,
+          # which also reports the full skip manifest to the step summary.
           SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
-          if [ -s "${SKIP_FILE}" ]; then
-            echo "## Skipped tests" >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            cat "${SKIP_FILE}" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "No tests skipped." >> $GITHUB_STEP_SUMMARY
-          fi
-
           ctest --test-dir build --output-on-failure --exclude-from-file "${SKIP_FILE}" 2>&1 | tee ctest_output.log
 
       - name: Test summary
@@ -238,19 +248,19 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
 
       - name: Makefile test
         if: ${{ !cancelled() }}
         run: |
-          make test HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" 2>&1 | tee makefile_test_output.log
+          make test HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_TEST="$SKIP_FROM_TEST" 2>&1 | tee makefile_test_output.log
 
       - name: Upload Makefile test logs
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version }}-${{ matrix.install_method }}
+          name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
 
       - name: Clean the workspace

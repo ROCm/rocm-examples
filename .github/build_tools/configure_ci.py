@@ -14,6 +14,10 @@ GPU_CONFIG_MAP = {
 # Install methods for all distros (ROCm installed at CI runtime from TheRock nightlies).
 INSTALL_METHODS = ["whl-multi-arch", "tarball-multi-arch"]
 
+# "preinstalled" is a valid input but is NOT part of the default "all" expansion:
+# it only applies to images that already ship ROCm (e.g. the pinned stable image).
+PREINSTALLED = "preinstalled"
+
 # Distros to build against – keyed by short name.
 # "install_methods": omit to use the global INSTALL_METHODS list.
 # Add new entries here to enable more distros (also add to workflow_dispatch options).
@@ -23,6 +27,12 @@ DISTRO_MAP = {
     "almalinux-8":  {"image": "ghcr.io/rocm/rocm-examples-almalinux-8-multiarch:latest",  "label": "AlmaLinux 8"},
     "ubuntu-24.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest", "label": "Ubuntu 24.04"},
     "ubuntu-26.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest", "label": "Ubuntu 26.04"},
+    # Pinned stable image: ROCm baked in at /opt/rocm (no runtime install).
+    "stable_release": {
+        "image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14",
+        "label": "Ubuntu 24.04 (ROCm 7.14)",
+        "install_methods": [PREINSTALLED],
+    },
 }
 
 def _is_all(value):
@@ -46,8 +56,9 @@ def main():
     if _is_all(install_input):
         install_methods = INSTALL_METHODS
     else:
-        if install_input not in INSTALL_METHODS:
-            raise ValueError(f"Invalid install method: {install_input}. Allowed: {INSTALL_METHODS}")
+        allowed_methods = INSTALL_METHODS + [PREINSTALLED]
+        if install_input not in allowed_methods:
+            raise ValueError(f"Invalid install method: {install_input}. Allowed: {allowed_methods}")
         install_methods = [install_input]
 
     # Determine distros
