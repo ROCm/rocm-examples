@@ -63,6 +63,7 @@ if(
     endif()
     add_subdirectory(hipFFT)
     add_subdirectory(hipRAND)
+    add_subdirectory(hipThreads)
     add_subdirectory(hipSOLVER)
     add_subdirectory(hipSPARSE)
     add_subdirectory(hipSPARSELt)
