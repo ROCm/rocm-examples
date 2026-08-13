@@ -45,14 +45,19 @@ __device__ __hip_fp8_storage_t d_convert_float_to_fp8(float in, __hip_fp8_interp
     return __hip_cvt_float_to_fp8(in, sat, interpret);
 }
 
+__host__ __device__ float convert_fp8_to_float(__hip_fp8_storage_t        in,
+                                               __hip_fp8_interpretation_t interpret)
+{
+    return __half(__hip_cvt_fp8_to_halfraw(in, interpret));
+}
+
 __global__ void float_to_fp8_to_float(float *in, __hip_fp8_interpretation_t interpret, __hip_saturation_t sat, float *out, size_t size)
 {
-    int i = threadIdx.x;
+    size_t i = threadIdx.x;
     if (i < size)
     {
         auto fp8 = d_convert_float_to_fp8(in[i], interpret, sat);
-        // Implicit conversion from fp8 to float is defined by HIP runtime
-        out[i] = fp8;
+        out[i]   = convert_fp8_to_float(fp8, interpret);
     }
 }
 
@@ -69,14 +74,6 @@ int main()
     constexpr size_t size = 32;
     hipDeviceProp_t prop;
     hip_check(hipGetDeviceProperties(&prop, 0));
-    bool is_supported = (std::string(prop.gcnArchName).find("gfx94") != std::string::npos); // gfx94x
-    if(!is_supported)
-    {
-        std::cerr << "Need a gfx94x, but found: " << prop.gcnArchName << std::endl;
-        std::cerr << "No device conversions are supported, only host conversions are supported." << std::endl;
-        return EXIT_SUCCESS;
-    }
-
     const __hip_fp8_interpretation_t interpret = (std::string(prop.gcnArchName).find("gfx94") != std::string::npos)
                                                     ? __HIP_E4M3_FNUZ // gfx94x
                                                     : __HIP_E4M3;
@@ -94,8 +91,7 @@ int main()
     for (const auto &fval : in)
     {
         auto fp8 = convert_float_to_fp8(fval, interpret, sat);
-        // Implicit conversion from fp8 to float is defined by HIP runtime
-        cpu_out.push_back(fp8);
+        cpu_out.push_back(convert_fp8_to_float(fp8, interpret));
     }
 
     // GPU convert
