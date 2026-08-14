@@ -6,7 +6,7 @@ The examples in this subdirectory showcase the [hipThreads](https://github.com/R
 
 Each example is structured as a progression of steps — from a CPU-only baseline, through a minimal hipThreads drop-in port, to a fully SIMD-vectorized GPU implementation that exploits wavefront-width fiber parallelism.
 
-The examples build on Linux for the ROCm (AMD GPU) backend. hipThreads requires ROCm 10 or later.
+The examples can be built on Linux systems for the ROCm (AMD GPU) backend. hipThreads requires ROCm 10 or later.
 
 ## Prerequisites
 
