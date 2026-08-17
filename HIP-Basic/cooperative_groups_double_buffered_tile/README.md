@@ -2,30 +2,43 @@
 
 ## Description
 
-This program showcases a double-buffered tile load pipeline built from two cooperative groups
-APIs: the group-collective `cooperative_groups::memcpy_async` and the split barrier of a
-`thread_block`. A split barrier decomposes an ordinary block barrier into two phases,
-`barrier_arrive` and `barrier_wait`, so that independent work can run between them instead of every
-thread blocking immediately.
+This program demonstrates a double-buffered tile load pipeline built with two cooperative groups
+APIs:
+
+* `cooperative_groups::memcpy_async`
+* The `thread_block` split barrier (`barrier_arrive()` / `barrier_wait()`)
+
+A split barrier decomposes an ordinary block barrier into two phases:
+
+* `barrier_arrive`
+* `barrier_wait`
+
+This separation allows useful independent work to execute between the two operations instead of
+forcing every thread to block immediately at a single barrier.
 
 A single block streams a 1D array through two LDS (shared memory) buffers, one tile at a time.
 The async load of the next tile is issued into the second buffer while the current tile is consumed.
 A split barrier separates the moment a thread has finished reading a buffer from the moment the
 block guarantees that every thread is done. The kernel applies the element-wise operation
 `out[i] = scale * in[i] + bias`, which is trivial to validate against a CPU reference.
+See the [cooperative groups API reference](https://github.com/ROCm/clr/blob/develop/hipamd/include/hip/amd_detail/amd_hip_cooperative_groups.h) for the full API.
 
-`cooperative_groups::memcpy_async` is an **asynchronous**, group-collective copy (typically
-global <-> LDS). HIP does not expose a separate wait handle (there is no `cg::wait()`), so its
-completion must be enforced by a following group barrier - either a `block.sync()` (as the official
-reference test does) or, as in this example, the `barrier_wait` of a split barrier whose
-`barrier_arrive` is issued *after* the copy. Ordering matters: the prefetch of the next tile is
+`cooperative_groups::memcpy_async()` is an **asynchronous**, group-collective copy operation,
+typically used to stage data between global memory and LDS (shared memory). HIP does not provide
+a separate completion handle or equivalent `cg::wait()` primitive. Therefore, completion of an
+asynchronous copy must be synchronized through a subsequent group barrier. The official reference
+test uses `block.sync()`, while this example relies on the `barrier_wait()` phase of a split
+barrier.
+
+Correct ordering is critical. The prefetch of the next tile is
 issued **before** `barrier_arrive`, so the release fence in `barrier_arrive` orders the copy's
 completion and the acquire fence in `barrier_wait` makes the prefetched buffer visible to every
 thread by the next iteration. The split barrier additionally lets the current tile's computation
 run as independent work between `barrier_arrive` and `barrier_wait`. Correctness (no data races,
 validated output) is the top priority.
 
-This example targets the AMD/HIP (ROCm) backend, and it requires a ROCm version recent enough to ship `hip/cooperative_groups/memcpy_async.h`.
+This example targets the AMD/HIP (ROCm) backend, and it requires ROCm 7.14 or later
+(the version that ships `hip/cooperative_groups/memcpy_async.h`).
 
 ### Application flow
 
@@ -46,26 +59,26 @@ This example targets the AMD/HIP (ROCm) backend, and it requires a ROCm version 
 
 ## Key APIs and Concepts
 
-- `cooperative_groups::this_thread_block` returns the `thread_block` group that represents all
+* `cooperative_groups::this_thread_block` returns the `thread_block` group that represents all
   threads of the block. The block is used both as the group for the collective copies and as the
   group that owns the split barrier.
-- `cooperative_groups::memcpy_async(group, dst, src, count_in_bytes)` is an asynchronous
-  group-collective copy that is designed for global <-> LDS transfers. Every thread of the group
-  must call it collectively. **In HIP the `count` argument is expressed in bytes** (here `tile_size *
-  sizeof(float)`). The copy is asynchronous and HIP exposes no separate wait handle, so its
-  completion is enforced by a following group barrier (`block.sync()` or
-  `barrier_wait`). On hardware or compilers without the asynchronous LDS builtins
-  `cooperative_groups::memcpy_async()` falls back to a
-  traditional per-thread copy, so it always produces correct results.
-- The split barrier decomposes a block barrier into two phases. `thread_block::barrier_arrive`
+* The split barrier decomposes a block barrier into two phases. `thread_block::barrier_arrive`
   signals that a thread has reached the barrier and returns an `arrival_token`; it emits a release
   fence and does not block, which exposes a window for independent work. `thread_block::barrier_wait`
   consumes the moved token, blocks until every thread of the block has arrived, and emits an acquire
   fence. Together they act as a full block barrier whose release/acquire fences order the prefetch
   issued just before `barrier_arrive`.
-- Two LDS buffers (`__shared__ float buf[2][tile_size]`) are alternated between iterations so that
+* `cooperative_groups::memcpy_async(group, dst, src, count_in_bytes)` is an asynchronous
+  group-collective copy that is designed for global <-> LDS transfers. Every thread of the group
+  must call it collectively. **In HIP the `count` argument is expressed in bytes** (here `tile_size *
+  sizeof(float)`). The copy is asynchronous and HIP exposes no separate wait handle, so the copy
+  completion is enforced by a following group barrier (`block.sync()` or `barrier_wait`).
+  On hardware or compilers without the asynchronous LDS builtins,
+  `cooperative_groups::memcpy_async()` falls back to a traditional per-thread copy, so it always
+  produces correct results.
+* Two LDS buffers (`__shared__ float buf[2][tile_size]`) are alternated between iterations so that
   the buffer being consumed is never the buffer being prefetched.
-- Race-freedom: (a) the buffer prefetched during an iteration (`buf[(t + 1) & 1]`) is always
+* Race-freedom: (a) the buffer prefetched during an iteration (`buf[(t + 1) & 1]`) is always
   different from the buffer read as independent work (`buf[cur]`), so the load and the reads target
   disjoint memory; (b) the prefetch is issued before `barrier_arrive`, so the barrier's
   release/acquire fences order its completion and visibility before the next iteration consumes it;
@@ -80,18 +93,18 @@ This example targets the AMD/HIP (ROCm) backend, and it requires a ROCm version 
 
 #### Device symbols
 
-- `cooperative_groups::this_thread_block`
-- `thread_block`
-- `cooperative_groups::memcpy_async`
-- `thread_block::barrier_arrive`
-- `thread_block::barrier_wait`
-- `thread_block::sync`
-- All above from the [`cooperative_groups` namespace](https://github.com/ROCm/clr/blob/develop/hipamd/include/hip/amd_detail/amd_hip_cooperative_groups.h)
+* `cooperative_groups::this_thread_block`
+* `thread_block`
+* `cooperative_groups::memcpy_async`
+* `thread_block::barrier_arrive`
+* `thread_block::barrier_wait`
+* `thread_block::sync`
+* All above from the [`cooperative_groups` namespace](https://github.com/ROCm/clr/blob/develop/hipamd/include/hip/amd_detail/amd_hip_cooperative_groups.h)
 
 #### Host symbols
 
-- `hipMalloc`
-- `hipMemcpy`
-- `hipStreamDefault`
-- `hipGetLastError`
-- `hipFree`
+* `hipMalloc`
+* `hipMemcpy`
+* `hipStreamDefault`
+* `hipGetLastError`
+* `hipFree`
