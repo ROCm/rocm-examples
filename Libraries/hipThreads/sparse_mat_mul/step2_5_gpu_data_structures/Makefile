@@ -33,19 +33,18 @@ ROCM_PATH ?= /opt/rocm
 
 HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
-HIP_INCLUDE_DIR        := $(ROCM_PATH)/include
-HIPTHREADS_INCLUDE_DIR := $(ROCM_PATH)/include/hipthreads
-LIBHIPCXX_INCLUDE_DIR  := $(ROCM_PATH)/include/libhipcxx
+HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
+LIBHIPCXX_INCLUDE_DIR := $(ROCM_PATH)/include/libhipcxx
 
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) -O3 -fgpu-rdc $(CXXFLAGS)
-ILDFLAGS  := -fgpu-rdc -L$(ROCM_PATH)/lib/hipthreads $(LDFLAGS)
-ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -isystem $(HIPTHREADS_INCLUDE_DIR) \
+ILDFLAGS  := -fgpu-rdc $(LDFLAGS)
+ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) \
              -I $(LIBHIPCXX_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) \
              -D_LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE -DEXAMPLE_DATA_DIR=\"$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/../data\" \
              $(CPPFLAGS)
-ILDLIBS   := -lhipthreads -lpthread $(LDLIBS)
+ILDLIBS   := -lpthread $(LDLIBS)
 
 $(EXAMPLE): main.cpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -x hip -o $@ main.cpp $(ILDFLAGS) $(ILDLIBS)

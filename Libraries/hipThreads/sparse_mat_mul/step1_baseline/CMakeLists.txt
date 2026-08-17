@@ -31,8 +31,11 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
 
+find_package(Threads REQUIRED)
+
 add_executable(${example_name} main.cpp)
 target_compile_options(${example_name} PRIVATE "-O3" )
+target_link_libraries(${example_name} PRIVATE Threads::Threads)
 target_compile_definitions(${example_name} PRIVATE EXAMPLE_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../data")
 target_include_directories(${example_name} PRIVATE "../../../../Common")
 

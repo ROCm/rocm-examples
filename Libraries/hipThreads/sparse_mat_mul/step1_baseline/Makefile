@@ -29,6 +29,7 @@ CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD) -O3
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) \
              -DEXAMPLE_DATA_DIR=\"$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/../data\"
+ILDLIBS   := -lpthread
 
 CXXFLAGS ?= -Wall -Wextra
 ICXXFLAGS += $(CXXFLAGS)
