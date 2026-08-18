@@ -57,7 +57,8 @@ RUN dnf install -y dnf-plugins-core && \
         libXinerama-devel \
         libXrandr-devel \
         libatomic \
-        libquadmath && \
+        libquadmath \
+        opencv-devel && \
     dnf clean all
 
 # GCC 8's libstdc++fs has an ABI-incompatible std::filesystem::path layout vs
