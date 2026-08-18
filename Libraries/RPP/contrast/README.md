@@ -43,7 +43,7 @@ where $factor$ controls the contrast intensity and $center$ is the pivot point (
   - ROI tensors enable batch processing with different regions per image.
 
 - **Contrast Operation**:
-  - `rppt_contrast_gpu()`: Executes the contrast adjustment on GPU, taking source and destination descriptors, contrast factor and center parameter tensors, and ROI information.
+  - `rppt_contrast()`: Executes the contrast adjustment on GPU, taking source and destination descriptors, contrast factor and center parameter tensors, ROI information, and the execution backend.
   - Contrast factor values greater than 1.0 increase contrast, while values less than 1.0 decrease contrast.
   - The center point defines the pivot around which contrast scaling occurs.
   - Both parameters can be specified per image in the batch.
@@ -68,7 +68,7 @@ where $factor$ controls the contrast intensity and $center$ is the pivot point (
 
 - `rppCreate`
 - `rppDestroy`
-- `rppt_contrast_gpu`
+- `rppt_contrast`
 
 ### HIP runtime
 

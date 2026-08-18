@@ -43,7 +43,7 @@ where $\alpha$ is a multiplier (contrast factor) and $\beta$ is an offset (brigh
   - ROI tensors enable batch processing with different regions per image.
 
 - **Brightness Operation**:
-  - `rppt_brightness_gpu()`: Executes the brightness adjustment on GPU, taking source and destination descriptors, alpha and beta parameter tensors, and ROI information.
+  - `rppt_brightness()`: Executes the brightness adjustment on GPU, taking source and destination descriptors, alpha and beta parameter tensors, ROI information, and the execution backend.
   - Alpha values control the contrast/scaling of pixel values.
   - Beta values control the brightness offset added to all pixels.
   - Both parameters can be specified per image in the batch.
@@ -68,7 +68,7 @@ where $\alpha$ is a multiplier (contrast factor) and $\beta$ is an offset (brigh
 
 - `rppCreate`
 - `rppDestroy`
-- `rppt_brightness_gpu`
+- `rppt_brightness`
 
 ### HIP runtime
 

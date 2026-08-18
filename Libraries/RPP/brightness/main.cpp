@@ -262,15 +262,16 @@ int main(int argc, char** argv)
     // Execute brightness kernel
     if(input_bit_depth == 0 || input_bit_depth == 1 || input_bit_depth == 2 || input_bit_depth == 5)
     {
-        RPP_CHECK(rppt_brightness_gpu(d_input,
-                                      src_desc_ptr,
-                                      d_output,
-                                      dst_desc_ptr,
-                                      alpha_tensor,
-                                      beta_tensor,
-                                      roi_tensor_ptr_src,
-                                      roi_type_src,
-                                      handle));
+        RPP_CHECK(rppt_brightness(d_input,
+                                  src_desc_ptr,
+                                  d_output,
+                                  dst_desc_ptr,
+                                  alpha_tensor,
+                                  beta_tensor,
+                                  roi_tensor_ptr_src,
+                                  roi_type_src,
+                                  handle,
+                                  backend));
         std::cout << "Executed brightness kernel on HIP backend" << std::endl;
     }
     else

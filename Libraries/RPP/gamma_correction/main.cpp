@@ -273,14 +273,15 @@ int main(int argc, char** argv)
     // Execute gamma correction kernel
     if(input_bit_depth == 0 || input_bit_depth == 1 || input_bit_depth == 2 || input_bit_depth == 5)
     {
-        RPP_CHECK(rppt_gamma_correction_gpu(d_input,
-                                            src_desc_ptr,
-                                            d_output,
-                                            dst_desc_ptr,
-                                            gamma_tensor,
-                                            roi_tensor_ptr_src,
-                                            roi_type_src,
-                                            handle));
+        RPP_CHECK(rppt_gamma_correction(d_input,
+                                        src_desc_ptr,
+                                        d_output,
+                                        dst_desc_ptr,
+                                        gamma_tensor,
+                                        roi_tensor_ptr_src,
+                                        roi_type_src,
+                                        handle,
+                                        backend));
         std::cout << "Executed gamma correction kernel on HIP backend" << std::endl;
     }
     else

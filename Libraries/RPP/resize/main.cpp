@@ -269,15 +269,16 @@ int main(int argc, char** argv)
     // Execute resize kernel
     if(input_bit_depth == 0 || input_bit_depth == 1 || input_bit_depth == 2 || input_bit_depth == 5)
     {
-        RPP_CHECK(rppt_resize_gpu(d_input,
-                                  src_desc_ptr,
-                                  d_output,
-                                  dst_desc_ptr,
-                                  dst_img_sizes,
-                                  rpp_interpolation_type,
-                                  roi_tensor_ptr_src,
-                                  roi_type_src,
-                                  handle));
+        RPP_CHECK(rppt_resize(d_input,
+                              src_desc_ptr,
+                              d_output,
+                              dst_desc_ptr,
+                              dst_img_sizes,
+                              rpp_interpolation_type,
+                              roi_tensor_ptr_src,
+                              roi_type_src,
+                              handle,
+                              backend));
         std::cout << "Executed resize kernel on HIP backend" << std::endl;
     }
     else

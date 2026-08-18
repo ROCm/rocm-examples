@@ -46,7 +46,7 @@ The operation supports two interpolation methods:
   - Destination ROIs specify the target dimensions for each image.
 
 - **Resize Operation**:
-  - `rppt_resize_gpu()`: Executes the resize operation on GPU, taking source and destination descriptors, destination image sizes, interpolation type, and ROI information.
+  - `rppt_resize()`: Executes the resize operation on GPU, taking source and destination descriptors, destination image sizes, interpolation type, ROI information, and the execution backend.
   - `RpptImagePatch`: Specifies target width and height for each image in the batch.
   - `RpptInterpolationType`: Defines the interpolation method (`NEAREST_NEIGHBOR` or `BILINEAR`).
   - Supports both upscaling and downscaling operations.
@@ -77,7 +77,7 @@ The operation supports two interpolation methods:
 
 - `rppCreate`
 - `rppDestroy`
-- `rppt_resize_gpu`
+- `rppt_resize`
 
 ### HIP runtime
 
