@@ -49,6 +49,7 @@ RUN dnf install -y dnf-plugins-core && \
         python3.11 \
         python3.11-pip \
         elfutils-devel \
+        opencv-devel \
         mesa-libGL-devel \
         wayland-devel \
         libxkbcommon-devel \

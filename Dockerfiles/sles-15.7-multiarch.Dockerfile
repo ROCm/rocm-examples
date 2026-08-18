@@ -57,8 +57,10 @@ RUN zypper -qni update -y && \
 # evaluation until instantiation (P2593R1).
 # gcc13-c++ is not in the SLES base image and SUSEConnect requires registration,
 # so we pull it from the openSUSE Leap 15.6 OSS repo (binary-compatible with SLE 15).
+# opencv-devel (RPP examples) is also absent from the SLES base and comes from the
+# same Leap OSS repo, shipping opencv4.pc + OpenCVConfig.cmake for make and CMake.
 RUN zypper -qni addrepo -G https://download.opensuse.org/distribution/leap/15.6/repo/oss/ leap-oss && \
-    zypper -qni install -y gcc13-c++ libstdc++6-devel-gcc13 && \
+    zypper -qni install -y gcc13-c++ libstdc++6-devel-gcc13 opencv-devel && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130 && \
     update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 130 && \
