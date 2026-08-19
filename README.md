@@ -159,6 +159,9 @@ The following options are available when building with CMake.
   - [assembly_to_executable](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/assembly_to_executable): Program and accompanying build systems that show how to manually compile and link a HIP application from host and device code.
   - [bandwidth](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/bandwidth): Program that measures memory bandwidth from host to device, device to host, and device to device.
   - [bit_extract](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/bit_extract): Program that showcases how to use HIP built-in bit extract.
+  - [cooperative_groups](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/cooperative_groups): Showcases the cooperative groups programming model with a block- and partition-level reduction.
+  - [cooperative_groups_double_buffered_tile](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/cooperative_groups_double_buffered_tile): Double-buffered tile pipeline over a 1D array combining `memcpy_async` with a split barrier.
+  - [cooperative_groups_prefix_sum](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/cooperative_groups_prefix_sum): Inclusive and exclusive prefix sums (scans) using warp-sized cooperative groups tiles.
   - [device_globals](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/device_globals): Show cases how to set global variables on the device from the host.
   - [device_query](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/device_query): Program that showcases how properties from the device may be queried.
   - [dynamic_shared](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Basic/dynamic_shared): Program that showcases how to use dynamic shared memory with the help of a simple matrix transpose kernel.
