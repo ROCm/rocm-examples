@@ -253,24 +253,32 @@ int main(int argc, char** argv)
     RppBackend backend = RppBackend::RPP_HIP_BACKEND;
     RPP_CHECK(rppCreate(&handle, num_images, 0, stream, backend));
 
-    // Set parameters for brightness operation
-    std::vector<Rpp32f> alpha_values(num_images, alpha);
-    std::vector<Rpp32f> beta_values(num_images, beta);
-    Rpp32f*             alpha_tensor = alpha_values.data();
-    Rpp32f*             beta_tensor  = beta_values.data();
+    // Set parameters for brightness operation. RPP reads these tensors from the
+    // device, so they must be host-pinned rather than ordinary pageable memory.
+    Rpp32f* alpha_tensor;
+    Rpp32f* beta_tensor;
+    HIP_CHECK(hipHostMalloc(&alpha_tensor, num_images * sizeof(Rpp32f)));
+    HIP_CHECK(hipHostMalloc(&beta_tensor, num_images * sizeof(Rpp32f)));
+
+    for(int i = 0; i < num_images; i++)
+    {
+        alpha_tensor[i] = alpha;
+        beta_tensor[i]  = beta;
+    }
 
     // Execute brightness kernel
     if(input_bit_depth == 0 || input_bit_depth == 1 || input_bit_depth == 2 || input_bit_depth == 5)
     {
-        RPP_CHECK(rppt_brightness_gpu(d_input,
-                                      src_desc_ptr,
-                                      d_output,
-                                      dst_desc_ptr,
-                                      alpha_tensor,
-                                      beta_tensor,
-                                      roi_tensor_ptr_src,
-                                      roi_type_src,
-                                      handle));
+        RPP_CHECK(rppt_brightness(d_input,
+                                  src_desc_ptr,
+                                  d_output,
+                                  dst_desc_ptr,
+                                  alpha_tensor,
+                                  beta_tensor,
+                                  roi_tensor_ptr_src,
+                                  roi_type_src,
+                                  handle,
+                                  backend));
         std::cout << "Executed brightness kernel on HIP backend" << std::endl;
     }
     else
@@ -357,6 +365,8 @@ int main(int argc, char** argv)
     HIP_CHECK(hipHostFree(roi_tensor_ptr_src));
     HIP_CHECK(hipHostFree(roi_tensor_ptr_dst));
     HIP_CHECK(hipHostFree(dst_img_sizes));
+    HIP_CHECK(hipHostFree(alpha_tensor));
+    HIP_CHECK(hipHostFree(beta_tensor));
     free(input);
     free(output);
     free(input_u8);

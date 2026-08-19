@@ -259,24 +259,32 @@ int main(int argc, char** argv)
     RppBackend backend = RppBackend::RPP_HIP_BACKEND;
     RPP_CHECK(rppCreate(&handle, num_images, 0, stream, backend));
 
-    // Set parameters for contrast operation
-    std::vector<Rpp32f> contrast_factor_values(num_images, contrast_factor);
-    std::vector<Rpp32f> contrast_center_values(num_images, contrast_center);
-    Rpp32f*             contrast_factor_tensor = contrast_factor_values.data();
-    Rpp32f*             contrast_center_tensor = contrast_center_values.data();
+    // Set parameters for contrast operation. RPP reads these tensors from the
+    // device, so they must be host-pinned rather than ordinary pageable memory.
+    Rpp32f* contrast_factor_tensor;
+    Rpp32f* contrast_center_tensor;
+    HIP_CHECK(hipHostMalloc(&contrast_factor_tensor, num_images * sizeof(Rpp32f)));
+    HIP_CHECK(hipHostMalloc(&contrast_center_tensor, num_images * sizeof(Rpp32f)));
+
+    for(int i = 0; i < num_images; i++)
+    {
+        contrast_factor_tensor[i] = contrast_factor;
+        contrast_center_tensor[i] = contrast_center;
+    }
 
     // Execute contrast kernel
     if(input_bit_depth == 0 || input_bit_depth == 1 || input_bit_depth == 2 || input_bit_depth == 5)
     {
-        RPP_CHECK(rppt_contrast_gpu(d_input,
-                                    src_desc_ptr,
-                                    d_output,
-                                    dst_desc_ptr,
-                                    contrast_factor_tensor,
-                                    contrast_center_tensor,
-                                    roi_tensor_ptr_src,
-                                    roi_type_src,
-                                    handle));
+        RPP_CHECK(rppt_contrast(d_input,
+                                src_desc_ptr,
+                                d_output,
+                                dst_desc_ptr,
+                                contrast_factor_tensor,
+                                contrast_center_tensor,
+                                roi_tensor_ptr_src,
+                                roi_type_src,
+                                handle,
+                                backend));
         std::cout << "Executed contrast kernel on HIP backend" << std::endl;
     }
     else
@@ -363,6 +371,8 @@ int main(int argc, char** argv)
     HIP_CHECK(hipHostFree(roi_tensor_ptr_src));
     HIP_CHECK(hipHostFree(roi_tensor_ptr_dst));
     HIP_CHECK(hipHostFree(dst_img_sizes));
+    HIP_CHECK(hipHostFree(contrast_factor_tensor));
+    HIP_CHECK(hipHostFree(contrast_center_tensor));
     free(input);
     free(output);
     free(input_u8);
