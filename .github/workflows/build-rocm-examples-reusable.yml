@@ -73,7 +73,7 @@ jobs:
         id: install-tarball-multi-arch
         run: |
           TARBALL_LISTING=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" https://rocm.nightlies.amd.com/tarball-multi-arch/ \
-            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
+            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
           LATEST_TARBALL=$(echo "${TARBALL_LISTING}" | sort -V | tail -1)
           mkdir /therock-tarball && cd /therock-tarball
           wget "https://rocm.nightlies.amd.com/tarball-multi-arch/${LATEST_TARBALL}"

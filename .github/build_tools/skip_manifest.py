@@ -81,7 +81,7 @@ applies everywhere). Always include a ``reason``.
 
 # rocDecode leaf directories. All ten need the video test data + utility sources
 # under $ROCM_PATH/share/rocdecode. The pinned stable image ships these via the
-# amdrocm-decode-test package, and the nightly tarball carries them too, so
+# amdrocm-decode-test package, and the nightly "-tests" tarball carries them too, so
 # rocDecode builds and its tests run in both. The nightly whl install does NOT
 # carry the data, so the make-test skip is scoped to that install method.
 # ctest self-guards each on `if(EXISTS ...)`, so the ctest key is None (ctest
@@ -127,7 +127,7 @@ SKIP_MANIFEST = [
             "scope": ["test"],
             "channels": ["nightly"],
             "install_methods": ["whl-multi-arch"],
-            "reason": "video test data absent from the TheRock nightly whl install (present on the stable image via amdrocm-decode-test and in the nightly tarball)",
+            "reason": "video test data absent from the TheRock nightly whl install (present on the stable image via amdrocm-decode-test and in the nightly tests tarball)",
         }
         for d in _ROCDECODE_DIRS
     ],
