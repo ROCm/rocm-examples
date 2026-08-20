@@ -19,7 +19,7 @@ concurrency:
 env:
     DEBIAN_FRONTEND: noninteractive
     ROCM_VERSION: '7.2.4'
-    AMDGPU_INSTALLER_VERSION: 7.2.70204-1
+    AMDGPU_INSTALLER_VERSION: 7.2.4.70204-1
 
 jobs:
     build:
