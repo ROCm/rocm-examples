@@ -419,6 +419,26 @@ The following options are available when building with CMake.
   - [hipSPARSELt](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/)
     - [spmm](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/spmm): Perform a *sparse matrix - dense matrix multiplication*.
     - [spmm_advanced](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipSPARSELt/spmm_advanced): Perform a *sparse matrix - dense matrix multiplication* with a scaling vector, bias addition and an activation function.
+  - [hipThreads](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/): Demonstrates porting CPU `std::thread` programs to the AMD GPU using hipThreads.
+    - [saxpy](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/saxpy/): Compute-bound SAXPY (A·X+Y) porting series, from CPU to GPU to SIMD-vectorized GPU.
+      - [step1_baseline](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/saxpy/step1_baseline/): Single-precision AXPY on the CPU using `std::thread`.
+      - [step2_hipthread_dropin](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/saxpy/step2_hipthread_dropin/): Minimal port to the GPU using `hip::wthread` as a drop-in replacement for `std::thread`.
+      - [step3_simdize](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/saxpy/step3_simdize/): SAXPY with wavefront-width fiber SIMD for full GPU throughput.
+    - [in_one_weekend_raytracer](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/in_one_weekend_raytracer/): Monte Carlo path tracer based on "Ray Tracing in One Weekend", ported from CPU to GPU.
+      - [step1_baseline](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/in_one_weekend_raytracer/step1_baseline/): CPU baseline using `std::thread`, partitioning rows across threads.
+      - [step2_cpu_tiling](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/in_one_weekend_raytracer/step2_cpu_tiling/): CPU with 8×4 pixel tile work queue for improved cache locality.
+      - [step3_hipthread_dropin](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/in_one_weekend_raytracer/step3_hipthread_dropin/): GPU port using `hip::wthread` with the same tiling structure.
+      - [step4_simdize](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/in_one_weekend_raytracer/step4_simdize/): GPU port with wavefront-width fibers, each fiber tracing one pixel per tile.
+    - [llama3c](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/llama3c/): LLaMA 3 autoregressive inference porting series from CPU to GPU using hipThreads.
+      - [step1_baseline](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/llama3c/step1_baseline/): CPU baseline transformer inference using `std::thread` for parallel matrix operations.
+      - [step2_barrier_cpu](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/llama3c/step2_barrier_cpu/): CPU threading refactored to use `std::barrier` (C++20) for inter-layer synchronization.
+      - [step3_barrier_gpu](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/llama3c/step3_barrier_gpu/): GPU port using `hip::thread` and `hip::barrier` with GPU-resident model weights.
+      - [step4_simdize](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/llama3c/step4_simdize/): GPU port with wavefront-width SIMD fibers for vectorized matrix operations.
+    - [sparse_mat_mul](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/sparse_mat_mul/): Sparse matrix-matrix multiplication (SpMM) porting series from CPU to GPU.
+      - [step1_baseline](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/sparse_mat_mul/step1_baseline/): Single-threaded CPU SpMM with CSR/CSC formats loaded from MatrixMarket files.
+      - [step2_cpu_threading](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/sparse_mat_mul/step2_cpu_threading/): Multi-threaded CPU SpMM using `std::thread` to parallelize over output rows.
+      - [step2_5_gpu_data_structures](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/sparse_mat_mul/step2_5_gpu_data_structures/): Intermediate step migrating matrix data structures to GPU-resident memory using rocThrust and libhipcxx.
+      - [step3_hipthread_port](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipThreads/sparse_mat_mul/step3_hipthread_port/): Full GPU SpMM using `hip::wthread` with GPU-resident matrices.
   - [hipTensor](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/)
     - [contraction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction): Tensor contraction operations that compute products over shared dimensions
       - [bilinear](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/contraction/bilinear): Bilinear contractions with accumulation support for combining tensor products with existing output data
