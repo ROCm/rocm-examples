@@ -26,6 +26,22 @@ project(HIP-Doc-Programming-Guide-Porting-CUDA-code-to-HIP LANGUAGES CXX)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    set(ROCM_ROOT
+        "$ENV{HIP_PATH}"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+else()
+    set(ROCM_ROOT
+        "/opt/rocm"
+        CACHE PATH
+        "Root directory of the ROCm installation"
+    )
+endif()
+
+list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
+
 add_subdirectory(address_retrieval)
 add_subdirectory(device_code_feature_identification)
 add_subdirectory(host_code_feature_identification)
@@ -40,6 +56,12 @@ else()
     add_subdirectory(load_module_ex_cuda)
 endif()
 
-add_subdirectory(lane_masks_bit_shift)
+find_package(hipcub QUIET)
+if(NOT hipcub_FOUND)
+    message(STATUS "hipCUB not found. Skipping lane masks bit-shift example.")
+else()
+    add_subdirectory(lane_masks_bit_shift)
+endif()
+
 add_subdirectory(per_thread_default_stream)
 add_subdirectory(pointer_memory_type)

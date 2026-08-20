@@ -31,8 +31,8 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-    # The example calls hipDeviceGetAttribute which internally uses the CUDA driver API. We must explicitly link the
-    # driver library.
+    # The example calls hipDeviceGetAttribute which internally uses the CUDA
+    # driver API. We must explicitly link the driver library.
     find_package(CUDAToolkit REQUIRED)
 endif()
 
@@ -52,6 +52,10 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
+if(NOT TARGET hip::hipcub)
+    find_package(hipcub REQUIRED)
+endif()
+
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
@@ -62,6 +66,6 @@ set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA
                                                  $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
 target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
 target_include_directories(${example_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
-target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda_driver>)
+target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda_driver> hip::hipcub)
 
 install(TARGETS ${example_name})
