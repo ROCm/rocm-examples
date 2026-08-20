@@ -27,6 +27,7 @@
 #include <cstdint>
 #include <cstdlib>
 #include <iostream>
+#include <vector>
 
 #define HIP_CHECK(expression)                                \
 {                                                            \
@@ -158,8 +159,9 @@ int main()
         HIP_CHECK(hipGetLastError());
         HIP_CHECK(hipDeviceSynchronize());
         
-        std::uint32_t h_results_32[num_warps];
-        HIP_CHECK(hipMemcpy(h_results_32, d_results_32, 
+        std::vector<std::uint32_t> h_results_32;
+        h_results_32.resize(num_warps);
+        HIP_CHECK(hipMemcpy(h_results_32.data(), d_results_32, 
                            num_warps * sizeof(std::uint32_t), 
                            hipMemcpyDeviceToHost));
         
@@ -189,8 +191,9 @@ int main()
     HIP_CHECK(hipGetLastError());
     HIP_CHECK(hipDeviceSynchronize());
     
-    std::uint64_t h_results_64[num_warps];
-    HIP_CHECK(hipMemcpy(h_results_64, d_results_64, 
+    std::vector<std::uint64_t> h_results_64;
+    h_results_64.resize(num_warps);
+    HIP_CHECK(hipMemcpy(h_results_64.data(), d_results_64, 
                        num_warps * sizeof(std::uint64_t), 
                        hipMemcpyDeviceToHost));
     
@@ -216,8 +219,9 @@ int main()
     HIP_CHECK(hipGetLastError());
     HIP_CHECK(hipDeviceSynchronize());
     
-    lane_mask_t h_results_portable[num_warps];
-    HIP_CHECK(hipMemcpy(h_results_portable, d_results_portable, 
+    std::vector<lane_mask_t> h_results_portable;
+    h_results_portable.resize(num_warps);
+    HIP_CHECK(hipMemcpy(h_results_portable.data(), d_results_portable,
                        num_warps * sizeof(lane_mask_t), 
                        hipMemcpyDeviceToHost));
     
