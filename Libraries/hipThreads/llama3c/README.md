@@ -6,6 +6,32 @@ This series implements autoregressive LLM inference for LLaMA 3 models. It is a 
 
 The series starts from a CPU baseline using `std::thread` and progressively ports the transformer to the AMD GPU using hipThreads, introducing barrier synchronization and wavefront SIMD along the way.
 
+## Prerequisites
+
+In addition to the [hipThreads prerequisites](../README.md#prerequisites), this series requires a LLaMA 3 model exported to the binary checkpoint format expected by the C++ examples.
+
+### Model setup
+
+- Install the Python dependencies:
+
+  ```shell
+  pip install -r requirements.txt
+  ```
+
+- Download a LLaMA 3 checkpoint from HuggingFace and export it to a binary file using `export.py`:
+
+  ```shell
+  python export.py model.bin --hf <path-to-hf-model>
+  ```
+
+- Export the tokenizer to a binary file using `tokenizer.py`:
+
+  ```shell
+  python tokenizer.py --tokenizer-model <path-to-tokenizer.model>
+  ```
+
+Pass `model.bin` as the positional argument and `-z tokenizer.bin` to each step's executable. See the individual step READMEs for the full command-line interface.
+
 ### Steps
 
 | Step | Directory | Description |
