@@ -2,7 +2,7 @@
 # Visual Studio 15
 VisualStudioVersion = 15.0.28307.1684
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lane_masks_bit_shift_vs2017", "lane_masks_bit_shift_vs2017.vcxproj", "{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lane_masks_bit_shift_vs2017", "lane_masks_bit_shift_vs2017.vcxproj", "{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -10,10 +10,10 @@ Global
 		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Debug|x64.ActiveCfg = Debug|x64
-		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Debug|x64.Build.0 = Debug|x64
-		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Release|x64.ActiveCfg = Release|x64
-		{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}.Release|x64.Build.0 = Release|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Debug|x64.ActiveCfg = Debug|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Debug|x64.Build.0 = Debug|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Release|x64.ActiveCfg = Release|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -12,7 +12,7 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{A1B2C3D4-E5F6-4789-A012-3456789ABCDE}</ProjectGuid>
+    <ProjectGuid>{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>lane_masks_bit_shift_vs2017</RootNamespace>
     <WindowsTargetPlatformVersion>$(LatestTargetPlatformVersion)</WindowsTargetPlatformVersion>
