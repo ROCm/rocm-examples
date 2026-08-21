@@ -116,8 +116,15 @@ jobs:
 
       - name: Generate skip lists
         run: |
+          # The preinstalled distro is the pinned rocm:7.14 image, i.e. the "stable"
+          # channel; every other install method pulls a TheRock "nightly" build.
+          if [ "${{ matrix.install_method }}" = "preinstalled" ]; then
+            CHANNEL=stable
+          else
+            CHANNEL=nightly
+          fi
           python3 .github/build_tools/generate_skip_tests.py \
-            --channel nightly \
+            --channel "$CHANNEL" \
             --target "${{ matrix.gpu_config.gpu_target }}" \
             --distro "${{ inputs.distro }}" \
             --install-method "${{ matrix.install_method }}"
