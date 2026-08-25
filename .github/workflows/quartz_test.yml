@@ -23,6 +23,15 @@ on:
     # example uses 17 5-19; we start earlier and finish sooner to cut latency, since
     # our build-only gate is ready well before the full release. See ROCm/Quartz PR #32.)
     - cron: "30 1-11/2 * * *"
+  # TEMPORARY (REVERT BEFORE MERGE): run on PRs touching this workflow so it can
+  # be validated end-to-end without waiting for the schedule (which only fires on
+  # the default branch). Remove this pull_request trigger before merging.
+  pull_request:
+    paths:
+      - ".github/workflows/quartz_test.yml"
+      - ".github/workflows/build-rocm-examples-reusable.yml"
+      - ".github/quartz/**"
+      - ".github/build_tools/configure_ci.py"
   workflow_dispatch:
     inputs:
       force:
