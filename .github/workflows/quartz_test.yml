@@ -1,0 +1,156 @@
+name: Quartz nightly test
+
+# Test rocm-examples against the latest READY ROCm nightly reported by Quartz
+# (ROCm's CI/CD data hub), running the expensive matrix exactly once per new
+# version. A cache marker keyed on (rocm_version, build_date) dedups so a version
+# is tested once, not on every poll.
+#
+# Gate: Quartz latest.json must report the Linux ROCm *build* as success (test
+# rollups are routinely red and are not the gate). When nothing is ready -- build
+# in progress, or Quartz unreachable -- the run does nothing and doubles as a
+# Quartz availability canary.
+
+on:
+  schedule:
+    # Poll every 2h at :30, 01:30-11:30 UTC. The Linux ROCm build (our gate) starts
+    # ~00:02 and goes green ~02:24-03:09 UTC on a normal night: the 01:30 poll sees
+    # the build in progress (a cheap cache-skip), the 03:30 poll usually catches it
+    # green, and the morning tail to 11:30 absorbs a slow build or any lag before
+    # Quartz republishes latest.json. The 2h gap between polls is itself the retry --
+    # a build still in progress at one poll is almost always done by the next, and it
+    # rides out transient Quartz outages. A morning finish drops only the rare evening
+    # re-run, which self-heals when the next nightly supersedes it. (Quartz's own
+    # example uses 17 5-19; we start earlier and finish sooner to cut latency, since
+    # our build-only gate is ready well before the full release. See ROCm/Quartz PR #32.)
+    - cron: "30 1-11/2 * * *"
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Re-test even if this version was already recorded"
+        type: boolean
+        default: false
+
+run-name: Quartz nightly test
+
+permissions:
+  contents: read
+
+# Never let a new poll cancel an in-flight test.
+concurrency:
+  group: quartz-test
+  cancel-in-progress: false
+
+jobs:
+  gate:
+    name: "Resolve latest ready nightly"
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      resolved: ${{ steps.consume.outputs.resolved }}
+      rocm_version: ${{ steps.consume.outputs.rocm_version }}
+      build_date: ${{ steps.consume.outputs.build_date }}
+      is_new: ${{ steps.dedup.outputs.is_new }}
+      distros: ${{ steps.config.outputs.distros }}
+      distro_map: ${{ steps.config.outputs.distro_map }}
+      gpu_configs: ${{ steps.config.outputs.gpu_configs }}
+      install_methods: ${{ steps.config.outputs.install_methods }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Resolve latest ready nightly from Quartz
+        id: consume
+        run: python3 .github/quartz/consume_status.py --latest-only ""
+
+      - name: Probe dedup marker
+        id: marker
+        if: steps.consume.outputs.resolved == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          lookup-only: true
+          path: .quartz-tested
+          key: quartz-tested-${{ steps.consume.outputs.rocm_version }}-${{ steps.consume.outputs.build_date }}
+
+      - name: Compute is_new
+        id: dedup
+        run: |
+          # is_new = there is a ready build we have not recorded yet (or --force).
+          if [ "${{ steps.consume.outputs.resolved }}" != "true" ]; then
+            echo "is_new=false" >> "$GITHUB_OUTPUT"
+          elif [ "${{ steps.marker.outputs.cache-hit }}" = "true" ] && [ "${{ github.event.inputs.force }}" != "true" ]; then
+            echo "is_new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_new=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Configure test matrix
+        id: config
+        if: steps.consume.outputs.resolved == 'true' && steps.dedup.outputs.is_new == 'true'
+        # Exclude preinstalled-only images (the version-pinned stable image): their
+        # ROCm version is baked in and unrelated to the nightly we are pinning.
+        run: python3 .github/build_tools/configure_ci.py --exclude-preinstalled
+
+  test:
+    needs: gate
+    if: needs.gate.outputs.resolved == 'true' && needs.gate.outputs.is_new == 'true'
+    name: "Test ROCm ${{ needs.gate.outputs.rocm_version }}"
+    strategy:
+      fail-fast: false
+      matrix:
+        distro: ${{ fromJson(needs.gate.outputs.distros) }}
+    uses: ./.github/workflows/build-rocm-examples-reusable.yml
+    with:
+      distro: ${{ matrix.distro }}
+      distro_map: ${{ needs.gate.outputs.distro_map }}
+      gpu_configs: ${{ needs.gate.outputs.gpu_configs }}
+      install_methods: ${{ needs.gate.outputs.install_methods }}
+      rocm_version: ${{ needs.gate.outputs.rocm_version }}
+    secrets: inherit
+
+  record:
+    needs: [gate, test]
+    # Record on pass OR fail so a version is tested exactly once (a red result is a
+    # real regression signal, surfaced once, not retried hourly). Skip only if the
+    # test job was cancelled or never ran.
+    if: always() && needs.gate.outputs.is_new == 'true' && needs.test.result != 'cancelled' && needs.test.result != 'skipped'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Write dedup marker
+        run: touch .quartz-tested
+
+      - name: Save dedup marker
+        uses: actions/cache/save@v4
+        with:
+          path: .quartz-tested
+          key: quartz-tested-${{ needs.gate.outputs.rocm_version }}-${{ needs.gate.outputs.build_date }}
+
+      - name: Summary
+        run: |
+          echo "Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested; result=${{ needs.test.result }}." >> "$GITHUB_STEP_SUMMARY"
+
+  report:
+    needs: gate
+    # Self-explanatory run for the skip cases (nothing ready, or already tested).
+    if: always() && (needs.gate.outputs.resolved != 'true' || needs.gate.outputs.is_new != 'true')
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    # Dynamic job name surfaces the outcome in the UI (run-name cannot see step outputs).
+    name: >-
+      ${{ needs.gate.outputs.resolved == 'true'
+          && format('Skipped {0} (already tested)', needs.gate.outputs.rocm_version)
+          || 'No ready build yet' }}
+    steps:
+      - name: Report
+        run: |
+          if [ "${{ needs.gate.outputs.resolved }}" = "true" ]; then
+            echo "ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) already tested; skipping." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "No ready ROCm nightly reported by Quartz yet." >> "$GITHUB_STEP_SUMMARY"
+          fi

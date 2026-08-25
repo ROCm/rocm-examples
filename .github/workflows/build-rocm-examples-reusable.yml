@@ -19,6 +19,11 @@ on:
         description: "JSON array of install methods (fallback for distros without per-distro override)"
         required: true
         type: string
+      rocm_version:
+        description: "Exact ROCm nightly version to install (e.g. 10.1.0a20260821). Empty = latest on the index."
+        required: false
+        type: string
+        default: ""
 env:
   DEBIAN_FRONTEND: noninteractive
 
@@ -50,9 +55,15 @@ jobs:
         run: |
           echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
           pip install --no-cache-dir --upgrade pip
+          PKG="rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+          # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
+          # otherwise install whatever is latest on the index.
+          if [ -n "${{ inputs.rocm_version }}" ]; then
+            PKG="${PKG}==${{ inputs.rocm_version }}"
+          fi
           pip install --no-cache-dir \
             --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ \
-            "rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+            "$PKG"
           rocm-sdk init
 
       - name: Wheel sanity check
@@ -72,9 +83,15 @@ jobs:
         if: ${{ matrix.install_method == 'tarball-multi-arch' }}
         id: install-tarball-multi-arch
         run: |
-          TARBALL_LISTING=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" https://rocm.nightlies.amd.com/tarball-multi-arch/ \
-            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
-          LATEST_TARBALL=$(echo "${TARBALL_LISTING}" | sort -V | tail -1)
+          # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
+          # otherwise pick the latest tarball on the index.
+          if [ -n "${{ inputs.rocm_version }}" ]; then
+            LATEST_TARBALL="therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-${{ inputs.rocm_version }}.tar.gz"
+          else
+            TARBALL_LISTING=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" https://rocm.nightlies.amd.com/tarball-multi-arch/ \
+              | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
+            LATEST_TARBALL=$(echo "${TARBALL_LISTING}" | sort -V | tail -1)
+          fi
           mkdir /therock-tarball && cd /therock-tarball
           wget "https://rocm.nightlies.amd.com/tarball-multi-arch/${LATEST_TARBALL}"
           mkdir install

@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Configure CI matrix based on workflow inputs or defaults."""
+import argparse
 import os
 import json
 
@@ -40,9 +41,19 @@ def _is_all(value):
     return not value or value == "all"
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--exclude-preinstalled",
+        action="store_true",
+        help="drop preinstalled-only images (e.g. the version-pinned stable image), "
+        "whose ROCm version is baked in and cannot be pinned to a nightly",
+    )
+    args = parser.parse_args()
+
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
     distro_input = os.getenv("DISTRO", "")
+    exclude_preinstalled = args.exclude_preinstalled
 
     # Determine GPU configurations
     if _is_all(gpu_input):
@@ -78,11 +89,20 @@ def main():
     distro_map_out = {}
     for key in distro_keys:
         entry = DISTRO_MAP[key]
+        methods = entry.get("install_methods", install_methods)
+        # Skip preinstalled-only images (e.g. the version-pinned stable image) when asked:
+        # their ROCm version is baked in, so a caller pinning a specific nightly (the
+        # Quartz workflow) cannot use them.
+        if exclude_preinstalled and methods == [PREINSTALLED]:
+            continue
         distro_map_out[key] = {
             "image": entry["image"],
             "label": entry["label"],
-            "install_methods": entry.get("install_methods", install_methods),
+            "install_methods": methods,
         }
+
+    # Keep the distros list in sync with the (possibly filtered) map.
+    distro_keys = list(distro_map_out.keys())
 
     github_output = os.getenv("GITHUB_OUTPUT")
     if github_output:
