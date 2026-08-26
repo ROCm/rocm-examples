@@ -53,7 +53,6 @@ def main():
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
     distro_input = os.getenv("DISTRO", "")
-    exclude_preinstalled = args.exclude_preinstalled
 
     # Determine GPU configurations
     if _is_all(gpu_input):
@@ -93,7 +92,7 @@ def main():
         # Skip preinstalled-only images (e.g. the version-pinned stable image) when asked:
         # their ROCm version is baked in, so a caller pinning a specific nightly (the
         # Quartz workflow) cannot use them.
-        if exclude_preinstalled and methods == [PREINSTALLED]:
+        if args.exclude_preinstalled and methods == [PREINSTALLED]:
             continue
         distro_map_out[key] = {
             "image": entry["image"],

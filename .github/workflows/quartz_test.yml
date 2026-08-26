@@ -58,6 +58,7 @@ jobs:
         shell: bash
     outputs:
       resolved: ${{ steps.consume.outputs.resolved }}
+      source: ${{ steps.consume.outputs.source }}
       rocm_version: ${{ steps.consume.outputs.rocm_version }}
       build_date: ${{ steps.consume.outputs.build_date }}
       is_new: ${{ steps.dedup.outputs.is_new }}
@@ -67,7 +68,7 @@ jobs:
       install_methods: ${{ steps.config.outputs.install_methods }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Resolve latest ready nightly from Quartz
         id: consume
@@ -76,7 +77,7 @@ jobs:
       - name: Probe dedup marker
         id: marker
         if: steps.consume.outputs.resolved == 'true'
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           lookup-only: true
           path: .quartz-tested
@@ -133,7 +134,7 @@ jobs:
         run: touch .quartz-tested
 
       - name: Save dedup marker
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
         with:
           path: .quartz-tested
           key: quartz-tested-${{ needs.gate.outputs.rocm_version }}-${{ needs.gate.outputs.build_date }}
@@ -154,12 +155,15 @@ jobs:
     name: >-
       ${{ needs.gate.outputs.resolved == 'true'
           && format('Skipped {0} (already tested)', needs.gate.outputs.rocm_version)
-          || 'No ready build yet' }}
+          || (needs.gate.outputs.source == 'unavailable' && 'Quartz unavailable'
+              || 'No ready build') }}
     steps:
       - name: Report
         run: |
           if [ "${{ needs.gate.outputs.resolved }}" = "true" ]; then
             echo "ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) already tested; skipping." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ needs.gate.outputs.source }}" = "unavailable" ]; then
+            echo "Quartz status could not be fetched or parsed; skipping this poll (availability canary)." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "No ready ROCm nightly reported by Quartz yet." >> "$GITHUB_STEP_SUMMARY"
+            echo "Quartz reports no ready ROCm nightly right now (build not finished, or already superseded); skipping." >> "$GITHUB_STEP_SUMMARY"
           fi
