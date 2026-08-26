@@ -125,10 +125,15 @@ jobs:
 
   record:
     needs: [gate, test]
-    # Record on pass OR fail so a version is tested exactly once (a red result is a
-    # real regression signal, surfaced once, not retried hourly). Skip only if the
-    # test job was cancelled or never ran.
-    if: always() && needs.gate.outputs.is_new == 'true' && needs.test.result != 'cancelled' && needs.test.result != 'skipped'
+    # Record ONLY on a green test run. Any failure -- transient infra (wheel-index
+    # outage, tarball 404, runner hiccup) OR a real build/test break -- leaves the
+    # version unrecorded so the next poll re-tests it, instead of masking it until
+    # the 7-day cache eviction. A failed run is never a conclusive "tested": we may
+    # simply have been unable to install. Retry is bounded -- a version is revisited
+    # only while it stays Quartz's latest-ready build, and the next nightly (which
+    # resolve() always prefers) supersedes it -- so a genuinely broken nightly costs
+    # at most the handful of polls in one morning window, not an hourly loop.
+    if: needs.test.result == 'success'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -145,7 +150,7 @@ jobs:
 
       - name: Summary
         run: |
-          echo "Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested; result=${{ needs.test.result }}." >> "$GITHUB_STEP_SUMMARY"
+          echo "Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested (passed)." >> "$GITHUB_STEP_SUMMARY"
 
   report:
     needs: gate
