@@ -63,6 +63,18 @@ void ComputeFlowHIP(const float *I0,
 {
     printf("Computing optical flow on GPU...\n");
 
+    // Query once: hipDeviceAttributeImageSupport is a static hardware property.
+    // On NVIDIA (CUDA backend) all GPUs support hardware textures; skip the
+    // driver-API query (cuDeviceGetAttribute) which requires libcuda at link time.
+#if defined(__HIP_PLATFORM_NVCC__) || defined(__HIP_PLATFORM_NVIDIA__)
+    int imageSupport = 1;
+#else
+    int imageSupport = 0;
+    int deviceId     = 0;
+    HIP_CHECK(hipGetDevice(&deviceId));
+    HIP_CHECK(hipDeviceGetAttribute(&imageSupport, hipDeviceAttributeImageSupport, deviceId));
+#endif
+
     // pI0 and pI1 will hold device pointers
     float **pI0 = new float *[nLevels];
     float **pI1 = new float *[nLevels];
@@ -133,7 +145,8 @@ void ComputeFlowHIP(const float *I0,
                   nw,
                   nh,
                   ns,
-                  pI0[currentLevel - 1]);
+                  pI0[currentLevel - 1],
+                  imageSupport);
 
         Downscale(pI1[currentLevel],
                   pW[currentLevel],
@@ -142,7 +155,8 @@ void ComputeFlowHIP(const float *I0,
                   nw,
                   nh,
                   ns,
-                  pI1[currentLevel - 1]);
+                  pI1[currentLevel - 1],
+                  imageSupport);
 
         pW[currentLevel - 1] = nw;
         pH[currentLevel - 1] = nh;
@@ -163,10 +177,10 @@ void ComputeFlowHIP(const float *I0,
 
             // on current level we compute optical flow
             // between frame 0 and warped frame 1
-            WarpImage(pI1[currentLevel], pW[currentLevel], pH[currentLevel], pS[currentLevel], d_u, d_v, d_tmp);
+            WarpImage(pI1[currentLevel], pW[currentLevel], pH[currentLevel], pS[currentLevel], d_u, d_v, d_tmp, imageSupport);
 
             ComputeDerivatives(
-                pI0[currentLevel], d_tmp, pW[currentLevel], pH[currentLevel], pS[currentLevel], d_Ix, d_Iy, d_Iz);
+                pI0[currentLevel], d_tmp, pW[currentLevel], pH[currentLevel], pS[currentLevel], d_Ix, d_Iy, d_Iz, imageSupport);
 
             for (int iter = 0; iter < nSolverIters; ++iter) {
                 SolveForUpdate(d_du0,
@@ -202,7 +216,8 @@ void ComputeFlowHIP(const float *I0,
                     pH[currentLevel + 1],
                     pS[currentLevel + 1],
                     scaleX,
-                    d_nu);
+                    d_nu,
+                    imageSupport);
 
             float scaleY = (float)pH[currentLevel + 1] / (float)pH[currentLevel];
 
@@ -214,7 +229,8 @@ void ComputeFlowHIP(const float *I0,
                     pH[currentLevel + 1],
                     pS[currentLevel + 1],
                     scaleY,
-                    d_nv);
+                    d_nv,
+                    imageSupport);
 
             Swap(d_u, d_nu);
             Swap(d_v, d_nv);

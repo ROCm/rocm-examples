@@ -25,14 +25,28 @@
 #include "common.h"
 
 ///////////////////////////////////////////////////////////////////////////////
-/// \brief upscale one component of a displacement field, HIP kernel
-/// \param[in]  width   field width
-/// \param[in]  height  field height
-/// \param[in]  stride  field stride
-/// \param[in]  scale   scale factor (multiplier)
-/// \param[out] out     result
+/// \brief upscale one component of a displacement field (software sampler path)
+///
+/// Used on devices that lack hardware texture units (e.g. CDNA / MI300X).
+/// \param[in]  width      field width
+/// \param[in]  height     field height
+/// \param[in]  stride     field stride in elements
+/// \param[in]  scale      scale factor (multiplier)
+/// \param[out] out        result
+/// \param[in]  texCoarse  coarse field device pointer (SW path)
+/// \param[in]  srcWidth   coarse field width (SW path)
+/// \param[in]  srcHeight  coarse field height (SW path)
+/// \param[in]  srcStride  coarse field stride in elements (SW path)
 ///////////////////////////////////////////////////////////////////////////////
-__global__ void UpscaleKernel(int width, int height, int stride, float scale, float *out, hipTextureObject_t texCoarse)
+__global__ void UpscaleKernelSW(int          width,
+                                 int          height,
+                                 int          stride,
+                                 float        scale,
+                                 float       *out,
+                                 const float *texCoarse,
+                                 int          srcWidth,
+                                 int          srcHeight,
+                                 int          srcStride)
 {
     const int ix = threadIdx.x + blockIdx.x * blockDim.x;
     const int iy = threadIdx.y + blockIdx.y * blockDim.y;
@@ -43,22 +57,56 @@ __global__ void UpscaleKernel(int width, int height, int stride, float scale, fl
     float x = ((float)ix + 0.5f) / (float)width;
     float y = ((float)iy + 0.5f) / (float)height;
 
-    // exploit hardware interpolation
-    // and scale interpolated vector to match next pyramid level resolution
+    // bilinear interpolation scales the vector to match the next pyramid level
+    out[ix + iy * stride] = tex2D_bilinear(texCoarse, srcWidth, srcHeight, srcStride, x, y) * scale;
+}
+
+#if !defined(__HIP_NO_IMAGE_SUPPORT)
+///////////////////////////////////////////////////////////////////////////////
+/// \brief upscale one component of a displacement field (hardware texture path)
+///
+/// Used on devices with hardware texture units (e.g. RDNA).
+/// \param[in]  width     field width
+/// \param[in]  height    field height
+/// \param[in]  stride    field stride in elements
+/// \param[in]  scale     scale factor (multiplier)
+/// \param[out] out       result
+/// \param[in]  texCoarse coarse field texture object
+///////////////////////////////////////////////////////////////////////////////
+__global__ void UpscaleKernel(int                width,
+                              int                height,
+                              int                stride,
+                              float              scale,
+                              float             *out,
+                              hipTextureObject_t texCoarse)
+{
+    const int ix = threadIdx.x + blockIdx.x * blockDim.x;
+    const int iy = threadIdx.y + blockIdx.y * blockDim.y;
+
+    if (ix >= width || iy >= height)
+        return;
+
+    float x = ((float)ix + 0.5f) / (float)width;
+    float y = ((float)iy + 0.5f) / (float)height;
+
+    // bilinear interpolation scales the vector to match the next pyramid level
     out[ix + iy * stride] = tex2D<float>(texCoarse, x, y) * scale;
 }
+#endif // !__HIP_NO_IMAGE_SUPPORT
 
 ///////////////////////////////////////////////////////////////////////////////
 /// \brief upscale one component of a displacement field, kernel wrapper
-/// \param[in]  src         field component to upscale
-/// \param[in]  width       field current width
-/// \param[in]  height      field current height
-/// \param[in]  stride      field current stride
-/// \param[in]  newWidth    field new width
-/// \param[in]  newHeight   field new height
-/// \param[in]  newStride   field new stride
-/// \param[in]  scale       value scale factor (multiplier)
-/// \param[out] out         upscaled field component
+///
+/// \param[in]  src          field component to upscale
+/// \param[in]  width        field current width
+/// \param[in]  height       field current height
+/// \param[in]  stride       field current stride
+/// \param[in]  newWidth     field new width
+/// \param[in]  newHeight    field new height
+/// \param[in]  newStride    field new stride
+/// \param[in]  scale        value scale factor (multiplier)
+/// \param[out] out          upscaled field component
+/// \param[in]  imageSupport non-zero if the current device has image support
 ///////////////////////////////////////////////////////////////////////////////
 static void Upscale(const float *src,
                     int          width,
@@ -68,30 +116,42 @@ static void Upscale(const float *src,
                     int          newHeight,
                     int          newStride,
                     float        scale,
-                    float       *out)
+                    float       *out,
+                    int          imageSupport)
 {
     dim3 threads(32, 8);
     dim3 blocks(iDivUp(newWidth, threads.x), iDivUp(newHeight, threads.y));
 
-    hipResourceDesc texRes = {};
-    texRes.resType                  = hipResourceTypePitch2D;
-    texRes.res.pitch2D.devPtr       = (void *)src;
-    texRes.res.pitch2D.desc         = hipCreateChannelDesc<float>();
-    texRes.res.pitch2D.width        = width;
-    texRes.res.pitch2D.height       = height;
-    texRes.res.pitch2D.pitchInBytes = stride * sizeof(float);
+    if (!imageSupport)
+    {
+        UpscaleKernelSW<<<blocks, threads>>>(newWidth, newHeight, newStride, scale, out,
+                                             src, width, height, stride);
+        HIP_CHECK(hipGetLastError());
+        return;
+    }
 
-    hipTextureDesc texDescr = {};
-    texDescr.normalizedCoords = true;
-    texDescr.filterMode       = hipFilterModeLinear;
-    texDescr.addressMode[0]   = hipAddressModeMirror;
-    texDescr.addressMode[1]   = hipAddressModeMirror;
-    texDescr.readMode         = hipReadModeElementType;
+#if !defined(__HIP_NO_IMAGE_SUPPORT)
+    hipResourceDesc texRes               = {};
+    texRes.resType                       = hipResourceTypePitch2D;
+    texRes.res.pitch2D.devPtr            = (void *)src;
+    texRes.res.pitch2D.desc              = hipCreateChannelDesc<float>();
+    texRes.res.pitch2D.width             = width;
+    texRes.res.pitch2D.height            = height;
+    texRes.res.pitch2D.pitchInBytes      = stride * sizeof(float);
+
+    hipTextureDesc texDescr         = {};
+    texDescr.normalizedCoords       = true;
+    texDescr.filterMode             = hipFilterModeLinear;
+    texDescr.addressMode[0]         = hipAddressModeMirror;
+    texDescr.addressMode[1]         = hipAddressModeMirror;
+    texDescr.readMode               = hipReadModeElementType;
 
     hipTextureObject_t texCoarse;
     HIP_CHECK(hipCreateTextureObject(&texCoarse, &texRes, &texDescr, NULL));
 
     UpscaleKernel<<<blocks, threads>>>(newWidth, newHeight, newStride, scale, out, texCoarse);
+    HIP_CHECK(hipGetLastError());
 
     HIP_CHECK(hipDestroyTextureObject(texCoarse));
+#endif
 }
