@@ -160,14 +160,13 @@ jobs:
     defaults:
       run:
         shell: bash
-    # Dynamic job name surfaces the outcome in the UI (run-name cannot see step outputs).
-    name: >-
-      ${{ needs.gate.outputs.resolved == 'true'
-          && format('Skipped {0} (already tested)', needs.gate.outputs.rocm_version)
-          || (needs.gate.outputs.source == 'unavailable' && 'Quartz unavailable'
-              || 'No ready build') }}
+    name: Report skip reason
     steps:
-      - name: Report
+      - name: >-
+          ${{ needs.gate.outputs.resolved == 'true'
+              && format('Skipped {0} (already tested)', needs.gate.outputs.rocm_version)
+              || (needs.gate.outputs.source == 'unavailable' && 'Quartz unavailable'
+                  || 'No ready build') }}
         run: |
           if [ "${{ needs.gate.outputs.resolved }}" = "true" ]; then
             echo "ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) already tested; skipping." >> "$GITHUB_STEP_SUMMARY"
