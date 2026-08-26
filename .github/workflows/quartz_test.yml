@@ -61,6 +61,8 @@ jobs:
       source: ${{ steps.consume.outputs.source }}
       rocm_version: ${{ steps.consume.outputs.rocm_version }}
       build_date: ${{ steps.consume.outputs.build_date }}
+      wheels_url: ${{ steps.consume.outputs.wheels_url }}
+      tarballs_url: ${{ steps.consume.outputs.tarballs_url }}
       is_new: ${{ steps.dedup.outputs.is_new }}
       distros: ${{ steps.config.outputs.distros }}
       distro_map: ${{ steps.config.outputs.distro_map }}
@@ -117,6 +119,8 @@ jobs:
       gpu_configs: ${{ needs.gate.outputs.gpu_configs }}
       install_methods: ${{ needs.gate.outputs.install_methods }}
       rocm_version: ${{ needs.gate.outputs.rocm_version }}
+      wheels_url: ${{ needs.gate.outputs.wheels_url }}
+      tarballs_url: ${{ needs.gate.outputs.tarballs_url }}
     secrets: inherit
 
   record:

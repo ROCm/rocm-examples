@@ -175,11 +175,20 @@ def main() -> None:
     rocm_version = result.status.rocm_version if result.status else ""
     build_date = result.status.build_date if result.status else ""
 
+    # Install URLs straight from Quartz (summary.linux.urls), so the reusable
+    # workflow pins the exact index/tarball base Quartz published rather than a
+    # hardcoded guess. Empty when there is no status document.
+    platform = result.status.platform(PLATFORM) if result.status else None
+    wheels_url = (platform.url("wheels") or "") if platform else ""
+    tarballs_url = (platform.url("tarballs") or "") if platform else ""
+
     set_github_outputs(
         resolved=str(result.resolved).lower(),
         rocm_version=rocm_version,
         build_date=build_date,
         source=result.source,
+        wheels_url=wheels_url,
+        tarballs_url=tarballs_url,
     )
 
     if result.resolved:
