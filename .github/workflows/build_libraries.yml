@@ -61,11 +61,12 @@ jobs:
           - name: Generate skip lists
             run: |
               python3 .github/build_tools/generate_skip_tests.py --channel stable --target "${GPU_TARGETS%%;*}"
-          - name: CMake Configure and Build
+          - name: CMake Configure, Build, and Install
             run: |
               cd Libraries
               cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -DROCM_EXAMPLES_ENABLE_OPENMP=ON -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" -S . -B build
               cmake --build build --parallel $(nproc)
+              cmake --install build --prefix install
           - name: Make
             run: |
               cd Libraries

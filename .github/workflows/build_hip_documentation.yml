@@ -34,13 +34,16 @@ jobs:
           - name: Generate skip lists
             run: |
               python3 .github/build_tools/generate_skip_tests.py --channel stable --target "${GPU_TARGETS%%;*}"
-          - name: CMake Configure and Build
+          - name: CMake Configure, Build, and Install
             # The CMAKE_POLICY_VERSION_MINIMUM environment variable can be removed once the CMake updates from ROCm 7.0 are available
             run: |
               cd HIP-Doc
               export CMAKE_POLICY_VERSION_MINIMUM="3.5"
-              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" -S . -B build
+              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" \
+                    -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" \
+                    -S . -B build
               cmake --build build -j
+              cmake --install build --prefix install
           - name: Make
             run: |
               cd HIP-Doc
