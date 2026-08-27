@@ -51,4 +51,5 @@ target_link_libraries(${example_name} PRIVATE hipthreads::hipthreads roc::rocthr
 target_include_directories(${example_name} PRIVATE "../../../../Common")
 
 add_test(NAME ${example_name} COMMAND ${example_name})
+set_tests_properties(${example_name} PROPERTIES ENVIRONMENT "HIPTHREADS_VCORES_PER_WGP=1")
 install(TARGETS ${example_name})
