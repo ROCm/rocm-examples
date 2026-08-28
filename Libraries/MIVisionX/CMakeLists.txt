@@ -49,11 +49,11 @@ if(NOT OpenVX_LIBRARY)
     return()
 endif()
 
-add_subdirectory(canny)
 # Disable this test until Jira ticket ROCM-1771 is resolved
 #add_subdirectory(mv_objdetect)
 
-# OpenCV support will be removed in future releases
-# this example will only work on ubuntu 22.04 with MIVisionX built from source with OpenCV support
+# MIVisionX will stop being shipped with OpenCV support in future releases
+# examples using MIVisionX's OpenCV extension will need MIVisionX built with OpenCV support
 # see https://github.com/ROCm/MIVisionX/pull/1575
+# add_subdirectory(canny)
 # add_subdirectory(opencv_orb)
