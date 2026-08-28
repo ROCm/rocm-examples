@@ -73,8 +73,9 @@ jobs:
               make -j
               make install
 
-          - name: Configure and Build
+          - name: Configure, Build, and Install
             run: |
-              cd Applications && mkdir build && cd build
-              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA ..
-              cmake --build . -j
+              cd Applications
+              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -S . -B build
+              cmake --build build -j
+              cmake --install build --prefix install

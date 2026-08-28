@@ -48,8 +48,9 @@ jobs:
               apt-get update -qq &&
               apt-get install -y hip-dev hipify-clang
 
-          - name: Configure and Build
+          - name: Configure, Build, and Install
             run: |
-              cd HIP-Basic && mkdir build && cd build
-              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA ..
-              cmake --build . -j
+              cd HIP-Basic
+              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -S . -B build
+              cmake --build build -j
+              cmake --install build --prefix install

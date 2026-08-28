@@ -56,11 +56,12 @@ jobs:
                   wget ${{ env.HIPFILE_BASE_URL }}/hipfile-dev_0.2.0.70200-nightly.9999.24.04_amd64.deb
                   apt-get install -y ./hipfile_0.2.0.70200-nightly.9999.24.04_amd64.deb \
                                      ./hipfile-dev_0.2.0.70200-nightly.9999.24.04_amd64.deb
-          - name: CMake Configure and Build
+          - name: CMake Configure, Build, and Install
             run: |
               cd Systems
               cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -S . -B build
               cmake --build build -j $(nproc)
+              cmake --install build --prefix install
           - name: Make
             run: |
               cd Systems

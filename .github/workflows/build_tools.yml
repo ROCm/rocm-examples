@@ -52,11 +52,12 @@ jobs:
                   apt-get autoclean
           - name: Install rocprof-compute dependencies
             run: python3 -m pip install -r /opt/rocm/libexec/rocprofiler-compute/requirements.txt
-          - name: CMake Configure and Build
+          - name: CMake Configure, Build, and Install
             run: |
               cd Tools
               cmake -DGPU_TARGETS="${GPU_TARGETS}" -S . -B build
               cmake --build build -j
+              cmake --install build --prefix install
           - name: Make
             run: |
               cd Tools
