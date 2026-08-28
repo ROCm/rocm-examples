@@ -376,6 +376,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "per_thread_default_stream_v
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pointer_memory_type_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\pointer_memory_type\pointer_memory_type_vs2017.vcxproj", "{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lane_masks_bit_shift_vs2017", "HIP-Doc\Programming-Guide\Porting-CUDA-code-to-HIP\lane_masks_bit_shift\lane_masks_bit_shift_vs2017.vcxproj", "{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "async_kernel_execution_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\async_kernel_execution\async_kernel_execution_vs2017.vcxproj", "{97295C91-A455-4B78-89C9-BB6EA1791BBE}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event_based_synchronization_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Asynchronous-Concurrent-Execution\event_based_synchronization\event_based_synchronization_vs2017.vcxproj", "{54C05E77-0E5D-449E-B048-8166D2EE97E7}"
@@ -1060,6 +1062,10 @@ Global
 		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}.Debug|x64.Build.0 = Debug|x64
 		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}.Release|x64.ActiveCfg = Release|x64
 		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B}.Release|x64.Build.0 = Release|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Debug|x64.ActiveCfg = Debug|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Debug|x64.Build.0 = Debug|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Release|x64.ActiveCfg = Release|x64
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9}.Release|x64.Build.0 = Release|x64
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE}.Debug|x64.ActiveCfg = Debug|x64
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE}.Debug|x64.Build.0 = Debug|x64
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE}.Release|x64.ActiveCfg = Release|x64
@@ -1436,6 +1442,7 @@ Global
 		{F26935E2-D711-4EB5-8608-4F53E909512F} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
 		{0B4B7EA7-8A50-4946-8C62-45C79D3426FE} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
 		{35E3ACD9-51BD-49DF-99A4-DB745ACB491B} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
+		{49AE00CF-ABB5-46D2-93A3-7A8A3FD3A7F9} = {D9C2946B-AE0F-4123-B842-C6E658FFB7F1}
 		{97295C91-A455-4B78-89C9-BB6EA1791BBE} = {7E8D5012-CD98-4F05-9641-0E83DF6E37FC}
 		{54C05E77-0E5D-449E-B048-8166D2EE97E7} = {7E8D5012-CD98-4F05-9641-0E83DF6E37FC}
 		{FEE9F556-803D-43D9-BB9F-92D1465D86BE} = {7E8D5012-CD98-4F05-9641-0E83DF6E37FC}
