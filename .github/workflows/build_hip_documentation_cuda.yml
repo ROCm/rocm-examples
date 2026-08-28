@@ -48,10 +48,11 @@ jobs:
               apt-get update -qq &&
               apt-get install -y hip-dev hipify-clang hipfft-dev
 
-          - name: Configure and Build
+          - name: Configure, Build, and Install
             # The CMAKE_POLICY_VERSION_MINIMUM environment variable can be removed once the CMake updates from ROCm 7.0 are available
             run: |
-              cd HIP-Doc && mkdir build && cd build
+              cd HIP-Doc
               export CMAKE_POLICY_VERSION_MINIMUM="3.5"
-              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -DHIP_PLATFORM=nvidia ..
-              cmake --build . -j
+              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -DHIP_PLATFORM=nvidia -S . -B build
+              cmake --build build -j
+              cmake --install build --prefix install

@@ -63,4 +63,4 @@ target_include_directories(${example_name} PRIVATE
 target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda_driver>)
 
 install(TARGETS ${example_name})
-install(FILES test_colored.jpg DESTINATION ${CMAKE_INSTALL_PREFIX})
+install(FILES test_colored.jpg TYPE BIN)
