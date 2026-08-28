@@ -64,8 +64,9 @@ jobs:
                   apt-get install -y ./hipfile_0.2.0.70200-nightly.9999.24.04_amd64.deb \
                                      ./hipfile-dev_0.2.0.70200-nightly.9999.24.04_amd64.deb
 
-          - name: Configure and Build
+          - name: Configure, Build, and Install
             run: |
-              cd Systems && mkdir build && cd build
-              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -DHIP_PLATFORM=nvidia ..
-              cmake --build . -j $(nproc)
+              cd Systems
+              cmake -DROCM_EXAMPLES_GPU_LANGUAGE=CUDA -DHIP_PLATFORM=nvidia -S . -B build
+              cmake --build build -j $(nproc)
+              cmake --install build --prefix install

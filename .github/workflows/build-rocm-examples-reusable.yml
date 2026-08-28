@@ -175,6 +175,11 @@ jobs:
         run: |
           cmake --build build -j
 
+      - name: CMake install
+        if: ${{ !cancelled() }}
+        run: |
+          cmake --install build --prefix install
+
       - name: Collect Makefile build artifacts
         if: ${{ !cancelled() }}
         run: |
