@@ -39,7 +39,7 @@ int main(int argc, char* argv[])
     // 1. Define the various input parameters.
     using data_t = std::complex<double>;
 
-    std::cout << "hipFFT single-node multi-gpu complex-to-complex 3D FFT example\n";
+    std::cout << "hipFFT single-node multi-gpu complex-to-complex 2D FFT example\n";
 
     cli::Parser parser(argc, argv);
     parser.set_optional<std::vector<int>>("l", "length", {8, 8}, "2D FFT size (eg: -l 8 8).");
@@ -80,9 +80,6 @@ int main(int argc, char* argv[])
     HIPFFT_CHECK(hipfftCreate(&plan));
 
     // 4. Set up multi GPU execution.
-    hipStream_t stream{};
-    HIP_CHECK(hipStreamCreate(&stream));
-    HIPFFT_CHECK(hipfftSetStream(plan, stream));
     HIPFFT_CHECK(hipfftXtSetGPUs(plan, devices.size(), devices.data()));
 
     // 5. Make the 2D FFT plan.
@@ -90,36 +87,32 @@ int main(int argc, char* argv[])
     HIPFFT_CHECK(
         hipfftMakePlan2d(plan, length[0], length[1], hipfftType::HIPFFT_Z2Z, work_size.data()));
 
-    // 6. Allocate memory on device.
-    hipLibXtDesc* input_desc;
-    hipLibXtDesc* output_desc;
-    HIPFFT_CHECK(hipfftXtMalloc(plan, &input_desc, hipfftXtSubFormat::HIPFFT_XT_FORMAT_INPUT));
-    HIPFFT_CHECK(hipfftXtMalloc(plan, &output_desc, hipfftXtSubFormat::HIPFFT_XT_FORMAT_OUTPUT));
+    // 6. Allocate memory on device (in-place requires a single descriptor).
+    hipLibXtDesc* desc;
+    HIPFFT_CHECK(hipfftXtMalloc(plan, &desc, hipfftXtSubFormat::HIPFFT_XT_FORMAT_INPLACE));
 
     // 7. Copy data from host to device.
     HIPFFT_CHECK(hipfftXtMemcpy(plan,
-                                input_desc,
+                                desc,
                                 input.data(),
                                 hipfftXtCopyType::HIPFFT_COPY_HOST_TO_DEVICE));
 
-    // 8. Execute multi GPU FFT from plan.
-    HIPFFT_CHECK(hipfftXtExecDescriptor(plan, input_desc, output_desc, HIPFFT_FORWARD));
+    // 8. Execute in-place multi GPU FFT from plan.
+    HIPFFT_CHECK(hipfftXtExecDescriptor(plan, desc, desc, HIPFFT_FORWARD));
 
     // 9. Copy data from device to host.
     std::vector<data_t> output(length[0] * length[1]);
     HIPFFT_CHECK(hipfftXtMemcpy(plan,
                                 output.data(),
-                                output_desc,
+                                desc,
                                 hipfftXtCopyType::HIPFFT_COPY_DEVICE_TO_HOST));
 
     std::cout << "Output:\n";
     print_nd_data(output, length, 16, 3);
 
     // 10. Clean up.
-    HIPFFT_CHECK(hipfftXtFree(input_desc));
-    HIPFFT_CHECK(hipfftXtFree(output_desc));
+    HIPFFT_CHECK(hipfftXtFree(desc));
     HIPFFT_CHECK(hipfftDestroy(plan));
-    HIP_CHECK(hipStreamDestroy(stream));
 
     return 0;
 }

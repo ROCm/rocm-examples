@@ -1,4 +1,4 @@
-# hipFFT Mutli GPU Example
+# hipFFT Multi GPU Example
 
 ## Description
 
@@ -23,15 +23,15 @@ at least ROCm 6.0.
 
 The application provides the following optional command line arguments:
 
-- `-l` or `--length`. The 3-D FFT size separated by spaces. It default value is `8 8 8`.
-- `-d` or `--devices`. The list of devices to use separated by spaces. It default value is `0 1`.
+- `-l` or `--length`. The 2-D FFT size separated by spaces. Its default value is `8 8`.
+- `-d` or `--devices`. The list of devices to use separated by spaces. Its default value is `0 1`.
 
 ## Key APIs and Concepts
 
 - The `hipfftHandle` needs to be created with `hipfftCreate(...)` before use and destroyed with `hipfftDestroy(...)` after use.
   It can be associated with multiple GPUs.
 - `hipfftXtSetGPUs` instructs a plan to use multiple GPUs.
-- `hipfhipfftMakePlan2dftPlan2d` is used to create a plan for a 2-dimensional FFT.
+- `hipfftMakePlan2d` is used to create a plan for a 2-dimensional FFT.
 - `hipfftXtExecDescriptor` can execute a multi GPU plan.
 - Device memory management:
   - `hipfftXtMalloc` allocates device memory for a plan associated with multiple devices.
@@ -48,7 +48,6 @@ The application provides the following optional command line arguments:
 - `hipfftDestroy`
 - `hipfftHandle`
 - `hipfftMakePlan2d`
-- `hipfftSetStream`
 - `hipfftType`
   - `HIPFFT_Z2Z`
 - `hipfftXtCopyType`
@@ -59,13 +58,9 @@ The application provides the following optional command line arguments:
 - `hipfftXtMemcpy`
 - `hipfftXtSetGPUs`
 - `hipfftXtSubFormat`
-  - `HIPFFT_XT_FORMAT_INPUT`
-  - `HIPFFT_XT_FORMAT_OUTPUT`
+  - `HIPFFT_XT_FORMAT_INPLACE`
 - `hipfftXtExecDescriptor`
 
 ### HIP runtime
 
 - `hipGetDeviceCount`
-- `hipStream_t`
-- `hipStreamCreate`
-- `hipStreamDestroy`
