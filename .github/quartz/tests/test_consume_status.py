@@ -57,10 +57,6 @@ class ArchIsGoodTest(unittest.TestCase):
             consume_status.arch_is_good(make_status(build_status="failure"), "")
         )
 
-    def test_unknown_schema(self):
-        self.assertFalse(consume_status.arch_is_good(make_status(schema="3.0"), ""))
-        self.assertFalse(consume_status.arch_is_good(make_status(schema=""), ""))
-
     def test_missing_linux_platform(self):
         status = StatusDocument({"schema_version": "2.0", "summary": {}})
         self.assertFalse(consume_status.arch_is_good(status, ""))
@@ -94,6 +90,19 @@ class ResolveTest(unittest.TestCase):
         self.assertFalse(resolved)
         self.assertIsNone(status)
         self.assertEqual(source, "unavailable")
+
+    def test_resolve_bad_schema_major_exits(self):
+        self._patch_load(lambda *a, **k: make_status(schema="3.0"))
+        with self.assertRaises(SystemExit):
+            consume_status.resolve(None, "")
+
+    def test_resolve_real_bug_propagates(self):
+        def boom(*a, **k):
+            raise AttributeError("reader renamed a field")
+
+        self._patch_load(boom)
+        with self.assertRaises(AttributeError):
+            consume_status.resolve(None, "")
 
 
 if __name__ == "__main__":

@@ -46,6 +46,11 @@ from read_status_json import (
 PLATFORM = "linux"
 PIPELINE = "rocm"
 
+# The status.json schema major this consumer understands. A bump to a new major
+# can move or rename the fields the accessors read, so an unsupported major is a
+# hard failure, not a soft skip (mirrors ROCm/Quartz example_consume_status.py).
+SUPPORTED_SCHEMA_MAJOR = "2."
+
 
 class Resolution(NamedTuple):
     """Outcome of resolve(): whether a ready build was found, the parsed status
@@ -70,15 +75,13 @@ def set_github_outputs(**outputs: str) -> None:
 def arch_is_good(status: StatusDocument, arch: str) -> bool:
     """Return True if this build passed the gate we depend on.
 
-    - schema guard: the vendored reader is written against schema v2, so a
-      document whose schema_version does not start with "2." is treated as not
-      consumable rather than silently misread;
     - the Linux ROCm build must be Status.success;
     - if arch is non-empty, it must be one of the build's architectures (an
       empty arch means a platform-level gate only).
+
+    The schema-major guard lives in resolve(): an unsupported major is a hard
+    failure there, not a soft "not ready" here.
     """
-    if not status.schema_version.startswith("2."):
-        return False
     platform = status.platform(PLATFORM)
     if platform is None:
         return False
@@ -131,15 +134,28 @@ def load_latest(source: str | None) -> StatusDocument:
 def resolve(source: str | None, arch: str) -> Resolution:
     """Load latest.json and decide whether it is ready to act on.
 
-    Every fetch is wrapped: an absent or unreachable Quartz yields
-    Resolution(False, None, "unavailable") so the workflow simply skips the poll
-    and doubles as a Quartz availability canary.
+    A missing or unreachable Quartz -- a network error or a malformed/partial
+    document (OSError/ValueError, the latter covering json.JSONDecodeError) --
+    yields Resolution(False, None, "unavailable") so the workflow simply skips
+    the poll and doubles as a Quartz availability canary. Anything else (e.g. an
+    AttributeError from a reader change) is a real bug and propagates, rather
+    than being mislabeled "unavailable" and retried forever.
     """
     try:
         status = load_latest(source)
-    except Exception as exc:  # noqa: BLE001 - fail-safe: never break the workflow
+    except (OSError, ValueError) as exc:
         print(f"Quartz status unavailable: {exc}", file=sys.stderr)
         return Resolution(False, None, "unavailable")
+    # An unsupported schema major is permanent, unlike a transient fetch hiccup:
+    # retrying will not help, and a new major can move or rename the fields the
+    # accessors read, so continuing risks silently misreading the document. Fail
+    # loudly so the consumer gets updated, rather than reporting a false "nothing
+    # ready" that hides the break on every future poll.
+    if not status.schema_version.startswith(SUPPORTED_SCHEMA_MAJOR):
+        sys.exit(
+            f"schema_version {status.schema_version} unsupported "
+            f"(this consumer handles {SUPPORTED_SCHEMA_MAJOR}x); update the consumer."
+        )
     if arch_is_good(status, arch):
         return Resolution(True, status, "latest")
     return Resolution(False, status, "not-ready")

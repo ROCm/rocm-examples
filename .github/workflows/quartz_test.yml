@@ -52,7 +52,7 @@ concurrency:
 jobs:
   gate:
     name: "Resolve latest ready nightly"
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash
@@ -134,7 +134,7 @@ jobs:
     # resolve() always prefers) supersedes it -- so a genuinely broken nightly costs
     # at most the handful of polls in one morning window, not an hourly loop.
     if: needs.test.result == 'success'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash
@@ -156,7 +156,7 @@ jobs:
     needs: gate
     # Self-explanatory run for the skip cases (nothing ready, or already tested).
     if: always() && (needs.gate.outputs.resolved != 'true' || needs.gate.outputs.is_new != 'true')
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     defaults:
       run:
         shell: bash
