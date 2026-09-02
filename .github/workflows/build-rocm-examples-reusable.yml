@@ -19,6 +19,21 @@ on:
         description: "JSON array of install methods (fallback for distros without per-distro override)"
         required: true
         type: string
+      rocm_version:
+        description: "Exact ROCm nightly version to install (e.g. 10.1.0a20260821). Empty = latest on the index."
+        required: false
+        type: string
+        default: ""
+      wheels_url:
+        description: "Wheel index URL (from Quartz summary.linux.urls.wheels). Empty = default nightly index."
+        required: false
+        type: string
+        default: ""
+      tarballs_url:
+        description: "Tarball base URL (from Quartz summary.linux.urls.tarballs). Empty = default nightly base."
+        required: false
+        type: string
+        default: ""
 env:
   DEBIAN_FRONTEND: noninteractive
 
@@ -50,9 +65,21 @@ jobs:
         run: |
           echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
           pip install --no-cache-dir --upgrade pip
+          PKG="rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+          # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
+          # otherwise install whatever is latest on the index.
+          if [ -n "${{ inputs.rocm_version }}" ]; then
+            PKG="${PKG}==${{ inputs.rocm_version }}"
+          fi
+          # Prefer the index Quartz published for this build; fall back to the
+          # current default nightly index for non-Quartz callers.
+          INDEX_URL="${{ inputs.wheels_url }}"
+          if [ -z "$INDEX_URL" ]; then
+            INDEX_URL="https://nightly.repo.amd.com/rocm/whl-next/"
+          fi
           pip install --no-cache-dir \
-            --index-url https://rocm.nightlies.amd.com/whl-multi-arch/ \
-            "rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+            --index-url "$INDEX_URL" \
+            "$PKG"
           rocm-sdk init
 
       - name: Wheel sanity check
@@ -72,18 +99,31 @@ jobs:
         if: ${{ matrix.install_method == 'tarball-multi-arch' }}
         id: install-tarball-multi-arch
         run: |
-          TARBALL_LISTING=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" https://rocm.nightlies.amd.com/tarball-multi-arch/ \
-            | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
-          LATEST_TARBALL=$(echo "${TARBALL_LISTING}" | sort -V | tail -1)
+          # Prefer the tarball base Quartz published for this build; fall back to
+          # the current default nightly base for non-Quartz callers.
+          TARBALL_BASE="${{ inputs.tarballs_url }}"
+          if [ -z "$TARBALL_BASE" ]; then
+            TARBALL_BASE="https://nightly.repo.amd.com/rocm/core/tarball/"
+          fi
+          TARBALL_BASE="${TARBALL_BASE%/}/"
+          # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
+          # otherwise pick the latest tarball on the index.
+          if [ -n "${{ inputs.rocm_version }}" ]; then
+            LATEST_TARBALL="therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-${{ inputs.rocm_version }}.tar.gz"
+          else
+            TARBALL_LISTING=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" "${TARBALL_BASE}" \
+              | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
+            LATEST_TARBALL=$(echo "${TARBALL_LISTING}" | sort -V | tail -1)
+          fi
           mkdir /therock-tarball && cd /therock-tarball
-          wget "https://rocm.nightlies.amd.com/tarball-multi-arch/${LATEST_TARBALL}"
+          wget "${TARBALL_BASE}${LATEST_TARBALL}"
           mkdir install
           tar -xzf "${LATEST_TARBALL}" -C install
 
           ROCM_VERSION=$(echo "${LATEST_TARBALL}" | grep -oE "[0-9]+\.[0-9]+\.\w+")
           echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
           echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
-          echo "## Tarball link: https://rocm.nightlies.amd.com/tarball-multi-arch/${LATEST_TARBALL}" >> $GITHUB_STEP_SUMMARY
+          echo "## Tarball link: ${TARBALL_BASE}${LATEST_TARBALL}" >> $GITHUB_STEP_SUMMARY
 
       - name: Setup environment variables (tarball-multi-arch)
         if: ${{ matrix.install_method == 'tarball-multi-arch' }}
