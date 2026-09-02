@@ -18,23 +18,22 @@ Deduplication (test each version exactly once) lives in the workflow, not here:
 this script only reports what the latest build is, and the workflow gates on a
 cache marker keyed by (rocm_version, build_date).
 
-read_status_json.py is the sibling vendored reader. Running this file as
-`python3 .github/quartz/consume_status.py` puts this directory on sys.path[0],
-so the plain import below resolves it with no path shim.
+read_status_json is Quartz's reusable reader, not vendored here. The workflow
+sparse-checks it out from ROCm/Quartz at a pinned commit and puts its directory
+on PYTHONPATH, so the plain import below resolves it. To run this file or its
+tests locally, point PYTHONPATH at a checkout, e.g.
+
+    git clone --depth 1 https://github.com/ROCm/Quartz /tmp/quartz
+    PYTHONPATH=/tmp/quartz/scripts/consumer python3 .github/quartz/consume_status.py
 """
 
 import argparse
-import json
 import os
 import sys
-import urllib.request
-from pathlib import Path
 from typing import NamedTuple
-from urllib.parse import urljoin
 
 from read_status_json import (
     DEFAULT_SOURCE,
-    DEFAULT_TIMEOUT,
     Status,
     StatusDocument,
     load_status,
@@ -92,45 +91,6 @@ def arch_is_good(status: StatusDocument, arch: str) -> bool:
     return True
 
 
-def _read_pointer(source: str) -> str | None:
-    """Return the relative status.json path a Quartz latest.json symlink points
-    to, or None when source is already a real document.
-
-    Quartz publishes release-nightly/latest.json as a symlink to the current
-    dated file (e.g. "20260826/status.json"). raw.githubusercontent.com serves
-    the symlink *target path* as the file body instead of following it, so a
-    direct JSON parse fails. Detect that bare-path body and hand back the target
-    so the caller can fetch the real document.
-    """
-    if source.startswith(("http://", "https://")):
-        with urllib.request.urlopen(source, timeout=DEFAULT_TIMEOUT) as response:
-            body = response.read().decode("utf-8")
-    else:
-        body = Path(source).read_text()
-    body = body.strip()
-    # A pointer is a single relative path ending in .json, never a JSON document.
-    if "\n" in body or "{" in body or not body.endswith(".json"):
-        return None
-    return body
-
-
-def load_latest(source: str | None) -> StatusDocument:
-    """load_status, transparently following a Quartz latest.json symlink pointer.
-
-    Parse normally first; on a JSON decode error, check whether the body is a
-    symlink target path and, if so, resolve it against the base URL and fetch the
-    real document.
-    """
-    base = source or DEFAULT_SOURCE
-    try:
-        return load_status(base)
-    except json.JSONDecodeError:
-        target = _read_pointer(base)
-        if target is None:
-            raise
-        return load_status(urljoin(base, target))
-
-
 def resolve(source: str | None, arch: str) -> Resolution:
     """Load latest.json and decide whether it is ready to act on.
 
@@ -142,7 +102,7 @@ def resolve(source: str | None, arch: str) -> Resolution:
     than being mislabeled "unavailable" and retried forever.
     """
     try:
-        status = load_latest(source)
+        status = load_status(source)
     except (OSError, ValueError) as exc:
         print(f"Quartz status unavailable: {exc}", file=sys.stderr)
         return Resolution(False, None, "unavailable")
@@ -182,7 +142,7 @@ def main() -> None:
     )
     mode.add_argument(
         "--source",
-        default=None,
+        default=DEFAULT_SOURCE,
         help="override the status.json URL or path (default: Quartz latest nightly)",
     )
     args = parser.parse_args()

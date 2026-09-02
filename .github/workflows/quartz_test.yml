@@ -72,8 +72,23 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
+      # Quartz's reusable status.json reader, sparse-checked-out (single file) at
+      # a pinned commit rather than vendored. Pinned to the ROCm/Quartz#91 merge,
+      # which shipped the schema-v2 reader that follows the latest.json symlink;
+      # bump this SHA to pick up reader fixes or a schema-major update.
+      - name: Sparse-checkout Quartz reader
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          repository: ROCm/Quartz
+          ref: 910cc21e061790356f2697eaeb25e0db596f3dc3
+          sparse-checkout: scripts/consumer/read_status_json.py
+          sparse-checkout-cone-mode: false
+          path: .quartz-upstream
+
       - name: Resolve latest ready nightly from Quartz
         id: consume
+        env:
+          PYTHONPATH: .quartz-upstream/scripts/consumer
         run: python3 .github/quartz/consume_status.py --latest-only ""
 
       - name: Probe dedup marker

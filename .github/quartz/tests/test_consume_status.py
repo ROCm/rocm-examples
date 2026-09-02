@@ -4,7 +4,13 @@
 
 """Unit tests for consume_status gate + resolve logic.
 
-Run: python3 -m unittest discover -s .github/quartz/tests
+read_status_json is Quartz's reusable reader (not vendored here), so point
+PYTHONPATH at a Quartz checkout before running:
+
+    git clone --depth 1 https://github.com/ROCm/Quartz /tmp/quartz
+    PYTHONPATH=/tmp/quartz/scripts/consumer \\
+        python3 -m unittest discover -s .github/quartz/tests
+
 No network: StatusDocument is built from in-memory dicts and load_status is
 stubbed for the resolve() cases.
 """
@@ -13,8 +19,9 @@ import sys
 import unittest
 from pathlib import Path
 
-# Put .github/quartz/ (the package dir) on sys.path so consume_status and its
-# sibling read_status_json import the same way they do when run in the workflow.
+# Put .github/quartz/ on sys.path so `import consume_status` resolves; the reader
+# it imports (read_status_json) comes from Quartz via PYTHONPATH, see the module
+# docstring.
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import consume_status  # noqa: E402
