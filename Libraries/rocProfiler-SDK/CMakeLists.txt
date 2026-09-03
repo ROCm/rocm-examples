@@ -53,5 +53,4 @@ else()
     message(WARNING "OpenMP offloading target examples are disabled. Skipping rocProfiler-SDK OpenMP target example.")
 endif()
 add_subdirectory(pc_sampling)
-# Disabled until feature is released in future ROCm
-# add_subdirectory(thread_trace)
+add_subdirectory(thread_trace)
