@@ -76,6 +76,6 @@ function(find_omp_library RESULT_VAR)
             REQUIRED
         )
         set("${RESULT_VAR}" "${_omp_lib}" PARENT_SCOPE)
-        message(STATUS "OpenMP found with find_library at ${OMP_LIBRARY}")
+        message(STATUS "OpenMP found with find_library at ${_omp_lib}")
     endif()
 endfunction()
