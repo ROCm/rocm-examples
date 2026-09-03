@@ -111,34 +111,40 @@
 /// \brief Checks if the provided rocProfiler status is \p ROCPROFILER_STATUS_SUCCESS and if not,
 /// prints an error message to the standard error output and terminates the program
 /// with an error code.
-#define ROCPROFILER_CHECK(condition)                                                          \
-    {                                                                                         \
-        const rocprofiler_status_t status = condition;                                        \
-        if(status != ROCPROFILER_STATUS_SUCCESS)                                              \
-        {                                                                                     \
-            std::cerr << "rocProfiler error encountered: \""                                  \
-                      << rocprofiler_get_status_string(status) << "\" at " << __FILE__ << ':' \
-                      << __LINE__ << std::endl;                                               \
-            std::exit(error_exit_code);                                                       \
-        }                                                                                     \
+#define ROCPROFILER_CHECK(condition)                                                        \
+    {                                                                                       \
+        const rocprofiler_status_t ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__) = condition; \
+        if(ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__) != ROCPROFILER_STATUS_SUCCESS)       \
+        {                                                                                   \
+            std::cerr << "rocProfiler error encountered: \""                                \
+                      << rocprofiler_get_status_string(                                     \
+                             ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__))                   \
+                      << "\" at " << __FILE__ << ':' << __LINE__ << std::endl;              \
+            std::exit(error_exit_code);                                                     \
+        }                                                                                   \
     }
 
 /// \brief Checks if the provided rocProfiler status is \p ROCPROFILER_STATUS_SUCCESS and if not,
 /// prints an error message with custom message to the standard error output and terminates the
 /// program with an error code.
-#define ROCPROFILER_CALL(condition, msg)                                                   \
-    {                                                                                      \
-        const rocprofiler_status_t status = condition;                                     \
-        if(status != ROCPROFILER_STATUS_SUCCESS)                                           \
-        {                                                                                  \
-            std::cerr << "[" #condition "][" << __FILE__ << ":" << __LINE__ << "] " << msg \
-                      << " failed with error code " << status << ": "                      \
-                      << rocprofiler_get_status_string(status) << std::endl;               \
-            std::stringstream errmsg{};                                                    \
-            errmsg << "[" #condition "][" << __FILE__ << ":" << __LINE__ << "] " << msg    \
-                   << " failure (" << rocprofiler_get_status_string(status) << ")";        \
-            throw std::runtime_error(errmsg.str());                                        \
-        }                                                                                  \
+#define ROCPROFILER_CALL(condition, msg)                                                           \
+    {                                                                                              \
+        const rocprofiler_status_t ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__) = condition;        \
+        if(ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__) != ROCPROFILER_STATUS_SUCCESS)              \
+        {                                                                                          \
+            std::cerr << "[" #condition "][" << __FILE__ << ":" << __LINE__ << "] " << msg         \
+                      << " failed with error code " << ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__) \
+                      << ": "                                                                      \
+                      << rocprofiler_get_status_string(                                            \
+                             ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__))                          \
+                      << std::endl;                                                                \
+            std::stringstream errmsg{};                                                            \
+            errmsg << "[" #condition "][" << __FILE__ << ":" << __LINE__ << "] " << msg            \
+                   << " failure ("                                                                 \
+                   << rocprofiler_get_status_string(ROCPROFILER_VARIABLE(CHECKSTATUS, __LINE__))   \
+                   << ")";                                                                         \
+            throw std::runtime_error(errmsg.str());                                                \
+        }                                                                                          \
     }
 
 #define ROCPROFILER_VAR_NAME_COMBINE(X, Y) X##Y
