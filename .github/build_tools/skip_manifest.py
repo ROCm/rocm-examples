@@ -140,4 +140,17 @@ SKIP_MANIFEST = [
         "channels": ["stable"],
         "reason": "hip_scan.h not present in the pinned 7.14 stable image",
     },
+    # --- hipThreads: nightly whl build skip (whole tree) ------------------
+    # The TheRock nightly whl ships hipthreads headers + libhipthreads.a but an
+    # empty include/libhipcxx, so the libhipcxx headers the examples include
+    # (hip/std, hip/atomic) are absent and every hipthreads-linked example fails
+    # to compile. Skip the whole Libraries/hipThreads tree until the nightly whl
+    # ships libhipcxx at include/libhipcxx (ROCm/TheRock#7530 disabled it).
+    {
+        "ctest": None,
+        "path": "Libraries/hipThreads",
+        "scope": ["build"],
+        "channels": ["nightly"],
+        "reason": "libhipcxx headers (hip/std, hip/atomic) absent from include/libhipcxx in the TheRock nightly whl (ROCm/TheRock#7530); hipthreads ships but is unbuildable without them",
+    },
 ]

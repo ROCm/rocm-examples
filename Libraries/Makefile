@@ -30,7 +30,15 @@ LIBRARIES := \
 	rocRAND \
 	hipRAND
 
-SKIP_FROM_TEST :=
+# Skips are driven by .github/build_tools/skip_manifest.py: CI runs
+# generate_skip_tests.py and passes SKIP_FROM_BUILD / SKIP_FROM_TEST as
+# repo-relative paths on the make command line (overriding these defaults).
+# skip_here matches only entries naming THIS directory's libraries. A bare local
+# build/test skips nothing. The `test` target honors SKIP_FROM_BUILD too: a
+# library that isn't built can't be tested, so build skips imply test skips.
+SKIP_FROM_BUILD ?=
+SKIP_FROM_TEST ?=
+skip_here = $(foreach e,$(LIBRARIES),$(if $(filter %/$(notdir $(CURDIR))/$(e) $(notdir $(CURDIR))/$(e),$(1)),$(e)))
 
 ifneq ($(GPU_RUNTIME), CUDA)
 
@@ -96,7 +104,7 @@ endif
 
 endif
 
-all: $(LIBRARIES)
+all: $(filter-out $(call skip_here,$(SKIP_FROM_BUILD)),$(LIBRARIES))
 
 clean: TARGET=clean
 clean: all
@@ -105,6 +113,6 @@ $(LIBRARIES):
 	$(MAKE) -C $@ $(TARGET)
 
 test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(LIBRARIES))
+test: $(filter-out $(call skip_here,$(SKIP_FROM_TEST) $(SKIP_FROM_BUILD)),$(LIBRARIES))
 
 .PHONY: all clean test $(LIBRARIES)

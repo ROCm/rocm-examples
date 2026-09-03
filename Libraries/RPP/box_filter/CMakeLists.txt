@@ -49,7 +49,7 @@ find_library(OMP_LIBRARY
     PATHS
         "${ROCM_PATH}/lib/llvm/lib"
         "${ROCM_PATH}/lib"
-    PATH_SUFFIXES lib lib64
+    PATH_SUFFIXES lib lib64 x86_64-unknown-linux-gnu llvm/lib/x86_64-unknown-linux-gnu
     REQUIRED
 )
 
