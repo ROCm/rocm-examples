@@ -44,14 +44,9 @@ include("../../../Common/ROCmPath.cmake")
 
 find_package(OpenCV REQUIRED)
 
-find_library(OMP_LIBRARY
-    NAMES omp
-    PATHS
-        "${ROCM_PATH}/lib/llvm/lib"
-        "${ROCM_PATH}/lib"
-    PATH_SUFFIXES lib lib64 x86_64-unknown-linux-gnu llvm/lib/x86_64-unknown-linux-gnu
-    REQUIRED
-)
+# Locate libomp.so with helper
+include("../../../Common/FindOpenMPHelpers.cmake")
+find_omp_library(OMP_LIBRARY)
 
 add_executable(${example_name} main.cpp)
 add_test(NAME ${example_name} COMMAND ${example_name})
