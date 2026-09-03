@@ -140,6 +140,19 @@ SKIP_MANIFEST = [
         "channels": ["stable"],
         "reason": "hip_scan.h not present in the pinned 7.14 stable image",
     },
+    # --- Stable-only build skip ------------
+    # The experimental thread-trace shader-data callback was changed to take a
+    # single rocprofiler_thread_trace_shader_data_t struct; the pinned 7.14 stable
+    # image still ships the older multi-arg callback and has no such struct, so the
+    # updated example does not compile there. Nightly TheRock builds carry the new
+    # API and build it, so scope this skip to the stable channel only.
+    {
+        "ctest": None,
+        "path": "Libraries/rocProfiler-SDK/thread_trace",
+        "scope": ["build"],
+        "channels": ["stable"],
+        "reason": "rocprofiler_thread_trace_shader_data_t (new single-struct shader-data callback) absent from the pinned 7.14 stable image",
+    },
     # --- hipThreads: nightly whl build skip (whole tree) ------------------
     # The TheRock nightly whl ships hipthreads headers + libhipthreads.a but an
     # empty include/libhipcxx, so the libhipcxx headers the examples include
