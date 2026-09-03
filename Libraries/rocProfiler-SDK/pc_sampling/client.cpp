@@ -64,7 +64,7 @@ int tool_init(rocprofiler_client_finalize_t fini_func, void* /*tool_data*/)
     if(client::pcs::gpu_agents.empty())
     {
         *common::get_output_stream()
-            << "No availabe gpu agents supporting PC sampling" << std::endl;
+            << "No available gpu agents supporting PC sampling" << std::endl;
         // Emit the message to explicitly skip the sample.
         std::cerr << "PC sampling unavailable" << std::endl;
         // Exit with no error if none of the GPUs support PC sampling.
@@ -146,7 +146,7 @@ void tool_fini(void* /*tool_data*/)
             }
             else
             {
-                ROCPROFILER_CHECK(ROCPROFILER_STATUS_SUCCESS);
+                ROCPROFILER_CHECK(status);
             }
         }
     }

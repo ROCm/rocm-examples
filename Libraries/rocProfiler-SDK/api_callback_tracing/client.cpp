@@ -283,7 +283,7 @@ void start()
 void stop()
 {
     int status = 0;
-    rocprofiler_is_initialized(&status);
+    ROCPROFILER_CALL(rocprofiler_is_initialized(&status), "failed to retrieve init status");
     if(status != 0)
     {
         ROCPROFILER_CALL(rocprofiler_stop_context(client_ctx), "rocprofiler context stop failed");
