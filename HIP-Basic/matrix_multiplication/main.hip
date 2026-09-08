@@ -108,6 +108,53 @@ __global__ void matrix_multiplication_kernel(const float*       A,
     // Every thread stores the final result to global memory.
     C[block_offset + b_cols * ty + tx] = thread_result;
 }
+
+bool checkValidity (const float* A, const float* B, const float* C, size_t a_rows,size_t a_cols, size_t b_cols)
+{
+    const float EPSILON = 0.001;
+    const int BLOCK_SIZE = 64;
+
+    std::vector<float> golden_c(b_cols * a_rows);
+
+    for (size_t i_block = 0; i_block < a_rows; i_block += BLOCK_SIZE) {
+        for (size_t j_block = 0; j_block < b_cols; j_block += BLOCK_SIZE) {
+            for (size_t t_block = 0; t_block < a_cols; t_block += BLOCK_SIZE) {
+                int i_end = std::min(i_block + BLOCK_SIZE, a_rows);
+                int j_end = std::min(j_block + BLOCK_SIZE, b_cols);
+                int t_end = std::min(t_block + BLOCK_SIZE, a_cols);
+
+                
+                for (int i = i_block; i < i_end; ++i) {
+                    for (int t = t_block; t < t_end; ++t) {
+                        float a_val = A[i * a_cols + t];
+                        for (int j = j_block; j < j_end; ++j) {
+                             golden_c[i * b_cols + j] += a_val * B[t * b_cols + j];
+                        }
+                    }
+                }
+            }
+        }
+    }
+   
+    for (size_t i = 0; i < a_rows; ++i) 
+    {        
+        for (size_t j = 0; j < b_cols; ++j) 
+        {
+            float absdiff = abs(C[i*b_cols+j] - golden_c[i*b_cols+j]);
+            if(absdiff > EPSILON)
+            {
+                std::cerr << "\nVALIDATION FAILED!!!\n    reference" << "[" << i << ", " << j << "] = "
+                     << golden_c[i*b_cols+j] << ",\n    calculated" << "[" << i << ", " << j << "] = "
+                     << C[i*b_cols+j]
+                     << ",\n    absolute difference" << "[" << i << ", " << j << "] = " << absdiff << "\n"
+                     << "Further validation was stopped\n\n";
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 template<unsigned int BlockSize>
 void configure_parser(cli::Parser& parser)
 {
@@ -165,12 +212,10 @@ int main(int argc, const char* argv[])
     std::vector<float> B(b_cols * b_rows);
     std::vector<float> C(c_cols * c_rows);
 
-    // Set matrix elements to a constant on the host.
-    std::fill(A.begin(), A.end(), 1.F);
-
-    constexpr float b_value = 0.02F;
-    std::fill(B.begin(), B.end(), b_value);
-
+    // Set matrix elements to random value on the host.
+    for (size_t i = 0; i < A.size(); ++i) A[i] = static_cast<float>(rand() / (RAND_MAX + 1.0f) );
+    for (size_t i = 0; i < B.size(); ++i) B[i] = static_cast<float>(rand() / (RAND_MAX + 1.0f) );
+    
     const size_t a_bytes = sizeof(float) * A.size();
     const size_t b_bytes = sizeof(float) * B.size();
     const size_t c_bytes = sizeof(float) * C.size();
@@ -203,11 +248,7 @@ int main(int argc, const char* argv[])
     HIP_CHECK(hipFree(d_C));
 
     // Check if the resulting elements match the expectation.
-    constexpr float tolerance         = 0.001F;
-    const bool      validation_passed = std::all_of(
-        C.begin(),
-        C.end(),
-        [=](const float value) { return tolerance > std::abs(value - a_cols * b_value); });
+    bool      validation_passed = checkValidity(A.data(),B.data(),C.data(),a_rows,a_cols,b_cols);
     if(validation_passed)
     {
         std::cout << "Validation passed." << std::endl;
