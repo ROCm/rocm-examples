@@ -36,6 +36,7 @@ from read_status_json import (
     DEFAULT_SOURCE,
     Status,
     StatusDocument,
+    UnsupportedSchemaError,
     load_status,
 )
 
@@ -44,11 +45,6 @@ from read_status_json import (
 # pipeline across platforms and is routinely red even when ROCm itself is fine).
 PLATFORM = "linux"
 PIPELINE = "rocm"
-
-# The status.json schema major this consumer understands. A bump to a new major
-# can move or rename the fields the accessors read, so an unsupported major is a
-# hard failure, not a soft skip (mirrors ROCm/Quartz example_consume_status.py).
-SUPPORTED_SCHEMA_MAJOR = "2."
 
 
 class Resolution(NamedTuple):
@@ -103,19 +99,20 @@ def resolve(source: str | None, arch: str) -> Resolution:
     """
     try:
         status = load_status(source)
+    except UnsupportedSchemaError as exc:
+        # An unsupported schema major is permanent, unlike a transient fetch
+        # hiccup: retrying will not help, and a new major can move or rename the
+        # fields the accessors read, so continuing risks silently misreading the
+        # document. load_status raises this from its own version guard; catch it
+        # before the transient clause below (UnsupportedSchemaError is a
+        # ValueError subclass) and fail loudly so the consumer gets updated,
+        # rather than reporting a false "nothing ready" that hides the break on
+        # every future poll. Newer minors within the supported major are accepted
+        # by load_status and need no handling here.
+        sys.exit(f"{exc} Update the consumer.")
     except (OSError, ValueError) as exc:
         print(f"Quartz status unavailable: {exc}", file=sys.stderr)
         return Resolution(False, None, "unavailable")
-    # An unsupported schema major is permanent, unlike a transient fetch hiccup:
-    # retrying will not help, and a new major can move or rename the fields the
-    # accessors read, so continuing risks silently misreading the document. Fail
-    # loudly so the consumer gets updated, rather than reporting a false "nothing
-    # ready" that hides the break on every future poll.
-    if not status.schema_version.startswith(SUPPORTED_SCHEMA_MAJOR):
-        sys.exit(
-            f"schema_version {status.schema_version} unsupported "
-            f"(this consumer handles {SUPPORTED_SCHEMA_MAJOR}x); update the consumer."
-        )
     if arch_is_good(status, arch):
         return Resolution(True, status, "latest")
     return Resolution(False, status, "not-ready")

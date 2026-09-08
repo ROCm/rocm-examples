@@ -25,10 +25,10 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 import consume_status  # noqa: E402
-from read_status_json import StatusDocument  # noqa: E402
+from read_status_json import StatusDocument, UnsupportedSchemaError  # noqa: E402
 
 
-def make_status(schema="2.0", build_status="success", arches=("gfx110X-all",)):
+def make_status(schema="2.1", build_status="success", arches=("gfx110X-all",)):
     """Build a minimal v2-shaped status document for the Linux ROCm gate."""
     return StatusDocument(
         {
@@ -65,7 +65,7 @@ class ArchIsGoodTest(unittest.TestCase):
         )
 
     def test_missing_linux_platform(self):
-        status = StatusDocument({"schema_version": "2.0", "summary": {}})
+        status = StatusDocument({"schema_version": "2.1", "summary": {}})
         self.assertFalse(consume_status.arch_is_good(status, ""))
 
 
@@ -99,7 +99,13 @@ class ResolveTest(unittest.TestCase):
         self.assertEqual(source, "unavailable")
 
     def test_resolve_bad_schema_major_exits(self):
-        self._patch_load(lambda *a, **k: make_status(schema="3.0"))
+        # load_status guards the schema major itself and raises
+        # UnsupportedSchemaError; resolve() must exit non-zero, not treat it as a
+        # transient "unavailable" (it is a ValueError subclass).
+        def boom(*a, **k):
+            raise UnsupportedSchemaError("schema_version 3.0 unsupported")
+
+        self._patch_load(boom)
         with self.assertRaises(SystemExit):
             consume_status.resolve(None, "")
 
