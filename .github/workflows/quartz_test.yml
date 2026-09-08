@@ -129,17 +129,48 @@ jobs:
       tarballs_url: ${{ needs.gate.outputs.tarballs_url }}
     secrets: inherit
 
-  record:
+  collect:
     needs: [gate, test]
-    # Record ONLY on a green test run. Any failure -- transient infra (wheel-index
-    # outage, tarball 404, runner hiccup) OR a real build/test break -- leaves the
-    # version unrecorded so the next poll re-tests it, instead of masking it until
-    # the 7-day cache eviction. A failed run is never a conclusive "tested": we may
-    # simply have been unable to install. Retry is bounded -- a version is revisited
-    # only while it stays Quartz's latest-ready build, and the next nightly (which
-    # resolve() always prefers) supersedes it -- so a genuinely broken nightly costs
-    # at most the handful of polls in one morning window, not an hourly loop.
-    if: needs.test.result == 'success'
+    # Read each test cell's self-reported category and take the worst: any genuine
+    # build/test break -> "bug"; else any transient infra failure -> "infra"; else
+    # "success". record uses this to decide record-and-stop vs leave-unrecorded-to-retry.
+    if: always() && needs.gate.outputs.is_new == 'true' && needs.test.result != 'skipped'
+    runs-on: ubuntu-24.04
+    permissions:
+      actions: read
+    defaults:
+      run:
+        shell: bash
+    outputs:
+      category: ${{ steps.eval.outputs.category }}
+    steps:
+      - name: Download cell categories
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          pattern: category-*
+          path: cats
+
+      - name: Aggregate categories
+        id: eval
+        run: |
+          # Worst cell wins. No artifacts at all -> infra, so we retry rather than
+          # record a version we have no signal for.
+          if   grep -rqx bug     cats 2>/dev/null; then category=bug
+          elif grep -rqx infra   cats 2>/dev/null; then category=infra
+          elif grep -rqx success cats 2>/dev/null; then category=success
+          else                                          category=infra
+          fi
+          echo "category=$category" >> "$GITHUB_OUTPUT"
+
+  record:
+    needs: [gate, test, collect]
+    # Record when the run is conclusive: a clean pass, OR a genuine build/test break
+    # (retrying won't fix broken examples -- mark tested so we stop re-running it, and
+    # surface it below). A transient infra failure (wheel-index outage, tarball 404,
+    # runner hiccup) stays unrecorded so the next poll re-tests it. Retry is bounded --
+    # a version is revisited only while it stays Quartz's latest-ready build, and the
+    # next nightly (which resolve() always prefers) supersedes it.
+    if: needs.test.result == 'success' || needs.collect.outputs.category == 'bug'
     runs-on: ubuntu-24.04
     defaults:
       run:
@@ -156,7 +187,11 @@ jobs:
 
       - name: Summary
         run: |
-          echo "Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested (passed)." >> "$GITHUB_STEP_SUMMARY"
+          if [ "${{ needs.test.result }}" = "success" ]; then
+            echo "Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested (passed)." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "::warning::Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested (GENUINE build/test break -- will not retry). Investigate." >> "$GITHUB_STEP_SUMMARY"
+          fi
 
   report:
     needs: gate

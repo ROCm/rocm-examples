@@ -58,10 +58,12 @@ jobs:
         gpu_config: ${{ fromJson(inputs.gpu_configs) }}
     steps:
       - name: Checkout repository
+        id: checkout
         uses: actions/checkout@v4
 
       - name: Install ROCm (whl-multi-arch)
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
+        id: install-whl
         run: |
           echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
           pip install --no-cache-dir --upgrade pip
@@ -127,6 +129,7 @@ jobs:
 
       - name: Setup environment variables (tarball-multi-arch)
         if: ${{ matrix.install_method == 'tarball-multi-arch' }}
+        id: setup-env-tarball
         run: |
           ROCM_PATH=/therock-tarball/install
           echo "ROCM_PATH=${ROCM_PATH}" >> $GITHUB_ENV
@@ -154,7 +157,29 @@ jobs:
           echo "ENABLE_CK=OFF" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
 
+      - name: Prep status
+        id: prep
+        if: always()
+        run: |
+          # "Prep" = everything needed before our builds: checkout, ROCm install, env
+          # setup. A failure here is transient infra (network/index/runner), not a code
+          # bug -- classified infra so the version is retried, not recorded broken.
+          ok=true
+          for oc in "${{ steps.checkout.outcome }}" \
+                    "${{ steps.install-whl.outcome }}" \
+                    "${{ steps.whl-multiarch-version.outcome }}" \
+                    "${{ steps.install-tarball-multi-arch.outcome }}" \
+                    "${{ steps.setup-env-tarball.outcome }}" \
+                    "${{ steps.preinstalled.outcome }}"; do
+            [ "$oc" = "failure" ] && ok=false
+          done
+          echo "ok=$ok" >> "$GITHUB_OUTPUT"
+
+      # The collect job in quartz_test.yml classifies each cell from these build/test
+      # step ids/outcomes; keep the ids stable when renaming steps.
       - name: Generate skip lists
+        if: ${{ !cancelled() && steps.prep.outputs.ok == 'true' }}
+        id: skip-lists
         run: |
           # The preinstalled distro is the pinned rocm:7.14 image, i.e. the "stable"
           # channel; every other install method pulls a TheRock "nightly" build.
@@ -170,17 +195,21 @@ jobs:
             --install-method "${{ matrix.install_method }}"
 
       - name: Makefile build
+        if: ${{ !cancelled() && steps.prep.outputs.ok == 'true' && steps.skip-lists.outcome == 'success' }}
+        id: mk-build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
           make -j HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
 
       - name: CMake configure
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.prep.outputs.ok == 'true' && steps.skip-lists.outcome == 'success' }}
+        id: cmake-configure
         run: |
           cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -DROCM_EXAMPLES_ENABLE_CK="${ENABLE_CK}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" 2> >(tee cmake_error.log >&2)
 
       - name: CMake configure error summary
         if: ${{ !cancelled() }}
+        continue-on-error: true
         run: |
           if [ ! -f cmake_error.log ]; then
             exit 0
@@ -211,17 +240,20 @@ jobs:
           fi
 
       - name: CMake build
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.cmake-configure.outcome == 'success' }}
+        id: cmake-build
         run: |
           cmake --build build -j
 
       - name: CMake install
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.cmake-build.outcome == 'success' }}
+        id: cmake-install
         run: |
           cmake --install build --prefix install
 
       - name: Collect Makefile build artifacts
         if: ${{ !cancelled() }}
+        continue-on-error: true
         run: |
           mkdir -p /tmp/makefile_build
           find . -name Makefile -not -path './build/*' | while IFS= read -r makefile; do
@@ -235,6 +267,7 @@ jobs:
 
       - name: Upload CMake build artifacts
         if: ${{ !cancelled() }}
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
@@ -242,13 +275,15 @@ jobs:
 
       - name: Upload Makefile build artifacts
         if: ${{ !cancelled() }}
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
 
       - name: Run tests
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.cmake-install.outcome == 'success' }}
+        id: ctest
         run: |
           # skip_tests.txt was produced by the "Generate skip lists" step,
           # which also reports the full skip manifest to the step summary.
@@ -257,6 +292,7 @@ jobs:
 
       - name: Test summary
         if: ${{ !cancelled() }}
+        continue-on-error: true
         run: |
           LAST_TEST_LOG="build/Testing/Temporary/LastTest.log"
           if [ ! -f ctest_output.log ] || [ ! -f "${LAST_TEST_LOG}" ]; then
@@ -298,22 +334,54 @@ jobs:
 
       - name: Upload test logs
         if: ${{ !cancelled() }}
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
 
       - name: Makefile test
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.mk-build.outcome == 'success' }}
+        id: mk-test
         run: |
           make test HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_TEST="$SKIP_FROM_TEST" 2>&1 | tee makefile_test_output.log
 
       - name: Upload Makefile test logs
         if: ${{ !cancelled() }}
+        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
+
+      - name: Classify outcome
+        if: always()
+        run: |
+          # prep failure -> infra (retry). Otherwise any of our build/test steps failing
+          # -> a genuine bug (record as tested so it is not retried). The collect job in
+          # quartz_test.yml takes the worst category across all cells.
+          if [ "${{ steps.prep.outputs.ok }}" != "true" ]; then
+            c=infra
+          elif [ "${{ steps.skip-lists.outcome }}" = "failure" ] \
+            || [ "${{ steps.mk-build.outcome }}" = "failure" ] \
+            || [ "${{ steps.cmake-configure.outcome }}" = "failure" ] \
+            || [ "${{ steps.cmake-build.outcome }}" = "failure" ] \
+            || [ "${{ steps.cmake-install.outcome }}" = "failure" ] \
+            || [ "${{ steps.ctest.outcome }}" = "failure" ] \
+            || [ "${{ steps.mk-test.outcome }}" = "failure" ]; then
+            c=bug
+          else
+            c=success
+          fi
+          echo "$c" > cell-category.txt
+          echo "Cell category: $c" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload cell category
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: category-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ matrix.install_method }}
+          path: cell-category.txt
 
       - name: Clean the workspace
         if: always()
