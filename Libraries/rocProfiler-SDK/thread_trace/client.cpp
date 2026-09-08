@@ -170,6 +170,10 @@ void tool_codeobj_tracing_callback(rocprofiler_callback_tracing_record_t record,
     {
         return;
     }
+    if(record.phase != ROCPROFILER_CALLBACK_PHASE_LOAD)
+    {
+        return;
+    }
 
     CHECK_NOTNULL(Results::table);
     auto* data = static_cast<rocprofiler_callback_tracing_code_object_load_data_t*>(record.payload);
@@ -200,10 +204,7 @@ void tool_codeobj_tracing_callback(rocprofiler_callback_tracing_record_t record,
                                data->load_size);
 }
 
-void shader_data_callback(rocprofiler_agent_id_t /* agent */,
-                          int64_t /* se_id */,
-                          void*  se_data,
-                          size_t data_size,
+void shader_data_callback(rocprofiler_thread_trace_shader_data_t shader_data,
                           rocprofiler_user_data_t /* userdata */)
 {
     CHECK_NOTNULL(Results::latencies);
@@ -250,7 +251,9 @@ void shader_data_callback(rocprofiler_agent_id_t /* agent */,
         }
     };
 
-    DECODER_CALL(rocprofiler_trace_decode(decoder, parse, se_data, data_size, nullptr));
+    auto* data = static_cast<char*>(shader_data.data) + shader_data.read_offset;
+    auto  size = shader_data.data_size - shader_data.read_offset;
+    DECODER_CALL(rocprofiler_trace_decode(decoder, parse, data, size, nullptr));
 }
 
 } // namespace Decoder
@@ -278,9 +281,10 @@ rocprofiler_status_t query_available_agents(rocprofiler_agent_version_t /* versi
         }
 
         auto parameters = std::vector<rocprofiler_thread_trace_parameter_t>{};
-        parameters.push_back({ROCPROFILER_THREAD_TRACE_PARAMETER_TARGET_CU, TARGET_CU});
-        parameters.push_back({ROCPROFILER_THREAD_TRACE_PARAMETER_BUFFER_SIZE, BUFFER_SIZE});
-        parameters.push_back({ROCPROFILER_THREAD_TRACE_PARAMETER_SHADER_ENGINE_MASK, SHADER_MASK});
+        parameters.push_back({ROCPROFILER_THREAD_TRACE_PARAMETER_TARGET_CU, {TARGET_CU}});
+        parameters.push_back({ROCPROFILER_THREAD_TRACE_PARAMETER_BUFFER_SIZE, {BUFFER_SIZE}});
+        parameters.push_back(
+            {ROCPROFILER_THREAD_TRACE_PARAMETER_SHADER_ENGINE_MASK, {SHADER_MASK}});
 
         ROCPROFILER_CALL(
             rocprofiler_configure_device_thread_trace_service(agent_ctx,
