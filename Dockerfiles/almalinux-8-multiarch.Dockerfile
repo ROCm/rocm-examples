@@ -114,7 +114,11 @@ ENV LD_LIBRARY_PATH="${VULKAN_SDK}/lib:${LD_LIBRARY_PATH}"
 ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/local/lib64/pkgconfig"
 
-# Build FFmpeg from source (not available in RHEL 8 repos)
+# Build FFmpeg from source (not available in RHEL 8 repos). FFmpeg installs into
+# /usr/local/lib, which RHEL 8's ldconfig does not search by default (unlike SLES,
+# whose /etc/ld.so.conf lists it), so register it before ldconfig -- otherwise
+# libavcodec.so.58 stays out of the loader cache and rocDecode's Makefile test
+# fails at runtime with "error while loading shared libraries".
 WORKDIR /tmp
 RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
     tar -xvf ffmpeg-4.4.6.tar.xz && \
@@ -122,6 +126,7 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
     ./configure --enable-pic --enable-shared && \
     make -j$(nproc) && \
     make install && \
+    echo "/usr/local/lib" > /etc/ld.so.conf.d/local.conf && \
     ldconfig && \
     rm -rf /tmp/ffmpeg-4.4.6*
 
