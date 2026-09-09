@@ -131,9 +131,10 @@ jobs:
 
   collect:
     needs: [gate, test]
-    # Read each test cell's self-reported category and take the worst: any genuine
-    # build/test break -> "bug"; else any transient infra failure -> "infra"; else
-    # "success". record uses this to decide record-and-stop vs leave-unrecorded-to-retry.
+    # Read each cell's self-reported category and retry until infra is healthy: any
+    # cell with an infra failure (install/env) -> "infra" (retry the whole version);
+    # else any genuine build/test break -> "bug" (record & stop); else "success".
+    # record uses this to decide record-and-stop vs leave-unrecorded-to-retry.
     if: always() && needs.gate.outputs.is_new == 'true' && needs.test.result != 'skipped'
     runs-on: ubuntu-24.04
     permissions:
@@ -144,21 +145,23 @@ jobs:
     outputs:
       category: ${{ steps.eval.outputs.category }}
     steps:
-      - name: Download cell categories
+      - name: Download job status
         uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
         with:
-          pattern: category-*
-          path: cats
+          pattern: status-*
+          path: status
 
       - name: Aggregate categories
         id: eval
         run: |
-          # Worst cell wins. No artifacts at all -> infra, so we retry rather than
-          # record a version we have no signal for.
-          if   grep -rqx bug     cats 2>/dev/null; then category=bug
-          elif grep -rqx infra   cats 2>/dev/null; then category=infra
-          elif grep -rqx success cats 2>/dev/null; then category=success
-          else                                          category=infra
+          # Infra wins: retry until infra is healthy. Any cell that hit an infra
+          # failure (install/env) -> retry the whole version; only once every cell's
+          # environment came up do we judge the build/test result. No artifacts at
+          # all -> infra, so we retry rather than record a version we have no signal for.
+          if   grep -rqx infra   status 2>/dev/null; then category=infra
+          elif grep -rqx bug     status 2>/dev/null; then category=bug
+          elif grep -rqx success status 2>/dev/null; then category=success
+          else                                            category=infra
           fi
           echo "category=$category" >> "$GITHUB_OUTPUT"
 
