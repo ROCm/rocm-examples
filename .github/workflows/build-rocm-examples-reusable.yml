@@ -59,7 +59,7 @@ jobs:
     steps:
       - name: Checkout repository
         id: checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
 
       - name: Install ROCm (whl-multi-arch)
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
@@ -83,6 +83,7 @@ jobs:
             --index-url "$INDEX_URL" \
             "$PKG"
           rocm-sdk init
+          echo "install_url=$INDEX_URL" >> "$GITHUB_OUTPUT"
 
       - name: Wheel sanity check
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
@@ -124,6 +125,7 @@ jobs:
 
           ROCM_VERSION=$(echo "${LATEST_TARBALL}" | grep -oE "[0-9]+\.[0-9]+\.\w+")
           echo "rocm_version=${ROCM_VERSION}" >> $GITHUB_OUTPUT
+          echo "install_url=${TARBALL_BASE}${LATEST_TARBALL}" >> $GITHUB_OUTPUT
           echo "## ROCm Version: ${ROCM_VERSION}" >> $GITHUB_STEP_SUMMARY
           echo "## Tarball link: ${TARBALL_BASE}${LATEST_TARBALL}" >> $GITHUB_STEP_SUMMARY
 
@@ -167,6 +169,7 @@ jobs:
           ok=true
           for oc in "${{ steps.checkout.outcome }}" \
                     "${{ steps.install-whl.outcome }}" \
+                    "${{ steps.sanity-check.outcome }}" \
                     "${{ steps.whl-multiarch-version.outcome }}" \
                     "${{ steps.install-tarball-multi-arch.outcome }}" \
                     "${{ steps.setup-env-tarball.outcome }}" \
@@ -176,7 +179,7 @@ jobs:
           echo "ok=$ok" >> "$GITHUB_OUTPUT"
 
       # The Classify outcome step below reads these build/test step ids/outcomes
-      # to categorize the cell (infra/bug/success); keep the ids stable when
+      # to categorize the matrix job (infra/bug/success); keep the ids stable when
       # renaming steps.
       - name: Generate skip lists
         if: ${{ !cancelled() && steps.environment-status.outputs.ok == 'true' }}
@@ -196,14 +199,14 @@ jobs:
             --install-method "${{ matrix.install_method }}"
 
       - name: Makefile build
-        if: ${{ !cancelled() && steps.environment-status.outputs.ok == 'true' && steps.skip-lists.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.skip-lists.outcome == 'success' }}
         id: make-build
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
           make -j HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
 
       - name: CMake configure
-        if: ${{ !cancelled() && steps.environment-status.outputs.ok == 'true' && steps.skip-lists.outcome == 'success' }}
+        if: ${{ !cancelled() && steps.skip-lists.outcome == 'success' }}
         id: cmake-configure
         run: |
           cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -DROCM_EXAMPLES_ENABLE_CK="${ENABLE_CK}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" 2> >(tee cmake_error.log >&2)
@@ -268,16 +271,18 @@ jobs:
 
       - name: Upload CMake build artifacts
         if: ${{ !cancelled() }}
+        id: upload-cmake-build
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
 
       - name: Upload Makefile build artifacts
         if: ${{ !cancelled() }}
+        id: upload-make-build
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
@@ -335,8 +340,9 @@ jobs:
 
       - name: Upload test logs
         if: ${{ !cancelled() }}
+        id: upload-ctest-logs
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
@@ -349,8 +355,9 @@ jobs:
 
       - name: Upload Makefile test logs
         if: ${{ !cancelled() }}
+        id: upload-make-test-logs
         continue-on-error: true
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
@@ -358,10 +365,15 @@ jobs:
       - name: Classify outcome
         if: always()
         run: |
-          # Env failure -> infra (retry). Otherwise any of our build/test steps failing
+          # Env failure, or a failed artifact upload, -> infra (retry): both are
+          # transient, not a code bug. Otherwise any of our build/test steps failing
           # -> a genuine bug (record as tested so it is not retried). The collect job in
-          # quartz_test.yml takes the worst category across all cells.
-          if [ "${{ steps.environment-status.outputs.ok }}" != "true" ]; then
+          # quartz_test.yml takes the worst category across all matrix jobs.
+          if [ "${{ steps.environment-status.outputs.ok }}" != "true" ] \
+            || [ "${{ steps.upload-cmake-build.outcome }}" = "failure" ] \
+            || [ "${{ steps.upload-make-build.outcome }}" = "failure" ] \
+            || [ "${{ steps.upload-ctest-logs.outcome }}" = "failure" ] \
+            || [ "${{ steps.upload-make-test-logs.outcome }}" = "failure" ]; then
             c=infra
           elif [ "${{ steps.skip-lists.outcome }}" = "failure" ] \
             || [ "${{ steps.cmake-configure.outcome }}" = "failure" ] \
@@ -374,12 +386,20 @@ jobs:
           else
             c=success
           fi
-          echo "$c" > job-status.txt
+          # First line is the bare category (collect aggregates it with `grep -qx`);
+          # the metadata lines below it are inert to that match.
+          rocm_version="${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}"
+          install_url="${{ steps.install-whl.outputs.install_url || steps.install-tarball-multi-arch.outputs.install_url }}"
+          {
+            echo "$c"
+            echo "rocm_version=$rocm_version"
+            echo "install_url=$install_url"
+          } > job-status.txt
           echo "Job status: $c" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload job status
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: status-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ matrix.install_method }}
           path: job-status.txt

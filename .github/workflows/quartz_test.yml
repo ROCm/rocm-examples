@@ -131,8 +131,8 @@ jobs:
 
   collect:
     needs: [gate, test]
-    # Read each cell's self-reported category and retry until infra is healthy: any
-    # cell with an infra failure (install/env) -> "infra" (retry the whole version);
+    # Read each matrix job's self-reported category and retry until infra is healthy: any
+    # matrix job with an infra failure (install/env) -> "infra" (retry the whole version);
     # else any genuine build/test break -> "bug" (record & stop); else "success".
     # record uses this to decide record-and-stop vs leave-unrecorded-to-retry.
     if: always() && needs.gate.outputs.is_new == 'true' && needs.test.result != 'skipped'
@@ -154,8 +154,8 @@ jobs:
       - name: Aggregate categories
         id: eval
         run: |
-          # Infra wins: retry until infra is healthy. Any cell that hit an infra
-          # failure (install/env) -> retry the whole version; only once every cell's
+          # Infra wins: retry until infra is healthy. Any matrix job that hit an infra
+          # failure (install/env) -> retry the whole version; only once every matrix job's
           # environment came up do we judge the build/test result. No artifacts at
           # all -> infra, so we retry rather than record a version we have no signal for.
           if   grep -rqx infra   status 2>/dev/null; then category=infra
@@ -165,6 +165,17 @@ jobs:
           fi
           echo "category=$category" >> "$GITHUB_OUTPUT"
 
+      - name: Report verdict
+        run: |
+          # record itself reports the success/bug cases; the infra verdict is not
+          # recorded by any downstream job, so surface here that it will be retried.
+          ver="ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }})"
+          case "${{ steps.eval.outputs.category }}" in
+            infra) echo "::notice::${ver}: infra failure (install/env) -- left unrecorded, will be retried on the next poll." >> "$GITHUB_STEP_SUMMARY" ;;
+            bug)   echo "${ver}: genuine build/test break -- recording (no retry)." >> "$GITHUB_STEP_SUMMARY" ;;
+            *)     echo "${ver}: all matrix jobs passed." >> "$GITHUB_STEP_SUMMARY" ;;
+          esac
+
   record:
     needs: [gate, test, collect]
     # Record when the run is conclusive: a clean pass, OR a genuine build/test break
@@ -173,7 +184,16 @@ jobs:
     # runner hiccup) stays unrecorded so the next poll re-tests it. Retry is bounded --
     # a version is revisited only while it stays Quartz's latest-ready build, and the
     # next nightly (which resolve() always prefers) supersedes it.
-    if: needs.test.result == 'success' || needs.collect.outputs.category == 'bug'
+    #
+    # always() is required: without a status function a failed/skipped `collect` would
+    # skip `record` outright, even on an all-green matrix, since GitHub gates a job on
+    # its `needs` succeeding unless the `if` opts out. With always(), an all-green run
+    # still records via test.result == 'success' (collect's empty category just makes the
+    # second clause false), and skip cases stay skipped (test skipped/cancelled, no category).
+    if: >-
+      always()
+      && needs.gate.outputs.is_new == 'true'
+      && (needs.test.result == 'success' || needs.collect.outputs.category == 'bug')
     runs-on: ubuntu-24.04
     defaults:
       run:
