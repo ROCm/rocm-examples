@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -36,27 +36,23 @@
 /// \param[out] out        result
 /// \param[in]  texToWarp  source image device pointer (SW path)
 ///////////////////////////////////////////////////////////////////////////////
-__global__ void WarpingKernelSW(int          width,
-                                 int          height,
-                                 int          stride,
-                                 const float *u,
-                                 const float *v,
-                                 float       *out,
-                                 const float *texToWarp)
-{
-    const int ix = threadIdx.x + blockIdx.x * blockDim.x;
-    const int iy = threadIdx.y + blockIdx.y * blockDim.y;
+__global__ void WarpingKernelSW(int width, int height, int stride,
+                                const float *u, const float *v, float *out,
+                                const float *texToWarp) {
+  const int ix = threadIdx.x + blockIdx.x * blockDim.x;
+  const int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
-    const int pos = ix + iy * stride;
+  const int pos = ix + iy * stride;
 
-    if (ix >= width || iy >= height)
-        return;
+  if (ix >= width || iy >= height)
+    return;
 
-    float x = ((float)ix + u[pos] + 0.5f) / (float)width;
-    float y = ((float)iy + v[pos] + 0.5f) / (float)height;
+  float x = ((float)ix + u[pos] + 0.5f) / (float)width;
+  float y = ((float)iy + v[pos] + 0.5f) / (float)height;
 
-    // Source and output images share the same dimensions and stride per WarpImage contract.
-    out[pos] = tex2D_bilinear(texToWarp, width, height, stride, x, y);
+  // Source and output images share the same dimensions and stride per WarpImage
+  // contract.
+  out[pos] = tex2D_bilinear(texToWarp, width, height, stride, x, y);
 }
 
 #if !defined(__HIP_NO_IMAGE_SUPPORT)
@@ -72,26 +68,21 @@ __global__ void WarpingKernelSW(int          width,
 /// \param[out] out       result
 /// \param[in]  texToWarp source image texture object
 ///////////////////////////////////////////////////////////////////////////////
-__global__ void WarpingKernel(int                width,
-                              int                height,
-                              int                stride,
-                              const float       *u,
-                              const float       *v,
-                              float             *out,
-                              hipTextureObject_t texToWarp)
-{
-    const int ix = threadIdx.x + blockIdx.x * blockDim.x;
-    const int iy = threadIdx.y + blockIdx.y * blockDim.y;
+__global__ void WarpingKernel(int width, int height, int stride, const float *u,
+                              const float *v, float *out,
+                              hipTextureObject_t texToWarp) {
+  const int ix = threadIdx.x + blockIdx.x * blockDim.x;
+  const int iy = threadIdx.y + blockIdx.y * blockDim.y;
 
-    const int pos = ix + iy * stride;
+  const int pos = ix + iy * stride;
 
-    if (ix >= width || iy >= height)
-        return;
+  if (ix >= width || iy >= height)
+    return;
 
-    float x = ((float)ix + u[pos] + 0.5f) / (float)width;
-    float y = ((float)iy + v[pos] + 0.5f) / (float)height;
+  float x = ((float)ix + u[pos] + 0.5f) / (float)width;
+  float y = ((float)iy + v[pos] + 0.5f) / (float)height;
 
-    out[pos] = tex2D<float>(texToWarp, x, y);
+  out[pos] = tex2D<float>(texToWarp, x, y);
 }
 #endif // !__HIP_NO_IMAGE_SUPPORT
 
@@ -112,47 +103,39 @@ __global__ void WarpingKernel(int                width,
 /// \param[out] out          warped image
 /// \param[in]  imageSupport non-zero if the current device has image support
 ///////////////////////////////////////////////////////////////////////////////
-static void WarpImage(const float *src,
-                      int          w,
-                      int          h,
-                      int          s,
-                      const float *u,
-                      const float *v,
-                      float       *out,
-                      int          imageSupport)
-{
-    dim3 threads(32, 6);
-    dim3 blocks(iDivUp(w, threads.x), iDivUp(h, threads.y));
+static void WarpImage(const float *src, int w, int h, int s, const float *u,
+                      const float *v, float *out, int imageSupport) {
+  dim3 threads(32, 6);
+  dim3 blocks(iDivUp(w, threads.x), iDivUp(h, threads.y));
 
-    if (!imageSupport)
-    {
-        WarpingKernelSW<<<blocks, threads>>>(w, h, s, u, v, out, src);
-        HIP_CHECK(hipGetLastError());
-        return;
-    }
+  if (!imageSupport) {
+    WarpingKernelSW<<<blocks, threads>>>(w, h, s, u, v, out, src);
+    HIP_CHECK(hipGetLastError());
+    return;
+  }
 
 #if !defined(__HIP_NO_IMAGE_SUPPORT)
-    hipResourceDesc texRes               = {};
-    texRes.resType                       = hipResourceTypePitch2D;
-    texRes.res.pitch2D.devPtr            = (void *)src;
-    texRes.res.pitch2D.desc              = hipCreateChannelDesc<float>();
-    texRes.res.pitch2D.width             = w;
-    texRes.res.pitch2D.height            = h;
-    texRes.res.pitch2D.pitchInBytes      = s * sizeof(float);
+  hipResourceDesc texRes = {};
+  texRes.resType = hipResourceTypePitch2D;
+  texRes.res.pitch2D.devPtr = (void *)src;
+  texRes.res.pitch2D.desc = hipCreateChannelDesc<float>();
+  texRes.res.pitch2D.width = w;
+  texRes.res.pitch2D.height = h;
+  texRes.res.pitch2D.pitchInBytes = s * sizeof(float);
 
-    hipTextureDesc texDescr         = {};
-    texDescr.normalizedCoords       = true;
-    texDescr.filterMode             = hipFilterModeLinear;
-    texDescr.addressMode[0]         = hipAddressModeMirror;
-    texDescr.addressMode[1]         = hipAddressModeMirror;
-    texDescr.readMode               = hipReadModeElementType;
+  hipTextureDesc texDescr = {};
+  texDescr.normalizedCoords = true;
+  texDescr.filterMode = hipFilterModeLinear;
+  texDescr.addressMode[0] = hipAddressModeMirror;
+  texDescr.addressMode[1] = hipAddressModeMirror;
+  texDescr.readMode = hipReadModeElementType;
 
-    hipTextureObject_t texToWarp;
-    HIP_CHECK(hipCreateTextureObject(&texToWarp, &texRes, &texDescr, NULL));
+  hipTextureObject_t texToWarp;
+  HIP_CHECK(hipCreateTextureObject(&texToWarp, &texRes, &texDescr, NULL));
 
-    WarpingKernel<<<blocks, threads>>>(w, h, s, u, v, out, texToWarp);
-    HIP_CHECK(hipGetLastError());
+  WarpingKernel<<<blocks, threads>>>(w, h, s, u, v, out, texToWarp);
+  HIP_CHECK(hipGetLastError());
 
-    HIP_CHECK(hipDestroyTextureObject(texToWarp));
+  HIP_CHECK(hipDestroyTextureObject(texToWarp));
 #endif
 }

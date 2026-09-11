@@ -23,7 +23,7 @@ function Run-Example {
 
     $Job = Start-Job -ScriptBlock {
         param([string]$FullName)
-        $Time = Measure-Command { 
+        $Time = Measure-Command {
             try {
                 $Log = & $FullName
                 $JobExitStatus = $LASTEXITCODE
@@ -59,7 +59,7 @@ function Run-Example {
         $ExitDisplay = "`e[32m$ExitStatus`e[0m"
     } else {
         $ExitDisplay = "`e[31m$ExitStatus`e[0m"
-        
+
         # Otherwise, fail!
         $Status = "`e[31m`e[1mFail`e[0m"
         $script:FailureCount += 1
@@ -95,7 +95,7 @@ Get-ChildItem -Recurse -File -Path $Path -Filter $Filter | ForEach-Object {
         $Results += [PSCustomObject]@{
             Name       = $_.Name
             State      = "`e[33m`e[1mSkip`e[0m"
-            ExitStatus = $null 
+            ExitStatus = $null
             Time       = $null
         }
     }

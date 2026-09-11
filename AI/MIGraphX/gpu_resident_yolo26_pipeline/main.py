@@ -34,11 +34,11 @@ from rich.progress import track
 # Constants
 # ============================================================================
 
-TARGET_INPUT_SIZE = 640                # YOLO26 expects square 640x640 input
-LETTERBOX_FILL_NORM = 114.0 / 255.0    # YOLO letterbox padding value (RGB, normalised)
-DEFAULT_DEVICE_ID = 0                  # GPU index passed to rocDecode
-MP4_FOURCC = "mp4v"                    # cv2.VideoWriter codec
-ROC_RGB_FORMAT_RGB = 3                 # pyRocVideoDecode rgb_format enum: RGB packed
+TARGET_INPUT_SIZE = 640  # YOLO26 expects square 640x640 input
+LETTERBOX_FILL_NORM = 114.0 / 255.0  # YOLO letterbox padding value (RGB, normalised)
+DEFAULT_DEVICE_ID = 0  # GPU index passed to rocDecode
+MP4_FOURCC = "mp4v"  # cv2.VideoWriter codec
+ROC_RGB_FORMAT_RGB = 3  # pyRocVideoDecode rgb_format enum: RGB packed
 
 # Approximate CCIR 601 luma weights (B, G, R) used to pick black/white text on a coloured background.
 LUMA_WEIGHTS_BGR = (0.114, 0.587, 0.299)
@@ -46,11 +46,26 @@ LUMA_TEXT_DARK_THRESHOLD = 140
 
 # Deterministic per-class colour palette (BGR); same class keeps the same tint across frames.
 PALETTE_BGR = [
-    (255, 119, 46),  (180, 119, 31),  (14, 127, 255),  (44, 160, 44),
-    (40, 39, 214),   (189, 103, 148), (75, 86, 140),   (127, 127, 127),
-    (34, 189, 188),  (207, 190, 23),  (232, 176, 174), (120, 187, 255),
-    (150, 218, 152), (148, 156, 255), (156, 158, 199), (207, 199, 196),
-    (219, 219, 197), (229, 218, 158), (165, 214, 197), (154, 204, 219),
+    (255, 119, 46),
+    (180, 119, 31),
+    (14, 127, 255),
+    (44, 160, 44),
+    (40, 39, 214),
+    (189, 103, 148),
+    (75, 86, 140),
+    (127, 127, 127),
+    (34, 189, 188),
+    (207, 190, 23),
+    (232, 176, 174),
+    (120, 187, 255),
+    (150, 218, 152),
+    (148, 156, 255),
+    (156, 158, 199),
+    (207, 199, 196),
+    (219, 219, 197),
+    (229, 218, 158),
+    (165, 214, 197),
+    (154, 204, 219),
 ]
 
 
@@ -82,8 +97,8 @@ class Timings:
     """Per-frame timing accumulator: predict() and full decode+predict pipeline."""
 
     frames: int = 0
-    predict_s: float = 0.0     # Step 2-4 inside Detector.detect_on_gpu()
-    pipeline_s: float = 0.0    # decode + predict (host-side draw/write excluded)
+    predict_s: float = 0.0  # Step 2-4 inside Detector.detect_on_gpu()
+    pipeline_s: float = 0.0  # decode + predict (host-side draw/write excluded)
 
     def report(self, pipeline_label: str, output_path: str | Path) -> None:
         """Print average ms/frame and fps for predict() and the full pipeline."""
@@ -93,8 +108,12 @@ class Timings:
         pipeline_ms = self.pipeline_s / self.frames * 1000
         print(f"\n{'=' * 60}")
         print(f"Processing complete!  Total frames: {self.frames}")
-        print(f"Average predict():         {predict_ms:.2f} ms  ({self.frames / self.predict_s:.1f} fps)")
-        print(f"Average {pipeline_label}: {pipeline_ms:.2f} ms  ({self.frames / self.pipeline_s:.1f} fps)")
+        print(
+            f"Average predict():         {predict_ms:.2f} ms  ({self.frames / self.predict_s:.1f} fps)"
+        )
+        print(
+            f"Average {pipeline_label}: {pipeline_ms:.2f} ms  ({self.frames / self.pipeline_s:.1f} fps)"
+        )
         print(f"Output saved to: {output_path}")
         print(f"{'=' * 60}\n")
 
@@ -102,6 +121,7 @@ class Timings:
 # ============================================================================
 # Detector: model state + Step 2/3/4 helpers
 # ============================================================================
+
 
 class Detector:
     """GPU-resident YOLO26 detector backed by a compiled MIGraphX .mxr model.
@@ -111,16 +131,86 @@ class Detector:
     """
 
     COCO_CLASSES = [
-        "person", "bicycle", "car", "motorcycle", "airplane", "bus", "train", "truck", "boat",
-        "traffic light", "fire hydrant", "stop sign", "parking meter", "bench", "bird", "cat",
-        "dog", "horse", "sheep", "cow", "elephant", "bear", "zebra", "giraffe", "backpack",
-        "umbrella", "handbag", "tie", "suitcase", "frisbee", "skis", "snowboard", "sports ball",
-        "kite", "baseball bat", "baseball glove", "skateboard", "surfboard", "tennis racket",
-        "bottle", "wine glass", "cup", "fork", "knife", "spoon", "bowl", "banana", "apple",
-        "sandwich", "orange", "broccoli", "carrot", "hot dog", "pizza", "donut", "cake",
-        "chair", "couch", "potted plant", "bed", "dining table", "toilet", "tv", "laptop",
-        "mouse", "remote", "keyboard", "cell phone", "microwave", "oven", "toaster", "sink",
-        "refrigerator", "book", "clock", "vase", "scissors", "teddy bear", "hair drier", "toothbrush",
+        "person",
+        "bicycle",
+        "car",
+        "motorcycle",
+        "airplane",
+        "bus",
+        "train",
+        "truck",
+        "boat",
+        "traffic light",
+        "fire hydrant",
+        "stop sign",
+        "parking meter",
+        "bench",
+        "bird",
+        "cat",
+        "dog",
+        "horse",
+        "sheep",
+        "cow",
+        "elephant",
+        "bear",
+        "zebra",
+        "giraffe",
+        "backpack",
+        "umbrella",
+        "handbag",
+        "tie",
+        "suitcase",
+        "frisbee",
+        "skis",
+        "snowboard",
+        "sports ball",
+        "kite",
+        "baseball bat",
+        "baseball glove",
+        "skateboard",
+        "surfboard",
+        "tennis racket",
+        "bottle",
+        "wine glass",
+        "cup",
+        "fork",
+        "knife",
+        "spoon",
+        "bowl",
+        "banana",
+        "apple",
+        "sandwich",
+        "orange",
+        "broccoli",
+        "carrot",
+        "hot dog",
+        "pizza",
+        "donut",
+        "cake",
+        "chair",
+        "couch",
+        "potted plant",
+        "bed",
+        "dining table",
+        "toilet",
+        "tv",
+        "laptop",
+        "mouse",
+        "remote",
+        "keyboard",
+        "cell phone",
+        "microwave",
+        "oven",
+        "toaster",
+        "sink",
+        "refrigerator",
+        "book",
+        "clock",
+        "vase",
+        "scissors",
+        "teddy bear",
+        "hair drier",
+        "toothbrush",
     ]
 
     def __init__(self, model_path: str | Path, conf_threshold: float = 0.25):
@@ -130,11 +220,16 @@ class Detector:
         self.conf_threshold = conf_threshold
         param_shapes = self.model.get_parameter_shapes()
         self.input_name = "images"
-        self.output_name = next(name for name in param_shapes if name != self.input_name)
+        self.output_name = next(
+            name for name in param_shapes if name != self.input_name
+        )
         self.input_shape = param_shapes[self.input_name]
         self.output_shape = param_shapes[self.output_name]
         self.output_tensor = torch.empty_strided(
-            self.output_shape.lens(), self.output_shape.strides(), dtype=torch.float32, device="cuda"
+            self.output_shape.lens(),
+            self.output_shape.strides(),
+            dtype=torch.float32,
+            device="cuda",
         )
         self.mgx_output_arg = migraphx.argument_from_pointer(
             self.output_shape, self.output_tensor.data_ptr()
@@ -146,19 +241,25 @@ class Detector:
         return rgb_tensor.permute(2, 0, 1).unsqueeze(0) / 255.0
 
     @staticmethod
-    def letterbox_geometry(h: int, w: int, target: int = TARGET_INPUT_SIZE) -> tuple[float, int, int]:
+    def letterbox_geometry(
+        h: int, w: int, target: int = TARGET_INPUT_SIZE
+    ) -> tuple[float, int, int]:
         """Return uniform scale and symmetric letterbox padding for *target*x*target*."""
         scale = min(target / w, target / h)
         pad_x = (target - int(w * scale)) // 2
         pad_y = (target - int(h * scale)) // 2
         return scale, pad_x, pad_y
 
-    def preprocess_spatial(self, tensor: torch.Tensor, target: int = TARGET_INPUT_SIZE) -> torch.Tensor:
+    def preprocess_spatial(
+        self, tensor: torch.Tensor, target: int = TARGET_INPUT_SIZE
+    ) -> torch.Tensor:
         """Resize to scaled size and letterbox-pad to *target*x*target*."""
         h, w = tensor.shape[2], tensor.shape[3]
         scale, pad_x, pad_y = self.letterbox_geometry(h, w, target)
         new_h, new_w = int(h * scale), int(w * scale)
-        tensor = F.interpolate(tensor, size=(new_h, new_w), mode="bilinear", align_corners=False)
+        tensor = F.interpolate(
+            tensor, size=(new_h, new_w), mode="bilinear", align_corners=False
+        )
         padding = (pad_x, target - new_w - pad_x, pad_y, target - new_h - pad_y)
         return F.pad(tensor, padding, value=LETTERBOX_FILL_NORM).contiguous()
 
@@ -167,7 +268,9 @@ class Detector:
         """Enqueue MIGraphX inference on the active PyTorch stream."""
         curr_stream = torch.cuda.current_stream()
         mgx_buffers = {
-            self.input_name: migraphx.argument_from_pointer(self.input_shape, input_tensor.data_ptr()),
+            self.input_name: migraphx.argument_from_pointer(
+                self.input_shape, input_tensor.data_ptr()
+            ),
             self.output_name: self.mgx_output_arg,
         }
         self.model.run_async(mgx_buffers, curr_stream.cuda_stream, "ihipStream_t")
@@ -220,19 +323,24 @@ class Detector:
         detections: list[Detection] = []
         for x1, y1, x2, y2, conf, cid in host:
             cid = int(cid)
-            class_name = self.classes[cid] if cid < len(self.classes) else f"class_{cid}"
-            detections.append(Detection(
-                class_id=cid,
-                class_name=class_name,
-                confidence=float(conf),
-                box=(int(x1), int(y1), int(x2 - x1), int(y2 - y1)),
-            ))
+            class_name = (
+                self.classes[cid] if cid < len(self.classes) else f"class_{cid}"
+            )
+            detections.append(
+                Detection(
+                    class_id=cid,
+                    class_name=class_name,
+                    confidence=float(conf),
+                    box=(int(x1), int(y1), int(x2 - x1), int(y2 - y1)),
+                )
+            )
         return detections
 
 
 # ============================================================================
 # Drawing, DLPack shim, video writer, stats
 # ============================================================================
+
 
 def draw_detections(frame: np.ndarray, detections: list[Detection]) -> None:
     """Draw bounding boxes and confidence labels onto *frame* in-place (BGR)."""
@@ -245,9 +353,15 @@ def draw_detections(frame: np.ndarray, detections: list[Detection]) -> None:
         cv2.rectangle(frame, (x, y), (x + w, y + h), colour, 2)
         (lw, lh), bl = cv2.getTextSize(label, font, 0.5, 1)
         b, g, r = colour
-        text_colour = (20, 20, 20) if wb * b + wg * g + wr * r > LUMA_TEXT_DARK_THRESHOLD else (255, 255, 255)
+        text_colour = (
+            (20, 20, 20)
+            if wb * b + wg * g + wr * r > LUMA_TEXT_DARK_THRESHOLD
+            else (255, 255, 255)
+        )
         cv2.rectangle(frame, (x, y - lh - bl - 6), (x + lw + 4, y), colour, -1)
-        cv2.putText(frame, label, (x + 2, y - bl - 2), font, 0.5, text_colour, 1, cv2.LINE_AA)
+        cv2.putText(
+            frame, label, (x + 2, y - bl - 2), font, 0.5, text_colour, 1, cv2.LINE_AA
+        )
 
 
 def decoded_rgb_view(packet) -> torch.Tensor:
@@ -281,14 +395,19 @@ def _open_video(path: str | Path) -> tuple[cv2.VideoCapture, VideoInfo]:
     return cap, info
 
 
-def _make_writer(path: str | Path, fps: int, width: int, height: int) -> cv2.VideoWriter:
+def _make_writer(
+    path: str | Path, fps: int, width: int, height: int
+) -> cv2.VideoWriter:
     """Create an MP4 writer at *path* for ``(width, height)`` frames at *fps*."""
-    return cv2.VideoWriter(str(path), cv2.VideoWriter_fourcc(*MP4_FOURCC), fps, (width, height))
+    return cv2.VideoWriter(
+        str(path), cv2.VideoWriter_fourcc(*MP4_FOURCC), fps, (width, height)
+    )
 
 
 # ============================================================================
 # Run modes
 # ============================================================================
+
 
 def process_video_rocdecode(
     detector: Detector, input_path: str | Path, output_path: str | Path
@@ -340,7 +459,9 @@ def process_video_rocdecode(
 
         for _ in range(n_frame_returned):  # one packet may yield 0-N frames
             frame_process_start = time.perf_counter()
-            pts = viddec.GetFrameRgb(packet, rgb_format=ROC_RGB_FORMAT_RGB)  # NV12->RGB on the GPU via HIP kernel
+            pts = viddec.GetFrameRgb(
+                packet, rgb_format=ROC_RGB_FORMAT_RGB
+            )  # NV12->RGB on the GPU via HIP kernel
             if pts == -1:
                 viddec.ReleaseFrame(packet)
                 continue
@@ -410,17 +531,37 @@ def process_video_opencv(
 # CLI
 # ============================================================================
 
+
 def main() -> None:
     """Parse CLI arguments, build the detector, and run the selected decoder path."""
     p = argparse.ArgumentParser(
         description="GPU-resident YOLO video inference on AMD GPUs",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    p.add_argument("--decoder", default="rocdecode", choices=["opencv", "rocdecode"], help="Video decoder backend")
-    p.add_argument("--model", default="model.mxr", type=Path, help="MIGraphX .mxr model path")
-    p.add_argument("--input", default="data/peloton_sample_ai_gen.mp4", type=Path, help="Input video path (MP4/MKV; H.264/H.265 for rocdecode)")
-    p.add_argument("--output", default="output.mp4", type=Path, help="Output video path")
-    p.add_argument("--conf-threshold", default=0.25, type=float, help="Detection confidence threshold")
+    p.add_argument(
+        "--decoder",
+        default="rocdecode",
+        choices=["opencv", "rocdecode"],
+        help="Video decoder backend",
+    )
+    p.add_argument(
+        "--model", default="model.mxr", type=Path, help="MIGraphX .mxr model path"
+    )
+    p.add_argument(
+        "--input",
+        default="data/peloton_sample_ai_gen.mp4",
+        type=Path,
+        help="Input video path (MP4/MKV; H.264/H.265 for rocdecode)",
+    )
+    p.add_argument(
+        "--output", default="output.mp4", type=Path, help="Output video path"
+    )
+    p.add_argument(
+        "--conf-threshold",
+        default=0.25,
+        type=float,
+        help="Detection confidence threshold",
+    )
     args = p.parse_args()
 
     print(f"Loading model from: {args.model}")

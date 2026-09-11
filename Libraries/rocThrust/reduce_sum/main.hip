@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,31 +29,29 @@
 #include <thrust/host_vector.h>
 #include <thrust/reduce.h>
 
-int main()
-{
-    // create a host vector with 4 elements
-    thrust::host_vector<int> host_vector(4);
-    host_vector[0] = 33;
-    host_vector[1] = -1;
-    host_vector[2] = 0;
-    host_vector[3] = 10;
+int main() {
+  // create a host vector with 4 elements
+  thrust::host_vector<int> host_vector(4);
+  host_vector[0] = 33;
+  host_vector[1] = -1;
+  host_vector[2] = 0;
+  host_vector[3] = 10;
 
-    // print the elements of the vector
-    std::cout << "host_vector after setting elements: "
-              << format_range(host_vector.begin(), host_vector.end()) << std::endl;
+  // print the elements of the vector
+  std::cout << "host_vector after setting elements: "
+            << format_range(host_vector.begin(), host_vector.end())
+            << std::endl;
 
-    // transfer to device and compute sum
-    const thrust::device_vector<int> device_vector = host_vector;
+  // transfer to device and compute sum
+  const thrust::device_vector<int> device_vector = host_vector;
 
-    // initial value used in the summation
-    constexpr int initial_value = 500;
+  // initial value used in the summation
+  constexpr int initial_value = 500;
 
-    // compute sum
-    const int sum = thrust::reduce(device_vector.begin(),
-                                   device_vector.end(),
-                                   initial_value,
-                                   thrust::plus<int>{});
+  // compute sum
+  const int sum = thrust::reduce(device_vector.begin(), device_vector.end(),
+                                 initial_value, thrust::plus<int>{});
 
-    // print the sum
-    std::cout << "The sum is: " << sum << std::endl;
+  // print the sum
+  std::cout << "The sum is: " << sum << std::endl;
 }

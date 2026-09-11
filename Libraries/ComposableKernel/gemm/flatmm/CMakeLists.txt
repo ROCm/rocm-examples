@@ -73,4 +73,3 @@ add_executable(${example_grouped} grouped_flatmm.cpp)
 set_source_files_properties(grouped_flatmm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_grouped} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_grouped} PRIVATE composable_kernel::ck_tile hip::host)
-

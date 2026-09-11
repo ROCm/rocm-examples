@@ -1052,9 +1052,9 @@ def write_blobs(
             and k.F_pipeline.F_lse == "f"
             and k.F_pipeline.F_squant == kernel.F_pipeline.F_squant
         ]
-        assert len(combine_ks) == 1, (
-            f"{len(combine_ks)} matching FmhaFwdSplitKVCombineKernel for {kernel}"
-        )
+        assert (
+            len(combine_ks) == 1
+        ), f"{len(combine_ks)} matching FmhaFwdSplitKVCombineKernel for {kernel}"
         combine_kernel = combine_ks[0]
         api_pool.register_traits(
             FmhaFwdSplitKVApiTrait(

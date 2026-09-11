@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,12 +27,11 @@
 #include "ck_tile/ops/permute.hpp"
 #include <string>
 
-struct permute_traits
-{
-    std::string data_type;
+struct permute_traits {
+  std::string data_type;
 };
 
 using permute_args = ck_tile::GenericPermuteHostArgs;
 
 // host API
-float permute(permute_traits, permute_args, const ck_tile::stream_config&);
+float permute(permute_traits, permute_args, const ck_tile::stream_config &);

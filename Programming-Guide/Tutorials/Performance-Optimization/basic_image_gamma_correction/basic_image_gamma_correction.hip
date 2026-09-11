@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,61 +27,53 @@
 #include <cstdlib>
 #include <vector>
 
-std::uint8_t* load(const char* file, int* width, int* height, int* channels);
-void save(std::uint8_t* data, int width, int height, int channels);
+std::uint8_t *load(const char *file, int *width, int *height, int *channels);
+void save(std::uint8_t *data, int width, int height, int channels);
 
-__global__ void image_gamma(std::uint8_t* d_image, float gamma, int num_values)
-{
-    int idx = threadIdx.x + blockIdx.x * blockDim.x;
-    if (idx < num_values)
-    {
-        d_image[idx] = powf(d_image[idx] / 255.f, gamma) * 255.f;
-    }
+__global__ void image_gamma(std::uint8_t *d_image, float gamma,
+                            int num_values) {
+  int idx = threadIdx.x + blockIdx.x * blockDim.x;
+  if (idx < num_values) {
+    d_image[idx] = powf(d_image[idx] / 255.f, gamma) * 255.f;
+  }
 }
 
-int main()
-{
-    int width, height, channels;
+int main() {
+  int width, height, channels;
 
-    auto d_image = load("img.png", &width, &height, &channels);
-    
-    auto num_values = width * height * channels;
-    auto data = std::vector<std::uint8_t>();
-    data.resize(num_values);
+  auto d_image = load("img.png", &width, &height, &channels);
 
-    int blockSize = 256;
-    int gridSize = (num_values + blockSize - 1) / blockSize;
+  auto num_values = width * height * channels;
+  auto data = std::vector<std::uint8_t>();
+  data.resize(num_values);
 
-    float gamma = 4.f;
-    image_gamma<<<gridSize, blockSize>>>(d_image, gamma, num_values);
+  int blockSize = 256;
+  int gridSize = (num_values + blockSize - 1) / blockSize;
 
-    hipMemcpy(
-        data.data(),
-        d_image,
-        num_values * sizeof(std::uint8_t),
-        hipMemcpyDeviceToHost
-    );
+  float gamma = 4.f;
+  image_gamma<<<gridSize, blockSize>>>(d_image, gamma, num_values);
 
-    save(data.data(), width, height, channels);
+  hipMemcpy(data.data(), d_image, num_values * sizeof(std::uint8_t),
+            hipMemcpyDeviceToHost);
 
-    hipFree(d_image);
-    return EXIT_SUCCESS;
+  save(data.data(), width, height, channels);
+
+  hipFree(d_image);
+  return EXIT_SUCCESS;
 }
 // [sphinx-end]
 
-std::uint8_t* load(const char* file, int* width, int* height, int* channels)
-{
-    // Dummy implementation for illustration purposes.
-    *width = 1024;
-    *height = 768;
-    *channels = 3;
-    int num_values = (*width) * (*height) * (*channels);
-    std::uint8_t* d_image;
-    hipMalloc(&d_image, num_values * sizeof(std::uint8_t));
-    return d_image;
+std::uint8_t *load(const char *file, int *width, int *height, int *channels) {
+  // Dummy implementation for illustration purposes.
+  *width = 1024;
+  *height = 768;
+  *channels = 3;
+  int num_values = (*width) * (*height) * (*channels);
+  std::uint8_t *d_image;
+  hipMalloc(&d_image, num_values * sizeof(std::uint8_t));
+  return d_image;
 }
 
-void save(std::uint8_t* data, int width, int height, int channels)
-{
-    // Dummy implementation for illustration purposes.
+void save(std::uint8_t *data, int width, int height, int channels) {
+  // Dummy implementation for illustration purposes.
 }

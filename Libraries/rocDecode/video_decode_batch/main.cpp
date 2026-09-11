@@ -35,9 +35,9 @@ THE SOFTWARE.
 #include <unistd.h>
 #include <vector>
 #if __cplusplus >= 201703L && __has_include(<filesystem>)
-    #include <filesystem>
+#include <filesystem>
 #else
-    #include <experimental/filesystem>
+#include <experimental/filesystem>
 #endif
 #include "CmdParser/cmdparser.hpp"
 #include "roc_video_dec.h"
@@ -45,664 +45,517 @@ THE SOFTWARE.
 
 #include "rocdecode_utils.hpp"
 
-class ThreadPool
-{
+class ThreadPool {
 public:
-    ThreadPool(int n_threads) : shutdown_(false)
+  ThreadPool(int n_threads) : shutdown_(false) {
+    // Create the specified number of threads
+    threads_.reserve(n_threads);
+    for (int i = 0; i < n_threads; ++i) {
+      threads_.emplace_back(std::bind(&ThreadPool::ThreadEntry, this, i));
+    }
+  }
+
+  ~ThreadPool() {}
+
+  void JoinThreads() {
     {
-        // Create the specified number of threads
-        threads_.reserve(n_threads);
-        for(int i = 0; i < n_threads; ++i)
-        {
-            threads_.emplace_back(std::bind(&ThreadPool::ThreadEntry, this, i));
-        }
+      // Unblock any threads and tell them to stop
+      std::unique_lock<std::mutex> lock(mutex_);
+      shutdown_ = true;
+      cond_var_.notify_all();
     }
 
-    ~ThreadPool() {}
-
-    void JoinThreads()
-    {
-        {
-            // Unblock any threads and tell them to stop
-            std::unique_lock<std::mutex> lock(mutex_);
-            shutdown_ = true;
-            cond_var_.notify_all();
-        }
-
-        // Wait for all threads to stop
-        for(auto& thread : threads_)
-        {
-            thread.join();
-        }
+    // Wait for all threads to stop
+    for (auto &thread : threads_) {
+      thread.join();
     }
+  }
 
-    void ExecuteJob(std::function<void()> func)
-    {
-        // Place a job on the queue and unblock a thread
-        std::unique_lock<std::mutex> lock(mutex_);
-        decode_jobs_queue_.emplace(std::move(func));
-        cond_var_.notify_one();
-    }
+  void ExecuteJob(std::function<void()> func) {
+    // Place a job on the queue and unblock a thread
+    std::unique_lock<std::mutex> lock(mutex_);
+    decode_jobs_queue_.emplace(std::move(func));
+    cond_var_.notify_one();
+  }
 
 protected:
-    void ThreadEntry(int /*i*/)
-    {
-        std::function<void()> execute_decode_job;
+  void ThreadEntry(int /*i*/) {
+    std::function<void()> execute_decode_job;
 
-        while(true)
-        {
-            {
-                std::unique_lock<std::mutex> lock(mutex_);
-                cond_var_.wait(lock, [&] { return shutdown_ || !decode_jobs_queue_.empty(); });
-                if(decode_jobs_queue_.empty())
-                {
-                    // No jobs to do; shutting down
-                    return;
-                }
-
-                execute_decode_job = std::move(decode_jobs_queue_.front());
-                decode_jobs_queue_.pop();
-            }
-
-            // Execute the decode job without holding any locks
-            execute_decode_job();
+    while (true) {
+      {
+        std::unique_lock<std::mutex> lock(mutex_);
+        cond_var_.wait(
+            lock, [&] { return shutdown_ || !decode_jobs_queue_.empty(); });
+        if (decode_jobs_queue_.empty()) {
+          // No jobs to do; shutting down
+          return;
         }
-    }
 
-    std::mutex                        mutex_;
-    std::condition_variable           cond_var_;
-    bool                              shutdown_;
-    std::queue<std::function<void()>> decode_jobs_queue_;
-    std::vector<std::thread>          threads_;
+        execute_decode_job = std::move(decode_jobs_queue_.front());
+        decode_jobs_queue_.pop();
+      }
+
+      // Execute the decode job without holding any locks
+      execute_decode_job();
+    }
+  }
+
+  std::mutex mutex_;
+  std::condition_variable cond_var_;
+  bool shutdown_;
+  std::queue<std::function<void()>> decode_jobs_queue_;
+  std::vector<std::thread> threads_;
 };
 
-struct DecoderInfo
-{
-    int                              dec_device_id;
-    std::unique_ptr<RocVideoDecoder> viddec;
-    std::uint32_t                    bit_depth;
-    rocDecVideoCodec                 rocdec_codec_id;
-    std::atomic_bool                 decoding_complete;
+struct DecoderInfo {
+  int dec_device_id;
+  std::unique_ptr<RocVideoDecoder> viddec;
+  std::uint32_t bit_depth;
+  rocDecVideoCodec rocdec_codec_id;
+  std::atomic_bool decoding_complete;
 
-    DecoderInfo() : dec_device_id(0), viddec(nullptr), bit_depth(8), decoding_complete(false) {}
+  DecoderInfo()
+      : dec_device_id(0), viddec(nullptr), bit_depth(8),
+        decoding_complete(false) {}
 };
 
-void DecProc(RocVideoDecoder*        p_dec,
-             VideoDemuxer*           demuxer,
-             int*                    pn_frame,
-             double*                 pn_fps,
-             std::atomic_bool&       decoding_complete,
-             bool&                   b_dump_output_frames,
-             std::string&            output_file_name,
-             OutputSurfaceMemoryType mem_type)
-{
-    int                n_video_bytes = 0, n_frame_returned = 0, n_frame = 0;
-    uint8_t *          p_video = nullptr, *p_frame = nullptr;
-    int64_t            pts            = 0;
-    double             total_dec_time = 0.0;
-    OutputSurfaceInfo* surf_info;
-    auto               start_time = std::chrono::high_resolution_clock::now();
-    do
-    {
-        demuxer->Demux(&p_video, &n_video_bytes, &pts);
-        n_frame_returned = p_dec->DecodeFrame(p_video, n_video_bytes, 0, pts);
-        n_frame += n_frame_returned;
-        if(b_dump_output_frames && mem_type != OUT_SURFACE_MEM_NOT_MAPPED)
-        {
-            if(n_frame_returned)
-            {
-                if(!p_dec->GetOutputSurfaceInfo(&surf_info))
-                {
-                    std::cerr << "Error: Failed to get Output Surface Info!" << std::endl;
-                    break;
-                }
-            }
-            for(int i = 0; i < n_frame_returned; i++)
-            {
-                p_frame = p_dec->GetFrame(&pts);
-                p_dec->SaveFrameToFile(output_file_name, p_frame, surf_info);
-                // release frame
-                p_dec->ReleaseFrame(pts);
-            }
+void DecProc(RocVideoDecoder *p_dec, VideoDemuxer *demuxer, int *pn_frame,
+             double *pn_fps, std::atomic_bool &decoding_complete,
+             bool &b_dump_output_frames, std::string &output_file_name,
+             OutputSurfaceMemoryType mem_type) {
+  int n_video_bytes = 0, n_frame_returned = 0, n_frame = 0;
+  uint8_t *p_video = nullptr, *p_frame = nullptr;
+  int64_t pts = 0;
+  double total_dec_time = 0.0;
+  OutputSurfaceInfo *surf_info;
+  auto start_time = std::chrono::high_resolution_clock::now();
+  do {
+    demuxer->Demux(&p_video, &n_video_bytes, &pts);
+    n_frame_returned = p_dec->DecodeFrame(p_video, n_video_bytes, 0, pts);
+    n_frame += n_frame_returned;
+    if (b_dump_output_frames && mem_type != OUT_SURFACE_MEM_NOT_MAPPED) {
+      if (n_frame_returned) {
+        if (!p_dec->GetOutputSurfaceInfo(&surf_info)) {
+          std::cerr << "Error: Failed to get Output Surface Info!" << std::endl;
+          break;
         }
+      }
+      for (int i = 0; i < n_frame_returned; i++) {
+        p_frame = p_dec->GetFrame(&pts);
+        p_dec->SaveFrameToFile(output_file_name, p_frame, surf_info);
+        // release frame
+        p_dec->ReleaseFrame(pts);
+      }
     }
-    while(n_video_bytes);
-    n_frame += p_dec->GetNumOfFlushedFrames();
+  } while (n_video_bytes);
+  n_frame += p_dec->GetNumOfFlushedFrames();
 
-    auto end_time        = std::chrono::high_resolution_clock::now();
-    auto time_per_decode = std::chrono::duration<double, std::milli>(end_time - start_time).count();
+  auto end_time = std::chrono::high_resolution_clock::now();
+  auto time_per_decode =
+      std::chrono::duration<double, std::milli>(end_time - start_time).count();
 
-    // Calculate average decoding time
-    total_dec_time               = time_per_decode;
-    double average_decoding_time = total_dec_time / n_frame;
-    double n_fps                 = 1000 / average_decoding_time;
-    *pn_fps                      = n_fps;
-    *pn_frame                    = n_frame;
-    p_dec->ResetSaveFrameToFile();
-    decoding_complete = true;
+  // Calculate average decoding time
+  total_dec_time = time_per_decode;
+  double average_decoding_time = total_dec_time / n_frame;
+  double n_fps = 1000 / average_decoding_time;
+  *pn_fps = n_fps;
+  *pn_frame = n_frame;
+  p_dec->ResetSaveFrameToFile();
+  decoding_complete = true;
 }
 
-int main(int argc, char** argv)
-{
-    // Parse command-line arguments
-    cli::Parser parser(argc, argv);
-    parser.set_required<std::string>("i", "input", "Directory containing input video files");
-    parser.set_optional<int>("t", "threads", 4, "Number of threads (1 >= n_thread <= 64)");
-    parser.set_optional<int>("d", "device", 0, "Device ID (>= 0)");
-    parser.set_optional<std::string>("o", "output", "", "Directory for output YUV files");
-    parser.set_optional<int>("m",
-                             "mem_type",
-                             3,
-                             "Output surface memory type [0: DEV_INTERNAL, 1: DEV_COPIED, 2: "
-                             "HOST_COPIED, 3: NOT_MAPPED]");
-    parser.set_optional<int>("disp_delay",
-                             "disp_delay",
-                             1,
-                             "Number of frames to be delayed for display");
-    parser.run_and_exit_if_error();
+int main(int argc, char **argv) {
+  // Parse command-line arguments
+  cli::Parser parser(argc, argv);
+  parser.set_required<std::string>("i", "input",
+                                   "Directory containing input video files");
+  parser.set_optional<int>("t", "threads", 4,
+                           "Number of threads (1 >= n_thread <= 64)");
+  parser.set_optional<int>("d", "device", 0, "Device ID (>= 0)");
+  parser.set_optional<std::string>("o", "output", "",
+                                   "Directory for output YUV files");
+  parser.set_optional<int>(
+      "m", "mem_type", 3,
+      "Output surface memory type [0: DEV_INTERNAL, 1: DEV_COPIED, 2: "
+      "HOST_COPIED, 3: NOT_MAPPED]");
+  parser.set_optional<int>("disp_delay", "disp_delay", 1,
+                           "Number of frames to be delayed for display");
+  parser.run_and_exit_if_error();
 
-    std::string             input_folder_path  = parser.get<std::string>("i");
-    std::string             output_folder_path = parser.get<std::string>("o");
-    int                     device_id          = parser.get<int>("d");
-    int                     n_thread           = parser.get<int>("t");
-    int                     disp_delay         = parser.get<int>("disp_delay");
-    OutputSurfaceMemoryType mem_type = static_cast<OutputSurfaceMemoryType>(parser.get<int>("m"));
+  std::string input_folder_path = parser.get<std::string>("i");
+  std::string output_folder_path = parser.get<std::string>("o");
+  int device_id = parser.get<int>("d");
+  int n_thread = parser.get<int>("t");
+  int disp_delay = parser.get<int>("disp_delay");
+  OutputSurfaceMemoryType mem_type =
+      static_cast<OutputSurfaceMemoryType>(parser.get<int>("m"));
 
-    if(n_thread <= 0 || n_thread > 64)
-    {
-        std::cerr << "Error: Number of threads must be between 1 and 64" << std::endl;
-        return 1;
-    }
+  if (n_thread <= 0 || n_thread > 64) {
+    std::cerr << "Error: Number of threads must be between 1 and 64"
+              << std::endl;
+    return 1;
+  }
 
-    if(device_id < 0)
-    {
-        std::cerr << "Error: Device ID must be >= 0" << std::endl;
-        return 1;
-    }
+  if (device_id < 0) {
+    std::cerr << "Error: Device ID must be >= 0" << std::endl;
+    return 1;
+  }
 
-    bool b_dump_output_frames = !output_folder_path.empty();
-    if(b_dump_output_frames)
-    {
+  bool b_dump_output_frames = !output_folder_path.empty();
+  if (b_dump_output_frames) {
 #if __cplusplus >= 201703L && __has_include(<filesystem>)
-        if(std::filesystem::is_directory(output_folder_path))
-        {
-            std::filesystem::remove_all(output_folder_path);
-        }
-        std::filesystem::create_directory(output_folder_path);
-#else
-        if(std::experimental::filesystem::is_directory(output_folder_path))
-        {
-            std::experimental::filesystem::remove_all(output_folder_path);
-        }
-        std::experimental::filesystem::create_directory(output_folder_path);
-#endif
+    if (std::filesystem::is_directory(output_folder_path)) {
+      std::filesystem::remove_all(output_folder_path);
     }
+    std::filesystem::create_directory(output_folder_path);
+#else
+    if (std::experimental::filesystem::is_directory(output_folder_path)) {
+      std::experimental::filesystem::remove_all(output_folder_path);
+    }
+    std::experimental::filesystem::create_directory(output_folder_path);
+#endif
+  }
 
-    int                      num_files              = 0;
-    Rect*                    p_crop_rect            = nullptr;
-    bool                     b_extract_sei_messages = false;
-    bool                     b_force_zero_latency   = false;
-    std::vector<std::string> input_file_names;
+  int num_files = 0;
+  Rect *p_crop_rect = nullptr;
+  bool b_extract_sei_messages = false;
+  bool b_force_zero_latency = false;
+  std::vector<std::string> input_file_names;
 
-    try
-    {
+  try {
 #if __cplusplus >= 201703L && __has_include(<filesystem>)
-        for(const auto& entry : std::filesystem::directory_iterator(input_folder_path))
-        {
+    for (const auto &entry :
+         std::filesystem::directory_iterator(input_folder_path)) {
 #else
-        for(const auto& entry :
-            std::experimental::filesystem::directory_iterator(input_folder_path))
-        {
+    for (const auto &entry :
+         std::experimental::filesystem::directory_iterator(input_folder_path)) {
 #endif
-            input_file_names.push_back(entry.path());
-            num_files++;
-        }
-
-        std::vector<std::string> output_file_names(num_files);
-        n_thread                    = ((n_thread > num_files) ? num_files : n_thread);
-        int             num_devices = 0, sd = 0;
-        hipError_t      hip_status = hipSuccess;
-        hipDeviceProp_t hip_dev_prop;
-        std::string     gcn_arch_name;
-        hip_status = hipGetDeviceCount(&num_devices);
-        if(hip_status != hipSuccess)
-        {
-            std::cout << "ERROR: hipGetDeviceCount failed! (" << hip_status << ")" << std::endl;
-            return -1;
-        }
-        if(num_devices < 1)
-        {
-            std::cerr << "ERROR: didn't find any GPU!" << std::endl;
-            return -1;
-        }
-
-        hip_status = hipGetDeviceProperties(&hip_dev_prop, device_id);
-        if(hip_status != hipSuccess)
-        {
-            std::cerr << "ERROR: hipGetDeviceProperties for device (" + std::to_string(device_id)
-                       + " ) failed! (" + hipGetErrorName(hip_status) + ")" << std::endl;
-            return -1;
-        }
-
-        gcn_arch_name   = hip_dev_prop.gcnArchName;
-        std::size_t pos = gcn_arch_name.find_first_of(":");
-        std::string gcn_arch_name_base
-            = (pos != std::string::npos) ? gcn_arch_name.substr(0, pos) : gcn_arch_name;
-
-        // gfx90a has two GCDs as two separate devices
-        if(!gcn_arch_name_base.compare("gfx90a") && num_devices > 1)
-        {
-            sd = 1;
-        }
-
-        std::string         device_name;
-        int                 pci_bus_id, pci_domain_id, pci_device_id;
-        double              total_fps = 0;
-        int                 n_total   = 0;
-        std::vector<double> v_fps;
-        std::vector<int>    v_frame;
-        v_fps.resize(num_files, 0);
-        v_frame.resize(num_files, 0);
-        int hip_vis_dev_count = 0;
-        get_env_var("HIP_VISIBLE_DEVICES", hip_vis_dev_count);
-
-        std::cout << "info: Number of threads: " << n_thread << std::endl;
-
-        std::vector<std::unique_ptr<VideoDemuxer>> v_demuxer(num_files);
-        std::unique_ptr<RocVideoDecoder>           dec_8bit_avc(nullptr), dec_8bit_hevc(nullptr),
-            dec_10bit_hevc(nullptr), dec_8bit_av1(nullptr), dec_10bit_av1(nullptr),
-            dec_8bit_vp9(nullptr), dec_10bit_vp9(nullptr);
-        std::vector<std::unique_ptr<DecoderInfo>> v_dec_info;
-        ThreadPool                                thread_pool(n_thread);
-
-        //reconfig parameters
-        ReconfigParams            reconfig_params      = {};
-        reconfig_dump_file_struct reconfig_user_struct = {};
-        reconfig_params.p_fn_reconfigure_flush         = reconfigure_flush_callback;
-        if(!b_dump_output_frames)
-        {
-            reconfig_user_struct.b_dump_frames_to_file = false;
-            reconfig_params.reconfig_flush_mode        = RECONFIG_FLUSH_MODE_NONE;
-        }
-        else
-        {
-            reconfig_user_struct.b_dump_frames_to_file = true;
-            reconfig_params.reconfig_flush_mode        = RECONFIG_FLUSH_MODE_DUMP_TO_FILE;
-        }
-        reconfig_params.p_reconfig_user_struct = &reconfig_user_struct;
-
-        for(int i = 0; i < num_files; i++)
-        {
-            std::unique_ptr<VideoDemuxer> demuxer(new VideoDemuxer(input_file_names[i].c_str()));
-            v_demuxer[i]           = std::move(demuxer);
-            std::size_t found_file = input_file_names[i].find_last_of('/');
-            input_file_names[i]    = input_file_names[i].substr(found_file + 1);
-            if(b_dump_output_frames)
-            {
-                std::size_t found_ext = input_file_names[i].find_last_of('.');
-                std::string path      = output_folder_path + "/output_"
-                                   + input_file_names[i].substr(0, found_ext) + ".yuv";
-                output_file_names[i] = path;
-            }
-        }
-
-        for(int i = 0; i < n_thread; i++)
-        {
-            v_dec_info.emplace_back(std::make_unique<DecoderInfo>());
-            if(!hip_vis_dev_count)
-            {
-                if(device_id % 2 == 0)
-                {
-                    v_dec_info[i]->dec_device_id = (i % 2 == 0) ? device_id : device_id + sd;
-                }
-                else
-                {
-                    v_dec_info[i]->dec_device_id = (i % 2 == 0) ? device_id - sd : device_id;
-                }
-            }
-            else
-            {
-                v_dec_info[i]->dec_device_id = i % hip_vis_dev_count;
-            }
-
-            v_dec_info[i]->rocdec_codec_id = AVCodec2RocDecVideoCodec(v_demuxer[i]->GetCodecID());
-            v_dec_info[i]->bit_depth       = v_demuxer[i]->GetBitDepth();
-            if(v_dec_info[i]->bit_depth == 8)
-            {
-                if(v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_AVC)
-                {
-                    std::unique_ptr<RocVideoDecoder> dec_8bit_avc(
-                        new RocVideoDecoder(v_dec_info[i]->dec_device_id,
-                                            mem_type,
-                                            v_dec_info[i]->rocdec_codec_id,
-                                            b_force_zero_latency,
-                                            p_crop_rect,
-                                            b_extract_sei_messages,
-                                            disp_delay));
-                    v_dec_info[i]->viddec = std::move(dec_8bit_avc);
-                }
-                else if(v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_HEVC)
-                {
-                    std::unique_ptr<RocVideoDecoder> dec_8bit_hevc(
-                        new RocVideoDecoder(v_dec_info[i]->dec_device_id,
-                                            mem_type,
-                                            v_dec_info[i]->rocdec_codec_id,
-                                            b_force_zero_latency,
-                                            p_crop_rect,
-                                            b_extract_sei_messages,
-                                            disp_delay));
-                    v_dec_info[i]->viddec = std::move(dec_8bit_hevc);
-                }
-                else if(v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_AV1)
-                {
-                    std::unique_ptr<RocVideoDecoder> dec_8bit_av1(
-                        new RocVideoDecoder(v_dec_info[i]->dec_device_id,
-                                            mem_type,
-                                            v_dec_info[i]->rocdec_codec_id,
-                                            b_force_zero_latency,
-                                            p_crop_rect,
-                                            b_extract_sei_messages,
-                                            disp_delay));
-                    v_dec_info[i]->viddec = std::move(dec_8bit_av1);
-                }
-                else if(v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_VP9)
-                {
-                    std::unique_ptr<RocVideoDecoder> dec_8bit_vp9(
-                        new RocVideoDecoder(v_dec_info[i]->dec_device_id,
-                                            mem_type,
-                                            v_dec_info[i]->rocdec_codec_id,
-                                            b_force_zero_latency,
-                                            p_crop_rect,
-                                            b_extract_sei_messages,
-                                            disp_delay));
-                    v_dec_info[i]->viddec = std::move(dec_8bit_vp9);
-                }
-                else
-                {
-                    std::cerr << "ERROR: codec type is not supported!" << std::endl;
-                    return -1;
-                }
-            }
-            else
-            { //bit depth = 10bit
-                if(v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_HEVC)
-                {
-                    std::unique_ptr<RocVideoDecoder> dec_10bit_hevc(
-                        new RocVideoDecoder(v_dec_info[i]->dec_device_id,
-                                            mem_type,
-                                            v_dec_info[i]->rocdec_codec_id,
-                                            b_force_zero_latency,
-                                            p_crop_rect,
-                                            b_extract_sei_messages,
-                                            disp_delay));
-                    v_dec_info[i]->viddec = std::move(dec_10bit_hevc);
-                }
-                else if(v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_AV1)
-                {
-                    std::unique_ptr<RocVideoDecoder> dec_10bit_av1(
-                        new RocVideoDecoder(v_dec_info[i]->dec_device_id,
-                                            mem_type,
-                                            v_dec_info[i]->rocdec_codec_id,
-                                            b_force_zero_latency,
-                                            p_crop_rect,
-                                            b_extract_sei_messages,
-                                            disp_delay));
-                    v_dec_info[i]->viddec = std::move(dec_10bit_av1);
-                }
-                else if(v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_VP9)
-                {
-                    std::unique_ptr<RocVideoDecoder> dec_10bit_vp9(
-                        new RocVideoDecoder(v_dec_info[i]->dec_device_id,
-                                            mem_type,
-                                            v_dec_info[i]->rocdec_codec_id,
-                                            b_force_zero_latency,
-                                            p_crop_rect,
-                                            b_extract_sei_messages,
-                                            disp_delay));
-                    v_dec_info[i]->viddec = std::move(dec_10bit_vp9);
-                }
-                else
-                {
-                    std::cerr << "ERROR: codec type is not supported!" << std::endl;
-                    return -1;
-                }
-            }
-
-            v_dec_info[i]->viddec->GetDeviceinfo(device_name,
-                                                 gcn_arch_name,
-                                                 pci_bus_id,
-                                                 pci_domain_id,
-                                                 pci_device_id);
-            std::cout << "info: decoding " << input_file_names[i] << " using GPU device "
-                      << v_dec_info[i]->dec_device_id << " - " << device_name << "["
-                      << gcn_arch_name << "] on PCI bus " << std::setfill('0') << std::setw(2)
-                      << std::right << std::hex << pci_bus_id << ":" << std::setfill('0')
-                      << std::setw(2) << std::right << std::hex << pci_domain_id << "."
-                      << pci_device_id << std::dec << std::endl;
-        }
-
-        std::mutex mutex;
-
-        for(int j = 0; j < num_files; j++)
-        {
-            int thread_idx = j % n_thread;
-            if(j >= n_thread)
-            {
-                {
-                    std::unique_lock<std::mutex> lock(mutex);
-                    while(!v_dec_info[thread_idx]->decoding_complete)
-                    {
-                    }
-                    v_dec_info[thread_idx]->decoding_complete = false;
-                }
-                uint32_t         bit_depth = v_demuxer[j]->GetBitDepth();
-                rocDecVideoCodec codec_id  = AVCodec2RocDecVideoCodec(v_demuxer[j]->GetCodecID());
-                if(v_dec_info[thread_idx]->bit_depth != bit_depth
-                   || v_dec_info[thread_idx]->rocdec_codec_id != codec_id)
-                {
-                    if(bit_depth == 8)
-                    { // can be HEVC or H.264 or AV1
-                        if(dec_8bit_avc == nullptr && codec_id == rocDecVideoCodec_AVC)
-                        {
-                            std::unique_ptr<RocVideoDecoder> dec_8bit_avc(
-                                new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
-                                                    mem_type,
-                                                    codec_id,
-                                                    b_force_zero_latency,
-                                                    p_crop_rect,
-                                                    b_extract_sei_messages,
-                                                    disp_delay));
-                            v_dec_info[thread_idx]->viddec = std::move(dec_8bit_avc);
-                        }
-                        else if(dec_8bit_hevc == nullptr && codec_id == rocDecVideoCodec_HEVC)
-                        {
-                            std::unique_ptr<RocVideoDecoder> dec_8bit_hevc(
-                                new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
-                                                    mem_type,
-                                                    codec_id,
-                                                    b_force_zero_latency,
-                                                    p_crop_rect,
-                                                    b_extract_sei_messages,
-                                                    disp_delay));
-                            v_dec_info[thread_idx]->viddec = std::move(dec_8bit_hevc);
-                        }
-                        else if(dec_8bit_av1 == nullptr && codec_id == rocDecVideoCodec_AV1)
-                        {
-                            std::unique_ptr<RocVideoDecoder> dec_8bit_av1(
-                                new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
-                                                    mem_type,
-                                                    codec_id,
-                                                    b_force_zero_latency,
-                                                    p_crop_rect,
-                                                    b_extract_sei_messages,
-                                                    disp_delay));
-                            v_dec_info[thread_idx]->viddec = std::move(dec_8bit_av1);
-                        }
-                        else if(dec_8bit_av1 == nullptr && codec_id == rocDecVideoCodec_VP9)
-                        {
-                            std::unique_ptr<RocVideoDecoder> dec_8bit_vp9(
-                                new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
-                                                    mem_type,
-                                                    codec_id,
-                                                    b_force_zero_latency,
-                                                    p_crop_rect,
-                                                    b_extract_sei_messages,
-                                                    disp_delay));
-                            v_dec_info[thread_idx]->viddec = std::move(dec_8bit_vp9);
-                        }
-                        else
-                        {
-                            if(codec_id == rocDecVideoCodec_AVC)
-                            {
-                                v_dec_info[thread_idx]->viddec.swap(dec_8bit_avc);
-                            }
-                            else if(codec_id == rocDecVideoCodec_HEVC)
-                            {
-                                v_dec_info[thread_idx]->viddec.swap(dec_8bit_hevc);
-                            }
-                            else if(codec_id == rocDecVideoCodec_AV1)
-                            {
-                                v_dec_info[thread_idx]->viddec.swap(dec_8bit_av1);
-                            }
-                            else if(codec_id == rocDecVideoCodec_VP9)
-                            {
-                                v_dec_info[thread_idx]->viddec.swap(dec_8bit_vp9);
-                            }
-                            else
-                            {
-                                std::cerr << "ERROR: codec type is not supported!" << std::endl;
-                                return -1;
-                            }
-                        }
-                        v_dec_info[thread_idx]->bit_depth       = bit_depth;
-                        v_dec_info[thread_idx]->rocdec_codec_id = codec_id;
-                    }
-                    else
-                    { // bit_depth = 10bit; HEVC or AV1
-                        if(dec_10bit_hevc == nullptr && codec_id == rocDecVideoCodec_HEVC)
-                        {
-                            std::unique_ptr<RocVideoDecoder> dec_10bit_hevc(
-                                new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
-                                                    mem_type,
-                                                    codec_id,
-                                                    b_force_zero_latency,
-                                                    p_crop_rect,
-                                                    b_extract_sei_messages,
-                                                    disp_delay));
-                            v_dec_info[thread_idx]->viddec = std::move(dec_10bit_hevc);
-                        }
-                        else if(dec_10bit_av1 == nullptr && codec_id == rocDecVideoCodec_AV1)
-                        {
-                            std::unique_ptr<RocVideoDecoder> dec_10bit_av1(
-                                new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
-                                                    mem_type,
-                                                    codec_id,
-                                                    b_force_zero_latency,
-                                                    p_crop_rect,
-                                                    b_extract_sei_messages,
-                                                    disp_delay));
-                            v_dec_info[thread_idx]->viddec = std::move(dec_10bit_av1);
-                        }
-                        else if(dec_10bit_vp9 == nullptr && codec_id == rocDecVideoCodec_VP9)
-                        {
-                            std::unique_ptr<RocVideoDecoder> dec_10bit_vp9(
-                                new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
-                                                    mem_type,
-                                                    codec_id,
-                                                    b_force_zero_latency,
-                                                    p_crop_rect,
-                                                    b_extract_sei_messages,
-                                                    disp_delay));
-                            v_dec_info[thread_idx]->viddec = std::move(dec_10bit_vp9);
-                        }
-                        else
-                        {
-                            if(codec_id == rocDecVideoCodec_HEVC)
-                            {
-                                v_dec_info[thread_idx]->viddec.swap(dec_10bit_hevc);
-                            }
-                            else if(codec_id == rocDecVideoCodec_AV1)
-                            {
-                                v_dec_info[thread_idx]->viddec.swap(dec_10bit_av1);
-                            }
-                            else if(codec_id == rocDecVideoCodec_VP9)
-                            {
-                                v_dec_info[thread_idx]->viddec.swap(dec_10bit_vp9);
-                            }
-                            else
-                            {
-                                std::cerr << "ERROR: codec type is not supported!" << std::endl;
-                                return -1;
-                            }
-                        }
-                        v_dec_info[thread_idx]->bit_depth       = bit_depth;
-                        v_dec_info[thread_idx]->rocdec_codec_id = codec_id;
-                    }
-                }
-                v_dec_info[thread_idx]->viddec->GetDeviceinfo(device_name,
-                                                              gcn_arch_name,
-                                                              pci_bus_id,
-                                                              pci_domain_id,
-                                                              pci_device_id);
-                std::cout << "info: decoding " << input_file_names[j] << " using GPU device "
-                          << v_dec_info[thread_idx]->dec_device_id << " - " << device_name << "["
-                          << gcn_arch_name << "] on PCI bus " << std::setfill('0') << std::setw(2)
-                          << std::right << std::hex << pci_bus_id << ":" << std::setfill('0')
-                          << std::setw(2) << std::right << std::hex << pci_domain_id << "."
-                          << pci_device_id << std::dec << std::endl;
-            }
-            if(!v_dec_info[thread_idx]->viddec->CodecSupported(
-                   v_dec_info[thread_idx]->dec_device_id,
-                   v_dec_info[thread_idx]->rocdec_codec_id,
-                   v_dec_info[thread_idx]->bit_depth))
-            {
-                std::cerr << "Codec not supported on GPU, skipping this file!" << std::endl;
-                v_dec_info[thread_idx]->decoding_complete = true;
-                continue;
-            }
-            thread_pool.ExecuteJob(std::bind(DecProc,
-                                             v_dec_info[thread_idx]->viddec.get(),
-                                             v_demuxer[j].get(),
-                                             &v_frame[j],
-                                             &v_fps[j],
-                                             std::ref(v_dec_info[thread_idx]->decoding_complete),
-                                             b_dump_output_frames,
-                                             output_file_names[j],
-                                             mem_type));
-        }
-
-        thread_pool.JoinThreads();
-        for(int i = 0; i < num_files; i++)
-        {
-            total_fps += v_fps[i] * static_cast<double>(n_thread) / static_cast<double>(num_files);
-            n_total += v_frame[i];
-        }
-        if(!b_dump_output_frames)
-        {
-            std::cout << "info: Total frame decoded: " << n_total << std::endl;
-            std::cout << "info: avg decoding time per frame: " << 1000 / total_fps << " ms"
-                      << std::endl;
-            std::cout << "info: avg FPS: " << total_fps << std::endl;
-        }
-        else
-        {
-            if(mem_type == OUT_SURFACE_MEM_NOT_MAPPED)
-            {
-                std::cout << "info: saving frames with -m 3 option is not supported!" << std::endl;
-            }
-            else
-            {
-                for(int i = 0; i < num_files; i++)
-                {
-                    std::cout << "info: saved frames into " << output_file_names[i] << std::endl;
-                }
-            }
-        }
-    }
-    catch(const std::exception& ex)
-    {
-        std::cout << ex.what() << std::endl;
+      input_file_names.push_back(entry.path());
+      num_files++;
     }
 
-    return 0;
+    std::vector<std::string> output_file_names(num_files);
+    n_thread = ((n_thread > num_files) ? num_files : n_thread);
+    int num_devices = 0, sd = 0;
+    hipError_t hip_status = hipSuccess;
+    hipDeviceProp_t hip_dev_prop;
+    std::string gcn_arch_name;
+    hip_status = hipGetDeviceCount(&num_devices);
+    if (hip_status != hipSuccess) {
+      std::cout << "ERROR: hipGetDeviceCount failed! (" << hip_status << ")"
+                << std::endl;
+      return -1;
+    }
+    if (num_devices < 1) {
+      std::cerr << "ERROR: didn't find any GPU!" << std::endl;
+      return -1;
+    }
+
+    hip_status = hipGetDeviceProperties(&hip_dev_prop, device_id);
+    if (hip_status != hipSuccess) {
+      std::cerr << "ERROR: hipGetDeviceProperties for device (" +
+                       std::to_string(device_id) + " ) failed! (" +
+                       hipGetErrorName(hip_status) + ")"
+                << std::endl;
+      return -1;
+    }
+
+    gcn_arch_name = hip_dev_prop.gcnArchName;
+    std::size_t pos = gcn_arch_name.find_first_of(":");
+    std::string gcn_arch_name_base = (pos != std::string::npos)
+                                         ? gcn_arch_name.substr(0, pos)
+                                         : gcn_arch_name;
+
+    // gfx90a has two GCDs as two separate devices
+    if (!gcn_arch_name_base.compare("gfx90a") && num_devices > 1) {
+      sd = 1;
+    }
+
+    std::string device_name;
+    int pci_bus_id, pci_domain_id, pci_device_id;
+    double total_fps = 0;
+    int n_total = 0;
+    std::vector<double> v_fps;
+    std::vector<int> v_frame;
+    v_fps.resize(num_files, 0);
+    v_frame.resize(num_files, 0);
+    int hip_vis_dev_count = 0;
+    get_env_var("HIP_VISIBLE_DEVICES", hip_vis_dev_count);
+
+    std::cout << "info: Number of threads: " << n_thread << std::endl;
+
+    std::vector<std::unique_ptr<VideoDemuxer>> v_demuxer(num_files);
+    std::unique_ptr<RocVideoDecoder> dec_8bit_avc(nullptr),
+        dec_8bit_hevc(nullptr), dec_10bit_hevc(nullptr), dec_8bit_av1(nullptr),
+        dec_10bit_av1(nullptr), dec_8bit_vp9(nullptr), dec_10bit_vp9(nullptr);
+    std::vector<std::unique_ptr<DecoderInfo>> v_dec_info;
+    ThreadPool thread_pool(n_thread);
+
+    // reconfig parameters
+    ReconfigParams reconfig_params = {};
+    reconfig_dump_file_struct reconfig_user_struct = {};
+    reconfig_params.p_fn_reconfigure_flush = reconfigure_flush_callback;
+    if (!b_dump_output_frames) {
+      reconfig_user_struct.b_dump_frames_to_file = false;
+      reconfig_params.reconfig_flush_mode = RECONFIG_FLUSH_MODE_NONE;
+    } else {
+      reconfig_user_struct.b_dump_frames_to_file = true;
+      reconfig_params.reconfig_flush_mode = RECONFIG_FLUSH_MODE_DUMP_TO_FILE;
+    }
+    reconfig_params.p_reconfig_user_struct = &reconfig_user_struct;
+
+    for (int i = 0; i < num_files; i++) {
+      std::unique_ptr<VideoDemuxer> demuxer(
+          new VideoDemuxer(input_file_names[i].c_str()));
+      v_demuxer[i] = std::move(demuxer);
+      std::size_t found_file = input_file_names[i].find_last_of('/');
+      input_file_names[i] = input_file_names[i].substr(found_file + 1);
+      if (b_dump_output_frames) {
+        std::size_t found_ext = input_file_names[i].find_last_of('.');
+        std::string path = output_folder_path + "/output_" +
+                           input_file_names[i].substr(0, found_ext) + ".yuv";
+        output_file_names[i] = path;
+      }
+    }
+
+    for (int i = 0; i < n_thread; i++) {
+      v_dec_info.emplace_back(std::make_unique<DecoderInfo>());
+      if (!hip_vis_dev_count) {
+        if (device_id % 2 == 0) {
+          v_dec_info[i]->dec_device_id =
+              (i % 2 == 0) ? device_id : device_id + sd;
+        } else {
+          v_dec_info[i]->dec_device_id =
+              (i % 2 == 0) ? device_id - sd : device_id;
+        }
+      } else {
+        v_dec_info[i]->dec_device_id = i % hip_vis_dev_count;
+      }
+
+      v_dec_info[i]->rocdec_codec_id =
+          AVCodec2RocDecVideoCodec(v_demuxer[i]->GetCodecID());
+      v_dec_info[i]->bit_depth = v_demuxer[i]->GetBitDepth();
+      if (v_dec_info[i]->bit_depth == 8) {
+        if (v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_AVC) {
+          std::unique_ptr<RocVideoDecoder> dec_8bit_avc(new RocVideoDecoder(
+              v_dec_info[i]->dec_device_id, mem_type,
+              v_dec_info[i]->rocdec_codec_id, b_force_zero_latency, p_crop_rect,
+              b_extract_sei_messages, disp_delay));
+          v_dec_info[i]->viddec = std::move(dec_8bit_avc);
+        } else if (v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_HEVC) {
+          std::unique_ptr<RocVideoDecoder> dec_8bit_hevc(new RocVideoDecoder(
+              v_dec_info[i]->dec_device_id, mem_type,
+              v_dec_info[i]->rocdec_codec_id, b_force_zero_latency, p_crop_rect,
+              b_extract_sei_messages, disp_delay));
+          v_dec_info[i]->viddec = std::move(dec_8bit_hevc);
+        } else if (v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_AV1) {
+          std::unique_ptr<RocVideoDecoder> dec_8bit_av1(new RocVideoDecoder(
+              v_dec_info[i]->dec_device_id, mem_type,
+              v_dec_info[i]->rocdec_codec_id, b_force_zero_latency, p_crop_rect,
+              b_extract_sei_messages, disp_delay));
+          v_dec_info[i]->viddec = std::move(dec_8bit_av1);
+        } else if (v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_VP9) {
+          std::unique_ptr<RocVideoDecoder> dec_8bit_vp9(new RocVideoDecoder(
+              v_dec_info[i]->dec_device_id, mem_type,
+              v_dec_info[i]->rocdec_codec_id, b_force_zero_latency, p_crop_rect,
+              b_extract_sei_messages, disp_delay));
+          v_dec_info[i]->viddec = std::move(dec_8bit_vp9);
+        } else {
+          std::cerr << "ERROR: codec type is not supported!" << std::endl;
+          return -1;
+        }
+      } else { // bit depth = 10bit
+        if (v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_HEVC) {
+          std::unique_ptr<RocVideoDecoder> dec_10bit_hevc(new RocVideoDecoder(
+              v_dec_info[i]->dec_device_id, mem_type,
+              v_dec_info[i]->rocdec_codec_id, b_force_zero_latency, p_crop_rect,
+              b_extract_sei_messages, disp_delay));
+          v_dec_info[i]->viddec = std::move(dec_10bit_hevc);
+        } else if (v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_AV1) {
+          std::unique_ptr<RocVideoDecoder> dec_10bit_av1(new RocVideoDecoder(
+              v_dec_info[i]->dec_device_id, mem_type,
+              v_dec_info[i]->rocdec_codec_id, b_force_zero_latency, p_crop_rect,
+              b_extract_sei_messages, disp_delay));
+          v_dec_info[i]->viddec = std::move(dec_10bit_av1);
+        } else if (v_dec_info[i]->rocdec_codec_id == rocDecVideoCodec_VP9) {
+          std::unique_ptr<RocVideoDecoder> dec_10bit_vp9(new RocVideoDecoder(
+              v_dec_info[i]->dec_device_id, mem_type,
+              v_dec_info[i]->rocdec_codec_id, b_force_zero_latency, p_crop_rect,
+              b_extract_sei_messages, disp_delay));
+          v_dec_info[i]->viddec = std::move(dec_10bit_vp9);
+        } else {
+          std::cerr << "ERROR: codec type is not supported!" << std::endl;
+          return -1;
+        }
+      }
+
+      v_dec_info[i]->viddec->GetDeviceinfo(
+          device_name, gcn_arch_name, pci_bus_id, pci_domain_id, pci_device_id);
+      std::cout << "info: decoding " << input_file_names[i]
+                << " using GPU device " << v_dec_info[i]->dec_device_id << " - "
+                << device_name << "[" << gcn_arch_name << "] on PCI bus "
+                << std::setfill('0') << std::setw(2) << std::right << std::hex
+                << pci_bus_id << ":" << std::setfill('0') << std::setw(2)
+                << std::right << std::hex << pci_domain_id << "."
+                << pci_device_id << std::dec << std::endl;
+    }
+
+    std::mutex mutex;
+
+    for (int j = 0; j < num_files; j++) {
+      int thread_idx = j % n_thread;
+      if (j >= n_thread) {
+        {
+          std::unique_lock<std::mutex> lock(mutex);
+          while (!v_dec_info[thread_idx]->decoding_complete) {
+          }
+          v_dec_info[thread_idx]->decoding_complete = false;
+        }
+        uint32_t bit_depth = v_demuxer[j]->GetBitDepth();
+        rocDecVideoCodec codec_id =
+            AVCodec2RocDecVideoCodec(v_demuxer[j]->GetCodecID());
+        if (v_dec_info[thread_idx]->bit_depth != bit_depth ||
+            v_dec_info[thread_idx]->rocdec_codec_id != codec_id) {
+          if (bit_depth == 8) { // can be HEVC or H.264 or AV1
+            if (dec_8bit_avc == nullptr && codec_id == rocDecVideoCodec_AVC) {
+              std::unique_ptr<RocVideoDecoder> dec_8bit_avc(new RocVideoDecoder(
+                  v_dec_info[thread_idx]->dec_device_id, mem_type, codec_id,
+                  b_force_zero_latency, p_crop_rect, b_extract_sei_messages,
+                  disp_delay));
+              v_dec_info[thread_idx]->viddec = std::move(dec_8bit_avc);
+            } else if (dec_8bit_hevc == nullptr &&
+                       codec_id == rocDecVideoCodec_HEVC) {
+              std::unique_ptr<RocVideoDecoder> dec_8bit_hevc(
+                  new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
+                                      mem_type, codec_id, b_force_zero_latency,
+                                      p_crop_rect, b_extract_sei_messages,
+                                      disp_delay));
+              v_dec_info[thread_idx]->viddec = std::move(dec_8bit_hevc);
+            } else if (dec_8bit_av1 == nullptr &&
+                       codec_id == rocDecVideoCodec_AV1) {
+              std::unique_ptr<RocVideoDecoder> dec_8bit_av1(new RocVideoDecoder(
+                  v_dec_info[thread_idx]->dec_device_id, mem_type, codec_id,
+                  b_force_zero_latency, p_crop_rect, b_extract_sei_messages,
+                  disp_delay));
+              v_dec_info[thread_idx]->viddec = std::move(dec_8bit_av1);
+            } else if (dec_8bit_av1 == nullptr &&
+                       codec_id == rocDecVideoCodec_VP9) {
+              std::unique_ptr<RocVideoDecoder> dec_8bit_vp9(new RocVideoDecoder(
+                  v_dec_info[thread_idx]->dec_device_id, mem_type, codec_id,
+                  b_force_zero_latency, p_crop_rect, b_extract_sei_messages,
+                  disp_delay));
+              v_dec_info[thread_idx]->viddec = std::move(dec_8bit_vp9);
+            } else {
+              if (codec_id == rocDecVideoCodec_AVC) {
+                v_dec_info[thread_idx]->viddec.swap(dec_8bit_avc);
+              } else if (codec_id == rocDecVideoCodec_HEVC) {
+                v_dec_info[thread_idx]->viddec.swap(dec_8bit_hevc);
+              } else if (codec_id == rocDecVideoCodec_AV1) {
+                v_dec_info[thread_idx]->viddec.swap(dec_8bit_av1);
+              } else if (codec_id == rocDecVideoCodec_VP9) {
+                v_dec_info[thread_idx]->viddec.swap(dec_8bit_vp9);
+              } else {
+                std::cerr << "ERROR: codec type is not supported!" << std::endl;
+                return -1;
+              }
+            }
+            v_dec_info[thread_idx]->bit_depth = bit_depth;
+            v_dec_info[thread_idx]->rocdec_codec_id = codec_id;
+          } else { // bit_depth = 10bit; HEVC or AV1
+            if (dec_10bit_hevc == nullptr &&
+                codec_id == rocDecVideoCodec_HEVC) {
+              std::unique_ptr<RocVideoDecoder> dec_10bit_hevc(
+                  new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
+                                      mem_type, codec_id, b_force_zero_latency,
+                                      p_crop_rect, b_extract_sei_messages,
+                                      disp_delay));
+              v_dec_info[thread_idx]->viddec = std::move(dec_10bit_hevc);
+            } else if (dec_10bit_av1 == nullptr &&
+                       codec_id == rocDecVideoCodec_AV1) {
+              std::unique_ptr<RocVideoDecoder> dec_10bit_av1(
+                  new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
+                                      mem_type, codec_id, b_force_zero_latency,
+                                      p_crop_rect, b_extract_sei_messages,
+                                      disp_delay));
+              v_dec_info[thread_idx]->viddec = std::move(dec_10bit_av1);
+            } else if (dec_10bit_vp9 == nullptr &&
+                       codec_id == rocDecVideoCodec_VP9) {
+              std::unique_ptr<RocVideoDecoder> dec_10bit_vp9(
+                  new RocVideoDecoder(v_dec_info[thread_idx]->dec_device_id,
+                                      mem_type, codec_id, b_force_zero_latency,
+                                      p_crop_rect, b_extract_sei_messages,
+                                      disp_delay));
+              v_dec_info[thread_idx]->viddec = std::move(dec_10bit_vp9);
+            } else {
+              if (codec_id == rocDecVideoCodec_HEVC) {
+                v_dec_info[thread_idx]->viddec.swap(dec_10bit_hevc);
+              } else if (codec_id == rocDecVideoCodec_AV1) {
+                v_dec_info[thread_idx]->viddec.swap(dec_10bit_av1);
+              } else if (codec_id == rocDecVideoCodec_VP9) {
+                v_dec_info[thread_idx]->viddec.swap(dec_10bit_vp9);
+              } else {
+                std::cerr << "ERROR: codec type is not supported!" << std::endl;
+                return -1;
+              }
+            }
+            v_dec_info[thread_idx]->bit_depth = bit_depth;
+            v_dec_info[thread_idx]->rocdec_codec_id = codec_id;
+          }
+        }
+        v_dec_info[thread_idx]->viddec->GetDeviceinfo(
+            device_name, gcn_arch_name, pci_bus_id, pci_domain_id,
+            pci_device_id);
+        std::cout << "info: decoding " << input_file_names[j]
+                  << " using GPU device "
+                  << v_dec_info[thread_idx]->dec_device_id << " - "
+                  << device_name << "[" << gcn_arch_name << "] on PCI bus "
+                  << std::setfill('0') << std::setw(2) << std::right << std::hex
+                  << pci_bus_id << ":" << std::setfill('0') << std::setw(2)
+                  << std::right << std::hex << pci_domain_id << "."
+                  << pci_device_id << std::dec << std::endl;
+      }
+      if (!v_dec_info[thread_idx]->viddec->CodecSupported(
+              v_dec_info[thread_idx]->dec_device_id,
+              v_dec_info[thread_idx]->rocdec_codec_id,
+              v_dec_info[thread_idx]->bit_depth)) {
+        std::cerr << "Codec not supported on GPU, skipping this file!"
+                  << std::endl;
+        v_dec_info[thread_idx]->decoding_complete = true;
+        continue;
+      }
+      thread_pool.ExecuteJob(
+          std::bind(DecProc, v_dec_info[thread_idx]->viddec.get(),
+                    v_demuxer[j].get(), &v_frame[j], &v_fps[j],
+                    std::ref(v_dec_info[thread_idx]->decoding_complete),
+                    b_dump_output_frames, output_file_names[j], mem_type));
+    }
+
+    thread_pool.JoinThreads();
+    for (int i = 0; i < num_files; i++) {
+      total_fps += v_fps[i] * static_cast<double>(n_thread) /
+                   static_cast<double>(num_files);
+      n_total += v_frame[i];
+    }
+    if (!b_dump_output_frames) {
+      std::cout << "info: Total frame decoded: " << n_total << std::endl;
+      std::cout << "info: avg decoding time per frame: " << 1000 / total_fps
+                << " ms" << std::endl;
+      std::cout << "info: avg FPS: " << total_fps << std::endl;
+    } else {
+      if (mem_type == OUT_SURFACE_MEM_NOT_MAPPED) {
+        std::cout << "info: saving frames with -m 3 option is not supported!"
+                  << std::endl;
+      } else {
+        for (int i = 0; i < num_files; i++) {
+          std::cout << "info: saved frames into " << output_file_names[i]
+                    << std::endl;
+        }
+      }
+    }
+  } catch (const std::exception &ex) {
+    std::cout << ex.what() << std::endl;
+  }
+
+  return 0;
 }

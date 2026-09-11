@@ -15,7 +15,9 @@ with open(os.environ["GITHUB_ENV"], "a") as f:
     f.write(f"HIP_PLATFORM=amd\n")
     f.write(f"HIP_PATH={rocm}\n")
     f.write(f"HIP_DEVICE_LIB_PATH={rocm}/lib/llvm/amdgcn/bitcode\n")
-    f.write(f"PATH={rocm}/bin:{rocm}/lib/llvm/bin:{venv}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n")
+    f.write(
+        f"PATH={rocm}/bin:{rocm}/lib/llvm/bin:{venv}/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin\n"
+    )
     f.write(f"CPATH={rocm}/include\n")
     f.write(f"PKG_CONFIG_PATH={rocm}/lib/pkgconfig\n")
     f.write(f"LIBRARY_PATH={rocm}/lib:{rocm}/lib64\n")

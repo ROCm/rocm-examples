@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,68 +26,68 @@
 
 using namespace rocalution;
 
-int main()
-{
-    // Initialize rocALUTION
-    init_rocalution();
+int main() {
+  // Initialize rocALUTION
+  init_rocalution();
 
-    // Print rocALUTION info
-    info_rocalution();
+  // Print rocALUTION info
+  info_rocalution();
 
-    // rocALUTION objects
-    LocalVector<double>  x;
-    LocalVector<double>  rhs;
-    LocalVector<double>  e;
-    LocalStencil<double> stencil(Laplace2D);
+  // rocALUTION objects
+  LocalVector<double> x;
+  LocalVector<double> rhs;
+  LocalVector<double> e;
+  LocalStencil<double> stencil(Laplace2D);
 
-    // Set up stencil grid
-    stencil.SetGrid(100); // 100x100
+  // Set up stencil grid
+  stencil.SetGrid(100); // 100x100
 
-    // Allocate vectors
-    x.Allocate("x", stencil.GetN());
-    rhs.Allocate("rhs", stencil.GetM());
-    e.Allocate("e", stencil.GetN());
+  // Allocate vectors
+  x.Allocate("x", stencil.GetN());
+  rhs.Allocate("rhs", stencil.GetM());
+  e.Allocate("e", stencil.GetN());
 
-    // Linear Solver
-    CG<LocalStencil<double>, LocalVector<double>, double> ls;
+  // Linear Solver
+  CG<LocalStencil<double>, LocalVector<double>, double> ls;
 
-    // Initialize rhs such that A 1 = rhs
-    e.Ones();
-    stencil.Apply(e, &rhs);
+  // Initialize rhs such that A 1 = rhs
+  e.Ones();
+  stencil.Apply(e, &rhs);
 
-    // Initial zero guess
-    x.Zeros();
+  // Initial zero guess
+  x.Zeros();
 
-    // Set solver operator
-    ls.SetOperator(stencil);
+  // Set solver operator
+  ls.SetOperator(stencil);
 
-    // Build solver
-    ls.Build();
+  // Build solver
+  ls.Build();
 
-    // Print stencil info
-    stencil.Info();
+  // Print stencil info
+  stencil.Info();
 
-    // Start time measurement
-    double tick, tack;
-    tick = rocalution_time();
+  // Start time measurement
+  double tick, tack;
+  tick = rocalution_time();
 
-    // Solve A x = rhs
-    ls.Solve(rhs, &x);
+  // Solve A x = rhs
+  ls.Solve(rhs, &x);
 
-    // Stop time measurement
-    tack = rocalution_time();
-    std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec" << std::endl;
+  // Stop time measurement
+  tack = rocalution_time();
+  std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec"
+            << std::endl;
 
-    // Clear solver
-    ls.Clear();
+  // Clear solver
+  ls.Clear();
 
-    // Compute error L2 norm
-    e.ScaleAdd(-1.0, x);
-    double error = e.Norm();
-    std::cout << "||e - x||_2 = " << error << std::endl;
+  // Compute error L2 norm
+  e.ScaleAdd(-1.0, x);
+  double error = e.Norm();
+  std::cout << "||e - x||_2 = " << error << std::endl;
 
-    // Stop rocALUTION platform
-    stop_rocalution();
+  // Stop rocALUTION platform
+  stop_rocalution();
 
-    return 0;
+  return 0;
 }

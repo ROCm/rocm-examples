@@ -534,7 +534,7 @@ float layernorm2d_fwd(layernorm2d_fwd_traits t,
         dynamic_quant_out_dtype = ["int8", "fp8"]
         # some predefined support range
         # (prec_i,prec_o) for simplicity this string will be used as key for dict
-        scale_list = [("fp32,fp32")]
+        scale_list = ["fp32,fp32"]
         dtype_list = [
             ("fp16,fp16"),
             ("bf16,bf16"),

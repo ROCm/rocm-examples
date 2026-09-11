@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,73 +30,75 @@
 #include <array>
 #include <iostream>
 
-int main()
-{
-    // Number of elements in dense vector
-    constexpr rocsparse_int size = 9;
+int main() {
+  // Number of elements in dense vector
+  constexpr rocsparse_int size = 9;
 
-    // Number of non-zeros of the sparse vector
-    constexpr rocsparse_int nnz = 6;
+  // Number of non-zeros of the sparse vector
+  constexpr rocsparse_int nnz = 6;
 
-    // Sparse index vector
-    constexpr std::array<rocsparse_int, nnz> hx_ind = {1, 2, 3, 6, 7, 8};
+  // Sparse index vector
+  constexpr std::array<rocsparse_int, nnz> hx_ind = {1, 2, 3, 6, 7, 8};
 
-    // Sparse value vector
-    std::array<double, nnz> hx_val;
-    std::array<double, nnz> hx_val_host;
+  // Sparse value vector
+  std::array<double, nnz> hx_val;
+  std::array<double, nnz> hx_val_host;
 
-    // Dense vector
-    constexpr std::array<double, size> hy = {1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0};
+  // Dense vector
+  constexpr std::array<double, size> hy = {1.0, 2.0, 3.0, 4.0, 5.0,
+                                           6.0, 7.0, 8.0, 9.0};
 
-    // Index base
-    constexpr rocsparse_index_base idx_base = rocsparse_index_base_zero;
+  // Index base
+  constexpr rocsparse_index_base idx_base = rocsparse_index_base_zero;
 
-    // rocSPARSE handle
-    rocsparse_handle handle;
-    ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
-    
-    // Offload data to device
-    rocsparse_int* dx_ind;
-    double*        dx_val;
-    double*        dy;
+  // rocSPARSE handle
+  rocsparse_handle handle;
+  ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
 
-    HIP_CHECK(hipMalloc((void**)&dx_ind, sizeof(rocsparse_int) * nnz));
-    HIP_CHECK(hipMalloc((void**)&dx_val, sizeof(double) * nnz));
-    HIP_CHECK(hipMalloc((void**)&dy, sizeof(double) * size));
+  // Offload data to device
+  rocsparse_int *dx_ind;
+  double *dx_val;
+  double *dy;
 
-    HIP_CHECK(hipMemcpy(dx_ind, hx_ind.data(), sizeof(rocsparse_int) * nnz, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(dy, hy.data(), sizeof(double) * size, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMalloc((void **)&dx_ind, sizeof(rocsparse_int) * nnz));
+  HIP_CHECK(hipMalloc((void **)&dx_val, sizeof(double) * nnz));
+  HIP_CHECK(hipMalloc((void **)&dy, sizeof(double) * size));
 
-    // Call sgthr
-    ROCSPARSE_CHECK(rocsparse_dgthr(handle, nnz, dy, dx_val, dx_ind, idx_base));
+  HIP_CHECK(hipMemcpy(dx_ind, hx_ind.data(), sizeof(rocsparse_int) * nnz,
+                      hipMemcpyHostToDevice));
+  HIP_CHECK(
+      hipMemcpy(dy, hy.data(), sizeof(double) * size, hipMemcpyHostToDevice));
 
-    // Copy result back to host
-    HIP_CHECK(hipMemcpy(hx_val.data(), dx_val, sizeof(double) * nnz, hipMemcpyDeviceToHost));
+  // Call sgthr
+  ROCSPARSE_CHECK(rocsparse_dgthr(handle, nnz, dy, dx_val, dx_ind, idx_base));
 
-    // Clear rocSPARSE
-    ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
+  // Copy result back to host
+  HIP_CHECK(hipMemcpy(hx_val.data(), dx_val, sizeof(double) * nnz,
+                      hipMemcpyDeviceToHost));
 
-    // Clear device memory
-    HIP_CHECK(hipFree(dx_ind));
-    HIP_CHECK(hipFree(dx_val));
-    HIP_CHECK(hipFree(dy));
+  // Clear rocSPARSE
+  ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
 
-    // 8. Print results to standard output.
-    std::cout << "Solution successfully computed: ";
+  // Clear device memory
+  HIP_CHECK(hipFree(dx_ind));
+  HIP_CHECK(hipFree(dx_val));
+  HIP_CHECK(hipFree(dy));
 
-    std::cout << "x_val = " << format_range(std::begin(hx_val), std::end(hx_val)) << std::endl;
+  // 8. Print results to standard output.
+  std::cout << "Solution successfully computed: ";
 
-    for(rocsparse_int i = 0; i < nnz; ++i)
-    {
-        hx_val_host[i] = hy[hx_ind[i] - idx_base];
-    }
+  std::cout << "x_val = " << format_range(std::begin(hx_val), std::end(hx_val))
+            << std::endl;
 
-    int          errors{};
-    for(size_t i = 0; i < hx_val.size(); ++i)
-    {
-        errors += std::abs(hx_val[i] - hx_val_host[i]);
-    }
+  for (rocsparse_int i = 0; i < nnz; ++i) {
+    hx_val_host[i] = hy[hx_ind[i] - idx_base];
+  }
 
-    // Print validation result.
-    return report_validation_result(errors);
+  int errors{};
+  for (size_t i = 0; i < hx_val.size(); ++i) {
+    errors += std::abs(hx_val[i] - hx_val_host[i]);
+  }
+
+  // Print validation result.
+  return report_validation_result(errors);
 }

@@ -65,8 +65,8 @@ check_cxx_source_compiles("${test_code}" CXX_FS_NO_LINK)
 
 if (NOT CXX_FS_NO_LINK)
     # Check if we can link stdc++fs
-	set(CMAKE_REQUIRED_LIBRARIES stdc++fs)
-	check_cxx_source_compiles("${test_code}" CXX_FS_CAN_LINK)
+    set(CMAKE_REQUIRED_LIBRARIES stdc++fs)
+    check_cxx_source_compiles("${test_code}" CXX_FS_CAN_LINK)
     if (CXX_FS_CAN_LINK)
         set(CXX_FS_LIBRARY stdc++fs CACHE STRING "Additional library required to use filesystem" FORCE)
     endif()

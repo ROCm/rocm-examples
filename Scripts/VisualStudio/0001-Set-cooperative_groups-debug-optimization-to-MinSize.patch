@@ -48,6 +48,5 @@ index 7447dfa2..65e2e352 100644
      </ClCompile>
      <Link>
        <SubSystem>Console</SubSystem>
--- 
+--
 2.43.0
-

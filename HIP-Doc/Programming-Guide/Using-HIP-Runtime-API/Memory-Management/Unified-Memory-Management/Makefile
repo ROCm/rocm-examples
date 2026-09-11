@@ -31,7 +31,7 @@ EXAMPLES := \
 SKIP_FROM_TEST :=
 
 ifeq ($(HSA_XNACK), 1)
-  EXAMPLES += standard_unified_memory 
+  EXAMPLES += standard_unified_memory
 endif
 
 all: $(EXAMPLES)

@@ -19,7 +19,8 @@ static uint32_t __map_mmap_prot_page(const int prot) {
     return protect;
 
   if ((prot & PROT_EXEC) != 0) {
-    protect = ((prot & PROT_WRITE) != 0) ? PAGE_EXECUTE_READWRITE : PAGE_EXECUTE_READ;
+    protect =
+        ((prot & PROT_WRITE) != 0) ? PAGE_EXECUTE_READWRITE : PAGE_EXECUTE_READ;
   } else {
     protect = ((prot & PROT_WRITE) != 0) ? PAGE_READWRITE : PAGE_READONLY;
   }
@@ -43,7 +44,8 @@ static uint32_t __map_mmap_prot_file(const int prot) {
   return desiredAccess;
 }
 
-void *mmap(void *addr, size_t len, int prot, int flags, int fildes, ssize_t off) {
+void *mmap(void *addr, size_t len, int prot, int flags, int fildes,
+           ssize_t off) {
   HANDLE fm, h;
   void *map = MAP_FAILED;
 
@@ -68,14 +70,13 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fildes, ssize_t off)
 
   errno = 0;
 
-  if (len == 0
-      || (flags & MAP_FIXED) != 0
-      || prot == PROT_EXEC) {
+  if (len == 0 || (flags & MAP_FIXED) != 0 || prot == PROT_EXEC) {
     errno = EINVAL;
     return MAP_FAILED;
   }
 
-  h = ((flags & MAP_ANONYMOUS) == 0) ? (HANDLE)_get_osfhandle(fildes) : INVALID_HANDLE_VALUE;
+  h = ((flags & MAP_ANONYMOUS) == 0) ? (HANDLE)_get_osfhandle(fildes)
+                                     : INVALID_HANDLE_VALUE;
 
   if ((flags & MAP_ANONYMOUS) == 0 && h == INVALID_HANDLE_VALUE) {
     errno = EBADF;
@@ -89,7 +90,8 @@ void *mmap(void *addr, size_t len, int prot, int flags, int fildes, ssize_t off)
     return MAP_FAILED;
   }
 
-  map = MapViewOfFile(fm, desiredAccess, dwFileOffsetHigh, dwFileOffsetLow, len);
+  map =
+      MapViewOfFile(fm, desiredAccess, dwFileOffsetHigh, dwFileOffsetLow, len);
 
   CloseHandle(fm);
 

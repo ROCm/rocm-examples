@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,43 +28,37 @@
 
 /*
  Weights each pixel in the projection with a weighting factor.
- 
- Since we are using a cone-beam source, each ray that hits the detector plane traverses a different length. To account
- for differences in the absorption, each pixel must be weighted with a factor which depends on the detector geometry and
- the distances during the measurement.
+
+ Since we are using a cone-beam source, each ray that hits the detector plane
+ traverses a different length. To account for differences in the absorption,
+ each pixel must be weighted with a factor which depends on the detector
+ geometry and the distances during the measurement.
 */
-__global__ void weighting_kernel(
-    float* p,
-    std::size_t pitch,
-    uint2 dim,
-    float d_sd,
-    float d_so,
-    float2 minCoord,
-    float2 pixelDim
-)
-{
-    auto const h = blockDim.x * blockIdx.x + threadIdx.x;
-    auto const v = blockDim.y * blockIdx.y + threadIdx.y;
+__global__ void weighting_kernel(float *p, std::size_t pitch, uint2 dim,
+                                 float d_sd, float d_so, float2 minCoord,
+                                 float2 pixelDim) {
+  auto const h = blockDim.x * blockIdx.x + threadIdx.x;
+  auto const v = blockDim.y * blockIdx.y + threadIdx.y;
 
-    if((h < dim.x) && (v < dim.y))
-    {
-        auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(p) + v * pitch);
-        
-        // physical detector coordinates in mm (pixel center); adding 0.5f to stay consistent with texture fetching
-        // during backprojection
-        auto const h_j = (h + 0.5f) * pixelDim.x + minCoord.x;
-        auto const v_i = (v + 0.5f) * pixelDim.y + minCoord.y;
+  if ((h < dim.x) && (v < dim.y)) {
+    auto row =
+        reinterpret_cast<float *>(reinterpret_cast<char *>(p) + v * pitch);
 
-        // distance weighting
-        auto const dist_w = rsqrtf(d_sd * d_sd + h_j * h_j + v_i * v_i);
+    // physical detector coordinates in mm (pixel center); adding 0.5f to stay
+    // consistent with texture fetching during backprojection
+    auto const h_j = (h + 0.5f) * pixelDim.x + minCoord.x;
+    auto const v_i = (v + 0.5f) * pixelDim.y + minCoord.y;
 
-        // cosine weighting
-        auto const cos_w = d_so * rsqrtf(d_so * d_so + h_j * h_j + v_i * v_i);
+    // distance weighting
+    auto const dist_w = rsqrtf(d_sd * d_sd + h_j * h_j + v_i * v_i);
 
-        // calculate weight
-        auto const w_ij = d_sd * dist_w * cos_w;
+    // cosine weighting
+    auto const cos_w = d_so * rsqrtf(d_so * d_so + h_j * h_j + v_i * v_i);
 
-        // write value
-        row[h] *= w_ij;
-    }
+    // calculate weight
+    auto const w_ij = d_sd * dist_w * cos_w;
+
+    // write value
+    row[h] *= w_ij;
+  }
 }

@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -32,37 +32,34 @@
 #include <iostream>
 #include <vector>
 
-#define HIP_CHECK(expression)                \
-{                                            \
-    const hipError_t status = expression;    \
-    if(status != hipSuccess)                 \
-    {                                        \
-            std::cerr << "HIP error "        \
-                << status << ": "            \
-                << hipGetErrorString(status) \
-                << " at " << __FILE__ << ":" \
-                << __LINE__ << std::endl;    \
-        std::exit(EXIT_FAILURE);             \
-    }                                        \
-}
+#define HIP_CHECK(expression)                                                  \
+  {                                                                            \
+    const hipError_t status = expression;                                      \
+    if (status != hipSuccess) {                                                \
+      std::cerr << "HIP error " << status << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":" << __LINE__ << std::endl;         \
+      std::exit(EXIT_FAILURE);                                                 \
+    }                                                                          \
+  }
 
 #define MAX_THREADS_PER_BLOCK 512
 
 // Structure to hold node information
 struct Node {
-  int starting;     // Starting index in edge list
-  int no_of_edges;  // Number of edges from this node
+  int starting;    // Starting index in edge list
+  int no_of_edges; // Number of edges from this node
 };
 
 // [Sphinx HIP BFS kernel 1 start]
 __global__ void BFS_Kernel(Node *g_graph_nodes, int *g_graph_edges,
                            char *g_graph_mask, char *g_updating_graph_mask,
-                           char *g_graph_visited, int *g_cost, int no_of_nodes) {
+                           char *g_graph_visited, int *g_cost,
+                           int no_of_nodes) {
   int tid = blockIdx.x * MAX_THREADS_PER_BLOCK + threadIdx.x;
-  
+
   if (tid < no_of_nodes && g_graph_mask[tid]) {
     g_graph_mask[tid] = 0;
-    
+
     // Traverse all edges of this node
     for (int i = g_graph_nodes[tid].starting;
          i < (g_graph_nodes[tid].no_of_edges + g_graph_nodes[tid].starting);
@@ -79,9 +76,10 @@ __global__ void BFS_Kernel(Node *g_graph_nodes, int *g_graph_edges,
 
 // [Sphinx HIP BFS kernel 2 start]
 __global__ void BFS_Update(char *g_graph_mask, char *g_updating_graph_mask,
-                           char *g_graph_visited, bool *g_over, int no_of_nodes) {
+                           char *g_graph_visited, bool *g_over,
+                           int no_of_nodes) {
   int tid = blockIdx.x * MAX_THREADS_PER_BLOCK + threadIdx.x;
-  
+
   if (tid < no_of_nodes && g_updating_graph_mask[tid]) {
     g_graph_mask[tid] = 1;
     g_graph_visited[tid] = 1;
@@ -148,7 +146,7 @@ void BFSGraph(int argc, char **argv) {
   // Read the source node
   int source = 0;
   fscanf(fp, "%d", &source);
-  source = 0;  // Force source to 0
+  source = 0; // Force source to 0
 
   // Set the source node as active
   h_graph_mask[source] = 1;
@@ -209,7 +207,7 @@ void BFSGraph(int argc, char **argv) {
                       hipMemcpyHostToDevice));
 
   std::cout << "Starting BFS traversal..." << std::endl;
-  std::cout << "Grid: " << num_of_blocks << " blocks, " 
+  std::cout << "Grid: " << num_of_blocks << " blocks, "
             << num_of_threads_per_block << " threads per block" << std::endl;
 
   // Setup execution parameters
@@ -226,13 +224,13 @@ void BFSGraph(int argc, char **argv) {
 
     // Launch kernel to process current frontier
     BFS_Kernel<<<grid, threads>>>(d_graph_nodes, d_graph_edges, d_graph_mask,
-                                   d_updating_graph_mask, d_graph_visited,
-                                   d_cost, no_of_nodes);
+                                  d_updating_graph_mask, d_graph_visited,
+                                  d_cost, no_of_nodes);
     HIP_CHECK(hipGetLastError());
 
     // Launch kernel to update masks
     BFS_Update<<<grid, threads>>>(d_graph_mask, d_updating_graph_mask,
-                                   d_graph_visited, d_over, no_of_nodes);
+                                  d_graph_visited, d_over, no_of_nodes);
     HIP_CHECK(hipGetLastError());
 
     HIP_CHECK(hipMemcpy(&stop, d_over, sizeof(bool), hipMemcpyDeviceToHost));

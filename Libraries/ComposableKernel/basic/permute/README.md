@@ -2,10 +2,10 @@
 
 ## Description
 
-This example shows how to perform a **tensor permutation** with CK Tile. It reproduces the behavior of  
+This example shows how to perform a **tensor permutation** with CK Tile. It reproduces the behavior of
 
-* `torch.permute` – arbitrary axis re-ordering, and  
-* `torch.contiguous` – output laid out contiguously in memory,  
+* `torch.permute` – arbitrary axis re-ordering, and
+* `torch.contiguous` – output laid out contiguously in memory,
 
 with a single GPU kernel that supports **rank ≤ 8** tensors. Peak performance is *not* the primary goal; readability and
 generality of the kernel are.

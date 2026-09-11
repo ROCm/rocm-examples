@@ -66,7 +66,7 @@ while [ : ]; do
       echo "  --build-dir <path>               Set the build directory"
       echo "  --deb-dir <path>                 Set the DEB directory"
       echo "  --rpm-dir <path>                 Set the RPM directory"
-      echo "  --packgen <format>               Specify the package format. Options 'DEB' or 'RPM'. Default: '', which generates both."      
+      echo "  --packgen <format>               Specify the package format. Options 'DEB' or 'RPM'. Default: '', which generates both."
       echo "  --rocm-path <path>               Set the ROCM_PATH directory"
       exit 0
       ;;
@@ -198,7 +198,7 @@ copy_test_files() {
     find "$BUILD_DIR" -name "CTestTestfile.cmake" | while read -r cmake_file; do
         example_dir=$(dirname "$cmake_file")
         relative_path=$(realpath --relative-to="$BUILD_DIR" "$example_dir")
-        
+
         mkdir -p "$TEST_STAGING_DIR/$relative_path"
         cp "$cmake_file" "$TEST_STAGING_DIR/$relative_path"
     done
