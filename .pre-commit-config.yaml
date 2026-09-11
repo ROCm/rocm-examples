@@ -1,0 +1,65 @@
+# Netpbm images (rawbits) are misdetected as text by pre-commit's `identify`,
+# so the whitespace/EOF/line-ending hooks would corrupt them; the MNIST digit
+# dump is likewise binary data. Exempt them globally.
+exclude: |
+  (?x)^(
+    .*\.(pgm|ppm|pbm)|
+    Libraries/MIGraphX/vision/cpp_mnist/digits\.txt
+  )$
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: cef0300fd0fc4d2a87a85fa2093c6b283ea36f4b  # v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+        exclude_types: ["image", "jupyter"]
+      - id: check-yaml
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-added-large-files
+      - id: mixed-line-ending
+  - repo: https://github.com/psf/black
+    rev: 05f0a8ce1f71fbb36e1e032d3b518c7b945089a2  # 25.11.0
+    hooks:
+      - id: black
+  - repo: https://github.com/pre-commit/mirrors-clang-format
+    rev: 79dadb849d5247ae54fa1f13f838fde95d91b2e9  # v18.1.4
+    hooks:
+      - id: clang-format
+        # clang-format's default types omit .hip (this repo's primary source
+        # language), so select by an explicit extension allowlist instead.
+        types_or: [file]
+        files: \.(c|cc|cxx|cpp|cu|cuh|h|hh|hxx|hpp|hip|json)$
+  - repo: https://github.com/Lucas-C/pre-commit-hooks
+    rev: a30f0d816e5062a67d87c8de753cfe499672b959  # v1.5.5
+    hooks:
+      - id: forbid-tabs
+        # Tabs are mandatory or format-owned here: Make recipes, Visual Studio
+        # solution/project files, GPU assembly, and the upstream-derived llama3c
+        # sources (Netpbm images are already covered by the global exclude).
+        exclude: |
+          (?x)(
+            (^|/)Makefile$|
+            \.(sln|vcxproj|filters|s)$|
+            ^Libraries/hipThreads/llama3c/.*\.cxx$
+          )
+  - repo: https://github.com/rhysd/actionlint
+    rev: 914e7df21a07ef503a81201c76d2b11c789d3fca  # v1.7.12
+    hooks:
+      - id: actionlint
+        args: [-shellcheck=, -ignore, 'label ".+" is unknown']
+  - repo: https://github.com/lalten/check-gha-pinning
+    rev: 1daab712690ac46a4fe18ec731a95fb6cd41fcc1  # v1.3.1
+    hooks:
+      - id: check-gha-pinning
+        # linting.yml calls ROCm/rocm-docs-core's reusable workflow at @develop
+        # by design (track upstream docs tooling); exempt it from SHA pinning.
+        exclude: ^\.github/workflows/linting\.yml$
+  - repo: local
+    hooks:
+      - id: forbidden-paths
+        name: Forbid secrets, certificates, keys, and executables
+        entry: "File matched a forbidden file path pattern. Do not commit secrets, key material, certificates, or Windows executables."
+        language: fail
+        files: '(^|/)([^/]*\.(pem|key|exe|crt|cer|p12|pfx|der|csr|gpg|asc)|\.env|id_(rsa|dsa|ecdsa|ed25519))$'
