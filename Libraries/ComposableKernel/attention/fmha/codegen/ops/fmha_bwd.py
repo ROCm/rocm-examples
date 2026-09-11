@@ -997,10 +997,20 @@ def get_bwd_blobs(
         spad1d_options = ["f", "t"]
         dpad_options = itertools.product(*([[0, 8, 1]] * 2))
         tf = ["t", "f"]
-        for tile, mode, mask, bias, dbias, dropout, spad1d, (
-            dpad,
-            dvpad,
-        ), deterministic in itertools.product(
+        for (
+            tile,
+            mode,
+            mask,
+            bias,
+            dbias,
+            dropout,
+            spad1d,
+            (
+                dpad,
+                dvpad,
+            ),
+            deterministic,
+        ) in itertools.product(
             tiles,
             MODE_MAP.keys(),
             get_mask_map(mask_impl).keys(),
@@ -1011,9 +1021,9 @@ def get_bwd_blobs(
             dpad_options,
             tf,
         ):
-            assert isinstance(tile, FmhaBwdDQDKDVTileSize), (
-                "tile must be FmhaBwdDQDKDVTileSize"
-            )
+            assert isinstance(
+                tile, FmhaBwdDQDKDVTileSize
+            ), "tile must be FmhaBwdDQDKDVTileSize"
             hdim = tile.F_bhdq
             if (mode == "group") and (spad1d == "f"):
                 continue

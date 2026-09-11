@@ -16,22 +16,22 @@ jobs:
     defaults:
       run:
         shell: bash
-    env:  
+    env:
       staging_branch: amd-staging
       mainline_branch: amd-mainline
-      
+
     steps:
       - name: Checkout repo
-        uses: actions/checkout@v4.2.2
-        with: 
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
           fetch-depth: 0
-        
+
       - name: Checkout staging and mainline branches
         run: |
           git pull
           git checkout $staging_branch
           git checkout $mainline_branch
-          
+
       - name: Sync mainline with staging locally
         run: |
           # Skip sync if staging matches mainline already
@@ -45,8 +45,7 @@ jobs:
           if [[ -n $(git log $staging_branch...$mainline_branch) ]]; then
             echo "branches don't match after sync!"
             exit 1
-          fi         
-          
+          fi
+
       - name: Push mainline
         run: git push -u origin $mainline_branch
-      

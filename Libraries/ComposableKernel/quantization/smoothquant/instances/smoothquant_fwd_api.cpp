@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,8 +20,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <ck_tile/core.hpp>
 #include "smoothquant.hpp"
+#include <ck_tile/core.hpp>
 
 template <typename DataType_,
           ck_tile::index_t Repeat_M_,         // each thread repeat along M
@@ -29,24 +29,16 @@ template <typename DataType_,
           ck_tile::index_t ThreadPerBlock_M_, // num threads along M
           ck_tile::index_t ThreadPerBlock_N_, // num threads along N
           ck_tile::index_t Vector_N_,         // vector size along N
-          bool kPadN_,
-          bool kTwoPass_>
-using trait_ = smoothquant_traits_<DataType_,
-                                   Repeat_M_,
-                                   Repeat_N_,
-                                   ThreadPerBlock_M_,
-                                   ThreadPerBlock_N_,
-                                   Vector_N_,
-                                   kPadN_,
-                                   kTwoPass_>;
+          bool kPadN_, bool kTwoPass_>
+using trait_ =
+    smoothquant_traits_<DataType_, Repeat_M_, Repeat_N_, ThreadPerBlock_M_,
+                        ThreadPerBlock_N_, Vector_N_, kPadN_, kTwoPass_>;
 
 template <typename data_type>
-float smoothquant_dispatch(smoothquant_traits /*t*/,
-                           smoothquant_args a,
-                           const ck_tile::stream_config& s)
-{
-    float r = -1;
-    // clang-format off
+float smoothquant_dispatch(smoothquant_traits /*t*/, smoothquant_args a,
+                           const ck_tile::stream_config &s) {
+  float r = -1;
+  // clang-format off
     //                                         rm  rn  tm  tn  vn   pd    2p
     if(a.n <= 64) {
             r = smoothquant_<trait_<data_type, 1,  1,  4,  64, 1,  true, false>>(s, a);
@@ -144,19 +136,15 @@ float smoothquant_dispatch(smoothquant_traits /*t*/,
             r = smoothquant_<trait_<data_type,  1, 4, 1, 1024, 1,  true, true>>(s, a);
     }
     return r;
-    // clang-format on
+  // clang-format on
 }
 
-float smoothquant(smoothquant_traits t, smoothquant_args a, const ck_tile::stream_config& s)
-{
-    if(t.data_type.compare("fp16") == 0)
-    {
-        return smoothquant_dispatch<ck_tile::fp16_t>(t, a, s);
-    }
-    else if(t.data_type.compare("bf16") == 0)
-    {
-        return smoothquant_dispatch<ck_tile::bf16_t>(t, a, s);
-    }
-    else
-        throw std::runtime_error("Without supported instances!");
+float smoothquant(smoothquant_traits t, smoothquant_args a,
+                  const ck_tile::stream_config &s) {
+  if (t.data_type.compare("fp16") == 0) {
+    return smoothquant_dispatch<ck_tile::fp16_t>(t, a, s);
+  } else if (t.data_type.compare("bf16") == 0) {
+    return smoothquant_dispatch<ck_tile::bf16_t>(t, a, s);
+  } else
+    throw std::runtime_error("Without supported instances!");
 }

@@ -123,7 +123,7 @@ struct rmsnorm2d_fwd_traits_
     using BlockTile  = ck_tile::sequence<Block_M, Block_N>;
     using Vector     = ck_tile::sequence<1, Vector_N_>;
     using ThreadPerBlock = ck_tile::sequence<ThreadPerBlock_M_, ThreadPerBlock_N_>;
-    
+
     using Shape = ck_tile::Generic2dBlockShape<BlockTile, ThreadPerBlock, Vector>;
 
     static constexpr bool kPadN        = kPadN_;
@@ -554,7 +554,7 @@ float rmsnorm2d_fwd(rmsnorm2d_fwd_traits t,
         dynamic_quant_out_dtype = ["int8", "fp8"]
         # some predefined support range
         # (prec_i,prec_o) for simplicity this string will be used as key for dict
-        scale_list = [("fp32,fp32")]
+        scale_list = ["fp32,fp32"]
         dtype_list = [
             ("fp16,fp16"),
             ("bf16,bf16"),

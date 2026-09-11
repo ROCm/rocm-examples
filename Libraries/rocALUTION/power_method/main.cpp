@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,226 +28,225 @@
 
 using namespace rocalution;
 
-int main(int argc, char* argv[])
-{
-    // Parse command line arguments
-    cli::Parser parser(argc, argv);
-    parser.set_optional<std::string>("matrix",
-                                     "matrix",
-                                     std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
-                                     "Path to matrix file in MTX format");
-    parser.set_optional<int>("threads", "threads", 0, "Number of OMP threads (0 = default)");
-    parser.run_and_exit_if_error();
+int main(int argc, char *argv[]) {
+  // Parse command line arguments
+  cli::Parser parser(argc, argv);
+  parser.set_optional<std::string>(
+      "matrix", "matrix", std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
+      "Path to matrix file in MTX format");
+  parser.set_optional<int>("threads", "threads", 0,
+                           "Number of OMP threads (0 = default)");
+  parser.run_and_exit_if_error();
 
-    std::string matrix_file = parser.get<std::string>("matrix");
-    int         num_threads = parser.get<int>("threads");
+  std::string matrix_file = parser.get<std::string>("matrix");
+  int num_threads = parser.get<int>("threads");
 
-    // Initialize rocALUTION
-    init_rocalution();
+  // Initialize rocALUTION
+  init_rocalution();
 
-    // Set number of OMP threads if specified
-    if(num_threads > 0)
-    {
-        set_omp_threads_rocalution(num_threads);
-    }
+  // Set number of OMP threads if specified
+  if (num_threads > 0) {
+    set_omp_threads_rocalution(num_threads);
+  }
 
-    // Print rocALUTION info
-    info_rocalution();
+  // Print rocALUTION info
+  info_rocalution();
 
-    LocalVector<double>  b;
-    LocalVector<double>  b_old;
-    LocalVector<double>* b_k;
-    LocalVector<double>* b_k1;
-    LocalVector<double>* b_tmp;
-    LocalMatrix<double>  mat;
+  LocalVector<double> b;
+  LocalVector<double> b_old;
+  LocalVector<double> *b_k;
+  LocalVector<double> *b_k1;
+  LocalVector<double> *b_tmp;
+  LocalMatrix<double> mat;
 
-    // Read matrix from MTX file
-    mat.ReadFileMTX(matrix_file);
+  // Read matrix from MTX file
+  mat.ReadFileMTX(matrix_file);
 
-    // Gershgorin spectrum approximation
-    double glambda_min, glambda_max;
+  // Gershgorin spectrum approximation
+  double glambda_min, glambda_max;
 
-    // Power method spectrum approximation
-    double plambda_min, plambda_max;
+  // Power method spectrum approximation
+  double plambda_min, plambda_max;
 
-    // Maximum number of iteration for the power method
-    int iter_max = 10000;
+  // Maximum number of iteration for the power method
+  int iter_max = 10000;
 
-    // Gershgorin approximation of the eigenvalues
-    mat.Gershgorin(glambda_min, glambda_max);
-    std::cout << "Gershgorin : Lambda min = " << glambda_min << "; Lambda max = " << glambda_max
-              << std::endl;
+  // Gershgorin approximation of the eigenvalues
+  mat.Gershgorin(glambda_min, glambda_max);
+  std::cout << "Gershgorin : Lambda min = " << glambda_min
+            << "; Lambda max = " << glambda_max << std::endl;
 
-    // Move objects to accelerator
-    mat.MoveToAccelerator();
-    b.MoveToAccelerator();
-    b_old.MoveToAccelerator();
+  // Move objects to accelerator
+  mat.MoveToAccelerator();
+  b.MoveToAccelerator();
+  b_old.MoveToAccelerator();
 
-    // Allocate vectors
-    b.Allocate("b_k+1", mat.GetM());
-    b_k1 = &b;
+  // Allocate vectors
+  b.Allocate("b_k+1", mat.GetM());
+  b_k1 = &b;
 
-    b_old.Allocate("b_k", mat.GetM());
-    b_k = &b_old;
+  b_old.Allocate("b_k", mat.GetM());
+  b_k = &b_old;
 
-    // Set b_k to 1
-    b_k->Ones();
+  // Set b_k to 1
+  b_k->Ones();
 
-    // Print matrix info
-    mat.Info();
+  // Print matrix info
+  mat.Info();
 
-    // Start time measurement
-    double tick, tack;
-    tick = rocalution_time();
+  // Start time measurement
+  double tick, tack;
+  tick = rocalution_time();
 
-    // compute lambda max
-    for(int i = 0; i <= iter_max; ++i)
-    {
-        mat.Apply(*b_k, b_k1);
-
-        //    std::cout << b_k1->Dot(*b_k) << std::endl;
-        b_k1->Scale(double(1.0) / b_k1->Norm());
-
-        b_tmp = b_k1;
-        b_k1  = b_k;
-        b_k   = b_tmp;
-    }
-
-    // get lambda max (Rayleigh quotient)
+  // compute lambda max
+  for (int i = 0; i <= iter_max; ++i) {
     mat.Apply(*b_k, b_k1);
-    plambda_max = b_k1->Dot(*b_k);
 
-    tack = rocalution_time();
-    std::cout << "Power method (lambda max) execution:" << (tack - tick) / 1e6 << " sec"
-              << std::endl;
+    //    std::cout << b_k1->Dot(*b_k) << std::endl;
+    b_k1->Scale(double(1.0) / b_k1->Norm());
 
-    mat.AddScalarDiagonal(double(-1.0) * plambda_max);
+    b_tmp = b_k1;
+    b_k1 = b_k;
+    b_k = b_tmp;
+  }
 
-    b_k->Ones();
+  // get lambda max (Rayleigh quotient)
+  mat.Apply(*b_k, b_k1);
+  plambda_max = b_k1->Dot(*b_k);
 
-    tick = rocalution_time();
+  tack = rocalution_time();
+  std::cout << "Power method (lambda max) execution:" << (tack - tick) / 1e6
+            << " sec" << std::endl;
 
-    // compute lambda min
-    for(int i = 0; i <= iter_max; ++i)
-    {
-        mat.Apply(*b_k, b_k1);
+  mat.AddScalarDiagonal(double(-1.0) * plambda_max);
 
-        //    std::cout << b_k1->Dot(*b_k) + plambda_max << std::endl;
-        b_k1->Scale(double(1.0) / b_k1->Norm());
+  b_k->Ones();
 
-        b_tmp = b_k1;
-        b_k1  = b_k;
-        b_k   = b_tmp;
-    }
+  tick = rocalution_time();
 
-    // get lambda min (Rayleigh quotient)
+  // compute lambda min
+  for (int i = 0; i <= iter_max; ++i) {
     mat.Apply(*b_k, b_k1);
-    plambda_min = (b_k1->Dot(*b_k) + plambda_max);
 
-    // back to the original matrix
-    mat.AddScalarDiagonal(plambda_max);
+    //    std::cout << b_k1->Dot(*b_k) + plambda_max << std::endl;
+    b_k1->Scale(double(1.0) / b_k1->Norm());
 
-    tack = rocalution_time();
-    std::cout << "Power method (lambda min) execution:" << (tack - tick) / 1e6 << " sec"
-              << std::endl;
+    b_tmp = b_k1;
+    b_k1 = b_k;
+    b_k = b_tmp;
+  }
 
-    std::cout << "Power method Lambda min = " << plambda_min << "; Lambda max = " << plambda_max
-              << "; iter=2x" << iter_max << std::endl;
+  // get lambda min (Rayleigh quotient)
+  mat.Apply(*b_k, b_k1);
+  plambda_min = (b_k1->Dot(*b_k) + plambda_max);
 
-    LocalVector<double> x;
-    LocalVector<double> e;
-    LocalVector<double> rhs;
+  // back to the original matrix
+  mat.AddScalarDiagonal(plambda_max);
 
-    x.CloneBackend(mat);
-    e.CloneBackend(mat);
-    rhs.CloneBackend(mat);
+  tack = rocalution_time();
+  std::cout << "Power method (lambda min) execution:" << (tack - tick) / 1e6
+            << " sec" << std::endl;
 
-    x.Allocate("x", mat.GetN());
-    e.Allocate("e", mat.GetN());
-    rhs.Allocate("rhs", mat.GetM());
+  std::cout << "Power method Lambda min = " << plambda_min
+            << "; Lambda max = " << plambda_max << "; iter=2x" << iter_max
+            << std::endl;
 
-    // Chebyshev iteration
-    Chebyshev<LocalMatrix<double>, LocalVector<double>, double> ls;
+  LocalVector<double> x;
+  LocalVector<double> e;
+  LocalVector<double> rhs;
 
-    // Initialize rhs such that A 1 = rhs
-    e.Ones();
-    mat.Apply(e, &rhs);
+  x.CloneBackend(mat);
+  e.CloneBackend(mat);
+  rhs.CloneBackend(mat);
 
-    // Initial zero guess
-    x.Zeros();
+  x.Allocate("x", mat.GetN());
+  e.Allocate("e", mat.GetN());
+  rhs.Allocate("rhs", mat.GetM());
 
-    // Set solver operator
-    ls.SetOperator(mat);
+  // Chebyshev iteration
+  Chebyshev<LocalMatrix<double>, LocalVector<double>, double> ls;
 
-    // Set eigenvalues
-    ls.Set(plambda_min, plambda_max);
+  // Initialize rhs such that A 1 = rhs
+  e.Ones();
+  mat.Apply(e, &rhs);
 
-    // Build solver
-    ls.Build();
+  // Initial zero guess
+  x.Zeros();
 
-    // Start time measurement
-    tick = rocalution_time();
+  // Set solver operator
+  ls.SetOperator(mat);
 
-    // Solve A x = rhs
-    ls.Solve(rhs, &x);
+  // Set eigenvalues
+  ls.Set(plambda_min, plambda_max);
 
-    // Stop time measurement
-    tack = rocalution_time();
-    std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec" << std::endl;
+  // Build solver
+  ls.Build();
 
-    // Clear solver
-    ls.Clear();
+  // Start time measurement
+  tick = rocalution_time();
 
-    // Compute error L2 norm
-    e.ScaleAdd(-1.0, x);
-    double error = e.Norm();
-    std::cout << "Chebyshev iteration ||e - x||_2 = " << error << std::endl;
+  // Solve A x = rhs
+  ls.Solve(rhs, &x);
 
-    // PCG + Chebyshev polynomial
-    CG<LocalMatrix<double>, LocalVector<double>, double>          cg;
-    AIChebyshev<LocalMatrix<double>, LocalVector<double>, double> p;
+  // Stop time measurement
+  tack = rocalution_time();
+  std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec"
+            << std::endl;
 
-    // damping factor
-    plambda_min = plambda_max / 7;
+  // Clear solver
+  ls.Clear();
 
-    // Set preconditioner
-    p.Set(3, plambda_min, plambda_max);
+  // Compute error L2 norm
+  e.ScaleAdd(-1.0, x);
+  double error = e.Norm();
+  std::cout << "Chebyshev iteration ||e - x||_2 = " << error << std::endl;
 
-    // Initialize rhs such that A 1 = rhs
-    e.Ones();
-    mat.Apply(e, &rhs);
+  // PCG + Chebyshev polynomial
+  CG<LocalMatrix<double>, LocalVector<double>, double> cg;
+  AIChebyshev<LocalMatrix<double>, LocalVector<double>, double> p;
 
-    // Initial zero guess
-    x.Zeros();
+  // damping factor
+  plambda_min = plambda_max / 7;
 
-    // Set solver operator
-    cg.SetOperator(mat);
-    // Set solver preconditioner
-    cg.SetPreconditioner(p);
+  // Set preconditioner
+  p.Set(3, plambda_min, plambda_max);
 
-    // Build solver
-    cg.Build();
+  // Initialize rhs such that A 1 = rhs
+  e.Ones();
+  mat.Apply(e, &rhs);
 
-    // Start time measurement
-    tick = rocalution_time();
+  // Initial zero guess
+  x.Zeros();
 
-    // Solve A x = rhs
-    cg.Solve(rhs, &x);
+  // Set solver operator
+  cg.SetOperator(mat);
+  // Set solver preconditioner
+  cg.SetPreconditioner(p);
 
-    // Stop time measurement
-    tack = rocalution_time();
-    std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec" << std::endl;
+  // Build solver
+  cg.Build();
 
-    // Clear solver
-    cg.Clear();
+  // Start time measurement
+  tick = rocalution_time();
 
-    // Compute error L2 norm
-    e.ScaleAdd(-1.0, x);
-    error = e.Norm();
-    std::cout << "CG + AIChebyshev ||e - x||_2 = " << error << std::endl;
+  // Solve A x = rhs
+  cg.Solve(rhs, &x);
 
-    // Stop rocALUTION platform
-    stop_rocalution();
+  // Stop time measurement
+  tack = rocalution_time();
+  std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec"
+            << std::endl;
 
-    return 0;
+  // Clear solver
+  cg.Clear();
+
+  // Compute error L2 norm
+  e.ScaleAdd(-1.0, x);
+  error = e.Norm();
+  std::cout << "CG + AIChebyshev ||e - x||_2 = " << error << std::endl;
+
+  // Stop rocALUTION platform
+  stop_rocalution();
+
+  return 0;
 }

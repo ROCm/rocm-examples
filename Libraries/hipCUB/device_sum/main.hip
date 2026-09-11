@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,52 +28,54 @@
 #include <hip/hip_runtime.h>
 #include <hipcub/device/device_reduce.hpp>
 
-int main()
-{
-    // Allocate and initialize data on the host
-    const std::vector<int> h_in{0, 1, 2, 3, 4, 5, 6, 6, 7, 8};
+int main() {
+  // Allocate and initialize data on the host
+  const std::vector<int> h_in{0, 1, 2, 3, 4, 5, 6, 6, 7, 8};
 
-    std::cout << "Input Data: " << format_range(h_in.begin(), h_in.end()) << std::endl;
-    std::cout << "Performing summation reduction using hipcub::DeviceReduce::Sum() on "
-              << h_in.size() << " elements" << std::endl;
+  std::cout << "Input Data: " << format_range(h_in.begin(), h_in.end())
+            << std::endl;
+  std::cout
+      << "Performing summation reduction using hipcub::DeviceReduce::Sum() on "
+      << h_in.size() << " elements" << std::endl;
 
-    // Allocate the storage on the device that is needed to copy h_in to the device
-    const size_t h_in_bytes = sizeof(int) * h_in.size();
-    int*         d_in       = nullptr;
-    HIP_CHECK(hipMalloc(&d_in, h_in_bytes));
+  // Allocate the storage on the device that is needed to copy h_in to the
+  // device
+  const size_t h_in_bytes = sizeof(int) * h_in.size();
+  int *d_in = nullptr;
+  HIP_CHECK(hipMalloc(&d_in, h_in_bytes));
 
-    // Allocate storage for device output
-    // The reduce sum produces a single scalar
-    int* d_out = nullptr;
-    HIP_CHECK(hipMalloc(&d_out, sizeof(int)));
+  // Allocate storage for device output
+  // The reduce sum produces a single scalar
+  int *d_out = nullptr;
+  HIP_CHECK(hipMalloc(&d_out, sizeof(int)));
 
-    // Initialize the device input data
-    // Copy h_in from the host to device in d_in
-    HIP_CHECK(hipMemcpy(d_in, h_in.data(), h_in_bytes, hipMemcpyHostToDevice));
+  // Initialize the device input data
+  // Copy h_in from the host to device in d_in
+  HIP_CHECK(hipMemcpy(d_in, h_in.data(), h_in_bytes, hipMemcpyHostToDevice));
 
-    // hipCUB algorithms require temporary storage on the device
-    void*  d_temp_storage     = nullptr;
-    size_t temp_storage_bytes = 0;
+  // hipCUB algorithms require temporary storage on the device
+  void *d_temp_storage = nullptr;
+  size_t temp_storage_bytes = 0;
 
-    // Since d_temp_storage is set to nullptr, this first call to hipcub::DeviceReduce::Sum
-    // will provide the size in bytes for d_temp_storage
-    // The size in bytes will be stored in temp_storage_bytes
-    HIP_CHECK(
-        hipcub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, d_in, d_out, h_in.size()));
+  // Since d_temp_storage is set to nullptr, this first call to
+  // hipcub::DeviceReduce::Sum will provide the size in bytes for d_temp_storage
+  // The size in bytes will be stored in temp_storage_bytes
+  HIP_CHECK(hipcub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, d_in,
+                                      d_out, h_in.size()));
 
-    HIP_CHECK(hipMalloc(&d_temp_storage, temp_storage_bytes));
+  HIP_CHECK(hipMalloc(&d_temp_storage, temp_storage_bytes));
 
-    // Run Sum on the device
-    HIP_CHECK(
-        hipcub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, d_in, d_out, h_in.size()));
-    // Get result back to host
-    int result;
-    HIP_CHECK(hipMemcpy(&result, d_out, sizeof(int), hipMemcpyDeviceToHost));
+  // Run Sum on the device
+  HIP_CHECK(hipcub::DeviceReduce::Sum(d_temp_storage, temp_storage_bytes, d_in,
+                                      d_out, h_in.size()));
+  // Get result back to host
+  int result;
+  HIP_CHECK(hipMemcpy(&result, d_out, sizeof(int), hipMemcpyDeviceToHost));
 
-    std::cout << "Reduced summation result: " << result << std::endl;
+  std::cout << "Reduced summation result: " << result << std::endl;
 
-    // Free device memory
-    HIP_CHECK(hipFree(d_in));
-    HIP_CHECK(hipFree(d_out));
-    HIP_CHECK(hipFree(d_temp_storage));
+  // Free device memory
+  HIP_CHECK(hipFree(d_in));
+  HIP_CHECK(hipFree(d_out));
+  HIP_CHECK(hipFree(d_temp_storage));
 }

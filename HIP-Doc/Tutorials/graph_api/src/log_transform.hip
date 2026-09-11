@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,18 +25,19 @@
 #include <cstddef>
 #include <limits>
 
-__global__ void log_transformation_kernel(float* proj, std::size_t pitch, uint2 dim)
-{
-    constexpr auto epsilon = std::numeric_limits<float>::epsilon();
+__global__ void log_transformation_kernel(float *proj, std::size_t pitch,
+                                          uint2 dim) {
+  constexpr auto epsilon = std::numeric_limits<float>::epsilon();
 
-    for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < dim.y; v += blockDim.y * gridDim.y)
-    {
-        for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < dim.x; h += blockDim.x * gridDim.x)
-        {
-            auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(proj) + v * pitch);
-            
-            auto const val = max(row[h], epsilon); // prevent logf(0)
-            row[h] = -logf(val);
-        }
+  for (auto v = blockIdx.y * blockDim.y + threadIdx.y; v < dim.y;
+       v += blockDim.y * gridDim.y) {
+    for (auto h = blockIdx.x * blockDim.x + threadIdx.x; h < dim.x;
+         h += blockDim.x * gridDim.x) {
+      auto row =
+          reinterpret_cast<float *>(reinterpret_cast<char *>(proj) + v * pitch);
+
+      auto const val = max(row[h], epsilon); // prevent logf(0)
+      row[h] = -logf(val);
     }
+  }
 }

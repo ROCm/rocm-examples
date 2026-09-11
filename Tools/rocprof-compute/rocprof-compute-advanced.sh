@@ -45,8 +45,8 @@ echo "==========================================================================
 # Kernels are specified as a substring list. The following matches all kernel names which contain "vgprbound". Roofline
 # profiling is disabled to save profiling time.
 $EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_substr --kernel vgprbound --no-roof -- $EXAMPLE_WORKLOAD
-# Notice the "top kernels" only shows "vgprbound" kernels, compared to the full profile capture  
-$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_substr/* --block 7 
+# Notice the "top kernels" only shows "vgprbound" kernels, compared to the full profile capture
+$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_substr/* --block 7
 
 echo "==============================================================================="
 echo "Profiling workload; filtering for System Speed-of-Light profiling and analysis"
@@ -54,7 +54,7 @@ echo "==========================================================================
 # It is possible to only collect some metrics. The list of supported hardware report blocks can be obtained with
 # rocprof-compute profile --list-metrics
 $EXAMPLE_TOOL profile --name ${EXAMPLE_BIN}_sol --block 2 -- $EXAMPLE_WORKLOAD
-$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_sol/* --block 2  
+$EXAMPLE_TOOL analyze --path workloads/${EXAMPLE_BIN}_sol/* --block 2
 
 
 echo "==============================================================================="
@@ -73,11 +73,11 @@ else
     echo "==============================================================================="
     echo "Profiling workload; filtering for metrics set: Wavefront Launch Statistics"
     echo "==============================================================================="
-    # A metric set contains a subset of metrics that can be collected in a single pass. 
-    # This is useful for minimizing profiling overhead by collecting only the counters 
-    # of interest. Note that rocprof-compute might collect other metrics as well, but 
+    # A metric set contains a subset of metrics that can be collected in a single pass.
+    # This is useful for minimizing profiling overhead by collecting only the counters
+    # of interest. Note that rocprof-compute might collect other metrics as well, but
     # only the metrics that are part of the set will be meaningful.
-    # 
+    #
     # To list available sets, use the '--list-sets' flag:
     # rocprof-compute profile --list-sets
     #

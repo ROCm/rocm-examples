@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,26 +27,24 @@
 #include <cstddef>
 #include <cstdint>
 
-__global__ void normalization_kernel(
-    std::uint16_t const* __restrict__ in,
-    std::size_t const inPitch,
-    float* __restrict__ out,
-    std::size_t const outPitch,
-    uint2 dim,
-    std::uint16_t bits
-)
-{
-    auto const maximum = (1 << bits) - 1;
+__global__ void normalization_kernel(std::uint16_t const *__restrict__ in,
+                                     std::size_t const inPitch,
+                                     float *__restrict__ out,
+                                     std::size_t const outPitch, uint2 dim,
+                                     std::uint16_t bits) {
+  auto const maximum = (1 << bits) - 1;
 
-    for(auto v = blockIdx.y * blockDim.y + threadIdx.y; v < dim.y; v += blockDim.y * gridDim.y)
-    {
-        for(auto h = blockIdx.x * blockDim.x + threadIdx.x; h < dim.x; h += blockDim.x * gridDim.x)
-        {
-            auto in_row = reinterpret_cast<std::uint16_t const*>(reinterpret_cast<char const*>(in) + v * inPitch);
-            auto out_row = reinterpret_cast<float*>(reinterpret_cast<char*>(out) + v * outPitch);
+  for (auto v = blockIdx.y * blockDim.y + threadIdx.y; v < dim.y;
+       v += blockDim.y * gridDim.y) {
+    for (auto h = blockIdx.x * blockDim.x + threadIdx.x; h < dim.x;
+         h += blockDim.x * gridDim.x) {
+      auto in_row = reinterpret_cast<std::uint16_t const *>(
+          reinterpret_cast<char const *>(in) + v * inPitch);
+      auto out_row = reinterpret_cast<float *>(reinterpret_cast<char *>(out) +
+                                               v * outPitch);
 
-            // Normalize
-            out_row[h] = static_cast<float>(in_row[h]) / maximum;
-        }
+      // Normalize
+      out_row[h] = static_cast<float>(in_row[h]) / maximum;
     }
+  }
 }

@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,15 +24,12 @@
 
 #include <cstddef>
 
-extern "C"
-__global__  void myKernel(float* A, float* B)
-{
-    std::size_t const elements = 64*1024;
-    auto const idx = blockIdx.x * blockDim.x + threadIdx.x;
-    auto const idxf = static_cast<float>(idx);
-    if(idx < elements)
-    {
-        A[idx] = sinf(idxf);
-        B[idx] = cosf(idxf);
-    }
+extern "C" __global__ void myKernel(float *A, float *B) {
+  std::size_t const elements = 64 * 1024;
+  auto const idx = blockIdx.x * blockDim.x + threadIdx.x;
+  auto const idxf = static_cast<float>(idx);
+  if (idx < elements) {
+    A[idx] = sinf(idxf);
+    B[idx] = cosf(idxf);
+  }
 }

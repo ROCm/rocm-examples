@@ -43,15 +43,15 @@
 /// \param vectors Sobol's direction vectors.
 /// \param offset Values to skip from the generated sequence.
 ///
-template<unsigned int Bits, typename StateT>
-__global__ void sobol_init_kernel(StateT* states, unsigned int* vectors, unsigned int offset = 0)
-{
-    const unsigned int dimension = blockIdx.y;
-    const unsigned int state_id  = blockIdx.x * blockDim.x + threadIdx.x;
+template <unsigned int Bits, typename StateT>
+__global__ void sobol_init_kernel(StateT *states, unsigned int *vectors,
+                                  unsigned int offset = 0) {
+  const unsigned int dimension = blockIdx.y;
+  const unsigned int state_id = blockIdx.x * blockDim.x + threadIdx.x;
 
-    StateT state;
-    hiprand_init(&vectors[dimension * 32], offset + state_id, &state);
-    states[gridDim.x * blockDim.x * dimension + state_id] = state;
+  StateT state;
+  hiprand_init(&vectors[dimension * 32], offset + state_id, &state);
+  states[gridDim.x * blockDim.x * dimension + state_id] = state;
 }
 
 ///
@@ -69,21 +69,18 @@ __global__ void sobol_init_kernel(StateT* states, unsigned int* vectors, unsigne
 /// \param scramble_constants Scrambled Sobol's constants.
 /// \param offset Values to skip from the generated sequence.
 ///
-template<unsigned int Bits, typename StateT>
-__global__ void scrambled_sobol_init_kernel(StateT*       states,
-                                            unsigned int* vectors,
-                                            unsigned int* scramble_constants,
-                                            unsigned int  offset = 0)
-{
-    const unsigned int dimension = blockIdx.y;
-    const unsigned int state_id  = blockIdx.x * blockDim.x + threadIdx.x;
+template <unsigned int Bits, typename StateT>
+__global__ void scrambled_sobol_init_kernel(StateT *states,
+                                            unsigned int *vectors,
+                                            unsigned int *scramble_constants,
+                                            unsigned int offset = 0) {
+  const unsigned int dimension = blockIdx.y;
+  const unsigned int state_id = blockIdx.x * blockDim.x + threadIdx.x;
 
-    StateT state;
-    hiprand_init(&vectors[dimension * Bits],
-                 scramble_constants[dimension],
-                 offset + state_id,
-                 &state);
-    states[gridDim.x * blockDim.x * dimension + state_id] = state;
+  StateT state;
+  hiprand_init(&vectors[dimension * Bits], scramble_constants[dimension],
+               offset + state_id, &state);
+  states[gridDim.x * blockDim.x * dimension + state_id] = state;
 }
 
 ///
@@ -101,177 +98,176 @@ __global__ void scrambled_sobol_init_kernel(StateT*       states,
 /// \param output Global memory output buffer.
 /// \param size Amount of values to be generated.
 ///
-template<typename StateT>
-__global__ void generate_kernel(StateT* states, unsigned int* output, const size_t size)
-{
-    const unsigned int dimension = blockIdx.y;
-    const unsigned int state_id  = blockIdx.x * blockDim.x + threadIdx.x;
-    const unsigned int stride    = gridDim.x * blockDim.x;
+template <typename StateT>
+__global__ void generate_kernel(StateT *states, unsigned int *output,
+                                const size_t size) {
+  const unsigned int dimension = blockIdx.y;
+  const unsigned int state_id = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int stride = gridDim.x * blockDim.x;
 
-    StateT       state  = states[gridDim.x * blockDim.x * dimension + state_id];
-    const size_t offset = dimension * size;
-    unsigned int index  = state_id;
+  StateT state = states[gridDim.x * blockDim.x * dimension + state_id];
+  const size_t offset = dimension * size;
+  unsigned int index = state_id;
 
-    while(index < size)
-    {
-        output[offset + index] = hiprand(&state);
-        // skipahead(stride - 1, &state); // TODO : fix error at skipahead
-        index += stride;
-    }
-    state = states[gridDim.x * blockDim.x * dimension + state_id];
-    // skipahead(static_cast<unsigned int>(size), &state);
-    states[gridDim.x * blockDim.x * dimension + state_id] = state;
+  while (index < size) {
+    output[offset + index] = hiprand(&state);
+    // skipahead(stride - 1, &state); // TODO : fix error at skipahead
+    index += stride;
+  }
+  state = states[gridDim.x * blockDim.x * dimension + state_id];
+  // skipahead(static_cast<unsigned int>(size), &state);
+  states[gridDim.x * blockDim.x * dimension + state_id] = state;
 }
 
-int main()
-{
-    typedef hiprandStateSobol32          sobol_state_t;
-    typedef hiprandStateScrambledSobol32 scrambled_sobol_state_t;
+int main() {
+  typedef hiprandStateSobol32 sobol_state_t;
+  typedef hiprandStateScrambledSobol32 scrambled_sobol_state_t;
 
-    const unsigned int dimensions         = 2;
-    const unsigned int size_per_dimension = 1000;
-    const size_t output_size = dimensions * size_per_dimension; /*number of values to generate*/
+  const unsigned int dimensions = 2;
+  const unsigned int size_per_dimension = 1000;
+  const size_t output_size =
+      dimensions * size_per_dimension; /*number of values to generate*/
 
-    // 1. Allocate device output buffers.
-    unsigned int* d_sobol_output;
-    unsigned int* d_scrambled_sobol_output;
+  // 1. Allocate device output buffers.
+  unsigned int *d_sobol_output;
+  unsigned int *d_scrambled_sobol_output;
 
-    HIP_CHECK(hipMalloc(&d_sobol_output, output_size * sizeof(*d_sobol_output)));
-    HIP_CHECK(
-        hipMalloc(&d_scrambled_sobol_output, output_size * sizeof(*d_scrambled_sobol_output)));
+  HIP_CHECK(hipMalloc(&d_sobol_output, output_size * sizeof(*d_sobol_output)));
+  HIP_CHECK(hipMalloc(&d_scrambled_sobol_output,
+                      output_size * sizeof(*d_scrambled_sobol_output)));
 
-    // 2. Allocate states.
-    // Each thread handles one state.
-    const unsigned int blocks_per_dimension = 2;
-    const unsigned int threads              = 64;
-    const unsigned int num_states           = dimensions * blocks_per_dimension * threads;
+  // 2. Allocate states.
+  // Each thread handles one state.
+  const unsigned int blocks_per_dimension = 2;
+  const unsigned int threads = 64;
+  const unsigned int num_states = dimensions * blocks_per_dimension * threads;
 
-    // Sobol
-    sobol_state_t* sobol_states;
-    HIP_CHECK(hipMalloc(&sobol_states, num_states * sizeof(sobol_state_t)));
+  // Sobol
+  sobol_state_t *sobol_states;
+  HIP_CHECK(hipMalloc(&sobol_states, num_states * sizeof(sobol_state_t)));
 
-    // Scrambled Sobol
-    scrambled_sobol_state_t* scrambled_sobol_states;
-    HIP_CHECK(hipMalloc(&scrambled_sobol_states, num_states * sizeof(scrambled_sobol_state_t)));
+  // Scrambled Sobol
+  scrambled_sobol_state_t *scrambled_sobol_states;
+  HIP_CHECK(hipMalloc(&scrambled_sobol_states,
+                      num_states * sizeof(scrambled_sobol_state_t)));
 
-    // 3. Get direction vectors.
-    const unsigned int direction_vectors_size = 32 /*bits in generated numbers*/ * dimensions;
+  // 3. Get direction vectors.
+  const unsigned int direction_vectors_size =
+      32 /*bits in generated numbers*/ * dimensions;
 
-    // Sobol
-    hiprandDirectionVectors32_t* h_sobol_vectors;
-    unsigned int*                d_sobol_vectors;
-    HIPRAND_CHECK(
-        hiprandGetDirectionVectors32(&h_sobol_vectors, HIPRAND_DIRECTION_VECTORS_32_JOEKUO6));
-    HIP_CHECK(hipMalloc(&d_sobol_vectors, direction_vectors_size * sizeof(*d_sobol_vectors)));
-    HIP_CHECK(hipMemcpy(d_sobol_vectors,
-                        h_sobol_vectors,
-                        direction_vectors_size * sizeof(*d_sobol_vectors),
-                        hipMemcpyHostToDevice));
+  // Sobol
+  hiprandDirectionVectors32_t *h_sobol_vectors;
+  unsigned int *d_sobol_vectors;
+  HIPRAND_CHECK(hiprandGetDirectionVectors32(
+      &h_sobol_vectors, HIPRAND_DIRECTION_VECTORS_32_JOEKUO6));
+  HIP_CHECK(hipMalloc(&d_sobol_vectors,
+                      direction_vectors_size * sizeof(*d_sobol_vectors)));
+  HIP_CHECK(hipMemcpy(d_sobol_vectors, h_sobol_vectors,
+                      direction_vectors_size * sizeof(*d_sobol_vectors),
+                      hipMemcpyHostToDevice));
 
-    // Scrambled Sobol
-    hiprandDirectionVectors32_t* h_scrambled_sobol_vectors;
-    unsigned int*                d_scrambled_sobol_vectors;
-    HIPRAND_CHECK(hiprandGetDirectionVectors32(&h_scrambled_sobol_vectors,
-                                               HIPRAND_SCRAMBLED_DIRECTION_VECTORS_32_JOEKUO6));
-    HIP_CHECK(hipMalloc(&d_scrambled_sobol_vectors,
-                        direction_vectors_size * sizeof(*d_scrambled_sobol_vectors)));
-    HIP_CHECK(hipMemcpy(d_scrambled_sobol_vectors,
-                        h_scrambled_sobol_vectors,
-                        direction_vectors_size * sizeof(*d_scrambled_sobol_vectors),
-                        hipMemcpyHostToDevice));
+  // Scrambled Sobol
+  hiprandDirectionVectors32_t *h_scrambled_sobol_vectors;
+  unsigned int *d_scrambled_sobol_vectors;
+  HIPRAND_CHECK(hiprandGetDirectionVectors32(
+      &h_scrambled_sobol_vectors,
+      HIPRAND_SCRAMBLED_DIRECTION_VECTORS_32_JOEKUO6));
+  HIP_CHECK(
+      hipMalloc(&d_scrambled_sobol_vectors,
+                direction_vectors_size * sizeof(*d_scrambled_sobol_vectors)));
+  HIP_CHECK(
+      hipMemcpy(d_scrambled_sobol_vectors, h_scrambled_sobol_vectors,
+                direction_vectors_size * sizeof(*d_scrambled_sobol_vectors),
+                hipMemcpyHostToDevice));
 
-    // 4. For Scrambled Sobol, get scramble constants.
-    const unsigned int* h_scramble_constants;
-    unsigned int*       d_scramble_constants;
-    HIPRAND_CHECK(hiprandGetScrambleConstants32(&h_scramble_constants));
-    HIP_CHECK(hipMalloc(&d_scramble_constants, dimensions * sizeof(*d_scramble_constants)));
-    HIP_CHECK(hipMemcpy(d_scramble_constants,
-                        h_scramble_constants,
-                        dimensions * sizeof(*d_scramble_constants),
-                        hipMemcpyHostToDevice));
+  // 4. For Scrambled Sobol, get scramble constants.
+  const unsigned int *h_scramble_constants;
+  unsigned int *d_scramble_constants;
+  HIPRAND_CHECK(hiprandGetScrambleConstants32(&h_scramble_constants));
+  HIP_CHECK(hipMalloc(&d_scramble_constants,
+                      dimensions * sizeof(*d_scramble_constants)));
+  HIP_CHECK(hipMemcpy(d_scramble_constants, h_scramble_constants,
+                      dimensions * sizeof(*d_scramble_constants),
+                      hipMemcpyHostToDevice));
 
-    // 5. Generate values.
-    // For each generator, we first initialize the state and then we generate the
-    // values.
-    const dim3 grid_size(blocks_per_dimension, dimensions);
-    const dim3 block_size(threads);
+  // 5. Generate values.
+  // For each generator, we first initialize the state and then we generate the
+  // values.
+  const dim3 grid_size(blocks_per_dimension, dimensions);
+  const dim3 block_size(threads);
 
-    // Sobol
-    std::cout << "Initializing Sobol generator...";
+  // Sobol
+  std::cout << "Initializing Sobol generator...";
 
-    sobol_init_kernel<32><<<grid_size, block_size>>>(sobol_states, d_sobol_vectors);
-    HIP_CHECK(hipGetLastError());
-    HIP_CHECK(hipDeviceSynchronize());
+  sobol_init_kernel<32>
+      <<<grid_size, block_size>>>(sobol_states, d_sobol_vectors);
+  HIP_CHECK(hipGetLastError());
+  HIP_CHECK(hipDeviceSynchronize());
 
-    std::cout << "done. \nLaunching generate_kernel for Sobol...";
+  std::cout << "done. \nLaunching generate_kernel for Sobol...";
 
-    generate_kernel<<<grid_size, block_size>>>(sobol_states, d_sobol_output, size_per_dimension);
-    HIP_CHECK(hipGetLastError());
-    HIP_CHECK(hipDeviceSynchronize());
+  generate_kernel<<<grid_size, block_size>>>(sobol_states, d_sobol_output,
+                                             size_per_dimension);
+  HIP_CHECK(hipGetLastError());
+  HIP_CHECK(hipDeviceSynchronize());
 
-    // Scrambled Sobol
-    std::cout << "done. \nInitializing Scrambled Sobol generator...";
+  // Scrambled Sobol
+  std::cout << "done. \nInitializing Scrambled Sobol generator...";
 
-    scrambled_sobol_init_kernel<32><<<grid_size, block_size>>>(scrambled_sobol_states,
-                                                               d_scrambled_sobol_vectors,
-                                                               d_scramble_constants);
-    HIP_CHECK(hipGetLastError());
-    HIP_CHECK(hipDeviceSynchronize());
+  scrambled_sobol_init_kernel<32><<<grid_size, block_size>>>(
+      scrambled_sobol_states, d_scrambled_sobol_vectors, d_scramble_constants);
+  HIP_CHECK(hipGetLastError());
+  HIP_CHECK(hipDeviceSynchronize());
 
-    std::cout << "done. \nLaunching generate_kernel for Scrambled Sobol...";
+  std::cout << "done. \nLaunching generate_kernel for Scrambled Sobol...";
 
-    generate_kernel<<<grid_size, block_size>>>(scrambled_sobol_states,
-                                               d_scrambled_sobol_output,
-                                               size_per_dimension);
-    HIP_CHECK(hipGetLastError());
-    HIP_CHECK(hipDeviceSynchronize());
+  generate_kernel<<<grid_size, block_size>>>(
+      scrambled_sobol_states, d_scrambled_sobol_output, size_per_dimension);
+  HIP_CHECK(hipGetLastError());
+  HIP_CHECK(hipDeviceSynchronize());
 
-    std::cout << "done. \nCopying results to host...";
+  std::cout << "done. \nCopying results to host...";
 
-    // 6. Copy outputs from device to host and free device memory.
-    std::vector<unsigned int> h_sobol_output(output_size);
-    HIP_CHECK(hipMemcpy(h_sobol_output.data(),
-                        d_sobol_output,
-                        output_size * sizeof(*d_sobol_output),
-                        hipMemcpyDeviceToHost));
+  // 6. Copy outputs from device to host and free device memory.
+  std::vector<unsigned int> h_sobol_output(output_size);
+  HIP_CHECK(hipMemcpy(h_sobol_output.data(), d_sobol_output,
+                      output_size * sizeof(*d_sobol_output),
+                      hipMemcpyDeviceToHost));
 
-    std::vector<unsigned int> h_scrambled_sobol_output(output_size);
-    HIP_CHECK(hipMemcpy(h_scrambled_sobol_output.data(),
-                        d_scrambled_sobol_output,
-                        output_size * sizeof(*d_scrambled_sobol_output),
-                        hipMemcpyDeviceToHost));
+  std::vector<unsigned int> h_scrambled_sobol_output(output_size);
+  HIP_CHECK(hipMemcpy(h_scrambled_sobol_output.data(), d_scrambled_sobol_output,
+                      output_size * sizeof(*d_scrambled_sobol_output),
+                      hipMemcpyDeviceToHost));
 
-    HIP_CHECK(hipFree(d_sobol_output));
-    HIP_CHECK(hipFree(d_sobol_vectors));
-    HIP_CHECK(hipFree(d_scrambled_sobol_output));
-    HIP_CHECK(hipFree(d_scrambled_sobol_vectors));
-    HIP_CHECK(hipFree(d_scramble_constants));
+  HIP_CHECK(hipFree(d_sobol_output));
+  HIP_CHECK(hipFree(d_sobol_vectors));
+  HIP_CHECK(hipFree(d_scrambled_sobol_output));
+  HIP_CHECK(hipFree(d_scrambled_sobol_vectors));
+  HIP_CHECK(hipFree(d_scramble_constants));
 
-    std::cout << "done. \nValidating results...";
+  std::cout << "done. \nValidating results...";
 
-    // 7. Check uniformity of results.
-    double mean = 0.f;
+  // 7. Check uniformity of results.
+  double mean = 0.f;
 
-    // Sobol
-    if((mean = is_not_uniform_dist(h_sobol_output)))
-    {
-        std::cout << "Validation failed! The normalized mean of the "
-                     "Sobol-generated values should be "
-                     "near 0.5 but it's "
-                  << mean << std::endl;
-        return error_exit_code;
-    }
+  // Sobol
+  if ((mean = is_not_uniform_dist(h_sobol_output))) {
+    std::cout << "Validation failed! The normalized mean of the "
+                 "Sobol-generated values should be "
+                 "near 0.5 but it's "
+              << mean << std::endl;
+    return error_exit_code;
+  }
 
-    // Scrambled Sobol
-    if((mean = is_not_uniform_dist(h_scrambled_sobol_output)))
-    {
-        std::cout << "Validation failed! The normalized mean of the Scrambled "
-                     "Sobol-generated "
-                     "values should be near 0.5 but it's "
-                  << mean << std::endl;
-        return error_exit_code;
-    }
+  // Scrambled Sobol
+  if ((mean = is_not_uniform_dist(h_scrambled_sobol_output))) {
+    std::cout << "Validation failed! The normalized mean of the Scrambled "
+                 "Sobol-generated "
+                 "values should be near 0.5 but it's "
+              << mean << std::endl;
+    return error_exit_code;
+  }
 
-    std::cout << "Validation succeded!" << std::endl;
-    return 0;
+  std::cout << "Validation succeded!" << std::endl;
+  return 0;
 }

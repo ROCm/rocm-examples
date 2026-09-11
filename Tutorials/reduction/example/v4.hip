@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -41,113 +41,106 @@
 #include <utility>
 #include <vector>
 
-template<typename T, typename F>
-__global__ void kernel(T* front, T* back, F op, T zero_elem, uint32_t front_size)
-{
-    extern __shared__ T shared[];
+template <typename T, typename F>
+__global__ void kernel(T *front, T *back, F op, T zero_elem,
+                       uint32_t front_size) {
+  extern __shared__ T shared[];
 
-    // Overindex-safe read of input
-    auto read_global_safe = [&](const uint32_t i) { return i < front_size ? front[i] : zero_elem; };
+  // Overindex-safe read of input
+  auto read_global_safe = [&](const uint32_t i) {
+    return i < front_size ? front[i] : zero_elem;
+  };
 
-    const uint32_t tid = threadIdx.x, bid = blockIdx.x, gid = bid * (blockDim.x * 2) + tid;
+  const uint32_t tid = threadIdx.x, bid = blockIdx.x,
+                 gid = bid * (blockDim.x * 2) + tid;
 
-    // Read input from front buffer to shared
-    shared[tid] = op(read_global_safe(gid), read_global_safe(gid + blockDim.x));
+  // Read input from front buffer to shared
+  shared[tid] = op(read_global_safe(gid), read_global_safe(gid + blockDim.x));
+  __syncthreads();
+
+  // Shared reduction
+  for (uint32_t i = blockDim.x / 2; i != 0; i /= 2) {
+    if (tid < i)
+      shared[tid] = op(shared[tid], shared[tid + i]);
     __syncthreads();
+  }
 
-    // Shared reduction
-    for(uint32_t i = blockDim.x / 2; i != 0; i /= 2)
-    {
-        if(tid < i)
-            shared[tid] = op(shared[tid], shared[tid + i]);
-        __syncthreads();
-    }
-
-    // Write result from shared to back buffer
-    if(tid == 0)
-        back[bid] = shared[0];
+  // Write result from shared to back buffer
+  if (tid == 0)
+    back[bid] = shared[0];
 }
 
-int main(int argc, char** argv)
-{
-    // Device selection
-    const int dev_id = argc > 1 ? std::atoi(argv[1]) : 0;
-    HIP_CHECK(hipSetDevice(dev_id));
+int main(int argc, char **argv) {
+  // Device selection
+  const int dev_id = argc > 1 ? std::atoi(argv[1]) : 0;
+  HIP_CHECK(hipSetDevice(dev_id));
 
-    // Query device properties
-    auto [name, block_size, warp_size] = [dev_id]()
-    {
-        hipDeviceProp_t prop;
-        HIP_CHECK(hipGetDeviceProperties(&prop, dev_id));
+  // Query device properties
+  auto [name, block_size, warp_size] = [dev_id]() {
+    hipDeviceProp_t prop;
+    HIP_CHECK(hipGetDeviceProperties(&prop, dev_id));
 
-        return std::make_tuple(std::string{prop.name}, prop.maxThreadsPerBlock, prop.warpSize);
-    }();
+    return std::make_tuple(std::string{prop.name}, prop.maxThreadsPerBlock,
+                           prop.warpSize);
+  }();
 
-    std::cout << "Selected device: " << name << std::endl;
-    std::cout << "Max threads per block: " << block_size << std::endl;
-    std::cout << "Warp size: " << warp_size << std::endl;
+  std::cout << "Selected device: " << name << std::endl;
+  std::cout << "Max threads per block: " << block_size << std::endl;
+  std::cout << "Warp size: " << warp_size << std::endl;
 
-    // User defined input
-    constexpr std::size_t input_count = 100'000'000;
-    auto kernel_op = [] __device__(unsigned lhs, unsigned rhs) { return max(lhs, rhs); };
-    constexpr unsigned zero_elem = std::numeric_limits<unsigned>::min();
-    std::size_t        factor    = block_size * 2;
-    auto               new_size  = [factor](const std::size_t actual)
-    {
-        // Every pass reduces input length by 'factor'. If actual size is not divisible by factor,
-        // an extra output element is produced using some number of zero_elem inputs.
-        return actual / factor + (actual % factor == 0 ? 0 : 1);
-    };
+  // User defined input
+  constexpr std::size_t input_count = 100'000'000;
+  auto kernel_op = [] __device__(unsigned lhs, unsigned rhs) {
+    return max(lhs, rhs);
+  };
+  constexpr unsigned zero_elem = std::numeric_limits<unsigned>::min();
+  std::size_t factor = block_size * 2;
+  auto new_size = [factor](const std::size_t actual) {
+    // Every pass reduces input length by 'factor'. If actual size is not
+    // divisible by factor, an extra output element is produced using some
+    // number of zero_elem inputs.
+    return actual / factor + (actual % factor == 0 ? 0 : 1);
+  };
 
-    // Initialize host-side storage
-    std::vector<unsigned> input(input_count);
-    std::iota(input.begin(), input.end(), 0);
+  // Initialize host-side storage
+  std::vector<unsigned> input(input_count);
+  std::iota(input.begin(), input.end(), 0);
 
-    // Initialize device-side storage
-    unsigned *front, *back;
-    HIP_CHECK(hipMalloc((void**)&front, sizeof(unsigned) * input_count));
-    HIP_CHECK(hipMalloc((void**)&back, new_size(input_count) * sizeof(unsigned)));
+  // Initialize device-side storage
+  unsigned *front, *back;
+  HIP_CHECK(hipMalloc((void **)&front, sizeof(unsigned) * input_count));
+  HIP_CHECK(
+      hipMalloc((void **)&back, new_size(input_count) * sizeof(unsigned)));
 
-    HIP_CHECK(
-        hipMemcpy(front, input.data(), input.size() * sizeof(unsigned), hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(front, input.data(), input.size() * sizeof(unsigned),
+                      hipMemcpyHostToDevice));
 
-    // Device-side reduction
-    for(uint32_t curr = input_count; curr > 1;)
-    {
-        hipLaunchKernelGGL(kernel,
-                           dim3(new_size(curr)),
-                           dim3(block_size),
-                           block_size * sizeof(unsigned),
-                           hipStreamDefault,
-                           front,
-                           back,
-                           kernel_op,
-                           zero_elem,
-                           curr);
-        hip::check(hipGetLastError(), "hipKernelLaunchGGL");
+  // Device-side reduction
+  for (uint32_t curr = input_count; curr > 1;) {
+    hipLaunchKernelGGL(kernel, dim3(new_size(curr)), dim3(block_size),
+                       block_size * sizeof(unsigned), hipStreamDefault, front,
+                       back, kernel_op, zero_elem, curr);
+    hip::check(hipGetLastError(), "hipKernelLaunchGGL");
 
-        curr = new_size(curr);
-        if(curr > 1)
-            std::swap(front, back);
-    }
+    curr = new_size(curr);
+    if (curr > 1)
+      std::swap(front, back);
+  }
 
-    // Fetch result
-    unsigned result;
-    HIP_CHECK(hipMemcpy(&result, back, sizeof(unsigned), hipMemcpyDeviceToHost));
+  // Fetch result
+  unsigned result;
+  HIP_CHECK(hipMemcpy(&result, back, sizeof(unsigned), hipMemcpyDeviceToHost));
 
-    // Free device-side resources
-    HIP_CHECK(hipFree(front));
-    HIP_CHECK(hipFree(back));
+  // Free device-side resources
+  HIP_CHECK(hipFree(front));
+  HIP_CHECK(hipFree(back));
 
-    if(unsigned reference = input_count - 1; result != reference)
-    {
-        std::cerr << "Validation FAILED!"
-                  << "\n\tDevice result: " << result << "\n\tReference: " << reference << std::endl;
-        return -1;
-    }
-    else
-    {
-        std::cout << "Validation passed!" << std::endl;
-        return 0;
-    }
+  if (unsigned reference = input_count - 1; result != reference) {
+    std::cerr << "Validation FAILED!" << "\n\tDevice result: " << result
+              << "\n\tReference: " << reference << std::endl;
+    return -1;
+  } else {
+    std::cout << "Validation passed!" << std::endl;
+    return 0;
+  }
 }

@@ -27,138 +27,111 @@
 #include <cmath>
 #include <cstdio>
 
-constexpr float  EPS_FLOAT  = 1.0e-7f;
+constexpr float EPS_FLOAT = 1.0e-7f;
 constexpr double EPS_DOUBLE = 1.0e-15;
 
 #pragma omp declare target
-template<typename T>
-T mul(T a, T b)
-{
-    T c;
-    c = a * b;
-    return c;
+template <typename T> T mul(T a, T b) {
+  T c;
+  c = a * b;
+  return c;
 }
 #pragma omp end declare target
 
-template<typename T>
-void vmul(T* a, T* b, T* c, int N)
-{
-#pragma omp target           map(to : a [0:N], b [0:N]) map(from : c [0:N])
+template <typename T> void vmul(T *a, T *b, T *c, int N) {
+#pragma omp target map(to : a[0 : N], b[0 : N]) map(from : c[0 : N])
 #pragma omp teams distribute parallel for
-    for(int i = 0; i < N; i++)
-    {
-        c[i] = mul(a[i], b[i]);
-    }
+  for (int i = 0; i < N; i++) {
+    c[i] = mul(a[i], b[i]);
+  }
 }
 
-int main()
-{
-    //client::setup();
-    auto range_id = roctxRangeStart("main");
+int main() {
+  // client::setup();
+  auto range_id = roctxRangeStart("main");
 
-    constexpr int N = 100000;
-    int           a_i[N], b_i[N], c_i[N], validate_i[N];
-    float         a_f[N], b_f[N], c_f[N], validate_f[N];
-    double        a_d[N], b_d[N], c_d[N], validate_d[N];
-    int           N_errors = 0;
-    bool          flag     = false;
+  constexpr int N = 100000;
+  int a_i[N], b_i[N], c_i[N], validate_i[N];
+  float a_f[N], b_f[N], c_f[N], validate_f[N];
+  double a_d[N], b_d[N], c_d[N], validate_d[N];
+  int N_errors = 0;
+  bool flag = false;
 
-    roctxMark("initialization");
+  roctxMark("initialization");
 
 #pragma omp parallel for
-    for(int i = 0; i < N; ++i)
-    {
-        a_f[i] = a_i[i] = i + 1;
-        b_f[i] = b_i[i] = i + 2;
-        a_d[i]          = a_i[i];
-        b_d[i]          = b_i[i];
-        validate_i[i]   = a_i[i] * b_i[i];
-        validate_f[i]   = a_f[i] * b_f[i];
-        validate_d[i]   = a_d[i] * b_d[i];
+  for (int i = 0; i < N; ++i) {
+    a_f[i] = a_i[i] = i + 1;
+    b_f[i] = b_i[i] = i + 2;
+    a_d[i] = a_i[i];
+    b_d[i] = b_i[i];
+    validate_i[i] = a_i[i] * b_i[i];
+    validate_f[i] = a_f[i] * b_f[i];
+    validate_d[i] = a_d[i] * b_d[i];
+  }
+
+  vmul(a_i, b_i, c_i, N);
+  vmul(a_f, b_f, c_f, N);
+
+  auto tid = roctx_thread_id_t{};
+  // get the thread id recognized by rocprofiler-sdk from roctx
+  roctxGetThreadId(&tid);
+  // pause API tracing
+  roctxProfilerPause(tid);
+
+  // we don't expect to see the third vmul
+  vmul(a_d, b_d, c_d, N);
+
+  // resume API tracing
+  roctxProfilerResume(tid);
+
+  for (int i = 0; i < N; i++) {
+    if (c_i[i] != validate_i[i]) {
+      ++N_errors;
+      //       print 1st bad index
+      if (!flag) {
+        printf("First fail: c_i[%d](%d) != validate_i[%d](%d)\n", i, c_i[i], i,
+               validate_i[i]);
+        flag = true;
+      }
     }
-
-    vmul(a_i, b_i, c_i, N);
-    vmul(a_f, b_f, c_f, N);
-
-    auto tid = roctx_thread_id_t{};
-    // get the thread id recognized by rocprofiler-sdk from roctx
-    roctxGetThreadId(&tid);
-    // pause API tracing
-    roctxProfilerPause(tid);
-
-    // we don't expect to see the third vmul
-    vmul(a_d, b_d, c_d, N);
-
-    // resume API tracing
-    roctxProfilerResume(tid);
-
-    for(int i = 0; i < N; i++)
-    {
-        if(c_i[i] != validate_i[i])
-        {
-            ++N_errors;
-            //       print 1st bad index
-            if(!flag)
-            {
-                printf("First fail: c_i[%d](%d) != validate_i[%d](%d)\n",
-                       i,
-                       c_i[i],
-                       i,
-                       validate_i[i]);
-                flag = true;
-            }
-        }
+  }
+  flag = false;
+  for (int i = 0; i < N; i++) {
+    if (fabs(c_f[i] - validate_f[i]) > EPS_FLOAT) {
+      ++N_errors;
+      //      print 1st bad index
+      if (!flag) {
+        printf("First fail: c_f[%d](%f) != validate_f[%d](%f)\n", i,
+               static_cast<double>(c_f[i]), i,
+               static_cast<double>(validate_f[i]));
+        flag = true;
+      }
     }
-    flag = false;
-    for(int i = 0; i < N; i++)
-    {
-        if(fabs(c_f[i] - validate_f[i]) > EPS_FLOAT)
-        {
-            ++N_errors;
-            //      print 1st bad index
-            if(!flag)
-            {
-                printf("First fail: c_f[%d](%f) != validate_f[%d](%f)\n",
-                       i,
-                       static_cast<double>(c_f[i]),
-                       i,
-                       static_cast<double>(validate_f[i]));
-                flag = true;
-            }
-        }
+  }
+  flag = false;
+  for (int i = 0; i < N; i++) {
+    if (fabs(c_d[i] - validate_d[i]) > EPS_DOUBLE) {
+      ++N_errors;
+      //      print 1st bad index
+      if (!flag) {
+        printf("First fail: c_d[%d](%f) != validate_d[%d](%f)\n", i, c_d[i], i,
+               validate_d[i]);
+        flag = true;
+      }
     }
-    flag = false;
-    for(int i = 0; i < N; i++)
-    {
-        if(fabs(c_d[i] - validate_d[i]) > EPS_DOUBLE)
-        {
-            ++N_errors;
-            //      print 1st bad index
-            if(!flag)
-            {
-                printf("First fail: c_d[%d](%f) != validate_d[%d](%f)\n",
-                       i,
-                       c_d[i],
-                       i,
-                       validate_d[i]);
-                flag = true;
-            }
-        }
-    }
-    if(N_errors == 0)
-    {
-        printf("Success\n");
-        return 0;
-    }
-    else
-    {
-        printf("Total %d failures\n", N_errors);
-        printf("Fail\n");
-        return 1;
-    }
+  }
+  if (N_errors == 0) {
+    printf("Success\n");
+    return 0;
+  } else {
+    printf("Total %d failures\n", N_errors);
+    printf("Fail\n");
+    return 1;
+  }
 
-    roctxRangeStop(range_id);
+  roctxRangeStop(range_id);
 
-    //client::stop();
-    //client::shutdown();
+  // client::stop();
+  // client::shutdown();
 }

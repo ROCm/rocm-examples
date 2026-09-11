@@ -27,9 +27,11 @@ unwanted_prefix = "fmha_"
 handlers = dict(
     [
         (
-            op.__name__[len(unwanted_prefix) :]
-            if op.__name__.startswith(unwanted_prefix)
-            else op.__name__,
+            (
+                op.__name__[len(unwanted_prefix) :]
+                if op.__name__.startswith(unwanted_prefix)
+                else op.__name__
+            ),
             (op.list_blobs, op.write_blobs),
         )
         for op in ops
