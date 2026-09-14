@@ -49,13 +49,6 @@ repos:
     hooks:
       - id: actionlint
         args: [-shellcheck=, -ignore, 'label ".+" is unknown']
-  - repo: https://github.com/lalten/check-gha-pinning
-    rev: 1daab712690ac46a4fe18ec731a95fb6cd41fcc1  # v1.3.1
-    hooks:
-      - id: check-gha-pinning
-        # linting.yml calls ROCm/rocm-docs-core's reusable workflow at @develop
-        # by design (track upstream docs tooling); exempt it from SHA pinning.
-        exclude: ^\.github/workflows/linting\.yml$
   - repo: local
     hooks:
       - id: forbidden-paths

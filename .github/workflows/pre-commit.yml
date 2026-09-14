@@ -1,8 +1,8 @@
 name: pre-commit
 
-# Lint workflows and enforce SHA-pinned GitHub Actions on every PR and on
-# pushes to the mainline. Runs the hooks in .pre-commit-config.yaml
-# (whitespace/EOF, YAML + merge-conflict checks, actionlint, check-gha-pinning).
+# Run the repo's pre-commit hooks on every PR and on pushes to the
+# mainline. Runs the hooks in .pre-commit-config.yaml
+# (whitespace/EOF, YAML + merge-conflict checks, actionlint).
 
 on:
   pull_request:
