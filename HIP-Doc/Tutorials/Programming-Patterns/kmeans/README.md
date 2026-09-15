@@ -315,10 +315,10 @@ while (!converged) {
     // GPU: Parallel operation
     gpuKernel<<<grid, block>>>(gpuData, ...);
     hipMemcpy(results, gpuResults, size, hipMemcpyDeviceToHost);
-    
+
     // CPU: Serial operation
     updateOnCPU(results);
-    
+
     // Check convergence
     if (noChanges) break;
 }

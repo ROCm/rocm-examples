@@ -10,15 +10,15 @@
 #define ftell _ftelli64
 
 #ifndef _WIN32_WINNT
-    #define _WIN32_WINNT 0x0501
+#define _WIN32_WINNT 0x0501
 #endif
 
 #include <sys/types.h>
 
-// POSIX file calls (open/close/read/lseek, O_RDONLY) live in <unistd.h> on Linux.
-// On Windows they are the underscore-prefixed CRT functions in <io.h>/<fcntl.h>.
-// Only the OS handle behind the fd is used by mmap (via _get_osfhandle), so text/
-// binary mode is irrelevant here.
+// POSIX file calls (open/close/read/lseek, O_RDONLY) live in <unistd.h> on
+// Linux. On Windows they are the underscore-prefixed CRT functions in
+// <io.h>/<fcntl.h>. Only the OS handle behind the fd is used by mmap (via
+// _get_osfhandle), so text/ binary mode is irrelevant here.
 #include <fcntl.h>
 #include <io.h>
 #define open _open
@@ -26,7 +26,7 @@
 #define read _read
 #define lseek _lseek
 #ifndef O_RDONLY
-    #define O_RDONLY _O_RDONLY
+#define O_RDONLY _O_RDONLY
 #endif
 
 #ifdef __cplusplus
@@ -46,18 +46,19 @@ extern "C" {
 #define MAP_ANONYMOUS 0x20
 #define MAP_ANON MAP_ANONYMOUS
 
-#define MAP_FAILED ((void*)-1)
+#define MAP_FAILED ((void *)-1)
 
 #define MS_ASYNC 1
 #define MS_SYNC 2
 #define MS_INVALIDATE 4
 
-void* mmap(void* addr, size_t len, int prot, int flags, int fildes, ssize_t off);
-int   munmap(void* addr, size_t len);
-int   mprotect(void* addr, size_t len, int prot);
-int   msync(void* addr, size_t len, int flags);
-int   mlock(const void* addr, size_t len);
-int   munlock(const void* addr, size_t len);
+void *mmap(void *addr, size_t len, int prot, int flags, int fildes,
+           ssize_t off);
+int munmap(void *addr, size_t len);
+int mprotect(void *addr, size_t len, int prot);
+int msync(void *addr, size_t len, int flags);
+int mlock(const void *addr, size_t len);
+int munlock(const void *addr, size_t len);
 
 #ifdef __cplusplus
 };

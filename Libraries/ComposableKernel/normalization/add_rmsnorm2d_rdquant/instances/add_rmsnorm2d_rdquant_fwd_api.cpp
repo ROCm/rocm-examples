@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -20,37 +20,26 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#include <ck_tile/core.hpp>
 #include "add_rmsnorm2d_rdquant_fwd.hpp"
+#include <ck_tile/core.hpp>
 
-template <typename InputDataType_,
-          typename QuantizedDataType_,
+template <typename InputDataType_, typename QuantizedDataType_,
           ck_tile::index_t Repeat_M_,         // each thread repeat along M
           ck_tile::index_t Repeat_N_,         // each thread repeat along N
           ck_tile::index_t ThreadPerBlock_M_, // num threads along M
           ck_tile::index_t ThreadPerBlock_N_, // num threads along N
           ck_tile::index_t Vector_N_,         // vector size along N
-          bool kPadN_,
-          bool kSaveX_,
-          bool kThreePass_>
-using trait_ = add_rmsnorm2d_rdquant_fwd_traits_<InputDataType_,
-                                                 QuantizedDataType_,
-                                                 Repeat_M_,
-                                                 Repeat_N_,
-                                                 ThreadPerBlock_M_,
-                                                 ThreadPerBlock_N_,
-                                                 Vector_N_,
-                                                 kPadN_,
-                                                 kSaveX_,
-                                                 kThreePass_>;
+          bool kPadN_, bool kSaveX_, bool kThreePass_>
+using trait_ = add_rmsnorm2d_rdquant_fwd_traits_<
+    InputDataType_, QuantizedDataType_, Repeat_M_, Repeat_N_, ThreadPerBlock_M_,
+    ThreadPerBlock_N_, Vector_N_, kPadN_, kSaveX_, kThreePass_>;
 
 template <typename input_data_type, typename quantized_data_type>
 float add_rmsnorm2d_rdquant_fwd_b16_(add_rmsnorm2d_rdquant_fwd_traits t,
                                      add_rmsnorm2d_rdquant_fwd_args a,
-                                     const ck_tile::stream_config& s)
-{
-    float r = -1;
-    // clang-format off
+                                     const ck_tile::stream_config &s) {
+  float r = -1;
+  // clang-format off
     //                                                      rm  rn  tm   tn  vn   pd     x      3p
     if(a.n <= 64) {
             r = add_rmsnorm2d_rdquant_fwd_<trait_<input_data_type, quantized_data_type, 1,  1,  4,  64, 1,  true,  true, false>>(s, a);
@@ -194,53 +183,44 @@ float add_rmsnorm2d_rdquant_fwd_b16_(add_rmsnorm2d_rdquant_fwd_traits t,
             r = add_rmsnorm2d_rdquant_fwd_<trait_<input_data_type, quantized_data_type,  1, 8, 1, 1024, 1,  true,  true, true>>(s, a);
     }
     return r;
-    // clang-format on
+  // clang-format on
 }
 
 float add_rmsnorm2d_rdquant_fwd(add_rmsnorm2d_rdquant_fwd_traits t,
                                 add_rmsnorm2d_rdquant_fwd_args a,
-                                const ck_tile::stream_config& s)
-{
-    if(t.input_data_type.compare("fp16") == 0 && t.quantized_data_type.compare("int8") == 0 &&
-       t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::int8_t>(t, a, s);
-    }
-    else if(t.input_data_type.compare("fp16") == 0 && t.quantized_data_type.compare("int8") == 0 &&
-            !t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::int8_t>(t, a, s);
-    }
-    else if(t.input_data_type.compare("bf16") == 0 && t.quantized_data_type.compare("int8") == 0 &&
-            t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::int8_t>(t, a, s);
-    }
-    else if(t.input_data_type.compare("bf16") == 0 && t.quantized_data_type.compare("int8") == 0 &&
-            !t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::int8_t>(t, a, s);
-    }
-    else if(t.input_data_type.compare("fp16") == 0 && t.quantized_data_type.compare("fp8") == 0 &&
-            t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::fp8_t>(t, a, s);
-    }
-    else if(t.input_data_type.compare("fp16") == 0 && t.quantized_data_type.compare("fp8") == 0 &&
-            !t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::fp8_t>(t, a, s);
-    }
-    else if(t.input_data_type.compare("bf16") == 0 && t.quantized_data_type.compare("fp8") == 0 &&
-            t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::fp8_t>(t, a, s);
-    }
-    else if(t.input_data_type.compare("bf16") == 0 && t.quantized_data_type.compare("fp8") == 0 &&
-            !t.save_x)
-    {
-        return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::fp8_t>(t, a, s);
-    }
-    else
-        throw std::runtime_error("Without supported instances!");
+                                const ck_tile::stream_config &s) {
+  if (t.input_data_type.compare("fp16") == 0 &&
+      t.quantized_data_type.compare("int8") == 0 && t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::int8_t>(
+        t, a, s);
+  } else if (t.input_data_type.compare("fp16") == 0 &&
+             t.quantized_data_type.compare("int8") == 0 && !t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::int8_t>(
+        t, a, s);
+  } else if (t.input_data_type.compare("bf16") == 0 &&
+             t.quantized_data_type.compare("int8") == 0 && t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::int8_t>(
+        t, a, s);
+  } else if (t.input_data_type.compare("bf16") == 0 &&
+             t.quantized_data_type.compare("int8") == 0 && !t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::int8_t>(
+        t, a, s);
+  } else if (t.input_data_type.compare("fp16") == 0 &&
+             t.quantized_data_type.compare("fp8") == 0 && t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::fp8_t>(t, a,
+                                                                           s);
+  } else if (t.input_data_type.compare("fp16") == 0 &&
+             t.quantized_data_type.compare("fp8") == 0 && !t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::fp16_t, ck_tile::fp8_t>(t, a,
+                                                                           s);
+  } else if (t.input_data_type.compare("bf16") == 0 &&
+             t.quantized_data_type.compare("fp8") == 0 && t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::fp8_t>(t, a,
+                                                                           s);
+  } else if (t.input_data_type.compare("bf16") == 0 &&
+             t.quantized_data_type.compare("fp8") == 0 && !t.save_x) {
+    return add_rmsnorm2d_rdquant_fwd_b16_<ck_tile::bf16_t, ck_tile::fp8_t>(t, a,
+                                                                           s);
+  } else
+    throw std::runtime_error("Without supported instances!");
 }

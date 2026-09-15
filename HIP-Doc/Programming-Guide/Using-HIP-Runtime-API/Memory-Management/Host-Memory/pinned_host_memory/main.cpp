@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,56 +26,52 @@
 #include <cstring>
 #include <iostream>
 
-#define HIP_CHECK(expression)                  \
-{                                              \
-    const hipError_t status = expression;      \
-    if(status != hipSuccess)                   \
-    {                                          \
-        std::cerr << "HIP error "              \
-                  << status << ": "            \
-                  << hipGetErrorString(status) \
-                  << " at " << __FILE__ << ":" \
-                  << __LINE__ << std::endl;    \
-    }                                          \
-}
+#define HIP_CHECK(expression)                                                  \
+  {                                                                            \
+    const hipError_t status = expression;                                      \
+    if (status != hipSuccess) {                                                \
+      std::cerr << "HIP error " << status << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":" << __LINE__ << std::endl;         \
+    }                                                                          \
+  }
 
-int main()
-{
-    const int element_number = 100;
+int main() {
+  const int element_number = 100;
 
-    int *host_input, *host_output;
-    // Host allocation
-    HIP_CHECK(hipHostMalloc(&host_input, element_number * sizeof(int)));
-    HIP_CHECK(hipHostMalloc(&host_output, element_number * sizeof(int)));
+  int *host_input, *host_output;
+  // Host allocation
+  HIP_CHECK(hipHostMalloc(&host_input, element_number * sizeof(int)));
+  HIP_CHECK(hipHostMalloc(&host_output, element_number * sizeof(int)));
 
-    // Host data preparation
-    for (int i = 0; i < element_number; i++)
-    {
-        host_input[i] = i;
-    }
-    std::memset(host_output, 0, element_number * sizeof(int));
+  // Host data preparation
+  for (int i = 0; i < element_number; i++) {
+    host_input[i] = i;
+  }
+  std::memset(host_output, 0, element_number * sizeof(int));
 
-    int *device_input, *device_output;
+  int *device_input, *device_output;
 
-    // Device allocation
-    HIP_CHECK(hipMalloc(&device_input,  element_number * sizeof(int)));
-    HIP_CHECK(hipMalloc(&device_output, element_number * sizeof(int)));
+  // Device allocation
+  HIP_CHECK(hipMalloc(&device_input, element_number * sizeof(int)));
+  HIP_CHECK(hipMalloc(&device_output, element_number * sizeof(int)));
 
-    // Device data preparation
-    HIP_CHECK(hipMemcpy(device_input, host_input, element_number * sizeof(int), hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemset(device_output, 0, element_number * sizeof(int)));
+  // Device data preparation
+  HIP_CHECK(hipMemcpy(device_input, host_input, element_number * sizeof(int),
+                      hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemset(device_output, 0, element_number * sizeof(int)));
 
-    // Run the kernel
-    // ...
+  // Run the kernel
+  // ...
 
-    HIP_CHECK(hipMemcpy(device_input, host_input, element_number * sizeof(int), hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(device_input, host_input, element_number * sizeof(int),
+                      hipMemcpyHostToDevice));
 
-    // Free host memory
-    HIP_CHECK(hipFreeHost(host_input));
-    HIP_CHECK(hipFreeHost(host_output));
+  // Free host memory
+  HIP_CHECK(hipFreeHost(host_input));
+  HIP_CHECK(hipFreeHost(host_output));
 
-    // Free device memory
-    HIP_CHECK(hipFree(device_input));
-    HIP_CHECK(hipFree(device_output));
+  // Free device memory
+  HIP_CHECK(hipFree(device_input));
+  HIP_CHECK(hipFree(device_output));
 }
 // [sphinx-end]

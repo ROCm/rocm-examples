@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,8 +24,6 @@
 
 /// \brief A simple device function for squaring an integer value.
 /// This function is exported from the library, so that another library or
-/// an application may call it from device code after this library is linked to it.
-__device__ int device_square(int x)
-{
-    return x * x;
-}
+/// an application may call it from device code after this library is linked to
+/// it.
+__device__ int device_square(int x) { return x * x; }

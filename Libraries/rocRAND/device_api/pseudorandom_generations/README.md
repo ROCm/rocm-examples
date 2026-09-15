@@ -45,7 +45,7 @@ All of them provide API entries for the initialization of their internal state a
 However, for MTGP32 and LFSR113 these interfaces change, due to the requirements of these generators:
 
 - **MTGP32** generates values for multiple sequences, and each of said sequences is kept in a `rocrand_state_mtgp32` state structure. Thus, MTGP32 provides methods for intializing and copying these states in an efficient way by utilizing all threads in a thread block:
-  
+
   - `rocrand_make_state_mtgp32`: for initializing a whole array of `rocrand_state_mtgp32` states, and
   - `rocrand_mtgp32_block_copy`: for copying one `rocrand_state_mtgp32` to another. This method may be used to load/write one state from/to global memory before/after a block generates values for it.
 

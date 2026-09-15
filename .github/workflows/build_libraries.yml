@@ -39,10 +39,10 @@ jobs:
             image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14
         steps:
           # see https://github.com/dorny/paths-filter/issues/212
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
           - name: Trust git directory
             run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          - uses: dorny/paths-filter@v3
+          - uses: dorny/paths-filter@0e4a8c6effa4802afeda77dc8d303f8176d7dfad # v3.0.4
             id: changes
             with:
               filters: |

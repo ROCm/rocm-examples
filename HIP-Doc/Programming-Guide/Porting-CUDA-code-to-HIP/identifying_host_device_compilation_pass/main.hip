@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,27 +26,23 @@
 #include <cstdlib>
 #include <iostream>
 
-__host__ __device__ void call_func()
-{
-    #ifdef __HIP_DEVICE_COMPILE__
-        printf("device\n");
-    #else
-        std::cout << "host" << std::endl;
-    #endif
+__host__ __device__ void call_func() {
+#ifdef __HIP_DEVICE_COMPILE__
+  printf("device\n");
+#else
+  std::cout << "host" << std::endl;
+#endif
 }
 
-__global__ void test_kernel()
-{
+__global__ void test_kernel() { call_func(); }
+
+int main() {
+  test_kernel<<<1, 1, 0, 0>>>();
+  if (auto err = hipDeviceSynchronize(); err != hipSuccess)
+    std::cerr << "HIP error " << err << ": " << hipGetErrorString(err)
+              << std::endl;
+
   call_func();
-}
-
-int main()
-{
-    test_kernel<<<1, 1, 0, 0>>>();
-    if(auto err = hipDeviceSynchronize(); err != hipSuccess)
-        std::cerr << "HIP error " << err << ": " << hipGetErrorString(err) << std::endl;
-
-    call_func();
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 // [sphinx-end]

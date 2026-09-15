@@ -24,64 +24,54 @@
 #define N 0x10000000U
 #define NUM_ITERATIONS 512
 
-int main()
-{
-    std::vector<float> x(N, 1.0F);
-    std::vector<float> y(N, 2.0F);
-    const float        alpha = 2.0F;
+int main() {
+  std::vector<float> x(N, 1.0F);
+  std::vector<float> y(N, 2.0F);
+  const float alpha = 2.0F;
 
-    auto                     start = std::chrono::steady_clock::now();
-    std::vector<std::thread> threads(std::thread::hardware_concurrency());
+  auto start = std::chrono::steady_clock::now();
+  std::vector<std::thread> threads(std::thread::hardware_concurrency());
 
-    for(unsigned int i = 0; i < threads.size(); ++i)
-    {
-        size_t chunk_size
-            = (i < N % threads.size()) ? (N / threads.size() + 1) : (N / threads.size());
-        size_t offset
-            = (i < N % threads.size()) ? (i * chunk_size) : (i * chunk_size + N % threads.size());
+  for (unsigned int i = 0; i < threads.size(); ++i) {
+    size_t chunk_size = (i < N % threads.size()) ? (N / threads.size() + 1)
+                                                 : (N / threads.size());
+    size_t offset = (i < N % threads.size())
+                        ? (i * chunk_size)
+                        : (i * chunk_size + N % threads.size());
 
-        threads[i] = std::thread(
-            [](uint32_t n, float a, const float* x, float* y)
-            {
-                for(uint32_t i = 0; i < n; ++i)
-                {
-                    float t = x[i];
+    threads[i] = std::thread(
+        [](uint32_t n, float a, const float *x, float *y) {
+          for (uint32_t i = 0; i < n; ++i) {
+            float t = x[i];
 #pragma clang loop unroll(full)
-                    for(int j = 0; j < NUM_ITERATIONS; ++j)
-                    {
-                        t = a * t + y[i];
-                    }
-                    y[i] = t;
-                }
-            },
-            chunk_size,
-            alpha,
-            x.data() + offset,
-            y.data() + offset);
-    }
+            for (int j = 0; j < NUM_ITERATIONS; ++j) {
+              t = a * t + y[i];
+            }
+            y[i] = t;
+          }
+        },
+        chunk_size, alpha, x.data() + offset, y.data() + offset);
+  }
 
-    for(auto& t : threads)
-    {
-        t.join();
-    }
-    auto finished = std::chrono::steady_clock::now();
+  for (auto &t : threads) {
+    t.join();
+  }
+  auto finished = std::chrono::steady_clock::now();
 
-    // Check results:
-    float t = 1.0F;
-    for(int j = 0; j < NUM_ITERATIONS; ++j)
-    {
-        t = alpha * t + 2.0F;
+  // Check results:
+  float t = 1.0F;
+  for (int j = 0; j < NUM_ITERATIONS; ++j) {
+    t = alpha * t + 2.0F;
+  }
+  for (uint32_t i = 0; i < N; ++i) {
+    if (std::abs(y[i] - t) > 0.0000001F) {
+      std::cerr << "Error: y[" << i << "] = " << y[i] << " (Expected " << t
+                << ").\n";
+      return 1;
     }
-    for(uint32_t i = 0; i < N; ++i)
-    {
-        if(std::abs(y[i] - t) > 0.0000001F)
-        {
-            std::cerr << "Error: y[" << i << "] = " << y[i] << " (Expected " << t << ").\n";
-            return 1;
-        }
-    }
-    std::chrono::nanoseconds body = finished - start;
-    std::cout.imbue(std::locale(""));
-    std::cout << "Time to run saxpy(" << N << ") = " << body.count() << "ns\n";
-    return 0;
+  }
+  std::chrono::nanoseconds body = finished - start;
+  std::cout.imbue(std::locale(""));
+  std::cout << "Time to run saxpy(" << N << ") = " << body.count() << "ns\n";
+  return 0;
 }
