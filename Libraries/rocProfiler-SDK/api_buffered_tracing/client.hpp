@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,15 +23,14 @@
 #pragma once
 
 #ifdef buffered_api_tracing_client_EXPORTS
-    #define CLIENT_API __attribute__((visibility("default")))
+#define CLIENT_API __attribute__((visibility("default")))
 #else
-    #define CLIENT_API
+#define CLIENT_API
 #endif
 
 #include <cstdint>
 
-namespace client
-{
+namespace client {
 void setup() CLIENT_API;
 
 void shutdown() CLIENT_API;

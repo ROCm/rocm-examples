@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -23,6 +23,7 @@
 #include <hip/hip_runtime.h>
 
 #include <algorithm>
+#include <cfloat>
 #include <cmath>
 #include <cstdlib>
 #include <fstream>
@@ -31,26 +32,21 @@
 #include <limits>
 #include <random>
 #include <vector>
-#include <cfloat>
 
-#define HIP_CHECK(expression)                \
-{                                            \
-    const hipError_t status = expression;    \
-    if(status != hipSuccess)                 \
-    {                                        \
-            std::cerr << "HIP error "        \
-                << status << ": "            \
-                << hipGetErrorString(status) \
-                << " at " << __FILE__ << ":" \
-                << __LINE__ << std::endl;    \
-        std::exit(EXIT_FAILURE);             \
-    }                                        \
-}
+#define HIP_CHECK(expression)                                                  \
+  {                                                                            \
+    const hipError_t status = expression;                                      \
+    if (status != hipSuccess) {                                                \
+      std::cerr << "HIP error " << status << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":" << __LINE__ << std::endl;         \
+      std::exit(EXIT_FAILURE);                                                 \
+    }                                                                          \
+  }
 
 // [Sphinx HIP KMeans membership kernel start]
 __global__ void updateMembershipGPU(float *data, float *centroids,
-                                    int *membership, int dataSize, int dimension,
-                                    int k) {
+                                    int *membership, int dataSize,
+                                    int dimension, int k) {
   int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
   if (idx < dataSize) {
@@ -63,7 +59,8 @@ __global__ void updateMembershipGPU(float *data, float *centroids,
 
       // Calculate Euclidean distance
       for (int d = 0; d < dimension; ++d) {
-        float diff = data[idx * dimension + d] - centroids[cluster * dimension + d];
+        float diff =
+            data[idx * dimension + d] - centroids[cluster * dimension + d];
         distance += diff * diff;
       }
 
@@ -79,8 +76,8 @@ __global__ void updateMembershipGPU(float *data, float *centroids,
 // [Sphinx HIP KMeans membership kernel end]
 
 // Initialize centroids randomly from the dataset
-std::vector<float> initializeCentroids(const std::vector<float> &data, int length,
-                                       int dimension, int k) {
+std::vector<float> initializeCentroids(const std::vector<float> &data,
+                                       int length, int dimension, int k) {
   std::vector<float> centroids(k * dimension);
   std::random_device rd;
   std::mt19937 gen(rd());
@@ -192,7 +189,7 @@ std::vector<float> generateRandomData(int length, int dimension, int k) {
 
     // Generate points around this center
     int pointsPerCluster = length / k;
-    std::normal_distribution<> pointDis(0.0, 2.0);  // Spread around center
+    std::normal_distribution<> pointDis(0.0, 2.0); // Spread around center
 
     for (int i = 0; i < pointsPerCluster; ++i) {
       int idx = cluster * pointsPerCluster + i;
@@ -239,7 +236,8 @@ float calculateWCSS(const std::vector<float> &data,
 }
 
 // Save results to file
-void saveResults(const std::string &filename, const std::vector<float> &centroids,
+void saveResults(const std::string &filename,
+                 const std::vector<float> &centroids,
                  const std::vector<int> &membership, int k, int dimension) {
   std::ofstream outfile(filename);
 
@@ -303,7 +301,8 @@ int main(int argc, char **argv) {
 
   // Initialize centroids and membership
   std::cout << "Initializing centroids...\n";
-  std::vector<float> centroids = initializeCentroids(data, length, dimension, k);
+  std::vector<float> centroids =
+      initializeCentroids(data, length, dimension, k);
   std::vector<int> membership(length, 0);
 
   std::cout << "Starting KMeans iterations...\n\n";

@@ -43,7 +43,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "The hipSPARSELt examples are available on Linux only.")
 else()
     find_package(hipsparselt QUIET)
-    
+
     if(NOT hipsparselt_FOUND)
         message(WARNING "hipSPARSELt could not be found, not building hipSPARSELt examples")
     else()

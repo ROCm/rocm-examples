@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -24,16 +24,12 @@
 
 #include "example_utils.hpp"
 
-__global__ void hello_world_kernel()
-{
-    printf("Hello, World!\n");
-}
+__global__ void hello_world_kernel() { printf("Hello, World!\n"); }
 
-int main()
-{
-    static constexpr unsigned int grid_size  = 1;
-    static constexpr unsigned int block_size = 1;
-    hello_world_kernel<<<grid_size, block_size>>>();
-    HIP_CHECK(hipGetLastError());
-    HIP_CHECK(hipDeviceSynchronize());
+int main() {
+  static constexpr unsigned int grid_size = 1;
+  static constexpr unsigned int block_size = 1;
+  hello_world_kernel<<<grid_size, block_size>>>();
+  HIP_CHECK(hipGetLastError());
+  HIP_CHECK(hipDeviceSynchronize());
 }

@@ -18,7 +18,7 @@ $EXE -prec=$prec -b=8  -h=16        -s=2048  -d=$hdim -causal=$causal -iperm=$pe
 $EXE -prec=$prec -b=4  -h=16        -s=4096  -d=$hdim -causal=$causal -iperm=$perm -operm=$perm -v=$VALID
 $EXE -prec=$prec -b=2  -h=16        -s=8192  -d=$hdim -causal=$causal -iperm=$perm -operm=$perm -v=$VALID
 $EXE -prec=$prec -b=1  -h=16        -s=16384 -d=$hdim -causal=$causal -iperm=$perm -operm=$perm -v=$VALID
-                                          
+
 $EXE -prec=$prec -b=1  -h=64        -s=16384 -d=$hdim -causal=$causal -iperm=$perm -operm=$perm -v=$VALID
 $EXE -prec=$prec -b=1  -h=16 -h_k=1 -s=65536 -d=$hdim -causal=$causal -iperm=$perm -operm=$perm -v=$VALID
 $EXE -prec=$prec -b=1  -h=40        -s=37200 -d=$hdim -causal=$causal -iperm=$perm -operm=$perm -v=$VALID

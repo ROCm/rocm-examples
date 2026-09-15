@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,102 +31,96 @@ template <typename InputDataType, typename QuantizedDataType>
 struct AddRmsnormRdquantTypeConfig;
 
 template <>
-struct AddRmsnormRdquantTypeConfig<ck_tile::half_t, ck_tile::int8_t>
-{
-    using ADataType       = ck_tile::half_t;
-    using BDataType       = ck_tile::half_t;
-    using GammaDataType   = ck_tile::half_t;
-    using XDataType       = ck_tile::half_t;
-    using YScaleDataType  = float;
-    using QYDataType      = ck_tile::int8_t;
-    using ComputeDataType = float;
+struct AddRmsnormRdquantTypeConfig<ck_tile::half_t, ck_tile::int8_t> {
+  using ADataType = ck_tile::half_t;
+  using BDataType = ck_tile::half_t;
+  using GammaDataType = ck_tile::half_t;
+  using XDataType = ck_tile::half_t;
+  using YScaleDataType = float;
+  using QYDataType = ck_tile::int8_t;
+  using ComputeDataType = float;
 };
 
 template <>
-struct AddRmsnormRdquantTypeConfig<ck_tile::bf16_t, ck_tile::int8_t>
-{
-    using ADataType       = ck_tile::bf16_t;
-    using BDataType       = ck_tile::bf16_t;
-    using GammaDataType   = ck_tile::bf16_t;
-    using XDataType       = ck_tile::bf16_t;
-    using YScaleDataType  = float;
-    using QYDataType      = ck_tile::int8_t;
-    using ComputeDataType = float;
+struct AddRmsnormRdquantTypeConfig<ck_tile::bf16_t, ck_tile::int8_t> {
+  using ADataType = ck_tile::bf16_t;
+  using BDataType = ck_tile::bf16_t;
+  using GammaDataType = ck_tile::bf16_t;
+  using XDataType = ck_tile::bf16_t;
+  using YScaleDataType = float;
+  using QYDataType = ck_tile::int8_t;
+  using ComputeDataType = float;
 };
 
 template <>
-struct AddRmsnormRdquantTypeConfig<ck_tile::half_t, ck_tile::fp8_t>
-{
-    using ADataType       = ck_tile::half_t;
-    using BDataType       = ck_tile::half_t;
-    using GammaDataType   = ck_tile::half_t;
-    using XDataType       = ck_tile::half_t;
-    using YScaleDataType  = float;
-    using QYDataType      = ck_tile::fp8_t;
-    using ComputeDataType = float;
+struct AddRmsnormRdquantTypeConfig<ck_tile::half_t, ck_tile::fp8_t> {
+  using ADataType = ck_tile::half_t;
+  using BDataType = ck_tile::half_t;
+  using GammaDataType = ck_tile::half_t;
+  using XDataType = ck_tile::half_t;
+  using YScaleDataType = float;
+  using QYDataType = ck_tile::fp8_t;
+  using ComputeDataType = float;
 };
 
 template <>
-struct AddRmsnormRdquantTypeConfig<ck_tile::bf16_t, ck_tile::fp8_t>
-{
-    using ADataType       = ck_tile::bf16_t;
-    using BDataType       = ck_tile::bf16_t;
-    using GammaDataType   = ck_tile::bf16_t;
-    using XDataType       = ck_tile::bf16_t;
-    using YScaleDataType  = float;
-    using QYDataType      = ck_tile::fp8_t;
-    using ComputeDataType = float;
+struct AddRmsnormRdquantTypeConfig<ck_tile::bf16_t, ck_tile::fp8_t> {
+  using ADataType = ck_tile::bf16_t;
+  using BDataType = ck_tile::bf16_t;
+  using GammaDataType = ck_tile::bf16_t;
+  using XDataType = ck_tile::bf16_t;
+  using YScaleDataType = float;
+  using QYDataType = ck_tile::fp8_t;
+  using ComputeDataType = float;
 };
 
 // runtime args
-struct add_rmsnorm2d_rdquant_fwd_args : public ck_tile::AddRmsnorm2dRdquantFwdHostArgs
-{
-};
+struct add_rmsnorm2d_rdquant_fwd_args
+    : public ck_tile::AddRmsnorm2dRdquantFwdHostArgs {};
 
-// this is used to pattern-match internl kernel implementation, not to instantiate kernel
-template <typename InputDataType_,
-          typename QuantizedDataType_,
+// this is used to pattern-match internl kernel implementation, not to
+// instantiate kernel
+template <typename InputDataType_, typename QuantizedDataType_,
           ck_tile::index_t Repeat_M_,         // each thread repeat along M
           ck_tile::index_t Repeat_N_,         // each thread repeat along N
           ck_tile::index_t ThreadPerBlock_M_, // num threads along M
           ck_tile::index_t ThreadPerBlock_N_, // num threads along N
           ck_tile::index_t Vector_N_,         // vector size along N
-          bool kPadN_,
-          bool kSaveX_,
-          bool kThreePass_>
-struct add_rmsnorm2d_rdquant_fwd_traits_
-{
-    using InputDataType     = ck_tile::remove_cvref_t<InputDataType_>;
-    using QuantizedDataType = ck_tile::remove_cvref_t<QuantizedDataType_>;
+          bool kPadN_, bool kSaveX_, bool kThreePass_>
+struct add_rmsnorm2d_rdquant_fwd_traits_ {
+  using InputDataType = ck_tile::remove_cvref_t<InputDataType_>;
+  using QuantizedDataType = ck_tile::remove_cvref_t<QuantizedDataType_>;
 
-    static constexpr ck_tile::index_t Repeat_M = Repeat_M_;
-    static constexpr ck_tile::index_t Repeat_N = Repeat_N_;
+  static constexpr ck_tile::index_t Repeat_M = Repeat_M_;
+  static constexpr ck_tile::index_t Repeat_N = Repeat_N_;
 
-    static constexpr ck_tile::index_t Block_M = Repeat_M_ * ThreadPerBlock_M_;
-    static constexpr ck_tile::index_t Block_N = Repeat_N_ * ThreadPerBlock_N_ * Vector_N_;
+  static constexpr ck_tile::index_t Block_M = Repeat_M_ * ThreadPerBlock_M_;
+  static constexpr ck_tile::index_t Block_N =
+      Repeat_N_ * ThreadPerBlock_N_ * Vector_N_;
 
-    using BlockTile      = ck_tile::sequence<Block_M, Block_N>;
-    using Vector         = ck_tile::sequence<1, Vector_N_>;
-    using ThreadPerBlock = ck_tile::sequence<ThreadPerBlock_M_, ThreadPerBlock_N_>;
+  using BlockTile = ck_tile::sequence<Block_M, Block_N>;
+  using Vector = ck_tile::sequence<1, Vector_N_>;
+  using ThreadPerBlock =
+      ck_tile::sequence<ThreadPerBlock_M_, ThreadPerBlock_N_>;
 
-    using Shape = ck_tile::Generic2dBlockShape<BlockTile, ThreadPerBlock, Vector>;
+  using Shape = ck_tile::Generic2dBlockShape<BlockTile, ThreadPerBlock, Vector>;
 
-    static constexpr bool kPadN      = kPadN_;
-    static constexpr bool kSaveX     = kSaveX_;
-    static constexpr bool kThreePass = kThreePass_;
+  static constexpr bool kPadN = kPadN_;
+  static constexpr bool kSaveX = kSaveX_;
+  static constexpr bool kThreePass = kThreePass_;
 };
 
 template <typename Traits_>
-float add_rmsnorm2d_rdquant_fwd_(const ck_tile::stream_config& s, add_rmsnorm2d_rdquant_fwd_args a);
+float add_rmsnorm2d_rdquant_fwd_(const ck_tile::stream_config &s,
+                                 add_rmsnorm2d_rdquant_fwd_args a);
 
 // This is the public API, will be generated by script
-struct add_rmsnorm2d_rdquant_fwd_traits
-{
-    std::string input_data_type;
-    std::string quantized_data_type;
-    bool save_x;
+struct add_rmsnorm2d_rdquant_fwd_traits {
+  std::string input_data_type;
+  std::string quantized_data_type;
+  bool save_x;
 };
 
 float add_rmsnorm2d_rdquant_fwd(add_rmsnorm2d_rdquant_fwd_traits,
                                 add_rmsnorm2d_rdquant_fwd_args,
-                                const ck_tile::stream_config&);
+                                const ck_tile::stream_config &);

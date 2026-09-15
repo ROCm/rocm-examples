@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,105 +30,103 @@
 #include <string>
 #include <vector>
 
-#define CUDA_CHECK(expression)                                          \
-{                                                                       \
-    const CUresult err = expression;                                    \
-    if (err != CUDA_SUCCESS)                                            \
-    {                                                                   \
-        const char* err_str{nullptr};                                   \
-        cuGetErrorString(err, &err_str);                                \
-        std::cerr << "CUDA Error: " << err_str                          \
-                  << " at line " << __LINE__ << std::endl;              \
-        std::exit(EXIT_FAILURE);                                        \
-    }                                                                   \
+#define CUDA_CHECK(expression)                                                 \
+  {                                                                            \
+    const CUresult err = expression;                                           \
+    if (err != CUDA_SUCCESS) {                                                 \
+      const char *err_str{nullptr};                                            \
+      cuGetErrorString(err, &err_str);                                         \
+      std::cerr << "CUDA Error: " << err_str << " at line " << __LINE__        \
+                << std::endl;                                                  \
+      std::exit(EXIT_FAILURE);                                                 \
+    }                                                                          \
+  }
+
+void *populate_data_pointer() {
+  auto filename = std::string{"myKernel.ptx"};
+  std::fstream file{filename, std::ios::in | std::ios::binary | std::ios::ate};
+  if (!file.is_open()) {
+    std::cerr << "Error opening file " << filename << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
+
+  auto filesize = file.tellg();
+  auto storage = new char[filesize];
+
+  file.seekg(0, std::ios::beg);
+  file.read(storage, filesize);
+
+  return storage;
 }
 
-void* populate_data_pointer()
-{
-    auto filename = std::string{"myKernel.ptx"};
-    std::fstream file{filename, std::ios::in | std::ios::binary | std::ios::ate};
-    if(!file.is_open())
-    {
-        std::cerr << "Error opening file " << filename << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
+int main() {
+  std::size_t elements = 64 * 1024;
+  std::size_t size_bytes = elements * sizeof(float);
 
-    auto filesize = file.tellg();
-    auto storage = new char[filesize];
+  std::vector<float> A(elements), B(elements);
 
-    file.seekg(0, std::ios::beg);
-    file.read(storage, filesize);
+  // On NVIDIA platforms the driver runtime needs to be initiated
+  cuInit(0);
+  CUdevice device;
+  CUcontext context;
+  CUDA_CHECK(cuDeviceGet(&device, 0));
+  CUDA_CHECK(cuCtxCreate(&context, 0, device));
 
-    return storage;
-}
+  // Allocate device memory
+  CUdeviceptr d_A, d_B;
+  CUDA_CHECK(cuMemAlloc(&d_A, size_bytes));
+  CUDA_CHECK(cuMemAlloc(&d_B, size_bytes));
 
-int main()
-{
-    std::size_t elements = 64*1024;
-    std::size_t size_bytes = elements * sizeof(float);
+  // Copy data to device
+  CUDA_CHECK(cuMemcpyHtoD(d_A, A.data(), size_bytes));
+  CUDA_CHECK(cuMemcpyHtoD(d_B, B.data(), size_bytes));
 
-    std::vector<float> A(elements), B(elements);
+  // Load module
 
-    // On NVIDIA platforms the driver runtime needs to be initiated
-    cuInit(0);
-    CUdevice device;
-    CUcontext context;
-    CUDA_CHECK(cuDeviceGet(&device, 0));
-    CUDA_CHECK(cuCtxCreate(&context, 0, device));
+  // For NVIDIA the module file has to contain PTX, found in e.g. "myKernel.ptx"
+  // [sphinx-start]
+  CUmodule module;
+  void *imagePtr = populate_data_pointer();
 
-    // Allocate device memory
-    CUdeviceptr d_A, d_B;
-    CUDA_CHECK(cuMemAlloc(&d_A, size_bytes));
-    CUDA_CHECK(cuMemAlloc(&d_B, size_bytes));
+  const int numOptions = 1;
+  CUjit_option options[numOptions];
+  void *optionValues[numOptions];
 
-    // Copy data to device
-    CUDA_CHECK(cuMemcpyHtoD(d_A, A.data(), size_bytes));
-    CUDA_CHECK(cuMemcpyHtoD(d_B, B.data(), size_bytes));
+  options[0] = CU_JIT_MAX_REGISTERS;
+  unsigned maxRegs = 15;
+  optionValues[0] = (void *)(&maxRegs);
 
-    // Load module
-    
-    // For NVIDIA the module file has to contain PTX, found in e.g. "myKernel.ptx"
-    // [sphinx-start]
-    CUmodule module;
-    void* imagePtr = populate_data_pointer();
+  cuModuleLoadDataEx(&module, imagePtr, numOptions, options, optionValues);
 
-    const int numOptions = 1;
-    CUjit_option options[numOptions];
-    void *optionValues[numOptions];
+  CUfunction k;
+  cuModuleGetFunction(&k, module, "myKernel");
+  // [sphinx-end]
 
-    options[0] = CU_JIT_MAX_REGISTERS;
-    unsigned maxRegs = 15;
-    optionValues[0] = (void *)(&maxRegs);
+  // Create buffer for kernel arguments
+  std::vector<void *> argBuffer{&d_A, &d_B};
+  std::size_t arg_size_bytes = argBuffer.size() * sizeof(void *);
 
-    cuModuleLoadDataEx(&module, imagePtr, numOptions, options, optionValues);
+  // Create configuration passed to the kernel as arguments
+  void *config[] = {CU_LAUNCH_PARAM_BUFFER_POINTER, argBuffer.data(),
+                    CU_LAUNCH_PARAM_BUFFER_SIZE, &arg_size_bytes,
+                    CU_LAUNCH_PARAM_END};
 
-    CUfunction k;
-    cuModuleGetFunction(&k, module, "myKernel");
-    // [sphinx-end]
+  int threads_per_block = 128;
+  int blocks = (elements + threads_per_block - 1) / threads_per_block;
 
-    // Create buffer for kernel arguments
-    std::vector<void*> argBuffer{&d_A, &d_B};
-    std::size_t arg_size_bytes = argBuffer.size() * sizeof(void*);
+  // Actually launch kernel
+  CUDA_CHECK(cuLaunchKernel(k, blocks, 1, 1, threads_per_block, 1, 1, 0, 0,
+                            NULL, config));
 
-    // Create configuration passed to the kernel as arguments
-    void* config[] = {CU_LAUNCH_PARAM_BUFFER_POINTER, argBuffer.data(),
-                      CU_LAUNCH_PARAM_BUFFER_SIZE, &arg_size_bytes, CU_LAUNCH_PARAM_END};
+  CUDA_CHECK(cuMemcpyDtoH(A.data(), d_A, elements));
+  CUDA_CHECK(cuMemcpyDtoH(B.data(), d_B, elements));
 
-    int threads_per_block = 128;
-    int blocks = (elements + threads_per_block - 1) / threads_per_block;
+  CUDA_CHECK(cuMemFree(d_A));
+  CUDA_CHECK(cuMemFree(d_B));
 
-    // Actually launch kernel
-    CUDA_CHECK(cuLaunchKernel(k, blocks, 1, 1, threads_per_block, 1, 1, 0, 0, NULL, config));
+  CUDA_CHECK(cuCtxDestroy(context));
 
-    CUDA_CHECK(cuMemcpyDtoH(A.data(), d_A, elements));
-    CUDA_CHECK(cuMemcpyDtoH(B.data(), d_B, elements));
+  delete[] static_cast<char *>(imagePtr);
 
-    CUDA_CHECK(cuMemFree(d_A));
-    CUDA_CHECK(cuMemFree(d_B));
-
-    CUDA_CHECK(cuCtxDestroy(context));
-
-    delete[] static_cast<char*>(imagePtr);
-
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }

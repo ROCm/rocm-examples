@@ -110,4 +110,3 @@ target_compile_features(${example_splitk_two_stage} PRIVATE cxx_std_17 hip_std_1
 target_compile_options(${example_splitk_two_stage} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_splitk_two_stage} PRIVATE composable_kernel::ck_tile hip::host)
 set_source_files_properties(gemm_splitk_two_stage.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-

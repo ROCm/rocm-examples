@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,63 +30,60 @@
 #include <numbers>
 
 // Creates a Shepp-Logan filter
-__global__ void filter_creation_kernel(float* __restrict__ r, int N_hFFT, float tau)
-{
-    constexpr auto pi = std::numbers::pi_v<float>;
-    auto const i = blockDim.x * blockIdx.x + threadIdx.x;
+__global__ void filter_creation_kernel(float *__restrict__ r, int N_hFFT,
+                                       float tau) {
+  constexpr auto pi = std::numbers::pi_v<float>;
+  auto const i = blockDim.x * blockIdx.x + threadIdx.x;
 
-    if(i < static_cast<unsigned int>(N_hFFT))
-    {
-        auto const j = -((N_hFFT - 2) / 2) + static_cast<int>(i);
+  if (i < static_cast<unsigned int>(N_hFFT)) {
+    auto const j = -((N_hFFT - 2) / 2) + static_cast<int>(i);
 
-        if(j == 0)
-            r[i] = (1.f / 4.f) * (1.f / tau);
-        else if(j % 2 == 0)
-            r[i] = 0;
-        else
-        {
-            auto const x = pi * j / N_hFFT;
-            r[i] = -(1.f / (j * j * pi * pi * tau)) * (sinf(x) / x);
-        }
+    if (j == 0)
+      r[i] = (1.f / 4.f) * (1.f / tau);
+    else if (j % 2 == 0)
+      r[i] = 0;
+    else {
+      auto const x = pi * j / N_hFFT;
+      r[i] = -(1.f / (j * j * pi * pi * tau)) * (sinf(x) / x);
     }
+  }
 }
 
-__global__ void filter_absolute_kernel(hipfftComplex* R, unsigned int N_hTrans, float tau)
-{
-    auto const i = blockIdx.x * blockDim.x + threadIdx.x;
-    if(i < N_hTrans)
-    {
-        auto const val = R[i];
-        auto const result = tau * fabsf(sqrtf((val.x * val.x) + (val.y * val.y)));
-        R[i].x = result;
-        R[i].y = result;
-    }
+__global__ void filter_absolute_kernel(hipfftComplex *R, unsigned int N_hTrans,
+                                       float tau) {
+  auto const i = blockIdx.x * blockDim.x + threadIdx.x;
+  if (i < N_hTrans) {
+    auto const val = R[i];
+    auto const result = tau * fabsf(sqrtf((val.x * val.x) + (val.y * val.y)));
+    R[i].x = result;
+    R[i].y = result;
+  }
 }
 
-__global__ void filter_application_kernel(hipfftComplex* __restrict__ P, std::size_t pitch,
-                                          hipfftComplex const* __restrict__ R,
-                                          uint2 dimTrans)
-{
-    auto const h = blockIdx.x * blockDim.x + threadIdx.x;
-    auto const v = blockIdx.y * blockDim.y + threadIdx.y;
+__global__ void filter_application_kernel(hipfftComplex *__restrict__ P,
+                                          std::size_t pitch,
+                                          hipfftComplex const *__restrict__ R,
+                                          uint2 dimTrans) {
+  auto const h = blockIdx.x * blockDim.x + threadIdx.x;
+  auto const v = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if(h < dimTrans.x && v < dimTrans.y)
-    {
-        auto row = reinterpret_cast<hipfftComplex*>(reinterpret_cast<char*>(P) + v * pitch);
+  if (h < dimTrans.x && v < dimTrans.y) {
+    auto row = reinterpret_cast<hipfftComplex *>(reinterpret_cast<char *>(P) +
+                                                 v * pitch);
 
-        row[h].x *= R[h].x;
-        row[h].y *= R[h].y;
-    }
+    row[h].x *= R[h].x;
+    row[h].y *= R[h].y;
+  }
 }
 
-__global__ void filter_normalization_kernel(float* p, std::size_t pitch, unsigned int N_hFFT, uint2 dim)
-{
-    auto const h = blockIdx.x * blockDim.x + threadIdx.x;
-    auto const v = blockIdx.y * blockDim.y + threadIdx.y;
+__global__ void filter_normalization_kernel(float *p, std::size_t pitch,
+                                            unsigned int N_hFFT, uint2 dim) {
+  auto const h = blockIdx.x * blockDim.x + threadIdx.x;
+  auto const v = blockIdx.y * blockDim.y + threadIdx.y;
 
-    if((h < dim.x) && (v < dim.y))
-    {
-        auto row = reinterpret_cast<float*>(reinterpret_cast<char*>(p) + v * pitch);
-        row[h] /= N_hFFT;
-    }
+  if ((h < dim.x) && (v < dim.y)) {
+    auto row =
+        reinterpret_cast<float *>(reinterpret_cast<char *>(p) + v * pitch);
+    row[h] /= N_hFFT;
+  }
 }

@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,14 +31,14 @@
 /// \param[in]  count vector size
 /// \param[out] sum   result
 ///////////////////////////////////////////////////////////////////////////////
-__global__ void AddKernel(const float *op1, const float *op2, int count, float *sum)
-{
-    const int pos = threadIdx.x + blockIdx.x * blockDim.x;
+__global__ void AddKernel(const float *op1, const float *op2, int count,
+                          float *sum) {
+  const int pos = threadIdx.x + blockIdx.x * blockDim.x;
 
-    if (pos >= count)
-        return;
+  if (pos >= count)
+    return;
 
-    sum[pos] = op1[pos] + op2[pos];
+  sum[pos] = op1[pos] + op2[pos];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -48,10 +48,9 @@ __global__ void AddKernel(const float *op1, const float *op2, int count, float *
 /// \param[in]  count vector size
 /// \param[out] sum   result
 ///////////////////////////////////////////////////////////////////////////////
-static void Add(const float *op1, const float *op2, int count, float *sum)
-{
-    dim3 threads(256);
-    dim3 blocks(iDivUp(count, threads.x));
+static void Add(const float *op1, const float *op2, int count, float *sum) {
+  dim3 threads(256);
+  dim3 blocks(iDivUp(count, threads.x));
 
-    AddKernel<<<blocks, threads>>>(op1, op2, count, sum);
+  AddKernel<<<blocks, threads>>>(op1, op2, count, sum);
 }

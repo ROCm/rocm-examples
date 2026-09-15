@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,86 +28,84 @@
 
 using namespace rocalution;
 
-int main(int argc, char* argv[])
-{
-    // Parse command line arguments
-    cli::Parser parser(argc, argv);
-    parser.set_optional<std::string>("matrix",
-                                     "matrix",
-                                     std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
-                                     "Path to matrix file in MTX format");
-    parser.set_optional<int>("threads", "threads", 0, "Number of OMP threads (0 = default)");
-    parser.run_and_exit_if_error();
+int main(int argc, char *argv[]) {
+  // Parse command line arguments
+  cli::Parser parser(argc, argv);
+  parser.set_optional<std::string>(
+      "matrix", "matrix", std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
+      "Path to matrix file in MTX format");
+  parser.set_optional<int>("threads", "threads", 0,
+                           "Number of OMP threads (0 = default)");
+  parser.run_and_exit_if_error();
 
-    std::string matrix_file = parser.get<std::string>("matrix");
-    int         num_threads = parser.get<int>("threads");
+  std::string matrix_file = parser.get<std::string>("matrix");
+  int num_threads = parser.get<int>("threads");
 
-    // Initialize rocALUTION
-    init_rocalution();
+  // Initialize rocALUTION
+  init_rocalution();
 
-    // Set number of OMP threads if specified
-    if(num_threads > 0)
-    {
-        set_omp_threads_rocalution(num_threads);
-    }
+  // Set number of OMP threads if specified
+  if (num_threads > 0) {
+    set_omp_threads_rocalution(num_threads);
+  }
 
-    // Print rocALUTION info
-    info_rocalution();
+  // Print rocALUTION info
+  info_rocalution();
 
-    // rocALUTION objects
-    LocalVector<double> x;
-    LocalVector<double> rhs;
+  // rocALUTION objects
+  LocalVector<double> x;
+  LocalVector<double> rhs;
 
-    LocalMatrix<double> mat;
+  LocalMatrix<double> mat;
 
-    // Read matrix from MTX file
-    mat.ReadFileMTX(matrix_file);
+  // Read matrix from MTX file
+  mat.ReadFileMTX(matrix_file);
 
-    // Print matrix info
-    mat.Info();
+  // Print matrix info
+  mat.Info();
 
-    // Allocate vectors
-    x.Allocate("x", mat.GetN());
-    rhs.Allocate("rhs", mat.GetM());
+  // Allocate vectors
+  x.Allocate("x", mat.GetN());
+  rhs.Allocate("rhs", mat.GetM());
 
-    // Print vector info
-    x.Info();
-    rhs.Info();
+  // Print vector info
+  x.Info();
+  rhs.Info();
 
-    // Set rhs to 1
-    rhs.Ones();
+  // Set rhs to 1
+  rhs.Ones();
 
-    // x = mat * rhs
-    mat.Apply(rhs, &x);
+  // x = mat * rhs
+  mat.Apply(rhs, &x);
 
-    // Print dot product <x, rhs>
-    std::cout << "dot=" << x.Dot(rhs) << std::endl;
+  // Print dot product <x, rhs>
+  std::cout << "dot=" << x.Dot(rhs) << std::endl;
 
-    // Convert matrix to ELL format
-    mat.ConvertToELL();
+  // Convert matrix to ELL format
+  mat.ConvertToELL();
 
-    // Print matrix info
-    mat.Info();
+  // Print matrix info
+  mat.Info();
 
-    // Move objects to accelerator
-    mat.MoveToAccelerator();
-    x.MoveToAccelerator();
-    rhs.MoveToAccelerator();
+  // Move objects to accelerator
+  mat.MoveToAccelerator();
+  x.MoveToAccelerator();
+  rhs.MoveToAccelerator();
 
-    // Print matrix info
-    mat.Info();
+  // Print matrix info
+  mat.Info();
 
-    // Set rhs to 1
-    rhs.Ones();
+  // Set rhs to 1
+  rhs.Ones();
 
-    // x = mat * rhs
-    mat.Apply(rhs, &x);
+  // x = mat * rhs
+  mat.Apply(rhs, &x);
 
-    // Print dot product <x, rhs>
-    std::cout << "dot=" << x.Dot(rhs) << std::endl;
+  // Print dot product <x, rhs>
+  std::cout << "dot=" << x.Dot(rhs) << std::endl;
 
-    // Stop rocALUTION platform
-    stop_rocalution();
+  // Stop rocALUTION platform
+  stop_rocalution();
 
-    return 0;
+  return 0;
 }

@@ -40,12 +40,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
 add_executable(${example_name} main.hip)
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-set_target_properties(${example_name} PROPERTIES 
+set_target_properties(${example_name} PROPERTIES
     $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
     $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>
 )
 target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
-target_include_directories(${example_name} PRIVATE 
+target_include_directories(${example_name} PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
     $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_PATH}/include>
 )

@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,26 +28,25 @@
 
 extern __shared__ int shared_array[];
 
-__global__ void kernel()
-{
-    // initialize shared memory
-    shared_array[threadIdx.x] = threadIdx.x;
-    // use shared memory - synchronize to make sure, that all threads of the
-    // block see all changes to shared memory
-    __syncthreads();
+__global__ void kernel() {
+  // initialize shared memory
+  shared_array[threadIdx.x] = threadIdx.x;
+  // use shared memory - synchronize to make sure, that all threads of the
+  // block see all changes to shared memory
+  __syncthreads();
 }
 
-int main()
-{
-    //shared memory in this case depends on the configurable block size
-    constexpr int blockSize = 256;
-    constexpr int sharedMemSize = blockSize * sizeof(int);
-    constexpr int gridSize = 2;
+int main() {
+  // shared memory in this case depends on the configurable block size
+  constexpr int blockSize = 256;
+  constexpr int sharedMemSize = blockSize * sizeof(int);
+  constexpr int gridSize = 2;
 
-    kernel<<<dim3(gridSize), dim3(blockSize), sharedMemSize, 0>>>();
-    if(auto err = hipDeviceSynchronize(); err != hipSuccess)
-        std::cerr << "HIP error " << err << ": " << hipGetErrorString(err) << std::endl;
+  kernel<<<dim3(gridSize), dim3(blockSize), sharedMemSize, 0>>>();
+  if (auto err = hipDeviceSynchronize(); err != hipSuccess)
+    std::cerr << "HIP error " << err << ": " << hipGetErrorString(err)
+              << std::endl;
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 // [sphinx-end]
