@@ -699,16 +699,21 @@ int extract_number(const std::string& filename)
 }
 
 // helper function for sort
-// Sort entries based on the numerical part of their filenames
+// Sort entries based on the numerical part of their filenames.
+// Extract the number from the basename only: the full path may contain digits
+// (e.g. a versioned install dir like /opt/rocm-10.1.0) that would otherwise
+// collide every key and break decode ordering.
 bool compare_filenames(const std::string& a, const std::string& b)
 {
-    int num_a = extract_number(a);
-    int num_b = extract_number(b);
+    std::string name_a = get_last_part(a, '/');
+    std::string name_b = get_last_part(b, '/');
+    int         num_a  = extract_number(name_a);
+    int         num_b  = extract_number(name_b);
     if (num_a != num_b)
     {
         return num_a < num_b;
     }
-    return a < b; // Fallback to lexicographical comparison
+    return name_a < name_b; // Fallback to lexicographical comparison
 }
 
 int main(int argc, char** argv)
