@@ -65,12 +65,12 @@ RUN mkdir --parents --mode=0755 /etc/apt/keyrings && \
     wget https://rocm.prereleases.amd.com/packages-multi-arch/gpg/rocm.gpg -O - | \
     gpg --dearmor | tee /etc/apt/keyrings/amdrocm-prerelease.gpg > /dev/null && \
     echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/amdrocm-prerelease.gpg] https://rocm.prereleases.amd.com/packages-multi-arch/ubuntu2404 stable main" | tee /etc/apt/sources.list.d/rocm-prerelease.list && \
-    echo "Package: *\nPin: origin \"rocm.prereleases.amd.com\"\nPin-Priority: 1" | tee /etc/apt/preferences.d/rocm-prerelease > /dev/null && \
-    apt update
+    echo "Package: *\nPin: origin \"rocm.prereleases.amd.com\"\nPin-Priority: 1" | tee /etc/apt/preferences.d/rocm-prerelease > /dev/null
 
 # Install ROCm
 # amdrocm-decode-test is only published in the prerelease repo (7.14.0~pre3)
-RUN apt install -y \
+RUN apt update && \
+    apt install -y \
         amdrocm-core-sdk${ROCM_VERSION} \
         amdrocm-hiptensor-dev${ROCM_VERSION} \
         amdrocm-hiptensor${ROCM_VERSION} \

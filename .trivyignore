@@ -1,0 +1,14 @@
+# Trivy misconfiguration suppressions for rocm-examples.
+#
+# DS-0002 "Specify at least 1 USER command ... with non-root user":
+# Every Dockerfile in this repo produces a GitHub Actions job-container image
+# (see .github/workflows/build_*.yml `container:`). A non-root USER cannot
+# write GITHUB_WORKSPACE, which is host-mounted and owned by the runner uid;
+# that breaks actions/checkout and every subsequent build step. This was
+# verified empirically by running the exact CI build steps against a non-root
+# image. These images must run as root, so the finding does not apply here.
+#
+# Note: DS-0029 on the rocm meta-package install is suppressed inline at its
+# single occurrence in Dockerfiles/hip-libraries-cuda-ubuntu.Dockerfile, so it
+# is intentionally not listed here (a bare ID would suppress it repo-wide).
+AVD-DS-0002
