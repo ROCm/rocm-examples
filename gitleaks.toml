@@ -1,0 +1,14 @@
+# Copyright Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: MIT
+#
+# gitleaks configuration for rocm-examples, picked up by the rocm-security-gh
+# reusable scanner (.github/workflows/security_scan_pr.yml and
+# security_scan_weekly.yml) in place of its own org-wide default.
+# Reference: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
+
+title = "rocm-examples gitleaks config"
+
+[extend]
+# Inherit gitleaks' built-in ruleset (rotations, AWS, GCP, Slack, ...)
+# rather than rolling our own detections.
+useDefault = true
