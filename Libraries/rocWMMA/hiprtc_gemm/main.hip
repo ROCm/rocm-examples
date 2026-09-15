@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -40,8 +40,8 @@ using rocwmma::col_major;
 using rocwmma::row_major;
 
 // Types
-using input_t   = bfloat16_t;
-using output_t  = float32_t;
+using input_t = bfloat16_t;
+using output_t = float32_t;
 using compute_t = float32_t;
 
 // WMMA block dimensions
@@ -147,249 +147,224 @@ __global__ void gemm_rocwmma_d(uint32_t         m,
 }
 )";
 
-char const* src = source.c_str();
+char const *src = source.c_str();
 
-int main()
-{
-    // 1. Set up input data
-    uint32_t  m     = 256;
-    uint32_t  n     = 256;
-    uint32_t  k     = 256;
-    compute_t alpha = 2.1f;
-    compute_t beta  = 2.1f;
+int main() {
+  // 1. Set up input data
+  uint32_t m = 256;
+  uint32_t n = 256;
+  uint32_t k = 256;
+  compute_t alpha = 2.1f;
+  compute_t beta = 2.1f;
 
-    // Determine the rocm path to use for build
-    std::string rocm_path
-        = (std::getenv("ROCM_PATH") != nullptr) ? std::getenv("ROCM_PATH") : ROCM_DEFAULT_PATH;
-    std::string rocwmma_include_path = std::string("-I") + rocm_path + std::string("/include");
+  // Determine the rocm path to use for build
+  std::string rocm_path = (std::getenv("ROCM_PATH") != nullptr)
+                              ? std::getenv("ROCM_PATH")
+                              : ROCM_DEFAULT_PATH;
+  std::string rocwmma_include_path =
+      std::string("-I") + rocm_path + std::string("/include");
 
-    // 2. Compile kernel with hipRTC
-    hiprtcProgram prog;
-    HIPRTC_CHECK(hiprtcCreateProgram(&prog, src, nullptr, 0, nullptr, nullptr));
-    const char* opts[] = {"-D__HIP_PLATFORM_AMD__", "--std=c++17", rocwmma_include_path.c_str()};
+  // 2. Compile kernel with hipRTC
+  hiprtcProgram prog;
+  HIPRTC_CHECK(hiprtcCreateProgram(&prog, src, nullptr, 0, nullptr, nullptr));
+  const char *opts[] = {"-D__HIP_PLATFORM_AMD__", "--std=c++17",
+                        rocwmma_include_path.c_str()};
 
-    hiprtcResult result = hiprtcCompileProgram(prog, sizeof(opts) / sizeof(opts[0]), opts);
-    if(result != HIPRTC_SUCCESS)
-    {
-        std::cout << "HipRTC compile failed." << std::endl;
-        std::cout << result << std::endl;
-        std::string s_error = hiprtcGetErrorString(result);
-        std::cout << s_error << std::endl;
-        std::size_t log_size;
-        HIPRTC_CHECK(hiprtcGetProgramLogSize(prog, &log_size));
-        std::cout << "Log Size: " << log_size << std::endl;
-        std::string log;
+  hiprtcResult result =
+      hiprtcCompileProgram(prog, sizeof(opts) / sizeof(opts[0]), opts);
+  if (result != HIPRTC_SUCCESS) {
+    std::cout << "HipRTC compile failed." << std::endl;
+    std::cout << result << std::endl;
+    std::string s_error = hiprtcGetErrorString(result);
+    std::cout << s_error << std::endl;
+    std::size_t log_size;
+    HIPRTC_CHECK(hiprtcGetProgramLogSize(prog, &log_size));
+    std::cout << "Log Size: " << log_size << std::endl;
+    std::string log;
 
-        log.reserve(log_size);
-        HIPRTC_CHECK(hiprtcGetProgramLog(prog, &log[0]));
+    log.reserve(log_size);
+    HIPRTC_CHECK(hiprtcGetProgramLog(prog, &log[0]));
 
-        std::cout << log.c_str() << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
+    std::cout << log.c_str() << std::endl;
+    std::exit(EXIT_FAILURE);
+  }
 
-    // 3. Load compiled module and get function
-    std::size_t code_size;
-    HIPRTC_CHECK(hiprtcGetCodeSize(prog, &code_size));
-    std::vector<char> code(code_size);
+  // 3. Load compiled module and get function
+  std::size_t code_size;
+  HIPRTC_CHECK(hiprtcGetCodeSize(prog, &code_size));
+  std::vector<char> code(code_size);
 
-    HIPRTC_CHECK(hiprtcGetCode(prog, code.data()));
+  HIPRTC_CHECK(hiprtcGetCode(prog, code.data()));
 
-    hipModule_t   module;
-    hipFunction_t func;
-    HIP_CHECK(hipModuleLoadData(&module, code.data()));
-    HIP_CHECK(hipModuleGetFunction(&func, module, "gemm_rocwmma_d"));
+  hipModule_t module;
+  hipFunction_t func;
+  HIP_CHECK(hipModuleLoadData(&module, code.data()));
+  HIP_CHECK(hipModuleGetFunction(&func, module, "gemm_rocwmma_d"));
 
-    // Bounds check
-    if((m < (uint32_t)(rocwmma_m * t_block_x / wave_size) || n < (rocwmma_n * t_block_y)
-        || k < rocwmma_k)
-       || (m % rocwmma_m || n % rocwmma_n || k % rocwmma_k))
-    {
-        std::cout << "Unsupported size!\n";
-        return 0;
-    }
-
-    uint32_t lda = k;
-    uint32_t ldb = k;
-    uint32_t ldc = n;
-    uint32_t ldd = ldc;
-
-    std::cout << "rocWMMA hipRTC GEMM Example" << std::endl;
-    std::cout << "Initializing host data..." << std::endl;
-
-    // 4. Initialize host matrices
-    std::vector<input_t>  matrix_a(m * k);
-    std::vector<input_t>  matrix_b(k * n);
-    std::vector<output_t> matrix_c(m * n);
-    std::vector<output_t> matrix_d(m * n, std::numeric_limits<output_t>::signaling_NaN());
-
-    fill_rand(matrix_a.data(), m, k);
-    fill_rand(matrix_b.data(), k, n);
-    fill_rand(matrix_c.data(), m, n);
-
-    std::cout << "Initializing device data..." << std::endl;
-
-    // 5. Allocate device memory and copy input data
-    hipDeviceptr_t d_a, d_b, d_c, d_d;
-
-    const size_t bytes_a = matrix_a.size() * sizeof(input_t);
-    const size_t bytes_b = matrix_b.size() * sizeof(input_t);
-    const size_t bytes_c = matrix_c.size() * sizeof(output_t);
-    const size_t bytes_d = matrix_d.size() * sizeof(output_t);
-
-    HIP_CHECK(hipMalloc(&d_a, bytes_a));
-    HIP_CHECK(hipMalloc(&d_b, bytes_b));
-    HIP_CHECK(hipMalloc(&d_c, bytes_c));
-    HIP_CHECK(hipMalloc(&d_d, bytes_d));
-
-    HIP_CHECK(hipMemcpy(d_a, matrix_a.data(), bytes_a, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_b, matrix_b.data(), bytes_b, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_c, matrix_c.data(), bytes_c, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_d, matrix_d.data(), bytes_d, hipMemcpyHostToDevice));
-
-    // 6. Configure kernel launch parameters
-    auto block_dim = dim3(t_block_x, t_block_y);
-    auto grid_dim  = dim3(rocwmma::ceil_div(m, rocwmma_m * t_block_x / wave_size),
-                         rocwmma::ceil_div(n, rocwmma_n * t_block_y));
-
-    struct
-    {
-        uint32_t       _m;
-        uint32_t       _n;
-        uint32_t       _k;
-        hipDeviceptr_t _d_a;
-        hipDeviceptr_t _d_b;
-        hipDeviceptr_t _d_c;
-        hipDeviceptr_t _d_d;
-        uint32_t       _lda;
-        uint32_t       _ldb;
-        uint32_t       _ldc;
-        uint32_t       _ldd;
-        compute_t      _alpha;
-        compute_t      _beta;
-    } args{m, n, k, d_a, d_b, d_c, d_d, lda, ldb, ldc, ldd, alpha, beta};
-
-    std::size_t args_size = sizeof(args);
-
-    void* config[] = {HIP_LAUNCH_PARAM_BUFFER_POINTER,
-                      &args,
-                      HIP_LAUNCH_PARAM_BUFFER_SIZE,
-                      &args_size,
-                      HIP_LAUNCH_PARAM_END};
-
-    std::cout << "Launching GEMM kernel..." << std::endl;
-
-    // 7. Launch rocWMMA kernel
-    // Warm-up
-    for(uint32_t i = 0; i < 5; ++i)
-    {
-        HIP_CHECK(hipModuleLaunchKernel(func,
-                                        grid_dim.x,
-                                        grid_dim.y,
-                                        grid_dim.z,
-                                        block_dim.x,
-                                        block_dim.y,
-                                        block_dim.z,
-                                        0,
-                                        nullptr,
-                                        nullptr,
-                                        (void**)&config));
-    }
-
-    constexpr uint32_t record_runs = 100u;
-
-    // Actual recorded runs
-    hipEvent_t start_event, stop_event;
-    HIP_CHECK(hipEventCreate(&start_event));
-    HIP_CHECK(hipEventCreate(&stop_event));
-
-    HIP_CHECK(hipEventRecord(start_event));
-    for(uint32_t i = 0; i < record_runs; ++i)
-    {
-        HIP_CHECK(hipModuleLaunchKernel(func,
-                                        grid_dim.x,
-                                        grid_dim.y,
-                                        grid_dim.z,
-                                        block_dim.x,
-                                        block_dim.y,
-                                        block_dim.z,
-                                        0,
-                                        nullptr,
-                                        nullptr,
-                                        (void**)&config));
-    }
-    HIP_CHECK(hipEventRecord(stop_event));
-    HIP_CHECK(hipEventSynchronize(stop_event));
-
-    auto elapsed_time_ms = 0.0f;
-    HIP_CHECK(hipEventElapsedTime(&elapsed_time_ms, start_event, stop_event));
-
-    auto gflops = calculate_gflops(m, n, k);
-    auto tflops_per_sec
-        = calculate_tflops_per_sec(m, n, k, static_cast<double>(elapsed_time_ms), record_runs);
-
-    HIP_CHECK(hipEventDestroy(start_event));
-    HIP_CHECK(hipEventDestroy(stop_event));
-
-    // Echo performance
-    std::cout << std::left << std::setw(8) << "TBlockX" << std::setw(8) << "TBlockY" << std::setw(8)
-              << "BlocksM" << std::setw(8) << "BlocksN" << std::setw(6) << "BlkM" << std::setw(6)
-              << "BlkN" << std::setw(6) << "BlkK" << std::setw(8) << "MatM" << std::setw(8)
-              << "MatN" << std::setw(8) << "MatK" << std::setw(8) << "alpha" << std::setw(8)
-              << "lda" << std::setw(8) << "ldb" << std::setw(8) << "beta" << std::setw(8) << "ldc"
-              << std::setw(8) << "ldd" << std::setw(13) << "elapsedMs" << std::setw(23)
-              << "Problem Size(GFlops)" << std::setw(10) << "TFlops/s" << std::endl;
-
-    std::cout << std::left << std::setw(8) << t_block_x << std::setw(8) << t_block_y << std::setw(8)
-              << "N/A" << std::setw(8) << "N/A" << std::setw(6) << rocwmma_m << std::setw(6)
-              << rocwmma_n << std::setw(6) << rocwmma_k << std::setw(8) << m << std::setw(8) << n
-              << std::setw(8) << k << std::setw(8) << alpha << std::setw(8) << lda << std::setw(8)
-              << ldb << std::setw(8) << beta << std::setw(8) << ldc << std::setw(8) << ldd
-              << std::setw(13) << elapsed_time_ms << std::setw(23) << gflops << std::setw(10)
-              << tflops_per_sec << std::endl;
-
-    // 8. Copy result back to host
-    HIP_CHECK(hipMemcpy(matrix_d.data(), d_d, bytes_d, hipMemcpyDeviceToHost));
-
-    // 9. Validate result (CPU reference calculation)
-    std::cout << "Validating result with reference..." << std::endl;
-    std::vector<output_t> matrix_d_ref(m * n, std::numeric_limits<output_t>::signaling_NaN());
-    gemm_cpu_h<input_t, output_t, compute_t, row_major, col_major, row_major>(m,
-                                                                              n,
-                                                                              k,
-                                                                              matrix_a.data(),
-                                                                              matrix_b.data(),
-                                                                              matrix_c.data(),
-                                                                              matrix_d_ref.data(),
-                                                                              lda,
-                                                                              ldb,
-                                                                              ldc,
-                                                                              ldd,
-                                                                              alpha,
-                                                                              beta);
-
-    auto res = compare_equal<output_t>(matrix_d.data(), matrix_d_ref.data(), m * n);
-
-    if(std::get<0>(res) == false)
-    {
-        std::cout << "FAILED!" << std::endl;
-        std::cout << "Max relative error: " << std::get<1>(res) << std::endl;
-        std::exit(EXIT_FAILURE);
-    }
-    else
-    {
-        std::cout << "PASSED!" << std::endl;
-    }
-
-    // 10. Clean up device memory and hipRTC resources
-    HIP_CHECK(hipFree(d_a));
-    HIP_CHECK(hipFree(d_b));
-    HIP_CHECK(hipFree(d_c));
-    HIP_CHECK(hipFree(d_d));
-
-    std::cout << "Finished!" << std::endl;
-
-    HIP_CHECK(hipModuleUnload(module));
-    HIPRTC_CHECK(hiprtcDestroyProgram(&prog));
-
+  // Bounds check
+  if ((m < (uint32_t)(rocwmma_m * t_block_x / wave_size) ||
+       n < (rocwmma_n * t_block_y) || k < rocwmma_k) ||
+      (m % rocwmma_m || n % rocwmma_n || k % rocwmma_k)) {
+    std::cout << "Unsupported size!\n";
     return 0;
+  }
+
+  uint32_t lda = k;
+  uint32_t ldb = k;
+  uint32_t ldc = n;
+  uint32_t ldd = ldc;
+
+  std::cout << "rocWMMA hipRTC GEMM Example" << std::endl;
+  std::cout << "Initializing host data..." << std::endl;
+
+  // 4. Initialize host matrices
+  std::vector<input_t> matrix_a(m * k);
+  std::vector<input_t> matrix_b(k * n);
+  std::vector<output_t> matrix_c(m * n);
+  std::vector<output_t> matrix_d(
+      m * n, std::numeric_limits<output_t>::signaling_NaN());
+
+  fill_rand(matrix_a.data(), m, k);
+  fill_rand(matrix_b.data(), k, n);
+  fill_rand(matrix_c.data(), m, n);
+
+  std::cout << "Initializing device data..." << std::endl;
+
+  // 5. Allocate device memory and copy input data
+  hipDeviceptr_t d_a, d_b, d_c, d_d;
+
+  const size_t bytes_a = matrix_a.size() * sizeof(input_t);
+  const size_t bytes_b = matrix_b.size() * sizeof(input_t);
+  const size_t bytes_c = matrix_c.size() * sizeof(output_t);
+  const size_t bytes_d = matrix_d.size() * sizeof(output_t);
+
+  HIP_CHECK(hipMalloc(&d_a, bytes_a));
+  HIP_CHECK(hipMalloc(&d_b, bytes_b));
+  HIP_CHECK(hipMalloc(&d_c, bytes_c));
+  HIP_CHECK(hipMalloc(&d_d, bytes_d));
+
+  HIP_CHECK(hipMemcpy(d_a, matrix_a.data(), bytes_a, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_b, matrix_b.data(), bytes_b, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_c, matrix_c.data(), bytes_c, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_d, matrix_d.data(), bytes_d, hipMemcpyHostToDevice));
+
+  // 6. Configure kernel launch parameters
+  auto block_dim = dim3(t_block_x, t_block_y);
+  auto grid_dim = dim3(rocwmma::ceil_div(m, rocwmma_m * t_block_x / wave_size),
+                       rocwmma::ceil_div(n, rocwmma_n * t_block_y));
+
+  struct {
+    uint32_t _m;
+    uint32_t _n;
+    uint32_t _k;
+    hipDeviceptr_t _d_a;
+    hipDeviceptr_t _d_b;
+    hipDeviceptr_t _d_c;
+    hipDeviceptr_t _d_d;
+    uint32_t _lda;
+    uint32_t _ldb;
+    uint32_t _ldc;
+    uint32_t _ldd;
+    compute_t _alpha;
+    compute_t _beta;
+  } args{m, n, k, d_a, d_b, d_c, d_d, lda, ldb, ldc, ldd, alpha, beta};
+
+  std::size_t args_size = sizeof(args);
+
+  void *config[] = {HIP_LAUNCH_PARAM_BUFFER_POINTER, &args,
+                    HIP_LAUNCH_PARAM_BUFFER_SIZE, &args_size,
+                    HIP_LAUNCH_PARAM_END};
+
+  std::cout << "Launching GEMM kernel..." << std::endl;
+
+  // 7. Launch rocWMMA kernel
+  // Warm-up
+  for (uint32_t i = 0; i < 5; ++i) {
+    HIP_CHECK(hipModuleLaunchKernel(func, grid_dim.x, grid_dim.y, grid_dim.z,
+                                    block_dim.x, block_dim.y, block_dim.z, 0,
+                                    nullptr, nullptr, (void **)&config));
+  }
+
+  constexpr uint32_t record_runs = 100u;
+
+  // Actual recorded runs
+  hipEvent_t start_event, stop_event;
+  HIP_CHECK(hipEventCreate(&start_event));
+  HIP_CHECK(hipEventCreate(&stop_event));
+
+  HIP_CHECK(hipEventRecord(start_event));
+  for (uint32_t i = 0; i < record_runs; ++i) {
+    HIP_CHECK(hipModuleLaunchKernel(func, grid_dim.x, grid_dim.y, grid_dim.z,
+                                    block_dim.x, block_dim.y, block_dim.z, 0,
+                                    nullptr, nullptr, (void **)&config));
+  }
+  HIP_CHECK(hipEventRecord(stop_event));
+  HIP_CHECK(hipEventSynchronize(stop_event));
+
+  auto elapsed_time_ms = 0.0f;
+  HIP_CHECK(hipEventElapsedTime(&elapsed_time_ms, start_event, stop_event));
+
+  auto gflops = calculate_gflops(m, n, k);
+  auto tflops_per_sec = calculate_tflops_per_sec(
+      m, n, k, static_cast<double>(elapsed_time_ms), record_runs);
+
+  HIP_CHECK(hipEventDestroy(start_event));
+  HIP_CHECK(hipEventDestroy(stop_event));
+
+  // Echo performance
+  std::cout << std::left << std::setw(8) << "TBlockX" << std::setw(8)
+            << "TBlockY" << std::setw(8) << "BlocksM" << std::setw(8)
+            << "BlocksN" << std::setw(6) << "BlkM" << std::setw(6) << "BlkN"
+            << std::setw(6) << "BlkK" << std::setw(8) << "MatM" << std::setw(8)
+            << "MatN" << std::setw(8) << "MatK" << std::setw(8) << "alpha"
+            << std::setw(8) << "lda" << std::setw(8) << "ldb" << std::setw(8)
+            << "beta" << std::setw(8) << "ldc" << std::setw(8) << "ldd"
+            << std::setw(13) << "elapsedMs" << std::setw(23)
+            << "Problem Size(GFlops)" << std::setw(10) << "TFlops/s"
+            << std::endl;
+
+  std::cout << std::left << std::setw(8) << t_block_x << std::setw(8)
+            << t_block_y << std::setw(8) << "N/A" << std::setw(8) << "N/A"
+            << std::setw(6) << rocwmma_m << std::setw(6) << rocwmma_n
+            << std::setw(6) << rocwmma_k << std::setw(8) << m << std::setw(8)
+            << n << std::setw(8) << k << std::setw(8) << alpha << std::setw(8)
+            << lda << std::setw(8) << ldb << std::setw(8) << beta
+            << std::setw(8) << ldc << std::setw(8) << ldd << std::setw(13)
+            << elapsed_time_ms << std::setw(23) << gflops << std::setw(10)
+            << tflops_per_sec << std::endl;
+
+  // 8. Copy result back to host
+  HIP_CHECK(hipMemcpy(matrix_d.data(), d_d, bytes_d, hipMemcpyDeviceToHost));
+
+  // 9. Validate result (CPU reference calculation)
+  std::cout << "Validating result with reference..." << std::endl;
+  std::vector<output_t> matrix_d_ref(
+      m * n, std::numeric_limits<output_t>::signaling_NaN());
+  gemm_cpu_h<input_t, output_t, compute_t, row_major, col_major, row_major>(
+      m, n, k, matrix_a.data(), matrix_b.data(), matrix_c.data(),
+      matrix_d_ref.data(), lda, ldb, ldc, ldd, alpha, beta);
+
+  auto res =
+      compare_equal<output_t>(matrix_d.data(), matrix_d_ref.data(), m * n);
+
+  if (std::get<0>(res) == false) {
+    std::cout << "FAILED!" << std::endl;
+    std::cout << "Max relative error: " << std::get<1>(res) << std::endl;
+    std::exit(EXIT_FAILURE);
+  } else {
+    std::cout << "PASSED!" << std::endl;
+  }
+
+  // 10. Clean up device memory and hipRTC resources
+  HIP_CHECK(hipFree(d_a));
+  HIP_CHECK(hipFree(d_b));
+  HIP_CHECK(hipFree(d_c));
+  HIP_CHECK(hipFree(d_d));
+
+  std::cout << "Finished!" << std::endl;
+
+  HIP_CHECK(hipModuleUnload(module));
+  HIPRTC_CHECK(hiprtcDestroyProgram(&prog));
+
+  return 0;
 }

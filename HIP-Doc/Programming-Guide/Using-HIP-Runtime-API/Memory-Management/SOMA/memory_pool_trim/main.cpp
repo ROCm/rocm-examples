@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,43 +27,39 @@
 #include <cstdlib>
 #include <iostream>
 
-#define HIP_CHECK(expression)                        \
-{                                                    \
-    const hipError_t status = expression;            \
-    if (status != hipSuccess)                        \
-    {                                                \
-        std::cerr << "HIP error " << status          \
-                << ": " << hipGetErrorString(status) \
-                << " at " << __FILE__ << ":"         \
-                << __LINE__ << std::endl;            \
-        std::exit(EXIT_FAILURE);                     \
-    }                                                \
-}
+#define HIP_CHECK(expression)                                                  \
+  {                                                                            \
+    const hipError_t status = expression;                                      \
+    if (status != hipSuccess) {                                                \
+      std::cerr << "HIP error " << status << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":" << __LINE__ << std::endl;         \
+      std::exit(EXIT_FAILURE);                                                 \
+    }                                                                          \
+  }
 
-int main()
-{
-    hipMemPool_t memPool;
-    hipDevice_t device = 0; // Specify the device index.
+int main() {
+  hipMemPool_t memPool;
+  hipDevice_t device = 0; // Specify the device index.
 
-    // Initialize the device.
-    HIP_CHECK(hipSetDevice(device));
+  // Initialize the device.
+  HIP_CHECK(hipSetDevice(device));
 
-    // Get the default memory pool for the device.
-    HIP_CHECK(hipDeviceGetDefaultMemPool(&memPool, device));
+  // Get the default memory pool for the device.
+  HIP_CHECK(hipDeviceGetDefaultMemPool(&memPool, device));
 
-    // Allocate memory from the pool (e.g., 1 MB).
-    std::size_t allocSize = 1 * 1024 * 1024;
-    void* ptr;
-    HIP_CHECK(hipMalloc(&ptr, allocSize));
+  // Allocate memory from the pool (e.g., 1 MB).
+  std::size_t allocSize = 1 * 1024 * 1024;
+  void *ptr;
+  HIP_CHECK(hipMalloc(&ptr, allocSize));
 
-    // Free the allocated memory.
-    HIP_CHECK(hipFree(ptr));
+  // Free the allocated memory.
+  HIP_CHECK(hipFree(ptr));
 
-    // Trim the memory pool to a specific size (e.g., 512 KB).
-    std::size_t newSize = 512 * 1024;
-    HIP_CHECK(hipMemPoolTrimTo(memPool, newSize));
+  // Trim the memory pool to a specific size (e.g., 512 KB).
+  std::size_t newSize = 512 * 1024;
+  HIP_CHECK(hipMemPoolTrimTo(memPool, newSize));
 
-    std::cout << "Memory pool trimmed to " << newSize << " bytes." << std::endl;
-    return EXIT_SUCCESS;
+  std::cout << "Memory pool trimmed to " << newSize << " bytes." << std::endl;
+  return EXIT_SUCCESS;
 }
 // [sphinx-end]

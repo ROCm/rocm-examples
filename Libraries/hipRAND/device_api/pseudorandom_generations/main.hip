@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,20 +30,26 @@
 #include <vector>
 
 ///
-/// \brief Cooperative generation of \p size uniformly distributed random <tt>unsigned int</tt> among thread blocks.
+/// \brief Cooperative generation of \p size uniformly distributed random
+/// <tt>unsigned int</tt> among thread blocks.
 ///
 /// Each thread generates as many values as necessary. For instance:
-/// - if \p size = gridDim.x * blockDim.x, where gridDim.x * blockDim.x is the total number of
+/// - if \p size = gridDim.x * blockDim.x, where gridDim.x * blockDim.x is the
+/// total number of
 ///   threads, each thread generates one output value.
-/// - if \p size is not a multiple of gridDim.x * blockDim.x, then thread i within block j will generate
-///   size / (gridDim.x * blockDim.x) + ((j * blockDim.x + i) < (size % (gridDim.x * blockDim.x)))
-///   output values, where:
-///   - size / (gridDim.x * blockDim.x) tells how many values do all threads generate
+/// - if \p size is not a multiple of gridDim.x * blockDim.x, then thread i
+/// within block j will generate
+///   size / (gridDim.x * blockDim.x) + ((j * blockDim.x + i) < (size %
+///   (gridDim.x * blockDim.x))) output values, where:
+///   - size / (gridDim.x * blockDim.x) tells how many values do all threads
+///   generate
 ///   - j * blockDim.x + i is the global index of thread i within block j
-///   - size % (gridDim.x * blockDim.x) is the amount of extra values to be generated which is not a multiple of the
+///   - size % (gridDim.x * blockDim.x) is the amount of extra values to be
+///   generated which is not a multiple of the
 ///     total number of threads
-/// For instance, in this example we launch the generation kernels with a total of 4*64 = 256 threads, but we need to
-/// generate 1000 values. Each thread will generate 3 values and threads from 0 to 231 will generate 1 extra value.
+/// For instance, in this example we launch the generation kernels with a total
+/// of 4*64 = 256 threads, but we need to generate 1000 values. Each thread will
+/// generate 3 values and threads from 0 to 231 will generate 1 extra value.
 ///
 /// \tparam StateT Pseudorandom generator state type.
 ///
@@ -52,71 +58,65 @@
 /// \param seed Seed value.
 /// \param offset Values to skip from the generated sequence.
 ///
-template<class StateT>
-__global__ void hiprand_kernel(unsigned int*            output,
-                               const size_t             size,
-                               const unsigned long long seed   = 0,
-                               const unsigned long long offset = 0)
-{
-    const unsigned int tid    = blockIdx.x * blockDim.x + threadIdx.x;
-    const unsigned int stride = gridDim.x * blockDim.x;
+template <class StateT>
+__global__ void hiprand_kernel(unsigned int *output, const size_t size,
+                               const unsigned long long seed = 0,
+                               const unsigned long long offset = 0) {
+  const unsigned int tid = blockIdx.x * blockDim.x + threadIdx.x;
+  const unsigned int stride = gridDim.x * blockDim.x;
 
-    StateT             state;
-    const unsigned int subsequence = tid;
-    hiprand_init(seed, subsequence, offset, &state);
+  StateT state;
+  const unsigned int subsequence = tid;
+  hiprand_init(seed, subsequence, offset, &state);
 
-    unsigned int index = tid;
-    while(index < size)
-    {
-        output[index] = hiprand(&state);
-        index += stride;
-    }
+  unsigned int index = tid;
+  while (index < size) {
+    output[index] = hiprand(&state);
+    index += stride;
+  }
 }
 
-int main()
-{
-    typedef hiprandStateXORWOW state_t;
+int main() {
+  typedef hiprandStateXORWOW state_t;
 
-    const size_t output_size = 1000; /*number of values to generate*/
+  const size_t output_size = 1000; /*number of values to generate*/
 
-    // 1. Allocate device output buffers.
-    unsigned int* d_output;
+  // 1. Allocate device output buffers.
+  unsigned int *d_output;
 
-    HIP_CHECK(hipMalloc(&d_output, output_size * sizeof(*d_output)));
+  HIP_CHECK(hipMalloc(&d_output, output_size * sizeof(*d_output)));
 
-    // 2. Generate values.
-    const dim3 block_size(64);
-    const dim3 grid_size(4);
+  // 2. Generate values.
+  const dim3 block_size(64);
+  const dim3 grid_size(4);
 
-    std::cout << "Launching hiprand_kernel...";
+  std::cout << "Launching hiprand_kernel...";
 
-    hiprand_kernel<state_t><<<grid_size, block_size>>>(d_output, output_size);
-    HIP_CHECK(hipDeviceSynchronize());
-    HIP_CHECK(hipGetLastError());
+  hiprand_kernel<state_t><<<grid_size, block_size>>>(d_output, output_size);
+  HIP_CHECK(hipDeviceSynchronize());
+  HIP_CHECK(hipGetLastError());
 
-    std::cout << "done. \nCopying results to host...";
+  std::cout << "done. \nCopying results to host...";
 
-    // 3. Copy outputs from device to host and free device memory.
-    std::vector<unsigned int> h_output(output_size);
-    HIP_CHECK(hipMemcpy(h_output.data(),
-                        d_output,
-                        output_size * sizeof(*d_output),
-                        hipMemcpyDeviceToHost));
+  // 3. Copy outputs from device to host and free device memory.
+  std::vector<unsigned int> h_output(output_size);
+  HIP_CHECK(hipMemcpy(h_output.data(), d_output,
+                      output_size * sizeof(*d_output), hipMemcpyDeviceToHost));
 
-    HIP_CHECK(hipFree(d_output));
+  HIP_CHECK(hipFree(d_output));
 
-    std::cout << "done. \nValidating results...";
+  std::cout << "done. \nValidating results...";
 
-    // 4. Check uniformity of results.
-    double mean = 0.f;
-    if((mean = is_not_uniform_dist(h_output)))
-    {
-        std::cout << "Validation failed! The normalized mean of the generated values should be "
-                     "near 0.5 but it's "
-                  << mean << std::endl;
-        return error_exit_code;
-    }
+  // 4. Check uniformity of results.
+  double mean = 0.f;
+  if ((mean = is_not_uniform_dist(h_output))) {
+    std::cout << "Validation failed! The normalized mean of the generated "
+                 "values should be "
+                 "near 0.5 but it's "
+              << mean << std::endl;
+    return error_exit_code;
+  }
 
-    std::cout << "Validation succeded!" << std::endl;
-    return 0;
+  std::cout << "Validation succeded!" << std::endl;
+  return 0;
 }

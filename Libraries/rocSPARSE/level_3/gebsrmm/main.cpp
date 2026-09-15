@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,68 +30,67 @@
 #include <cstdio>
 #include <iostream>
 
-int main()
-{
-    // 1. Set up input data
-    // Number of rows and columns of the input matrices.
-    constexpr rocsparse_int m = 4;
-    constexpr rocsparse_int k = 6;
-    constexpr rocsparse_int n = 10;
+int main() {
+  // 1. Set up input data
+  // Number of rows and columns of the input matrices.
+  constexpr rocsparse_int m = 4;
+  constexpr rocsparse_int k = 6;
+  constexpr rocsparse_int n = 10;
 
-    // Sparse matrix A (m x k)
-    //     ( 1 2 0 | 3 0 0 )
-    //     ( 0 4 5 | 0 0 0 )   ( A_{00} | A_{01} )
-    // A = (-------+-------) = (--------+--------)
-    //     ( 0 0 0 | 7 8 0 )   (    O   | A_{11} )
-    //     ( 0 0 0 | 2 4 1 )
+  // Sparse matrix A (m x k)
+  //     ( 1 2 0 | 3 0 0 )
+  //     ( 0 4 5 | 0 0 0 )   ( A_{00} | A_{01} )
+  // A = (-------+-------) = (--------+--------)
+  //     ( 0 0 0 | 7 8 0 )   (    O   | A_{11} )
+  //     ( 0 0 0 | 2 4 1 )
 
-    // GEBSR block row and column dimensions.
-    constexpr rocsparse_int bsr_row_dim = 2;
-    constexpr rocsparse_int bsr_col_dim = 3;
+  // GEBSR block row and column dimensions.
+  constexpr rocsparse_int bsr_row_dim = 2;
+  constexpr rocsparse_int bsr_col_dim = 3;
 
-    // Number of rows and columns of the block matrix.
-    constexpr rocsparse_int mb = (m + bsr_row_dim - 1) / bsr_row_dim;
-    constexpr rocsparse_int kb = (k + bsr_col_dim - 1) / bsr_col_dim;
+  // Number of rows and columns of the block matrix.
+  constexpr rocsparse_int mb = (m + bsr_row_dim - 1) / bsr_row_dim;
+  constexpr rocsparse_int kb = (k + bsr_col_dim - 1) / bsr_col_dim;
 
-    // Padded dimensions of input matrix.
-    constexpr size_t m_padded = mb * bsr_row_dim;
-    constexpr size_t k_padded = kb * bsr_col_dim;
+  // Padded dimensions of input matrix.
+  constexpr size_t m_padded = mb * bsr_row_dim;
+  constexpr size_t k_padded = kb * bsr_col_dim;
 
-    // Number of non-zero block entries
-    constexpr rocsparse_int nnzb = 3;
+  // Number of non-zero block entries
+  constexpr rocsparse_int nnzb = 3;
 
-    // GEBSR row pointers
-    constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 2, 3};
+  // GEBSR row pointers
+  constexpr std::array<rocsparse_int, mb + 1> h_bsr_row_ptr = {0, 2, 3};
 
-    // GEBSR column indices
-    constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 1};
+  // GEBSR column indices
+  constexpr std::array<rocsparse_int, nnzb> h_bsr_col_ind = {0, 1, 1};
 
-    // GEBSR values
-    constexpr rocsparse_int elements_of_val = nnzb * bsr_row_dim * bsr_col_dim;
-    // clang-format off
+  // GEBSR values
+  constexpr rocsparse_int elements_of_val = nnzb * bsr_row_dim * bsr_col_dim;
+  // clang-format off
     constexpr std::array<double, elements_of_val>
         h_bsr_val{1.0, 2.0, 0.0, 0.0, 4.0, 5.0,  // A_{00}
                   3.0, 0.0, 0.0, 0.0, 0.0, 0.0,  // A_{01}
                   7.0, 8.0, 0.0, 2.0, 4.0, 1.0}; // A_{10};
-    // clang-format on
+  // clang-format on
 
-    // Storage scheme of the GEBSR blocks.
-    constexpr rocsparse_direction dir = rocsparse_direction_row;
+  // Storage scheme of the GEBSR blocks.
+  constexpr rocsparse_direction dir = rocsparse_direction_row;
 
-    // Transposition of the matrix
-    constexpr rocsparse_operation trans_A = rocsparse_operation_none;
+  // Transposition of the matrix
+  constexpr rocsparse_operation trans_A = rocsparse_operation_none;
 
-    // Dense matrix B (k x n)
-    //     (  9  11  13  15  17  10  12  14  16  18 )
-    //     (  8  10   1  10   6  11   7   3  12  17 )
-    // B = ( 11  11   0   4   6  12   2   9  13   2 )
-    //     ( 15   3   2   3   8   1   2   4   6   6 )
-    //     (  2   5   7   0   1  15   9   4  10   1 )
-    //     (  7  12  12   1  12   5   1  11   1  14 )
+  // Dense matrix B (k x n)
+  //     (  9  11  13  15  17  10  12  14  16  18 )
+  //     (  8  10   1  10   6  11   7   3  12  17 )
+  // B = ( 11  11   0   4   6  12   2   9  13   2 )
+  //     ( 15   3   2   3   8   1   2   4   6   6 )
+  //     (  2   5   7   0   1  15   9   4  10   1 )
+  //     (  7  12  12   1  12   5   1  11   1  14 )
 
-    // Matrix B elements in column-major
-    constexpr rocsparse_int elements_of_B = k_padded * n;
-    // clang-format off
+  // Matrix B elements in column-major
+  constexpr rocsparse_int elements_of_B = k_padded * n;
+  // clang-format off
     constexpr std::array<double, elements_of_B>
         h_B{ 9,  8, 11, 15,  2,  7,
             11, 10, 11,  3,  5, 12,
@@ -103,121 +102,108 @@ int main()
             14,  3,  9,  4,  4, 11,
             16, 12, 13,  6, 10,  1,
             18, 17,  2,  6,  1, 14};
-    // clang-format on
+  // clang-format on
 
-    // Transposition of the matrix
-    constexpr rocsparse_operation trans_B = rocsparse_operation_none;
+  // Transposition of the matrix
+  constexpr rocsparse_operation trans_B = rocsparse_operation_none;
 
-    // Initialize a dense matrix C (m x n)
-    constexpr rocsparse_int           elements_of_C = m_padded * n;
-    std::array<double, elements_of_C> h_C{};
+  // Initialize a dense matrix C (m x n)
+  constexpr rocsparse_int elements_of_C = m_padded * n;
+  std::array<double, elements_of_C> h_C{};
 
-    // Scalar alpha and beta
-    constexpr double alpha = 1.0;
-    constexpr double beta  = 0.0;
+  // Scalar alpha and beta
+  constexpr double alpha = 1.0;
+  constexpr double beta = 0.0;
 
-    // 2. Prepare device for calculation
-    // rocSPARSE handle
-    rocsparse_handle handle;
-    ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
-    ROCSPARSE_CHECK(rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
+  // 2. Prepare device for calculation
+  // rocSPARSE handle
+  rocsparse_handle handle;
+  ROCSPARSE_CHECK(rocsparse_create_handle(&handle));
+  ROCSPARSE_CHECK(
+      rocsparse_set_pointer_mode(handle, rocsparse_pointer_mode_host));
 
-    // Matrix descriptor
-    rocsparse_mat_descr descr;
-    ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
+  // Matrix descriptor
+  rocsparse_mat_descr descr;
+  ROCSPARSE_CHECK(rocsparse_create_mat_descr(&descr));
 
-    // 3. Offload data to device
-    rocsparse_int* d_bsr_row_ptr;
-    rocsparse_int* d_bsr_col_ind;
-    double*        d_bsr_val{};
-    double*        d_B{};
-    double*        d_C{};
+  // 3. Offload data to device
+  rocsparse_int *d_bsr_row_ptr;
+  rocsparse_int *d_bsr_col_ind;
+  double *d_bsr_val{};
+  double *d_B{};
+  double *d_C{};
 
-    constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
-    constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
-    constexpr size_t val_size     = sizeof(*d_bsr_val) * elements_of_val;
-    constexpr size_t B_size       = sizeof(*d_B) * elements_of_B;
-    constexpr size_t C_size       = sizeof(*d_C) * elements_of_C;
+  constexpr size_t row_ptr_size = sizeof(*d_bsr_row_ptr) * (mb + 1);
+  constexpr size_t col_ind_size = sizeof(*d_bsr_col_ind) * nnzb;
+  constexpr size_t val_size = sizeof(*d_bsr_val) * elements_of_val;
+  constexpr size_t B_size = sizeof(*d_B) * elements_of_B;
+  constexpr size_t C_size = sizeof(*d_C) * elements_of_C;
 
-    HIP_CHECK(hipMalloc(&d_bsr_row_ptr, row_ptr_size));
-    HIP_CHECK(hipMalloc(&d_bsr_col_ind, col_ind_size));
-    HIP_CHECK(hipMalloc(&d_bsr_val, val_size));
-    HIP_CHECK(hipMalloc(&d_B, B_size));
-    HIP_CHECK(hipMalloc(&d_C, C_size));
+  HIP_CHECK(hipMalloc(&d_bsr_row_ptr, row_ptr_size));
+  HIP_CHECK(hipMalloc(&d_bsr_col_ind, col_ind_size));
+  HIP_CHECK(hipMalloc(&d_bsr_val, val_size));
+  HIP_CHECK(hipMalloc(&d_B, B_size));
+  HIP_CHECK(hipMalloc(&d_C, C_size));
 
-    HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), row_ptr_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), col_ind_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_bsr_val, h_bsr_val.data(), val_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_B, h_B.data(), B_size, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_C, h_C.data(), C_size, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_bsr_row_ptr, h_bsr_row_ptr.data(), row_ptr_size,
+                      hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_bsr_col_ind, h_bsr_col_ind.data(), col_ind_size,
+                      hipMemcpyHostToDevice));
+  HIP_CHECK(
+      hipMemcpy(d_bsr_val, h_bsr_val.data(), val_size, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_B, h_B.data(), B_size, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_C, h_C.data(), C_size, hipMemcpyHostToDevice));
 
-    // 4. Call gebsrmm to perform C = alpha * op_a(A) * op_b(B) + beta * C
-    // This function is non blocking and executed asynchronously with respect to the host.
-    ROCSPARSE_CHECK(rocsparse_dgebsrmm(handle,
-                                       dir,
-                                       trans_A,
-                                       trans_B,
-                                       mb,
-                                       n,
-                                       kb,
-                                       nnzb,
-                                       &alpha,
-                                       descr,
-                                       d_bsr_val,
-                                       d_bsr_row_ptr,
-                                       d_bsr_col_ind,
-                                       bsr_row_dim,
-                                       bsr_col_dim,
-                                       d_B,
-                                       k_padded,
-                                       &beta,
-                                       d_C,
-                                       m_padded));
+  // 4. Call gebsrmm to perform C = alpha * op_a(A) * op_b(B) + beta * C
+  // This function is non blocking and executed asynchronously with respect to
+  // the host.
+  ROCSPARSE_CHECK(rocsparse_dgebsrmm(
+      handle, dir, trans_A, trans_B, mb, n, kb, nnzb, &alpha, descr, d_bsr_val,
+      d_bsr_row_ptr, d_bsr_col_ind, bsr_row_dim, bsr_col_dim, d_B, k_padded,
+      &beta, d_C, m_padded));
 
-    // 5. Copy C from device to host. This call synchronizes with the host.
-    HIP_CHECK(hipMemcpy(h_C.data(), d_C, C_size, hipMemcpyDeviceToHost));
+  // 5. Copy C from device to host. This call synchronizes with the host.
+  HIP_CHECK(hipMemcpy(h_C.data(), d_C, C_size, hipMemcpyDeviceToHost));
 
-    // 6. Clear rocSPARSE
-    ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
-    ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(descr));
+  // 6. Clear rocSPARSE
+  ROCSPARSE_CHECK(rocsparse_destroy_handle(handle));
+  ROCSPARSE_CHECK(rocsparse_destroy_mat_descr(descr));
 
-    // 7. Clear device memory
-    HIP_CHECK(hipFree(d_bsr_row_ptr));
-    HIP_CHECK(hipFree(d_bsr_col_ind));
-    HIP_CHECK(hipFree(d_bsr_val));
-    HIP_CHECK(hipFree(d_B));
-    HIP_CHECK(hipFree(d_C));
+  // 7. Clear device memory
+  HIP_CHECK(hipFree(d_bsr_row_ptr));
+  HIP_CHECK(hipFree(d_bsr_col_ind));
+  HIP_CHECK(hipFree(d_bsr_val));
+  HIP_CHECK(hipFree(d_B));
+  HIP_CHECK(hipFree(d_C));
 
-    // 8. Print results to standard output.
-    // Define expected result, stored in column-major ordering.
-    constexpr std::array<double, m * n> expected_C{
-        70, 87,  121, 45, /*C1*/
-        40, 95,  61,  38, /*C2*/
-        21, 4,   70,  44, /*C3*/
-        44, 60,  21,  7, /*C4*/
-        53, 54,  64,  32, /*C5*/
-        35, 104, 127, 67, /*C6*/
-        32, 38,  86,  41, /*C7*/
-        32, 57,  60,  35, /*C8*/
-        58, 113, 122, 53, /*C9*/
-        70, 78,  50,  30 /*C10*/
-    };
+  // 8. Print results to standard output.
+  // Define expected result, stored in column-major ordering.
+  constexpr std::array<double, m * n> expected_C{
+      70, 87,  121, 45, /*C1*/
+      40, 95,  61,  38, /*C2*/
+      21, 4,   70,  44, /*C3*/
+      44, 60,  21,  7,  /*C4*/
+      53, 54,  64,  32, /*C5*/
+      35, 104, 127, 67, /*C6*/
+      32, 38,  86,  41, /*C7*/
+      32, 57,  60,  35, /*C8*/
+      58, 113, 122, 53, /*C9*/
+      70, 78,  50,  30  /*C10*/
+  };
 
-    std::cout << "Solution successfully computed: " << std::endl;
-    std::cout << "C =" << std::endl;
-    int              errors{};
-    constexpr double eps = std::numeric_limits<double>::epsilon();
-    for(rocsparse_int i = 0; i < m; ++i)
-    {
-        std::cout << "    (";
-        for(rocsparse_int j = 0; j < n; ++j)
-        {
-            std::printf("%5.0lf", h_C[i + j * m_padded]);
-            errors += std::fabs(h_C[i + j * m_padded] - expected_C[i + j * m]) > eps;
-        }
-
-        std::cout << " )" << std::endl;
+  std::cout << "Solution successfully computed: " << std::endl;
+  std::cout << "C =" << std::endl;
+  int errors{};
+  constexpr double eps = std::numeric_limits<double>::epsilon();
+  for (rocsparse_int i = 0; i < m; ++i) {
+    std::cout << "    (";
+    for (rocsparse_int j = 0; j < n; ++j) {
+      std::printf("%5.0lf", h_C[i + j * m_padded]);
+      errors += std::fabs(h_C[i + j * m_padded] - expected_C[i + j * m]) > eps;
     }
 
-    return report_validation_result(errors);
+    std::cout << " )" << std::endl;
+  }
+
+  return report_validation_result(errors);
 }

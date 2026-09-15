@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,36 +29,34 @@
 
 #include <iostream>
 
-/// \brief Checks if the provided hipRAND status is \p HIPRAND_STATUS_SUCCESS and if not, prints an
-///        error message to the standard error output and terminates the program with an error code.
-#define HIPRAND_CHECK(condition)                                                       \
-    do                                                                                 \
-    {                                                                                  \
-        const hiprandStatus_t status = condition;                                      \
-        if(status != HIPRAND_STATUS_SUCCESS)                                           \
-        {                                                                              \
-            std::cerr << "A hipRAND error occurred at " << __FILE__ << ':' << __LINE__ \
-                      << std::endl;                                                    \
-            std::exit(error_exit_code);                                                \
-        }                                                                              \
-    }                                                                                  \
-    while(0)
+/// \brief Checks if the provided hipRAND status is \p HIPRAND_STATUS_SUCCESS
+/// and if not, prints an
+///        error message to the standard error output and terminates the program
+///        with an error code.
+#define HIPRAND_CHECK(condition)                                               \
+  do {                                                                         \
+    const hiprandStatus_t status = condition;                                  \
+    if (status != HIPRAND_STATUS_SUCCESS) {                                    \
+      std::cerr << "A hipRAND error occurred at " << __FILE__ << ':'           \
+                << __LINE__ << std::endl;                                      \
+      std::exit(error_exit_code);                                              \
+    }                                                                          \
+  } while (0)
 
 /// \brief Checks whether the values in \p output are uniformly distributed.
 /// \return 0 if they are, the mean value obtained otherwise.
-double is_not_uniform_dist(const std::vector<unsigned int>& output)
-{
-    double           mean = 0;
-    constexpr double tol  = 0.1;
+double is_not_uniform_dist(const std::vector<unsigned int> &output) {
+  double mean = 0;
+  constexpr double tol = 0.1;
 
-    // Compute mean normalized to [0, 1], as values are generated in [0, 2**32 - 1] = [0, UINT_MAX].
-    for(const auto v : output)
-    {
-        mean += static_cast<double>(v) / UINT_MAX;
-    }
-    mean = mean / output.size();
+  // Compute mean normalized to [0, 1], as values are generated in [0, 2**32 -
+  // 1] = [0, UINT_MAX].
+  for (const auto v : output) {
+    mean += static_cast<double>(v) / UINT_MAX;
+  }
+  mean = mean / output.size();
 
-    return (std::abs(mean - 0.5) > tol) ? mean : 0;
+  return (std::abs(mean - 0.5) > tol) ? mean : 0;
 }
 
 #endif // COMMON_HIPRAND_UTILS_HPP

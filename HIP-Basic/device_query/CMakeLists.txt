@@ -23,7 +23,7 @@
 set(example_name hip_device_query)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(${example_name} LANGUAGES CXX)  
+project(${example_name} LANGUAGES CXX)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
 select_gpu_language()

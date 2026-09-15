@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -29,13 +29,10 @@
 #include <cstdint>
 
 /* Takes a projection and transforms it onto the [0.f, 1.f] range. */
-__global__ void normalization_kernel(
-    std::uint16_t const* __restrict__ in,
-    std::size_t const inPitch,
-    float* __restrict__ out,
-    std::size_t const outPitch,
-    uint2 dim,
-    std::uint16_t bits
-);
+__global__ void normalization_kernel(std::uint16_t const *__restrict__ in,
+                                     std::size_t const inPitch,
+                                     float *__restrict__ out,
+                                     std::size_t const outPitch, uint2 dim,
+                                     std::uint16_t bits);
 
 #endif

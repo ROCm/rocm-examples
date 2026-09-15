@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,106 +28,105 @@
 
 using namespace rocalution;
 
-int main(int argc, char* argv[])
-{
-    // Parse command line arguments
-    cli::Parser parser(argc, argv);
-    parser.set_optional<std::string>("matrix",
-                                     "matrix",
-                                     std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
-                                     "Path to matrix file in MTX format");
-    parser.set_optional<int>("threads", "threads", 0, "Number of OMP threads (0 = default)");
-    parser.run_and_exit_if_error();
+int main(int argc, char *argv[]) {
+  // Parse command line arguments
+  cli::Parser parser(argc, argv);
+  parser.set_optional<std::string>(
+      "matrix", "matrix", std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
+      "Path to matrix file in MTX format");
+  parser.set_optional<int>("threads", "threads", 0,
+                           "Number of OMP threads (0 = default)");
+  parser.run_and_exit_if_error();
 
-    std::string matrix_file = parser.get<std::string>("matrix");
-    int         num_threads = parser.get<int>("threads");
+  std::string matrix_file = parser.get<std::string>("matrix");
+  int num_threads = parser.get<int>("threads");
 
-    // Initialize rocALUTION
-    init_rocalution();
+  // Initialize rocALUTION
+  init_rocalution();
 
-    // Set number of OMP threads if specified
-    if(num_threads > 0)
-    {
-        set_omp_threads_rocalution(num_threads);
-    }
+  // Set number of OMP threads if specified
+  if (num_threads > 0) {
+    set_omp_threads_rocalution(num_threads);
+  }
 
-    // Print rocALUTION info
-    info_rocalution();
+  // Print rocALUTION info
+  info_rocalution();
 
-    // rocALUTION objects
-    LocalVector<double> x;
-    LocalVector<double> rhs;
-    LocalVector<double> e;
-    LocalMatrix<double> mat;
+  // rocALUTION objects
+  LocalVector<double> x;
+  LocalVector<double> rhs;
+  LocalVector<double> e;
+  LocalMatrix<double> mat;
 
-    // Read matrix from MTX file
-    mat.ReadFileMTX(matrix_file);
+  // Read matrix from MTX file
+  mat.ReadFileMTX(matrix_file);
 
-    // Move objects to accelerator
-    mat.MoveToAccelerator();
-    rhs.MoveToAccelerator();
-    x.MoveToAccelerator();
-    e.MoveToAccelerator();
+  // Move objects to accelerator
+  mat.MoveToAccelerator();
+  rhs.MoveToAccelerator();
+  x.MoveToAccelerator();
+  e.MoveToAccelerator();
 
-    // Allocate vectors
-    x.Allocate("x", mat.GetN());
-    rhs.Allocate("rhs", mat.GetM());
-    e.Allocate("e", mat.GetN());
+  // Allocate vectors
+  x.Allocate("x", mat.GetN());
+  rhs.Allocate("rhs", mat.GetM());
+  e.Allocate("e", mat.GetN());
 
-    // Linear Solver
-    FixedPoint<LocalMatrix<double>, LocalVector<double>, double> fp;
+  // Linear Solver
+  FixedPoint<LocalMatrix<double>, LocalVector<double>, double> fp;
 
-    Jacobi<LocalMatrix<double>, LocalVector<double>, double> p;
-    //  MultiColoredILU<LocalMatrix<double>, LocalVector<double>, double > p;
-    //  ILU<LocalMatrix<double>, LocalVector<double>, double > p;
-    //  MultiColoredGS<LocalMatrix<double>, LocalVector<double>, double > p;
-    //  MultiColoredSGS<LocalMatrix<double>, LocalVector<double>, double > p;
+  Jacobi<LocalMatrix<double>, LocalVector<double>, double> p;
+  //  MultiColoredILU<LocalMatrix<double>, LocalVector<double>, double > p;
+  //  ILU<LocalMatrix<double>, LocalVector<double>, double > p;
+  //  MultiColoredGS<LocalMatrix<double>, LocalVector<double>, double > p;
+  //  MultiColoredSGS<LocalMatrix<double>, LocalVector<double>, double > p;
 
-    // Initialize rhs such that A 1 = rhs
-    e.Ones();
-    mat.Apply(e, &rhs);
+  // Initialize rhs such that A 1 = rhs
+  e.Ones();
+  mat.Apply(e, &rhs);
 
-    // Initial zero guess
-    x.Zeros();
+  // Initial zero guess
+  x.Zeros();
 
-    // Set solver operator
-    fp.SetOperator(mat);
-    // Set solver preconditioner
-    fp.SetPreconditioner(p);
+  // Set solver operator
+  fp.SetOperator(mat);
+  // Set solver preconditioner
+  fp.SetPreconditioner(p);
 
-    // Set relaxation parameter omega
-    fp.SetRelaxation(2. / 3.);
+  // Set relaxation parameter omega
+  fp.SetRelaxation(2. / 3.);
 
-    // Verbosity output
-    fp.Verbose(1);
+  // Verbosity output
+  fp.Verbose(1);
 
-    // Build solver
-    fp.Build();
+  // Build solver
+  fp.Build();
 
-    // Print matrix info
-    mat.Info();
+  // Print matrix info
+  mat.Info();
 
-    // Start time measurement
-    double tick, tack;
-    tick = rocalution_time();
+  // Start time measurement
+  double tick, tack;
+  tick = rocalution_time();
 
-    // Solve A x = rhs
-    fp.Solve(rhs, &x);
+  // Solve A x = rhs
+  fp.Solve(rhs, &x);
 
-    // Stop time measurement
-    tack = rocalution_time();
-    std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec" << std::endl;
+  // Stop time measurement
+  tack = rocalution_time();
+  std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec"
+            << std::endl;
 
-    // Clear solver
-    fp.Clear();
+  // Clear solver
+  fp.Clear();
 
-    // Compute error L2 norm
-    e.ScaleAdd(-1.0, x);
-    double error = e.Norm();
-    std::cout << "||e - x||_2 = " << error << std::endl;
+  // Compute error L2 norm
+  e.ScaleAdd(-1.0, x);
+  double error = e.Norm();
+  std::cout << "||e - x||_2 = " << error << std::endl;
 
-    // Stop rocALUTION platform
-    stop_rocalution();
+  // Stop rocALUTION platform
+  stop_rocalution();
 
-    return 0;
+  return 0;
 }

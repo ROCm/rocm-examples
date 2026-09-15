@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -35,46 +35,49 @@
 #include <thrust/reduce.h>
 #include <thrust/sequence.h>
 
-int main()
-{
-    // Allocate memory buffer to store 10 integers on the device
-    constexpr size_t              N     = 10;
-    const thrust::device_ptr<int> d_ptr = thrust::device_malloc<int>(N);
+int main() {
+  // Allocate memory buffer to store 10 integers on the device
+  constexpr size_t N = 10;
+  const thrust::device_ptr<int> d_ptr = thrust::device_malloc<int>(N);
 
-    // thrust::device_ptr supports pointer arithmetic
-    const thrust::device_ptr<int> first = d_ptr;
-    const thrust::device_ptr<int> last  = d_ptr + N;
-    std::cout << "Device array contains " << (last - first) << " uninitialized values" << std::endl;
+  // thrust::device_ptr supports pointer arithmetic
+  const thrust::device_ptr<int> first = d_ptr;
+  const thrust::device_ptr<int> last = d_ptr + N;
+  std::cout << "Device array contains " << (last - first)
+            << " uninitialized values" << std::endl;
 
-    // thrust::device_ptr can be used when calling Thrust algorithms
-    thrust::sequence(first, last);
-    std::cout << "Device array after calling thrust::sequence(first, last): "
-              << format_range(first, last) << std::endl;
+  // thrust::device_ptr can be used when calling Thrust algorithms
+  thrust::sequence(first, last);
+  std::cout << "Device array after calling thrust::sequence(first, last): "
+            << format_range(first, last) << std::endl;
 
-    // Device memory pointed to by thrust::device_ptr can be read and written transparently from host
-    d_ptr[0] = 1;
-    d_ptr[1] = 11;
-    d_ptr[2] = d_ptr[0] + d_ptr[1];
-    std::cout << "Device array after setting first three values from host-side: "
-              << format_range(first, last) << std::endl;
+  // Device memory pointed to by thrust::device_ptr can be read and written
+  // transparently from host
+  d_ptr[0] = 1;
+  d_ptr[1] = 11;
+  d_ptr[2] = d_ptr[0] + d_ptr[1];
+  std::cout << "Device array after setting first three values from host-side: "
+            << format_range(first, last) << std::endl;
 
-    // thrust::device_ptr can be converted to a "raw" device pointer for use in other APIs and kernels, etc.
-    // Note: the "raw" device pointer should not be dereferenced in host code!
-    // To make sure that it's accessible in host code, the memory has to be allocated by using `hipMallocManaged`
-    std::cout << "Converting device_ptr to \"raw\" device pointer" << std::endl;
-    int* raw_ptr = thrust::raw_pointer_cast(d_ptr);
+  // thrust::device_ptr can be converted to a "raw" device pointer for use in
+  // other APIs and kernels, etc. Note: the "raw" device pointer should not be
+  // dereferenced in host code! To make sure that it's accessible in host code,
+  // the memory has to be allocated by using `hipMallocManaged`
+  std::cout << "Converting device_ptr to \"raw\" device pointer" << std::endl;
+  int *raw_ptr = thrust::raw_pointer_cast(d_ptr);
 
-    // Conversely, raw device pointers can be wrapped in thrust::device_ptr
-    std::cout << "Converting \"raw\" device pointer back to device_ptr \"wrapped_ptr\""
-              << std::endl;
-    thrust::device_ptr<int> wrapped_ptr = thrust::device_pointer_cast(raw_ptr);
-    // The wrapped pointer is expected to be equal with the original one
-    assert((wrapped_ptr == d_ptr));
+  // Conversely, raw device pointers can be wrapped in thrust::device_ptr
+  std::cout
+      << "Converting \"raw\" device pointer back to device_ptr \"wrapped_ptr\""
+      << std::endl;
+  thrust::device_ptr<int> wrapped_ptr = thrust::device_pointer_cast(raw_ptr);
+  // The wrapped pointer is expected to be equal with the original one
+  assert((wrapped_ptr == d_ptr));
 
-    std::cout << "The sum of values in \"wrapped_ptr\" is "
-              << thrust::reduce(wrapped_ptr, wrapped_ptr + N) << std::endl;
+  std::cout << "The sum of values in \"wrapped_ptr\" is "
+            << thrust::reduce(wrapped_ptr, wrapped_ptr + N) << std::endl;
 
-    std::cout << "Freeing device memory pointed to by device_ptr" << std::endl;
-    // device_ptr is not a smart pointer, the memory has to be freed manually
-    thrust::device_free(wrapped_ptr);
+  std::cout << "Freeing device memory pointed to by device_ptr" << std::endl;
+  // device_ptr is not a smart pointer, the memory has to be freed manually
+  thrust::device_free(wrapped_ptr);
 }

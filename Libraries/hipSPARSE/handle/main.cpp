@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,24 +25,20 @@
 
 #include <stdio.h>
 
-int main()
-{
-    hipsparseHandle_t handle;
-    HIPSPARSE_CHECK(hipsparseCreate(&handle));
+int main() {
+  hipsparseHandle_t handle;
+  HIPSPARSE_CHECK(hipsparseCreate(&handle));
 
-    int version;
-    HIPSPARSE_CHECK(hipsparseGetVersion(handle, &version));
+  int version;
+  HIPSPARSE_CHECK(hipsparseGetVersion(handle, &version));
 
-    char rev[128];
-    HIPSPARSE_CHECK(hipsparseGetGitRevision(handle, rev));
+  char rev[128];
+  HIPSPARSE_CHECK(hipsparseGetGitRevision(handle, rev));
 
-    printf("hipSPARSE version %d.%d.%d-%s\n",
-           version / 100000,
-           version / 100 % 1000,
-           version % 100,
-           rev);
+  printf("hipSPARSE version %d.%d.%d-%s\n", version / 100000,
+         version / 100 % 1000, version % 100, rev);
 
-    HIPSPARSE_CHECK(hipsparseDestroy(handle));
+  HIPSPARSE_CHECK(hipsparseDestroy(handle));
 
-    return 0;
+  return 0;
 }

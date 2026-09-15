@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,189 +31,165 @@
 #include <unordered_map>
 #include <vector>
 
-int main()
-{
-    // 1. Check if F32 is supported.
-    if(!is_f32_supported())
-    {
-        std::cout << "unsupported host device" << std::endl;
-        return 0;
-    }
+int main() {
+  // 1. Check if F32 is supported.
+  if (!is_f32_supported()) {
+    std::cout << "unsupported host device" << std::endl;
+    return 0;
+  }
 
-    // 2. Define type aliases.
-    typedef float float_type_a;
-    typedef float float_type_c;
-    typedef float float_type_compute;
+  // 2. Define type aliases.
+  typedef float float_type_a;
+  typedef float float_type_c;
+  typedef float float_type_compute;
 
-    // 3. Set up tensor data types.
-    hiptensorDataType_t                type_a       = HIPTENSOR_R_32F;
-    hiptensorDataType_t                type_c       = HIPTENSOR_R_32F;
-    hiptensorComputeDescriptor_t const desc_compute = HIPTENSOR_COMPUTE_DESC_32F;
+  // 3. Set up tensor data types.
+  hiptensorDataType_t type_a = HIPTENSOR_R_32F;
+  hiptensorDataType_t type_c = HIPTENSOR_R_32F;
+  hiptensorComputeDescriptor_t const desc_compute = HIPTENSOR_COMPUTE_DESC_32F;
 
-    // 4. Set scalar values.
-    float_type_compute alpha = (float_type_compute)1.0f;
+  // 4. Set scalar values.
+  float_type_compute alpha = (float_type_compute)1.0f;
 
-    // 5. Define tensor operation.
-    // B_{w, h, c, n} = 1.0 * IDENTITY(A_{c, n, h, w})
+  // 5. Define tensor operation.
+  // B_{w, h, c, n} = 1.0 * IDENTITY(A_{c, n, h, w})
 
-    // 6. Set up tensor modes.
-    std::vector<int> mode_a{'w', 'h', 'c'};
-    std::vector<int> mode_c{'c', 'w', 'h'};
-    int              nmode_a = mode_a.size();
-    int              nmode_c = mode_c.size();
+  // 6. Set up tensor modes.
+  std::vector<int> mode_a{'w', 'h', 'c'};
+  std::vector<int> mode_c{'c', 'w', 'h'};
+  int nmode_a = mode_a.size();
+  int nmode_c = mode_c.size();
 
-    // 7. Set up tensor extents.
-    std::unordered_map<int, int64_t> extent;
-    extent['h'] = 512;
-    extent['w'] = 512;
-    extent['c'] = 512;
+  // 7. Set up tensor extents.
+  std::unordered_map<int, int64_t> extent;
+  extent['h'] = 512;
+  extent['w'] = 512;
+  extent['c'] = 512;
 
-    // 8. Calculate extent vectors.
-    std::vector<int64_t> extent_a;
-    for(auto mode : mode_a)
-    {
-        extent_a.push_back(extent[mode]);
-    }
-    std::vector<int64_t> extent_c;
-    for(auto mode : mode_c)
-    {
-        extent_c.push_back(extent[mode]);
-    }
+  // 8. Calculate extent vectors.
+  std::vector<int64_t> extent_a;
+  for (auto mode : mode_a) {
+    extent_a.push_back(extent[mode]);
+  }
+  std::vector<int64_t> extent_c;
+  for (auto mode : mode_c) {
+    extent_c.push_back(extent[mode]);
+  }
 
-    // 9. Allocate device memory.
-    size_t elements_a = 1;
-    for(auto mode : mode_a)
-    {
-        elements_a *= extent[mode];
-    }
-    size_t elements_c = 1;
-    for(auto mode : mode_c)
-    {
-        elements_c *= extent[mode];
-    }
+  // 9. Allocate device memory.
+  size_t elements_a = 1;
+  for (auto mode : mode_a) {
+    elements_a *= extent[mode];
+  }
+  size_t elements_c = 1;
+  for (auto mode : mode_c) {
+    elements_c *= extent[mode];
+  }
 
-    size_t size_a = sizeof(float_type_a) * elements_a;
-    size_t size_c = sizeof(float_type_c) * elements_c;
+  size_t size_a = sizeof(float_type_a) * elements_a;
+  size_t size_c = sizeof(float_type_c) * elements_c;
 
-    void *a_d, *c_d;
-    HIP_CHECK(hipMalloc((void**)&a_d, size_a));
-    HIP_CHECK(hipMalloc((void**)&c_d, size_c));
+  void *a_d, *c_d;
+  HIP_CHECK(hipMalloc((void **)&a_d, size_a));
+  HIP_CHECK(hipMalloc((void **)&c_d, size_c));
 
-    float_type_a *a, *c;
-    HIP_CHECK(hipHostMalloc((void**)&a, sizeof(float_type_a) * elements_a));
-    HIP_CHECK(hipHostMalloc((void**)&c, sizeof(float_type_c) * elements_c));
+  float_type_a *a, *c;
+  HIP_CHECK(hipHostMalloc((void **)&a, sizeof(float_type_a) * elements_a));
+  HIP_CHECK(hipHostMalloc((void **)&c, sizeof(float_type_c) * elements_c));
 
-    // 10. Initialize data.
-    for(size_t i = 0; i < elements_a; i++)
-    {
-        a[i] = (float)i;
-    }
+  // 10. Initialize data.
+  for (size_t i = 0; i < elements_a; i++) {
+    a[i] = (float)i;
+  }
 
-    HIP_CHECK(hipMemcpy(a_d, a, size_a, hipMemcpyDefault));
+  HIP_CHECK(hipMemcpy(a_d, a, size_a, hipMemcpyDefault));
 
-    // 11. Initialize hipTensor.
-    hiptensorHandle_t handle;
-    HIPTENSOR_CHECK(hiptensorCreate(&handle));
-    HIPTENSOR_CHECK(hiptensorLoggerSetMask(HIPTENSOR_LOG_LEVEL_PERF_TRACE));
+  // 11. Initialize hipTensor.
+  hiptensorHandle_t handle;
+  HIPTENSOR_CHECK(hiptensorCreate(&handle));
+  HIPTENSOR_CHECK(hiptensorLoggerSetMask(HIPTENSOR_LOG_LEVEL_PERF_TRACE));
 
-    // 12. Create tensor descriptors.
-    hiptensorTensorDescriptor_t desc_a;
-    HIPTENSOR_CHECK(hiptensorCreateTensorDescriptor(handle,
-                                                    &desc_a,
-                                                    nmode_a,
-                                                    extent_a.data(),
-                                                    nullptr /* stride */,
-                                                    type_a,
-                                                    0));
+  // 12. Create tensor descriptors.
+  hiptensorTensorDescriptor_t desc_a;
+  HIPTENSOR_CHECK(
+      hiptensorCreateTensorDescriptor(handle, &desc_a, nmode_a, extent_a.data(),
+                                      nullptr /* stride */, type_a, 0));
 
-    hiptensorTensorDescriptor_t desc_c;
-    HIPTENSOR_CHECK(hiptensorCreateTensorDescriptor(handle,
-                                                    &desc_c,
-                                                    nmode_c,
-                                                    extent_c.data(),
-                                                    nullptr /* stride */,
-                                                    type_c,
-                                                    0));
+  hiptensorTensorDescriptor_t desc_c;
+  HIPTENSOR_CHECK(
+      hiptensorCreateTensorDescriptor(handle, &desc_c, nmode_c, extent_c.data(),
+                                      nullptr /* stride */, type_c, 0));
 
-    // 13. Create permutation descriptor.
-    hiptensorOperationDescriptor_t desc;
-    HIPTENSOR_CHECK(hiptensorCreatePermutation(handle,
-                                               &desc,
-                                               desc_a,
-                                               mode_a.data(),
-                                               HIPTENSOR_OP_IDENTITY,
-                                               desc_c,
-                                               mode_c.data(),
-                                               desc_compute));
+  // 13. Create permutation descriptor.
+  hiptensorOperationDescriptor_t desc;
+  HIPTENSOR_CHECK(hiptensorCreatePermutation(
+      handle, &desc, desc_a, mode_a.data(), HIPTENSOR_OP_IDENTITY, desc_c,
+      mode_c.data(), desc_compute));
 
-    // 14. Set algorithm.
-    const hiptensorAlgo_t algo = HIPTENSOR_ALGO_DEFAULT;
+  // 14. Set algorithm.
+  const hiptensorAlgo_t algo = HIPTENSOR_ALGO_DEFAULT;
 
-    hiptensorPlanPreference_t plan_pref;
-    HIPTENSOR_CHECK(
-        hiptensorCreatePlanPreference(handle, &plan_pref, algo, HIPTENSOR_JIT_MODE_NONE));
+  hiptensorPlanPreference_t plan_pref;
+  HIPTENSOR_CHECK(hiptensorCreatePlanPreference(handle, &plan_pref, algo,
+                                                HIPTENSOR_JIT_MODE_NONE));
 
-    // 15. Create plan.
-    hiptensorPlan_t plan;
-    HIPTENSOR_CHECK(
-        hiptensorCreatePlan(handle, &plan, desc, plan_pref, 0 /* workspaceSizeLimit */));
+  // 15. Create plan.
+  hiptensorPlan_t plan;
+  HIPTENSOR_CHECK(hiptensorCreatePlan(handle, &plan, desc, plan_pref,
+                                      0 /* workspaceSizeLimit */));
 
-    // 16. Run permutation.
-    HIPTENSOR_CHECK(hiptensorPermute(handle, plan, &alpha, a_d, c_d, nullptr /* stream */));
+  // 16. Run permutation.
+  HIPTENSOR_CHECK(
+      hiptensorPermute(handle, plan, &alpha, a_d, c_d, nullptr /* stream */));
 
 #if !NDEBUG
-    // 17. Print and store results.
-    bool print_elements = false;
-    bool store_elements = false;
+  // 17. Print and store results.
+  bool print_elements = false;
+  bool store_elements = false;
 
-    if(print_elements || store_elements)
-    {
-        HIP_CHECK(hipMemcpy(c, c_d, size_c, hipMemcpyDefault));
+  if (print_elements || store_elements) {
+    HIP_CHECK(hipMemcpy(c, c_d, size_c, hipMemcpyDefault));
+  }
+
+  if (print_elements) {
+    if (elements_a < MAX_ELEMENTS_PRINT_COUNT) {
+      std::cout << "Tensor A elements:\n";
+      hiptensor_print_array_elements(std::cout, a, elements_a);
+      std::cout << std::endl;
     }
 
-    if(print_elements)
-    {
-        if(elements_a < MAX_ELEMENTS_PRINT_COUNT)
-        {
-            std::cout << "Tensor A elements:\n";
-            hiptensor_print_array_elements(std::cout, a, elements_a);
-            std::cout << std::endl;
-        }
-
-        if(elements_c < MAX_ELEMENTS_PRINT_COUNT)
-        {
-            std::cout << "Tensor C elements:\n";
-            hiptensor_print_array_elements(std::cout, c, elements_c);
-            std::cout << std::endl;
-        }
+    if (elements_c < MAX_ELEMENTS_PRINT_COUNT) {
+      std::cout << "Tensor C elements:\n";
+      hiptensor_print_array_elements(std::cout, c, elements_c);
+      std::cout << std::endl;
     }
+  }
 
-    if(store_elements)
-    {
-        std::ofstream tensor_a, tensor_b, tensor_c;
-        tensor_a.open("tensor_A.txt");
-        hiptensor_print_elements_to_file(tensor_a, a, elements_a, ", ");
-        tensor_a.close();
+  if (store_elements) {
+    std::ofstream tensor_a, tensor_b, tensor_c;
+    tensor_a.open("tensor_A.txt");
+    hiptensor_print_elements_to_file(tensor_a, a, elements_a, ", ");
+    tensor_a.close();
 
-        tensor_c.open("tensor_C_scale_contraction_results.txt");
-        hiptensor_print_elements_to_file(tensor_c, c, elements_c, ", ");
-        tensor_c.close();
-    }
+    tensor_c.open("tensor_C_scale_contraction_results.txt");
+    hiptensor_print_elements_to_file(tensor_c, c, elements_c, ", ");
+    tensor_c.close();
+  }
 #endif
 
-    // 18. Cleanup.
-    HIPTENSOR_CHECK(hiptensorDestroy(handle));
-    HIPTENSOR_CHECK(hiptensorDestroyPlan(plan));
-    HIPTENSOR_CHECK(hiptensorDestroyOperationDescriptor(desc));
-    HIPTENSOR_CHECK(hiptensorDestroyPlanPreference(plan_pref));
-    HIPTENSOR_CHECK(hiptensorDestroyTensorDescriptor(desc_a));
-    HIPTENSOR_CHECK(hiptensorDestroyTensorDescriptor(desc_c));
+  // 18. Cleanup.
+  HIPTENSOR_CHECK(hiptensorDestroy(handle));
+  HIPTENSOR_CHECK(hiptensorDestroyPlan(plan));
+  HIPTENSOR_CHECK(hiptensorDestroyOperationDescriptor(desc));
+  HIPTENSOR_CHECK(hiptensorDestroyPlanPreference(plan_pref));
+  HIPTENSOR_CHECK(hiptensorDestroyTensorDescriptor(desc_a));
+  HIPTENSOR_CHECK(hiptensorDestroyTensorDescriptor(desc_c));
 
-    HIPTENSOR_FREE_HOST(a);
-    HIPTENSOR_FREE_HOST(c);
-    HIPTENSOR_FREE_DEVICE(a_d);
-    HIPTENSOR_FREE_DEVICE(c_d);
+  HIPTENSOR_FREE_HOST(a);
+  HIPTENSOR_FREE_HOST(c);
+  HIPTENSOR_FREE_DEVICE(a_d);
+  HIPTENSOR_FREE_DEVICE(c_d);
 
-    std::cout << "Finished!" << std::endl;
-    return 0;
+  std::cout << "Finished!" << std::endl;
+  return 0;
 }
