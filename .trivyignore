@@ -1,0 +1,17 @@
+# Trivy misconfiguration suppressions for rocm-examples.
+#
+# DS-0002 "Specify at least 1 USER command ... with non-root user":
+# Every Dockerfile in this repo produces a GitHub Actions job-container image
+# (see .github/workflows/build_*.yml `container:`). A non-root USER cannot
+# write GITHUB_WORKSPACE, which is host-mounted and owned by the runner uid;
+# that breaks actions/checkout and every subsequent build step. This was
+# verified empirically by running the exact CI build steps against a non-root
+# image. These images must run as root, so the finding does not apply here.
+AVD-DS-0002
+#
+# DS-0029 "'--no-install-recommends' flag is missed" on `apt-get install -y rocm`:
+# `rocm` is a meta-package whose recommended dependencies pull in the ROCm
+# runtime/toolchain subcomponents the image needs. Adding --no-install-recommends
+# would drop those recommends and produce an incomplete image, so the flag is
+# intentionally omitted for the meta-package install.
+AVD-DS-0029
