@@ -7,11 +7,8 @@
 # that breaks actions/checkout and every subsequent build step. This was
 # verified empirically by running the exact CI build steps against a non-root
 # image. These images must run as root, so the finding does not apply here.
-AVD-DS-0002
 #
-# DS-0029 "'--no-install-recommends' flag is missed" on `apt-get install -y rocm`:
-# `rocm` is a meta-package whose recommended dependencies pull in the ROCm
-# runtime/toolchain subcomponents the image needs. Adding --no-install-recommends
-# would drop those recommends and produce an incomplete image, so the flag is
-# intentionally omitted for the meta-package install.
-AVD-DS-0029
+# Note: DS-0029 on the rocm meta-package install is suppressed inline at its
+# single occurrence in Dockerfiles/hip-libraries-cuda-ubuntu.Dockerfile, so it
+# is intentionally not listed here (a bare ID would suppress it repo-wide).
+AVD-DS-0002
