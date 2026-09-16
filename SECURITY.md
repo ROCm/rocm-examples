@@ -17,7 +17,7 @@ This policy covers code and configuration in this repository. For vulnerabilitie
 ## Automated security scanning
 
 Alongside the reporting path above, this repository is scanned automatically.
-The scanners are not implemented here: Quartz calls the shared
+The scanners are not implemented here: rocm-examples calls the shared
 [`ROCm/rocm-security-gh`](https://github.com/ROCm/rocm-security-gh)
 `security-baseline.yml` reusable workflow, so the scanner versions and
 behavior are maintained centrally for ROCm, and this repository supplies only
@@ -42,7 +42,7 @@ produced it:
 - [`security_scan_weekly.yml`](.github/workflows/security_scan_weekly.yml)
   runs on a schedule across the whole repository and uploads SARIF to this
   repository's Security tab, which is the authoritative view of the current
-  state. Quartz is a monorepo-adjacent, low-churn repository, so a weekly
+  state. rocm-examples is a monorepo-adjacent, low-churn repository, so a weekly
   cadence (rather than on every push to `develop`/`main`) is enough to keep
   the Security tab current without adding a scan to every merge.
 
