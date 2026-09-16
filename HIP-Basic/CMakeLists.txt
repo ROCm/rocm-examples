@@ -73,7 +73,7 @@ if(NOT "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
         endif()
         message(WARNING "${ROCM_LLVM_DEV_WARNING}")
     endif()
-    
+
     if(OFFLOAD_BUNDLER_COMMAND AND LLVM_MC_COMMAND)
         add_subdirectory(assembly_to_executable)
     else()

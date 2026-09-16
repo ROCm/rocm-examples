@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -27,32 +27,27 @@
 #include <cstdlib>
 #include <iostream>
 
-#define HIP_CHECK(expression)                \
-{                                            \
-    const hipError_t status = expression;    \
-    if(status != hipSuccess)                 \
-    {                                        \
-            std::cerr << "HIP error "        \
-                << status << ": "            \
-                << hipGetErrorString(status) \
-                << " at " << __FILE__ << ":" \
-                << __LINE__ << std::endl;    \
-    }                                        \
-}
+#define HIP_CHECK(expression)                                                  \
+  {                                                                            \
+    const hipError_t status = expression;                                      \
+    if (status != hipSuccess) {                                                \
+      std::cerr << "HIP error " << status << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":" << __LINE__ << std::endl;         \
+    }                                                                          \
+  }
 
-int main()
-{
-    std::size_t stackSize;
-    HIP_CHECK(hipDeviceGetLimit(&stackSize, hipLimitStackSize));
-    std::cout << "Default stack size: " << stackSize << " bytes" << std::endl;
+int main() {
+  std::size_t stackSize;
+  HIP_CHECK(hipDeviceGetLimit(&stackSize, hipLimitStackSize));
+  std::cout << "Default stack size: " << stackSize << " bytes" << std::endl;
 
-    // Set a new stack size
-    std::size_t newStackSize = 1024 * 8; // 8 KiB
-    HIP_CHECK(hipDeviceSetLimit(hipLimitStackSize, newStackSize));
+  // Set a new stack size
+  std::size_t newStackSize = 1024 * 8; // 8 KiB
+  HIP_CHECK(hipDeviceSetLimit(hipLimitStackSize, newStackSize));
 
-    HIP_CHECK(hipDeviceGetLimit(&stackSize, hipLimitStackSize));
-    std::cout << "Updated stack size: " << stackSize << " bytes" << std::endl;
+  HIP_CHECK(hipDeviceGetLimit(&stackSize, hipLimitStackSize));
+  std::cout << "Updated stack size: " << stackSize << " bytes" << std::endl;
 
-    return EXIT_SUCCESS;
+  return EXIT_SUCCESS;
 }
 // [sphinx-end]

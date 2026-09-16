@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,19 +28,17 @@
 #include <iostream>
 
 // [sphinx-start]
-__global__ void kernel()
-{
+__global__ void kernel() {
   __shared__ int array[128];
   __shared__ double result;
 }
 // [sphinx-end]
 
-int main()
-{
-    kernel<<<64, 512>>>();
-    HIP_CHECK(hipPeekAtLastError());
-    HIP_CHECK(hipDeviceSynchronize());
+int main() {
+  kernel<<<64, 512>>>();
+  HIP_CHECK(hipPeekAtLastError());
+  HIP_CHECK(hipDeviceSynchronize());
 
-    std::cout << "Success!" << std::endl;
-    return EXIT_SUCCESS;
+  std::cout << "Success!" << std::endl;
+  return EXIT_SUCCESS;
 }

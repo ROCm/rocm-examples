@@ -25,14 +25,16 @@ class GuidTools:
 
     def __init__(self) -> None:
         self.directory = os.getcwd()
+
     # Check GUID format validity.
     def check_guid_validity(self, file: str, guid: str):
         try:
             UUID(guid, version=4)
         except:
-            print(f'[red]Incorrect GUID format in [yellow]{file}[/yellow]:[/red]')
-            print(f'    {guid}')
+            print(f"[red]Incorrect GUID format in [yellow]{file}[/yellow]:[/red]")
+            print(f"    {guid}")
             self.error_counter += 1
+
     def get_guid_validity_errors(self, file: str, guid: str) -> int:
         self.check_guid_validity(file, guid)
         return self.error_counter
@@ -41,7 +43,7 @@ class GuidTools:
 # Check all XML files.
 class XmlChecker(GuidTools):
     def __init__(self, tag: str, ext: Union[str, None] = None) -> None:
-        self.xml_files:List[str] = []
+        self.xml_files: List[str] = []
         self.tag_values: Dict[str, List[str]] = {}
         self.error_counter = 0
         self.tag = tag
@@ -63,7 +65,7 @@ class XmlChecker(GuidTools):
         for elem in tree.iter():
             if elem.text is None:
                 continue
-            value = elem.text.upper().strip('{}')
+            value = elem.text.upper().strip("{}")
             if elem.tag.endswith(self.tag):
                 self.error_counter += super().get_guid_validity_errors(file, value)
 
@@ -88,9 +90,11 @@ class XmlChecker(GuidTools):
     def set_error_counter(self) -> None:
         repeated_values = self.get_duplicated_tag_values()
         for value, files in repeated_values.items():
-            print(f'[red]The [yellow]{self.tag}[/yellow] value [yellow]{value}[/yellow] is repeated in the following files:[/red]')
+            print(
+                f"[red]The [yellow]{self.tag}[/yellow] value [yellow]{value}[/yellow] is repeated in the following files:[/red]"
+            )
             for file in files:
-                print(f'    {file}')
+                print(f"    {file}")
             self.error_counter += 1
 
     # Get error counter.
@@ -107,29 +111,35 @@ class SlnChecker(GuidTools):
         self.check_solution_files()
 
     # Get values from a single project configuration from an SLN file.
-    def vars_from_config_match(self, match: Tuple[str, str, str]) -> Union[List[str], Tuple[str, str, str]]:
+    def vars_from_config_match(
+        self, match: Tuple[str, str, str]
+    ) -> Union[List[str], Tuple[str, str, str]]:
         guid_raw, config, mode = match
         return guid_raw.upper(), config, mode
 
     # Get project configurations from SLN file.
     def get_configurations(self, sln_file_content: str) -> List[Tuple[str, str, str]]:
         # Regular expression pattern to match the project configurations.
-        global_selection_pattern = r'\s*GlobalSection\(ProjectConfigurationPlatforms\)\s*=\s*postSolution\s*\n(.*?)EndGlobalSection'
-        global_selection_matches: List[str] = re.findall(global_selection_pattern, sln_file_content, re.DOTALL)
+        global_selection_pattern = r"\s*GlobalSection\(ProjectConfigurationPlatforms\)\s*=\s*postSolution\s*\n(.*?)EndGlobalSection"
+        global_selection_matches: List[str] = re.findall(
+            global_selection_pattern, sln_file_content, re.DOTALL
+        )
 
         # Regular expression pattern to parse a project configuration.
-        configuration_pattern = r'\s*{(.*?)}.(.*?)\s*=\s*(.*?)\s*\n'
+        configuration_pattern = r"\s*{(.*?)}.(.*?)\s*=\s*(.*?)\s*\n"
         return re.findall(configuration_pattern, global_selection_matches[0], re.DOTALL)
 
     # Validate project configurations from sln file and check whether all
     # configuration has been added.
-    def check_configurations(self, sln_file_content: str, reference_guid: str, sln_file_path: str):
+    def check_configurations(
+        self, sln_file_content: str, reference_guid: str, sln_file_path: str
+    ):
         configuration_matches = self.get_configurations(sln_file_content)
         list_of_configurations = [
             ["Debug|x64.ActiveCfg", "Debug|x64"],
             ["Debug|x64.Build.0", "Debug|x64"],
             ["Release|x64.ActiveCfg", "Release|x64"],
-            ["Release|x64.Build.0", "Release|x64"]
+            ["Release|x64.Build.0", "Release|x64"],
         ]
         for match in configuration_matches:
             guid, config, mode = self.vars_from_config_match(match)
@@ -137,59 +147,64 @@ class SlnChecker(GuidTools):
                 try:
                     list_of_configurations.remove([config, mode])
                 except ValueError:
-                    print(f'[red]Incorrect configuration in [yellow]{sln_file_path}[/yellow]:[/red]')
-                    print(f'    {guid}: {config} = {mode}')
+                    print(
+                        f"[red]Incorrect configuration in [yellow]{sln_file_path}[/yellow]:[/red]"
+                    )
+                    print(f"    {guid}: {config} = {mode}")
                     self.error_counter += 1
         if len(list_of_configurations):
-            print(f'[red]Missing configuration(s) in [yellow]{sln_file_path}[/yellow] for [yellow]{reference_guid}[/yellow]:[/red]')
+            print(
+                f"[red]Missing configuration(s) in [yellow]{sln_file_path}[/yellow] for [yellow]{reference_guid}[/yellow]:[/red]"
+            )
             for configuration_settings in list_of_configurations:
-                print(f'    {configuration_settings[0]} = {configuration_settings[1]}')
+                print(f"    {configuration_settings[0]} = {configuration_settings[1]}")
             self.error_counter += 1
 
     # Get project details from SLN file.
-    def vars_from_project_match(self, match: Tuple[str, str, str, str]) -> Union[List[str], Tuple[str, str, str]]:
+    def vars_from_project_match(
+        self, match: Tuple[str, str, str, str]
+    ) -> Union[List[str], Tuple[str, str, str]]:
         _, name, path, guid_raw = match
         return guid_raw.upper(), name, path
 
     # Set path to POSIX format.
     def format_path(self, raw_path: str):
         return PureWindowsPath(raw_path).as_posix()
-    
+
     # Check if the path is a directory.
     def is_dir(self, path: str):
         return not os.path.splitext(path)[1]
-    
+
     # Get matching solution file for project file.
     def get_sln_path(self, project_path: str):
-        return os.path.splitext(project_path)[0] + '.sln'
-    
+        return os.path.splitext(project_path)[0] + ".sln"
+
     # Get the full path of a solution file in the directory of the project file.
     def get_full_path(self, project_path: str, sln_single_path: str):
-        return os.path.dirname(project_path) + '/' + sln_single_path
+        return os.path.dirname(project_path) + "/" + sln_single_path
 
     # Collect and check project details in an SLN file.
     def parse_sln_file(self, sln_file_path: str) -> Dict[str, Dict[str, str]]:
-        with open(sln_file_path, 'r') as file:
+        with open(sln_file_path, "r") as file:
             sln_file_content = file.read()
         # Regular expression pattern to match and parse project details.
         pattern = r'Project\("\{(.+?)\}"\)\s*=\s*"(.+?)",\s*"(.+?)",\s*"\{(.+?)\}"'
         matches: List[Tuple[str, str, str, str]] = re.findall(pattern, sln_file_content)
 
-        project_details:Dict[str, Dict[str, str]] = {}
+        project_details: Dict[str, Dict[str, str]] = {}
         for match in matches:
             guid, name, path = self.vars_from_project_match(match)
             # Skip subdirectories.
             if self.is_dir(path):
                 continue
-            project_details[self.format_path(path)]={
-                'name': name,
-                'guid': guid
-            }
+            project_details[self.format_path(path)] = {"name": name, "guid": guid}
             self.check_configurations(sln_file_content, guid, sln_file_path)
         return project_details
 
     # Get project details for every projects in root SLN file.
-    def get_project_details_from_solution(self, project_details:Dict[str, Dict[str, str]]) -> Dict[str, Dict[str, str]]:
+    def get_project_details_from_solution(
+        self, project_details: Dict[str, Dict[str, str]]
+    ) -> Dict[str, Dict[str, str]]:
         for project_path in project_details:
             # Skip subdirectories.
             if self.is_dir(project_path):
@@ -201,13 +216,15 @@ class SlnChecker(GuidTools):
                     project_detail = single_project_details[sln_single_path]
                     path = self.get_full_path(project_path, sln_single_path)
                     if path not in project_details.keys():
-                        print(f'[red]Inconsistent path found in [yellow]{sln_path}[/yellow]:[/red]')
-                        print(f'    {sln_single_path}')
+                        print(
+                            f"[red]Inconsistent path found in [yellow]{sln_path}[/yellow]:[/red]"
+                        )
+                        print(f"    {sln_single_path}")
                         self.error_counter += 1
                         path = project_path
-                    project_details[path]['sln_guid'] = project_detail['guid']
-                    project_details[path]['sln_name'] = project_detail['name']
-                    project_details[path]['sln_path'] = sln_path
+                    project_details[path]["sln_guid"] = project_detail["guid"]
+                    project_details[path]["sln_name"] = project_detail["name"]
+                    project_details[path]["sln_path"] = sln_path
 
             # Skip if there is no SLN file in embedded projects
             # (see: HIP-Basic\static_host_library).
@@ -217,34 +234,42 @@ class SlnChecker(GuidTools):
 
     # Check whether the GUIDs are identical in the root and project SLN file
     # and in VCXPROJ file for the same project.
-    def check_guid_coherency(self, project_details: Dict[str, Dict[str, str]], sln_file_path: str):
+    def check_guid_coherency(
+        self, project_details: Dict[str, Dict[str, str]], sln_file_path: str
+    ):
         for project_path in project_details:
             if not os.path.isfile(project_path):
                 continue
 
             project = project_details[project_path]
-            project_name = project['name']
-            project_guid = project['guid']
-            sln_guid = project['sln_guid']
-            sln_name = project['sln_name']
-            sln_path = project['sln_path']
-            xml_checker = XmlChecker(tag='ProjectGuid')
+            project_name = project["name"]
+            project_guid = project["guid"]
+            sln_guid = project["sln_guid"]
+            sln_name = project["sln_name"]
+            sln_path = project["sln_path"]
+            xml_checker = XmlChecker(tag="ProjectGuid")
             vcxproj_value = xml_checker.get_tag_values(project_path)
             vcxproj_guid = list(vcxproj_value.keys())[0]
 
             if project_name != sln_name:
-                print(f'[red]Inconsistent project name found in [yellow]{sln_path}[/yellow]:[/red]')
-                print(f'    {sln_name}')
-                print(f'    The expected project name in [yellow]{sln_file_path}[/yellow]: {project_name}')
+                print(
+                    f"[red]Inconsistent project name found in [yellow]{sln_path}[/yellow]:[/red]"
+                )
+                print(f"    {sln_name}")
+                print(
+                    f"    The expected project name in [yellow]{sln_file_path}[/yellow]: {project_name}"
+                )
                 self.error_counter += 1
 
-            if (project_guid == vcxproj_guid and project_guid == sln_guid):
+            if project_guid == vcxproj_guid and project_guid == sln_guid:
                 continue
 
-            print(f'[red]Inconsistent GUID found for [yellow]{project_name}[/yellow] in [yellow]{sln_file_path}[/yellow]:[/red]')
-            print(f'    {project_guid}: {sln_file_path}')
-            print(f'    {sln_guid}: {sln_path}')
-            print(f'    {vcxproj_guid}: {project_path}')
+            print(
+                f"[red]Inconsistent GUID found for [yellow]{project_name}[/yellow] in [yellow]{sln_file_path}[/yellow]:[/red]"
+            )
+            print(f"    {project_guid}: {sln_file_path}")
+            print(f"    {sln_guid}: {sln_path}")
+            print(f"    {vcxproj_guid}: {project_path}")
             self.error_counter += 1
 
     # Check all GUIDs in a root SLN file.
@@ -266,10 +291,10 @@ class SlnChecker(GuidTools):
 class GuidChecker:
     def __init__(self) -> None:
         # Get repeated GUIDs for UniqueIdentifier in VCXPROJ.FILTERS file.
-        self.filters_checker = XmlChecker(tag='UniqueIdentifier', ext='.filters')
+        self.filters_checker = XmlChecker(tag="UniqueIdentifier", ext=".filters")
 
         # Get repeated GUIDs for ProjectGuid in VCXPROJ files.
-        self.vcxproj_checker = XmlChecker(tag='ProjectGuid', ext='.vcxproj')
+        self.vcxproj_checker = XmlChecker(tag="ProjectGuid", ext=".vcxproj")
 
         # Get GUID errors in SLN files.
         self.sln_checker = SlnChecker()
@@ -279,15 +304,17 @@ class GuidChecker:
 
     # Set error counter as a sum of the errors in different checkers.
     def set_error_counter(self) -> None:
-        self.error_counter = self.filters_checker.get_error_counter() \
-        + self.vcxproj_checker.get_error_counter() \
-        + self.sln_checker.get_error_counter()
+        self.error_counter = (
+            self.filters_checker.get_error_counter()
+            + self.vcxproj_checker.get_error_counter()
+            + self.sln_checker.get_error_counter()
+        )
 
     # Get error counter.
     def get_error_counter(self) -> int:
         return self.error_counter
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     guid_checker = GuidChecker()
     sys.exit(guid_checker.get_error_counter())

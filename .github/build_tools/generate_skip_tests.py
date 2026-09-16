@@ -108,19 +108,11 @@ def main():
         return out
 
     skip_tests = _unique(
-        e["ctest"]
-        for e in applicable
-        if "test" in e["scope"] and e.get("ctest")
+        e["ctest"] for e in applicable if "test" in e["scope"] and e.get("ctest")
     )
-    skip_build_paths = _unique(
-        e["path"] for e in applicable if "build" in e["scope"]
-    )
-    skip_from_test = _unique(
-        e["path"] for e in applicable if "test" in e["scope"]
-    )
-    skip_from_build = _unique(
-        e["path"] for e in applicable if "build" in e["scope"]
-    )
+    skip_build_paths = _unique(e["path"] for e in applicable if "build" in e["scope"])
+    skip_from_test = _unique(e["path"] for e in applicable if "test" in e["scope"])
+    skip_from_build = _unique(e["path"] for e in applicable if "build" in e["scope"])
 
     os.makedirs(args.output_dir, exist_ok=True)
 

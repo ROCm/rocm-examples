@@ -65,4 +65,3 @@ if(CMAKE_SYSTEM_NAME MATCHES Windows)
         install(IMPORTED_RUNTIME_ARTIFACTS CUDA::cufft)
     endif()
 endif()
-

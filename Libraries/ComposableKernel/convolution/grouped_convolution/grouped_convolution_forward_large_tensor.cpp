@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -21,9 +21,10 @@
 // SOFTWARE.
 
 // Large tensor grouped convolution example
-// This example demonstrates convolution for large tensors that exceed memory limits.
-// It uses automatic tensor splitting when needed to handle large images.
-// For regular convolution without tensor splitting, use grouped_convolution_forward.cpp
+// This example demonstrates convolution for large tensors that exceed memory
+// limits. It uses automatic tensor splitting when needed to handle large
+// images. For regular convolution without tensor splitting, use
+// grouped_convolution_forward.cpp
 
 #include <hip/hip_runtime.h>
 
@@ -34,49 +35,40 @@
 #include <tuple>
 
 #include "ck_tile/host.hpp"
-#include "grouped_convolution_utils.hpp"
 #include "grouped_convolution_forward_large_tensor_invoker.hpp"
+#include "grouped_convolution_utils.hpp"
 #include "run_grouped_convolution_fwd_example.inc"
 
 template <template <typename PrecType> typename ConvConfig>
-int run_grouped_conv_fwd_example(int argc, char* argv[])
-{
-    using Invoker = GroupedConvolutionForwardInvoker;
+int run_grouped_conv_fwd_example(int argc, char *argv[]) {
+  using Invoker = GroupedConvolutionForwardInvoker;
 
-    auto [result, arg_parser] = create_args(argc, argv);
-    if(!result)
-        return -1;
+  auto [result, arg_parser] = create_args(argc, argv);
+  if (!result)
+    return -1;
 
-    std::string data_type  = arg_parser.get_str("prec");
-    std::string in_layout  = arg_parser.get_str("in_layout");
-    std::string wei_layout = arg_parser.get_str("wei_layout");
-    std::string out_layout = arg_parser.get_str("out_layout");
+  std::string data_type = arg_parser.get_str("prec");
+  std::string in_layout = arg_parser.get_str("in_layout");
+  std::string wei_layout = arg_parser.get_str("wei_layout");
+  std::string out_layout = arg_parser.get_str("out_layout");
 
-    if(data_type == "fp16")
-    {
-        return run_grouped_conv_fwd_example_prec_type<Invoker,
-                                                      ConvConfig<ck_tile::half_t>,
-                                                      ck_tile::half_t>(
-            in_layout, wei_layout, out_layout, argc, argv);
-    }
-    else if(data_type == "bf16")
-    {
-        return run_grouped_conv_fwd_example_prec_type<Invoker,
-                                                      ConvConfig<ck_tile::bf16_t>,
-                                                      ck_tile::bf16_t>(
-            in_layout, wei_layout, out_layout, argc, argv);
-    }
-    else
-    {
-        throw std::runtime_error("Unsupported data type for this operation !!!");
-    }
+  if (data_type == "fp16") {
+    return run_grouped_conv_fwd_example_prec_type<
+        Invoker, ConvConfig<ck_tile::half_t>, ck_tile::half_t>(
+        in_layout, wei_layout, out_layout, argc, argv);
+  } else if (data_type == "bf16") {
+    return run_grouped_conv_fwd_example_prec_type<
+        Invoker, ConvConfig<ck_tile::bf16_t>, ck_tile::bf16_t>(
+        in_layout, wei_layout, out_layout, argc, argv);
+  } else {
+    throw std::runtime_error("Unsupported data type for this operation !!!");
+  }
 }
 
-int main(int argc, char* argv[])
-{
+int main(int argc, char *argv[]) {
 #if CK_TILE_USE_WMMA
-    return !run_grouped_conv_fwd_example<ConvConfigComputeV3_WMMA>(argc, argv);
+  return !run_grouped_conv_fwd_example<ConvConfigComputeV3_WMMA>(argc, argv);
 #else
-    return !run_grouped_conv_fwd_example<ConvConfigComputeV3>(argc, argv);
+  return !run_grouped_conv_fwd_example<ConvConfigComputeV3>(argc, argv);
 #endif
 }
