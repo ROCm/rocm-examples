@@ -45,7 +45,7 @@ The operation supports three flip modes:
   - ROI tensors enable batch processing with different regions per image.
 
 - **Flip Operation**:
-  - `rppt_flip_gpu()`: Executes the flip operation on GPU, taking source and destination descriptors, horizontal and vertical flip flag tensors, and ROI information.
+  - `rppt_flip()`: Executes the flip operation on GPU, taking source and destination descriptors, horizontal and vertical flip flag tensors, ROI information, and the execution backend.
   - Horizontal flip tensor: Set to 1 to enable horizontal flipping, 0 to disable.
   - Vertical flip tensor: Set to 1 to enable vertical flipping, 0 to disable.
   - Both flags can be enabled simultaneously for combined flipping.
@@ -71,7 +71,7 @@ The operation supports three flip modes:
 
 - `rppCreate`
 - `rppDestroy`
-- `rppt_flip_gpu`
+- `rppt_flip`
 
 ### HIP runtime
 

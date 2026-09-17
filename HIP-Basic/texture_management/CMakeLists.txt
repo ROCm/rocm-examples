@@ -41,7 +41,7 @@ add_executable(${example_name} main.hip)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Temporary workaround: a known bug prevents the example from executing succesfully
-# if multiple GPUs are visible 
+# if multiple GPUs are visible
 set_tests_properties(
     ${example_name}
     PROPERTIES ENVIRONMENT "HIP_VISIBLE_DEVICES=0"

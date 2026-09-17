@@ -1,0 +1,29 @@
+# Copyright Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: MIT
+#
+# gitleaks configuration for rocm-examples, picked up by the rocm-security-gh
+# reusable scanner (.github/workflows/security_scan_pr.yml and
+# security_scan_weekly.yml) in place of its own org-wide default.
+# Reference: https://github.com/gitleaks/gitleaks/blob/master/config/gitleaks.toml
+
+title = "rocm-examples gitleaks config"
+
+[extend]
+# Inherit gitleaks' built-in ruleset (rotations, AWS, GCP, Slack, ...)
+# rather than rolling our own detections.
+useDefault = true
+
+# The generic-api-key rule flags the GUID in Visual Studio .sln
+# `Project("{...}") = "name", "path", "{...}"` declarations as a secret.
+# Scope an allowlist to that rule so the false positives are dropped without
+# weakening detection elsewhere: a finding is only ignored when it is in a
+# .sln file AND its line is a Project() declaration (condition = "AND").
+[[rules]]
+id = "generic-api-key"
+
+[[rules.allowlists]]
+description = "Visual Studio .sln Project() GUID declarations (not secrets)"
+condition = "AND"
+paths = ['''\.sln$''']
+regexTarget = "line"
+regexes = ['''Project\("\{[0-9A-Fa-f-]+\}"\)\s*=''']

@@ -31,12 +31,13 @@ jobs:
       run:
         shell: bash
     container:
-      image: ghcr.io/rocm/rocm-examples-hip-libraries-cuda-ubuntu
+      # ghcr.io/rocm/rocm-examples-hip-libraries-cuda-ubuntu:latest
+      image: ghcr.io/rocm/rocm-examples-hip-libraries-cuda-ubuntu@sha256:151e63ddfef9798457e5321d6466f8e0168a9caedd92cc4469fbfe62e645701f
       options: --user root
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Build hipCUB example
         run: |

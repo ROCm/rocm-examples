@@ -26,7 +26,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 if(NOT TARGET ck_tile)
     find_package(hip REQUIRED)
     find_path(CK_TILE_INCLUDE_DIR NAMES ck_tile/core.hpp)
-    
+
     add_library(ck_tile INTERFACE)
     target_include_directories(ck_tile INTERFACE ${CK_TILE_INCLUDE_DIR})
     target_link_libraries(ck_tile INTERFACE hip::host)

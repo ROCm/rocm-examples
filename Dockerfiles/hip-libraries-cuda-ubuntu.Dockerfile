@@ -52,7 +52,10 @@ RUN export DEBIAN_FRONTEND=noninteractive; \
         python3-pip \
     && rm -rf /var/lib/apt/lists/*
 
-# Install the HIP compiler and libraries from the ROCm repositories
+# Install the HIP compiler and libraries from the ROCm repositories.
+# rocm is a meta-package whose recommends pull in the required ROCm subcomponents;
+# --no-install-recommends would yield an incomplete image, so the flag is omitted.
+# trivy:ignore:AVD-DS-0029
 RUN export DEBIAN_FRONTEND=noninteractive; \
     mkdir -p /etc/apt/keyrings \
     && wget -q -O - https://repo.radeon.com/rocm/rocm.gpg.key | gpg --dearmor > /etc/apt/keyrings/rocm.gpg \

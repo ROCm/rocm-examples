@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -30,19 +30,15 @@
 #include <iostream>
 #include <vector>
 
-#define HIP_CHECK(expression)                \
-{                                            \
-    const hipError_t status = expression;    \
-    if(status != hipSuccess)                 \
-    {                                        \
-            std::cerr << "HIP error "        \
-                << status << ": "            \
-                << hipGetErrorString(status) \
-                << " at " << __FILE__ << ":" \
-                << __LINE__ << std::endl;    \
-        std::exit(EXIT_FAILURE);             \
-    }                                        \
-}
+#define HIP_CHECK(expression)                                                  \
+  {                                                                            \
+    const hipError_t status = expression;                                      \
+    if (status != hipSuccess) {                                                \
+      std::cerr << "HIP error " << status << ": " << hipGetErrorString(status) \
+                << " at " << __FILE__ << ":" << __LINE__ << std::endl;         \
+      std::exit(EXIT_FAILURE);                                                 \
+    }                                                                          \
+  }
 
 // [Sphinx HIP 2D convolution kernel start]
 __global__ void conv2d(uint8_t *image, uint8_t *output, float *mask,
@@ -58,7 +54,7 @@ __global__ void conv2d(uint8_t *image, uint8_t *output, float *mask,
   // Process each channel separately
   for (int c = 0; c < channels; ++c) {
     float sum = 0.0f;
-    
+
     for (int i = 0; i < mask_height; i++) {
       for (int j = 0; j < mask_width; j++) {
         // Calculate the coordinate of the pixel to read.
@@ -84,10 +80,10 @@ __global__ void conv2d(uint8_t *image, uint8_t *output, float *mask,
 }
 // [Sphinx HIP 2D convolution kernel end]
 
-int main(int argc, char** argv) {
+int main(int argc, char **argv) {
   // Determine input and output filenames
-  const char* input_filename = (argc > 1) ? argv[1] : "test.jpg";
-  const char* output_filename = (argc > 2) ? argv[2] : "test_out.jpg";
+  const char *input_filename = (argc > 1) ? argv[1] : "test.jpg";
+  const char *output_filename = (argc > 2) ? argv[2] : "test_out.jpg";
 
   // Load the image from disk
   int width, height, channels;
@@ -110,7 +106,7 @@ int main(int argc, char** argv) {
     mask[i] = mask_value;
   }
 
-  std::cout << "Applying " << mask_width << "x" << mask_height 
+  std::cout << "Applying " << mask_width << "x" << mask_height
             << " box blur filter..." << std::endl;
 
   // Allocate output image buffer on host
@@ -123,7 +119,7 @@ int main(int argc, char** argv) {
   HIP_CHECK(hipMalloc(&d_image, image_size * sizeof(uint8_t)));
   HIP_CHECK(hipMalloc(&d_output, image_size * sizeof(uint8_t)));
   HIP_CHECK(hipMalloc(&d_mask, mask_width * mask_height * sizeof(float)));
-  
+
   HIP_CHECK(hipMemcpy(d_image, image, image_size * sizeof(uint8_t),
                       hipMemcpyHostToDevice));
   HIP_CHECK(hipMemcpy(d_mask, mask.data(),
@@ -135,30 +131,31 @@ int main(int argc, char** argv) {
   dim3 grid_size((width + block_size.x - 1) / block_size.x,
                  (height + block_size.y - 1) / block_size.y, 1);
 
-  std::cout << "Launching kernel with grid size: (" 
-            << grid_size.x << ", " << grid_size.y << ")" << std::endl;
-  std::cout << "Block size: (" << block_size.x << ", " << block_size.y << ")" 
+  std::cout << "Launching kernel with grid size: (" << grid_size.x << ", "
+            << grid_size.y << ")" << std::endl;
+  std::cout << "Block size: (" << block_size.x << ", " << block_size.y << ")"
             << std::endl;
 
   conv2d<<<grid_size, block_size>>>(d_image, d_output, d_mask, width, height,
                                     channels, mask_width, mask_height);
-  
+
   // Check the kernel launch
   HIP_CHECK(hipGetLastError());
   // Check for kernel execution error
   HIP_CHECK(hipDeviceSynchronize());
 
   // Copy the data back to the host.
-  HIP_CHECK(hipMemcpy(output_image.data(), d_output, 
-                      image_size * sizeof(uint8_t),
-                      hipMemcpyDeviceToHost));
+  HIP_CHECK(hipMemcpy(output_image.data(), d_output,
+                      image_size * sizeof(uint8_t), hipMemcpyDeviceToHost));
 
   // Store the image to disk.
-  if (stbi_write_jpg(output_filename, width, height, channels, 
+  if (stbi_write_jpg(output_filename, width, height, channels,
                      output_image.data(), 100)) {
-    std::cout << "Successfully wrote output to: " << output_filename << std::endl;
+    std::cout << "Successfully wrote output to: " << output_filename
+              << std::endl;
   } else {
-    std::cerr << "Failed to write output image: " << output_filename << std::endl;
+    std::cerr << "Failed to write output image: " << output_filename
+              << std::endl;
   }
 
   // Cleanup

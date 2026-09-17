@@ -82,6 +82,17 @@ if(NOT rpp_FOUND)
     endif()
 endif()
 
+# The examples read and write images with OpenCV. It is not part of ROCm and is not
+# packaged on every distribution we build on, so skip the examples when it is absent
+# instead of failing the whole configure step. The GNU Make build applies the same
+# rule via REQUIRED_DEPS := OPENCV.
+find_package(OpenCV QUIET)
+
+if(NOT OpenCV_FOUND)
+    message(WARNING "OpenCV could not be found, not building RPP examples")
+    return()
+endif()
+
 add_subdirectory(box_filter)
 add_subdirectory(brightness)
 add_subdirectory(contrast)

@@ -40,7 +40,7 @@ The operation performs spatial convolution with a uniform kernel of configurable
   - ROI tensors enable batch processing with different regions per image.
 
 - **Box Filter Operation**:
-  - `rppt_box_filter_gpu()`: Executes the box filter operation on GPU, taking source and destination descriptors, kernel size, border type, and ROI information.
+  - `rppt_box_filter()`: Executes the box filter operation on GPU, taking source and destination descriptors, kernel size, border type, ROI information, and the execution backend.
   - Kernel sizes must be odd values (3, 5, 7, or 9) to ensure symmetric filtering.
   - Border handling uses `REPLICATE` mode to extend edge pixels.
 
@@ -65,7 +65,7 @@ The operation performs spatial convolution with a uniform kernel of configurable
 
 - `rppCreate`
 - `rppDestroy`
-- `rppt_box_filter_gpu`
+- `rppt_box_filter`
 
 ### HIP runtime
 

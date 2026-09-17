@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,8 +25,7 @@
 /// \brief The main entry point of the application.
 /// This file is compiled as a regular program, and can not contain
 /// HIP code.
-int main()
-{
-    // Call into the library function, which does contain HIP code.
-    return run_test();
+int main() {
+  // Call into the library function, which does contain HIP code.
+  return run_test();
 }

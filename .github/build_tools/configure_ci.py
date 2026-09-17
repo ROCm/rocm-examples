@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Configure CI matrix based on workflow inputs or defaults."""
+import argparse
 import os
 import json
 
@@ -23,10 +24,22 @@ PREINSTALLED = "preinstalled"
 # Add new entries here to enable more distros (also add to workflow_dispatch options).
 DISTRO_MAP = {
     # Multi-arch images: ROCm installed at CI runtime from TheRock nightlies
-    "sles-15.7":    {"image": "ghcr.io/rocm/rocm-examples-sles-15.7-multiarch:latest",    "label": "SLES 15.7"},
-    "almalinux-8":  {"image": "ghcr.io/rocm/rocm-examples-almalinux-8-multiarch:latest",  "label": "AlmaLinux 8"},
-    "ubuntu-24.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest", "label": "Ubuntu 24.04"},
-    "ubuntu-26.04": {"image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest", "label": "Ubuntu 26.04"},
+    "sles-15.7": {
+        "image": "ghcr.io/rocm/rocm-examples-sles-15.7-multiarch:latest",
+        "label": "SLES 15.7",
+    },
+    "almalinux-8": {
+        "image": "ghcr.io/rocm/rocm-examples-almalinux-8-multiarch:latest",
+        "label": "AlmaLinux 8",
+    },
+    "ubuntu-24.04": {
+        "image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-multiarch:latest",
+        "label": "Ubuntu 24.04",
+    },
+    "ubuntu-26.04": {
+        "image": "ghcr.io/rocm/rocm-examples-ubuntu-26.04-multiarch:latest",
+        "label": "Ubuntu 26.04",
+    },
     # Pinned stable image: ROCm baked in at /opt/rocm (no runtime install).
     "stable_release": {
         "image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14",
@@ -35,11 +48,22 @@ DISTRO_MAP = {
     },
 }
 
+
 def _is_all(value):
     """Return True when the input means 'use everything'."""
     return not value or value == "all"
 
+
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--exclude-preinstalled",
+        action="store_true",
+        help="drop preinstalled-only images (e.g. the version-pinned stable image), "
+        "whose ROCm version is baked in and cannot be pinned to a nightly",
+    )
+    args = parser.parse_args()
+
     gpu_input = os.getenv("GPU_CONFIG", "")
     install_input = os.getenv("INSTALL_METHOD", "")
     distro_input = os.getenv("DISTRO", "")
@@ -49,7 +73,9 @@ def main():
         gpu_targets = list(GPU_CONFIG_MAP.keys())
     else:
         if gpu_input not in GPU_CONFIG_MAP:
-            raise ValueError(f"Invalid GPU target: {gpu_input}. Allowed: {list(GPU_CONFIG_MAP.keys())}")
+            raise ValueError(
+                f"Invalid GPU target: {gpu_input}. Allowed: {list(GPU_CONFIG_MAP.keys())}"
+            )
         gpu_targets = [gpu_input]
 
     # Determine install methods
@@ -58,7 +84,9 @@ def main():
     else:
         allowed_methods = INSTALL_METHODS + [PREINSTALLED]
         if install_input not in allowed_methods:
-            raise ValueError(f"Invalid install method: {install_input}. Allowed: {allowed_methods}")
+            raise ValueError(
+                f"Invalid install method: {install_input}. Allowed: {allowed_methods}"
+            )
         install_methods = [install_input]
 
     # Determine distros
@@ -66,7 +94,9 @@ def main():
         distro_keys = list(DISTRO_MAP.keys())
     else:
         if distro_input not in DISTRO_MAP:
-            raise ValueError(f"Invalid distro: {distro_input}. Allowed: {list(DISTRO_MAP.keys())}")
+            raise ValueError(
+                f"Invalid distro: {distro_input}. Allowed: {list(DISTRO_MAP.keys())}"
+            )
         distro_keys = [distro_input]
 
     gpu_configs = [
@@ -78,11 +108,20 @@ def main():
     distro_map_out = {}
     for key in distro_keys:
         entry = DISTRO_MAP[key]
+        methods = entry.get("install_methods", install_methods)
+        # Skip preinstalled-only images (e.g. the version-pinned stable image) when asked:
+        # their ROCm version is baked in, so a caller pinning a specific nightly (the
+        # Quartz workflow) cannot use them.
+        if args.exclude_preinstalled and methods == [PREINSTALLED]:
+            continue
         distro_map_out[key] = {
             "image": entry["image"],
             "label": entry["label"],
-            "install_methods": entry.get("install_methods", install_methods),
+            "install_methods": methods,
         }
+
+    # Keep the distros list in sync with the (possibly filtered) map.
+    distro_keys = list(distro_map_out.keys())
 
     github_output = os.getenv("GITHUB_OUTPUT")
     if github_output:
@@ -96,6 +135,7 @@ def main():
     print(f"install_methods={json.dumps(install_methods)}")
     print(f"distros={json.dumps(distro_keys)}")
     print(f"distro_map={json.dumps(distro_map_out)}")
+
 
 if __name__ == "__main__":
     main()

@@ -47,7 +47,7 @@ where $\gamma$ is the gamma value. Common gamma values include:
   - ROI tensors enable batch processing with different regions per image.
 
 - **Gamma Correction Operation**:
-  - `rppt_gamma_correction_gpu()`: Executes the gamma correction on GPU, taking source and destination descriptors, gamma parameter tensor, and ROI information.
+  - `rppt_gamma_correction()`: Executes the gamma correction on GPU, taking source and destination descriptors, gamma parameter tensor, ROI information, and the execution backend.
   - Gamma values typically range from 0.5 to 2.5 for practical image processing.
   - The operation applies a power-law transformation to adjust tonal distribution.
   - Each image in the batch can have a different gamma value.
@@ -72,7 +72,7 @@ where $\gamma$ is the gamma value. Common gamma values include:
 
 - `rppCreate`
 - `rppDestroy`
-- `rppt_gamma_correction_gpu`
+- `rppt_gamma_correction`
 
 ### HIP runtime
 

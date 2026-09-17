@@ -33,53 +33,59 @@
 #include <iostream>
 
 /// \brief Converts a \p ncclResult_t variable to its correspondent string.
-inline const char* nccl_result_to_string(ncclResult_t result)
-{
-    switch(result)
-    {
-        case ncclSuccess: return "ncclSuccess";
-        case ncclUnhandledCudaError: return "ncclUnhandledCudaError";
-        case ncclSystemError: return "ncclSystemError";
-        case ncclInternalError: return "ncclInternalError";
-        case ncclInvalidArgument: return "ncclInvalidArgument";
-        case ncclInvalidUsage: return "ncclInvalidUsage";
-        case ncclRemoteError: return "ncclRemoteError";
-        case ncclInProgress: return "ncclInProgress";
-        case ncclNumResults: return "ncclNumResults";
-        default: return "<unknown ncclResult_t value>";
-    }
+inline const char *nccl_result_to_string(ncclResult_t result) {
+  switch (result) {
+  case ncclSuccess:
+    return "ncclSuccess";
+  case ncclUnhandledCudaError:
+    return "ncclUnhandledCudaError";
+  case ncclSystemError:
+    return "ncclSystemError";
+  case ncclInternalError:
+    return "ncclInternalError";
+  case ncclInvalidArgument:
+    return "ncclInvalidArgument";
+  case ncclInvalidUsage:
+    return "ncclInvalidUsage";
+  case ncclRemoteError:
+    return "ncclRemoteError";
+  case ncclInProgress:
+    return "ncclInProgress";
+  case ncclNumResults:
+    return "ncclNumResults";
+  default:
+    return "<unknown ncclResult_t value>";
+  }
 }
 
 /// \brief Checks if the provided status code is \p ncclSuccess and if not,
-/// prints an error message to the standard error output and terminates the program
-/// with an error code.
-#define RCCL_CHECK(condition)                                                                    \
-    {                                                                                            \
-        const ncclResult_t result = (condition);                                                 \
-        if(result != ncclSuccess)                                                                \
-        {                                                                                        \
-            std::cerr << "RCCL error encountered: \"" << nccl_result_to_string(result) << "\" (" \
-                      << ncclGetErrorString(result) << ")"                                       \
-                      << " at " << __FILE__ << ':' << __LINE__ << std::endl;                     \
-            std::exit(error_exit_code);                                                          \
-        }                                                                                        \
-    }
+/// prints an error message to the standard error output and terminates the
+/// program with an error code.
+#define RCCL_CHECK(condition)                                                  \
+  {                                                                            \
+    const ncclResult_t result = (condition);                                   \
+    if (result != ncclSuccess) {                                               \
+      std::cerr << "RCCL error encountered: \""                                \
+                << nccl_result_to_string(result) << "\" ("                     \
+                << ncclGetErrorString(result) << ")" << " at " << __FILE__     \
+                << ':' << __LINE__ << std::endl;                               \
+      std::exit(error_exit_code);                                              \
+    }                                                                          \
+  }
 
 /// \brief Detect the number of available GPUs in the system
-inline int detect_num_gpus()
-{
-    int device_count = 0;
-    HIP_CHECK(hipGetDeviceCount(&device_count));
-    return device_count;
+inline int detect_num_gpus() {
+  int device_count = 0;
+  HIP_CHECK(hipGetDeviceCount(&device_count));
+  return device_count;
 }
 
 /// \brief Print information about a specific GPU device
-inline void print_gpu_info(int device_id)
-{
-    hipDeviceProp_t props;
-    HIP_CHECK(hipGetDeviceProperties(&props, device_id));
-    std::cout << "GPU " << device_id << ": " << props.name << " (Compute " << props.major << "."
-              << props.minor << ")" << std::endl;
+inline void print_gpu_info(int device_id) {
+  hipDeviceProp_t props;
+  HIP_CHECK(hipGetDeviceProperties(&props, device_id));
+  std::cout << "GPU " << device_id << ": " << props.name << " (Compute "
+            << props.major << "." << props.minor << ")" << std::endl;
 }
 
 #endif // COMMON_RCCL_UTILS_HPP

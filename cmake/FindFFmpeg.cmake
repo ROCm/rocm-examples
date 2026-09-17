@@ -45,7 +45,7 @@ else()
   endif()
 
   # AVCODEC
-  find_path(AVCODEC_INCLUDE_DIR 
+  find_path(AVCODEC_INCLUDE_DIR
     NAMES libavcodec/avcodec.h
     PATHS ${_FFMPEG_AVCODEC_INCLUDE_DIRS}
       /usr/local/include
@@ -66,7 +66,7 @@ else()
   mark_as_advanced(AVCODEC_LIBRARY)
 
   # AVFORMAT
-  find_path(AVFORMAT_INCLUDE_DIR 
+  find_path(AVFORMAT_INCLUDE_DIR
     NAMES libavformat/avformat.h
     PATHS ${_FFMPEG_AVFORMAT_INCLUDE_DIRS}
       /usr/local/include
@@ -87,7 +87,7 @@ else()
   mark_as_advanced(AVFORMAT_LIBRARY)
 
   # AVUTIL
-  find_path(AVUTIL_INCLUDE_DIR 
+  find_path(AVUTIL_INCLUDE_DIR
     NAMES libavutil/avutil.h
     PATHS ${_FFMPEG_AVUTIL_INCLUDE_DIRS}
       /usr/local/include
@@ -110,7 +110,7 @@ else()
   if(AVCODEC_LIBRARY AND AVFORMAT_LIBRARY)
     set(FFMPEG_FOUND TRUE)
   endif()
-  
+
   if(_FFMPEG_AVCODEC_VERSION VERSION_LESS 58.18.100 OR _FFMPEG_AVFORMAT_VERSION VERSION_LESS 58.12.100 OR _FFMPEG_AVUTIL_VERSION VERSION_LESS 56.14.100)
     if(FFMPEG_FOUND)
       message("-- ${White}FFMPEG   required min version - 4.0.4 Found:${FFMPEG_VERSION}")
@@ -121,7 +121,7 @@ else()
     set(FFMPEG_FOUND FALSE)
     message( "-- ${Yellow}NOTE: FindFFmpeg failed to find -- FFMPEG${ColourReset}" )
   endif()
-  
+
   if(FFMPEG_FOUND)
     set(FFMPEG_INCLUDE_DIR ${AVFORMAT_INCLUDE_DIR} CACHE INTERNAL "")
     set(FFMPEG_LIBRARIES

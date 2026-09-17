@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,38 +31,26 @@ using std::popcount;
 
 #elif defined(__clang__) || defined(__GNUC__)
 
-inline auto popcount(unsigned int x) -> int
-{
-    return __builtin_popcount(x);
-}
+inline auto popcount(unsigned int x) -> int { return __builtin_popcount(x); }
 
-inline auto popcount(unsigned long x) -> int
-{
-    return __builtin_popcountl(x);
-}
+inline auto popcount(unsigned long x) -> int { return __builtin_popcountl(x); }
 
-inline auto popcount(unsigned long long x) -> int
-{
-    return __builtin_popcountll(x);
+inline auto popcount(unsigned long long x) -> int {
+  return __builtin_popcountll(x);
 }
 
 #elif defined(_MSC_VER)
 
 #include <intrin.h>
 
-inline auto popcount(unsigned short x) -> unsigned short
-{
-    return __popcnt16(x);
+inline auto popcount(unsigned short x) -> unsigned short {
+  return __popcnt16(x);
 }
 
-inline auto popcount(unsigned int x) -> unsigned int
-{
-    return __popcnt(x);
-}
+inline auto popcount(unsigned int x) -> unsigned int { return __popcnt(x); }
 
-inline auto popcount(unsigned __int64 x) -> unsigned __int64
-{
-    return __popcnt64(x);
+inline auto popcount(unsigned __int64 x) -> unsigned __int64 {
+  return __popcnt64(x);
 }
 
 #endif

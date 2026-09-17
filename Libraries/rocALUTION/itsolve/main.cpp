@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,140 +28,137 @@
 
 using namespace rocalution;
 
-int main(int argc, char* argv[])
-{
-    // Parse command line arguments
-    cli::Parser parser(argc, argv);
-    parser.set_optional<std::string>("matrix",
-                                     "matrix",
-                                     std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
-                                     "Path to matrix file in MTX format");
-    parser.set_optional<int>("threads", "threads", 0, "Number of OMP threads (0 = default)");
-    parser.run_and_exit_if_error();
+int main(int argc, char *argv[]) {
+  // Parse command line arguments
+  cli::Parser parser(argc, argv);
+  parser.set_optional<std::string>(
+      "matrix", "matrix", std::string(EXAMPLE_DATA_DIR) + "/gr_30_30.mtx",
+      "Path to matrix file in MTX format");
+  parser.set_optional<int>("threads", "threads", 0,
+                           "Number of OMP threads (0 = default)");
+  parser.run_and_exit_if_error();
 
-    std::string matrix_file = parser.get<std::string>("matrix");
-    int         num_threads = parser.get<int>("threads");
+  std::string matrix_file = parser.get<std::string>("matrix");
+  int num_threads = parser.get<int>("threads");
 
-    // Initialize rocALUTION
-    init_rocalution();
+  // Initialize rocALUTION
+  init_rocalution();
 
-    // Set number of OMP threads if specified
-    if(num_threads > 0)
-    {
-        set_omp_threads_rocalution(num_threads);
+  // Set number of OMP threads if specified
+  if (num_threads > 0) {
+    set_omp_threads_rocalution(num_threads);
+  }
+
+  // Print rocALUTION info
+  info_rocalution();
+
+  // rocALUTION objects
+  LocalVector<double> x;
+  LocalVector<double> rhs;
+  LocalVector<double> e;
+  LocalMatrix<double> mat;
+
+  // Read matrix from MTX file
+  mat.ReadFileMTX(matrix_file);
+
+  // Move objects to accelerator
+  mat.MoveToAccelerator();
+  x.MoveToAccelerator();
+  rhs.MoveToAccelerator();
+  e.MoveToAccelerator();
+
+  // Allocate vectors
+  x.Allocate("x", mat.GetN());
+  rhs.Allocate("rhs", mat.GetM());
+  e.Allocate("e", mat.GetN());
+
+  // Linear Solver
+  FixedPoint<LocalMatrix<double>, LocalVector<double>, double> fp;
+
+  // Preconditioner
+  ItILU0<LocalMatrix<double>, LocalVector<double>, double> p;
+
+  // Set iterative ILU stopping criteria
+  p.SetTolerance(1e-8);
+  p.SetMaxIter(50);
+
+  const int option = ItILU0Option::Verbose | ItILU0Option::StoppingCriteria |
+                     ItILU0Option::ComputeNrmCorrection |
+                     ItILU0Option::ComputeNrmResidual |
+                     ItILU0Option::ConvergenceHistory;
+
+  p.SetOptions(option);
+
+  p.SetAlgorithm(ItILU0Algorithm::SyncSplit);
+
+  // Set up iterative triangular solve
+  SolverDescr descr;
+  descr.SetTriSolverAlg(TriSolverAlg_Iterative);
+  descr.SetIterativeSolverMaxIteration(30);
+  descr.SetIterativeSolverTolerance(1e-8);
+
+  p.SetSolverDescriptor(descr);
+
+  // Initialize rhs such that A 1 = rhs
+  e.Ones();
+  mat.Apply(e, &rhs);
+
+  // Initial zero guess
+  x.Zeros();
+
+  // Set solver operator
+  fp.SetOperator(mat);
+  // Set solver preconditioner
+  fp.SetPreconditioner(p);
+
+  // Build solver
+  fp.Build();
+
+  // Verbosity output
+  fp.Verbose(1);
+
+  // Print matrix info
+  mat.Info();
+
+  // Start time measurement
+  double tick, tack;
+  tick = rocalution_time();
+
+  // Solve A x = rhs
+  fp.Solve(rhs, &x);
+
+  // Stop time measurement
+  tack = rocalution_time();
+  std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec"
+            << std::endl;
+
+  int niter_preconditioner;
+  const double *history = p.GetConvergenceHistory(&niter_preconditioner);
+  std::cout << "ItILU0::niter = " << niter_preconditioner << std::endl;
+  if ((option & ItILU0Option::ComputeNrmCorrection) > 0) {
+    for (int i = 0; i < niter_preconditioner; ++i) {
+      std::cout << "ItILU0::CorrectionNrm[" << i << "] = " << history[i]
+                << std::endl;
     }
+  }
 
-    // Print rocALUTION info
-    info_rocalution();
-
-    // rocALUTION objects
-    LocalVector<double> x;
-    LocalVector<double> rhs;
-    LocalVector<double> e;
-    LocalMatrix<double> mat;
-
-    // Read matrix from MTX file
-    mat.ReadFileMTX(matrix_file);
-
-    // Move objects to accelerator
-    mat.MoveToAccelerator();
-    x.MoveToAccelerator();
-    rhs.MoveToAccelerator();
-    e.MoveToAccelerator();
-
-    // Allocate vectors
-    x.Allocate("x", mat.GetN());
-    rhs.Allocate("rhs", mat.GetM());
-    e.Allocate("e", mat.GetN());
-
-    // Linear Solver
-    FixedPoint<LocalMatrix<double>, LocalVector<double>, double> fp;
-
-    // Preconditioner
-    ItILU0<LocalMatrix<double>, LocalVector<double>, double> p;
-
-    // Set iterative ILU stopping criteria
-    p.SetTolerance(1e-8);
-    p.SetMaxIter(50);
-
-    const int option = ItILU0Option::Verbose | ItILU0Option::StoppingCriteria
-                       | ItILU0Option::ComputeNrmCorrection | ItILU0Option::ComputeNrmResidual
-                       | ItILU0Option::ConvergenceHistory;
-
-    p.SetOptions(option);
-
-    p.SetAlgorithm(ItILU0Algorithm::SyncSplit);
-
-    // Set up iterative triangular solve
-    SolverDescr descr;
-    descr.SetTriSolverAlg(TriSolverAlg_Iterative);
-    descr.SetIterativeSolverMaxIteration(30);
-    descr.SetIterativeSolverTolerance(1e-8);
-
-    p.SetSolverDescriptor(descr);
-
-    // Initialize rhs such that A 1 = rhs
-    e.Ones();
-    mat.Apply(e, &rhs);
-
-    // Initial zero guess
-    x.Zeros();
-
-    // Set solver operator
-    fp.SetOperator(mat);
-    // Set solver preconditioner
-    fp.SetPreconditioner(p);
-
-    // Build solver
-    fp.Build();
-
-    // Verbosity output
-    fp.Verbose(1);
-
-    // Print matrix info
-    mat.Info();
-
-    // Start time measurement
-    double tick, tack;
-    tick = rocalution_time();
-
-    // Solve A x = rhs
-    fp.Solve(rhs, &x);
-
-    // Stop time measurement
-    tack = rocalution_time();
-    std::cout << "Solver execution:" << (tack - tick) / 1e6 << " sec" << std::endl;
-
-    int           niter_preconditioner;
-    const double* history = p.GetConvergenceHistory(&niter_preconditioner);
-    std::cout << "ItILU0::niter = " << niter_preconditioner << std::endl;
-    if((option & ItILU0Option::ComputeNrmCorrection) > 0)
-    {
-        for(int i = 0; i < niter_preconditioner; ++i)
-        {
-            std::cout << "ItILU0::CorrectionNrm[" << i << "] = " << history[i] << std::endl;
-        }
+  if ((option & ItILU0Option::ComputeNrmResidual) > 0) {
+    for (int i = 0; i < niter_preconditioner; ++i) {
+      std::cout << "ItILU0::ResidualNrm[" << i
+                << "] = " << history[niter_preconditioner + i] << std::endl;
     }
+  }
 
-    if((option & ItILU0Option::ComputeNrmResidual) > 0)
-    {
-        for(int i = 0; i < niter_preconditioner; ++i)
-        {
-            std::cout << "ItILU0::ResidualNrm[" << i << "] = " << history[niter_preconditioner + i]
-                      << std::endl;
-        }
-    }
+  // Clear solver
+  fp.Clear();
 
-    // Clear solver
-    fp.Clear();
+  // Compute error L2 norm
+  e.ScaleAdd(-1.0, x);
+  double error = e.Norm();
+  std::cout << "||e - x||_2 = " << error << std::endl;
 
-    // Compute error L2 norm
-    e.ScaleAdd(-1.0, x);
-    double error = e.Norm();
-    std::cout << "||e - x||_2 = " << error << std::endl;
+  // Stop rocALUTION platform
+  stop_rocalution();
 
-    // Stop rocALUTION platform
-    stop_rocalution();
-
-    return 0;
+  return 0;
 }

@@ -39,10 +39,10 @@ jobs:
             image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14
         steps:
           # see https://github.com/dorny/paths-filter/issues/212
-          - uses: actions/checkout@v4
+          - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
           - name: Trust git directory
             run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
-          - uses: dorny/paths-filter@v3
+          - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
             id: changes
             with:
               filters: |
@@ -61,11 +61,12 @@ jobs:
           - name: Generate skip lists
             run: |
               python3 .github/build_tools/generate_skip_tests.py --channel stable --target "${GPU_TARGETS%%;*}"
-          - name: CMake Configure and Build
+          - name: CMake Configure, Build, and Install
             run: |
               cd Libraries
               cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -DROCM_EXAMPLES_ENABLE_OPENMP=ON -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" -S . -B build
               cmake --build build --parallel $(nproc)
+              cmake --install build --prefix install
           - name: Make
             run: |
               cd Libraries

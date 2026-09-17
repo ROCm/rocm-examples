@@ -81,7 +81,7 @@ applies everywhere). Always include a ``reason``.
 
 # rocDecode leaf directories. All ten need the video test data + utility sources
 # under $ROCM_PATH/share/rocdecode. The pinned stable image ships these via the
-# amdrocm-decode-test package, and the nightly tarball carries them too, so
+# amdrocm-decode-test package, and the nightly "-tests" tarball carries them too, so
 # rocDecode builds and its tests run in both. The nightly whl install does NOT
 # carry the data, so the make-test skip is scoped to that install method.
 # ctest self-guards each on `if(EXISTS ...)`, so the ctest key is None (ctest
@@ -127,7 +127,7 @@ SKIP_MANIFEST = [
             "scope": ["test"],
             "channels": ["nightly"],
             "install_methods": ["whl-multi-arch"],
-            "reason": "video test data absent from the TheRock nightly whl install (present on the stable image via amdrocm-decode-test and in the nightly tarball)",
+            "reason": "video test data absent from the TheRock nightly whl install (present on the stable image via amdrocm-decode-test and in the nightly tests tarball)",
         }
         for d in _ROCDECODE_DIRS
     ],
@@ -139,5 +139,31 @@ SKIP_MANIFEST = [
         "scope": ["build"],
         "channels": ["stable"],
         "reason": "hip_scan.h not present in the pinned 7.14 stable image",
+    },
+    # --- Stable-only build skip ------------
+    # The experimental thread-trace shader-data callback was changed to take a
+    # single rocprofiler_thread_trace_shader_data_t struct; the pinned 7.14 stable
+    # image still ships the older multi-arg callback and has no such struct, so the
+    # updated example does not compile there. Nightly TheRock builds carry the new
+    # API and build it, so scope this skip to the stable channel only.
+    {
+        "ctest": None,
+        "path": "Libraries/rocProfiler-SDK/thread_trace",
+        "scope": ["build"],
+        "channels": ["stable"],
+        "reason": "rocprofiler_thread_trace_shader_data_t (new single-struct shader-data callback) absent from the pinned 7.14 stable image",
+    },
+    # --- hipThreads: nightly whl build skip (whole tree) ------------------
+    # The TheRock nightly whl ships hipthreads headers + libhipthreads.a but an
+    # empty include/libhipcxx, so the libhipcxx headers the examples include
+    # (hip/std, hip/atomic) are absent and every hipthreads-linked example fails
+    # to compile. Skip the whole Libraries/hipThreads tree until the nightly whl
+    # ships libhipcxx at include/libhipcxx (ROCm/TheRock#7530 disabled it).
+    {
+        "ctest": None,
+        "path": "Libraries/hipThreads",
+        "scope": ["build"],
+        "channels": ["nightly"],
+        "reason": "libhipcxx headers (hip/std, hip/atomic) absent from include/libhipcxx in the TheRock nightly whl (ROCm/TheRock#7530); hipthreads ships but is unbuildable without them",
     },
 ]

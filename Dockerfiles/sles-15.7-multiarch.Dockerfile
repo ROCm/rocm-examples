@@ -57,8 +57,10 @@ RUN zypper -qni update -y && \
 # evaluation until instantiation (P2593R1).
 # gcc13-c++ is not in the SLES base image and SUSEConnect requires registration,
 # so we pull it from the openSUSE Leap 15.6 OSS repo (binary-compatible with SLE 15).
+# opencv-devel, needed by the RPP examples, is absent from SLE_BCI for the same
+# reason and comes from the same repo.
 RUN zypper -qni addrepo -G https://download.opensuse.org/distribution/leap/15.6/repo/oss/ leap-oss && \
-    zypper -qni install -y gcc13-c++ libstdc++6-devel-gcc13 && \
+    zypper -qni install -y gcc13-c++ libstdc++6-devel-gcc13 opencv-devel && \
     update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-13 130 && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 130 && \
     update-alternatives --install /usr/bin/cc cc /usr/bin/gcc-13 130 && \
@@ -122,6 +124,7 @@ RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
     ./configure --enable-pic --enable-shared && \
     make -j$(nproc) && \
     make install && \
+    ldconfig && \
     rm -rf /tmp/ffmpeg-4.4.6*
 
 ENV HIP_PLATFORM=amd

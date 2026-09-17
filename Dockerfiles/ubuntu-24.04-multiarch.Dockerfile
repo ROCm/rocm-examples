@@ -26,9 +26,6 @@
 #
 # Build manually:
 #   docker build -t rocm-examples-test-ubuntu-24.04 -f Dockerfile.ubuntu-24.04 .
-#
-# Run tests (preferred):
-#   ./run-tests.sh --distro ubuntu-24.04 [/path/to/rocm-examples] [ctest-filter]
 
 FROM ubuntu:24.04
 
