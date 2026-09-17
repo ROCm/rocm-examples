@@ -92,11 +92,13 @@ jobs:
 
       - name: Compute is_new
         id: dedup
+        env:
+          FORCE: ${{ github.event.inputs.force }}
         run: |
           # is_new = there is a ready build we have not recorded yet (or --force).
           if [ "${{ steps.consume.outputs.resolved }}" != "true" ]; then
             echo "is_new=false" >> "$GITHUB_OUTPUT"
-          elif [ "${{ steps.marker.outputs.cache-hit }}" = "true" ] && [ "${{ github.event.inputs.force }}" != "true" ]; then
+          elif [ "${{ steps.marker.outputs.cache-hit }}" = "true" ] && [ "$FORCE" != "true" ]; then
             echo "is_new=false" >> "$GITHUB_OUTPUT"
           else
             echo "is_new=true" >> "$GITHUB_OUTPUT"
