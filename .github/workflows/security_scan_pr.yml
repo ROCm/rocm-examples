@@ -1,0 +1,24 @@
+# Copyright Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: MIT
+#
+# Pre-commit security gate: fast, PR-side security scanners that run on
+# every pull request. The set of scanners lives in `security-baseline.yml`,
+# so scanners coming online are picked up here without touching this file.
+
+name: Security scan (PR)
+
+on:
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  security:
+    uses: ROCm/rocm-security-gh/.github/workflows/security-baseline.yml@3a1bd0da89771757df435817daae14d1635b7fdb # v1.0.1
+    with:
+      report_formats: human
