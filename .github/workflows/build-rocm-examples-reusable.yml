@@ -42,7 +42,7 @@ jobs:
     name: "${{ fromJson(inputs.distro_map)[inputs.distro].label }} - ${{ matrix.gpu_config.gpu_target }} - ${{ matrix.install_method }}"
     runs-on: [self-hosted, Linux, "${{ matrix.gpu_config.therock_family }}"]
     container:
-      image: ${{ fromJson(inputs.distro_map)[inputs.distro].image }}
+      image: ${{ fromJson(inputs.distro_map)[inputs.distro].image }} # zizmor: ignore[unpinned-images]
       options:
         --group-add video
         --device /dev/kfd
@@ -64,18 +64,21 @@ jobs:
       - name: Install ROCm (whl-multi-arch)
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
         id: install-whl
+        env:
+          ROCM_VERSION: ${{ inputs.rocm_version }}
+          WHEELS_URL: ${{ inputs.wheels_url }}
         run: |
           echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
           pip install --no-cache-dir --upgrade pip
           PKG="rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
           # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
           # otherwise install whatever is latest on the index.
-          if [ -n "${{ inputs.rocm_version }}" ]; then
-            PKG="${PKG}==${{ inputs.rocm_version }}"
+          if [ -n "$ROCM_VERSION" ]; then
+            PKG="${PKG}==${ROCM_VERSION}"
           fi
           # Prefer the index Quartz published for this build; fall back to the
           # current default nightly index for non-Quartz callers.
-          INDEX_URL="${{ inputs.wheels_url }}"
+          INDEX_URL="$WHEELS_URL"
           if [ -z "$INDEX_URL" ]; then
             INDEX_URL="https://nightly.repo.amd.com/rocm/whl-next/"
           fi
@@ -101,18 +104,21 @@ jobs:
       - name: Install TheRock tarball (multi-arch)
         if: ${{ matrix.install_method == 'tarball-multi-arch' }}
         id: install-tarball-multi-arch
+        env:
+          ROCM_VERSION: ${{ inputs.rocm_version }}
+          TARBALLS_URL: ${{ inputs.tarballs_url }}
         run: |
           # Prefer the tarball base Quartz published for this build; fall back to
           # the current default nightly base for non-Quartz callers.
-          TARBALL_BASE="${{ inputs.tarballs_url }}"
+          TARBALL_BASE="$TARBALLS_URL"
           if [ -z "$TARBALL_BASE" ]; then
             TARBALL_BASE="https://nightly.repo.amd.com/rocm/core/tarball/"
           fi
           TARBALL_BASE="${TARBALL_BASE%/}/"
           # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
           # otherwise pick the latest tarball on the index.
-          if [ -n "${{ inputs.rocm_version }}" ]; then
-            LATEST_TARBALL="therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-${{ inputs.rocm_version }}.tar.gz"
+          if [ -n "$ROCM_VERSION" ]; then
+            LATEST_TARBALL="therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-${ROCM_VERSION}.tar.gz"
           else
             TARBALL_LISTING=$(curl -s -H "Cache-Control: no-cache" -H "Pragma: no-cache" "${TARBALL_BASE}" \
               | grep -oE "therock-dist-linux-${{ matrix.gpu_config.therock_family }}-tests-[0-9]+\.[0-9]+\.\w+\.tar\.gz")
@@ -184,6 +190,8 @@ jobs:
       - name: Generate skip lists
         if: ${{ !cancelled() && steps.environment-status.outputs.ok == 'true' }}
         id: skip-lists
+        env:
+          DISTRO: ${{ inputs.distro }}
         run: |
           # The preinstalled distro is the pinned rocm:7.14 image, i.e. the "stable"
           # channel; every other install method pulls a TheRock "nightly" build.
@@ -195,7 +203,7 @@ jobs:
           python3 .github/build_tools/generate_skip_tests.py \
             --channel "$CHANNEL" \
             --target "${{ matrix.gpu_config.gpu_target }}" \
-            --distro "${{ inputs.distro }}" \
+            --distro "$DISTRO" \
             --install-method "${{ matrix.install_method }}"
 
       - name: Makefile build
