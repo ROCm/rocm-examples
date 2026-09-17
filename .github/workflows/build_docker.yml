@@ -40,7 +40,7 @@ jobs:
         files: ${{ steps.find-files.outputs.files }}
       steps:
         - name: Checkout repository
-          uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+          uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         - name: Find Dockerfiles
           id: find-files
           run: |
@@ -70,10 +70,10 @@ jobs:
           file: ${{fromJson(needs.find-dockerfiles.outputs.files)}}
       steps:
         - name: Checkout repository
-          uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+          uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
         - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+          uses: docker/setup-buildx-action@37fe631027851001ddb9b187196cc803df7f5f0e # v4.3.0
 
         - name: Generate image tag
           id: image-tag
@@ -94,7 +94,7 @@ jobs:
 
         - name: Log in to GHCR
           if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-          uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+          uses: docker/login-action@dbcb813823bdd20940b903addbd779551569679f # v4.6.0
           with:
             registry: ${{ env.REGISTRY }}
             username: ${{ github.actor }}
@@ -102,7 +102,7 @@ jobs:
 
         - name: Extract metadata (tags, labels) for Docker
           id: meta
-          uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+          uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
           with:
             images: ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-${{ steps.image-tag.outputs.name }}
             tags: |
@@ -117,7 +117,7 @@ jobs:
               type=raw,value=${{ steps.rocm-version.outputs.version }},enable=${{ matrix.file == 'ubuntu-24.04-rocm.Dockerfile' && steps.rocm-version.outputs.version != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || (github.event_name == 'workflow_dispatch' && inputs.tag_latest)) }}
 
         - name: Build and push Docker image for ${{ matrix.file }}
-          uses: docker/build-push-action@ca052bb54ab0790a636c9b5f226502c73d547a25 # v5.4.0
+          uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7.3.0
           with:
             context: Dockerfiles/
             file: Dockerfiles/${{ matrix.file }}

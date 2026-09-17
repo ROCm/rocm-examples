@@ -59,7 +59,7 @@ jobs:
     steps:
       - name: Checkout repository
         id: checkout
-        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Install ROCm (whl-multi-arch)
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
@@ -281,7 +281,7 @@ jobs:
         if: ${{ !cancelled() }}
         id: upload-cmake-build
         continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: rocm-examples-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/
@@ -290,7 +290,7 @@ jobs:
         if: ${{ !cancelled() }}
         id: upload-make-build
         continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: makefile-build-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: /tmp/makefile_build/
@@ -350,7 +350,7 @@ jobs:
         if: ${{ !cancelled() }}
         id: upload-ctest-logs
         continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: ctest-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: build/Testing/Temporary/
@@ -365,7 +365,7 @@ jobs:
         if: ${{ !cancelled() }}
         id: upload-make-test-logs
         continue-on-error: true
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: makefile-test-logs-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}-${{ matrix.install_method }}
           path: makefile_test_output.log
@@ -407,7 +407,7 @@ jobs:
 
       - name: Upload job status
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: status-${{ inputs.distro }}-${{ matrix.gpu_config.gpu_target }}-${{ matrix.install_method }}
           path: job-status.txt
