@@ -8,7 +8,7 @@ the
 
 ### Application flow
 
-1. Query the GPU device properties and check for a supported GPU architecture.
+1. Query the GPU device properties and select the FP8 interpretation for the GPU architecture.
 2. On the host side:
    1. Create an input vector and an output vector consisting of 32-bit floating-point numbers.
    2. Initialize the input vector.
@@ -39,8 +39,11 @@ the
   synchronizes the device with the host, ensuring that all kernels queued before the call finish executing before the
   transfer begins. The function completes once the copying operation is finished.
 * Use `hipGetErrorString` to convert a HIP error code into a human-readable string.
-* Use `hipGetDeviceProperties` to query the GPU's information and check for a supported GPU architecture.
+* Use `hipGetDeviceProperties` to query the GPU's information and select the appropriate FP8 interpretation.
 * Use `__hip_cvt_float_to_fp8` to convert a 32-bit floating-point number to its 8-bit equivalent.
+* Use `__hip_cvt_fp8_to_halfraw` to convert the raw 8-bit value to half precision before converting it back to a
+  32-bit floating-point number. HIP uses a portable conversion implementation on GPU architectures without native FP8
+  conversion instructions.
 
 ## Demonstrated API calls
 
@@ -50,6 +53,7 @@ the
 
 * `threadIdx`
 * `__hip_cvt_float_to_fp8`
+* `__hip_cvt_fp8_to_halfraw`
 
 #### Host symbols
 
@@ -59,3 +63,4 @@ the
 * `hipMemcpy`
 * `hipFree`
 * `__hip_cvt_float_to_fp8`
+* `__hip_cvt_fp8_to_halfraw`
