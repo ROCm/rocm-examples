@@ -19,7 +19,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-    HIPSDK_INSTALLER_VERSION: 25.Q3
+    HIPSDK_INSTALLER_VERSION: 26.Q3
     VULKAN_SDK: C:\VulkanSDK\1.4.313.2\
     GLFW_DIR: C:\glfw-3.4.bin.WIN64\
 
@@ -45,8 +45,8 @@ jobs:
           - name: Install HIP SDK
             run: |
                   $ProgressPreference = 'SilentlyContinue'
-                  Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe"
-                  Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe -OutFile HIPSDK.exe
+                  Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win11-For-HIP.exe"
+                  Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win11-For-HIP.exe -OutFile HIPSDK.exe
                   Write-Host "Installing HIP SDK"
                   Start-Process HIPSDK.exe -ArgumentList '-install','-log',"$((Get-Location).Path)\installer_log.txt" -NoNewWindow -Wait
                   Write-Host "Installer log:"

@@ -20,33 +20,43 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-  address_retrieval \
-  device_code_feature_identification \
-  host_code_feature_identification \
-  identifying_compilation_target_platform \
-  identifying_host_device_compilation_pass \
-  lane_masks_bit_shift \
-  load_module \
-  load_module_ex \
-  per_thread_default_stream \
-  pointer_memory_type
+EXAMPLE := hip_lane_masks_bit_shift
+GPU_RUNTIME ?= HIP
 
-SKIP_FROM_TEST :=
+# HIP variables
+ROCM_PATH ?= /opt/rocm
+HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
+
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+
+# Common variables and flags
+CXX_STD   := c++17
+ICXXFLAGS := -std=$(CXX_STD)
+ICPPFLAGS :=
+ILDFLAGS  :=
+ILDLIBS   :=
 
 ifeq ($(GPU_RUNTIME), CUDA)
-  EXAMPLES += load_module_ex_cuda
+  ICXXFLAGS += -x cu
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+else ifeq ($(GPU_RUNTIME), HIP)
+  CXXFLAGS ?= -Wall -Wextra
+else
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
 
-all: $(EXAMPLES)
+ICXXFLAGS += $(CXXFLAGS)
+ICPPFLAGS += $(CPPFLAGS)
+ILDFLAGS  += $(LDFLAGS)
+ILDLIBS   += $(LDLIBS)
 
-clean: TARGET=clean
-clean: all
+$(EXAMPLE): main.hip
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
 
-test: TARGET=test
-test: $(filter-out $(SKIP_FROM_TEST),$(EXAMPLES))
+clean:
+	$(RM) $(EXAMPLE)
 
-.PHONY: all clean test $(EXAMPLES)
+.PHONY: clean
