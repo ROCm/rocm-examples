@@ -193,7 +193,7 @@ jobs:
         env:
           DISTRO: ${{ inputs.distro }}
         run: |
-          # The preinstalled distro is the pinned rocm:7.14 image, i.e. the "stable"
+          # The preinstalled distro is the pinned rocm:10.0 image, i.e. the "stable"
           # channel; every other install method pulls a TheRock "nightly" build.
           if [ "${{ matrix.install_method }}" = "preinstalled" ]; then
             CHANNEL=stable
