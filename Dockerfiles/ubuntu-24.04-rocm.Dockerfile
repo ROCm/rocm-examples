@@ -22,7 +22,7 @@
 
 FROM ubuntu:24.04
 
-ARG ROCM_VERSION=7.14
+ARG ROCM_VERSION=10.0
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -59,16 +59,16 @@ RUN apt-get update -qq && \
 # packages; the prerelease repo is pinned to priority 1 so only packages
 # absent from stable (the -test data packages) are pulled from it.
 RUN mkdir --parents --mode=0755 /etc/apt/keyrings && \
-    wget https://repo.amd.com/rocm/packages-multi-arch/gpg/rocm.gpg -O - | \
+    wget https://stable.repo.amd.com/rocm/gpg/packages.gpg -O - | \
     gpg --dearmor | tee /etc/apt/keyrings/amdrocm.gpg > /dev/null && \
-    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/amdrocm.gpg] https://repo.amd.com/rocm/packages-multi-arch/ubuntu2404 stable main" | tee /etc/apt/sources.list.d/rocm.list && \
+    echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/amdrocm.gpg] https://stable.repo.amd.com/rocm/core/packages/ubuntu2404 stable main" | tee /etc/apt/sources.list.d/rocm.list && \
     wget https://rocm.prereleases.amd.com/packages-multi-arch/gpg/rocm.gpg -O - | \
     gpg --dearmor | tee /etc/apt/keyrings/amdrocm-prerelease.gpg > /dev/null && \
     echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/amdrocm-prerelease.gpg] https://rocm.prereleases.amd.com/packages-multi-arch/ubuntu2404 stable main" | tee /etc/apt/sources.list.d/rocm-prerelease.list && \
     echo "Package: *\nPin: origin \"rocm.prereleases.amd.com\"\nPin-Priority: 1" | tee /etc/apt/preferences.d/rocm-prerelease > /dev/null
 
 # Install ROCm
-# amdrocm-decode-test is only published in the prerelease repo (7.14.0~pre3)
+# amdrocm-decode-test is only published in the prerelease repo (10.0.0~pre4)
 RUN apt update && \
     apt install -y \
         amdrocm-core-sdk${ROCM_VERSION} \
