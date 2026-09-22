@@ -29,7 +29,7 @@ represent, including casing. If any directory does not represent a library, it
 should named in `camelCase`.
 - Directories for individual examples use `snake_case`.
 - Files generally use `snake_case`, with the exception of files for which an
-existing convention already applies (`README.md`, `LICENSE.md`, `CMakeLists.txt`,
+existing convention already applies (`README.md`, `LICENSE`, `CMakeLists.txt`,
  etc).
 - Example binaries should be prefixed with the library name of the binary, so
 hat there are no conflicts between libraries (e.g. `hipcub_device_sum` and
