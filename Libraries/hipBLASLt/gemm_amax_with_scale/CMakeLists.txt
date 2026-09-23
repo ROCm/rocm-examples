@@ -25,7 +25,7 @@ set(example_name hipblaslt_gemm_amax_with_scale)
 cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../Common/HipPlatform.cmake")
+include("../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -35,7 +35,7 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 select_hip_platform()
 verify_hip_platform(PLATFORMS "amd")
 
-include("../../../Common/ROCmPath.cmake")
+include("../../../cmake/ROCmPath.cmake")
 
 find_package(hipblaslt REQUIRED)
 

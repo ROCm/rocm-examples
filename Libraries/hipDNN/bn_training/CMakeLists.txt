@@ -35,7 +35,7 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(hipdnn_frontend REQUIRED CONFIG)
 find_package(hipdnn_test_sdk REQUIRED CONFIG)

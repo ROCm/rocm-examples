@@ -25,7 +25,7 @@ set(example_name hiptensor_contraction_scale_f32_f32)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
@@ -34,11 +34,11 @@ endif()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/ROCmPath.cmake")
 
 find_package(hiptensor REQUIRED)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/FilterHIPArchitectures.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/FilterHIPArchitectures.cmake")
 filter_hip_architectures("hipTensor" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx11-generic;gfx1200;gfx1201;gfx1250;gfx12-generic" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()

@@ -35,7 +35,7 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(rocblas REQUIRED)
 find_package(rocsolver REQUIRED)

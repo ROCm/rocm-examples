@@ -31,12 +31,12 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FilterHIPArchitectures.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FilterHIPArchitectures.cmake")
 filter_hip_architectures("CK Tile MoE-SmoothQuant example" "gfx908;gfx90a;gfx942;gfx950" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
@@ -47,10 +47,10 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/ROCmPath.cmake")
 
 find_package(composable_kernel REQUIRED)
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/FindCKTile.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
