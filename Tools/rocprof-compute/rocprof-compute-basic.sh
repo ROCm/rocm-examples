@@ -61,13 +61,15 @@ else
     echo "==============================================================================="
     echo "Profiling workload and saving in rocpd file format"
     echo "==============================================================================="
-    # The following will store the results in *.rocpd file(s). rocprof-compute also supports csv (default).
-    ${EXAMPLE_TOOL} profile \
-        --name ${EXAMPLE_BIN}_rocpd \
-        --format-rocprof-output rocpd \
-        --retain-rocpd-output \
-        --no-roof \
-        -- $EXAMPLE_WORKLOAD
+    # --format-rocprof-output selects rocpd output only for 3.3.0 <= version < 3.9.0. From v3.9.0 (ROCm 10.1) rocpd is
+    # the default and the flag was removed, so passing it aborts with "unrecognized arguments". Add it only below 3.9.0.
+    profile_args=(--name "${EXAMPLE_BIN}_rocpd")
+    if ! printf '3.9.0\n%s\n' $RPCVER | sort -V -C; then
+        profile_args+=(--format-rocprof-output rocpd)
+    fi
+    profile_args+=(--retain-rocpd-output --no-roof)
+    # The following will store the results in *.rocpd file(s). rocprof-compute also supports csv.
+    ${EXAMPLE_TOOL} profile "${profile_args[@]}" -- $EXAMPLE_WORKLOAD
 fi
 
 # Check if the workload directory exists before analyzing
