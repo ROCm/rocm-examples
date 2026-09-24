@@ -8,6 +8,7 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - '.github/workflows/**'
+      - '.github/build_tools/**'
   workflow_dispatch:
     inputs:
       gpu_config:

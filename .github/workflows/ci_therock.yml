@@ -16,6 +16,7 @@ on:
       - 'CMakeLists.txt'
       - 'Makefile'
       - '.github/workflows/**'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
@@ -31,6 +32,7 @@ on:
       - 'CMakeLists.txt'
       - 'Makefile'
       - '.github/workflows/**'
+      - '.github/build_tools/**'
   workflow_dispatch:
     inputs:
       gpu_config:
