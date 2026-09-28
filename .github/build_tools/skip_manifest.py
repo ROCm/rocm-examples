@@ -7,7 +7,7 @@ The generator (``generate_skip_tests.py``) reads this list and produces the
 per-consumer artifacts:
 
   * ``skip_tests.txt``  -> consumed by ``ctest --exclude-from-file``
-  * ``skip_build.txt``  -> consumed by ``Common/SkipExamples.cmake``
+  * ``skip_build.txt``  -> consumed by ``cmake/SkipExamples.cmake``
   * ``SKIP_FROM_TEST``  -> passed on the ``make test`` command line
   * ``SKIP_FROM_BUILD`` -> passed on the ``make`` command line
 

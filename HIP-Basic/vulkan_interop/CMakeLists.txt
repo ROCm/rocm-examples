@@ -25,7 +25,7 @@ set(example_name hip_vulkan_interop)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
@@ -34,7 +34,7 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 add_executable(${example_name} main.hip vulkan_utils.hip)
 

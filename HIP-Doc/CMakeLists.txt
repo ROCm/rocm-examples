@@ -25,8 +25,8 @@ project(HIP-Doc LANGUAGES CXX)
 
 include(CTest)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/HipPlatform.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/ROCmPath.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()

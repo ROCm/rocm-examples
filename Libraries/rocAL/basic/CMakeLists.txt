@@ -39,7 +39,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_library(ROCAL_LIBRARY
     NAMES rocal

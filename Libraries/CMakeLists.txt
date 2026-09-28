@@ -24,7 +24,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(Libraries LANGUAGES CXX)
 include(CTest)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/ROCmPath.cmake")
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})

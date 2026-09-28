@@ -24,8 +24,8 @@ cmake_minimum_required(VERSION 3.21.3 FATAL_ERROR)
 project(ROCm-SDK-Examples LANGUAGES CXX VERSION 6.4.0)
 include(CTest)
 
-include("${CMAKE_CURRENT_LIST_DIR}/Common/HipPlatform.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/cmake/ROCmPath.cmake")
 
 # Set default build type to Release
 if(NOT CMAKE_BUILD_TYPE)

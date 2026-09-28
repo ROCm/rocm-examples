@@ -36,7 +36,7 @@ jobs:
           - name: CMake Configure, Build, and Install
             run: |
               cd Tools
-              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" -S . -B build
+              cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/cmake/SkipExamples.cmake" -S . -B build
               cmake --build build -j
               cmake --install build --prefix install
           - name: Make

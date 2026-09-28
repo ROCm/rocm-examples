@@ -25,7 +25,7 @@ set(example_name rocwmma_perf_i8gemm)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX HIP)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FilterHIPArchitectures.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/FilterHIPArchitectures.cmake")
 filter_hip_architectures("rocWMMA perf_i8gemm example" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
@@ -40,7 +40,7 @@ set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(hip REQUIRED)
 # Try to find rocWMMA as a package first

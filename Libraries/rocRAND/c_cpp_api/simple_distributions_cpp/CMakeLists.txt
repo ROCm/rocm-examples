@@ -25,7 +25,7 @@ set(example_name rocrand_simple_distributions_cpp)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")

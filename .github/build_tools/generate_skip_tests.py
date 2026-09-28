@@ -7,7 +7,7 @@ by the requested channel/target/distro, emits:
   * ``skip_tests.txt``  -- ctest names (scope contains "test", ctest key set).
                            Consumed by ``ctest --exclude-from-file``.
   * ``skip_build.txt``  -- repo-relative paths (scope contains "build").
-                           Consumed by ``Common/SkipExamples.cmake``.
+                           Consumed by ``cmake/SkipExamples.cmake``.
   * ``SKIP_FROM_TEST``  -- space-separated repo-relative leaf paths (scope test).
   * ``SKIP_FROM_BUILD`` -- space-separated repo-relative leaf paths (scope build).
 

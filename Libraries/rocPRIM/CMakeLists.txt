@@ -32,7 +32,7 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 find_package(rocprim QUIET)
 if(NOT rocprim_FOUND)

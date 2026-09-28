@@ -40,7 +40,7 @@ jobs:
           python3 -m pip install gersemi
       - name: Run gersemi
         run: |
-          gersemi --check --definitions Common/HipPlatform.cmake .
+          gersemi --check --definitions cmake/HipPlatform.cmake .
           if [ $? -ne 0 ]; then
             echo "CMake files are not formatted correctly. Please run gersemi ..."
             echo "For example: \`gersemi -i .\`"

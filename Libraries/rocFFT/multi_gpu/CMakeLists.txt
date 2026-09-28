@@ -29,7 +29,7 @@ set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
 set(CMAKE_HIP_STANDARD_REQUIRED ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(rocfft REQUIRED)
 

@@ -40,7 +40,7 @@ jobs:
               cd HIP-Doc
               export CMAKE_POLICY_VERSION_MINIMUM="3.5"
               cmake -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" \
-                    -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" \
+                    -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/cmake/SkipExamples.cmake" \
                     -S . -B build
               cmake --build build -j
               cmake --install build --prefix install

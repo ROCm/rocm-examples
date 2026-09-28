@@ -217,7 +217,7 @@ jobs:
         if: ${{ !cancelled() && steps.skip-lists.outcome == 'success' }}
         id: cmake-configure
         run: |
-          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -DROCM_EXAMPLES_ENABLE_CK="${ENABLE_CK}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" 2> >(tee cmake_error.log >&2)
+          cmake -S . -B build -DCMAKE_HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" -DCMAKE_BUILD_RPATH="${ROCM_PATH}/lib" -DROCM_EXAMPLES_ENABLE_OPENMP="${ENABLE_OPENMP}" -DROCM_EXAMPLES_ENABLE_CK="${ENABLE_CK}" -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/cmake/SkipExamples.cmake" 2> >(tee cmake_error.log >&2)
 
       - name: CMake configure error summary
         if: ${{ !cancelled() }}

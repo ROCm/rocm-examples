@@ -22,7 +22,7 @@
 
 # Build-skip hook for rocm-examples CI.
 #
-# Injected via `-DCMAKE_PROJECT_INCLUDE_BEFORE=<repo>/Common/SkipExamples.cmake`,
+# Injected via `-DCMAKE_PROJECT_INCLUDE_BEFORE=<repo>/cmake/SkipExamples.cmake`,
 # so CMake runs it at the start of every project() call. It overrides
 # add_subdirectory() to drop any example whose repo-root-relative path appears in
 # `.github/build_tools/skip_build.txt` (generated from skip_manifest.py). A
@@ -36,7 +36,7 @@
 if(NOT DEFINED ROCM_EXAMPLES_SKIP_BUILD_INITIALIZED)
     set(ROCM_EXAMPLES_SKIP_BUILD_INITIALIZED TRUE CACHE INTERNAL "")
 
-    # This file lives in <repo>/Common, so the repo root is one directory up.
+    # This file lives in <repo>/cmake, so the repo root is one directory up.
     # It is stable regardless of which folder root cmake -S points at.
     get_filename_component(_rocm_examples_root "${CMAKE_CURRENT_LIST_DIR}/.." ABSOLUTE)
     set(ROCM_EXAMPLES_ROOT "${_rocm_examples_root}" CACHE INTERNAL "")

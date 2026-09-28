@@ -27,7 +27,7 @@ include(CTest)
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 find_package(hiptensor QUIET)
 if(NOT hiptensor_FOUND)
@@ -38,7 +38,7 @@ if(NOT hiptensor_FOUND)
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/FilterHIPArchitectures.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/FilterHIPArchitectures.cmake")
 filter_hip_architectures("hipTensor" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx11-generic;gfx1200;gfx1201;gfx1250;gfx12-generic" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
