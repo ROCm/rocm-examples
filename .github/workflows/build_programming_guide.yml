@@ -25,7 +25,7 @@ jobs:
         name: "Build ROCm Programming Guide"
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.0
         defaults:
             run:
                 shell: bash

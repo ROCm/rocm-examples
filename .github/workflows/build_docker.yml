@@ -113,7 +113,7 @@ jobs:
               # so non-default builds never clobber latest.
               type=ref,event=branch,enable=${{ github.ref != format('refs/heads/{0}', github.event.repository.default_branch) && !(github.event_name == 'workflow_dispatch' && inputs.tag_latest) }}
               # ROCm-version tag tracks the stable channel: apply it only alongside 'latest'
-              # (default branch, or an opt-in dispatch) so dev builds never clobber the shared 7.14 tag.
+              # (default branch, or an opt-in dispatch) so dev builds never clobber the shared 10.0 tag.
               type=raw,value=${{ steps.rocm-version.outputs.version }},enable=${{ matrix.file == 'ubuntu-24.04-rocm.Dockerfile' && steps.rocm-version.outputs.version != '' && (github.ref == format('refs/heads/{0}', github.event.repository.default_branch) || (github.event_name == 'workflow_dispatch' && inputs.tag_latest)) }}
 
         - name: Build and push Docker image for ${{ matrix.file }}

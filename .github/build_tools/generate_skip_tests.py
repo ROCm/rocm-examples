@@ -67,7 +67,7 @@ def main():
         "--channel",
         required=True,
         choices=["stable", "nightly"],
-        help="CI channel: 'stable' = pinned rocm:7.14 native workflows, "
+        help="CI channel: 'stable' = pinned rocm:10.0 native workflows, "
         "'nightly' = TheRock multi-arch reusable workflow",
     )
     parser.add_argument(
