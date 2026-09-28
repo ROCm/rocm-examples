@@ -65,6 +65,10 @@ ifneq ($(wildcard $(INCLUDE_DIR)/hipthreads/hip/thread),)
 LIBRARIES += hipThreads
 endif
 
+ifneq ($(wildcard $(INCLUDE_DIR)/libhipcxx/cuda/std/atomic),)
+LIBRARIES += libhipcxx
+endif
+
 ifneq ($(wildcard $(INCLUDE_DIR)/rocdecode/rocdecode.h),)
 LIBRARIES += rocDecode
 endif
