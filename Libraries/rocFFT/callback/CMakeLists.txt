@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,7 +23,7 @@
 set(example_name rocfft_callback)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(${example_name} LANGUAGES CXX HIP)
+project(${example_name} LANGUAGES CXX)
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocFFT examples do not support the CUDA runtime")
@@ -36,24 +36,19 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_HIP_STANDARD 17)
-set(CMAKE_HIP_EXTENSIONS OFF)
-set(CMAKE_HIP_STANDARD_REQUIRED ON)
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 find_package(rocfft REQUIRED)
+find_package(hip REQUIRED)
+find_package(hiprtc REQUIRED)
 
-add_executable(${example_name} main.hip)
+add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 set(include_dirs "../../../Common" "../../../External")
 
-target_link_libraries(${example_name} PRIVATE roc::rocfft)
+target_link_libraries(${example_name} PRIVATE roc::rocfft hip::host hiprtc::hiprtc)
 target_include_directories(${example_name} PRIVATE ${include_dirs})
-target_compile_options(${example_name} PRIVATE -fgpu-rdc)
-target_link_options(${example_name} PRIVATE -fgpu-rdc)
-set_source_files_properties(main.hip PROPERTIES LANGUAGE HIP)
 
 install(TARGETS ${example_name})
