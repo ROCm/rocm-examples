@@ -22,13 +22,13 @@
 
 #include "example_utils.hpp"
 
-// <cuda/mdspan> provides cuda::std::mdspan, the C++23 Standard non-owning
+// <hip/mdspan> provides hip::std::mdspan, the C++23 Standard non-owning
 // multidimensional array view (usable in C++17 mode), together with the
-// libhipcxx extensions cuda::restrict_mdspan and cuda::restrict_accessor. It
-// already includes <cuda/std/mdspan> for the Standard pieces used below
-// (cuda::std::extents, cuda::std::layout_right, cuda::std::layout_left, ...),
+// libhipcxx extensions hip::restrict_mdspan and hip::restrict_accessor. It
+// already includes <hip/std/mdspan> for the Standard pieces used below
+// (hip::std::extents, hip::std::layout_right, hip::std::layout_left, ...),
 // so that header is not included again separately.
-#include <cuda/mdspan>
+#include <hip/mdspan>
 
 #include <hip/hip_runtime.h>
 
@@ -42,14 +42,14 @@
 // Extents::rank_dynamic() == 0, so an Extents object can be built with the
 // default constructor wherever an extents_type is expected -- including the
 // `{}` shorthand from the libhipcxx documentation:
-//   cuda::restrict_mdspan<int, cuda::std::extents<size_t, 4, 4>> md{ptr, {}};
+//   hip::restrict_mdspan<int, hip::std::extents<size_t, 4, 4>> md{ptr, {}};
 // Here the `{}` list-initializes the second constructor argument, which
 // selects mdspan's `mdspan(data_handle_type p, const extents_type& ext)`
 // constructor and default-constructs an Extents value to fill in `ext`.
 constexpr size_t num_rows = 8;
 constexpr size_t num_cols = 12;
 
-using Extents = cuda::std::extents<size_t, num_rows, num_cols>;
+using Extents = hip::std::extents<size_t, num_rows, num_cols>;
 
 // One thread block handles one tile_size x tile_size tile of the matrix.
 constexpr unsigned int tile_size = 4;
@@ -67,8 +67,8 @@ constexpr unsigned int tile_size = 4;
 /// below).
 ///
 /// The function is a template so that the same source is instantiated once
-/// with plain `cuda::std::mdspan` parameters and once with
-/// `cuda::restrict_mdspan` parameters, without duplicating the kernel body.
+/// with plain `hip::std::mdspan` parameters and once with
+/// `hip::restrict_mdspan` parameters, without duplicating the kernel body.
 template <class MDSpanA, class MDSpanB, class MDSpanC>
 __global__ void add_matrices_kernel(MDSpanA a, MDSpanB b, MDSpanC c) {
   const unsigned int row = blockIdx.y * blockDim.y + threadIdx.y;
@@ -90,7 +90,7 @@ int main() {
   constexpr size_t size = num_rows * num_cols;
 
   // Host input matrices, stored row-major (the same layout that
-  // cuda::std::layout_right, the default LayoutPolicy, will assume below).
+  // hip::std::layout_right, the default LayoutPolicy, will assume below).
   std::vector<float> h_a(size);
   std::vector<float> h_b(size);
   for (size_t i = 0; i < num_rows; ++i) {
@@ -118,16 +118,16 @@ int main() {
       ceiling_div(static_cast<unsigned int>(num_cols), tile_size),
       ceiling_div(static_cast<unsigned int>(num_rows), tile_size));
 
-  // First instantiation of add_matrices_kernel: plain cuda::std::mdspan
-  // parameters, using the default LayoutPolicy (cuda::std::layout_right) and
-  // the default AccessorPolicy (cuda::std::default_accessor). Every mdspan is
+  // First instantiation of add_matrices_kernel: plain hip::std::mdspan
+  // parameters, using the default LayoutPolicy (hip::std::layout_right) and
+  // the default AccessorPolicy (hip::std::default_accessor). Every mdspan is
   // built with the data-handle-and-extents constructor
   // `mdspan(data_handle_type p, const extents_type& ext)`, the same
-  // constructor that cuda::restrict_mdspan uses below -- restrict_mdspan is a
-  // libhipcxx alias for cuda::std::mdspan with a different AccessorPolicy,
+  // constructor that hip::restrict_mdspan uses below -- restrict_mdspan is a
+  // libhipcxx alias for hip::std::mdspan with a different AccessorPolicy,
   // not a separate class.
-  using PlainMDSpanIn = cuda::std::mdspan<const float, Extents>;
-  using PlainMDSpanOut = cuda::std::mdspan<float, Extents>;
+  using PlainMDSpanIn = hip::std::mdspan<const float, Extents>;
+  using PlainMDSpanOut = hip::std::mdspan<float, Extents>;
   const PlainMDSpanIn a_plain(d_a, Extents{});
   const PlainMDSpanIn b_plain(d_b, Extents{});
   const PlainMDSpanOut c_plain(d_c_plain, Extents{});
@@ -135,10 +135,10 @@ int main() {
   HIP_CHECK(hipGetLastError());
 
   // Second instantiation of the very same function template, now with
-  // cuda::restrict_mdspan parameters.
-  // cuda::restrict_mdspan<T, Extents, Layout, Accessor> is an alias for
-  // cuda::std::mdspan<T, Extents, Layout, cuda::restrict_accessor<Accessor>>.
-  // cuda::restrict_accessor<Accessor> wraps Accessor and redeclares its
+  // hip::restrict_mdspan parameters.
+  // hip::restrict_mdspan<T, Extents, Layout, Accessor> is an alias for
+  // hip::std::mdspan<T, Extents, Layout, hip::restrict_accessor<Accessor>>.
+  // hip::restrict_accessor<Accessor> wraps Accessor and redeclares its
   // data_handle_type as `element_type * __restrict` (see
   // include/cuda/__mdspan/restrict_accessor.h); the accessor requires
   // Accessor::data_handle_type to already be a pointer. The upshot is that
@@ -147,8 +147,8 @@ int main() {
   // above has no room for, so the same aliasing information a hand-written
   // `(float *__restrict__, ...)` signature would give the compiler survives
   // the switch to mdspan parameters.
-  using RestrictMDSpanIn = cuda::restrict_mdspan<const float, Extents>;
-  using RestrictMDSpanOut = cuda::restrict_mdspan<float, Extents>;
+  using RestrictMDSpanIn = hip::restrict_mdspan<const float, Extents>;
+  using RestrictMDSpanOut = hip::restrict_mdspan<float, Extents>;
   const RestrictMDSpanIn a_restrict(d_a, Extents{});
   const RestrictMDSpanIn b_restrict(d_b, Extents{});
   const RestrictMDSpanOut c_restrict(d_c_restrict, Extents{});
@@ -184,7 +184,7 @@ int main() {
   int errors = 0;
 
   // The plain-mdspan kernel and the restrict_mdspan kernel must produce the
-  // same numbers as a host-computed reference: cuda::restrict_mdspan only
+  // same numbers as a host-computed reference: hip::restrict_mdspan only
   // adds an aliasing promise for the optimizer, it does not change what the
   // kernel computes.
   for (size_t i = 0; i < num_rows; ++i) {
@@ -200,18 +200,18 @@ int main() {
     }
   }
 
-  // cuda::std::layout_right (the default LayoutPolicy used by every mdspan
-  // above) is only half of the layout story. cuda::std::layout_left is a
+  // hip::std::layout_right (the default LayoutPolicy used by every mdspan
+  // above) is only half of the layout story. hip::std::layout_left is a
   // drop-in replacement that changes how a multidimensional index is mapped
   // to a linear offset: layout_right is row-major (the *last* index varies
   // fastest, offset = i * num_cols + j), while layout_left is column-major
   // (the *first* index varies fastest, offset = i + j * num_rows). Building
   // an mdspan of each layout over the very same host buffer shows that the
   // same (i, j) then addresses two different elements of that buffer.
-  const cuda::std::mdspan<const float, Extents, cuda::std::layout_right>
+  const hip::std::mdspan<const float, Extents, hip::std::layout_right>
       right_view(h_a.data(), Extents{});
-  const cuda::std::mdspan<const float, Extents, cuda::std::layout_left>
-      left_view(h_a.data(), Extents{});
+  const hip::std::mdspan<const float, Extents, hip::std::layout_left> left_view(
+      h_a.data(), Extents{});
 
   std::cout << "\nlayout_right vs. layout_left over the same buffer "
                "h_a (index -> linear offset -> value):\n";

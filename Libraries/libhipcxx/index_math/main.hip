@@ -22,11 +22,11 @@
 
 #include "example_utils.hpp"
 
-// <cuda/cmath> provides the libhipcxx index-math helpers cuda::ceil_div,
-// cuda::round_up and cuda::round_down, along with the C++ Standard <cmath>
-// declarations (via <cuda/std/cmath>). None of the three helpers are part of
+// <hip/cmath> provides the libhipcxx index-math helpers hip::ceil_div,
+// hip::round_up and hip::round_down, along with the C++ Standard <cmath>
+// declarations (via <hip/std/cmath>). None of the three helpers are part of
 // the C++ Standard; they are libhipcxx extensions.
-#include <cuda/cmath>
+#include <hip/cmath>
 
 #include <hip/hip_runtime.h>
 
@@ -49,21 +49,21 @@ constexpr unsigned int tile_size = 128;
 
 // All three helpers are constexpr, so the results used throughout this
 // example can be, and are, checked at compile time.
-static_assert(cuda::ceil_div(problem_size, block_size) == 4,
-              "cuda::ceil_div can size a launch grid at compile time");
-static_assert(cuda::round_up(problem_size, tile_size) == 1024,
-              "cuda::round_up rounds problem_size up to the next multiple of "
+static_assert(hip::ceil_div(problem_size, block_size) == 4,
+              "hip::ceil_div can size a launch grid at compile time");
+static_assert(hip::round_up(problem_size, tile_size) == 1024,
+              "hip::round_up rounds problem_size up to the next multiple of "
               "tile_size");
-static_assert(cuda::round_down(300u, tile_size) == 256,
-              "cuda::round_down rounds an offset down to the start of its "
+static_assert(hip::round_down(300u, tile_size) == 256,
+              "hip::round_down rounds an offset down to the start of its "
               "containing tile");
-static_assert(cuda::round_up(tile_size, tile_size) == tile_size,
-              "cuda::round_up leaves an already-aligned value unchanged");
-static_assert(cuda::round_down(0u, tile_size) == 0,
-              "cuda::round_down of zero is zero");
+static_assert(hip::round_up(tile_size, tile_size) == tile_size,
+              "hip::round_up leaves an already-aligned value unchanged");
+static_assert(hip::round_down(0u, tile_size) == 0,
+              "hip::round_down of zero is zero");
 
 /// \brief Writes each thread's global index to d_out. The launch grid is
-/// sized with cuda::ceil_div and may therefore contain more threads than
+/// sized with hip::ceil_div and may therefore contain more threads than
 /// problem_size, so out-of-range threads must do nothing.
 __global__ void write_indices_kernel(unsigned int *d_out,
                                      const unsigned int size) {
@@ -77,10 +77,10 @@ int main() {
   int errors = 0;
 
   // ---------------------------------------------------------------------
-  // 1. Grid sizing with cuda::ceil_div.
+  // 1. Grid sizing with hip::ceil_div.
   // ---------------------------------------------------------------------
 
-  // cuda::ceil_div(a, b) takes a different implementation path depending on
+  // hip::ceil_div(a, b) takes a different implementation path depending on
   // where it runs (include/cuda/__cmath/ceil_div.h), but only when a / b's
   // promoted type is unsigned - the common case for sizes, and the case
   // here. It then uses NV_IF_ELSE_TARGET to pick between:
@@ -92,9 +92,9 @@ int main() {
   // is no separate device path in that case. Both formulas sidestep the
   // overflow that the naive (a + b - 1) / b idiom is prone to; see part 2
   // below.
-  const unsigned int grid_size = cuda::ceil_div(problem_size, block_size);
+  const unsigned int grid_size = hip::ceil_div(problem_size, block_size);
 
-  std::cout << "Grid sizing with cuda::ceil_div:\n"
+  std::cout << "Grid sizing with hip::ceil_div:\n"
             << "  problem_size                        = " << problem_size
             << '\n'
             << "  block_size                          = " << block_size << '\n'
@@ -135,33 +135,33 @@ int main() {
   // With a = UINT_MAX and b = 2, the naive idiom computes
   // (UINT_MAX + 2 - 1) / 2 = (UINT_MAX + 1) / 2. UINT_MAX + 1 wraps around to
   // 0 in unsigned arithmetic, so the naive formula silently returns 0 instead
-  // of the correct result. cuda::ceil_div avoids this failure mode entirely,
+  // of the correct result. hip::ceil_div avoids this failure mode entirely,
   // which is the actual argument for using it instead of hand-rolling the
   // formula.
   constexpr unsigned int max_value = std::numeric_limits<unsigned int>::max();
   constexpr unsigned int naive_wrong_result = (max_value + 2u - 1u) / 2u;
-  constexpr unsigned int correct_result = cuda::ceil_div(max_value, 2u);
+  constexpr unsigned int correct_result = hip::ceil_div(max_value, 2u);
   static_assert(naive_wrong_result == 0u,
                 "the naive (a + b - 1) / b idiom overflows silently for a "
                 "dividend near the maximum value of its type");
   static_assert(correct_result == max_value / 2u + 1u,
-                "cuda::ceil_div computes the correct result without "
+                "hip::ceil_div computes the correct result without "
                 "overflowing");
 
   std::cout << "Overflow pitfall of the naive (a + b - 1) / b idiom (a = "
                "UINT_MAX, b = 2):\n"
             << "  naive (a + b - 1) / b : " << naive_wrong_result
             << " (wrong; a + b - 1 wraps around)\n"
-            << "  cuda::ceil_div(a, b)  : " << correct_result << " (correct)\n"
+            << "  hip::ceil_div(a, b)  : " << correct_result << " (correct)\n"
             << std::endl;
 
   // ---------------------------------------------------------------------
-  // 3. Tile/alignment sizing with cuda::round_up and cuda::round_down.
+  // 3. Tile/alignment sizing with hip::round_up and hip::round_down.
   // ---------------------------------------------------------------------
 
   // Round the problem size up to a multiple of the tile size before
   // allocating, so that the allocation covers only whole tiles.
-  const unsigned int buffer_size = cuda::round_up(problem_size, tile_size);
+  const unsigned int buffer_size = hip::round_up(problem_size, tile_size);
   std::cout << "Rounding a buffer size up to a tile boundary before "
                "allocating:\n"
             << "  round_up(" << problem_size << ", " << tile_size
@@ -171,7 +171,7 @@ int main() {
   // Round an arbitrary offset down to the start of the tile that contains
   // it, e.g. to find where the tile covering that offset begins.
   constexpr unsigned int offset = 300;
-  const unsigned int tile_start = cuda::round_down(offset, tile_size);
+  const unsigned int tile_start = hip::round_down(offset, tile_size);
   std::cout << "Rounding an offset down to the start of its containing "
                "tile:\n"
             << "  round_down(" << offset << ", " << tile_size
@@ -185,19 +185,19 @@ int main() {
       0u,     1u,           tile_size - 1u, tile_size, tile_size + 1u,
       offset, problem_size, 4u * tile_size};
 
-  std::cout << "Boundary cases for cuda::round_up / cuda::round_down "
+  std::cout << "Boundary cases for hip::round_up / hip::round_down "
                "(tile_size = "
             << tile_size << "):\n"
             << "     value   round_up round_down\n";
   for (const unsigned int value : boundary_values) {
-    const unsigned int up = cuda::round_up(value, tile_size);
-    const unsigned int down = cuda::round_down(value, tile_size);
+    const unsigned int up = hip::round_up(value, tile_size);
+    const unsigned int down = hip::round_down(value, tile_size);
     std::cout << std::setw(10) << value << std::setw(11) << up << std::setw(11)
               << down << '\n';
 
     // Independent host oracle for both results. This uses plain division and
     // a remainder check, not the naive (a + b - 1) / b idiom, so the check
-    // does not share cuda::ceil_div's implementation with what it verifies.
+    // does not share hip::ceil_div's implementation with what it verifies.
     const unsigned int expected_ceil_div =
         value / tile_size + (value % tile_size != 0 ? 1u : 0u);
     const unsigned int expected_up = expected_ceil_div * tile_size;

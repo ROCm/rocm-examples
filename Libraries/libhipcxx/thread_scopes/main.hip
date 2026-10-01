@@ -22,7 +22,7 @@
 
 #include "example_utils.hpp"
 
-// cuda::thread_scope selects which set of threads an atomic operation must
+// hip::thread_scope selects which set of threads an atomic operation must
 // synchronize with: thread_scope_thread (the calling thread only),
 // thread_scope_block (threads of the same HIP block), thread_scope_device
 // (threads anywhere on the same GPU) or thread_scope_system (also threads on
@@ -36,11 +36,11 @@
 // travel), and it has no analogue in host-only C++, where std::atomic is
 // always visible to the whole process.
 //
-// Note: the cuda::thread_scope enum (cuda/std/__atomic/scopes.h) defines
+// Note: the hip::thread_scope enum (cuda/std/__atomic/scopes.h) defines
 // exactly thread_scope_system, thread_scope_device, thread_scope_block and
 // thread_scope_thread - there is no thread_scope_cluster, even though HIP
 // itself supports thread block clusters on some GPUs, for example gfx1250.
-#include <cuda/atomic>
+#include <hip/atomic>
 
 #include <hip/hip_runtime.h>
 
@@ -58,12 +58,12 @@ constexpr unsigned int block_size = 256;
 
 /// \brief The device-scope atomic that combines every block's partial
 /// maximum. Shared by every block in the grid.
-using DeviceScopeAtomic = cuda::atomic<int, cuda::thread_scope_device>;
+using DeviceScopeAtomic = hip::atomic<int, hip::thread_scope_device>;
 
 /// \brief The block-scope atomic that combines the values of one block.
 /// Lives in LDS (shared memory) and is only ever touched by the threads of
 /// the block that owns it.
-using BlockScopeAtomic = cuda::atomic<int, cuda::thread_scope_block>;
+using BlockScopeAtomic = hip::atomic<int, hip::thread_scope_block>;
 
 /// \brief Derives a value for one thread that depends on both its block and
 /// its thread index, so that neither index alone determines the maximum:
@@ -83,7 +83,7 @@ __host__ __device__ constexpr int thread_value(const unsigned int block_idx,
 /// or updates the atomic.
 __global__ void init_device_max_kernel(DeviceScopeAtomic *d_device_max,
                                        const int initial_value) {
-  d_device_max->store(initial_value, cuda::memory_order_relaxed);
+  d_device_max->store(initial_value, hip::memory_order_relaxed);
 }
 
 /// \brief Reads the current value of the device-scope atomic into
@@ -91,7 +91,7 @@ __global__ void init_device_max_kernel(DeviceScopeAtomic *d_device_max,
 /// has finished, so that every block's contribution is already visible.
 __global__ void load_device_max_kernel(const DeviceScopeAtomic *d_device_max,
                                        int *d_result) {
-  *d_result = d_device_max->load(cuda::memory_order_relaxed);
+  *d_result = d_device_max->load(hip::memory_order_relaxed);
 }
 
 /// \brief Computes thread_value for every thread and combines the results
@@ -117,7 +117,7 @@ __global__ void block_reduce_max_kernel(DeviceScopeAtomic *d_device_max,
                                         int *d_block_max) {
   // __shared__ variables have no dynamic initializer: the compiler never
   // runs a constructor for them, and shared memory is not zero-initialized
-  // between kernel launches. cuda::atomic's default constructor is
+  // between kernel launches. hip::atomic's default constructor is
   // "= default", and every base class behind it only holds a plain,
   // trivially-constructible storage member, so the type as a whole is
   // trivial. That means the object is already alive as soon as the
@@ -129,7 +129,7 @@ __global__ void block_reduce_max_kernel(DeviceScopeAtomic *d_device_max,
   __shared__ BlockScopeAtomic block_max;
 
   if (threadIdx.x == 0) {
-    block_max.store(INT_MIN, cuda::memory_order_relaxed);
+    block_max.store(INT_MIN, hip::memory_order_relaxed);
   }
   __syncthreads();
 
@@ -137,23 +137,23 @@ __global__ void block_reduce_max_kernel(DeviceScopeAtomic *d_device_max,
 
   // Block-scope fetch_max: cheap, LDS-only traffic. Correct here because no
   // other block ever reads or writes this shared-memory atomic.
-  block_max.fetch_max(value, cuda::memory_order_relaxed);
+  block_max.fetch_max(value, hip::memory_order_relaxed);
   __syncthreads(); // Wait until every thread's fetch_max has completed.
 
   if (threadIdx.x == 0) {
-    const int this_block_max = block_max.load(cuda::memory_order_relaxed);
+    const int this_block_max = block_max.load(hip::memory_order_relaxed);
     d_block_max[blockIdx.x] = this_block_max;
 
     // Device-scope fetch_max: one per block, visible to the whole grid (and,
     // with thread_scope_system, to the host and other GPUs too).
-    d_device_max->fetch_max(this_block_max, cuda::memory_order_relaxed);
+    d_device_max->fetch_max(this_block_max, hip::memory_order_relaxed);
   }
 }
 
 int main() {
   // Allocate the device-scope atomic that accumulates the final maximum.
   DeviceScopeAtomic *d_device_max{};
-  HIP_CHECK(hipMalloc(&d_device_max, sizeof(*d_device_max)));
+  HIP_CHECK(hipMalloc(&d_device_max, sizeof(DeviceScopeAtomic)));
 
   // Allocate space for the per-block maxima and the final result.
   int *d_block_max{};
@@ -200,8 +200,8 @@ int main() {
 
   // Print the block-scope partial maxima, one per block, so that a reader
   // can check that they vary across blocks.
-  std::cout << "Block-scope reduction (cuda::atomic<int, "
-               "cuda::thread_scope_block> in LDS):\n"
+  std::cout << "Block-scope reduction (hip::atomic<int, "
+               "hip::thread_scope_block> in LDS):\n"
             << "block block_max reference match\n";
   for (unsigned int block_idx = 0; block_idx < grid_size; ++block_idx) {
     const bool match = h_block_max[block_idx] == ref_block_max[block_idx];
@@ -212,8 +212,8 @@ int main() {
   }
 
   // Print the device-scope final maximum, combined from every block.
-  std::cout << "\nDevice-scope reduction (cuda::atomic<int, "
-               "cuda::thread_scope_device>), combining "
+  std::cout << "\nDevice-scope reduction (hip::atomic<int, "
+               "hip::thread_scope_device>), combining "
             << grid_size << " block maxima:\n"
             << "device_max reference match\n"
             << std::setw(10) << h_final_max << std::setw(10) << ref_final_max

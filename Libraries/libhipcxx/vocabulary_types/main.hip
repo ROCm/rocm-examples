@@ -24,29 +24,29 @@
 
 // libhipcxx vocabulary types used in this example, and what each one buys
 // over the alternative:
-// - cuda::std::tuple / cuda::std::pair (<cuda/std/tuple>, <cuda/std/utility>)
+// - hip::std::tuple / hip::std::pair (<hip/std/tuple>, <hip/std/utility>)
 //   are the Standard product types, usable on host and device. HIP built-in
 //   vector types (float4, int2, ...) are additionally given a tuple
 //   interface (tuple_size, tuple_element, get<N>), so generic, index-based
-//   code written for cuda::std::tuple also works on them, without a
+//   code written for hip::std::tuple also works on them, without a
 //   hand-written .x/.y/.z/.w accessor for every type. This does NOT extend
 //   to structured bindings: `auto [x, y, z, w] = some_float4;` is
 //   unsupported with hipcc because of how HIP_vector_type is implemented (a
 //   union member), so element access below always goes through
-//   cuda::std::get<N> explicitly.
-// - cuda::std::expected<T, E> (<cuda/std/expected>) is a per-thread return
+//   hip::std::get<N> explicitly.
+// - hip::std::expected<T, E> (<hip/std/expected>) is a per-thread return
 //   value that is either a T or an E. Device code cannot use exceptions, so
 //   without expected a failure would need an out-parameter or a sentinel
 //   value; every thread below instead returns one expected, and the host
 //   tells success from failure with has_value().
-// - cuda::std::optional<T> (<cuda/std/optional>) is a nullable value with
+// - hip::std::optional<T> (<hip/std/optional>) is a nullable value with
 //   the same has_value()/value_or() interface as expected. It is used below
 //   for a bonus term that only some threads compute.
-#include <cuda/std/expected>
-#include <cuda/std/optional>
-#include <cuda/std/tuple>
-#include <cuda/std/type_traits>
-#include <cuda/std/utility>
+#include <hip/std/expected>
+#include <hip/std/optional>
+#include <hip/std/tuple>
+#include <hip/std/type_traits>
+#include <hip/std/utility>
 
 #include <hip/hip_runtime.h>
 
@@ -78,18 +78,18 @@ std::string to_string(const ErrorCode code) {
 
 /// \brief Everything computed for one thread.
 struct ThreadResult {
-  cuda::std::expected<float, ErrorCode> value; // The final result or error.
-  cuda::std::optional<float> bonus; // Set only for every fourth thread.
+  hip::std::expected<float, ErrorCode> value; // The final result or error.
+  hip::std::optional<float> bonus; // Set only for every fourth thread.
 };
 
 // float4 is treated as a 4-element tuple of float by libhipcxx: tuple_size
-// and tuple_element are specialized for it, and cuda::std::get<N> works on
-// it, just like on cuda::std::tuple. These static_asserts are checked at
+// and tuple_element are specialized for it, and hip::std::get<N> works on
+// it, just like on hip::std::tuple. These static_asserts are checked at
 // compile time on the host.
-static_assert(cuda::std::tuple_size<float4>::value == 4,
+static_assert(hip::std::tuple_size<float4>::value == 4,
               "float4 is treated as a 4-element tuple");
 static_assert(
-    cuda::std::is_same<cuda::std::tuple_element<0, float4>::type, float>::value,
+    hip::std::is_same<hip::std::tuple_element<0, float4>::type, float>::value,
     "Every element of float4 has type float");
 
 /// \brief Computes the result for the thread with the given global index.
@@ -98,23 +98,23 @@ static_assert(
 /// index. The kernel calls this function on the device, and the host calls
 /// it again, with the same config, to compute the reference values.
 __host__ __device__ ThreadResult
-analyze_record(const cuda::std::tuple<int, float, float4> &config,
+analyze_record(const hip::std::tuple<int, float, float4> &config,
                const unsigned int index) {
   ThreadResult result{};
 
-  // Unpack the shared configuration. cuda::std::get<N> works identically on
-  // cuda::std::tuple and, thanks to the specializations above, on float4.
-  const int numerator = cuda::std::get<0>(config);
-  const float scale = cuda::std::get<1>(config);
-  const float4 weights = cuda::std::get<2>(config);
+  // Unpack the shared configuration. hip::std::get<N> works identically on
+  // hip::std::tuple and, thanks to the specializations above, on float4.
+  const int numerator = hip::std::get<0>(config);
+  const float scale = hip::std::get<1>(config);
+  const float4 weights = hip::std::get<2>(config);
   const float weight_sum =
-      cuda::std::get<0>(weights) + cuda::std::get<1>(weights) +
-      cuda::std::get<2>(weights) + cuda::std::get<3>(weights);
+      hip::std::get<0>(weights) + hip::std::get<1>(weights) +
+      hip::std::get<2>(weights) + hip::std::get<3>(weights);
 
   // Deliberate failure path #1: thread 0 would divide by its own index.
   if (index == 0) {
-    result.value = cuda::std::expected<float, ErrorCode>(
-        cuda::std::unexpect, ErrorCode::DivisionByZero);
+    result.value = hip::std::expected<float, ErrorCode>(
+        hip::std::unexpect, ErrorCode::DivisionByZero);
     return result;
   }
 
@@ -123,11 +123,11 @@ analyze_record(const cuda::std::tuple<int, float, float4> &config,
   const float scaled = divided * scale * weight_sum;
 
   // An optional intermediate value: only every fourth thread computes a
-  // "precision bonus". cuda::std::nullopt leaves it unset for the others,
+  // "precision bonus". hip::std::nullopt leaves it unset for the others,
   // and value_or(0.0f) below folds the missing case into the computation
   // without an if/else.
-  result.bonus = (index % 4 == 0) ? cuda::std::optional<float>(scaled * 0.1f)
-                                  : cuda::std::nullopt;
+  result.bonus = (index % 4 == 0) ? hip::std::optional<float>(scaled * 0.1f)
+                                  : hip::std::nullopt;
   const float final_value = scaled + result.bonus.value_or(0.0f);
 
   // Deliberate failure path #2: small indices divide 120 by almost nothing
@@ -139,10 +139,10 @@ analyze_record(const cuda::std::tuple<int, float, float4> &config,
   // only the exact value within one outcome.
   constexpr float range_limit = 50.0f;
   if (final_value > range_limit || final_value < -range_limit) {
-    result.value = cuda::std::expected<float, ErrorCode>(cuda::std::unexpect,
-                                                         ErrorCode::OutOfRange);
+    result.value = hip::std::expected<float, ErrorCode>(hip::std::unexpect,
+                                                        ErrorCode::OutOfRange);
   } else {
-    result.value = cuda::std::expected<float, ErrorCode>(final_value);
+    result.value = hip::std::expected<float, ErrorCode>(final_value);
   }
 
   return result;
@@ -150,7 +150,7 @@ analyze_record(const cuda::std::tuple<int, float, float4> &config,
 
 /// \brief Each thread analyzes the record for its own global index.
 __global__ void
-analyze_records_kernel(const cuda::std::tuple<int, float, float4> config,
+analyze_records_kernel(const hip::std::tuple<int, float, float4> config,
                        ThreadResult *d_results, const unsigned int size) {
   const unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
   if (index < size) {
@@ -172,7 +172,7 @@ bool nearly_equal(const float a, const float b) {
 }
 
 /// \brief Formats a thread's expected value or error for printing.
-std::string format_result(const cuda::std::expected<float, ErrorCode> &value) {
+std::string format_result(const hip::std::expected<float, ErrorCode> &value) {
   std::ostringstream stream;
   if (value.has_value()) {
     stream << std::fixed << std::setprecision(2) << *value;
@@ -194,11 +194,11 @@ int main() {
 
   // Build the shared configuration on the host: a numerator, a scale
   // factor, and a HIP float4 vector of per-channel weights.
-  // cuda::std::make_tuple deduces float4 as the third element type, and the
+  // hip::std::make_tuple deduces float4 as the third element type, and the
   // resulting tuple crosses into the kernel launch below like any other
   // trivially copyable argument.
-  const cuda::std::tuple<int, float, float4> config =
-      cuda::std::make_tuple(120, 0.5f, make_float4(1.0f, 2.0f, 3.0f, 4.0f));
+  const hip::std::tuple<int, float, float4> config =
+      hip::std::make_tuple(120, 0.5f, make_float4(1.0f, 2.0f, 3.0f, 4.0f));
 
   // Allocate the device memory for the results.
   ThreadResult *d_results{};
@@ -286,17 +286,17 @@ int main() {
     ++errors;
   }
 
-  // A short cuda::std::pair <-> host std::pair round trip. The conversions
+  // A short hip::std::pair <-> host std::pair round trip. The conversions
   // are host-only (there is no host std::pair on the device), so this runs
   // only here in main, not in the kernel.
-  const cuda::std::pair<int, float> hip_pair{7, 3.5f};
-  // cuda::std::pair's conversion operator to ::std::pair.
+  const hip::std::pair<int, float> hip_pair{7, 3.5f};
+  // hip::std::pair's conversion operator to ::std::pair.
   const std::pair<int, float> std_pair{hip_pair};
-  // cuda::std::pair's converting constructor from ::std::pair.
-  const cuda::std::pair<int, float> round_trip{std_pair};
+  // hip::std::pair's converting constructor from ::std::pair.
+  const hip::std::pair<int, float> round_trip{std_pair};
 
-  std::cout << "cuda::std::pair<int, float>{" << hip_pair.first << ", "
-            << hip_pair.second << "} -> std::pair -> cuda::std::pair{"
+  std::cout << "hip::std::pair<int, float>{" << hip_pair.first << ", "
+            << hip_pair.second << "} -> std::pair -> hip::std::pair{"
             << round_trip.first << ", " << round_trip.second << '}'
             << std::endl;
 

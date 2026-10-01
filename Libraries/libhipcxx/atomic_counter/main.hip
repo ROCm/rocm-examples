@@ -22,12 +22,12 @@
 
 #include "example_utils.hpp"
 
-// <cuda/atomic> provides cuda::atomic and cuda::atomic_ref, the libhipcxx
+// <hip/atomic> provides hip::atomic and hip::atomic_ref, the libhipcxx
 // extensions that add an explicit thread scope to the C++ Standard atomic
-// types. It also includes <cuda/std/atomic>, which provides cuda::std::atomic
-// and cuda::std::atomic_ref: the conforming Standard atomics, usable in both
+// types. It also includes <hip/std/atomic>, which provides hip::std::atomic
+// and hip::std::atomic_ref: the conforming Standard atomics, usable in both
 // __host__ and __device__ code.
-#include <cuda/atomic>
+#include <hip/atomic>
 
 #include <hip/hip_runtime.h>
 
@@ -46,58 +46,58 @@ constexpr unsigned int grid_size = ceiling_div(num_threads, block_size);
 
 /// \brief Every thread increments *counter by one.
 ///
-/// cuda::std::atomic<int> is the conforming C++ Standard atomic: the spelling
+/// hip::std::atomic<int> is the conforming C++ Standard atomic: the spelling
 /// is identical to host-only std::atomic<int>, only the include changes
-/// (<cuda/atomic> instead of <atomic>), and the same object can be
+/// (<hip/atomic> instead of <atomic>), and the same object can be
 /// incremented from __host__ and __device__ code alike.
 ///
-/// Every fetch_add below passes cuda::std::memory_order_relaxed (or, for the
-/// cuda::atomic kernels further down, the equivalent
-/// cuda::memory_order_relaxed): a pure counter needs atomicity - no increment
+/// Every fetch_add below passes hip::std::memory_order_relaxed (or, for the
+/// hip::atomic kernels further down, the equivalent
+/// hip::memory_order_relaxed): a pure counter needs atomicity - no increment
 /// may be lost - but not ordering with any other memory operation, so relaxed
 /// is the idiomatic, cheapest-available choice. The final value is only ever
 /// read after the kernel has completed, and hipMemcpy synchronizes with the
 /// device, so no stronger order is needed to observe it correctly on the host.
-__global__ void increment_std_atomic_kernel(cuda::std::atomic<int> *counter,
+__global__ void increment_std_atomic_kernel(hip::std::atomic<int> *counter,
                                             const unsigned int size) {
   const unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
   if (index < size) {
-    counter->fetch_add(1, cuda::std::memory_order_relaxed);
+    counter->fetch_add(1, hip::std::memory_order_relaxed);
   }
 }
 
-/// \brief The same counter, expressed with cuda::atomic instead of
-/// cuda::std::atomic.
+/// \brief The same counter, expressed with hip::atomic instead of
+/// hip::std::atomic.
 ///
-/// cuda::atomic<T, Scope> is a libhipcxx extension of cuda::std::atomic that
-/// adds a second, optional template parameter: a cuda::thread_scope, i.e. the
+/// hip::atomic<T, Scope> is a libhipcxx extension of hip::std::atomic that
+/// adds a second, optional template parameter: a hip::thread_scope, i.e. the
 /// set of threads whose accesses to the atomic are guaranteed to synchronize
-/// with each other. It defaults to cuda::thread_scope_system - the same scope
-/// cuda::std::atomic is implicitly locked to - so cuda::atomic<int> without a
-/// second argument and cuda::std::atomic<int> are the same type in every way
+/// with each other. It defaults to hip::thread_scope_system - the same scope
+/// hip::std::atomic is implicitly locked to - so hip::atomic<int> without a
+/// second argument and hip::std::atomic<int> are the same type in every way
 /// that matters here: same layout, same operations, same behavior. The
 /// extension is the *ability to narrow* the scope, not a different default.
-/// This kernel narrows to cuda::thread_scope_device because every increment
+/// This kernel narrows to hip::thread_scope_device because every increment
 /// below happens from device threads only; a narrower scope lets the
 /// compiler avoid synchronization that would only be needed to also
 /// coordinate with the host.
 ///
-/// This kernel and the two below use the cuda:: (not cuda::std::) spelling
-/// family, so they use cuda::memory_order_relaxed for consistency, even
-/// though it names the same enumerator as cuda::std::memory_order_relaxed.
+/// This kernel and the two below use the hip:: (not hip::std::) spelling
+/// family, so they use hip::memory_order_relaxed for consistency, even
+/// though it names the same enumerator as hip::std::memory_order_relaxed.
 __global__ void increment_device_atomic_kernel(
-    cuda::atomic<int, cuda::thread_scope_device> *counter,
+    hip::atomic<int, hip::thread_scope_device> *counter,
     const unsigned int size) {
   const unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
   if (index < size) {
-    counter->fetch_add(1, cuda::memory_order_relaxed);
+    counter->fetch_add(1, hip::memory_order_relaxed);
   }
 }
 
 /// \brief Increments a *plain*, non-atomic int through a
-/// cuda::std::atomic_ref<int>.
+/// hip::std::atomic_ref<int>.
 ///
-/// Unlike cuda::std::atomic<int>, an atomic_ref does not own the storage it
+/// Unlike hip::std::atomic<int>, an atomic_ref does not own the storage it
 /// protects: *counter is an ordinary int, allocated and zero-initialized like
 /// any other value, with no atomic object ever constructed over it.
 /// atomic_ref only makes the accesses that go *through* the reference atomic;
@@ -107,26 +107,26 @@ __global__ void increment_std_atomic_ref_kernel(int *counter,
                                                 const unsigned int size) {
   const unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
   if (index < size) {
-    cuda::std::atomic_ref<int> ref(*counter);
-    ref.fetch_add(1, cuda::std::memory_order_relaxed);
+    hip::std::atomic_ref<int> ref(*counter);
+    ref.fetch_add(1, hip::std::memory_order_relaxed);
   }
 }
 
-/// \brief The same atomic_ref pattern, narrowed to cuda::thread_scope_device
-/// with cuda::atomic_ref<int, Scope> - the scoped counterpart of
-/// cuda::std::atomic_ref, for the same reason as
+/// \brief The same atomic_ref pattern, narrowed to hip::thread_scope_device
+/// with hip::atomic_ref<int, Scope> - the scoped counterpart of
+/// hip::std::atomic_ref, for the same reason as
 /// increment_device_atomic_kernel above.
 __global__ void increment_device_atomic_ref_kernel(int *counter,
                                                    const unsigned int size) {
   const unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
   if (index < size) {
-    cuda::atomic_ref<int, cuda::thread_scope_device> ref(*counter);
-    ref.fetch_add(1, cuda::memory_order_relaxed);
+    hip::atomic_ref<int, hip::thread_scope_device> ref(*counter);
+    ref.fetch_add(1, hip::memory_order_relaxed);
   }
 }
 
 int main() {
-  // cuda::std::atomic<int> and cuda::atomic<int, Scope> store nothing but a
+  // hip::std::atomic<int> and hip::atomic<int, Scope> store nothing but a
   // single int: cuda/std/__atomic/types/base.h defines __atomic_storage<Tp>
   // with exactly one non-static data member, _Tp __a_value, and int is large
   // enough (4 bytes) that libhipcxx never routes it through the padded
@@ -135,11 +135,11 @@ int main() {
   // freshly-constructed int, so hipMemset to all-zero bytes is a valid way to
   // initialize each counter in place, without an extra kernel or a placement
   // new.
-  cuda::std::atomic<int> *d_std_counter{};
+  hip::std::atomic<int> *d_std_counter{};
   HIP_CHECK(hipMalloc(&d_std_counter, sizeof(*d_std_counter)));
   HIP_CHECK(hipMemset(d_std_counter, 0, sizeof(*d_std_counter)));
 
-  cuda::atomic<int, cuda::thread_scope_device> *d_device_counter{};
+  hip::atomic<int, hip::thread_scope_device> *d_device_counter{};
   HIP_CHECK(hipMalloc(&d_device_counter, sizeof(*d_device_counter)));
   HIP_CHECK(hipMemset(d_device_counter, 0, sizeof(*d_device_counter)));
 
@@ -194,13 +194,13 @@ int main() {
   // performed exactly one increment, so every counter must equal
   // num_threads.
   std::cout << "Threads per counter: " << num_threads << "\n\n";
-  std::cout << "cuda::std::atomic<int>                                     -> "
+  std::cout << "hip::std::atomic<int>                                     -> "
             << h_std_result << '\n';
-  std::cout << "cuda::atomic<int, thread_scope_device>                     -> "
+  std::cout << "hip::atomic<int, thread_scope_device>                     -> "
             << h_device_result << '\n';
-  std::cout << "cuda::std::atomic_ref<int> over a plain int                -> "
+  std::cout << "hip::std::atomic_ref<int> over a plain int                -> "
             << h_ref_result << '\n';
-  std::cout << "cuda::atomic_ref<int, thread_scope_device> over a plain int -> "
+  std::cout << "hip::atomic_ref<int, thread_scope_device> over a plain int -> "
             << h_device_ref_result << '\n';
   std::cout << std::endl;
 

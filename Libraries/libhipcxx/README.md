@@ -2,7 +2,7 @@
 
 ## Summary
 
-The examples in this subdirectory showcase the functionality of the [libhipcxx](https://github.com/ROCm/libhipcxx) library. libhipcxx is the HIP C++ Standard Library for host and device code. It provides the C++ Standard facilities in the `cuda::std::` namespace and additional extensions in the `cuda::` namespace, all of which you can call from both host and device code. The `hip::` namespace is an alias for the `cuda::` namespace.
+The examples in this subdirectory showcase the functionality of the [libhipcxx](https://github.com/ROCm/libhipcxx) library. libhipcxx is the HIP C++ Standard Library for host and device code. It provides the C++ Standard facilities in the `hip::std::` namespace and additional extensions in the `hip::` namespace, all of which you can call from both host and device code. The `hip::` namespaces and `<hip/...>` headers are aliases for the `cuda::` namespaces and `<cuda/...>` headers.
 
 The examples build on Linux using the ROCm platform. libhipcxx does not support Windows, so the examples do not provide Visual Studio project files, and the CMake project skips them on Windows.
 
@@ -12,8 +12,8 @@ The examples build on Linux using the ROCm platform. libhipcxx does not support 
 
 - [CMake](https://cmake.org/download/) (at least version 3.21)
   - OR GNU Make - available via the distribution's package manager
-- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 6.x.x)
-- [libhipcxx](https://github.com/ROCm/libhipcxx): libhipcxx must be installed. The headers are installed under `<prefix>/include/libhipcxx/`, and the CMake package `libhipcxx` provides the `libhipcxx::libhipcxx` target.
+- [ROCm](https://rocm.docs.amd.com/projects/HIP/en/latest/install/install.html) (at least version 7.x.x)
+- [libhipcxx](https://github.com/ROCm/libhipcxx): libhipcxx must be installed. The headers are installed under `<prefix>/include/hipccl/` (with `<prefix>/include/libhipcxx/` as a fallback), and the CMake package `libhipcxx` provides the `libhipcxx::libhipcxx` target.
   - If libhipcxx is installed under `ROCM_PATH`, the examples find it automatically.
   - If libhipcxx is installed in a different location, add its installation prefix to `CMAKE_PREFIX_PATH` when you configure the CMake project.
 
@@ -39,4 +39,4 @@ All examples can be built by a single invocation to Make or be built independent
 - `$ cd Libraries/libhipcxx`
 - `$ make`
 
-The Makefiles expect the libhipcxx headers in `$(ROCM_PATH)/include/libhipcxx`. If libhipcxx is installed in a different location, pass its include directory through `CPPFLAGS`, for example `$ make CPPFLAGS="-isystem <libhipcxx-prefix>/include/libhipcxx"`.
+The Makefiles look for the libhipcxx headers in `$(ROCM_PATH)/include/hipccl`, falling back to `$(ROCM_PATH)/include/libhipcxx`. If libhipcxx is installed in a different location, pass its include directory through `CPPFLAGS`, for example `$ make CPPFLAGS="-isystem <libhipcxx-prefix>/include/hipccl"`.

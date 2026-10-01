@@ -22,17 +22,17 @@
 
 #include "example_utils.hpp"
 
-// cuda::std::span (a non-owning view over contiguous storage) and
-// cuda::std::inplace_vector (a fixed-capacity, allocator-free sequence
+// hip::std::span (a non-owning view over contiguous storage) and
+// hip::std::inplace_vector (a fixed-capacity, allocator-free sequence
 // container, backported here from C++26) are "bounded sequences": their
 // storage requirements are known up front, so they work equally well in
 // registers, in global memory, and -- as shown below -- in shared memory
 // (LDS), where there is no allocator to call in the first place.
-// cuda::std::array is included too, for the small, self-contained demo of
+// hip::std::array is included too, for the small, self-contained demo of
 // get<N> and structured bindings at the end of main().
-#include <cuda/std/array>
-#include <cuda/std/inplace_vector>
-#include <cuda/std/span>
+#include <hip/std/array>
+#include <hip/std/inplace_vector>
+#include <hip/std/span>
 
 #include <hip/hip_runtime.h>
 
@@ -83,12 +83,12 @@ struct BlockHits {
 // The type of the per-block hit collector. Named here so the __shared__
 // storage below can be declared with `alignas(HitVector)` / `sizeof(HitVector)`
 // without repeating the template arguments.
-using HitVector = cuda::std::inplace_vector<int, max_hits_per_block>;
+using HitVector = hip::std::inplace_vector<int, max_hits_per_block>;
 
 /// \brief Scans one tile of `all` per block and collects the values that
-/// satisfy is_hit into a fixed-capacity cuda::std::inplace_vector built in
+/// satisfy is_hit into a fixed-capacity hip::std::inplace_vector built in
 /// shared memory (LDS).
-__global__ void find_hits_kernel(cuda::std::span<const int> all,
+__global__ void find_hits_kernel(hip::std::span<const int> all,
                                  BlockHits *d_block_hits) {
   // Slice this block's tile out of the full input with subspan, instead of
   // pointer arithmetic. Guard the last tile, which may be smaller than
@@ -97,13 +97,13 @@ __global__ void find_hits_kernel(cuda::std::span<const int> all,
   const size_t remaining = all.size() - offset;
   const size_t count =
       remaining < tile_size ? remaining : static_cast<size_t>(tile_size);
-  const cuda::std::span<const int> tile = all.subspan(offset, count);
+  const hip::std::span<const int> tile = all.subspan(offset, count);
 
   // __shared__ variables cannot have dynamic initialization in HIP: clang
   // only accepts a __shared__ variable whose type has a trivial (empty)
   // default constructor, and otherwise rejects the declaration outright
   // ("initialization is not supported for __shared__ variables").
-  // cuda::std::inplace_vector<int, N> selects an internal "trivial"
+  // hip::std::inplace_vector<int, N> selects an internal "trivial"
   // specialization for the trivial element type int, but that
   // specialization's defaulted default constructor is still not *empty*:
   // its members have default initializers that zero the element storage
@@ -137,13 +137,14 @@ __global__ void find_hits_kernel(cuda::std::span<const int> all,
         // never grow past max_hits_per_block. try_emplace_back reports
         // that by returning a null pointer instead of allocating,
         // throwing, or invoking undefined behavior. (Plain emplace_back
-        // would call cuda::std::terminate() here once hits is full: on
+        // would call hip::std::terminate() here once hits is full: on
         // the device, exceptions are not available, so libhipcxx's
         // __throw_bad_alloc terminates instead of throwing -- see
         // <cuda/std/__new/bad_alloc.h>.) try_emplace_back is therefore
         // always safe to call, even when more values match the predicate
         // than fit.
-        if (hits->try_emplace_back(tile[i]) == nullptr) {
+        int *const stored = hits->try_emplace_back(tile[i]);
+        if (stored == nullptr) {
           ++overflow_count;
         }
       }
@@ -166,7 +167,7 @@ __global__ void find_hits_kernel(cuda::std::span<const int> all,
 }
 
 /// \brief Recomputes, independently of the kernel and without using
-/// cuda::std::inplace_vector, which of data[begin, end) are hits, and how
+/// hip::std::inplace_vector, which of data[begin, end) are hits, and how
 /// many did not fit into a container of capacity max_hits_per_block. Used
 /// only to validate the device results.
 struct ExpectedHits {
@@ -217,7 +218,7 @@ int main() {
   HIP_CHECK(hipMalloc(&d_data, sizeof(int) * size));
   HIP_CHECK(hipMemcpy(d_data, h_data.data(), sizeof(int) * size,
                       hipMemcpyHostToDevice));
-  const cuda::std::span<const int> all(d_data, size);
+  const hip::std::span<const int> all(d_data, size);
 
   // Allocate device memory for one result per block.
   BlockHits *d_block_hits{};
@@ -268,23 +269,23 @@ int main() {
     total_overflow += actual.overflow_count;
   }
 
-  // A short, self-contained demonstration of cuda::std::array with get<N>
+  // A short, self-contained demonstration of hip::std::array with get<N>
   // and structured bindings, independent of the hit-finding kernel above.
-  const cuda::std::array<unsigned int, 3> summary = {total_hits, total_overflow,
-                                                     grid_size};
+  const hip::std::array<unsigned int, 3> summary = {total_hits, total_overflow,
+                                                    grid_size};
 
-  // cuda::std::get<N> accesses one element of a fixed-size array by a
-  // compile-time index, the same way cuda::std::tuple does.
-  std::cout << "\ncuda::std::array summary (via cuda::std::get):\n"
-            << "  total hits:     " << cuda::std::get<0>(summary) << '\n'
-            << "  total overflow: " << cuda::std::get<1>(summary) << '\n'
-            << "  blocks:         " << cuda::std::get<2>(summary) << std::endl;
+  // hip::std::get<N> accesses one element of a fixed-size array by a
+  // compile-time index, the same way hip::std::tuple does.
+  std::cout << "\nhip::std::array summary (via hip::std::get):\n"
+            << "  total hits:     " << hip::std::get<0>(summary) << '\n'
+            << "  total overflow: " << hip::std::get<1>(summary) << '\n'
+            << "  blocks:         " << hip::std::get<2>(summary) << std::endl;
 
   // A structured binding unpacks the same array by position, using the
   // same tuple-like protocol (tuple_size, tuple_element, get) that
-  // cuda::std::get relies on.
+  // hip::std::get relies on.
   const auto &[summary_hits, summary_overflow, summary_blocks] = summary;
-  std::cout << "cuda::std::array summary (via structured bindings):\n"
+  std::cout << "hip::std::array summary (via structured bindings):\n"
             << "  total hits:     " << summary_hits << '\n'
             << "  total overflow: " << summary_overflow << '\n'
             << "  blocks:         " << summary_blocks << std::endl;

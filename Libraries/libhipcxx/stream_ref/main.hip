@@ -22,11 +22,11 @@
 
 #include "example_utils.hpp"
 
-// <cuda/stream_ref> provides cuda::stream_ref, a small non-owning wrapper
+// <hip/stream_ref> provides hip::stream_ref, a small non-owning wrapper
 // around a hipStream_t. In libhipcxx it is genuinely backed by hipStream_t
 // (include/cuda/stream_ref, "using value_type = ::hipStream_t"), not a
 // renamed CUDA type, so it drops into existing HIP code without a cast.
-#include <cuda/stream_ref>
+#include <hip/stream_ref>
 
 #include <hip/hip_runtime.h>
 
@@ -61,7 +61,7 @@ __host__ __device__ uint32_t busy_fill_value(const uint32_t index,
 /// \brief Fills \p out with busy_fill_value(index, iterations) for every
 /// index. The loop inside busy_fill_value gives the kernel a modest, but
 /// clearly non-zero, amount of real work to do, which is what makes the
-/// cuda::stream_ref::ready() check below meaningful to look at.
+/// hip::stream_ref::ready() check below meaningful to look at.
 __global__ void busy_fill_kernel(uint32_t *out, const unsigned int count,
                                  const unsigned int iterations) {
   const unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
@@ -72,17 +72,17 @@ __global__ void busy_fill_kernel(uint32_t *out, const unsigned int count,
 
 /// \brief Prints the identity of the wrapped stream as its raw handle value.
 ///
-/// \p ref is taken by value. cuda::stream_ref's converting constructor from
+/// \p ref is taken by value. hip::stream_ref's converting constructor from
 /// hipStream_t (include/cuda/stream_ref, constructor at line 108) is
 /// implicit, so this function can be called directly with a raw hipStream_t
 /// handle: no explicit cast or wrapping is required at the call site. See the
 /// call with `raw` in main() below.
-void print_stream_identity(cuda::stream_ref ref, const char *label) {
+void print_stream_identity(hip::stream_ref ref, const char *label) {
   std::cout << "  " << std::left << std::setw(32) << label
             << reinterpret_cast<void *>(ref.get()) << '\n';
 }
 
-/// \brief Calls cuda::stream_ref::ready() for the racy, right-after-launch
+/// \brief Calls hip::stream_ref::ready() for the racy, right-after-launch
 /// poll and prints the outcome.
 ///
 /// ready() (include/cuda/stream_ref, line 172) wraps hipStreamQuery: it
@@ -96,8 +96,7 @@ void print_stream_identity(cuda::stream_ref ref, const char *label) {
 /// launch, false is merely the *expected* outcome, not a guaranteed one (see
 /// the comment at the call site in main()), so the only thing worth counting
 /// as an error is an unexpected exception.
-void checked_ready(const cuda::stream_ref &ref, const char *label,
-                   int &errors) {
+void checked_ready(const hip::stream_ref &ref, const char *label, int &errors) {
   try {
     const bool ready = ref.ready();
     std::cout << "  " << std::left << std::setw(32) << label << std::boolalpha
@@ -108,7 +107,7 @@ void checked_ready(const cuda::stream_ref &ref, const char *label,
   }
 }
 
-/// \brief Calls cuda::stream_ref::ready() once wait() has returned and
+/// \brief Calls hip::stream_ref::ready() once wait() has returned and
 /// validates the outcome.
 ///
 /// Unlike checked_ready() above, this check is not racy: after wait() has
@@ -116,7 +115,7 @@ void checked_ready(const cuda::stream_ref &ref, const char *label,
 /// have completed, so ready() must report true. Both an exception and an
 /// unexpected false are therefore counted as validation errors here, each
 /// counted exactly once.
-void checked_ready_after_wait(const cuda::stream_ref &ref, int &errors) {
+void checked_ready_after_wait(const hip::stream_ref &ref, int &errors) {
   try {
     const bool ready = ref.ready();
     std::cout << "  " << std::left << std::setw(32) << "ready() after wait()"
@@ -130,18 +129,18 @@ void checked_ready_after_wait(const cuda::stream_ref &ref, int &errors) {
   }
 }
 
-/// \brief Calls cuda::stream_ref::wait() and reports whether it threw.
+/// \brief Calls hip::stream_ref::wait() and reports whether it threw.
 ///
 /// wait() (include/cuda/stream_ref, line 160) wraps hipStreamSynchronize and,
 /// like ready(), throws hip::cuda_error on failure instead of the
 /// HIP_CHECK-style "print and abort" used for the plain HIP calls elsewhere
 /// in this file. See the comment on checked_ready() above for why this
 /// example catches it rather than letting it propagate.
-void checked_wait(const cuda::stream_ref &ref, int &errors) {
+void checked_wait(const hip::stream_ref &ref, int &errors) {
   try {
     ref.wait();
   } catch (const std::exception &e) {
-    std::cerr << "  cuda::stream_ref::wait() threw: " << e.what() << '\n';
+    std::cerr << "  hip::stream_ref::wait() threw: " << e.what() << '\n';
     ++errors;
   }
 }
@@ -161,32 +160,32 @@ int main() {
   // Number of LCG steps each thread performs. This is deliberately larger
   // than a single trivial write so that the kernel keeps the stream busy for
   // a modest, but non-zero, amount of time, which is what
-  // cuda::stream_ref::ready() below tries to observe. It is still small
+  // hip::stream_ref::ready() below tries to observe. It is still small
   // enough that recomputing the same function on the host for validation
   // stays fast.
   constexpr unsigned int busy_iterations = 256;
 
-  // Create an explicit HIP stream. cuda::stream_ref never owns the stream it
+  // Create an explicit HIP stream. hip::stream_ref never owns the stream it
   // wraps, so the hipStream_t below is what actually owns the resource and
-  // must outlive every cuda::stream_ref that refers to it.
+  // must outlive every hip::stream_ref that refers to it.
   hipStream_t raw;
   HIP_CHECK(hipStreamCreate(&raw));
 
   // Wrap the raw handle. This constructor is implicit (see
   // print_stream_identity's doc comment above and its first call below), so
   // `s` behaves like a lightweight view of `raw`, not a separate resource.
-  cuda::stream_ref s{raw};
+  hip::stream_ref s{raw};
 
-  // A default-constructed cuda::stream_ref refers to the default stream
+  // A default-constructed hip::stream_ref refers to the default stream
   // (its underlying handle is the null handle), which is a distinct stream
   // identity from the explicit stream created above. It does not create or
   // own anything, so no corresponding hipStreamCreate/hipStreamDestroy calls
   // are needed for it.
-  const cuda::stream_ref default_ref;
+  const hip::stream_ref default_ref;
 
   std::cout << "Stream identities (raw handle values):\n";
-  // Passing `raw` here relies on cuda::stream_ref's implicit conversion from
-  // hipStream_t: no `cuda::stream_ref{raw}` wrapping is written at the call
+  // Passing `raw` here relies on hip::stream_ref's implicit conversion from
+  // hipStream_t: no `hip::stream_ref{raw}` wrapping is written at the call
   // site.
   print_stream_identity(raw, "explicit stream (raw)");
   print_stream_identity(s, "explicit stream (wrapped)");
@@ -227,7 +226,7 @@ int main() {
   // does not.
   checked_ready_after_wait(s, errors);
 
-  // get() hands the raw handle back out for a HIP API that cuda::stream_ref
+  // get() hands the raw handle back out for a HIP API that hip::stream_ref
   // does not wrap itself. Here it is used for a second, redundant explicit
   // join: calling hipStreamSynchronize again on an already-idle stream is
   // well defined and simply returns immediately.
@@ -250,11 +249,11 @@ int main() {
   }
   std::cout << '\n';
 
-  // Demonstrate identity/equality. cuda::stream_ref compares by the wrapped
+  // Demonstrate identity/equality. hip::stream_ref compares by the wrapped
   // handle's value, so two stream_refs that wrap the same hipStream_t
   // compare equal, and the comparison also works directly against a raw
   // hipStream_t thanks to the implicit conversion.
-  const cuda::stream_ref s_alias{raw};
+  const hip::stream_ref s_alias{raw};
   const bool same_stream_equal = (s == s_alias);
   const bool raw_conversion_equal = (s == raw);
   const bool default_stream_distinct = (s != default_ref);
@@ -288,7 +287,7 @@ int main() {
     }
   }
 
-  // Destroying the stream is another HIP API that cuda::stream_ref does not
+  // Destroying the stream is another HIP API that hip::stream_ref does not
   // wrap: it is a non-owning view, so it has no destructor logic of its own.
   // get() hands back the same raw handle that was used to construct `s` and
   // `s_alias` for the one HIP call that actually releases the resource.

@@ -22,20 +22,20 @@
 
 #include "example_utils.hpp"
 
-// <cuda/memory_resource> provides cuda::mr::resource (a concept describing
+// <hip/memory_resource> provides hip::mr::resource (a concept describing
 // the minimal interface a memory resource must implement),
-// cuda::mr::resource_ref (a type-erased, non-owning view over any conforming
-// resource), and the property tags cuda::mr::device_accessible and
-// cuda::mr::host_accessible. Everything in the cuda::mr namespace is
+// hip::mr::resource_ref (a type-erased, non-owning view over any conforming
+// resource), and the property tags hip::mr::device_accessible and
+// hip::mr::host_accessible. Everything in the hip::mr namespace is
 // experimental and therefore hidden behind the
 // LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE macro, which this example
 // defines on the compiler command line (see CMakeLists.txt/Makefile).
-#include <cuda/memory_resource>
+#include <hip/memory_resource>
 
-// cuda::std::has_single_bit (C++20 <bit>, provided for host and device code
+// hip::std::has_single_bit (C++20 <bit>, provided for host and device code
 // by libhipcxx) checks whether a value is a power of two; used below to
 // validate the alignment requested from HipDeviceResource::allocate.
-#include <cuda/std/bit>
+#include <hip/std/bit>
 
 #include <hip/hip_runtime.h>
 
@@ -47,7 +47,7 @@
 /// \brief A minimal memory resource that allocates and frees device memory
 /// with hipMalloc/hipFree.
 ///
-/// To satisfy the cuda::mr::resource concept
+/// To satisfy the hip::mr::resource concept
 /// (cuda/__memory_resource/resource.h) a type must provide:
 ///   - `void* allocate(size_t bytes, size_t alignment)`
 ///   - `void deallocate(void* ptr, size_t bytes, size_t alignment)`
@@ -57,7 +57,7 @@
 ///
 /// This resource has no state, so every instance compares equal to every
 /// other instance. hipMalloc always aligns its returned memory to
-/// cuda::mr::default_cuda_malloc_alignment (256 bytes,
+/// hip::mr::default_cuda_malloc_alignment (256 bytes,
 /// cuda/__memory_resource/properties.h), so allocate() below can honor any
 /// requested alignment up to that value, but not a stricter one.
 class HipDeviceResource {
@@ -68,11 +68,11 @@ public:
     // asked for: a non-power-of-two alignment is meaningless, and a
     // power-of-two alignment stricter than 256 bytes exceeds what hipMalloc
     // guarantees.
-    if (!cuda::std::has_single_bit(alignment) ||
-        alignment > cuda::mr::default_cuda_malloc_alignment) {
+    if (!hip::std::has_single_bit(alignment) ||
+        alignment > hip::mr::default_cuda_malloc_alignment) {
       std::cerr << "HipDeviceResource::allocate: alignment " << alignment
                 << " is not supported (must be a power of two and at most "
-                << cuda::mr::default_cuda_malloc_alignment << ")\n";
+                << hip::mr::default_cuda_malloc_alignment << ")\n";
       std::exit(error_exit_code);
     }
     void *ptr{};
@@ -89,8 +89,8 @@ public:
   bool operator!=(const HipDeviceResource &) const { return false; }
 
   // A resource declares a property by providing a friend function named
-  // get_property that takes the resource and the property tag. cuda::mr::
-  // device_accessible and cuda::mr::host_accessible are stateless tags (empty
+  // get_property that takes the resource and the property tag. hip::mr::
+  // device_accessible and hip::mr::host_accessible are stateless tags (empty
   // structs), so the matching get_property overload simply returns void; its
   // existence is the signal, not its return value. get_property is found via
   // argument-dependent lookup, which is why it must be declared as a friend
@@ -102,18 +102,18 @@ public:
   // host_accessible, because the pointers it returns must not be
   // dereferenced from host code.
   friend constexpr void get_property(const HipDeviceResource &,
-                                     cuda::mr::device_accessible) noexcept {}
+                                     hip::mr::device_accessible) noexcept {}
 };
 
 // HipDeviceResource is checked against the library concepts at compile
-// time. cuda::mr::resource_with additionally verifies that the given
+// time. hip::mr::resource_with additionally verifies that the given
 // properties are satisfied via get_property/has_property.
-static_assert(cuda::mr::resource<HipDeviceResource>,
-              "HipDeviceResource must satisfy the cuda::mr::resource "
+static_assert(hip::mr::resource<HipDeviceResource>,
+              "HipDeviceResource must satisfy the hip::mr::resource "
               "concept: allocate/deallocate with the right signatures, plus "
               "operator== and operator!=");
 static_assert(
-    cuda::mr::resource_with<HipDeviceResource, cuda::mr::device_accessible>,
+    hip::mr::resource_with<HipDeviceResource, hip::mr::device_accessible>,
     "HipDeviceResource must additionally declare device_accessible");
 
 /// \brief Allocates `bytes` bytes through a type-erased resource_ref.
@@ -121,7 +121,7 @@ static_assert(
 /// This function is not templated on the concrete resource type and never
 /// mentions HipDeviceResource: `resource` could just as well be backed by
 /// a pool allocator, a logging wrapper, or any other type that conforms to
-/// cuda::mr::resource and declares device_accessible. This is the point of
+/// hip::mr::resource and declares device_accessible. This is the point of
 /// type erasure via resource_ref -- code that only needs to allocate memory
 /// does not need to become a template, and does not need to know (or even
 /// forward-declare) every resource type it might be handed.
@@ -129,20 +129,19 @@ static_assert(
 /// The alignment argument is omitted here, so resource_ref::allocate uses its
 /// default of alignof(std::max_align_t).
 void *allocate_device_buffer(
-    cuda::mr::resource_ref<cuda::mr::device_accessible> resource,
-    size_t bytes) {
+    hip::mr::resource_ref<hip::mr::device_accessible> resource, size_t bytes) {
   std::cout << "Allocating " << bytes
-            << " bytes through cuda::mr::resource_ref<device_accessible>...\n";
+            << " bytes through hip::mr::resource_ref<device_accessible>...\n";
   return resource.allocate(bytes);
 }
 
 /// \brief Frees a buffer previously obtained from allocate_device_buffer,
 /// again purely through the type-erased view.
 void free_device_buffer(
-    cuda::mr::resource_ref<cuda::mr::device_accessible> resource, void *ptr,
+    hip::mr::resource_ref<hip::mr::device_accessible> resource, void *ptr,
     size_t bytes) {
   resource.deallocate(ptr, bytes);
-  std::cout << "Freed " << bytes << " bytes through cuda::mr::resource_ref.\n";
+  std::cout << "Freed " << bytes << " bytes through hip::mr::resource_ref.\n";
 }
 
 /// \brief Each thread writes a value derived from its global index into the
@@ -178,7 +177,7 @@ int main() {
   //
   // resource_ref is a non-owning view (a "fat pointer" plus a small vtable):
   // it does not manage the lifetime of `resource`, which must outlive it.
-  cuda::mr::resource_ref<cuda::mr::device_accessible> ref{resource};
+  hip::mr::resource_ref<hip::mr::device_accessible> ref{resource};
 
   // allocate_device_buffer/free_device_buffer take a resource_ref by value.
   // Passing `resource` here relies on resource_ref's non-explicit,

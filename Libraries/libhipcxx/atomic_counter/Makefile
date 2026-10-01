@@ -32,7 +32,9 @@ endif
 ROCM_PATH ?= /opt/rocm
 
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
-LIBHIPCXX_INCLUDE_DIR := $(HIP_INCLUDE_DIR)/libhipcxx
+# TheRock#7024 installs the libhipcxx headers under include/hipccl; fall back to include/libhipcxx.
+LIBHIPCXX_INCLUDE_SUBDIR := $(if $(wildcard $(HIP_INCLUDE_DIR)/hipccl),hipccl,libhipcxx)
+LIBHIPCXX_INCLUDE_DIR    := $(HIP_INCLUDE_DIR)/$(LIBHIPCXX_INCLUDE_SUBDIR)
 
 HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 

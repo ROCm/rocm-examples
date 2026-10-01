@@ -22,13 +22,13 @@
 
 #include "example_utils.hpp"
 
-// <cuda/bit> provides the libhipcxx extensions cuda::bitmask,
-// cuda::bit_reverse, cuda::bitfield_insert and cuda::bitfield_extract. It also
-// includes <cuda/std/bit>, which provides the C++20 Standard <bit> operations
-// (cuda::std::popcount, cuda::std::countl_zero, cuda::std::bit_width,
-// cuda::std::rotl, ...) for host and device code, even in C++17 mode.
-#include <cuda/bit>
-#include <cuda/std/bit>
+// <hip/bit> provides the libhipcxx extensions hip::bitmask,
+// hip::bit_reverse, hip::bitfield_insert and hip::bitfield_extract. It also
+// includes <hip/std/bit>, which provides the C++20 Standard <bit> operations
+// (hip::std::popcount, hip::std::countl_zero, hip::std::bit_width,
+// hip::std::rotl, ...) for host and device code, even in C++17 mode.
+#include <hip/bit>
+#include <hip/std/bit>
 
 #include <hip/hip_runtime.h>
 
@@ -88,11 +88,11 @@ struct KeyResult {
   uint32_t key;              // The packed key.
   KeyFields fields;          // The fields extracted back from the key.
   uint32_t channel_in_place; // The channel bits, left at their position.
-  uint32_t reversed;         // cuda::bit_reverse(key)
-  uint32_t rotated;          // cuda::std::rotl(key, 32 - sequence start)
-  int popcount;              // cuda::std::popcount(key)
-  int leading_zeros;         // cuda::std::countl_zero(key)
-  int bit_width;             // cuda::std::bit_width(key)
+  uint32_t reversed;         // hip::bit_reverse(key)
+  uint32_t rotated;          // hip::std::rotl(key, 32 - sequence start)
+  int popcount;              // hip::std::popcount(key)
+  int leading_zeros;         // hip::std::countl_zero(key)
+  int bit_width;             // hip::std::bit_width(key)
 };
 
 /// \brief Derives the field values for the key with the given index. Every
@@ -105,51 +105,51 @@ __host__ __device__ constexpr KeyFields make_fields(const uint32_t index) {
 
 /// \brief Packs the fields into a single 32-bit key.
 __host__ __device__ constexpr uint32_t pack_key(const KeyFields fields) {
-  // cuda::bitfield_insert(dest, source, start, width) returns `dest` with the
+  // hip::bitfield_insert(dest, source, start, width) returns `dest` with the
   // bits [start, start + width) replaced by the lowest `width` bits of
   // `source`. The other bits of `dest` are kept, so the fields can be inserted
   // one after another into the same key. Higher bits of `source` that do not
   // fit into the field are discarded.
   uint32_t key = 0;
-  key = cuda::bitfield_insert(key, fields.flag, FlagField::start,
-                              FlagField::width);
-  key = cuda::bitfield_insert(key, fields.type, TypeField::start,
-                              TypeField::width);
-  key = cuda::bitfield_insert(key, fields.channel, ChannelField::start,
-                              ChannelField::width);
-  key = cuda::bitfield_insert(key, fields.sequence, SequenceField::start,
-                              SequenceField::width);
+  key = hip::bitfield_insert(key, fields.flag, FlagField::start,
+                             FlagField::width);
+  key = hip::bitfield_insert(key, fields.type, TypeField::start,
+                             TypeField::width);
+  key = hip::bitfield_insert(key, fields.channel, ChannelField::start,
+                             ChannelField::width);
+  key = hip::bitfield_insert(key, fields.sequence, SequenceField::start,
+                             SequenceField::width);
   return key;
 }
 
 /// \brief Unpacks the fields of a 32-bit key.
 __host__ __device__ constexpr KeyFields unpack_key(const uint32_t key) {
-  // cuda::bitfield_extract(value, start, width) returns the bits
+  // hip::bitfield_extract(value, start, width) returns the bits
   // [start, start + width) of `value`, shifted down to bit 0. This is the
-  // inverse of cuda::bitfield_insert.
+  // inverse of hip::bitfield_insert.
   return KeyFields{
-      cuda::bitfield_extract(key, FlagField::start, FlagField::width),
-      cuda::bitfield_extract(key, TypeField::start, TypeField::width),
-      cuda::bitfield_extract(key, ChannelField::start, ChannelField::width),
-      cuda::bitfield_extract(key, SequenceField::start, SequenceField::width)};
+      hip::bitfield_extract(key, FlagField::start, FlagField::width),
+      hip::bitfield_extract(key, TypeField::start, TypeField::width),
+      hip::bitfield_extract(key, ChannelField::start, ChannelField::width),
+      hip::bitfield_extract(key, SequenceField::start, SequenceField::width)};
 }
 
 // All libhipcxx bit functions are constexpr, so the key layout can be checked
-// at compile time on the host. cuda::bitmask<T>(start, width) returns a value
+// at compile time on the host. hip::bitmask<T>(start, width) returns a value
 // of type T with the bits [start, start + width) set. The type T is not
 // deduced from the arguments and must be given explicitly.
-static_assert(cuda::bitmask<uint32_t>(ChannelField::start,
-                                      ChannelField::width) == 0x00000FF0u,
+static_assert(hip::bitmask<uint32_t>(ChannelField::start,
+                                     ChannelField::width) == 0x00000FF0u,
               "The channel occupies bits 4-11");
 static_assert(FlagField::width + TypeField::width + ChannelField::width +
                       SequenceField::width ==
                   32,
               "The field widths add up to 32 bits");
 static_assert(
-    (cuda::bitmask<uint32_t>(FlagField::start, FlagField::width) |
-     cuda::bitmask<uint32_t>(TypeField::start, TypeField::width) |
-     cuda::bitmask<uint32_t>(ChannelField::start, ChannelField::width) |
-     cuda::bitmask<uint32_t>(SequenceField::start, SequenceField::width)) ==
+    (hip::bitmask<uint32_t>(FlagField::start, FlagField::width) |
+     hip::bitmask<uint32_t>(TypeField::start, TypeField::width) |
+     hip::bitmask<uint32_t>(ChannelField::start, ChannelField::width) |
+     hip::bitmask<uint32_t>(SequenceField::start, SequenceField::width)) ==
         0xFFFFFFFFu,
     "Together with the widths check, the fields cover every bit exactly once");
 static_assert(
@@ -166,13 +166,13 @@ __host__ __device__ KeyResult analyze_key(const uint32_t index) {
   result.key = pack_key(make_fields(index));
   result.fields = unpack_key(result.key);
 
-  // Masking with cuda::bitmask isolates the channel bits but, unlike
-  // cuda::bitfield_extract, leaves them at their position in the key.
+  // Masking with hip::bitmask isolates the channel bits but, unlike
+  // hip::bitfield_extract, leaves them at their position in the key.
   result.channel_in_place =
       result.key &
-      cuda::bitmask<uint32_t>(ChannelField::start, ChannelField::width);
+      hip::bitmask<uint32_t>(ChannelField::start, ChannelField::width);
 
-  // cuda::bit_reverse mirrors the bit order: bit 0 becomes bit 31, bit 1
+  // hip::bit_reverse mirrors the bit order: bit 0 becomes bit 31, bit 1
   // becomes bit 30, and so on. It is a libhipcxx extension, not part of the
   // C++ Standard. cuda/__bit/bit_reverse.h selects one of three
   // implementations: on the device it uses the __brev intrinsic
@@ -180,24 +180,24 @@ __host__ __device__ KeyResult analyze_key(const uint32_t index) {
   // uses the compiler builtin __builtin_bitreverse32 if available
   // (__bit_reverse_builtin), and a portable shift-and-mask sequence otherwise
   // (__bit_reverse_generic).
-  result.reversed = cuda::bit_reverse(result.key);
+  result.reversed = hip::bit_reverse(result.key);
 
-  // cuda::std::rotl rotates the bits to the left. Bits shifted out at the top
+  // hip::std::rotl rotates the bits to the left. Bits shifted out at the top
   // re-enter at the bottom, so no bits are lost. Rotating by
   // 32 - SequenceField::start moves the sequence number into the lowest bits
   // and the other fields above it, which changes the order of the fields.
-  result.rotated = cuda::std::rotl(result.key, 32 - SequenceField::start);
+  result.rotated = hip::std::rotl(result.key, 32 - SequenceField::start);
 
   // The counting operations of the C++20 Standard header <bit>, provided by
   // libhipcxx for host and device code:
-  // - cuda::std::popcount counts the bits set to 1.
-  // - cuda::std::countl_zero counts the consecutive 0 bits, starting at the
+  // - hip::std::popcount counts the bits set to 1.
+  // - hip::std::countl_zero counts the consecutive 0 bits, starting at the
   //   most significant bit. For a key of 0 it returns 32.
-  // - cuda::std::bit_width returns the number of bits needed to represent the
+  // - hip::std::bit_width returns the number of bits needed to represent the
   //   value, which is 32 - countl_zero(key) for a 32-bit value.
-  result.popcount = cuda::std::popcount(result.key);
-  result.leading_zeros = cuda::std::countl_zero(result.key);
-  result.bit_width = cuda::std::bit_width(result.key);
+  result.popcount = hip::std::popcount(result.key);
+  result.leading_zeros = hip::std::countl_zero(result.key);
+  result.bit_width = hip::std::bit_width(result.key);
 
   return result;
 }
@@ -223,7 +223,7 @@ std::string to_hex(const uint32_t value) {
 std::string to_fields_binary(const uint32_t key) {
   std::string binary;
   for (int bit = 31; bit >= 0; --bit) {
-    binary += cuda::bitfield_extract(key, bit, 1) ? '1' : '0';
+    binary += hip::bitfield_extract(key, bit, 1) ? '1' : '0';
     if (bit == SequenceField::start || bit == ChannelField::start ||
         bit == TypeField::start) {
       binary += '_';
@@ -275,7 +275,7 @@ int main() {
   // Print the first keys so that the results can be checked by eye.
   constexpr unsigned int print_count = 8;
 
-  std::cout << "Packing fields with cuda::bitfield_insert (binary: "
+  std::cout << "Packing fields with hip::bitfield_insert (binary: "
                "sequence_channel_type_flag):\n"
             << "index flag type channel sequence key        binary\n";
   for (unsigned int i = 0; i < print_count; ++i) {
@@ -309,7 +309,7 @@ int main() {
   // fields that were packed, and every value must match the value computed on
   // the host. The host and the device run the same source code, but several
   // functions take a different implementation path on each side, for example
-  // cuda::bit_reverse (intrinsic versus builtin) and cuda::std::rotl.
+  // hip::bit_reverse (intrinsic versus builtin) and hip::std::rotl.
   int errors = 0;
   for (unsigned int i = 0; i < size; ++i) {
     const KeyResult expected = analyze_key(i);
