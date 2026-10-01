@@ -19,6 +19,6 @@ concurrency:
 
 jobs:
   security:
-    uses: ROCm/rocm-security-gh/.github/workflows/security-baseline.yml@3a1bd0da89771757df435817daae14d1635b7fdb # v1.0.1
+    uses: ROCm/rocm-security-gh/.github/workflows/security-baseline.yml@213048f7d31ea455ad7d77cc689533afdd950e89 # v1.0.3
     with:
       report_formats: human
