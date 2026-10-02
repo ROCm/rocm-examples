@@ -56,10 +56,6 @@ constexpr unsigned int grid_size = 8;
 /// \brief Number of threads per block.
 constexpr unsigned int block_size = 256;
 
-/// \brief The device-scope atomic that combines every block's partial
-/// maximum. Shared by every block in the grid.
-using DeviceScopeAtomic = hip::atomic<int, hip::thread_scope_device>;
-
 /// \brief The block-scope atomic that combines the values of one block.
 /// Lives in LDS (shared memory) and is only ever touched by the threads of
 /// the block that owns it.
@@ -77,23 +73,6 @@ __host__ __device__ constexpr int thread_value(const unsigned int block_idx,
   return static_cast<int>(mixed % 100000u);
 }
 
-/// \brief Initializes the device-scope atomic to \p initial_value. Launched
-/// with a single thread before block_reduce_max_kernel, so that it completes
-/// (HIP orders kernel launches on the same stream) before any block observes
-/// or updates the atomic.
-__global__ void init_device_max_kernel(DeviceScopeAtomic *d_device_max,
-                                       const int initial_value) {
-  d_device_max->store(initial_value, hip::memory_order_relaxed);
-}
-
-/// \brief Reads the current value of the device-scope atomic into
-/// \p d_result. Launched with a single thread after block_reduce_max_kernel
-/// has finished, so that every block's contribution is already visible.
-__global__ void load_device_max_kernel(const DeviceScopeAtomic *d_device_max,
-                                       int *d_result) {
-  *d_result = d_device_max->load(hip::memory_order_relaxed);
-}
-
 /// \brief Computes thread_value for every thread and combines the results
 /// into a single maximum, in two stages:
 ///
@@ -108,13 +87,17 @@ __global__ void load_device_max_kernel(const DeviceScopeAtomic *d_device_max,
 ///    thread_scope_block here would be incorrect, since other blocks do
 ///    observe it.
 ///
+/// The device-scope atomic is a hip::atomic_ref over a plain int, so the
+/// host can initialize and read it back with an ordinary hipMemcpy instead
+/// of a helper kernel: it is the same accumulator, but its storage is not
+/// owned by an atomic object.
+///
 /// Because only one thread per block reaches the device stage, the grid
 /// performs grid_size device-scope atomic operations instead of
 /// grid_size * block_size, which is the performance payoff for staging the
 /// reduction instead of applying fetch_max to the device-scope atomic
 /// directly from every thread.
-__global__ void block_reduce_max_kernel(DeviceScopeAtomic *d_device_max,
-                                        int *d_block_max) {
+__global__ void block_reduce_max_kernel(int *d_device_max, int *d_block_max) {
   // __shared__ variables have no dynamic initializer: the compiler never
   // runs a constructor for them, and shared memory is not zero-initialized
   // between kernel launches. hip::atomic's default constructor is
@@ -145,45 +128,43 @@ __global__ void block_reduce_max_kernel(DeviceScopeAtomic *d_device_max,
     d_block_max[blockIdx.x] = this_block_max;
 
     // Device-scope fetch_max: one per block, visible to the whole grid (and,
-    // with thread_scope_system, to the host and other GPUs too).
-    d_device_max->fetch_max(this_block_max, hip::memory_order_relaxed);
+    // with thread_scope_system, to the host and other GPUs too). The
+    // atomic_ref layers atomic access over the plain int in d_device_max,
+    // which the host can read back directly.
+    hip::atomic_ref<int, hip::thread_scope_device> device_max(*d_device_max);
+    device_max.fetch_max(this_block_max, hip::memory_order_relaxed);
   }
 }
 
 int main() {
-  // Allocate the device-scope atomic that accumulates the final maximum.
-  DeviceScopeAtomic *d_device_max{};
-  HIP_CHECK(hipMalloc(&d_device_max, sizeof(DeviceScopeAtomic)));
+  // The device-scope accumulator is a plain int, accessed atomically only
+  // through a hip::atomic_ref inside the kernel. Allocate the accumulator,
+  // the per-block maxima, and seed the accumulator with the identity element
+  // for max; since it is an ordinary int, a host-to-device hipMemcpy can
+  // initialize it without a helper kernel.
+  int *d_device_max{};
+  HIP_CHECK(hipMalloc(&d_device_max, sizeof(int)));
+  const int initial_max = INT_MIN;
+  HIP_CHECK(hipMemcpy(d_device_max, &initial_max, sizeof(int),
+                      hipMemcpyHostToDevice));
 
-  // Allocate space for the per-block maxima and the final result.
   int *d_block_max{};
   HIP_CHECK(hipMalloc(&d_block_max, sizeof(int) * grid_size));
-  int *d_final_max{};
-  HIP_CHECK(hipMalloc(&d_final_max, sizeof(int)));
-
-  // Initialize the device-scope atomic to the identity element for max.
-  init_device_max_kernel<<<1, 1>>>(d_device_max, INT_MIN);
-  HIP_CHECK(hipGetLastError());
 
   // Run the staged, scope-narrowed reduction.
   block_reduce_max_kernel<<<grid_size, block_size>>>(d_device_max, d_block_max);
   HIP_CHECK(hipGetLastError());
 
-  // Read the device-scope atomic back through a tiny kernel, rather than
-  // assuming anything about its internal storage layout.
-  load_device_max_kernel<<<1, 1>>>(d_device_max, d_final_max);
-  HIP_CHECK(hipGetLastError());
-
-  // Copy the results back to the host and free the device memory.
+  // Copy both the per-block maxima and the device-scope accumulator back to
+  // the host. The accumulator is a plain int, so no load kernel is needed.
   std::vector<int> h_block_max(grid_size);
   HIP_CHECK(hipMemcpy(h_block_max.data(), d_block_max, sizeof(int) * grid_size,
                       hipMemcpyDeviceToHost));
   int h_final_max{};
-  HIP_CHECK(
-      hipMemcpy(&h_final_max, d_final_max, sizeof(int), hipMemcpyDeviceToHost));
+  HIP_CHECK(hipMemcpy(&h_final_max, d_device_max, sizeof(int),
+                      hipMemcpyDeviceToHost));
   HIP_CHECK(hipFree(d_device_max));
   HIP_CHECK(hipFree(d_block_max));
-  HIP_CHECK(hipFree(d_final_max));
 
   // Independently compute the reference maxima on the host, using the same
   // thread_value function, so that a reader can check the printed values by
@@ -212,7 +193,7 @@ int main() {
   }
 
   // Print the device-scope final maximum, combined from every block.
-  std::cout << "\nDevice-scope reduction (hip::atomic<int, "
+  std::cout << "\nDevice-scope reduction (hip::atomic_ref<int, "
                "hip::thread_scope_device>), combining "
             << grid_size << " block maxima:\n"
             << "device_max reference match\n"
