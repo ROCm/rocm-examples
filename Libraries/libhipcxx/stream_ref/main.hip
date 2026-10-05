@@ -35,15 +35,16 @@
 #include <stdexcept>
 #include <vector>
 
-__host__ __device__ constexpr uint32_t lcg_step(const uint32_t state) {
+__host__ __device__ constexpr std::uint32_t
+lcg_step(const std::uint32_t state) {
   return state * 1664525u + 1013904223u;
 }
 
 // Compiled for host and device so both sides run the exact same arithmetic:
 // the kernel fills the buffer, and main() recomputes the reference values.
-__host__ __device__ uint32_t busy_fill_value(const uint32_t index,
-                                             const unsigned int iterations) {
-  uint32_t state = index;
+__host__ __device__ std::uint32_t
+busy_fill_value(const std::uint32_t index, const unsigned int iterations) {
+  std::uint32_t state = index;
   for (unsigned int i = 0; i < iterations; ++i) {
     state = lcg_step(state);
   }
@@ -52,7 +53,7 @@ __host__ __device__ uint32_t busy_fill_value(const uint32_t index,
 
 // The LCG loop gives the kernel a modest, non-zero amount of work, which is
 // what makes the hip::stream_ref::ready() check meaningful.
-__global__ void busy_fill_kernel(uint32_t *out, const unsigned int count,
+__global__ void busy_fill_kernel(std::uint32_t *out, const unsigned int count,
                                  const unsigned int iterations) {
   const unsigned int index = blockIdx.x * blockDim.x + threadIdx.x;
   if (index < count) {
@@ -88,8 +89,8 @@ int main() {
   std::cout << "default stream handle: "
             << reinterpret_cast<void *>(default_ref.get()) << '\n';
 
-  uint32_t *d_result{};
-  HIP_CHECK(hipMalloc(&d_result, sizeof(uint32_t) * size));
+  std::uint32_t *d_result{};
+  HIP_CHECK(hipMalloc(&d_result, sizeof(std::uint32_t) * size));
 
   // The stream_ref must hand out the raw handle explicitly via get() for the
   // launch syntax.
@@ -129,8 +130,8 @@ int main() {
 
   HIP_CHECK(hipStreamSynchronize(s.get()));
 
-  std::vector<uint32_t> h_result(size);
-  HIP_CHECK(hipMemcpy(h_result.data(), d_result, sizeof(uint32_t) * size,
+  std::vector<std::uint32_t> h_result(size);
+  HIP_CHECK(hipMemcpy(h_result.data(), d_result, sizeof(std::uint32_t) * size,
                       hipMemcpyDeviceToHost));
   HIP_CHECK(hipFree(d_result));
 

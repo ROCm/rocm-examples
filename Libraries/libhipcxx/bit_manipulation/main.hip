@@ -70,19 +70,19 @@ struct SequenceField {
 
 // The unpacked field values of one key.
 struct KeyFields {
-  uint32_t flag;
-  uint32_t type;
-  uint32_t channel;
-  uint32_t sequence;
+  std::uint32_t flag;
+  std::uint32_t type;
+  std::uint32_t channel;
+  std::uint32_t sequence;
 };
 
 // All values that are computed for one key.
 struct KeyResult {
-  uint32_t key;
+  std::uint32_t key;
   KeyFields fields;
-  uint32_t channel_in_place;
-  uint32_t reversed;
-  uint32_t rotated;
+  std::uint32_t channel_in_place;
+  std::uint32_t reversed;
+  std::uint32_t rotated;
   int popcount;
   int leading_zeros;
   int bit_width;
@@ -90,7 +90,7 @@ struct KeyResult {
 
 // Derives the field values for the key with the given index; every value fits
 // the width of its field.
-__host__ __device__ constexpr KeyFields make_fields(const uint32_t index) {
+__host__ __device__ constexpr KeyFields make_fields(const std::uint32_t index) {
   return KeyFields{index % 2u, (index / 2u) % (1u << TypeField::width),
                    (index * 37u) % (1u << ChannelField::width),
                    (index * 1021u) % (1u << SequenceField::width)};
@@ -99,8 +99,8 @@ __host__ __device__ constexpr KeyFields make_fields(const uint32_t index) {
 // Packs the fields into a single 32-bit key. hip::bitfield_insert(dest,
 // source, start, width) replaces the bits [start, start + width) of `dest`
 // with the low `width` bits of `source`.
-__host__ __device__ constexpr uint32_t pack_key(const KeyFields fields) {
-  uint32_t key = 0;
+__host__ __device__ constexpr std::uint32_t pack_key(const KeyFields fields) {
+  std::uint32_t key = 0;
   key = hip::bitfield_insert(key, fields.flag, FlagField::start,
                              FlagField::width);
   key = hip::bitfield_insert(key, fields.type, TypeField::start,
@@ -115,7 +115,7 @@ __host__ __device__ constexpr uint32_t pack_key(const KeyFields fields) {
 // Unpacks the fields of a 32-bit key. hip::bitfield_extract(value, start,
 // width) returns the bits [start, start + width) of `value`, shifted down to
 // bit 0.
-__host__ __device__ constexpr KeyFields unpack_key(const uint32_t key) {
+__host__ __device__ constexpr KeyFields unpack_key(const std::uint32_t key) {
   return KeyFields{
       hip::bitfield_extract(key, FlagField::start, FlagField::width),
       hip::bitfield_extract(key, TypeField::start, TypeField::width),
@@ -125,7 +125,7 @@ __host__ __device__ constexpr KeyFields unpack_key(const uint32_t key) {
 
 // All libhipcxx bit functions are constexpr, so the key layout can be checked
 // at compile time; hip::bitmask<T>(start, width) needs T given explicitly.
-static_assert(hip::bitmask<uint32_t>(ChannelField::start,
+static_assert(hip::bitmask<std::uint32_t>(ChannelField::start,
                                      ChannelField::width) == 0x00000FF0u,
               "The channel occupies bits 4-11");
 static_assert(FlagField::width + TypeField::width + ChannelField::width +
@@ -139,7 +139,7 @@ static_assert(
 // Builds the key with the given index and applies the bit operations to it.
 // The kernel calls this on the device, and the host calls it again to compute
 // the reference values.
-__host__ __device__ KeyResult analyze_key(const uint32_t index) {
+__host__ __device__ KeyResult analyze_key(const std::uint32_t index) {
   KeyResult result{};
 
   result.key = pack_key(make_fields(index));
@@ -149,7 +149,7 @@ __host__ __device__ KeyResult analyze_key(const uint32_t index) {
   // bits at their position in the key.
   result.channel_in_place =
       result.key &
-      hip::bitmask<uint32_t>(ChannelField::start, ChannelField::width);
+      hip::bitmask<std::uint32_t>(ChannelField::start, ChannelField::width);
 
   result.reversed = hip::bit_reverse(result.key);
 
