@@ -50,7 +50,7 @@ class HipDeviceResource {
 public:
   // Reject an alignment hipMalloc cannot honor (non-power-of-two, or stricter
   // than the 256 bytes hip::mr::default_cuda_malloc_alignment guarantees).
-  void *allocate(size_t bytes, size_t alignment) {
+  void *allocate(std::size_t bytes, std::size_t alignment) {
     if (!hip::std::has_single_bit(alignment) ||
         alignment > hip::mr::default_cuda_malloc_alignment) {
       std::cerr << "HipDeviceResource::allocate: alignment " << alignment
@@ -62,8 +62,8 @@ public:
     return ptr;
   }
 
-  void deallocate(void *ptr, size_t /* bytes */,
-                  size_t /* alignment */) noexcept {
+  void deallocate(void *ptr, std::size_t /* bytes */,
+                  std::size_t /* alignment */) noexcept {
     HIP_CHECK(hipFree(ptr));
   }
 
@@ -86,7 +86,8 @@ static_assert(
 // Allocates through a type-erased resource_ref, without mentioning the
 // concrete resource type: this is the point of type erasure via resource_ref.
 void *allocate_device_buffer(
-    hip::mr::resource_ref<hip::mr::device_accessible> resource, size_t bytes) {
+    hip::mr::resource_ref<hip::mr::device_accessible> resource,
+    std::size_t bytes) {
   std::cout << "Allocating " << bytes
             << " bytes through hip::mr::resource_ref<device_accessible>.\n";
   return resource.allocate(bytes);
@@ -95,7 +96,7 @@ void *allocate_device_buffer(
 // Frees a buffer previously obtained from allocate_device_buffer.
 void free_device_buffer(
     hip::mr::resource_ref<hip::mr::device_accessible> resource, void *ptr,
-    size_t bytes) {
+    std::size_t bytes) {
   resource.deallocate(ptr, bytes);
   std::cout << "Freed " << bytes << " bytes through hip::mr::resource_ref.\n";
 }
@@ -113,7 +114,7 @@ int main() {
   constexpr unsigned int size = 256;
   constexpr unsigned int block_size = 256;
   constexpr unsigned int grid_size = ceiling_div(size, block_size);
-  const size_t bytes = size * sizeof(int);
+  const std::size_t bytes = size * sizeof(int);
 
   HipDeviceResource resource;
   hip::mr::resource_ref<hip::mr::device_accessible> ref{resource};

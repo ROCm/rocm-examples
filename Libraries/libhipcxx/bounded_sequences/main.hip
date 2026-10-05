@@ -80,10 +80,10 @@ __global__ void find_hits_kernel(hip::std::span<const int> all,
                                  BlockHits *d_block_hits) {
   // Slice this block's tile out of the full input with subspan, guarding the
   // last tile, which may be smaller than tile_size.
-  const size_t offset = static_cast<size_t>(blockIdx.x) * tile_size;
-  const size_t remaining = all.size() - offset;
-  const size_t count =
-      remaining < tile_size ? remaining : static_cast<size_t>(tile_size);
+  const std::size_t offset = static_cast<std::size_t>(blockIdx.x) * tile_size;
+  const std::size_t remaining = all.size() - offset;
+  const std::size_t count =
+      remaining < tile_size ? remaining : static_cast<std::size_t>(tile_size);
   const hip::std::span<const int> tile = all.subspan(offset, count);
 
   // __shared__ variables cannot have dynamic initialization, and
@@ -96,7 +96,7 @@ __global__ void find_hits_kernel(hip::std::span<const int> all,
     HitVector *hits = ::new (hits_storage) HitVector();
 
     unsigned int overflow_count = 0;
-    for (size_t i = 0; i < tile.size(); ++i) {
+    for (std::size_t i = 0; i < tile.size(); ++i) {
       if (is_hit(tile[i])) {
         // try_emplace_back returns a null pointer instead of growing past the
         // fixed capacity, so calling it is always safe.
@@ -128,9 +128,10 @@ struct ExpectedHits {
 };
 
 ExpectedHits compute_expected_hits(const std::vector<int> &data,
-                                   const size_t begin, const size_t end) {
+                                   const std::size_t begin,
+                                   const std::size_t end) {
   ExpectedHits expected;
-  for (size_t i = begin; i < end; ++i) {
+  for (std::size_t i = begin; i < end; ++i) {
     if (is_hit(data[i])) {
       if (expected.values.size() < max_hits_per_block) {
         expected.values.push_back(data[i]);
@@ -181,8 +182,9 @@ int main() {
   unsigned int total_hits = 0;
   unsigned int total_overflow = 0;
   for (unsigned int block = 0; block < grid_size; ++block) {
-    const size_t begin = static_cast<size_t>(block) * tile_size;
-    const size_t end = (begin + tile_size < size) ? begin + tile_size : size;
+    const std::size_t begin = static_cast<std::size_t>(block) * tile_size;
+    const std::size_t end =
+        (begin + tile_size < size) ? begin + tile_size : size;
     const ExpectedHits expected = compute_expected_hits(h_data, begin, end);
     const BlockHits &actual = h_block_hits[block];
 

@@ -14,7 +14,7 @@ The counter itself stays a plain `int` for the whole example. All atomicity come
 2. A host thread is started. It wraps the shared `int` in its own `hip::std::atomic_ref<int>` and applies `fetch_add(1, hip::std::memory_order_relaxed)` 10,000 times.
 3. While the host thread runs, the `increment_kernel` kernel is launched with one thread per increment (10,000 threads, rounded up to whole blocks), and a second host thread is started. Every device thread and both host threads wrap the same `int` in their own `hip::std::atomic_ref<int>` and apply `fetch_add(1, hip::std::memory_order_relaxed)`, so host and device increments interleave freely.
 4. The host threads are joined and the device is synchronized with `hipDeviceSynchronize`. Both sides are now finished.
-5. The final counter value is printed, then validated: it must equal the number of host increments plus the number of device increments. A smaller value would mean an increment was lost to a data race, which the atomics forbid.
+5. The final counter value is printed, then validated: it must equal two times the number of host increments plus the number of device increments (one `host_increments` per host thread). A smaller value would mean an increment was lost to a data race, which the atomics forbid.
 
 ## Key APIs and Concepts
 

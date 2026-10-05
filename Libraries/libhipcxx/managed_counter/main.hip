@@ -35,8 +35,11 @@
 #include <thread>
 #include <vector>
 
-constexpr unsigned int host_increments = 10000;
+constexpr unsigned int host_threads = 2;
+constexpr unsigned int host_increments = 10000; // per host thread
 constexpr unsigned int device_increments = 10000;
+constexpr unsigned int expected_total =
+    host_threads * host_increments + device_increments;
 constexpr unsigned int block_size = 256;
 constexpr unsigned int grid_size = ceiling_div(device_increments, block_size);
 
@@ -78,11 +81,12 @@ int main() {
   }
   HIP_CHECK(hipDeviceSynchronize());
 
-  std::cout << host_increments << " host increments + " << device_increments
+  std::cout << host_threads << " host threads x " << host_increments
+            << " increments + " << device_increments
             << " device increments = " << *counter << '\n';
 
   // Every increment must have been counted, no matter which side did it.
-  int errors = (*counter != static_cast<int>(host_increments + device_increments));
+  int errors = (*counter != static_cast<int>(expected_total));
 
   HIP_CHECK(hipFree(counter));
 
