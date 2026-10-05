@@ -15,7 +15,7 @@ This example shows how to use the libhipcxx index-math helpers `hip::ceil_div`, 
 3. The results are copied back to the host, freed on the device, and checked against the expected indices.
 4. A compile-time and a runtime comparison show why the naive `(a + b - 1) / b` idiom for computing a ceiling division is not a safe replacement for `hip::ceil_div`: for a dividend near the maximum value of its type, the naive idiom overflows and silently produces a wrong result, while `hip::ceil_div` does not.
 5. `hip::round_up` rounds a buffer size up to a tile boundary before allocating, and `hip::round_down` rounds an offset down to the start of its containing tile.
-6. A table of boundary cases (zero, one below a tile boundary, exactly on a boundary, one above a boundary, and a couple of larger values) is printed for both `hip::round_up` and `hip::round_down`.
+6. A table of boundary cases (zero, one below a tile boundary, exactly on a boundary, and a couple of larger values) is printed for both `hip::round_up` and `hip::round_down`.
 7. Every value in the table is checked against an independent host oracle that uses plain division and a remainder check, not the naive `(a + b - 1) / b` idiom, and the result of the comparison is printed to the standard output.
 
 ## Key APIs and Concepts

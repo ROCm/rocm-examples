@@ -13,10 +13,8 @@ The example defines `HipDeviceResource`, a minimal resource whose `allocate`/`de
 3. An instance of `HipDeviceResource` is created and wrapped in a `hip::mr::resource_ref<hip::mr::device_accessible>`.
 4. `allocate_device_buffer`, a function that only takes a `hip::mr::resource_ref<hip::mr::device_accessible>` (not a template), allocates a device buffer through the type-erased view.
 5. The `fill_kernel` kernel is launched with one thread per element and writes a value derived from each thread's global index into the buffer.
-6. The results are copied back to the host.
-7. The first few values are printed so that they can be checked by eye.
-8. `free_device_buffer` frees the buffer, again only through the type-erased `hip::mr::resource_ref`.
-9. The host checks that every element matches the value the kernel was expected to write, and the result of the comparison is printed to the standard output.
+6. The results are copied back to the host, and `free_device_buffer` frees the buffer, again only through the type-erased `hip::mr::resource_ref`.
+7. Every element is validated against the value the kernel was expected to write, and the result of the comparison is printed to the standard output.
 
 ## Key APIs and Concepts
 
