@@ -126,7 +126,7 @@ __host__ __device__ constexpr KeyFields unpack_key(const std::uint32_t key) {
 // All libhipcxx bit functions are constexpr, so the key layout can be checked
 // at compile time; hip::bitmask<T>(start, width) needs T given explicitly.
 static_assert(hip::bitmask<std::uint32_t>(ChannelField::start,
-                                     ChannelField::width) == 0x00000FF0u,
+                                          ChannelField::width) == 0x00000FF0u,
               "The channel occupies bits 4-11");
 static_assert(FlagField::width + TypeField::width + ChannelField::width +
                       SequenceField::width ==

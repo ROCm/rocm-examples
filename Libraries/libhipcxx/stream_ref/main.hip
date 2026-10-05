@@ -101,8 +101,8 @@ int main() {
   // Racy, right-after-launch poll: false is the expected outcome but not
   // guaranteed, so it is only printed, not asserted.
   try {
-    std::cout << "ready() right after launch: " << std::boolalpha
-              << s.ready() << '\n';
+    std::cout << "ready() right after launch: " << std::boolalpha << s.ready()
+              << '\n';
   } catch (const std::exception &e) {
     std::cerr << "ready() threw: " << e.what() << '\n';
     ++errors;

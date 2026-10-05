@@ -200,16 +200,16 @@ int main() {
     total_hits += actual.hit_count;
     total_overflow += actual.overflow_count;
   }
-  std::cout << "Total hits: " << total_hits << ", total overflow: "
-            << total_overflow << " across " << grid_size << " blocks\n";
+  std::cout << "Total hits: " << total_hits
+            << ", total overflow: " << total_overflow << " across " << grid_size
+            << " blocks\n";
 
   // A short, self-contained demonstration of hip::std::array with get<N> and
   // structured bindings.
   const hip::std::array<unsigned int, 3> summary = {total_hits, total_overflow,
                                                     grid_size};
-  std::cout << "Summary via hip::std::get: hits "
-            << hip::std::get<0>(summary) << ", overflow "
-            << hip::std::get<1>(summary) << ", blocks "
+  std::cout << "Summary via hip::std::get: hits " << hip::std::get<0>(summary)
+            << ", overflow " << hip::std::get<1>(summary) << ", blocks "
             << hip::std::get<2>(summary) << '\n';
 
   const auto &[summary_hits, summary_overflow, summary_blocks] = summary;

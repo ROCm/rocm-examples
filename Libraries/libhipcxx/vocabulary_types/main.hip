@@ -144,10 +144,9 @@ int main() {
     const ThreadResult &result = h_results[i];
     if (result.value.has_value()) {
       std::cout << "thread " << i << ": value " << std::fixed
-                << std::setprecision(2) << *result.value
-                << ", bonus: " << (result.bonus.has_value()
-                                       ? std::to_string(*result.bonus)
-                                       : std::string("--"))
+                << std::setprecision(2) << *result.value << ", bonus: "
+                << (result.bonus.has_value() ? std::to_string(*result.bonus)
+                                             : std::string("--"))
                 << '\n';
     } else {
       std::cout << "thread " << i << ": error "
