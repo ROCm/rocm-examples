@@ -7,6 +7,8 @@ This example shows how to increment one counter from the host and the device *at
 The counter itself stays a plain `int` for the whole example. All atomicity comes from `hip::std::atomic_ref`, which the host threads and the device threads construct over the shared memory.
 
 > Managed memory requires a platform that supports it. The [unified memory documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/unified_memory.html) lists the supported operating systems and GPUs.
+>
+> Not every atomic operation is supported on every AMD GPU when the memory is managed: on the affected architectures, an atomic operation on managed memory becomes a NOP and the increment is silently dropped. The atomic support tables for [AMD Instinct GPUs](https://rocm.docs.amd.com/en/latest/reference/gpu-atomics-operation.html#id1) and [generic LLVM gfx targets](https://rocm.docs.amd.com/en/latest/reference/gpu-atomics-operation.html#id2) list the operations available per architecture; atomic support for managed memory can be displayed by selecting the "HW Atomics -> PCIe atomics -> Pinned Host DRAM -> Fine-grained -> System" tabs. On an affected architecture, this example fails its validation with a lower count than expected.
 
 ### Application flow
 
