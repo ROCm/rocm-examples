@@ -38,7 +38,7 @@ endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
-find_package(rocfft REQUIRED)
+find_package(rocfft REQUIRED 1.0.40)
 find_package(hip REQUIRED)
 find_package(hiprtc REQUIRED)
 

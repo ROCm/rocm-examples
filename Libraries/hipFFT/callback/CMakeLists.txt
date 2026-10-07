@@ -34,9 +34,8 @@ endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
-find_package(hipfft REQUIRED)
+find_package(hipfft REQUIRED 1.0.26)
 find_package(hip REQUIRED)
-find_package(hiprtc REQUIRED)
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
@@ -54,6 +53,7 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
   list( GET CUDAToolkit_INCLUDE_DIRS 0 CUDA_INCLUDE_DIR )
   target_compile_definitions( ${example_name} PRIVATE __HIP_PLATFORM_NVIDIA__ CUDA_INCLUDE_DIR=\"${CUDA_INCLUDE_DIR}\" )
 else()
+  find_package(hiprtc REQUIRED)
   target_link_libraries(${example_name} PRIVATE  hiprtc::hiprtc)
 endif()
 
