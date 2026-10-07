@@ -23,7 +23,12 @@
 #ifndef COMMON_HIPRTC_UTILS_HPP
 #define COMMON_HIPRTC_UTILS_HPP
 
+#include "example_utils.hpp"
 #include <hip/hiprtc.h>
+#include <cstdlib>
+#include <iostream>
+#include <stdexcept>
+#include <string>
 #include <vector>
 
 /// \brief Checks if the provided error code is \p HIPRTC_SUCCESS and if not,
