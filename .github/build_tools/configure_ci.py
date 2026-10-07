@@ -42,8 +42,8 @@ DISTRO_MAP = {
     },
     # Pinned stable image: ROCm baked in at /opt/rocm (no runtime install).
     "stable_release": {
-        "image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:7.14",
-        "label": "Ubuntu 24.04 (ROCm 7.14)",
+        "image": "ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.0",
+        "label": "Ubuntu 24.04 (ROCm 10.0)",
         "install_methods": [PREINSTALLED],
     },
 }
