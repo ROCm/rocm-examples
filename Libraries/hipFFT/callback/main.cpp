@@ -47,7 +47,7 @@ static const char *load_callback_src = R"(
 #define CALLBACK_LINKAGE
 #include <cuComplex.h>
 typedef cuDoubleComplex hipDoubleComplex;
-#define make_hipDoubleComplex make_cuDoubleComplex 
+#define make_hipDoubleComplex make_cuDoubleComplex
 #define hipCmul cuCmul
 #endif
 
