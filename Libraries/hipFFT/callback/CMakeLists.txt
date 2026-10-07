@@ -26,12 +26,6 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 project(hipfft_callback LANGUAGES CXX)
 
-# Set default build type to Release
-# to workaround a compiler issue when building with -O0
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 find_package(hipfft REQUIRED 1.0.26)
