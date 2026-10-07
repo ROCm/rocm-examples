@@ -41,7 +41,6 @@ This example illustrates the use of rocFFT `callback` functionality. It shows ho
 - `rocfft_execution_info_destroy`
 - `rocfft_execution_info_set_load_callback_data`
 - `rocfft_execution_info_set_work_buffer`
-- `rocfft_placement_inplace`
 - `rocfft_plan_create`
 - `rocfft_plan_description`
 - `rocfft_plan_description_create`
@@ -50,9 +49,7 @@ This example illustrates the use of rocFFT `callback` functionality. It shows ho
 - `rocfft_plan_description_set_scale_factor`
 - `rocfft_plan_destroy`
 - `rocfft_plan_get_work_buffer_size`
-- `rocfft_precision_double`
 - `rocfft_setup`
-- `rocfft_transform_type_complex_forward`
 
 ### HIP runtime
 
@@ -60,6 +57,4 @@ This example illustrates the use of rocFFT `callback` functionality. It shows ho
 - `hipFree`
 - `hipMalloc`
 - `hipMemcpy`
-- `hipMemcpyDeviceToHost`
-- `hipMemcpyHostToDevice`
 - `make_hipDoubleComplex`

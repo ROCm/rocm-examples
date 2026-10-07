@@ -31,14 +31,9 @@ This example illustrates the use of hipFFT `callback` functionality. It shows ho
 
 - `hipfftCreate`
 - `hipfftDestroy`
-- `hipfftDoubleComplex`
 - `hipfftExecZ2Z`
-- `hipfftHandle`
 - `hipfftPlan1d`
-- `hipfftType::HIPFFT_Z2Z`
 - `hipfftXtSetJITCallback`
-- `HIPFFT_CB_LD_COMPLEX_DOUBLE`
-- `HIPFFT_FORWARD`
 
 ### HIP runtime
 
@@ -46,6 +41,4 @@ This example illustrates the use of hipFFT `callback` functionality. It shows ho
 - `hipFree`
 - `hipMalloc`
 - `hipMemcpy`
-- `hipMemcpyDeviceToHost`
-- `hipMemcpyHostToDevice`
 - `make_hipDoubleComplex`
