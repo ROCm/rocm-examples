@@ -31,24 +31,28 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 find_package(hipfft REQUIRED 1.0.26)
 find_package(hip REQUIRED)
 
-add_executable(${example_name} main.cpp)
-# Make example runnable using ctest
-add_test(NAME ${example_name} COMMAND ${example_name})
-
-set(include_dirs "../../../Common" "../../../External")
-
-target_link_libraries(${example_name} PRIVATE hip::hipfft hip::host)
-target_include_directories(${example_name} PRIVATE ${include_dirs})
-
-if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
-  find_package(CUDAToolkit REQUIRED)
-  target_link_libraries(${example_name} PRIVATE CUDA::cudart CUDA::nvrtc)
-  # on CUDA, RTC callback code needs to be told where the CUDA includes are
-  list( GET CUDAToolkit_INCLUDE_DIRS 0 CUDA_INCLUDE_DIR )
-  target_compile_definitions( ${example_name} PRIVATE __HIP_PLATFORM_NVIDIA__ CUDA_INCLUDE_DIR=\"${CUDA_INCLUDE_DIR}\" )
+if(hipfft_VERSION VERSION_LESS 1.0.26)
+  message(WARNING "hipFFT callback example is disabled as it requires hipFFT 1.0.26 or newer.")
 else()
-  find_package(hiprtc REQUIRED)
-  target_link_libraries(${example_name} PRIVATE  hiprtc::hiprtc)
-endif()
+  add_executable(${example_name} main.cpp)
+  # Make example runnable using ctest
+  add_test(NAME ${example_name} COMMAND ${example_name})
 
-install(TARGETS ${example_name})
+  set(include_dirs "../../../Common" "../../../External")
+
+  target_link_libraries(${example_name} PRIVATE hip::hipfft hip::host)
+  target_include_directories(${example_name} PRIVATE ${include_dirs})
+
+  if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    find_package(CUDAToolkit REQUIRED)
+    target_link_libraries(${example_name} PRIVATE CUDA::cudart CUDA::nvrtc)
+    # on CUDA, RTC callback code needs to be told where the CUDA includes are
+    list( GET CUDAToolkit_INCLUDE_DIRS 0 CUDA_INCLUDE_DIR )
+    target_compile_definitions( ${example_name} PRIVATE __HIP_PLATFORM_NVIDIA__ CUDA_INCLUDE_DIR=\"${CUDA_INCLUDE_DIR}\" )
+  else()
+    find_package(hiprtc REQUIRED)
+    target_link_libraries(${example_name} PRIVATE  hiprtc::hiprtc)
+  endif()
+
+  install(TARGETS ${example_name})
+endif()

@@ -38,17 +38,21 @@ endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
-find_package(rocfft REQUIRED 1.0.40)
+find_package(rocfft REQUIRED)
 find_package(hip REQUIRED)
 find_package(hiprtc REQUIRED)
 
-add_executable(${example_name} main.cpp)
-# Make example runnable using ctest
-add_test(NAME ${example_name} COMMAND ${example_name})
+if(rocfft_VERSION VERSION_LESS 1.0.40)
+  message(WARNING "rocFFT callback example is disabled as it requires rocFFT 1.0.40 or newer.")
+else()
+  add_executable(${example_name} main.cpp)
+  # Make example runnable using ctest
+  add_test(NAME ${example_name} COMMAND ${example_name})
 
-set(include_dirs "../../../Common" "../../../External")
+  set(include_dirs "../../../Common" "../../../External")
 
-target_link_libraries(${example_name} PRIVATE roc::rocfft hip::host hiprtc::hiprtc)
-target_include_directories(${example_name} PRIVATE ${include_dirs})
+  target_link_libraries(${example_name} PRIVATE roc::rocfft hip::host hiprtc::hiprtc)
+  target_include_directories(${example_name} PRIVATE ${include_dirs})
 
-install(TARGETS ${example_name})
+  install(TARGETS ${example_name})
+endif()
