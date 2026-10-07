@@ -9,8 +9,8 @@
 // copies of the Software, and to permit persons to whom the Software is
 // furnished to do so, subject to the following conditions:
 //
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
 //
 // THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 // IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -31,13 +31,12 @@
 #include <random>
 #include <vector>
 
-struct load_cbdata
-{
-    hipfftDoubleComplex* filter;
-    double               scale;
+struct load_cbdata {
+  hipfftDoubleComplex *filter;
+  double scale;
 };
 
-static const char* load_callback_src = R"(
+static const char *load_callback_src = R"(
 #ifdef __HIP_PLATFORM_AMD__
 // rocFFT expects the provided symbol to be found verbatim in the
 // compiled SPIR-V.  Give the callback function C linkage so that its
@@ -74,91 +73,89 @@ __device__ hipDoubleComplex load_callback(void*              input_void,
 }
 )";
 
-int main()
-{
-    std::cout << "hipfft 1D double-precision complex-to-complex transform with callback\n";
+int main() {
+  std::cout << "hipfft 1D double-precision complex-to-complex transform with "
+               "callback\n";
 
-    constexpr int Nx        = 8; // Size of data vector
-    constexpr int direction = HIPFFT_FORWARD; // forward=-1, backward=1
+  constexpr int Nx = 8;                     // Size of data vector
+  constexpr int direction = HIPFFT_FORWARD; // forward=-1, backward=1
 
-    // Initialize data and filter on host
-    std::vector<hipfftDoubleComplex>       h_data(Nx), h_filter(Nx);
-    std::random_device                     rd;
-    std::default_random_engine             gen(rd());
-    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+  // Initialize data and filter on host
+  std::vector<hipfftDoubleComplex> h_data(Nx), h_filter(Nx);
+  std::random_device rd;
+  std::default_random_engine gen(rd());
+  std::uniform_real_distribution<double> distribution(0.0, 1.0);
 
-    for(size_t i = 0; i < Nx; i++)
-    {
-        h_data[i].x   = i;
-        h_data[i].y   = i;
-        h_filter[i].x = distribution(gen);
-    }
+  for (size_t i = 0; i < Nx; i++) {
+    h_data[i].x = i;
+    h_data[i].y = i;
+    h_filter[i].x = distribution(gen);
+  }
 
-    const size_t complex_bytes = sizeof(decltype(h_data)::value_type) * h_data.size();
+  const size_t complex_bytes =
+      sizeof(decltype(h_data)::value_type) * h_data.size();
 
-    // Create HIP device object and copy data to device
-    hipfftDoubleComplex *d_data, *d_filter;
-    HIP_CHECK(hipMalloc(&d_data, complex_bytes));
-    HIP_CHECK(hipMalloc(&d_filter, complex_bytes));
-    HIP_CHECK(hipMemcpy(d_data, h_data.data(), complex_bytes, hipMemcpyHostToDevice));
-    HIP_CHECK(hipMemcpy(d_filter, h_filter.data(), complex_bytes, hipMemcpyHostToDevice));
+  // Create HIP device object and copy data to device
+  hipfftDoubleComplex *d_data, *d_filter;
+  HIP_CHECK(hipMalloc(&d_data, complex_bytes));
+  HIP_CHECK(hipMalloc(&d_filter, complex_bytes));
+  HIP_CHECK(
+      hipMemcpy(d_data, h_data.data(), complex_bytes, hipMemcpyHostToDevice));
+  HIP_CHECK(hipMemcpy(d_filter, h_filter.data(), complex_bytes,
+                      hipMemcpyHostToDevice));
 
-    std::cout << "input:\n";
-    for(size_t i = 0; i < h_data.size(); i++)
-    {
-        std::cout << "(" << h_data[i].x << ", " << h_data[i].y << ") ";
-    }
-    std::cout << std::endl;
+  std::cout << "input:\n";
+  for (size_t i = 0; i < h_data.size(); i++) {
+    std::cout << "(" << h_data[i].x << ", " << h_data[i].y << ") ";
+  }
+  std::cout << std::endl;
 
-    // Prepare callback
-    load_cbdata h_callback_data;
-    h_callback_data.filter = d_filter;
-    h_callback_data.scale  = 1.0 / static_cast<double>(Nx);
-    void* d_callback_data;
-    HIP_CHECK(hipMalloc(&d_callback_data, sizeof(load_cbdata)));
-    HIP_CHECK(
-        hipMemcpy(d_callback_data, &h_callback_data, sizeof(load_cbdata), hipMemcpyHostToDevice));
+  // Prepare callback
+  load_cbdata h_callback_data;
+  h_callback_data.filter = d_filter;
+  h_callback_data.scale = 1.0 / static_cast<double>(Nx);
+  void *d_callback_data;
+  HIP_CHECK(hipMalloc(&d_callback_data, sizeof(load_cbdata)));
+  HIP_CHECK(hipMemcpy(d_callback_data, &h_callback_data, sizeof(load_cbdata),
+                      hipMemcpyHostToDevice));
 
-    auto load_callback_code = compile_jit_callback(load_callback_src);
+  auto load_callback_code = compile_jit_callback(load_callback_src);
 
-    std::vector<void*> cbdatas(1);
-    cbdatas[0] = d_callback_data;
+  std::vector<void *> cbdatas(1);
+  cbdatas[0] = d_callback_data;
 
-    // Create the plan
-    hipfftHandle plan;
-    HIPFFT_CHECK(hipfftCreate(&plan));
+  // Create the plan
+  hipfftHandle plan;
+  HIPFFT_CHECK(hipfftCreate(&plan));
 
-    // Set callback
-    HIPFFT_CHECK(hipfftXtSetJITCallback(plan,
-                                        "load_callback",
-                                        load_callback_code.data(),
-                                        load_callback_code.size(),
-                                        HIPFFT_CB_LD_COMPLEX_DOUBLE,
-                                        cbdatas.data()));
+  // Set callback
+  HIPFFT_CHECK(hipfftXtSetJITCallback(
+      plan, "load_callback", load_callback_code.data(),
+      load_callback_code.size(), HIPFFT_CB_LD_COMPLEX_DOUBLE, cbdatas.data()));
 
-    size_t workSize = 0;
-    HIPFFT_CHECK(hipfftMakePlan1d(plan, // Plan handle
-                                  Nx, // Transform length
-                                  HIPFFT_Z2Z, // Transform type
-                                  1, // Number of transforms
-                                  &workSize)); // Work memory
+  size_t workSize = 0;
+  HIPFFT_CHECK(hipfftMakePlan1d(plan,        // Plan handle
+                                Nx,          // Transform length
+                                HIPFFT_Z2Z,  // Transform type
+                                1,           // Number of transforms
+                                &workSize)); // Work memory
 
-    // Execute plan
-    HIPFFT_CHECK(hipfftExecZ2Z(plan, d_data, d_data, direction));
+  // Execute plan
+  HIPFFT_CHECK(hipfftExecZ2Z(plan, d_data, d_data, direction));
 
-    std::cout << "output:\n";
-    HIP_CHECK(hipMemcpy(h_data.data(), d_data, complex_bytes, hipMemcpyDeviceToHost));
-    for(size_t i = 0; i < h_data.size(); i++)
-    {
-        std::cout << "(" << h_data[i].x << ", " << h_data[i].y << ") ";
-    }
-    std::cout << std::endl;
+  std::cout << "output:\n";
+  HIP_CHECK(
+      hipMemcpy(h_data.data(), d_data, complex_bytes, hipMemcpyDeviceToHost));
+  for (size_t i = 0; i < h_data.size(); i++) {
+    std::cout << "(" << h_data[i].x << ", " << h_data[i].y << ") ";
+  }
+  std::cout << std::endl;
 
-    // Clean up
-    HIPFFT_CHECK(hipfftDestroy(plan));
-    HIP_CHECK(hipFree(d_callback_data));
-    HIP_CHECK(hipFree(d_filter));
-    HIP_CHECK(hipFree(d_data));
+  // Clean up
+  HIPFFT_CHECK(hipfftDestroy(plan));
+  HIP_CHECK(hipFree(d_callback_data));
+  HIP_CHECK(hipFree(d_filter));
+  HIP_CHECK(hipFree(d_data));
 
-    return 0;
+  return 0;
 }
