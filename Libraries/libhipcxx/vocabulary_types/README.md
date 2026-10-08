@@ -15,7 +15,7 @@ This example shows how the "vocabulary types" of libhipcxx -- `hip::std::tuple`,
    3. Otherwise divides the numerator by its index, scales the result, and stores an optional "precision bonus" in a `hip::std::optional<float>` for every fourth thread. `value_or(0.0f)` folds the threads without a bonus into the same expression as the threads with one.
    4. Returns `hip::std::expected<float, ErrorCode>` holding `ErrorCode::OutOfRange` if the final value leaves a fixed range, and the value itself otherwise.
 5. The results are copied back to the host and the device memory is freed.
-6. The first five results are printed to the standard output: the thread index, either the value or the error name, and the optional bonus if present.
+6. One representative result per case is printed to the standard output: the `DivisionByZero` failure, the `OutOfRange` failure, a success without a bonus, and a success with a bonus.
 7. The host recomputes every result with the same `analyze_record` function and configuration, and compares it with what the device produced.
 8. A `hip::std::pair<int, float>` is converted to a host `std::pair<int, float>` and back, and the round trip is checked.
 9. The result of every check is printed to the standard output.

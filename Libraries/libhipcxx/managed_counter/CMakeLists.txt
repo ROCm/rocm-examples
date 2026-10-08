@@ -38,12 +38,13 @@ verify_hip_platform(PLATFORMS "amd")
 include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
 find_package(libhipcxx REQUIRED)
+find_package(Threads REQUIRED)
 
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
 
-target_link_libraries(${example_name} PRIVATE libhipcxx::libhipcxx)
+target_link_libraries(${example_name} PRIVATE libhipcxx::libhipcxx Threads::Threads)
 target_include_directories(${example_name} PRIVATE "../../../Common")
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 

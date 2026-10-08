@@ -61,6 +61,18 @@ __global__ void increment_kernel(int *counter) {
 }
 
 int main() {
+  // Guard against devices that do not report managed-memory support.
+  int device = 0;
+  int managed_memory_supported = 0;
+  HIP_CHECK(hipGetDevice(&device));
+  HIP_CHECK(hipDeviceGetAttribute(&managed_memory_supported,
+                                  hipDeviceAttributeManagedMemory, device));
+  if (!managed_memory_supported) {
+    std::cout << "Skipping, device " << device
+              << " does not support managed memory" << std::endl;
+    return 0;
+  }
+
   // Allocate one managed page: the host and the device share it, so no
   // hipMemcpy is needed. hipMallocManaged does not run a constructor, so
   // the counter is zero-initialized in place with placement new.

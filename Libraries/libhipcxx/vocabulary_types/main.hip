@@ -140,11 +140,14 @@ int main() {
                       hipMemcpyDeviceToHost));
   HIP_CHECK(hipFree(d_results));
 
-  for (unsigned int i = 0; i < 5; ++i) {
+  // Print one representative index from each case: the DivisionByZero
+  // failure, the OutOfRange failure, a success without a bonus, and a
+  // success with a bonus.
+  std::cout << std::fixed << std::setprecision(2);
+  for (const unsigned int i : {0u, 1u, 13u, 16u}) {
     const ThreadResult &result = h_results[i];
     if (result.value.has_value()) {
-      std::cout << "thread " << i << ": value " << std::fixed
-                << std::setprecision(2) << *result.value << ", bonus: "
+      std::cout << "thread " << i << ": value " << *result.value << ", bonus: "
                 << (result.bonus.has_value() ? std::to_string(*result.bonus)
                                              : std::string("--"))
                 << '\n';
