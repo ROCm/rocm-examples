@@ -20,11 +20,21 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(HIP-Doc-Programming-Guide-Porting-CUDA-code-to-HIP LANGUAGES CXX)
+set(example_name hip_lane_masks_bit_shift)
 
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
+
+if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
+    # The example calls hipDeviceGetAttribute which internally uses the CUDA
+    # driver API. We must explicitly link the driver library.
+    find_package(CUDAToolkit REQUIRED)
+endif()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_ROOT
@@ -42,26 +52,20 @@ endif()
 
 list(APPEND CMAKE_PREFIX_PATH "${ROCM_ROOT}")
 
-add_subdirectory(address_retrieval)
-add_subdirectory(device_code_feature_identification)
-add_subdirectory(host_code_feature_identification)
-add_subdirectory(identifying_compilation_target_platform)
-add_subdirectory(identifying_host_device_compilation_pass)
-add_subdirectory(load_module)
-add_subdirectory(load_module_ex)
-
-if(NOT ${ROCM_EXAMPLES_GPU_LANGUAGE} STREQUAL "CUDA")
-    message(STATUS "The load_module_ex_cuda example is available only for CUDA.")
-else()
-    add_subdirectory(load_module_ex_cuda)
+if(NOT TARGET hip::hipcub)
+    find_package(hipcub REQUIRED)
 endif()
 
-find_package(hipcub QUIET)
-if(NOT hipcub_FOUND)
-    message(STATUS "hipCUB not found. Skipping lane masks bit-shift example.")
-else()
-    add_subdirectory(lane_masks_bit_shift)
-endif()
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
 
-add_subdirectory(per_thread_default_stream)
-add_subdirectory(pointer_memory_type)
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+
+set_target_properties(${example_name} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
+                                                 $<$<COMPILE_LANGUAGE:HIP>:HIP_EXTENSIONS OFF>)
+target_compile_features(${example_name} PRIVATE cuda_std_17 hip_std_17)
+target_include_directories(${example_name} PRIVATE $<$<COMPILE_LANGUAGE:CUDA>:${ROCM_ROOT}/include>)
+target_link_libraries(${example_name} PRIVATE $<$<LINK_LANGUAGE:CUDA>:CUDA::cuda_driver> hip::hipcub)
+
+install(TARGETS ${example_name})

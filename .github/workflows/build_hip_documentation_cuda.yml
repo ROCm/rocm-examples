@@ -18,15 +18,15 @@ concurrency:
 
 env:
     DEBIAN_FRONTEND: noninteractive
-    ROCM_VERSION: '7.2'
-    AMDGPU_INSTALLER_VERSION: 7.2.70200-1
+    ROCM_VERSION: '7.2.4'
+    AMDGPU_INSTALLER_VERSION: 7.2.4.70204-1
 
 jobs:
     build:
         name: "Build HIP Documentation CUDA"
         runs-on: ubuntu-latest
         container:
-            image: nvidia/cuda:12.8.1-cudnn-devel-ubuntu22.04
+            image: nvidia/cuda:12.9.2-cudnn-devel-ubuntu22.04
         defaults:
             run:
                 shell: bash
@@ -46,7 +46,7 @@ jobs:
               wget https://repo.radeon.com/amdgpu-install/${{ env.ROCM_VERSION }}/ubuntu/jammy/amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb
               apt-get -y install ./amdgpu-install_${{ env.AMDGPU_INSTALLER_VERSION }}_all.deb &&
               apt-get update -qq &&
-              apt-get install -y hip-dev hipify-clang hipfft-dev
+              apt-get install -y hip-dev hipify-clang hipfft-dev hipcub-dev
 
           - name: Configure, Build, and Install
             # The CMAKE_POLICY_VERSION_MINIMUM environment variable can be removed once the CMake updates from ROCm 7.0 are available
