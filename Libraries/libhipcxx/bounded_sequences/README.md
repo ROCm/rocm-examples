@@ -20,7 +20,7 @@ A kernel takes the whole input as a `hip::std::span<const int>` instead of a `(p
    3. Has thread 0 scan the tile serially and call `try_emplace_back` for every even value. `try_emplace_back` returns a pointer to the new element, or a null pointer if the container was already at capacity. Both the number of stored hits and the number of failed (overflow) attempts are counted.
    4. Has thread 0 write the block's hit count, overflow count, and stored values back to device memory, then destroy the container again.
 4. The results are copied back to the host and the device memory is freed.
-5. A table with one row per block is printed: the tile's index range, its hit count, its overflow count, and the stored hit values.
+5. The per-block results are validated and the totals are printed to the standard output: how many hits were collected, how many overflowed, and across how many blocks.
 6. The host recomputes, independently and without using `hip::std::inplace_vector`, which values of each tile are hits and how many would overflow a capacity-8 container, and compares that to the device results.
 7. A short, separate demonstration builds a `hip::std::array<unsigned int, 3>` from the totals, reads it back with `hip::std::get<N>`, and again with a structured binding, and checks that both ways of reading it agree.
 

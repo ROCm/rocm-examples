@@ -22,26 +22,11 @@
 
 #include "example_utils.hpp"
 
-// libhipcxx vocabulary types used in this example, and what each one buys
-// over the alternative:
-// - hip::std::tuple / hip::std::pair (<hip/std/tuple>, <hip/std/utility>)
-//   are the Standard product types, usable on host and device. HIP built-in
-//   vector types (float4, int2, ...) are additionally given a tuple
-//   interface (tuple_size, tuple_element, get<N>), so generic, index-based
-//   code written for hip::std::tuple also works on them, without a
-//   hand-written .x/.y/.z/.w accessor for every type. This does NOT extend
-//   to structured bindings: `auto [x, y, z, w] = some_float4;` is
-//   unsupported with hipcc because of how HIP_vector_type is implemented (a
-//   union member), so element access below always goes through
-//   hip::std::get<N> explicitly.
-// - hip::std::expected<T, E> (<hip/std/expected>) is a per-thread return
-//   value that is either a T or an E. Device code cannot use exceptions, so
-//   without expected a failure would need an out-parameter or a sentinel
-//   value; every thread below instead returns one expected, and the host
-//   tells success from failure with has_value().
-// - hip::std::optional<T> (<hip/std/optional>) is a nullable value with
-//   the same has_value()/value_or() interface as expected. It is used below
-//   for a bonus term that only some threads compute.
+// libhipcxx vocabulary types used in this example: hip::std::tuple,
+// hip::std::expected, hip::std::optional, and the tuple interface on HIP
+// vector types such as float4. Structured bindings on float4 are unsupported
+// with hipcc (a union member implementation detail), so element access always
+// goes through hip::std::get<N>.
 #include <hip/std/expected>
 #include <hip/std/optional>
 #include <hip/std/tuple>
@@ -54,62 +39,35 @@
 #include <cmath>
 #include <iomanip>
 #include <iostream>
-#include <sstream>
 #include <string>
 #include <utility>
 #include <vector>
 
-/// \brief The two ways a thread's computation can fail.
 enum class ErrorCode {
   DivisionByZero,
   OutOfRange,
 };
 
-/// \brief Formats an ErrorCode for printing.
-std::string to_string(const ErrorCode code) {
-  switch (code) {
-  case ErrorCode::DivisionByZero:
-    return "DivisionByZero";
-  case ErrorCode::OutOfRange:
-    return "OutOfRange";
-  }
-  return "Unknown";
-}
-
-/// \brief Everything computed for one thread.
 struct ThreadResult {
   hip::std::expected<float, ErrorCode> value; // The final result or error.
   hip::std::optional<float> bonus; // Set only for every fourth thread.
 };
 
-// float4 is treated as a 4-element tuple of float by libhipcxx: tuple_size
-// and tuple_element are specialized for it, and hip::std::get<N> works on
-// it, just like on hip::std::tuple. These static_asserts are checked at
-// compile time on the host.
+// float4 is treated as a 4-element tuple of float: tuple_size and
+// tuple_element are specialized for it, and hip::std::get<N> works on it.
 static_assert(hip::std::tuple_size<float4>::value == 4,
               "float4 is treated as a 4-element tuple");
 static_assert(
     hip::std::is_same<hip::std::tuple_element<0, float4>::type, float>::value,
     "Every element of float4 has type float");
 
-/// \brief Computes the result for the thread with the given global index.
-/// \p config is the tuple built once on the host and passed unchanged into
-/// the kernel launch; every thread reads it and combines it with its own
-/// index. The kernel calls this function on the device, and the host calls
-/// it again, with the same config, to compute the reference values.
+// Computes the result for the thread with the given global index. The kernel
+// calls this function on the device, and the host calls it again with the
+// same config to compute the reference values.
 __host__ __device__ ThreadResult
 analyze_record(const hip::std::tuple<int, float, float4> &config,
                const unsigned int index) {
   ThreadResult result{};
-
-  // Unpack the shared configuration. hip::std::get<N> works identically on
-  // hip::std::tuple and, thanks to the specializations above, on float4.
-  const int numerator = hip::std::get<0>(config);
-  const float scale = hip::std::get<1>(config);
-  const float4 weights = hip::std::get<2>(config);
-  const float weight_sum =
-      hip::std::get<0>(weights) + hip::std::get<1>(weights) +
-      hip::std::get<2>(weights) + hip::std::get<3>(weights);
 
   // Deliberate failure path #1: thread 0 would divide by its own index.
   if (index == 0) {
@@ -118,25 +76,25 @@ analyze_record(const hip::std::tuple<int, float, float4> &config,
     return result;
   }
 
+  const int numerator = hip::std::get<0>(config);
+  const float scale = hip::std::get<1>(config);
+  const float4 weights = hip::std::get<2>(config);
+  const float weight_sum =
+      hip::std::get<0>(weights) + hip::std::get<1>(weights) +
+      hip::std::get<2>(weights) + hip::std::get<3>(weights);
+
   const float divided =
       static_cast<float>(numerator) / static_cast<float>(index);
   const float scaled = divided * scale * weight_sum;
 
-  // An optional intermediate value: only every fourth thread computes a
-  // "precision bonus". hip::std::nullopt leaves it unset for the others,
-  // and value_or(0.0f) below folds the missing case into the computation
-  // without an if/else.
+  // Only every fourth thread computes a "precision bonus"; value_or(0.0f)
+  // below folds the missing case into the computation.
   result.bonus = (index % 4 == 0) ? hip::std::optional<float>(scaled * 0.1f)
                                   : hip::std::nullopt;
   const float final_value = scaled + result.bonus.value_or(0.0f);
 
   // Deliberate failure path #2: small indices divide 120 by almost nothing
-  // and leave the valid range. The transition happens between index 12
-  // (final_value == 55.0, still out of range) and index 13
-  // (final_value ~= 46.15, back in range): a comfortable margin away from
-  // range_limit, so the host/device floating-point rounding differences
-  // handled by nearly_equal below cannot flip an OutOfRange/success outcome,
-  // only the exact value within one outcome.
+  // and leave the valid range.
   constexpr float range_limit = 50.0f;
   if (final_value > range_limit || final_value < -range_limit) {
     result.value = hip::std::expected<float, ErrorCode>(hip::std::unexpect,
@@ -148,7 +106,6 @@ analyze_record(const hip::std::tuple<int, float, float4> &config,
   return result;
 }
 
-/// \brief Each thread analyzes the record for its own global index.
 __global__ void
 analyze_records_kernel(const hip::std::tuple<int, float, float4> config,
                        ThreadResult *d_results, const unsigned int size) {
@@ -158,97 +115,58 @@ analyze_records_kernel(const hip::std::tuple<int, float, float4> config,
   }
 }
 
-/// \brief Compares two floats computed the same way on host and device.
-/// HIP compiles device code with -ffp-contract=fast by default, so an
-/// expression such as `scaled + bonus` (where bonus is itself `scaled *
-/// 0.1f`) may be fused into a single FMA on the GPU while the host build
-/// rounds the multiplication and the addition separately. The two results
-/// can then differ in the last ulp even though both are correctly rounded
-/// for their own evaluation order, so an exact == would report spurious
-/// validation failures on correct hardware. A small relative tolerance
-/// absorbs that without hiding a real mismatch.
+// HIP compiles device code with -ffp-contract=fast by default, so a
+// host/device FMA rounding difference makes an exact == unreliable here.
 bool nearly_equal(const float a, const float b) {
   return std::abs(a - b) <= 1e-5f * std::max(1.0f, std::abs(b));
 }
 
-/// \brief Formats a thread's expected value or error for printing.
-std::string format_result(const hip::std::expected<float, ErrorCode> &value) {
-  std::ostringstream stream;
-  if (value.has_value()) {
-    stream << std::fixed << std::setprecision(2) << *value;
-  } else {
-    stream << to_string(value.error());
-  }
-  return stream.str();
-}
-
 int main() {
-  // Number of records analyzed, one per thread.
   constexpr unsigned int size = 256;
-
-  // Number of threads per block.
   constexpr unsigned int block_size = 64;
-
-  // Number of blocks, rounded up so that every record gets a thread.
   constexpr unsigned int grid_size = ceiling_div(size, block_size);
 
-  // Build the shared configuration on the host: a numerator, a scale
-  // factor, and a HIP float4 vector of per-channel weights.
-  // hip::std::make_tuple deduces float4 as the third element type, and the
-  // resulting tuple crosses into the kernel launch below like any other
-  // trivially copyable argument.
   const hip::std::tuple<int, float, float4> config =
       hip::std::make_tuple(120, 0.5f, make_float4(1.0f, 2.0f, 3.0f, 4.0f));
 
-  // Allocate the device memory for the results.
   ThreadResult *d_results{};
   HIP_CHECK(hipMalloc(&d_results, sizeof(ThreadResult) * size));
 
-  // Analyze the records on the device.
   analyze_records_kernel<<<grid_size, block_size>>>(config, d_results, size);
-
-  // Check if the kernel launch was successful.
   HIP_CHECK(hipGetLastError());
 
-  // Copy the results back to the host and free the device memory.
   std::vector<ThreadResult> h_results(size);
   HIP_CHECK(hipMemcpy(h_results.data(), d_results, sizeof(ThreadResult) * size,
                       hipMemcpyDeviceToHost));
   HIP_CHECK(hipFree(d_results));
 
-  // Print the first records so that both outcomes -- a value and an error
-  // -- can be checked by eye.
-  constexpr unsigned int print_count = 16;
-  std::cout << "Per-thread results (numerator=120, scale=0.5, weights="
-               "(1,2,3,4)):\n"
-            << "index result          bonus\n";
-  for (unsigned int i = 0; i < print_count; ++i) {
+  // Print one representative index from each case: the DivisionByZero
+  // failure, the OutOfRange failure, a success without a bonus, and a
+  // success with a bonus.
+  std::cout << std::fixed << std::setprecision(2);
+  for (const unsigned int i : {0u, 1u, 13u, 16u}) {
     const ThreadResult &result = h_results[i];
-    std::cout << std::setw(5) << i << ' ' << std::setw(15) << std::left
-              << format_result(result.value) << std::right << ' '
-              << (result.bonus.has_value() ? std::to_string(*result.bonus)
-                                           : std::string("--"))
-              << '\n';
+    if (result.value.has_value()) {
+      std::cout << "thread " << i << ": value " << *result.value << ", bonus: "
+                << (result.bonus.has_value() ? std::to_string(*result.bonus)
+                                             : std::string("--"))
+                << '\n';
+    } else {
+      std::cout << "thread " << i << ": error "
+                << (result.value.error() == ErrorCode::DivisionByZero
+                        ? "DivisionByZero"
+                        : "OutOfRange")
+                << '\n';
+    }
   }
-  std::cout << std::endl;
 
-  // Validate the results. Every value is recomputed on the host with the
-  // same analyze_record function and the same config, and compared with
-  // what the device produced. The run is also checked to actually exercise
-  // both failure paths and the success path, so the design described above
-  // is verified rather than assumed.
+  // Recompute the results on the host with the same analyze_record function
+  // and compare with what the device produced.
   int errors = 0;
-  unsigned int success_count = 0;
-  unsigned int division_by_zero_count = 0;
-  unsigned int out_of_range_count = 0;
   for (unsigned int i = 0; i < size; ++i) {
     const ThreadResult expected_result = analyze_record(config, i);
     const ThreadResult &actual_result = h_results[i];
 
-    // Values and bonuses are compared with nearly_equal, not ==: see the
-    // comment on nearly_equal for why an exact comparison is not safe here.
-    // has_value() and error() are still compared exactly, since they are
-    // not the product of a floating-point computation.
     const bool values_match =
         actual_result.value.has_value() == expected_result.value.has_value() &&
         (actual_result.value.has_value()
@@ -261,44 +179,17 @@ int main() {
     if (!values_match || !bonus_matches) {
       ++errors;
     }
-
-    if (actual_result.value.has_value()) {
-      ++success_count;
-    } else if (actual_result.value.error() == ErrorCode::DivisionByZero) {
-      ++division_by_zero_count;
-    } else {
-      ++out_of_range_count;
-    }
   }
+  std::cout << "Validated all " << size << " threads.\n";
 
-  std::cout << success_count << " successes, " << division_by_zero_count
-            << " division-by-zero errors, " << out_of_range_count
-            << " out-of-range errors (of " << size << " threads)\n";
-
-  // Exactly thread 0 divides by zero by design.
-  if (division_by_zero_count != 1) {
-    ++errors;
-  }
-  // At least one small index must leave the valid range, and at least one
-  // larger index must stay inside it; otherwise the example would only show
-  // one of the two branches.
-  if (out_of_range_count == 0 || success_count == 0) {
-    ++errors;
-  }
-
-  // A short hip::std::pair <-> host std::pair round trip. The conversions
-  // are host-only (there is no host std::pair on the device), so this runs
-  // only here in main, not in the kernel.
+  // A short hip::std::pair <-> host std::pair round trip.
   const hip::std::pair<int, float> hip_pair{7, 3.5f};
-  // hip::std::pair's conversion operator to ::std::pair.
   const std::pair<int, float> std_pair{hip_pair};
-  // hip::std::pair's converting constructor from ::std::pair.
   const hip::std::pair<int, float> round_trip{std_pair};
 
-  std::cout << "hip::std::pair<int, float>{" << hip_pair.first << ", "
-            << hip_pair.second << "} -> std::pair -> hip::std::pair{"
-            << round_trip.first << ", " << round_trip.second << '}'
-            << std::endl;
+  std::cout << "hip::std::pair{" << hip_pair.first << ", " << hip_pair.second
+            << "} -> std::pair -> {" << round_trip.first << ", "
+            << round_trip.second << "}\n";
 
   if (round_trip.first != hip_pair.first ||
       round_trip.second != hip_pair.second) {

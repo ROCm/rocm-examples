@@ -42,14 +42,15 @@
 // Extents::rank_dynamic() == 0, so an Extents object can be built with the
 // default constructor wherever an extents_type is expected -- including the
 // `{}` shorthand from the libhipcxx documentation:
-//   hip::restrict_mdspan<int, hip::std::extents<size_t, 4, 4>> md{ptr, {}};
+//   hip::restrict_mdspan<int, hip::std::extents<std::size_t, 4, 4>> md{ptr,
+//   {}};
 // Here the `{}` list-initializes the second constructor argument, which
 // selects mdspan's `mdspan(data_handle_type p, const extents_type& ext)`
 // constructor and default-constructs an Extents value to fill in `ext`.
-constexpr size_t num_rows = 8;
-constexpr size_t num_cols = 12;
+constexpr std::size_t num_rows = 8;
+constexpr std::size_t num_cols = 12;
 
-using Extents = hip::std::extents<size_t, num_rows, num_cols>;
+using Extents = hip::std::extents<std::size_t, num_rows, num_cols>;
 
 // One thread block handles one tile_size x tile_size tile of the matrix.
 constexpr unsigned int tile_size = 4;
@@ -57,7 +58,8 @@ constexpr unsigned int tile_size = 4;
 /// \brief Adds two matrices element-wise, `c(i, j) = a(i, j) + b(i, j)`.
 ///
 /// The traditional signature for this kernel would be
-/// `(const float *a, const float *b, float *c, size_t rows, size_t cols)`,
+/// `(const float *a, const float *b, float *c, std::size_t rows,
+/// std::size_t cols)`,
 /// with `a[i * cols + j]` style indexing and a `__restrict__` keyword on
 /// each pointer to tell the compiler that `a`, `b`, and `c` do not alias.
 /// Here the kernel instead takes three mdspan values: the shape travels
@@ -82,19 +84,20 @@ __global__ void add_matrices_kernel(MDSpanA a, MDSpanB b, MDSpanC c) {
 /// \brief Returns a value that depends on both the row and the column, so
 /// that every matrix element is distinct and a reader can spot indexing
 /// mistakes at a glance.
-constexpr float matrix_value(const size_t i, const size_t j, const float base) {
+constexpr float matrix_value(const std::size_t i, const std::size_t j,
+                             const float base) {
   return base + static_cast<float>(i * 100 + j);
 }
 
 int main() {
-  constexpr size_t size = num_rows * num_cols;
+  constexpr std::size_t size = num_rows * num_cols;
 
   // Host input matrices, stored row-major (the same layout that
   // hip::std::layout_right, the default LayoutPolicy, will assume below).
   std::vector<float> h_a(size);
   std::vector<float> h_b(size);
-  for (size_t i = 0; i < num_rows; ++i) {
-    for (size_t j = 0; j < num_cols; ++j) {
+  for (std::size_t i = 0; i < num_rows; ++i) {
+    for (std::size_t j = 0; j < num_cols; ++j) {
       h_a[i * num_cols + j] = matrix_value(i, j, 0.0f);
       h_b[i * num_cols + j] = matrix_value(i, j, 1000.0f);
     }
@@ -169,12 +172,12 @@ int main() {
 
   // Print a small slice of the result so that it can be checked by eye,
   // rather than the whole 8x12 matrix.
-  constexpr size_t print_rows = 4;
-  constexpr size_t print_cols = 6;
+  constexpr std::size_t print_rows = 4;
+  constexpr std::size_t print_cols = 6;
   std::cout << "c(i, j) = a(i, j) + b(i, j), top-left " << print_rows << "x"
             << print_cols << " corner (plain mdspan kernel):\n";
-  for (size_t i = 0; i < print_rows; ++i) {
-    for (size_t j = 0; j < print_cols; ++j) {
+  for (std::size_t i = 0; i < print_rows; ++i) {
+    for (std::size_t j = 0; j < print_cols; ++j) {
       std::cout << std::setw(9) << h_c_plain[i * num_cols + j];
     }
     std::cout << '\n';
@@ -187,8 +190,8 @@ int main() {
   // same numbers as a host-computed reference: hip::restrict_mdspan only
   // adds an aliasing promise for the optimizer, it does not change what the
   // kernel computes.
-  for (size_t i = 0; i < num_rows; ++i) {
-    for (size_t j = 0; j < num_cols; ++j) {
+  for (std::size_t i = 0; i < num_rows; ++i) {
+    for (std::size_t j = 0; j < num_cols; ++j) {
       const float expected =
           matrix_value(i, j, 0.0f) + matrix_value(i, j, 1000.0f);
       if (h_c_plain[i * num_cols + j] != expected) {
@@ -215,10 +218,10 @@ int main() {
 
   std::cout << "\nlayout_right vs. layout_left over the same buffer "
                "h_a (index -> linear offset -> value):\n";
-  for (size_t i = 0; i < 2; ++i) {
-    for (size_t j = 0; j < 3; ++j) {
-      const size_t right_offset = right_view.mapping()(i, j);
-      const size_t left_offset = left_view.mapping()(i, j);
+  for (std::size_t i = 0; i < 2; ++i) {
+    for (std::size_t j = 0; j < 3; ++j) {
+      const std::size_t right_offset = right_view.mapping()(i, j);
+      const std::size_t left_offset = left_view.mapping()(i, j);
       std::cout << "(" << i << ", " << j << "): layout_right -> "
                 << std::setw(2) << right_offset << " -> " << std::setw(6)
                 << right_view(i, j) << "   layout_left -> " << std::setw(2)

@@ -10,7 +10,7 @@ The example creates an explicit HIP stream, wraps it, launches a kernel that doe
 
 1. An explicit HIP stream is created with `hipStreamCreate` and wrapped in a `hip::stream_ref`.
 2. A default-constructed `hip::stream_ref` is created, which refers to the default stream. It is a distinct stream identity from the explicit stream, even though it does not own or create anything itself.
-3. The raw handle values behind the explicit stream, the wrapped `hip::stream_ref`, and the default stream are printed so that their identities can be compared by eye. These printed handles are addresses and differ between runs (and between processes); only their equality or inequality to each other is meaningful, not their specific values.
+3. The handle behind the explicit stream and the default stream's handle are printed so their identities can be compared by eye. These printed handles are addresses and differ between runs (and between processes); only their equality or inequality to each other is meaningful, not their specific values.
 4. Device memory is allocated for the output buffer.
 5. A kernel is launched on the explicit stream, obtained via `s.get()`. Each thread seeds a small linear congruential generator with its index and advances it a fixed number of times, giving the kernel a modest, non-zero amount of real work to do.
 6. Immediately after the launch, `hip::stream_ref::ready()` is called and the result is printed. At this point the stream is expected to still be busy, so `ready()` is expected to report `false`, but this check is inherently racy and best-effort: depending on how fast the GPU finishes relative to the host, it may print either `true` or `false`. It is shown for illustration only and not asserted.

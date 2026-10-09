@@ -20,37 +20,32 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-  atomic_counter \
-  bit_manipulation \
-  bounded_sequences \
-  index_math \
-  managed_counter \
-  mdspan_restrict \
-  memory_resource \
-  stream_ref \
-  thread_scopes \
-  vocabulary_types
+set(example_name libhipcxx_managed_counter)
 
-# Skips are driven by .github/build_tools/skip_manifest.py: CI runs
-# generate_skip_tests.py and passes SKIP_FROM_BUILD / SKIP_FROM_TEST as
-# repo-relative paths on the make command line (overriding these defaults).
-# skip_here matches only entries naming THIS directory's examples. A bare local
-# build/test skips nothing. The `test` target honors SKIP_FROM_BUILD too: an
-# example that isn't built can't be tested, so build skips imply test skips.
-SKIP_FROM_BUILD ?=
-SKIP_FROM_TEST ?=
-skip_here = $(foreach e,$(EXAMPLES),$(if $(filter %/$(notdir $(CURDIR))/$(e),$(1)),$(e)))
+cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
 
-all: $(filter-out $(call skip_here,$(SKIP_FROM_BUILD)),$(EXAMPLES))
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+select_gpu_language()
+enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
+select_hip_platform()
 
-clean: TARGET=clean
-clean: all
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
+set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
+verify_hip_platform(PLATFORMS "amd")
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
 
-test: TARGET=test
-test: $(filter-out $(call skip_here,$(SKIP_FROM_TEST) $(SKIP_FROM_BUILD)),$(EXAMPLES))
+find_package(libhipcxx REQUIRED)
+find_package(Threads REQUIRED)
 
-.PHONY: all clean test $(EXAMPLES)
+add_executable(${example_name} main.hip)
+# Make example runnable using ctest
+add_test(NAME ${example_name} COMMAND ${example_name})
+
+target_link_libraries(${example_name} PRIVATE libhipcxx::libhipcxx Threads::Threads)
+target_include_directories(${example_name} PRIVATE "../../../Common")
+set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+
+install(TARGETS ${example_name})

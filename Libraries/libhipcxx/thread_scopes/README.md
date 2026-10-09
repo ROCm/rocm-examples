@@ -27,7 +27,7 @@ Note: the `hip::thread_scope` enum defines exactly `thread_scope_system`, `threa
    3. Applies `fetch_max` on the block-scope atomic with its own value, then synchronizes again so every thread's update has completed.
    4. Has thread 0 read the block's maximum, write it to the block's slot in device memory, and apply `fetch_max` on a `hip::atomic_ref<int, hip::thread_scope_device>` over the accumulator.
 3. The per-block maxima and the accumulator are copied back to the host, and the device memory is freed.
-4. The host independently computes the same maxima with `thread_value`, prints both the per-block maxima and the final device-scope maximum next to their reference values, and validates that they match.
+4. The host independently computes the same maxima with `thread_value`, validates that the per-block maxima and the final device-scope maximum match, and prints the device results to the standard output.
 
 ## Key APIs and Concepts
 

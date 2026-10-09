@@ -20,37 +20,39 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
-EXAMPLES := \
-  atomic_counter \
-  bit_manipulation \
-  bounded_sequences \
-  index_math \
-  managed_counter \
-  mdspan_restrict \
-  memory_resource \
-  stream_ref \
-  thread_scopes \
-  vocabulary_types
+EXAMPLE := libhipcxx_managed_counter
+COMMON_INCLUDE_DIR := ../../../Common
+GPU_RUNTIME ?= HIP
 
-# Skips are driven by .github/build_tools/skip_manifest.py: CI runs
-# generate_skip_tests.py and passes SKIP_FROM_BUILD / SKIP_FROM_TEST as
-# repo-relative paths on the make command line (overriding these defaults).
-# skip_here matches only entries naming THIS directory's examples. A bare local
-# build/test skips nothing. The `test` target honors SKIP_FROM_BUILD too: an
-# example that isn't built can't be tested, so build skips imply test skips.
-SKIP_FROM_BUILD ?=
-SKIP_FROM_TEST ?=
-skip_here = $(foreach e,$(EXAMPLES),$(if $(filter %/$(notdir $(CURDIR))/$(e),$(1)),$(e)))
+ifneq ($(GPU_RUNTIME), HIP)
+  $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be HIP.)
+endif
 
-all: $(filter-out $(call skip_here,$(SKIP_FROM_BUILD)),$(EXAMPLES))
+# HIP variables
+ROCM_PATH ?= /opt/rocm
 
-clean: TARGET=clean
-clean: all
+HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
+# TheRock#7024 installs the libhipcxx headers under include/hipccl; fall back to include/libhipcxx.
+LIBHIPCXX_INCLUDE_SUBDIR := $(if $(wildcard $(HIP_INCLUDE_DIR)/hipccl),hipccl,libhipcxx)
+LIBHIPCXX_INCLUDE_DIR    := $(HIP_INCLUDE_DIR)/$(LIBHIPCXX_INCLUDE_SUBDIR)
 
-$(EXAMPLES):
-	$(MAKE) -C $@ $(TARGET)
+HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
-test: TARGET=test
-test: $(filter-out $(call skip_here,$(SKIP_FROM_TEST) $(SKIP_FROM_BUILD)),$(EXAMPLES))
+# Common variables and flags
+CXX_STD   := c++17
+CXXFLAGS  ?= -Wall -Wextra
+ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(LIBHIPCXX_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS)
+ILDFLAGS  := $(LDFLAGS)
+ILDLIBS   := -lpthread $(LDLIBS)
 
-.PHONY: all clean test $(EXAMPLES)
+$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+
+test: $(EXAMPLE)
+	./$(EXAMPLE) $(TEST_ARGS)
+
+clean:
+	$(RM) $(EXAMPLE)
+
+.PHONY: clean test

@@ -18,7 +18,7 @@ The key uses the following layout:
 
 ### Application flow
 
-1. The key layout is checked at compile time with `static_assert`. Because the libhipcxx bit functions are `constexpr`, `hip::bitmask` verifies on the host that the fields cover all 32 bits without overlapping, and a packed field is extracted again at compile time.
+1. The key layout is checked at compile time with `static_assert`. Because the libhipcxx bit functions are `constexpr`, `hip::bitmask` verifies on the host that the channel mask matches the layout, and a packed field is extracted again at compile time.
 2. Device memory is allocated for one result per key.
 3. The `analyze_keys_kernel` kernel is launched with one thread per key. Each thread:
    1. Derives the four field values from its global index.
@@ -27,7 +27,7 @@ The key uses the following layout:
    4. Computes `hip::bit_reverse`, `hip::std::rotl`, `hip::std::popcount`, `hip::std::countl_zero`, and `hip::std::bit_width` of the key.
    5. Writes all values to device memory.
 4. The results are copied back to the host and the device memory is freed.
-5. Two tables with the results for the first eight keys are printed to the standard output. The first table shows the fields and the packed key in hexadecimal and binary notation, with an underscore between two fields. The second table shows the results of the bit operations.
+5. The results for the first four keys are printed in one line per key: the packed key and the operation results in hexadecimal notation, plus the counting results in decimal notation.
 6. The host checks that the extracted fields match the packed fields, and computes every value again with the same functions. The device results are compared with the host results, and the result of the comparison is printed to the standard output.
 
 ## Key APIs and Concepts
