@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2024 - 2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -34,28 +34,25 @@ ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR     := $(ROCM_PATH)/include
 ROCFFT_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
-
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCFFT_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR)
 ILDFLAGS  := -L $(ROCM_PATH)/lib
-ILDLIBS   := -lrocfft
+ILDLIBS   := -lrocfft -lhiprtc
 
 
 CXXFLAGS  ?= -Wall -Wextra
 ICPPFLAGS += -D__HIP_PLATFORM_AMD__ -isystem $(HIP_INCLUDE_DIR)
 ILDLIBS   += -lamdhip64
-COMPILER  := $(HIPCXX)
+COMPILER  := $(CXX)
 
 ICXXFLAGS += $(CXXFLAGS)
 ICPPFLAGS += $(CPPFLAGS)
 ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
-$(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/rocfft_utils.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp
+$(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/rocfft_utils.hpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hiprtc_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 test: $(EXAMPLE)
