@@ -125,6 +125,8 @@ void multiple_groups_groupedgemm_ext(
 
   for (std::size_t i = 0; i < grouped_gemms.size(); ++i) {
     auto &groupedGemm = grouped_gemms.at(i);
+    // initialize() checks the solution's workspace needs against this size.
+    groupedGemm.setMaxWorkspaceBytes(max_workspace_size);
     // Make sure to initialize every time when algo changes
     // Run first valid solution in this sample
     HIPBLASLT_CHECK(groupedGemm.initialize(
@@ -253,6 +255,8 @@ void groupedgemm_ext(hipblasLtHandle_t handle, hipblasOperation_t trans_a,
                       m.size() * sizeof(hipblaslt_ext::UserArguments),
                       hipMemcpyHostToDevice));
 
+  // initialize() checks the solution's workspace needs against this size.
+  groupedgemm.setMaxWorkspaceBytes(max_workspace_size);
   // Make sure to initialize every time when algo changes
   HIPBLASLT_CHECK(
       groupedgemm.initialize(heuristic_result[valid_idx[0]].algo, d_workspace));

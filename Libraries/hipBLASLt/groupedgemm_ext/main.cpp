@@ -124,6 +124,8 @@ void grouped_gemm_ext(hipblasLtHandle_t handle, hipblasOperation_t trans_a,
                       m.size() * sizeof(hipblaslt_ext::UserArguments),
                       hipMemcpyHostToDevice));
 
+  // initialize() checks the solution's workspace needs against this size.
+  groupedgemm.setMaxWorkspaceBytes(max_workspace_size);
   // Make sure to initialize every time when algo changes
   HIPBLASLT_CHECK(
       groupedgemm.initialize(heuristic_result[0].algo, d_workspace));
