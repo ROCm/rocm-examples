@@ -38,7 +38,7 @@ clean: TARGET=clean
 clean: all
 
 $(TOOLS):
-	$(MAKE) -C $@
+	$(MAKE) -C $@ $(TARGET)
 
 test: TARGET=test
 test: $(filter-out $(SKIP_FROM_TEST),$(TOOLS))

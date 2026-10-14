@@ -49,10 +49,18 @@ all: $(EXAMPLE)
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
+# Run the same scripts as the CTest tests, which are only registered if rocgdb is found.
+# GPU_ENABLE_COOP_GROUPS=0 is a temporary workaround, see CMakeLists.txt.
+test: export GPU_ENABLE_COOP_GROUPS := 0
 test: $(EXAMPLE)
-	./$(EXAMPLE) $(TEST_ARGS)
+	@if [ -x "$$(command -v rocgdb)" ]; then \
+	    echo "==> ./rocgdb-basic.sh" && ./rocgdb-basic.sh && \
+	    echo "==> ./rocgdb-advanced.sh" && ./rocgdb-advanced.sh; \
+	else \
+	    echo "==> Skipping (not found): rocgdb"; \
+	fi
 
 clean:
-	$(RM) $(EXAMPLE)
+	$(RM) $(EXAMPLE) rocgdb-*.log
 
 .PHONY: clean test
