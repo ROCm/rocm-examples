@@ -35,7 +35,12 @@ HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 HIP_INCLUDE_DIR        := $(ROCM_PATH)/include
 HIPTHREADS_INCLUDE_DIR := $(ROCM_PATH)/include/hipthreads
-LIBHIPCXX_INCLUDE_DIR  := $(ROCM_PATH)/include/libhipcxx
+# libhipcxx headers are installed under include/hipccl; fall back to the
+# include/libhipcxx location used by older ROCm installs.
+LIBHIPCXX_INCLUDE_DIR  := $(ROCM_PATH)/include/hipccl
+ifeq ($(wildcard $(LIBHIPCXX_INCLUDE_DIR)),)
+    LIBHIPCXX_INCLUDE_DIR := $(ROCM_PATH)/include/libhipcxx
+endif
 
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
@@ -45,7 +50,7 @@ ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -isystem $(HIPTHREADS_INCLUDE_DIR) \
              -I $(LIBHIPCXX_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) \
              -DEXAMPLE_DATA_DIR=\"$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/../data\" \
              $(CPPFLAGS)
-ILDLIBS   := -lhipthreads $(LDLIBS)
+ILDLIBS   := -lhipthreads -lpthread $(LDLIBS)
 
 $(EXAMPLE): main.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ main.hip $(ILDFLAGS) $(ILDLIBS)

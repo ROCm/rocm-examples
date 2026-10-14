@@ -68,6 +68,7 @@ if(
     add_subdirectory(hipSPARSELt)
     add_subdirectory(hipThreads)
     add_subdirectory(hipTensor)
+    add_subdirectory(libhipcxx)
     if(CMAKE_VERSION VERSION_LESS "3.25.2")
         message(WARNING "CMake version < 3.25.2, not building MIGraphX examples.")
     else()
