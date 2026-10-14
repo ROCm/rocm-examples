@@ -55,7 +55,7 @@ public:
 
   // Create the profile for a set of counters, which sample_counter_values
   // reuses.
-  void create_profile(const std::vector<std::string> &counters);
+  rocprofiler_status_t create_profile(const std::vector<std::string> &counters);
 
   // Sample the counter values for a set of counters, returns the records in the
   // out parameter.
@@ -163,9 +163,10 @@ std::unordered_map<std::string, size_t> counter_sampler::get_record_dimensions(
   return out;
 }
 
-void counter_sampler::create_profile(const std::vector<std::string> &counters) {
+rocprofiler_status_t
+counter_sampler::create_profile(const std::vector<std::string> &counters) {
   if (cached_profiles_.count(counters) > 0) {
-    return;
+    return ROCPROFILER_STATUS_SUCCESS;
   }
   size_t expected_size = 0;
   rocprofiler_counter_config_id_t profile = {};
@@ -180,18 +181,28 @@ void counter_sampler::create_profile(const std::vector<std::string> &counters) {
     gpu_counters.push_back(it->second);
     expected_size += get_counter_size(it->second);
   }
+  // A partial profile would silently drop a requested counter, so treat any
+  // missing counter as unavailable.
+  if (gpu_counters.size() < counters.size()) {
+    return ROCPROFILER_STATUS_ERROR_NO_HARDWARE_COUNTERS;
+  }
   ROCPROFILER_CALL(
       rocprofiler_create_counter_config(agent_, gpu_counters.data(),
                                         gpu_counters.size(), &profile),
       "Could not create profile");
   cached_profiles_.emplace(counters, profile);
   profile_sizes_.emplace(profile.handle, expected_size);
+  return ROCPROFILER_STATUS_SUCCESS;
 }
 
 rocprofiler_status_t counter_sampler::sample_counter_values(
     const std::vector<std::string> &counters,
     std::vector<rocprofiler_counter_record_t> &out) {
-  create_profile(counters);
+  if (auto status = create_profile(counters);
+      status != ROCPROFILER_STATUS_SUCCESS) {
+    out.clear();
+    return status;
+  }
   auto profile_cached = cached_profiles_.find(counters);
   try {
     out.resize(profile_sizes_.at(profile_cached->second.handle));
@@ -292,8 +303,12 @@ counter_sampler::get_counter_dimensions(rocprofiler_counter_id_t counter) {
                        counter, ROCPROFILER_COUNTER_INFO_VERSION_1,
                        static_cast<void *>(&info)),
                    "Could not query info for counter");
-  return std::vector<rocprofiler_counter_record_dimension_info_t>{
-      *info.dimensions, *info.dimensions + info.dimensions_count};
+  auto dims = std::vector<rocprofiler_counter_record_dimension_info_t>{};
+  dims.reserve(info.dimensions_count);
+  for (uint64_t i = 0; i < info.dimensions_count; ++i) {
+    dims.emplace_back(*info.dimensions[i]);
+  }
+  return dims;
 }
 
 std::atomic<bool> &exit_toggle() {
