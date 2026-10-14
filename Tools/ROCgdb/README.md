@@ -50,6 +50,7 @@ which can be opened in any editor to examine their output.
 > scripts fail with `Function "matrix_multiplication_kernel" not defined.`, run
 > them with `GPU_ENABLE_COOP_GROUPS=0`, as the CTest tests do:
 >
-> ```shell
-> GPU_ENABLE_COOP_GROUPS=0 ./rocgdb-basic.sh
+> ```console
+> user@machine:rocm-examples/Tools/ROCgdb$ cd build && GPU_ENABLE_COOP_GROUPS=0 ./rocgdb-basic.sh
+> user@machine:rocm-examples/Tools/ROCgdb$ cd build && GPU_ENABLE_COOP_GROUPS=0 ./rocgdb-advanced.sh
 > ```
