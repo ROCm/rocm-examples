@@ -170,6 +170,8 @@ void groupedgemm_fixed_mk_ext(
   //     heuristic_result[i].workspaceSize);
   // HIP_CHECKhipMalloc(&d_workspace, workspace_size));
 
+  // initialize() checks the solution's workspace needs against this size.
+  groupedgemm.setMaxWorkspaceBytes(max_workspace_size);
   for (size_t i = 0; i < valid_idx.size(); i++) {
     // Make sure to initialize every time the algo changes
     HIPBLASLT_CHECK(groupedgemm.initialize(heuristic_result[valid_idx[i]].algo,

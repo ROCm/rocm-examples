@@ -128,10 +128,14 @@ void gemm_tuning_wgm_ext(hipblasLtHandle_t handle, hipblasOperation_t trans_a,
   // amounts of valid_idx.
 
   void *ws_ptr = nullptr;
+  // initialize() checks the solution's workspace needs against the size set
+  // on the instance, so set it to the size of the buffer passed in.
   if (workspace_size > (uint64_t)max_workspace_size) {
     static_cast<void>(hipMalloc(&ws_ptr, workspace_size));
+    gemm.setMaxWorkspaceBytes(workspace_size);
   } else {
     ws_ptr = d_workspace;
+    gemm.setMaxWorkspaceBytes(max_workspace_size);
   }
 
   HIPBLASLT_CHECK(
