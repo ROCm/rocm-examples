@@ -48,6 +48,7 @@ jobs:
         --device /dev/kfd
         --device /dev/dri
         --security-opt seccomp=unconfined
+        --shm-size=10g
     defaults:
       run:
         shell: bash
