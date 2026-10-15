@@ -7,7 +7,7 @@ This series implements sparse matrix-matrix multiplication (SpMM): given two spa
 ### Steps
 
 | Step | Directory | Description |
-|------|-----------|-------------|
+| ---- | --------- | ----------- |
 | 1 | `step1_baseline/` | Single-threaded CPU baseline. |
 | 2 | `step2_cpu_threading/` | CPU threading: `std::thread` partitions output rows across threads. |
 | 2.5 | `step2_5_gpu_data_structures/` | GPU data structures: matrix data moved to GPU-resident memory via rocThrust, computation still on the CPU. |
