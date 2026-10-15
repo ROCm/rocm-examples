@@ -86,7 +86,8 @@ applies everywhere). Always include a ``reason``.
 # carry the data, so the make-test skip is scoped to that install method.
 # ctest self-guards each on `if(EXISTS ...)`, so the ctest key is None (ctest
 # auto-skips where the data is absent); only the `make test` path needs the
-# explicit, install-method-scoped skip.
+# explicit, install-method-scoped skip. video_decode_caps is not listed: it only
+# queries decoder capabilities and needs no test data.
 _ROCDECODE_DIRS = [
     "rocdec_decode",
     "video_decode",

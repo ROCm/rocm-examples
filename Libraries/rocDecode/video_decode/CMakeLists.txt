@@ -151,4 +151,11 @@ if (NOT USING_THE_ROCK)
     endif()
 endif()
 
+# The example exits with skip_exit_code (77, Common/example_utils.hpp) when the GPU's video
+# decoder doesn't support the stream's codec, e.g. AV1 on gfx90a. Report that as a skip.
+get_directory_property(example_tests TESTS)
+if(example_tests)
+    set_tests_properties(${example_tests} PROPERTIES SKIP_RETURN_CODE 77)
+endif()
+
 install(TARGETS ${example_name})
