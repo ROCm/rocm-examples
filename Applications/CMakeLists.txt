@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2022-2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2022-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -43,6 +43,10 @@ add_subdirectory(floyd_warshall)
 add_subdirectory(histogram)
 add_subdirectory(prefix_sum)
 add_subdirectory(optical_flow)
+
+if(ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "amd")
+    add_subdirectory(pqc_trustflow_rocm)
+endif()
 
 if(NOT CXX_FS_HEADER_FOUND)
     message(WARNING "filesystem not found, not building fdtd example")
