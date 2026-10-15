@@ -2,7 +2,9 @@
 
 ## Description
 
-This example illustrates the use of hipFFT `callback` functionality. It shows how to use load callbacks, a user-defined callback function that is run to load input from global memory at the start of the transform, with hipFFT.
+This example illustrates the use of hipFFT `JIT callback` functionality. It shows how to use a user-defined load callback, to load input from global memory at the start of the transform, with hipFFT.
+
+hipFFT introduced support for for JIT callbacks in version 1.0.26 with ROCm 10.1.
 
 ### Application flow
 

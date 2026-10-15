@@ -2,7 +2,9 @@
 
 ## Description
 
-This example illustrates the use of rocFFT `callback` functionality. It shows how to use load callback, a user-defined callback function that is run to load input from global memory at the start of the transform, with rocFFT. Additionally, it shows how to make use of rocFFT's result scaling functionality.
+This example illustrates the use of rocFFT `JIT callback` functionality. It shows how to use a user-defined load callback to load input from global memory at the start of the transform, with rocFFT. Additionally, it shows how to make use of rocFFT's result scaling functionality.
+
+rocFFT introduced support for for JIT callbacks in version 1.0.40 with ROCm 10.1.
 
 ### Application flow
 
