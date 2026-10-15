@@ -137,11 +137,11 @@ cmake --build build
 
 The following options are available when building with CMake.
 
-| Option                     | Relevant to | Default value    | Description                                                                                             |
-|:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
-| `ROCM_EXAMPLES_GPU_LANGUAGE` | HIP / CUDA  | `"HIP"`          | GPU language to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.  |
-| `CMAKE_HIP_ARCHITECTURES`  | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
-| `CMAKE_CUDA_ARCHITECTURES` | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capibility 50 and 72.                 |
+| Option                       | Relevant to | Default value    | Description                                                                                             |
+|:-----------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
+| `ROCM_EXAMPLES_GPU_LANGUAGE` | HIP / CUDA  | `"HIP"`          | GPU language to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.    |
+| `CMAKE_HIP_ARCHITECTURES`    | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
+| `CMAKE_CUDA_ARCHITECTURES`   | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capability 50 and 72.                 |
 
 ## Repository Contents
 
