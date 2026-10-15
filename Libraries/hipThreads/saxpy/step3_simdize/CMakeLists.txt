@@ -34,7 +34,7 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/ROCmPath.cmake")
 if(NOT CMAKE_PREFIX_PATH)
     set(CMAKE_PREFIX_PATH "$ENV{ROCM_PATH};/opt/rocm")
 endif()

@@ -24,9 +24,9 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Basic LANGUAGES CXX)
 include(CTest)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/FindFilesystem.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/FindFilesystem.cmake")
 
-include("${CMAKE_CURRENT_LIST_DIR}/../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/ROCmPath.cmake")
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     set(ROCM_LLVM_ROOT ${ROCM_PATH})

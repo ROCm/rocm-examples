@@ -33,7 +33,7 @@ endif()
 
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 find_package(hipdnn_frontend QUIET CONFIG)
 if(NOT hipdnn_frontend_FOUND)
