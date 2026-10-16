@@ -59,9 +59,6 @@ For more information on CK Tile terminology, refer to the
 
 * `ck_tile::AdjustToStructuredSparsity`
 * `ck_tile::ArgParser`
-* `ck_tile::BaseGemmPipelineAgBgCrCompV3`
-* `ck_tile::BaseGemmPipelineAgBgCrCompV4`
-* `ck_tile::BaseGemmPipelineAgBgCrMem`
 * `ck_tile::bf16_t`
 * `ck_tile::bf8_t`
 * `ck_tile::bool_constant`
@@ -84,13 +81,10 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::half_t`
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
-* `ck_tile::integral_constant`
-* `ck_tile::memory_operation_enum`
 * `ck_tile::pk_int4_t`
 * `ck_tile::remove_cvref_t`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
-* `ck_tile::TailNumber`
 * `ck_tile::tensor_layout::gemm::ColumnMajor`
 * `ck_tile::tensor_layout::gemm::RowMajor`
 * `ck_tile::TileGemmShape`

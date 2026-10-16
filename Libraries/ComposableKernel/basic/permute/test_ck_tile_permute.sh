@@ -1,6 +1,7 @@
 #!/bin/sh
 # TODO: run this script from CK root
 BUILD=build
+set -e
 EXE=$1
 COMMON_ARGS='-v=1 -warmup=0 -repeat=1'
 # mode=0

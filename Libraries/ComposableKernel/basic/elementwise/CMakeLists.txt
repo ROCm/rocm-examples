@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -57,21 +57,21 @@ set_source_files_properties(
 )
 
 add_executable(${example_name} elementwise_example.cpp)
-add_test(${example_name} COMMAND ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile)
 
 add_executable(${example_unary} elementwise_example_unary.cpp)
-add_test(${example_unary} COMMAND ${example_unary})
+add_test(NAME ${example_unary} COMMAND ${example_unary})
 target_compile_features(${example_unary} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_unary} PRIVATE composable_kernel::ck_tile)
 
 add_executable(${example_transpose} elementwise_example_transpose.cpp)
-add_test(${example_transpose} COMMAND ${example_transpose})
+add_test(NAME ${example_transpose} COMMAND ${example_transpose})
 target_compile_features(${example_transpose} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_transpose} PRIVATE composable_kernel::ck_tile)
 
 add_executable(${example_add_4d} elementwise_example_add_4d.cpp)
-add_test(${example_add_4d} COMMAND ${example_add_4d})
+add_test(NAME ${example_add_4d} COMMAND ${example_add_4d})
 target_compile_features(${example_add_4d} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_add_4d} PRIVATE composable_kernel::ck_tile)

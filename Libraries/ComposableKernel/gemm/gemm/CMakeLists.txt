@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -66,24 +66,19 @@ set_source_files_properties(
 )
 
 add_executable(${example_basic} gemm_basic.cpp)
-add_test(${example_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script} $<TARGET_FILE:${example_basic}>")
+add_test(NAME ${example_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script}" "$<TARGET_FILE:${example_basic}>")
 target_compile_features(${example_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_basic} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_basic} PRIVATE composable_kernel::ck_tile hip::host)
 
 add_executable(${example_universal} universal_gemm.cpp)
-add_test(${example_universal}
-         COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_universal_script} $<TARGET_FILE:${example_universal}>"
-)
+add_test(NAME ${example_universal} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_universal_script}" "$<TARGET_FILE:${example_universal}>")
 target_compile_features(${example_universal} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_universal} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_universal} PRIVATE composable_kernel::ck_tile hip::host)
 
 add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
-add_test(
-    ${example_weight_preshuffle}
-    COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script} $<TARGET_FILE:${example_weight_preshuffle}>"
-)
+add_test(NAME ${example_weight_preshuffle} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script}" "$<TARGET_FILE:${example_weight_preshuffle}>")
 target_compile_features(${example_weight_preshuffle} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(
     ${example_weight_preshuffle}
