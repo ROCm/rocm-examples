@@ -25,7 +25,7 @@ jobs:
         name: "Build HIP Documentation"
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.0
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.1
         defaults:
             run:
                 shell: bash
