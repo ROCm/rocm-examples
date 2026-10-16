@@ -94,6 +94,15 @@ add_custom_command(
 add_test(NAME ${example_basic} COMMAND ${example_basic_script} WORKING_DIRECTORY ${example_work_dir})
 add_test(NAME ${example_advanced} COMMAND ${example_advanced_script} WORKING_DIRECTORY ${example_work_dir})
 
+# Temporary workaround: with cooperative groups enabled, the HIP runtime creates its internal
+# device queue as a cooperative (GWS) queue on the first kernel launch. The driver refuses GWS
+# while a debugger is attached on some GPUs (e.g. gfx11), so the launch fails under ROCgdb.
+set_tests_properties(
+    ${example_basic}
+    ${example_advanced}
+    PROPERTIES ENVIRONMENT "GPU_ENABLE_COOP_GROUPS=0"
+)
+
 install(TARGETS ${example_workload})
 install(
     PROGRAMS

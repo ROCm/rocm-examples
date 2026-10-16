@@ -41,3 +41,16 @@ user@machine:rocm-examples/Tools/ROCgdb$ cd build && ./rocgdb-advanced.sh
 
 The scripts dump their output to several log files. These are plain text files
 which can be opened in any editor to examine their output.
+
+> **Note:** On some GPU architectures (for example gfx11), ROCgdb does not support
+> cooperative groups, and creating a cooperative queue fails while it is attached
+> (see the [ROCgdb known limitations](https://github.com/ROCm/ROCgdb/blob/c0a785c918a76c63328b774f244aca8f3d9a9dc7/gdb/doc/gdb.texinfo#L30070)).
+> The HIP runtime can create a cooperative queue internally even if the program
+> does not use cooperative groups, which makes the kernel launch fail. If the
+> scripts fail with `Function "matrix_multiplication_kernel" not defined.`, run
+> them with `GPU_ENABLE_COOP_GROUPS=0`, as `make test` and the CTest tests do:
+>
+> ```console
+> user@machine:rocm-examples/Tools/ROCgdb$ cd build && GPU_ENABLE_COOP_GROUPS=0 ./rocgdb-basic.sh
+> user@machine:rocm-examples/Tools/ROCgdb$ cd build && GPU_ENABLE_COOP_GROUPS=0 ./rocgdb-advanced.sh
+> ```
