@@ -4,9 +4,10 @@ set -euo pipefail
 
 SCRIPT_DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 EXE_NAME=ComposableKernel_ck_tile_fmha_fwd
-EXE="$(find . -name $EXE_NAME -type f | head -n 1)"
+EXE=$1
+shift
 KNAME=1
-GPU_arch=$GPU_arch
+GPU_arch=${GPU_arch:-""}
 if [ -z "$GPU_arch" ] ; then
     GPU_arch=$(rocminfo | grep -E 'Name:\s+gfx' | head -n1 | awk '{print $2}')
 fi
