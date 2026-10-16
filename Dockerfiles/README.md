@@ -35,10 +35,10 @@ Dockerfile: [ubuntu-24.04-rocm.Dockerfile](ubuntu-24.04-rocm.Dockerfile)
 
 This is an Ubuntu 24.04 image with ROCm installed from the AMD apt repositories, along with the
 system and Python dependencies needed to build rocm-examples. It registers both
-the stable (`repo.amd.com`) and prerelease (`rocm.prereleases.amd.com`) repos;
-the prerelease repo is pinned to priority 1 so only packages absent from stable
+the stable (`stable.repo.amd.com`) and release-candidate (`rc.repo.amd.com`) repos;
+the release-candidate repo is pinned to priority 1 so only packages absent from stable
 are pulled from it. This is used to install test packages such as `amdrocm-decode-test`
-(prerelease-only, `7.14.0~pre3`), which provides the video and utility assets the
+(release-candidate-only), which provides the video and utility assets the
 rocDecode examples need to build and run their tests.
 
 ### CI base images (multi-arch)

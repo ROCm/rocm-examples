@@ -25,8 +25,8 @@ set(example_name rocprofiler-sdk_code_object_isa_decode)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/FindFilesystem.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
@@ -46,7 +46,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(rocprofiler-sdk REQUIRED)
 find_package(libdw REQUIRED)

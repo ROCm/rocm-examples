@@ -7,7 +7,7 @@ by the requested channel/target/distro, emits:
   * ``skip_tests.txt``  -- ctest names (scope contains "test", ctest key set).
                            Consumed by ``ctest --exclude-from-file``.
   * ``skip_build.txt``  -- repo-relative paths (scope contains "build").
-                           Consumed by ``Common/SkipExamples.cmake``.
+                           Consumed by ``cmake/SkipExamples.cmake``.
   * ``SKIP_FROM_TEST``  -- space-separated repo-relative leaf paths (scope test).
   * ``SKIP_FROM_BUILD`` -- space-separated repo-relative leaf paths (scope build).
 
@@ -67,7 +67,7 @@ def main():
         "--channel",
         required=True,
         choices=["stable", "nightly"],
-        help="CI channel: 'stable' = pinned rocm:10.0 native workflows, "
+        help="CI channel: 'stable' = pinned stable ROCm image native workflows, "
         "'nightly' = TheRock multi-arch reusable workflow",
     )
     parser.add_argument(

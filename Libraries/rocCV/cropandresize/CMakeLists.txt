@@ -25,7 +25,7 @@ set(example_name roccv_cropandresize)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../Common/HipPlatform.cmake")
+include("../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -40,7 +40,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("../../../Common/ROCmPath.cmake")
+include("../../../cmake/ROCmPath.cmake")
 
 find_library(ROCCV_LIBRARY
     NAMES roccv

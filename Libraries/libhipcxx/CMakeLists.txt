@@ -37,7 +37,7 @@ if(WIN32)
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 find_package(libhipcxx QUIET)
 if(NOT libhipcxx_FOUND)

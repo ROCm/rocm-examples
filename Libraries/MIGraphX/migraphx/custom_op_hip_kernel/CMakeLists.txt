@@ -25,7 +25,7 @@ set(example_name migraphx_custom_op_hip_kernel)
 cmake_minimum_required(VERSION 3.25.2 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../../Common/HipPlatform.cmake")
+include("../../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -40,7 +40,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("../../../../Common/ROCmPath.cmake")
+include("../../../../cmake/ROCmPath.cmake")
 
 find_package(migraphx REQUIRED)
 
