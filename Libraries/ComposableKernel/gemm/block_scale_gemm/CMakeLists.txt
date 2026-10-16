@@ -62,7 +62,7 @@ set(example_sources
 )
 
 add_executable(${example_name} ${example_sources})
-add_test(${example_name} COMMAND ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 set_source_files_properties(${example_sources} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(

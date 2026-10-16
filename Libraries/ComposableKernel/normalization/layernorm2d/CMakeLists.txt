@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 set(example_name ComposableKernel_ck_tile_layernorm2d)
-set(example_script test_ck_tile_layernorm2d)
+set(example_script test_ck_tile_layernorm2d.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -91,4 +91,4 @@ target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_name} PRIVATE layernorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
 
-add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
+add_test(NAME ${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")

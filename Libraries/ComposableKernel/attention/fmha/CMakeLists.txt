@@ -119,7 +119,7 @@ target_include_directories(${example_fwd} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
 target_link_libraries(${example_fwd} PRIVATE composable_kernel::ck_tile hip::host)
 target_sources(${example_fwd} PRIVATE fmha_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS})
 
-add_test(${example_fwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_fwd_script}" "$<TARGET_FILE:${example_fwd}>")
+add_test(NAME ${example_fwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_fwd_script}" "$<TARGET_FILE:${example_fwd}>")
 
 ########################################################################################################################
 # BWD
@@ -167,4 +167,4 @@ target_sources(${example_bwd} PRIVATE fmha_bwd.cpp ${EXAMPLE_BWD_GEN_SRCS})
 set_source_files_properties(fmha_bwd.cpp ${EXAMPLE_BWD_GEN_SRCS}
                             PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-add_test(${example_bwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_bwd_script}" "$<TARGET_FILE:${example_bwd}>")
+add_test(NAME ${example_bwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_bwd_script}" "$<TARGET_FILE:${example_bwd}>")

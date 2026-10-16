@@ -54,7 +54,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 add_executable(${example_name} batched_contraction.cpp)
-add_test(${example_name} COMMAND ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 set_source_files_properties(batched_contraction.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)

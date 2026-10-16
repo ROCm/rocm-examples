@@ -17,8 +17,7 @@ run_tests() {
                     echo "Success: Test with batch=$batch, m=$m, n=$n, k=$k executed successfully."
                 else
                     echo "Error: Test with batch=$batch, m=$m, n=$n, k=$k failed to execute properly."
-                    # Optionally, exit or break if you need to halt further execution
-                    # exit 1
+                    exit 1
                 fi
 
             done
