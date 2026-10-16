@@ -1,24 +1,5 @@
-// MIT License
-//
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #pragma once
 template <typename Layout>
@@ -98,8 +79,7 @@ float invoke_gemm(int n_warmup,
         // earlier stage.
 
         std::vector<ck_tile::GemmTransKernelArg<>> kargs;
-        void* kargs_ptr   = gemm_workspace.GetDeviceBuffer();
-        const bool splitk = args[0].k_batch > 1;
+        void* kargs_ptr = gemm_workspace.GetDeviceBuffer();
         for(const auto& arg : args)
         {
             kargs.emplace_back(ck_tile::UniversalGemmKernelArgs<>{{arg.a_ptr},
@@ -128,7 +108,7 @@ float invoke_gemm(int n_warmup,
                                          ADataType,
                                          BDataType,
                                          AccDataType,
-                                         CDataType>(stream, group_count, kargs_ptr, splitk);
+                                         CDataType>(stream, group_count, kargs_ptr);
     }
 
     return ave_time;
@@ -253,7 +233,7 @@ int run_grouped_gemm_example_with_layouts(int argc,
         if constexpr(GemmConfig::Preshuffle)
         {
             ck_tile::HostTensor<BDataType> b_shuffle_host =
-                ck_tile::shuffle_b<GemmConfig>(b_k_n_tensors[i]);
+                ck_tile::shuffle_b_v0<GemmConfig>(b_k_n_tensors[i]);
             b_k_n_dev_buf.push_back(std::make_unique<ck_tile::DeviceMem>(b_shuffle_host));
         }
         else

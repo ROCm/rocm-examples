@@ -69,7 +69,6 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::bf8_t`
 * `ck_tile::BlockAttentionBiasEnum`
 * `ck_tile::BlockFmhaPipelineEnum`
-* `ck_tile::composes`
 * `ck_tile::DeviceMem`
 * `ck_tile::FillNormalDistribution`
 * `ck_tile::FillNormalDistributionIntegerValue`
@@ -98,6 +97,7 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::get_alibi_slopes`
 * `ck_tile::integer_divide_ceil`
 * `ck_tile::make_alibi_from_lr_mask`
+* `ck_tile::make_composes`
 * `ck_tile::make_generic_attention_mask_coordinates_from_lr_window`
 * `ck_tile::make_tuple`
 * `ck_tile::numeric<T>::max`

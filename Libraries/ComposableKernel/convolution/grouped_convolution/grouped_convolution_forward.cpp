@@ -1,24 +1,5 @@
-// MIT License
-//
-// Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #include <hip/hip_runtime.h>
 
@@ -29,8 +10,9 @@
 #include <tuple>
 
 #include "ck_tile/host.hpp"
-#include "grouped_convolution_forward_invoker.hpp"
 #include "grouped_convolution_utils.hpp"
+
+#include "grouped_convolution_forward_invoker.hpp"
 #include "run_grouped_convolution_fwd_example.inc"
 
 template <template <typename PrecType> typename ConvConfig>
@@ -60,9 +42,14 @@ int run_grouped_conv_fwd_example(int argc, char *argv[]) {
 }
 
 int main(int argc, char *argv[]) {
+  try {
 #if CK_TILE_USE_WMMA
-  return !run_grouped_conv_fwd_example<ConvConfigComputeV3_WMMA>(argc, argv);
+    return !run_grouped_conv_fwd_example<ConvConfigComputeV3_WMMA>(argc, argv);
 #else
-  return !run_grouped_conv_fwd_example<ConvConfigComputeV3>(argc, argv);
+    return !run_grouped_conv_fwd_example<ConvConfigComputeV3>(argc, argv);
 #endif
+  } catch (const std::runtime_error &e) {
+    std::cerr << "Runtime error: " << e.what() << '\n';
+    return EXIT_FAILURE;
+  }
 }
