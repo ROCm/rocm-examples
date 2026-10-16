@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -56,14 +56,14 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 add_executable(${example_name} permute.cpp)
-add_test(${example_name} COMMAND "${example_script} $<TARGET_FILE:${example_name}>")
+add_test(NAME ${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
 set_source_files_properties(permute.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
 
 # Alternative implementation
 add_executable(${example_name_alternative} alternative_impl/matrix_core_swizzle.cpp permute.cpp)
-add_test(${example_name_alternative} COMMAND "${example_script} $<TARGET_FILE:${example_name_alternative}>")
+add_test(NAME ${example_name_alternative} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name_alternative}>")
 set_source_files_properties(alternative_impl/matrix_core_swizzle.cpp permute.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name_alternative} PRIVATE cxx_std_17 hip_std_17)
 target_compile_definitions(${example_name_alternative} PRIVATE PERMUTE_USE_ALTERNATIVE_IMPL)
