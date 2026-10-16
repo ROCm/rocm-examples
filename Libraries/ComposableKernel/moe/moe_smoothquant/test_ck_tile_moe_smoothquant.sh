@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 EXE=$1
 
 for pr_i in "fp16" "bf16" ; do
