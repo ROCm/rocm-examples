@@ -46,7 +46,7 @@ if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${ROCM_EXAMPLES_GPU_LANGUAGE}" 
         add_subdirectory(rocprof-compute)
     endif()
 
-    find_program(rocprofiler-systems COMPONENTS user)
+    find_package(rocprofiler-systems COMPONENTS user)
     if(NOT rocprofiler-systems_FOUND)
         message(WARNING "rocprofiler-systems not found. Skipping rocprof-systems examples.")
     else()
