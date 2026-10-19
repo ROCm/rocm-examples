@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -32,4 +32,12 @@ if(NOT TARGET ck_tile)
     target_link_libraries(ck_tile INTERFACE hip::host)
 
     add_library(composable_kernel::ck_tile ALIAS ck_tile)
+endif()
+
+# Without CK_TILE_USE_OCP_FP8, ck_tile uses the OCP fp8 format in device code for gfx950 and gfx12
+# but the FNUZ format in host code, so the host reference results of the examples do not match.
+# Define it when building for these targets, as Composable Kernel's own build does. This also
+# applies to the other targets of the same build (e.g. gfx942), whose fp8 results are then wrong.
+if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx950|gfx12")
+    add_compile_definitions(CK_TILE_USE_OCP_FP8)
 endif()
