@@ -71,7 +71,8 @@ jobs:
         run: |
           echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
           pip install --no-cache-dir --upgrade pip
-          PKG="rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+          # The profiler extra provides the rocprof-sys tools needed by the rocprof-systems tests.
+          PKG="rocm[libraries,devel,profiler,device-${{ matrix.gpu_config.gpu_target }}]"
           # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
           # otherwise install whatever is latest on the index.
           if [ -n "$ROCM_VERSION" ]; then
