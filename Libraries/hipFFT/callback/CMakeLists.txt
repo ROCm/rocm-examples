@@ -26,7 +26,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
 project(hipfft_callback LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(hipfft REQUIRED 1.0.26)
 find_package(hip REQUIRED)

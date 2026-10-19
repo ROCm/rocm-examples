@@ -32,7 +32,7 @@ else()
     set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
@@ -41,7 +41,7 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 20)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 set(include_dirs "../../Common" "../../External")
 list(APPEND include_dirs "${PROJECT_SOURCE_DIR}")

@@ -35,7 +35,7 @@ Pass `model.bin` as the positional argument and `-z tokenizer.bin` to each step'
 ### Steps
 
 | Step | Directory | Description |
-|------|-----------|-------------|
+| ---- | --------- | ----------- |
 | 1 | `step1_baseline/` | CPU baseline: `std::thread` parallelizes matrix operations within each transformer layer. |
 | 2 | `step2_barrier_cpu/` | CPU barrier: threads persist across layers using `std::barrier`, avoiding repeated join and spawn. |
 | 3 | `step3_barrier_gpu/` | GPU port: `std::thread` replaced with `hip::thread`, `std::barrier` with `hip::barrier`, and activations moved to GPU-resident memory. |

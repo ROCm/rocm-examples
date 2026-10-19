@@ -24,7 +24,7 @@
 # Older toolchains (GCC <= 8 / SLES default) ship the implementation in a
 # separate static library; GCC >= 9 has it merged into libstdc++ proper.
 #
-# Mirrors the behavior of Common/FindFilesystem.cmake for the Make build path.
+# Mirrors the behavior of cmake/FindFilesystem.cmake for the Make build path.
 #
 # Usage in leaf Makefiles:
 #   include $(COMMON_INCLUDE_DIR)/find_filesystem.mk

@@ -24,7 +24,7 @@ The program computes optical flow on both the CPU (`flowGold`) and GPU (`flowHIP
 ## Key APIs and Concepts
 
 | Concept | HIP API |
-|---|---|
+| ------- | ------- |
 | Texture objects with bilinear filtering | `hipCreateTextureObject`, `hipTextureObject_t` |
 | Pitched 2D texture resource | `hipResourceTypePitch2D`, `hipResourceDesc` |
 | Mirror address mode | `hipAddressModeMirror` |

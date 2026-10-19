@@ -25,7 +25,7 @@ set(example_name rocjpeg_decode)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../Common/HipPlatform.cmake")
+include("../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -40,7 +40,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(rocjpeg REQUIRED)
 
@@ -49,7 +49,7 @@ add_executable(${example_name} main.cpp)
 add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/FindFilesystem.cmake")
 target_link_libraries(${example_name} PRIVATE rocjpeg::rocjpeg ${CXX_FS_LIBRARY})
 
 target_compile_definitions(

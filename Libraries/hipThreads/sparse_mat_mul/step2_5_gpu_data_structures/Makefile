@@ -34,7 +34,12 @@ ROCM_PATH ?= /opt/rocm
 HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
-LIBHIPCXX_INCLUDE_DIR := $(ROCM_PATH)/include/libhipcxx
+# libhipcxx headers are installed under include/hipccl; fall back to the
+# include/libhipcxx location used by older ROCm installs.
+LIBHIPCXX_INCLUDE_DIR := $(ROCM_PATH)/include/hipccl
+ifeq ($(wildcard $(LIBHIPCXX_INCLUDE_DIR)),)
+    LIBHIPCXX_INCLUDE_DIR := $(ROCM_PATH)/include/libhipcxx
+endif
 
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
