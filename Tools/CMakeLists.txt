@@ -46,14 +46,14 @@ if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${ROCM_EXAMPLES_GPU_LANGUAGE}" 
         add_subdirectory(rocprof-compute)
     endif()
 
-    find_package(rocprofiler-systems COMPONENTS user QUIET)
+    find_package(rocprofiler-systems COMPONENTS user)
     if(NOT rocprofiler-systems_FOUND)
         message(WARNING "rocprofiler-systems not found. Skipping rocprof-systems examples.")
     else()
         add_subdirectory(rocprof-systems)
     endif()
 
-    find_package(rocprofiler-sdk-roctx QUIET)
+    find_package(rocprofiler-sdk-roctx)
     if(NOT rocprofiler-sdk-roctx_FOUND)
         message(WARNING "rocprofiler-sdk-roctx not found. Skipping rocprofv3 examples.")
     else()
