@@ -126,12 +126,14 @@ add_test(NAME ${example_fwd} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_fwd_sc
 ########################################################################################################################
 add_executable(${example_bwd})
 
+# The backward pass needs three kernels per configuration, and --filter takes one pattern for each, separated by
+# "@": dot_do_o@convert_dq@dq_dk_dv. A configuration is generated only if all three kernel names match.
 execute_process(
     COMMAND ${Python3_EXECUTABLE} ${CMAKE_CURRENT_LIST_DIR}/generate.py
         --api bwd
         --targets ${GENERATOR_TARGETS}
         --optdim 64
-        --filter *fp16_group*
+        --filter *fp16*group*@*fp16*group*@*fp16*group*
         --receipt 3
         --list_blobs ${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt
     RESULT_VARIABLE ret
@@ -144,7 +146,7 @@ add_custom_target(fmha_bwd_gen_srcs
         --api bwd
         --targets ${GENERATOR_TARGETS}
         --optdim 64
-        --filter *fp16_group*
+        --filter *fp16*group*@*fp16*group*@*fp16*group*
         --receipt 3
         --output_dir ${CMAKE_CURRENT_BINARY_DIR}
     DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/bwd_src_list.txt" ${EXAMPLE_CODE_GEN_SCRIPTS}
