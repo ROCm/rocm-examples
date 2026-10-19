@@ -89,37 +89,25 @@ run_fp16_bf16_tests() {
     done ; done ; done ; done ; done
 }
 
-run_fp8_tests() {
-    for perm in 0 1 ; do
-    for bias in "n" "e" "a" ; do
-    for b in 1 2 ; do
-    for hdim in 64 128 256 ; do
-
-    $EXE -prec=fp8 -init=0 -b=$b -h=1 -d=$hdim -s=128 -bias=$bias -iperm=$perm -operm=$perm -vlayout=r -squant=1 -kname=$KNAME $COMMON_ARGS
-
-    done ; done ; done ; done
-}
-
 run_fp8bf16_tests() {
     for perm in 0 1 ; do
-    for bias in "n" "e" "a" ; do
     for b in 1 2 ; do
     for hdim in 64 128 256 ; do
+    for scale in 1 2; do
 
-    $EXE -prec=fp8bf16 -init=0 -b=$b -h=1 -d=$hdim -s=128 -bias=$bias -iperm=$perm -operm=$perm -vlayout=r -squant=1 -kname=$KNAME $COMMON_ARGS
+    $EXE -prec=fp8bf16 -init=3 -b=$b -h=1 -d=$hdim -s=128 -iperm=$perm -operm=$perm -vlayout=r -qscale=$scale -kname=$KNAME $COMMON_ARGS
 
     done ; done ; done ; done
 }
 
 run_fp8fp32_tests() {
     for perm in 0 1 ; do
-    for bias in "n" "e" "a" ; do
     for b in 1 2 ; do
     for hdim in 128 ; do
 
-    $EXE -prec=fp8fp32 -init=0 -b=$b -h=1 -d=$hdim -s=128 -bias=$bias -iperm=$perm -operm=$perm -vlayout=r -squant=1 -kname=$KNAME $COMMON_ARGS
+    $EXE -prec=fp8fp32 -init=3 -b=$b -h=1 -d=$hdim -s=128 -iperm=$perm -operm=$perm -vlayout=r -qscale=1 -kname=$KNAME $COMMON_ARGS
 
-    done ; done ; done ; done
+    done ; done ; done
 }
 
 run_fp16_appendkv_tests() {
@@ -250,7 +238,6 @@ set -x
 run_fp16_bf16_tests
 run_padding_smoke_tests
 run_padding_basic_boundary_tests
-run_fp8_tests
 run_fp8bf16_tests
 run_fp8fp32_tests
 
