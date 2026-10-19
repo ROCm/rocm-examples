@@ -101,7 +101,7 @@ target_sources(${example_name} PRIVATE rmsnorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS}
 # Basic example
 ########################################################################################################################
 add_executable(${example_name_basic} example_rmsnorm2d_fwd.cpp)
-add_test(NAME ${example_name_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name_basic}>")
+add_test(NAME ${example_name_basic} COMMAND ${example_name_basic})
 set_source_files_properties(example_rmsnorm2d_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name_basic} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
