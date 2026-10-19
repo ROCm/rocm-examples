@@ -117,7 +117,7 @@ target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::ho
 # Basic example
 ########################################################################################################################
 add_executable(${example_name_basic} example_smoothquant.cpp)
-add_test(NAME ${example_name_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name_basic}>")
+add_test(NAME ${example_name_basic} COMMAND ${example_name_basic})
 set_source_files_properties(example_smoothquant.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name_basic} PRIVATE -Wno-undefined-func-template -Wno-float-equal)
