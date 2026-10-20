@@ -63,6 +63,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Configure CI
         id: config
@@ -84,4 +86,3 @@ jobs:
       distro_map: ${{ needs.setup.outputs.distro_map }}
       gpu_configs: ${{ needs.setup.outputs.gpu_configs }}
       install_methods: ${{ needs.setup.outputs.install_methods }}
-    secrets: inherit
