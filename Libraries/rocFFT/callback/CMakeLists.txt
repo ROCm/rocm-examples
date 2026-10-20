@@ -30,12 +30,6 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     return()
 endif()
 
-# Set default build type to Release
-# to workaround a compiler issue when building with -O0
-if(NOT CMAKE_BUILD_TYPE)
-    set(CMAKE_BUILD_TYPE Release)
-endif()
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(rocfft REQUIRED)
