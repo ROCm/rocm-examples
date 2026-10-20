@@ -101,21 +101,6 @@ _ROCDECODE_DIRS = [
 ]
 
 SKIP_MANIFEST = [
-    # --- FFT callbacks: test-only, all channels ---------------------------
-    # ROCm/rocm-systems#7263: HIP CLR cannot resolve static device symbols via
-    # hipModuleGetGlobal; the default store callback aborts at runtime.
-    {
-        "ctest": "hipfft_callback",
-        "path": "Libraries/hipFFT/callback",
-        "scope": ["test"],
-        "reason": "ROCm/rocm-systems#7263 static device symbol abort at runtime",
-    },
-    {
-        "ctest": "rocfft_callback",
-        "path": "Libraries/rocFFT/callback",
-        "scope": ["test"],
-        "reason": "ROCm/rocm-systems#7263 static device symbol abort at runtime",
-    },
     # --- rocDecode: test-only, nightly whl install only, no ctest key -----
     # The stable image (amdrocm-decode-test) and the nightly tarball carry the
     # video data, so their tests run; the nightly whl install doesn't, so skip
