@@ -27,10 +27,10 @@ concurrency:
   cancel-in-progress: true
 
 env:
-    HIPSDK_INSTALLER_VERSION: 25.Q3
-    CUDA_VERSION: 12.8.1
-    CUDA_INSTALLER_VERSION: 572.61
-    CUDA_PATH: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.8
+    HIPSDK_INSTALLER_VERSION: 26.Q3
+    CUDA_VERSION: 12.9.2
+    CUDA_INSTALLER_VERSION: 576.57
+    CUDA_PATH: C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v12.9
     GLFW_DIR: C:\glfw-3.4.bin.WIN64\
     VULKAN_SDK: C:\VulkanSDK\1.4.313.2\
 
@@ -69,7 +69,7 @@ jobs:
                   Write-Host "Downloading installer https://developer.download.nvidia.com/compute/cuda/${{ env.CUDA_VERSION }}/local_installers/cuda_${{ env.CUDA_VERSION }}_${{ env.CUDA_INSTALLER_VERSION }}_windows.exe"
                   Invoke-WebRequest -Uri https://developer.download.nvidia.com/compute/cuda/${{ env.CUDA_VERSION }}/local_installers/cuda_${{ env.CUDA_VERSION }}_${{ env.CUDA_INSTALLER_VERSION }}_windows.exe -OutFile CUDAToolkit.exe
                   Write-Host "Installing CUDA Toolkit"
-                  Start-Process CUDAToolkit.exe -ArgumentList '-s cuda_profiler_api_12.8 cudart_12.8 nvcc_12.8 nvrtc_dev_12.8 cublas_dev_12.8 cufft_dev_12.8 curand_dev_12.8 cusolver_dev_12.8 cusparse_dev_12.8 visual_studio_integration_12.8','-n' -NoNewWindow -Wait
+                  Start-Process CUDAToolkit.exe -ArgumentList '-s cuda_profiler_api_12.9 cudart_12.9 nvcc_12.9 nvrtc_dev_12.9 cublas_dev_12.9 cufft_dev_12.9 curand_dev_12.9 cusolver_dev_12.9 cusparse_dev_12.9 visual_studio_integration_12.9','-n' -NoNewWindow -Wait
                   if (Test-Path -Path "${{ env.CUDA_PATH }}") {
                       Write-Host "CUDA_PATH directory exists: ${{ env.CUDA_PATH }}"
                       Write-Host "CUDA Toolkit installed successfully"
@@ -81,8 +81,8 @@ jobs:
           - name: Install HIP SDK
             run: |
                   $ProgressPreference = 'SilentlyContinue'
-                  Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe"
-                  Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win10-Win11-For-HIP.exe -OutFile HIPSDK.exe
+                  Write-Host "Downloading installer https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win11-For-HIP.exe"
+                  Invoke-WebRequest -Uri https://download.amd.com/developer/eula/rocm-hub/AMD-Software-PRO-Edition-${{ env.HIPSDK_INSTALLER_VERSION }}-Win11-For-HIP.exe -OutFile HIPSDK.exe
                   Write-Host "Installing HIP SDK"
                   Start-Process HIPSDK.exe -ArgumentList '-install','-log',"$((Get-Location).Path)\installer_log.txt" -NoNewWindow -Wait
                   Write-Host "Installer log:"

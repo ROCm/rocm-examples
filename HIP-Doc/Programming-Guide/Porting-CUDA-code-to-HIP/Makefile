@@ -26,6 +26,7 @@ EXAMPLES := \
   host_code_feature_identification \
   identifying_compilation_target_platform \
   identifying_host_device_compilation_pass \
+  lane_masks_bit_shift \
   load_module \
   load_module_ex \
   per_thread_default_stream \
