@@ -40,12 +40,15 @@ test_h_s_mask() {
     run_exe -b=2 -h=3 -h_k=1 -s=244 -s_k=499 -mask=b:4,35   $@
 }
 
+# CMakeLists.txt generates only the fp16 group mode kernels for head dimensions up to 64, without dbias and
+# deterministic mode. The tests are limited to these cases: -prec=fp16 -mode=1 and -d up to 64.
+
 set -x
 # main tests
-for prec in "fp16" "bf16" ; do
+for prec in "fp16" ; do
 for perm in 0 1 ; do
-for hdim in 32 64 128 256 ; do
-for mode in 0 1 ; do
+for hdim in 32 64 ; do
+for mode in 1 ; do
 for bias in "n" "a" ; do
 for dbias in 0 ; do
 for p_drop in 0.0 0.2 ; do
@@ -61,10 +64,8 @@ done
 done
 
 # additional cases
-for hdim in 40 48 72 96 ; do
+for hdim in 40 48 ; do
 test_h_s_mask -prec=fp16 -d=$hdim -bias=a -dbias=0 -p_drop=0.2 -iperm=0 -operm=0 -deterministic=0 -v=1 -mode=1 -kname=$KNAME $COMMON_ARGS
-test_h_s_mask -prec=bf16 -d=$hdim -bias=n -dbias=0 -p_drop=0   -iperm=1 -operm=1 -deterministic=0 -v=1 -mode=1 -kname=$KNAME $COMMON_ARGS
-test_h_s_mask -prec=bf16 -d=$hdim -bias=a -dbias=0 -p_drop=0.2 -iperm=1 -operm=1 -deterministic=0 -v=1 -mode=1 -kname=$KNAME $COMMON_ARGS
 done
 set +x
 
