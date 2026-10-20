@@ -23,6 +23,11 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(ComposableKernel_examples LANGUAGES CXX)
 
+# Set default build type to Release, as Composable Kernel's own build does
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Composable Kernel examples are supported on Linux only.")
     return()
