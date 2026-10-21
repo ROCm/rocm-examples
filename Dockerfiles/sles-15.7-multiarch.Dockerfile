@@ -68,18 +68,17 @@ RUN zypper -qni addrepo -G https://download.opensuse.org/distribution/leap/15.6/
     zypper clean -a
 
 # TheRock's tarball builds require elfutils >= 0.186 but SLES 15.7 ships 0.177.
-WORKDIR /tmp
+WORKDIR /tmp/elfutils-0.186
 RUN zypper -qni install -y bzip2 m4 zlib-devel && \
-    wget https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2 && \
-    tar -xjf elfutils-0.186.tar.bz2 && \
-    cd elfutils-0.186 && \
+    wget -P /tmp https://sourceware.org/elfutils/ftp/0.186/elfutils-0.186.tar.bz2 && \
+    tar -xjf /tmp/elfutils-0.186.tar.bz2 --strip-components=1 && \
     ./configure --disable-debuginfod --disable-libdebuginfod && \
     make -j$(nproc) && \
     make install && \
     ldconfig && \
-    cd /tmp && \
-    rm -rf elfutils-0.186* && \
+    rm -rf /tmp/elfutils-0.186* && \
     zypper clean -a
+WORKDIR /tmp
 
 # ============================================================================
 # Python virtual environment (ready for multi-arch ROCm installation)
@@ -117,10 +116,9 @@ ENV VK_ADD_LAYER_PATH="${VULKAN_SDK}/share/vulkan/explicit_layer.d"
 ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig"
 
 # Build FFmpeg from source (not available in SLES repos)
-WORKDIR /tmp
-RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
-    tar -xvf ffmpeg-4.4.6.tar.xz && \
-    cd ffmpeg-4.4.6 && \
+WORKDIR /tmp/ffmpeg-4.4.6
+RUN wget -P /tmp https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
+    tar -xvf /tmp/ffmpeg-4.4.6.tar.xz --strip-components=1 && \
     ./configure --enable-pic --enable-shared && \
     make -j$(nproc) && \
     make install && \

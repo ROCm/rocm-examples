@@ -62,6 +62,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       # Quartz's reusable status.json reader, sparse-checked-out (single file) at
       # a pinned commit (main branch) rather than vendored.
@@ -74,6 +76,7 @@ jobs:
           sparse-checkout: scripts/consumer/read_status_json.py
           sparse-checkout-cone-mode: false
           path: .quartz-upstream
+          persist-credentials: false
 
       - name: Resolve latest ready nightly from Quartz
         id: consume
@@ -94,11 +97,13 @@ jobs:
         id: dedup
         env:
           FORCE: ${{ github.event.inputs.force }}
+          RESOLVED: ${{ steps.consume.outputs.resolved }}
+          CACHE_HIT: ${{ steps.marker.outputs.cache-hit }}
         run: |
           # is_new = there is a ready build we have not recorded yet (or --force).
-          if [ "${{ steps.consume.outputs.resolved }}" != "true" ]; then
+          if [ "$RESOLVED" != "true" ]; then
             echo "is_new=false" >> "$GITHUB_OUTPUT"
-          elif [ "${{ steps.marker.outputs.cache-hit }}" = "true" ] && [ "$FORCE" != "true" ]; then
+          elif [ "$CACHE_HIT" = "true" ] && [ "$FORCE" != "true" ]; then
             echo "is_new=false" >> "$GITHUB_OUTPUT"
           else
             echo "is_new=true" >> "$GITHUB_OUTPUT"
@@ -128,7 +133,6 @@ jobs:
       rocm_version: ${{ needs.gate.outputs.rocm_version }}
       wheels_url: ${{ needs.gate.outputs.wheels_url }}
       tarballs_url: ${{ needs.gate.outputs.tarballs_url }}
-    secrets: inherit
 
   collect:
     needs: [gate, test]
@@ -167,11 +171,15 @@ jobs:
           echo "category=$category" >> "$GITHUB_OUTPUT"
 
       - name: Report verdict
+        env:
+          ROCM_VERSION: ${{ needs.gate.outputs.rocm_version }}
+          BUILD_DATE: ${{ needs.gate.outputs.build_date }}
+          CATEGORY: ${{ steps.eval.outputs.category }}
         run: |
           # record itself reports the success/bug cases; the infra verdict is not
           # recorded by any downstream job, so surface here that it will be retried.
-          ver="ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }})"
-          case "${{ steps.eval.outputs.category }}" in
+          ver="ROCm ${ROCM_VERSION} (${BUILD_DATE})"
+          case "$CATEGORY" in
             infra) echo "::notice::${ver}: infra failure (install/env) -- left unrecorded, will be retried on the next poll." >> "$GITHUB_STEP_SUMMARY" ;;
             bug)   echo "${ver}: genuine build/test break -- recording (no retry)." >> "$GITHUB_STEP_SUMMARY" ;;
             *)     echo "${ver}: all matrix jobs passed." >> "$GITHUB_STEP_SUMMARY" ;;
@@ -210,11 +218,15 @@ jobs:
           key: quartz-tested-${{ needs.gate.outputs.rocm_version }}-${{ needs.gate.outputs.build_date }}
 
       - name: Summary
+        env:
+          TEST_RESULT: ${{ needs.test.result }}
+          ROCM_VERSION: ${{ needs.gate.outputs.rocm_version }}
+          BUILD_DATE: ${{ needs.gate.outputs.build_date }}
         run: |
-          if [ "${{ needs.test.result }}" = "success" ]; then
-            echo "Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested (passed)." >> "$GITHUB_STEP_SUMMARY"
+          if [ "$TEST_RESULT" = "success" ]; then
+            echo "Recorded ROCm ${ROCM_VERSION} (${BUILD_DATE}) as tested (passed)." >> "$GITHUB_STEP_SUMMARY"
           else
-            echo "::warning::Recorded ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) as tested (GENUINE build/test break -- will not retry). Investigate." >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::Recorded ROCm ${ROCM_VERSION} (${BUILD_DATE}) as tested (GENUINE build/test break -- will not retry). Investigate." >> "$GITHUB_STEP_SUMMARY"
           fi
 
   report:
@@ -232,10 +244,15 @@ jobs:
               && format('Skipped {0} (already tested)', needs.gate.outputs.rocm_version)
               || (needs.gate.outputs.source == 'unavailable' && 'Quartz unavailable'
                   || 'No ready build') }}
+        env:
+          RESOLVED: ${{ needs.gate.outputs.resolved }}
+          SOURCE: ${{ needs.gate.outputs.source }}
+          ROCM_VERSION: ${{ needs.gate.outputs.rocm_version }}
+          BUILD_DATE: ${{ needs.gate.outputs.build_date }}
         run: |
-          if [ "${{ needs.gate.outputs.resolved }}" = "true" ]; then
-            echo "ROCm ${{ needs.gate.outputs.rocm_version }} (${{ needs.gate.outputs.build_date }}) already tested; skipping." >> "$GITHUB_STEP_SUMMARY"
-          elif [ "${{ needs.gate.outputs.source }}" = "unavailable" ]; then
+          if [ "$RESOLVED" = "true" ]; then
+            echo "ROCm ${ROCM_VERSION} (${BUILD_DATE}) already tested; skipping." >> "$GITHUB_STEP_SUMMARY"
+          elif [ "$SOURCE" = "unavailable" ]; then
             echo "Quartz status could not be fetched or parsed; skipping this poll (availability canary)." >> "$GITHUB_STEP_SUMMARY"
           else
             echo "Quartz reports no ready ROCm nightly right now (build not finished, or already superseded); skipping." >> "$GITHUB_STEP_SUMMARY"

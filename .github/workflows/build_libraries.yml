@@ -40,6 +40,8 @@ jobs:
         steps:
           # see https://github.com/dorny/paths-filter/issues/212
           - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            with:
+              persist-credentials: false
           - name: Trust git directory
             run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
           - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
@@ -49,9 +51,11 @@ jobs:
                 ck:
                   - 'Libraries/ComposableKernel/**'
           - name: Set CK build flag
+            env:
+              CK_CHANGED: ${{ steps.changes.outputs.ck }}
             run: |
               # Enable CK for: scheduled runs OR CK files changed
-              if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ steps.changes.outputs.ck }}" == "true" ]; then
+              if [ "$GITHUB_EVENT_NAME" == "schedule" ] || [ "$CK_CHANGED" == "true" ]; then
                 ENABLE_CK=ON
               else
                 ENABLE_CK=OFF
