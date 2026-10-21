@@ -26,6 +26,7 @@ set(example_basic_script test_ck_tile_gemm_basic.sh)
 set(example_universal ${example_name}_universal)
 set(example_universal_script test_ck_tile_gemm_universal.sh)
 set(example_weight_preshuffle ${example_name}_weight_preshuffle)
+set(example_weight_preshuffle_script test_ck_tile_gemm_weight_preshuffle.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -80,7 +81,10 @@ target_link_libraries(${example_universal} PRIVATE composable_kernel::ck_tile hi
 target_include_directories(${example_universal} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 
 add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
-add_test(NAME ${example_weight_preshuffle} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script}" "$<TARGET_FILE:${example_weight_preshuffle}>")
+add_test(
+    NAME ${example_weight_preshuffle}
+    COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_weight_preshuffle_script}" "$<TARGET_FILE:${example_weight_preshuffle}>"
+)
 target_compile_features(${example_weight_preshuffle} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(
     ${example_weight_preshuffle}
