@@ -92,6 +92,7 @@ endif()
 
 add_executable(${example_streams} main_streams.hip)
 add_test(NAME ${example_streams} COMMAND ${example_streams})
+set_tests_properties(${example_streams} PROPERTIES TIMEOUT 300)
 set_source_files_properties(main_streams.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 set_target_properties(${example_streams} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
                                                     $<$<COMPILE_LANGUAGE:CUDA>:CUDA_SEPARABLE_COMPILATION ON>
@@ -112,6 +113,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
 else()
     add_executable(${example_graph_capture} main_graph_capture.hip)
     add_test(NAME ${example_graph_capture} COMMAND ${example_graph_capture})
+    set_tests_properties(${example_graph_capture} PROPERTIES TIMEOUT 300)
     set_source_files_properties(main_graph_capture.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
     set_target_properties(${example_graph_capture} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
                                                               $<$<COMPILE_LANGUAGE:CUDA>:CUDA_SEPARABLE_COMPILATION ON>
@@ -130,6 +132,7 @@ endif()
 
 add_executable(${example_graph_creation} main_graph_creation.hip)
 add_test(NAME ${example_graph_creation} COMMAND ${example_graph_creation})
+set_tests_properties(${example_graph_creation} PROPERTIES TIMEOUT 300)
 set_source_files_properties(main_graph_creation.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 set_target_properties(${example_graph_creation} PROPERTIES $<$<COMPILE_LANGUAGE:CUDA>:CUDA_EXTENSIONS OFF>
                                                            $<$<COMPILE_LANGUAGE:CUDA>:CUDA_SEPARABLE_COMPILATION ON>
