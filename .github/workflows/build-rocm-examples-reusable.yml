@@ -303,7 +303,8 @@ jobs:
           # skip_tests.txt was produced by the "Generate skip lists" step,
           # which also reports the full skip manifest to the step summary.
           SKIP_FILE="${GITHUB_WORKSPACE}/.github/build_tools/skip_tests.txt"
-          ctest --test-dir build --output-on-failure --exclude-from-file "${SKIP_FILE}" 2>&1 | tee ctest_output.log
+          # --timeout only applies to tests without their own TIMEOUT property.
+          ctest --test-dir build --output-on-failure --timeout 900 --exclude-from-file "${SKIP_FILE}" 2>&1 | tee ctest_output.log
 
       - name: Test summary
         if: ${{ !cancelled() }}

@@ -47,6 +47,7 @@ find_package(rccl REQUIRED)
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
+set_tests_properties(${example_name} PROPERTIES TIMEOUT 60)
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::rccl)

@@ -39,6 +39,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
+set_tests_properties(${example_name} PROPERTIES TIMEOUT 60)
 set(include_dirs "../../Common" "../../External")
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_PATH}/include")
