@@ -24,6 +24,7 @@ EXAMPLES := \
 	rocdec_decode \
 	video_decode \
 	video_decode_batch \
+	video_decode_caps \
 	video_decode_mem \
 	video_decode_multi_files \
 	video_decode_perf \
@@ -32,10 +33,11 @@ EXAMPLES := \
 	video_decode_rgb \
 	video_to_sequence
 
-# All rocDecode examples need video test data (under $(ROCM_PATH)/share/rocdecode)
-# that CI images don't carry, so every example is test-skipped. The skip is now
+# All rocDecode examples except video_decode_caps need video test data (under
+# $(ROCM_PATH)/share/rocdecode) that CI images don't carry, so those examples are
+# test-skipped. The skip is now
 # driven by .github/build_tools/skip_manifest.py: CI runs generate_skip_tests.py
-# and passes SKIP_FROM_TEST (all ten example paths) on the make command line,
+# and passes SKIP_FROM_TEST (those ten example paths) on the make command line,
 # overriding this default. skip_here matches only entries naming THIS directory's
 # examples. A bare local `make test` runs them; to skip manually, pass
 # SKIP_FROM_TEST or cd into a leaf and control it there. The `test` target honors

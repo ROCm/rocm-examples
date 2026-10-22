@@ -41,6 +41,7 @@ if(NOT rocdecode_FOUND)
 endif()
 
 add_subdirectory(rocdec_decode)
+add_subdirectory(video_decode_caps)
 add_subdirectory(video_decode_raw)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
