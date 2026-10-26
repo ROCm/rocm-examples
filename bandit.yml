@@ -10,3 +10,12 @@ exclude_dirs:
   - .git
   - .venv
   - venv
+
+# Code adapted from upstream projects keeps upstream's assert-based checks
+# rather than diverging from the source it was taken from.
+assert_used:
+  skips:
+    # ROCm/composable_kernel example/ck_tile/01_fmha codegen.
+    - "*/Libraries/ComposableKernel/attention/fmha/*"
+    # jameswdelancey/llama3.c (fork of karpathy/llama2.c).
+    - "*/Libraries/hipThreads/llama3c/*"

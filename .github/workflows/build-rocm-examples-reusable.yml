@@ -61,6 +61,8 @@ jobs:
       - name: Checkout repository
         id: checkout
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Install ROCm (whl-multi-arch)
         if: ${{ matrix.install_method == 'whl-multi-arch' }}
@@ -68,10 +70,12 @@ jobs:
         env:
           ROCM_VERSION: ${{ inputs.rocm_version }}
           WHEELS_URL: ${{ inputs.wheels_url }}
+          GPU_TARGET: ${{ matrix.gpu_config.gpu_target }}
+          DISTRO_LABEL: ${{ fromJson(inputs.distro_map)[inputs.distro].label }}
         run: |
-          echo "## Target: ${{ matrix.gpu_config.gpu_target }} on ${{ fromJson(inputs.distro_map)[inputs.distro].label }}" >> $GITHUB_STEP_SUMMARY
+          echo "## Target: ${GPU_TARGET} on ${DISTRO_LABEL}" >> $GITHUB_STEP_SUMMARY
           pip install --no-cache-dir --upgrade pip
-          PKG="rocm[libraries,devel,device-${{ matrix.gpu_config.gpu_target }}]"
+          PKG="rocm[libraries,devel,device-${GPU_TARGET}]"
           # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
           # otherwise install whatever is latest on the index.
           if [ -n "$ROCM_VERSION" ]; then
@@ -193,26 +197,30 @@ jobs:
         id: skip-lists
         env:
           DISTRO: ${{ inputs.distro }}
+          GPU_TARGET: ${{ matrix.gpu_config.gpu_target }}
+          INSTALL_METHOD: ${{ matrix.install_method }}
         run: |
           # The preinstalled distro is the pinned stable ROCm image, i.e. the "stable"
           # channel; every other install method pulls a TheRock "nightly" build.
-          if [ "${{ matrix.install_method }}" = "preinstalled" ]; then
+          if [ "$INSTALL_METHOD" = "preinstalled" ]; then
             CHANNEL=stable
           else
             CHANNEL=nightly
           fi
           python3 .github/build_tools/generate_skip_tests.py \
             --channel "$CHANNEL" \
-            --target "${{ matrix.gpu_config.gpu_target }}" \
+            --target "$GPU_TARGET" \
             --distro "$DISTRO" \
-            --install-method "${{ matrix.install_method }}"
+            --install-method "$INSTALL_METHOD"
 
       - name: Makefile build
         if: ${{ !cancelled() && steps.skip-lists.outcome == 'success' }}
         id: make-build
+        env:
+          GPU_TARGET: ${{ matrix.gpu_config.gpu_target }}
         run: |
           ./Scripts/configure.sh --rocm-path="${ROCM_PATH}"
-          make -j HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
+          make -j HIP_ARCHITECTURES="${GPU_TARGET}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
 
       - name: CMake configure
         if: ${{ !cancelled() && steps.skip-lists.outcome == 'success' }}
@@ -374,12 +382,16 @@ jobs:
 
       - name: Classify outcome
         if: always()
+        env:
+          ENV_OK: ${{ steps.environment-status.outputs.ok }}
+          ROCM_VERSION: ${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}
+          INSTALL_URL: ${{ steps.install-whl.outputs.install_url || steps.install-tarball-multi-arch.outputs.install_url }}
         run: |
           # Env failure, or a failed artifact upload, -> infra (retry): both are
           # transient, not a code bug. Otherwise any of our build/test steps failing
           # -> a genuine bug (record as tested so it is not retried). The collect job in
           # quartz_test.yml takes the worst category across all matrix jobs.
-          if [ "${{ steps.environment-status.outputs.ok }}" != "true" ] \
+          if [ "$ENV_OK" != "true" ] \
             || [ "${{ steps.upload-cmake-build.outcome }}" = "failure" ] \
             || [ "${{ steps.upload-make-build.outcome }}" = "failure" ] \
             || [ "${{ steps.upload-ctest-logs.outcome }}" = "failure" ] \
@@ -398,12 +410,10 @@ jobs:
           fi
           # First line is the bare category (collect aggregates it with `grep -qx`);
           # the metadata lines below it are inert to that match.
-          rocm_version="${{ steps.whl-multiarch-version.outputs.rocm_version || steps.install-tarball-multi-arch.outputs.rocm_version || steps.preinstalled.outputs.rocm_version }}"
-          install_url="${{ steps.install-whl.outputs.install_url || steps.install-tarball-multi-arch.outputs.install_url }}"
           {
             echo "$c"
-            echo "rocm_version=$rocm_version"
-            echo "install_url=$install_url"
+            echo "rocm_version=$ROCM_VERSION"
+            echo "install_url=$INSTALL_URL"
           } > job-status.txt
           echo "Job status: $c" >> "$GITHUB_STEP_SUMMARY"
 
