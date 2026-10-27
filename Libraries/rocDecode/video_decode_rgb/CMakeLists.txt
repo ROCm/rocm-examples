@@ -105,21 +105,12 @@ set_source_files_properties(
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
-# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
-# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
-set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
-  set(USING_THE_ROCK ON)
-endif()
-
-if (NOT USING_THE_ROCK)
-    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
-        add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -of rgb)
-        add_test(NAME ${example_name}-resize COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -resize 640x360 -of rgb)
-    else()
-        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
-    endif()
+set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
+    add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -of rgb)
+    add_test(NAME ${example_name}-resize COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -resize 640x360 -of rgb)
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
 endif()
 
 install(TARGETS ${example_name})
