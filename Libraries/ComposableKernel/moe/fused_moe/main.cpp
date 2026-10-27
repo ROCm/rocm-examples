@@ -13,17 +13,29 @@
 #include "ck_tile/utility/json_dump.hpp"
 #include "fused_moe.hpp"
 
-// different threshold for different dtype
-template <typename DataType> auto get_elimit() {
-  double rtol = 1e-2;
-  double atol = 1e-2;
-  return ck_tile::make_tuple(rtol, atol);
-}
-
-template <> auto get_elimit<ck_tile::bf16_t>() {
-  double rtol = 1e-2;
-  double atol = 1e-2;
-  return ck_tile::make_tuple(rtol, atol);
+// Each token's output is the sum of topk expert results that the kernel adds
+// into the output with ODataType atomics, like a split-k gemm with
+// kbatch = topk. Unlike split-k, each expert runs the whole second gemm, so the
+// gemm error uses the full K and the full max value.
+template <typename ComputeType, typename OutDataType, typename AccDataType>
+auto calculate_rtol_atol(const ck_tile::index_t K, const ck_tile::index_t topk,
+                         const float max_accumulated_value) {
+  // Calculate thresholds
+  const auto rtol =
+      ck_tile::get_relative_threshold<ComputeType, OutDataType, AccDataType>(K);
+  const auto atol =
+      ck_tile::get_absolute_threshold<ComputeType, OutDataType, AccDataType>(
+          max_accumulated_value, K);
+  // Calculate error due to the topk accumulation
+  const auto rtol_topk =
+      ck_tile::get_relative_threshold<OutDataType, OutDataType, OutDataType>(
+          topk);
+  const auto atol_topk =
+      ck_tile::get_absolute_threshold<OutDataType, OutDataType, OutDataType>(
+          max_accumulated_value, topk);
+  // Use higher threshold
+  return ck_tile::make_tuple(std::max(rtol, rtol_topk),
+                             std::max(atol, atol_topk));
 }
 
 // mfma_type, 0:32x32, 1:16x16
@@ -482,7 +494,11 @@ bool run(const ck_tile::ArgParser &arg_parser) {
 
       auto o_dev = o_buf.ToHost<ODataType>();
       // ck_tile::savetxt(o_dev, "gpu-out.txt", "float");
-      auto [rtol, atol] = get_elimit<ADataType>();
+      const float max_accumulated_value =
+          *std::max_element(o_host.mData.begin(), o_host.mData.end());
+      auto [rtol, atol] =
+          calculate_rtol_atol<ADataType, ODataType, AccDataType>(
+              intermediate_size / tp, topk, max_accumulated_value);
       pass &= ck_tile::check_err(o_dev, o_host,
                                  std::string("OUT Error: Incorrect results!"),
                                  rtol, atol);
@@ -575,7 +591,11 @@ bool run(const ck_tile::ArgParser &arg_parser) {
 
       auto o_dev = o_buf.ToHost<ODataType>();
       // ck_tile::savetxt(o_dev, "gpu-out.txt", "float");
-      auto [rtol, atol] = get_elimit<ADataType>();
+      const float max_accumulated_value =
+          *std::max_element(o_host.mData.begin(), o_host.mData.end());
+      auto [rtol, atol] =
+          calculate_rtol_atol<ADataType, ODataType, AccDataType>(
+              intermediate_size / tp, topk, max_accumulated_value);
       pass &= ck_tile::check_err(o_dev, o_host,
                                  std::string("OUT Error: Incorrect results!"),
                                  rtol, atol);
