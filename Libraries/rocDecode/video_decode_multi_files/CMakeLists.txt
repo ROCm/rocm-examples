@@ -27,6 +27,7 @@ project(${example_name} LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 include("../../../cmake/HipPlatform.cmake")
+include("../../../cmake/RocDecodeLinkOrder.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -61,6 +62,7 @@ add_executable(${example_name}
     ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
 )
 
+link_rocdecode_first(${example_name})
 target_link_libraries(${example_name}
     PRIVATE
     hip::host

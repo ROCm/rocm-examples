@@ -7,19 +7,20 @@ This example demonstrates batch video decoding using multiple threads with the r
 ## Application Flow
 
 1. Parse command-line arguments for input directory, number of threads, device ID, and output options.
-2. Scan the input directory to collect all video files.
-3. Determine the optimal number of threads based on file count and user request (maximum 64 threads).
-4. Distribute video files across threads using round-robin assignment.
-5. For each thread:
+2. Scan the input directory to collect all video files. An empty directory is an error.
+3. Check the decode capability of the GPU devices used by the decoder threads with `rocDecGetDecoderCaps` for each file, and keep only the files whose codec and bit depth they support. Unsupported files (e.g. AV1 on gfx90a) are skipped with an info message. If no file is supported, the example exits with code 77 (skipped). A file that can't be opened as a video and a failed capability query are errors.
+4. Determine the optimal number of threads based on the number of supported files and user request (maximum 64 threads).
+5. Distribute video files across threads using round-robin assignment.
+6. For each thread:
    - Initialize a separate video demuxer for assigned files.
    - Create a dedicated decoder instance.
    - Process assigned files sequentially within the thread.
    - Decode all frames from each file.
    - Optionally save decoded frames to output.
    - Generate MD5 digest for validation if requested.
-6. Synchronize all threads and collect decoding statistics.
-7. Display aggregate performance metrics including total frames decoded and throughput.
-8. Clean up all decoder and demuxer resources.
+7. Synchronize all threads and collect decoding statistics.
+8. Display aggregate performance metrics including total frames decoded and throughput.
+9. Clean up all decoder and demuxer resources.
 
 ## Key APIs and Concepts
 
@@ -58,6 +59,7 @@ This example demonstrates batch video decoding using multiple threads with the r
 
 ### rocDecode APIs
 
+- `rocDecGetDecoderCaps`
 - `rocDecCreateDecoder`
 - `rocDecDecodeFrame`
 - `rocDecGetVideoFrame`

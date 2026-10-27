@@ -27,6 +27,7 @@ project(${example_name} LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 include("../../../cmake/HipPlatform.cmake")
+include("../../../cmake/RocDecodeLinkOrder.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -73,6 +74,7 @@ endif()
 
 add_executable(${example_name} ${SOURCES})
 
+link_rocdecode_first(${example_name})
 target_link_libraries(${example_name}
     PRIVATE
     hip::host
@@ -111,44 +113,42 @@ endif()
 
 set_source_files_properties(${SOURCES} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
 # Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
 set(USING_THE_ROCK OFF)
 if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
   set(USING_THE_ROCK ON)
 endif()
 
-if (NOT USING_THE_ROCK)
-    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
-        if(rocdecode-host_FOUND)
-            add_test(NAME ${example_name}-HEVC-host COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
-        endif()
-        add_test(NAME ${example_name}-HEVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
-    else()
-        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
+set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
+    # As in the upstream rocDecode tests, the host backend test doesn't run on TheRock.
+    if(rocdecode-host_FOUND AND NOT USING_THE_ROCK)
+        add_test(NAME ${example_name}-HEVC-host COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
     endif()
+    add_test(NAME ${example_name}-HEVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
+endif()
 
-    set(ROCDECODE_TEST_VIDEO_AVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H264.mp4")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO_AVC}")
-        add_test(NAME ${example_name}-AVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_AVC}")
-    else()
-        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_AVC} not found, skipping ${example_name}-AVC test")
-    endif()
+set(ROCDECODE_TEST_VIDEO_AVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H264.mp4")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_AVC}")
+    add_test(NAME ${example_name}-AVC COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_AVC}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_AVC} not found, skipping ${example_name}-AVC test")
+endif()
 
-    set(ROCDECODE_TEST_VIDEO_AV1 "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-AV1.mp4")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO_AV1}")
-        add_test(NAME ${example_name}-AV1 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_AV1}")
-    else()
-        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_AV1} not found, skipping ${example_name}-AV1 test")
-    endif()
+set(ROCDECODE_TEST_VIDEO_AV1 "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-AV1.mp4")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_AV1}")
+    add_test(NAME ${example_name}-AV1 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_AV1}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_AV1} not found, skipping ${example_name}-AV1 test")
+endif()
 
-    set(ROCDECODE_TEST_VIDEO_VP9 "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-VP9.ivf")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO_VP9}")
-        add_test(NAME ${example_name}-VP9 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_VP9}")
-    else()
-        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_VP9} not found, skipping ${example_name}-VP9 test")
-    endif()
+set(ROCDECODE_TEST_VIDEO_VP9 "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-VP9.ivf")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_VP9}")
+    add_test(NAME ${example_name}-VP9 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_VP9}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_VP9} not found, skipping ${example_name}-VP9 test")
 endif()
 
 # The example exits with skip_exit_code (77, Common/example_utils.hpp) when the GPU's video

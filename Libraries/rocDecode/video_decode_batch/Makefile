@@ -91,11 +91,18 @@ SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
-# Mirrors the single ctest invocation; skips cleanly if the test video directory isn't present.
+# Mirrors the single ctest invocation; skips cleanly if the test video directory isn't present,
+# or if the example exits with 77 because the GPU supports none of the input files' codecs
+# (ctest's SKIP_RETURN_CODE).
 test: $(EXAMPLE)
 	@D=$(ROCM_PATH)/share/rocdecode/video; \
 	if [ -e "$$D" ]; then \
-	    echo "==> ./$(EXAMPLE) -i $$D -t 2"; ./$(EXAMPLE) -i "$$D" -t 2; \
+	    echo "==> ./$(EXAMPLE) -i $$D -t 2"; ./$(EXAMPLE) -i "$$D" -t 2; ec=$$?; \
+	    if [ $$ec -eq 77 ]; then \
+	        echo "==> Skipping (no codec supported on this GPU): $$D"; \
+	    elif [ $$ec -ne 0 ]; then \
+	        exit $$ec; \
+	    fi; \
 	else \
 	    echo "==> Skipping (not found): $$D"; \
 	fi

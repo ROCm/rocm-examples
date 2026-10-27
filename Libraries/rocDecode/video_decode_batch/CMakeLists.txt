@@ -28,6 +28,7 @@ project(${example_name} LANGUAGES CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 include("../../../cmake/FindFilesystem.cmake")
 include("../../../cmake/HipPlatform.cmake")
+include("../../../cmake/RocDecodeLinkOrder.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -63,6 +64,7 @@ add_executable(${example_name}
     ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
 )
 
+link_rocdecode_first(${example_name})
 target_link_libraries(${example_name}
     PRIVATE
     hip::host
@@ -96,20 +98,15 @@ set_source_files_properties(
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
-# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
-# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
-set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
-  set(USING_THE_ROCK ON)
-endif()
-
-if (NOT USING_THE_ROCK)
-    set(ROCDECODE_TEST_VIDEO_DIR "${ROCM_PATH}/share/rocdecode/video")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO_DIR}")
-        add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_DIR}" -t 2)
-    else()
-        message(WARNING "rocDecode test video directory ${ROCDECODE_TEST_VIDEO_DIR} not found, skipping ${example_name} test")
-    endif()
+set(ROCDECODE_TEST_VIDEO_DIR "${ROCM_PATH}/share/rocdecode/video")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_DIR}")
+    add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_DIR}" -t 2)
+    # The example skips input files whose codec the GPU's video decoder doesn't support, e.g.
+    # AV1 on gfx90a, and exits with skip_exit_code (77, Common/example_utils.hpp) when it
+    # supports none of them. Report that as a skip.
+    set_tests_properties(${example_name} PROPERTIES SKIP_RETURN_CODE 77)
+else()
+    message(WARNING "rocDecode test video directory ${ROCDECODE_TEST_VIDEO_DIR} not found, skipping ${example_name} test")
 endif()
 
 install(TARGETS ${example_name})

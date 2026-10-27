@@ -27,6 +27,7 @@ project(${example_name} LANGUAGES CXX)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 include("../../../cmake/HipPlatform.cmake")
+include("../../../cmake/RocDecodeLinkOrder.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -61,6 +62,7 @@ add_executable(${example_name}
     ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
 )
 
+link_rocdecode_first(${example_name})
 target_link_libraries(${example_name}
     PRIVATE
     hip::host
@@ -92,20 +94,11 @@ set_source_files_properties(
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
-# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
-# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
-set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
-  set(USING_THE_ROCK ON)
-endif()
-
-if (NOT USING_THE_ROCK)
-    set(ROCDECODE_TEST_VIDEO "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO}")
-        add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO}")
-    else()
-        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO} not found, skipping ${example_name} test")
-    endif()
+set(ROCDECODE_TEST_VIDEO "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
+if(EXISTS "${ROCDECODE_TEST_VIDEO}")
+    add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO}")
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO} not found, skipping ${example_name} test")
 endif()
 
 install(TARGETS ${example_name})
