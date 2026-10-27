@@ -28,6 +28,18 @@ template <> auto get_elimit<ck_tile::int8_t>() {
   return ck_tile::make_tuple(rtol, atol);
 }
 
+// threshold for the output y. check_err takes the number of fp8 rounding steps
+// allowed instead of rtol for fp8, so fp8 needs its own threshold.
+template <typename DataType> auto get_y_elimit() {
+  return get_elimit<DataType>();
+}
+
+template <> auto get_y_elimit<ck_tile::fp8_t>() {
+  unsigned max_rounding_point_distance = 1;
+  double atol = 1.0;
+  return ck_tile::make_tuple(max_rounding_point_distance, atol);
+}
+
 auto create_args(int argc, char *argv[]) {
   ck_tile::ArgParser arg_parser;
   arg_parser.insert("m", "3328", "m dimension")
@@ -288,10 +300,8 @@ bool run(const ck_tile::ArgParser &arg_parser) {
           absmax = a > absmax ? a : absmax;
         }
         // printf("cpu:absmax:%f\n", absmax);
-        constexpr ComputeDataType kMaxY =
-            std::is_same<YDataType, ck_tile::fp8_t>::value    ? 240.0
-            : std::is_same<YDataType, ck_tile::int8_t>::value ? 127.0
-                                                              : 0.0;
+        const ComputeDataType kMaxY = ck_tile::type_convert<ComputeDataType>(
+            ck_tile::numeric<YDataType>::max());
         ComputeDataType y_scale = absmax / kMaxY;
         y_scale_host_ref(m_) = ck_tile::type_convert<YScaleDataType>(y_scale);
         for (int n_ = 0; n_ < N_; n_++) {
@@ -346,10 +356,11 @@ bool run(const ck_tile::ArgParser &arg_parser) {
     }
 
     auto [rtol, atol] = get_elimit<YDataType>();
+    auto [y_rtol, y_atol] = get_y_elimit<YDataType>();
     if (x_stride == n) {
       pass = ck_tile::check_err(y_host_dev, y_host_ref,
                                 std::string("\nOUT Error: Incorrect results!"),
-                                rtol, atol);
+                                y_rtol, y_atol);
 
       if constexpr (SaveUnquant) {
         pass &= ck_tile::check_err(
@@ -375,7 +386,7 @@ bool run(const ck_tile::ArgParser &arg_parser) {
             ck_tile::check_err(y_host_dev_row, y_host_ref_row,
                                std::string("\nOUT[") + std::to_string(i_r) +
                                    std::string("] Error: Incorrect results!"),
-                               rtol, atol);
+                               y_rtol, y_atol);
 
         if (fused_add == 1) {
           std::vector<YResidualDataType> y_residual_host_dev_row(
