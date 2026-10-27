@@ -47,7 +47,9 @@ find_package(rccl REQUIRED)
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
-set_tests_properties(${example_name} PROPERTIES TIMEOUT 60)
+# 60s was calibrated on <=8 GPUs (~15s). 64-GPU CPX init takes about as long
+# as the other RCCL samples (~3 min); 300s is the timeout QA confirmed.
+set_tests_properties(${example_name} PROPERTIES TIMEOUT 300)
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::rccl)
