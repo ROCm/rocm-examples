@@ -132,6 +132,20 @@ SKIP_MANIFEST = [
         }
         for d in _ROCDECODE_DIRS
     ],
+    # --- rocDecode video_decode_caps: test-only, stable channel, gfx1151 only ---
+    # The ROCm 10.1 rocDecode maps unmapped codec/bit-depth combinations (e.g. HEVC
+    # 12-bit) to VAProfileNone and calls vaCreateConfig on it. Mesa advertises
+    # VAProfileNone only on GPUs with a VPE block (gfx1151, not gfx1100), so there
+    # rocDecGetDecoderCaps returns ROCDEC_RUNTIME_ERROR instead of "unsupported".
+    # Fixed in ROCm/rocm-systems#11724, which is not in ROCm 10.1.
+    {
+        "ctest": "rocdecode_video_decode_caps",
+        "path": "Libraries/rocDecode/video_decode_caps",
+        "scope": ["test"],
+        "channels": ["stable"],
+        "targets": ["gfx1151"],
+        "reason": "ROCm/rocm-systems#11724 rocDecGetDecoderCaps VAProfileNone fix not in ROCm 10.1",
+    },
     # --- hipThreads: test-only, gfx1151 only, hipthreads_in_one_weekend_raytracer_step3_hipthread_dropin and hipthreads_in_one_weekend_raytracer_step4_simdize ---
     # oem kernel driver does not have ROCm/amdgpu@55ff0278dd12. This fix needs to be upstreamed for APUs that don’t use dkms to work properly with hipthread.
     # The test failure is due to the driver writing the page tables from the CPU (the default on APUs). The GPU keeps using the address translation it cached in iteration 1,
