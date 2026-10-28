@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -89,7 +89,7 @@ set_source_files_properties(
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
-add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
+add_test(NAME ${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
 set_source_files_properties(rmsnorm2d_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name} PRIVATE -Wno-undefined-func-template -Wno-float-equal --offload-compress)
@@ -101,9 +101,7 @@ target_sources(${example_name} PRIVATE rmsnorm2d_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS}
 # Basic example
 ########################################################################################################################
 add_executable(${example_name_basic} example_rmsnorm2d_fwd.cpp)
-add_test(${example_name_basic}
-         COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name_basic}>"
-)
+add_test(NAME ${example_name_basic} COMMAND ${example_name_basic})
 set_source_files_properties(example_rmsnorm2d_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name_basic} PRIVATE -Wno-undefined-func-template -Wno-float-equal)

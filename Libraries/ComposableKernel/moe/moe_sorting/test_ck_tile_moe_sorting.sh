@@ -1,5 +1,6 @@
-# #!/bin/sh
+#!/bin/sh
 
+set -e
 EXE=$1
 MOE_BUF="12"
 
