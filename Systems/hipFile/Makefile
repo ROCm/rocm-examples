@@ -24,6 +24,7 @@ SUBDIRECTORIES := \
   aiscp \
   api \
   async \
+  batch \
   basics
 
 SKIP_FROM_TEST :=

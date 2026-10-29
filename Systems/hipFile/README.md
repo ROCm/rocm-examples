@@ -1,7 +1,8 @@
 # hipFile Examples
 
 This directory contains working examples of the hipFile API, grouped by what they demonstrate.
-Every example verifies its result with an FNV-1a hash and prints `OK …` on success.
+The `basics`, `batch`, and `async` programs verify their results with an FNV-1a hash and print
+`OK …` on success.
 
 Most examples move data through the GPU using the hipFile fastpath backend, which opens files with `O_DIRECT`.
 Running them requires an AMD GPU supported by ROCm and source/destination paths on an
@@ -25,9 +26,10 @@ library and require neither a GPU nor an `O_DIRECT` filesystem.
 | --------- | ------------ |
 | [`api`](api) | Minimal examples of the non-I/O API (calls that query or configure the library, e.g. `get_version`). No `O_DIRECT` filesystem or file arguments needed. |
 | [`basics`](basics) | Small, single-purpose programs that each use one facet of the synchronous API: buffer registration, the fastpath backend, the fallback backend, chunked reads, device-buffer offsets, sub-region writes, GPU memory types, and a full round trip. |
+| [`batch`](batch) | A registered-buffer round trip using 4 KiB batch requests and the submit/status APIs (`hipFileBatchIOSubmit` / `hipFileBatchIOGetStatus`). |
 | [`async`](async) | Examples of the asynchronous, stream-based API (`hipFileReadAsync` / `hipFileWriteAsync`), including single-stream, non-blocking-stream, and concurrent multi-stream round trips. |
 | [`aiscp`](aiscp) | A standalone `cp`-like utility built on hipFile (`hipfile_aiscp SOURCE DEST`). |
-| [`common`](common) | Shared helpers used by `basics` and `async` (alignment math, pattern fill, FNV-1a hashing, file open/register). This is not an example in and of itself, but is compiled directly into each example that requires it. |
+| [`common`](common) | Shared helpers used by `basics`, `batch`, and `async` (alignment math, pattern fill, FNV-1a hashing, file open/register). This is not an example in and of itself, but is compiled directly into each example that requires it. |
 
 ## Building
 
@@ -106,7 +108,7 @@ success.
 | ------- | ------------- | ---- |
 | [`bufregister_write`](basics/bufregister_write) | Write a GPU buffer registered with `hipFileBufRegister` straight to disk (the fast path). | `OUTPUT [GPUID]` |
 | [`no_bufregister_write`](basics/no_bufregister_write) | Same write, but without registering the buffer; hipFile copies through its internal pool. | `OUTPUT [GPUID]` |
-| [`no_odirect_write`](basics/no_odirect_write) | Register a file opened *without* `O_DIRECT`. hipFile transparently reopens with `O_DIRECT` on capable filesystems; falls back to the POSIX compat path otherwise. | `OUTPUT [GPUID]` |
+| [`no_odirect_write`](basics/no_odirect_write) | Register a file opened *without* `O_DIRECT`. hipFile transparently reopens with `O_DIRECT` on capable filesystems; falls back to the POSIX compat path (enabled by default) otherwise. | `OUTPUT [GPUID]` |
 | [`iterative_read`](basics/iterative_read) | Chunked read into GPU memory where the **host pointer** advances each iteration, then one write. | `INPUT OUTPUT [GPUID]` |
 | [`iterative_devmem_offset_read`](basics/iterative_devmem_offset_read) | Same chunked read, but the base device pointer is fixed and the **`buf_offset`** argument advances. | `INPUT OUTPUT [GPUID]` |
 | [`subregion_write`](basics/subregion_write) | Read a whole file, then write only the bytes at/after an offset using a non-zero `buffer_offset`. | `INPUT OUTPUT [GPUID]` |
@@ -131,13 +133,46 @@ The input and output paths must live on an `O_DIRECT`-capable local filesystem (
 ```bash
 ./hipfile_bufregister_write            out_bufregister.bin
 ./hipfile_no_bufregister_write         out_no_bufregister.bin
-HIPFILE_ALLOW_COMPAT_MODE=1 \
-  ./hipfile_no_odirect_write           out_no_odirect.bin
+./hipfile_no_odirect_write             out_no_odirect.bin  # hipFile reopens with O_DIRECT; no env var needed
 ./hipfile_iterative_read               input.bin out_iter.bin
 ./hipfile_iterative_devmem_offset_read input.bin out_iter_off.bin
 ./hipfile_subregion_write              input.bin out_subregion.bin
 ./hipfile_various_mem_rw               input.bin out_vmrw.bin 1   # 1=device 2=managed 3=pinned
 ./hipfile_roundtrip_verify             rtv_created.bin rtv_copied.bin
+```
+
+---
+
+## `batch`
+
+A registered-buffer round trip using 4 KiB batch requests and the submit/status
+APIs. The input file is seeded with a deterministic pattern, read into a GPU
+buffer with `hipFileBatchIOSubmit` / `hipFileBatchIOGetStatus` while a
+continuously refilled batch keeps up to `BATCH_SIZE` requests in flight, written
+to a second file in a second batch phase, and both files are verified with an
+FNV-1a hash. Shares the helpers in [`common`](common) and prints `OK …` on
+success.
+
+It takes these arguments:
+
+```text
+PROGRAM READ_FILE WRITE_FILE FILE_SIZE BATCH_SIZE [GPUID]
+```
+
+`FILE_SIZE` is a byte count, and the GPU buffer holds the whole file rounded up
+to a 4 KiB boundary, with every request copying 4 KiB; the final padded write is
+truncated back to `FILE_SIZE`. `READ_FILE` is created and seeded by the program
+itself, so it does not need to exist beforehand. `WRITE_FILE` receives the
+round-tripped payload, must differ from `READ_FILE`, and is also
+created/truncated. Both paths must live on an `O_DIRECT`-capable local
+filesystem (ext4 mounted `data=ordered`, or xfs). `BATCH_SIZE` is the number of
+requests kept in flight and must be between 1 and 128, the largest capacity
+`hipFileBatchIOSetUp` accepts. `GPUID` is optional and defaults to `0`.
+
+### Running
+
+```bash
+./hipfile_batch_roundtrip input.bin output.bin 1048577 128
 ```
 
 ---
@@ -148,10 +183,6 @@ Examples of hipFile's asynchronous, stream-based API (`hipFileReadAsync` /
 `hipFileWriteAsync`). Each example seeds an input file with a deterministic pattern, issues a
 GPU-mediated read+write round trip on one or more HIP streams, synchronizes, and verifies the
 output by FNV-1a hash. They share the helpers in [`common`](common) and print `OK …` on success.
-
-> **Note:** The `O_DIRECT` fast path is not currently supported for asynchronous I/O; async
-> operations always run through the POSIX compat (fallback) path, regardless of whether the file
-> or filesystem is `O_DIRECT`-capable. Fast-path async support is planned for the future.
 
 | Example | What it shows |
 | ------- | ------------- |
@@ -172,8 +203,8 @@ Sizes and stream counts are compile-time `#define`s documented at the top of eac
 
 ### Running
 
-Both file paths must live on a local filesystem. From the directory containing the built
-binaries:
+Both file paths must live on an `O_DIRECT`-capable local filesystem (ext4 mounted `data=ordered`,
+or xfs). Verify with `/opt/rocm/bin/ais-check`. From the directory containing the built binaries:
 
 ```bash
 ./hipfile_roundtrip_async                         in.bin out.bin
@@ -200,7 +231,7 @@ SOURCE must be an existing file. DEST is created or overwritten. Both paths must
 
 ## `common`
 
-Not an example; a small collection of shared helpers used by `basics` and `async`:
+Not an example; a small collection of shared helpers used by `basics`, `batch`, and `async`:
 
 - `align_up` / `is_power_of_two`: alignment utilities
 - `fill_pattern`: fills a buffer with a deterministic byte pattern
