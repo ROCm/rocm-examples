@@ -42,7 +42,14 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FilterHIPArchitectures.cmake")
-filter_hip_architectures("CK Tile GEMM example" "gfx908;gfx90a;gfx942;gfx950" SHOULD_SKIP)
+# CK_TILE_USE_WMMA (FindCKTile.cmake) selects the kernel configurations for all GPU targets of the example, so it is
+# built either for the GPUs with MFMA instructions (gfx9) or for those with WMMA instructions (gfx11, gfx12).
+if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx908|gfx90a|gfx942|gfx950")
+    set(supported_archs "gfx908;gfx90a;gfx942;gfx950")
+else()
+    set(supported_archs "gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201")
+endif()
+filter_hip_architectures("CK Tile GEMM example" "${supported_archs}" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
 endif()
@@ -80,22 +87,37 @@ target_compile_options(${example_universal} PRIVATE -mllvm -enable-noalias-to-md
 target_link_libraries(${example_universal} PRIVATE composable_kernel::ck_tile hip::host)
 target_include_directories(${example_universal} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 
-add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
-add_test(
-    NAME ${example_weight_preshuffle}
-    COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_weight_preshuffle_script}" "$<TARGET_FILE:${example_weight_preshuffle}>"
-)
-target_compile_features(${example_weight_preshuffle} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(
-    ${example_weight_preshuffle}
-    PRIVATE
-    -Wno-unused-local-typedef
-    -Wno-gnu-line-marker
-    --save-temps
-    "SHELL:-mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32 -mllvm -enable-noalias-to-md-conversion=0"
-)
-target_link_libraries(${example_weight_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
-target_include_directories(${example_weight_preshuffle} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
+# On gfx11, the host code of ck_tile (shuffle_b_permuteN) preshuffles B for the kernel configuration of the example
+# as for the MFMA GPUs, so its results are wrong. Build it only for the other GPUs.
+set(weight_preshuffle_archs ${CMAKE_HIP_ARCHITECTURES})
+list(FILTER weight_preshuffle_archs EXCLUDE REGEX "^gfx11")
+if(weight_preshuffle_archs)
+    add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
+    add_test(
+        NAME ${example_weight_preshuffle}
+        COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_weight_preshuffle_script}" "$<TARGET_FILE:${example_weight_preshuffle}>"
+    )
+    target_compile_features(${example_weight_preshuffle} PRIVATE cxx_std_17 hip_std_17)
+    target_compile_options(
+        ${example_weight_preshuffle}
+        PRIVATE
+        -Wno-unused-local-typedef
+        -Wno-gnu-line-marker
+        --save-temps
+        "SHELL:-mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32 -mllvm -enable-noalias-to-md-conversion=0"
+    )
+    target_link_libraries(${example_weight_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
+    target_include_directories(${example_weight_preshuffle} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
+    # ROCm 10.2.0rc0's device-code link step for this example on gfx12 with fp8 enabled (CK_USE_WMMA_FP8) can
+    # exceed the default 8 MiB thread stack and crash (clang: "unable to execute command: Segmentation fault",
+    # from clang-linker-wrapper's call to ld.lld). Build it with an unlimited stack to work around this.
+    set_target_properties(
+        ${example_weight_preshuffle}
+        PROPERTIES
+        HIP_ARCHITECTURES "${weight_preshuffle_archs}"
+        HIP_COMPILER_LAUNCHER "bash;-c;ulimit -s unlimited\; exec \"$0\" \"$@\""
+    )
+endif()
 
 # Additional executables for splitk two-stage
 set(example_splitk_reduce ${example_name}_splitk_reduce)

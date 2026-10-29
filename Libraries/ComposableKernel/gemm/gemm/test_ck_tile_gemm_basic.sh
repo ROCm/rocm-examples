@@ -24,11 +24,16 @@ run_tests() {
     done
 }
 
+# gfx11 has no fp8 WMMA instructions, so the example supports fp8 and bf8 only on the other GPUs.
+GPU_arch=${GPU_arch:-$(rocminfo | grep -E 'Name:\s+gfx' | head -n1 | awk '{print $2}')}
+
 set -x
 
 run_tests "fp16"
 run_tests "bf16"
-run_tests "fp8"
-run_tests "bf8"
+if [[ $GPU_arch != gfx11* ]]; then
+    run_tests "fp8"
+    run_tests "bf8"
+fi
 
 set +x

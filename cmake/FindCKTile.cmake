@@ -47,6 +47,13 @@ else()
     add_compile_definitions(CK_TILE_USE_WMMA=0)
 endif()
 
+# fp8 and bf8 kernel configurations for the WMMA instructions of gfx12. gfx11 has no fp8 WMMA instructions and
+# these configurations do not compile for it, so unlike Composable Kernel's own build, a build that also includes
+# gfx11 leaves them out.
+if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx12" AND NOT CMAKE_HIP_ARCHITECTURES MATCHES "gfx11")
+    add_compile_definitions(CK_USE_WMMA_FP8)
+endif()
+
 # Without CK_TILE_USE_OCP_FP8, ck_tile uses the OCP fp8 format in device code for gfx950 and gfx12
 # but the FNUZ format in host code, so the host reference results of the examples do not match.
 if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx950|gfx12")

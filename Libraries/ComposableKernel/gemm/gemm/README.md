@@ -19,6 +19,27 @@ This example works with the following architectures:
 * `gfx90a`
 * `gfx942`
 * `gfx950`
+* `gfx1100`
+* `gfx1101`
+* `gfx1102`
+* `gfx1103`
+* `gfx1150`
+* `gfx1151`
+* `gfx1152`
+* `gfx1153`
+* `gfx1200`
+* `gfx1201`
+
+The examples use MFMA instructions on the gfx9 GPUs and WMMA instructions on
+the gfx11 and gfx12 GPUs, and the kernel configurations of a build are the same
+for all of its GPU targets. A build whose targets include both kinds of GPUs
+therefore builds the examples only for the gfx9 targets. In addition:
+
+* gfx11 has no fp8 WMMA instructions, so the `fp8`, `bf8`, `fp8i4` and `bf8i4`
+  precisions are not available on gfx11. A build that includes gfx11 leaves
+  them out for gfx12 as well.
+* The weight preshuffle example is not built for gfx11, where its results are
+  wrong.
 
 ### Application flow
 
