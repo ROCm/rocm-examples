@@ -64,6 +64,16 @@ on:
         - ubuntu-26.04
         - sles-15.7
         - almalinux-8
+      rocm_version:
+        description: "ROCm version to install: a nightly (e.g. 10.3.0a20261030) or a release candidate (e.g. 10.2.0rc0). Empty = latest nightly. Skips the stable_release image."
+        required: false
+        default: ""
+        type: string
+      enable_ck:
+        description: "Build and test the Composable Kernel examples"
+        required: false
+        default: false
+        type: boolean
 permissions:
   contents: read
   packages: read
@@ -96,7 +106,9 @@ jobs:
           GPU_CONFIG: ${{ github.event.inputs.gpu_config || 'all' }}
           INSTALL_METHOD: ${{ github.event.inputs.install_method || 'all' }}
           DISTRO: ${{ github.event.inputs.distro || 'ubuntu-24.04' }}
-        run: python3 .github/build_tools/configure_ci.py
+          ROCM_VERSION: ${{ github.event.inputs.rocm_version }}
+        # The stable_release image ships its own ROCm, so it cannot install a requested version.
+        run: python3 .github/build_tools/configure_ci.py ${ROCM_VERSION:+--exclude-preinstalled}
 
   build:
     needs: [setup]
@@ -110,3 +122,5 @@ jobs:
       distro_map: ${{ needs.setup.outputs.distro_map }}
       gpu_configs: ${{ needs.setup.outputs.gpu_configs }}
       install_methods: ${{ needs.setup.outputs.install_methods }}
+      rocm_version: ${{ github.event.inputs.rocm_version }}
+      enable_ck: ${{ github.event.inputs.enable_ck == 'true' }}

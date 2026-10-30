@@ -20,20 +20,25 @@ on:
         required: true
         type: string
       rocm_version:
-        description: "Exact ROCm nightly version to install (e.g. 10.1.0a20260821). Empty = latest on the index."
+        description: "Exact ROCm version to install: a nightly (e.g. 10.1.0a20260821) or a release candidate (e.g. 10.2.0rc0). Empty = latest nightly on the index."
         required: false
         type: string
         default: ""
       wheels_url:
-        description: "Wheel index URL (from Quartz summary.linux.urls.wheels). Empty = default nightly index."
+        description: "Wheel index URL (from Quartz summary.linux.urls.wheels). Empty = default nightly index, or the release candidate index for an rc rocm_version."
         required: false
         type: string
         default: ""
       tarballs_url:
-        description: "Tarball base URL (from Quartz summary.linux.urls.tarballs). Empty = default nightly base."
+        description: "Tarball base URL (from Quartz summary.linux.urls.tarballs). Empty = default nightly base, or the release candidate base for an rc rocm_version."
         required: false
         type: string
         default: ""
+      enable_ck:
+        description: "Build and test the Composable Kernel examples (ROCM_EXAMPLES_ENABLE_CK)."
+        required: false
+        type: boolean
+        default: false
 env:
   DEBIAN_FRONTEND: noninteractive
 
@@ -82,10 +87,14 @@ jobs:
             PKG="${PKG}==${ROCM_VERSION}"
           fi
           # Prefer the index Quartz published for this build; fall back to the
-          # current default nightly index for non-Quartz callers.
+          # release candidate index for an rc version (e.g. 10.2.0rc0) and to the
+          # current default nightly index otherwise.
           INDEX_URL="$WHEELS_URL"
           if [ -z "$INDEX_URL" ]; then
-            INDEX_URL="https://nightly.repo.amd.com/rocm/whl-next/"
+            case "$ROCM_VERSION" in
+              *rc*) INDEX_URL="https://rc.repo.amd.com/rocm/core/whl-next/" ;;
+              *)    INDEX_URL="https://nightly.repo.amd.com/rocm/whl-next/" ;;
+            esac
           fi
           pip install --no-cache-dir \
             --index-url "$INDEX_URL" \
@@ -114,10 +123,14 @@ jobs:
           TARBALLS_URL: ${{ inputs.tarballs_url }}
         run: |
           # Prefer the tarball base Quartz published for this build; fall back to
-          # the current default nightly base for non-Quartz callers.
+          # the release candidate base for an rc version (e.g. 10.2.0rc0) and to
+          # the current default nightly base otherwise.
           TARBALL_BASE="$TARBALLS_URL"
           if [ -z "$TARBALL_BASE" ]; then
-            TARBALL_BASE="https://nightly.repo.amd.com/rocm/core/tarball/"
+            case "$ROCM_VERSION" in
+              *rc*) TARBALL_BASE="https://rc.repo.amd.com/rocm/core/tarball/" ;;
+              *)    TARBALL_BASE="https://nightly.repo.amd.com/rocm/core/tarball/" ;;
+            esac
           fi
           TARBALL_BASE="${TARBALL_BASE%/}/"
           # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
@@ -167,8 +180,15 @@ jobs:
           echo "HIP_PATH=${ROCM_PATH}" >> $GITHUB_ENV
           echo "HIP_PLATFORM=amd" >> $GITHUB_ENV
           echo "ENABLE_OPENMP=ON" >> $GITHUB_ENV
-          echo "ENABLE_CK=OFF" >> $GITHUB_ENV
           echo "HIPCC_COMPILE_FLAGS_APPEND=--offload-arch=${{ matrix.gpu_config.gpu_target }}" >> $GITHUB_ENV
+
+      - name: Set CK build flag
+        id: ck-flag
+        env:
+          CK_FLAG: ${{ inputs.enable_ck && 'ON' || 'OFF' }}
+        run: |
+          echo "ENABLE_CK=${CK_FLAG}" >> $GITHUB_ENV
+          echo "ROCM_EXAMPLES_ENABLE_CK=${CK_FLAG}"
 
       - name: Environment status check
         id: environment-status
