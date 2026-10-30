@@ -37,8 +37,8 @@ endif()
 # Composable Kernel's own build defines the following macros when its GPU targets include certain
 # architectures. ck_tile and the examples also use them in host code, so define them in the same way.
 # They then apply to all GPU targets of the example: e.g. when an example is built for gfx942 and gfx950,
-# gfx942 also uses the OCP fp8 format and the tf32 GEMMs of gfx950, so its fp8, bf8 and tf32 results are
-# wrong.
+# gfx942 also uses the OCP fp8 format of gfx950, so its fp8 and bf8 results are wrong. (The GEMM example builds its
+# tf32 GEMMs only for gfx950.)
 
 # Kernel configurations for the WMMA instructions of gfx11 and gfx12 instead of MFMA
 if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx11|gfx12")
