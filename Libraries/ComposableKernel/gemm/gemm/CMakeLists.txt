@@ -79,6 +79,16 @@ target_compile_features(${example_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_basic} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_basic} PRIVATE composable_kernel::ck_tile hip::host)
 target_include_directories(${example_basic} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
+# With CK_GFX950_SUPPORT (FindCKTile.cmake), the example also builds tf32 GEMMs, which ROCm 10.2.0rc0's ck_tile does
+# not compile for gfx908 and gfx90a. Undefine it in the device code for the targets other than gfx950, so that only
+# gfx950 has the tf32 GEMMs.
+if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx950")
+    foreach(arch IN LISTS CMAKE_HIP_ARCHITECTURES)
+        if(NOT arch STREQUAL "gfx950")
+            target_compile_options(${example_basic} PRIVATE "SHELL:-Xarch_${arch} -UCK_GFX950_SUPPORT")
+        endif()
+    endforeach()
+endif()
 
 add_executable(${example_universal} universal_gemm.cpp)
 add_test(NAME ${example_universal} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_universal_script}" "$<TARGET_FILE:${example_universal}>")
