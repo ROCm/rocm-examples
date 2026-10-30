@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -26,6 +26,7 @@ set(example_basic_script test_ck_tile_gemm_basic.sh)
 set(example_universal ${example_name}_universal)
 set(example_universal_script test_ck_tile_gemm_universal.sh)
 set(example_weight_preshuffle ${example_name}_weight_preshuffle)
+set(example_weight_preshuffle_script test_ck_tile_gemm_weight_preshuffle.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -41,7 +42,14 @@ enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FilterHIPArchitectures.cmake")
-filter_hip_architectures("CK Tile GEMM example" "gfx908;gfx90a;gfx942;gfx950" SHOULD_SKIP)
+# CK_TILE_USE_WMMA (FindCKTile.cmake) selects the kernel configurations for all GPU targets of the example, so it is
+# built either for the GPUs with MFMA instructions (gfx9) or for those with WMMA instructions (gfx11, gfx12).
+if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx908|gfx90a|gfx942|gfx950")
+    set(supported_archs "gfx908;gfx90a;gfx942;gfx950")
+else()
+    set(supported_archs "gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201")
+endif()
+filter_hip_architectures("CK Tile GEMM example" "${supported_archs}" SHOULD_SKIP)
 if(SHOULD_SKIP)
     return()
 endif()
@@ -66,34 +74,60 @@ set_source_files_properties(
 )
 
 add_executable(${example_basic} gemm_basic.cpp)
-add_test(${example_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script} $<TARGET_FILE:${example_basic}>")
+add_test(NAME ${example_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script}" "$<TARGET_FILE:${example_basic}>")
 target_compile_features(${example_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_basic} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_basic} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_basic} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
+# With CK_GFX950_SUPPORT (FindCKTile.cmake), the example also builds tf32 GEMMs, which ROCm 10.2.0rc0's ck_tile does
+# not compile for gfx908 and gfx90a. Undefine it in the device code for the targets other than gfx950, so that only
+# gfx950 has the tf32 GEMMs.
+if(CMAKE_HIP_ARCHITECTURES MATCHES "gfx950")
+    foreach(arch IN LISTS CMAKE_HIP_ARCHITECTURES)
+        if(NOT arch STREQUAL "gfx950")
+            target_compile_options(${example_basic} PRIVATE "SHELL:-Xarch_${arch} -UCK_GFX950_SUPPORT")
+        endif()
+    endforeach()
+endif()
 
 add_executable(${example_universal} universal_gemm.cpp)
-add_test(${example_universal}
-         COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_universal_script} $<TARGET_FILE:${example_universal}>"
-)
+add_test(NAME ${example_universal} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_universal_script}" "$<TARGET_FILE:${example_universal}>")
 target_compile_features(${example_universal} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_universal} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_universal} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_universal} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 
-add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
-add_test(
-    ${example_weight_preshuffle}
-    COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_script} $<TARGET_FILE:${example_weight_preshuffle}>"
-)
-target_compile_features(${example_weight_preshuffle} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(
-    ${example_weight_preshuffle}
-    PRIVATE
-    -Wno-unused-local-typedef
-    -Wno-gnu-line-marker
-    --save-temps
-    "SHELL:-mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32 -mllvm -enable-noalias-to-md-conversion=0"
-)
-target_link_libraries(${example_weight_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
+# On gfx11, the host code of ck_tile (shuffle_b_permuteN) preshuffles B for the kernel configuration of the example
+# as for the MFMA GPUs, so its results are wrong. Build it only for the other GPUs.
+set(weight_preshuffle_archs ${CMAKE_HIP_ARCHITECTURES})
+list(FILTER weight_preshuffle_archs EXCLUDE REGEX "^gfx11")
+if(weight_preshuffle_archs)
+    add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
+    add_test(
+        NAME ${example_weight_preshuffle}
+        COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_weight_preshuffle_script}" "$<TARGET_FILE:${example_weight_preshuffle}>"
+    )
+    target_compile_features(${example_weight_preshuffle} PRIVATE cxx_std_17 hip_std_17)
+    target_compile_options(
+        ${example_weight_preshuffle}
+        PRIVATE
+        -Wno-unused-local-typedef
+        -Wno-gnu-line-marker
+        --save-temps
+        "SHELL:-mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32 -mllvm -enable-noalias-to-md-conversion=0"
+    )
+    target_link_libraries(${example_weight_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
+    target_include_directories(${example_weight_preshuffle} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
+    # ROCm 10.2.0rc0's device-code link step for this example on gfx12 with fp8 enabled (CK_USE_WMMA_FP8) can
+    # exceed the default 8 MiB thread stack and crash (clang: "unable to execute command: Segmentation fault",
+    # from clang-linker-wrapper's call to ld.lld). Build it with an unlimited stack to work around this.
+    set_target_properties(
+        ${example_weight_preshuffle}
+        PROPERTIES
+        HIP_ARCHITECTURES "${weight_preshuffle_archs}"
+        HIP_COMPILER_LAUNCHER "bash;-c;ulimit -s unlimited\; exec \"$0\" \"$@\""
+    )
+endif()
 
 # Additional executables for splitk two-stage
 set(example_splitk_reduce ${example_name}_splitk_reduce)
@@ -103,10 +137,12 @@ add_executable(${example_splitk_reduce} gemm_splitk_two_stage_reduce.cpp)
 target_compile_features(${example_splitk_reduce} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_splitk_reduce} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_splitk_reduce} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_splitk_reduce} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 set_source_files_properties(gemm_splitk_two_stage_reduce.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 add_executable(${example_splitk_two_stage} gemm_splitk_two_stage.cpp)
 target_compile_features(${example_splitk_two_stage} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_splitk_two_stage} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_splitk_two_stage} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_splitk_two_stage} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 set_source_files_properties(gemm_splitk_two_stage.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})

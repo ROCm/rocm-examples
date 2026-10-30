@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -85,7 +85,7 @@ add_executable(${example_name}
     add_rmsnorm2d_rdquant_fwd.cpp
 )
 target_include_directories(${example_name} PRIVATE ${CMAKE_CURRENT_LIST_DIR})
-add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
+add_test(NAME ${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
 set_source_files_properties(
     instances/add_rmsnorm2d_rdquant_fwd_api.cpp
     instances/add_rmsnorm2d_rdquant_fwd_bf16_n64_n128_instance.cpp
@@ -121,7 +121,7 @@ target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::ho
 # Tile example
 ########################################################################################################################
 add_executable(${example_name_tile} example_add_rmsnorm2d_rdquant_fwd.cpp)
-add_test(${example_name_tile} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name_tile}>")
+add_test(NAME ${example_name_tile} COMMAND ${example_name_tile})
 set_source_files_properties(example_add_rmsnorm2d_rdquant_fwd.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name_tile} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_name_tile} PRIVATE -Wno-undefined-func-template -Wno-float-equal)

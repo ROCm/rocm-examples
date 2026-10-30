@@ -1,27 +1,9 @@
-// MIT License
-//
-// Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
+#include "ck_tile/host.hpp"
 
 #include "fmha_bwd.hpp"
-#include "ck_tile/host.hpp"
 #include "fmha_bwd_runner.hpp"
 
 #include <string>
@@ -105,6 +87,16 @@ auto create_args(int argc, char *argv[]) {
               "if set to 1 will use multi-buffer reduction strategy for dq, "
               "atomic operation "
               "will not be used")
+      .insert("sink_grad", "0",
+              "if set to 1, compute and validate sink token gradient")
+      .insert("sink_regime", "sensitive",
+              "sink values used when sink_grad=1\n"
+              "  sensitive  - rand[-1,1], keeps d_sink dependent on the sink "
+              "element read\n"
+              "  neutral    - -inf on every other head, pins the "
+              "sink_ptr[nhead] contract\n"
+              "  saturated  - rand[30,60], exercises P_sink -> 1 and lse "
+              "saturation")
       .insert("json", "0", "0: No Json, 1: Dump Results in Json format")
       .insert("jsonfile", "fmha_bwd.json", "json file name to dump results");
 
@@ -139,6 +131,19 @@ auto run(const ck_tile::ArgParser &arg_parser) {
   bool deterministic = arg_parser.get_bool("deterministic");
   std::string init_method = arg_parser.get_str("init");
   uint32_t seed = arg_parser.get_uint32("seed");
+  bool sink_grad = arg_parser.get_bool("sink_grad");
+
+  const std::string sink_regime_str = arg_parser.get_str("sink_regime");
+  sink_regime sink_values = sink_regime::sensitive;
+  if (sink_regime_str == "neutral")
+    sink_values = sink_regime::neutral_heads;
+  else if (sink_regime_str == "saturated")
+    sink_values = sink_regime::saturated;
+  else if (sink_regime_str != "sensitive") {
+    std::cerr << "unknown sink_regime '" << sink_regime_str
+              << "', expected sensitive|neutral|saturated" << std::endl;
+    return bwd_result::invalid_args;
+  }
 
   ck_tile::stream_config stream_config{
       nullptr,
@@ -155,8 +160,9 @@ auto run(const ck_tile::ArgParser &arg_parser) {
   return fmha_bwd_run<DataTypeConfig>(
       mode, batch, nhead, nhead_k, seqlen_qs, seqlen_ks, seqlen_qpads,
       seqlen_kpads, hdim_q, hdim_v, i_perm, o_perm, scale, bias_str, use_dbias,
-      p_drop, drop_seed, drop_offset, drop_prefs, mask_str, deterministic,
-      init_method, seed, do_validation, stream_config, json);
+      p_drop, drop_seed, drop_offset, drop_prefs, mask_str, sink_grad,
+      deterministic, init_method, seed, do_validation, stream_config, json,
+      sink_values);
 }
 
 int main(int argc, char *argv[]) {
