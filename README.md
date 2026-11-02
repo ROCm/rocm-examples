@@ -288,8 +288,7 @@ The following options are available when building with CMake.
       - [kmeans](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns/kmeans): Shows how to distribute work between CPU and GPU.
       - [matrix_multiplication](https://github.com/ROCm/rocm-examples/tree/amd-staging/HIP-Doc/Tutorials/Programming-Patterns/matrix_multiplication): Demonstrates how to process grid-structured data using a matrix multiplication example.
 - [Dockerfiles](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/) hosts Dockerfiles with ready-to-use environments for the various samples. See [Dockerfiles/README.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/Dockerfiles/README.md) for details.
-- [Docs](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/)
-  - [CONTRIBUTING.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/Docs/CONTRIBUTING.md) contains information on how to contribute to the examples.
+- [CONTRIBUTING.md](https://github.com/ROCm/rocm-examples/tree/amd-staging/CONTRIBUTING.md) contains information on how to contribute to the examples.
 - [Libraries](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/)
   - [Composable Kernel](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/)
     - [Attention](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/ComposableKernel/attention): Examples focusing on attention operations.
