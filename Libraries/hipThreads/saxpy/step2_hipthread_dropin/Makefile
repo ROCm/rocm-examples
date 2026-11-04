@@ -31,7 +31,7 @@ endif
 
 ROCM_PATH ?= /opt/rocm
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 HIP_INCLUDE_DIR        := $(ROCM_PATH)/include
 HIPTHREADS_INCLUDE_DIR := $(ROCM_PATH)/include/hipthreads
@@ -44,12 +44,15 @@ endif
 
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
-ICXXFLAGS := -std=$(CXX_STD) -O3 -fgpu-rdc $(CXXFLAGS)
-ILDFLAGS  := -fgpu-rdc -L$(ROCM_PATH)/lib/hipthreads $(LDFLAGS)
+ICXXFLAGS := -std=$(CXX_STD) -x hip -O3 -fgpu-rdc $(CXXFLAGS)
+ILDFLAGS  := -fgpu-rdc --hip-link -L$(ROCM_PATH)/lib/hipthreads $(LDFLAGS)
 ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) -isystem $(HIPTHREADS_INCLUDE_DIR) \
              -I $(LIBHIPCXX_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) \
              $(CPPFLAGS)
 ILDLIBS   := -lhipthreads $(LDLIBS)
+
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += $(OFFLOAD_ARCH_FLAGS)
 
 $(EXAMPLE): main.hip
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ main.hip $(ILDFLAGS) $(ILDLIBS)

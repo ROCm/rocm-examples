@@ -27,7 +27,8 @@ GPU_RUNTIME ?= CUDA
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+CUDA_INSTALL_DIR ?= /usr/local/cuda
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -49,7 +50,7 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 $(EXAMPLE): main.cu
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(CUDACXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)

@@ -53,4 +53,4 @@ jobs:
             run: |
               cd HIP-Doc
               export HSA_XNACK=1
-              make -j SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
+              make -j HIP_ARCHITECTURES="${GPU_TARGETS}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"

@@ -31,7 +31,9 @@ endif
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
+CUDA_INSTALL_DIR ?= /usr/local/cuda
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -42,11 +44,14 @@ ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
 
 ifeq ($(GPU_RUNTIME), HIP)
+include ../../../../Common/filter_hip_architectures.mk
+ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+
 $(EXAMPLE): main.cpp vcpy_isa.hsaco
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --hip-link -o $@ $< $(ILDLIBS)
 
 vcpy_isa.hsaco: vcpy.hip
-	$(HIPCXX) -x hip $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -c --genco -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -c --cuda-device-only -o $@ $< $(ILDLIBS)
 
 clean:
 	$(RM) $(EXAMPLE) vcpy_isa.hsaco
@@ -54,10 +59,10 @@ endif
 
 ifeq ($(GPU_RUNTIME), CUDA)
 $(EXAMPLE): main.cpp vcpy_isa.ptx
-	$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) -lcudadevrt -lcudart_static -lrt $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(CUDACXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) -lcudadevrt -lcudart_static -lrt $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 vcpy_isa.ptx: vcpy.hip
-	$(HIPCXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
+	$(CUDACXX) -x cu $(ICXXFLAGS) -I $(HIP_INCLUDE_DIR) $(ICPPFLAGS) $(ILDFLAGS) -ptx -o $@ $< $(ILDLIBS)
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)

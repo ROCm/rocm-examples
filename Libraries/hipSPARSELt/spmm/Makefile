@@ -35,7 +35,7 @@ CUDA_INSTALL_DIR ?= /usr/local/cuda
 HIP_INCLUDE_DIR         := $(ROCM_PATH)/include
 HIPSPARSELT_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 # Common variables and flags
@@ -53,6 +53,9 @@ else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
   CPPFLAGS += -D__HIP_PLATFORM_AMD__
   COMPILER := $(HIPCXX)
+  include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+  ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+  ILDFLAGS  += --hip-link
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
@@ -67,7 +70,7 @@ $(EXAMPLE):
 	@echo "Skipping $(EXAMPLE): no supported architectures"
 else
 $(EXAMPLE): main.cpp $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/hipsparselt_utils.hpp
-	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 endif
 
 ifeq ($(SKIP_BUILD),1)

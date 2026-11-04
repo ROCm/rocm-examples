@@ -38,15 +38,16 @@ ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCWMMA_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 # Common variables and flags
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
-ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICXXFLAGS := -std=$(CXX_STD) -x hip -O3 $(CXXFLAGS)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCWMMA_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS) -DROCM_DEFAULT_PATH=\"$(ROCM_PATH)\"
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := -lhiprtc
+ILDFLAGS  += --hip-link
 
 ifeq ($(SKIP_BUILD),1)
 $(EXAMPLE):
