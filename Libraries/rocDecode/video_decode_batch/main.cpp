@@ -514,7 +514,7 @@ int main(int argc, char **argv) {
                   b_force_zero_latency, p_crop_rect, b_extract_sei_messages,
                   disp_delay));
               v_dec_info[thread_idx]->viddec = std::move(dec_8bit_av1);
-            } else if (dec_8bit_av1 == nullptr &&
+            } else if (dec_8bit_vp9 == nullptr &&
                        codec_id == rocDecVideoCodec_VP9) {
               std::unique_ptr<RocVideoDecoder> dec_8bit_vp9(new RocVideoDecoder(
                   v_dec_info[thread_idx]->dec_device_id, mem_type, codec_id,
