@@ -304,6 +304,7 @@ int main(int argc, char **argv) {
       }
     }
     std::vector<std::unique_ptr<VideoDemuxer>> v_demuxer;
+    int num_unsupported = 0;
     for (const auto &input_file_path : input_file_paths) {
       std::unique_ptr<VideoDemuxer> demuxer(
           new VideoDemuxer(input_file_path.c_str()));
@@ -312,9 +313,9 @@ int main(int argc, char **argv) {
       // VideoDemuxer doesn't throw when it can't open the file or find a video
       // stream; it leaves the bit depth at 0 and the codec ID unset.
       if (demuxer->GetBitDepth() == 0) {
-        std::cerr << "Error: Failed to open " << input_file_name
-                  << " as a video file" << std::endl;
-        return 1;
+        std::cout << "info: skipping " << input_file_name
+                  << ", not a video file" << std::endl;
+        continue;
       }
       bool b_supported = true;
       for (int dev_id : dec_device_ids) {
@@ -339,6 +340,7 @@ int main(int argc, char **argv) {
       if (!b_supported) {
         std::cout << "info: skipping " << input_file_name
                   << ", its codec isn't supported on the GPU" << std::endl;
+        num_unsupported++;
         continue;
       }
       v_demuxer.push_back(std::move(demuxer));
@@ -346,7 +348,13 @@ int main(int argc, char **argv) {
     }
 
     // Step 2: decode only the supported files. If none is supported, report
-    // the whole run as skipped.
+    // the whole run as skipped; if there's no video file at all, that's an
+    // error.
+    if (v_demuxer.empty() && num_unsupported == 0) {
+      std::cerr << "Error: No video files found in " << input_folder_path
+                << std::endl;
+      return 1;
+    }
     num_files = static_cast<int>(v_demuxer.size());
     if (num_files == 0) {
       std::cerr << "rocDecode doesn't support the codec of any input file, "
