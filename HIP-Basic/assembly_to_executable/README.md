@@ -26,10 +26,10 @@ Building HIP executables from device assembly can be useful for example to exper
 
 ## Generating device assembly
 
-This example creates a HIP file from device assembly code, however, such assembly files can also be created from HIP source code using `hipcc`. This can be done by passing `-S` and `--cuda-device-only` to hipcc. The former flag instructs the compiler to generate human-readable assembly instead of machine code, and the latter instruct the compiler to only compile the device part of the program. The assembly files for this example were generated as follows:
+This example creates a HIP file from device assembly code, however, such assembly files can also be created from HIP source code using `amdclang++`. This can be done by passing `-x hip`, `-S`, and `--cuda-device-only` to amdclang++. `-x hip` tells the compiler to treat the input as HIP source, `-S` instructs it to generate human-readable assembly instead of machine code, and `--cuda-device-only` instructs it to only compile the device part of the program. The assembly files for this example were generated as follows:
 
 ```shell
-$ROCM_PATH/bin/hipcc -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx950 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102 --offload-arch=gfx1151 --offload-arch=gfx1201 main.hip
+$ROCM_PATH/bin/amdclang++ -x hip -S --cuda-device-only --offload-arch=gfx803 --offload-arch=gfx900 --offload-arch=gfx906 --offload-arch=gfx908 --offload-arch=gfx90a --offload-arch=gfx942 --offload-arch=gfx950 --offload-arch=gfx1030 --offload-arch=gfx1100 --offload-arch=gfx1101 --offload-arch=gfx1102 --offload-arch=gfx1151 --offload-arch=gfx1201 main.hip
 ```
 
 The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
@@ -38,10 +38,10 @@ The user may modify the `--offload-arch` flag to build for other architectures a
 
 A HIP binary consists of a regular host executable, which has an offload bundle containing device code embedded inside it. This offload bundle contains object files for each of the target devices that it is compiled for, and is loaded at runtime to provide the machine code for the current device. A HIP executable can be built from device assembly files and host HIP code according to the following process:
 
-1. The `main.hip` file is compiled to an object file that only contains host code with `hipcc` by using the `--cuda-host-only` option. `main.hip` is a program that launches a simple kernel to compute the square of each element of a vector. The `-c` option is required to prevent the compiler from creating an executable, and make it create an object file containing the compiled host code instead.
+1. The `main.hip` file is compiled to an object file that only contains host code with `amdclang++` by using the `--cuda-host-only` option. `main.hip` is a program that launches a simple kernel to compute the square of each element of a vector. The `-c` option is required to prevent the compiler from creating an executable, and make it create an object file containing the compiled host code instead.
 
     ```shell
-    $ROCM_PATH/bin/hipcc -c --cuda-host-only main.hip
+    $ROCM_PATH/bin/amdclang++ -x hip -c --cuda-host-only main.hip
     ```
 
 2. Each device assembly file is compiled to a device object file using `clang`. This requires specifying the correct architecture using `-target amdgcn-amd-amdhsa`, and the target architecture that should be assembled for using `-mcpu`:
@@ -85,10 +85,10 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
     $ROCM_PATH/llvm/bin/llvm-mc -triple <host target> -o main_device.o hip_obj_gen.mcin --filetype=obj
     ```
 
-5. Finally, using the system linker, hipcc, or clang, the host object and device objects are linked into an executable:
+5. Finally, using the system linker, amdclang++, or clang, the host object and device objects are linked into an executable. `--hip-link` tells amdclang++ to link against the HIP runtime:
 
     ```shell
-    <ROCM_PATH>/hip/bin/hipcc -o hip_assembly_to_executable main.o main_device.o
+    $ROCM_PATH/bin/amdclang++ --hip-link -o hip_assembly_to_executable main.o main_device.o
     ```
 
 ### Visual Studio 2019

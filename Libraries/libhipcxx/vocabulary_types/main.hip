@@ -25,7 +25,7 @@
 // libhipcxx vocabulary types used in this example: hip::std::tuple,
 // hip::std::expected, hip::std::optional, and the tuple interface on HIP
 // vector types such as float4. Structured bindings on float4 are unsupported
-// with hipcc (a union member implementation detail), so element access always
+// with amdclang++ (a union member implementation detail), so element access always
 // goes through hip::std::get<N>.
 #include <hip/std/expected>
 #include <hip/std/optional>
