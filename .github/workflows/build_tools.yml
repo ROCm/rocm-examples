@@ -47,4 +47,4 @@ jobs:
           - name: Make
             run: |
               cd Tools
-              make -j SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
+              make -j HIP_ARCHITECTURES="${GPU_TARGETS}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"

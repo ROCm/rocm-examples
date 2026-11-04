@@ -35,7 +35,7 @@ ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 # Detect which rocdecode host library is available
 ROCDECODE_HOST_LIB := $(shell if [ -f $(ROCM_PATH)/lib/librocdecode-host.so ]; then \
@@ -50,6 +50,9 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR)
 ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lrocdecode $(CXX_FS_LIB)
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+ILDFLAGS  += --hip-link
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
 	CPPFLAGS += -D__HIP_PLATFORM_AMD__

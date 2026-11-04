@@ -32,7 +32,7 @@ CUDA_INSTALL_DIR ?= /usr/local/cuda
 HIP_INCLUDE_DIR     := $(ROCM_PATH)/include
 ROCRAND_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX  ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX  ?= $(ROCM_PATH)/bin/amdclang++
 CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 # Common variables and flags
@@ -53,6 +53,9 @@ else ifeq ($(GPU_RUNTIME), HIP)
   ICPPFLAGS += -D__HIP_PLATFORM_AMD__
   ILDLIBS   += -lamdhip64
   COMPILER  := $(HIPCXX)
+  include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+  ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+  ILDFLAGS  += --hip-link
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
