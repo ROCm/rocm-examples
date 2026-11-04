@@ -61,6 +61,8 @@ Only a subset of the examples support building via Make. Some examples depend on
 
 The configure script writes a `config.mk` file that each Makefile includes to check for required dependencies. To rebuild after installing new libraries, re-run `./configure.sh` and then `make clean && make`.
 
+Set `HIP_ARCHITECTURES` to target specific HIP device architectures, e.g. `make HIP_ARCHITECTURES="gfx908;gfx1030"`. It defaults to `native`, which targets the GPUs present on the build machine — the Make counterpart of CMake's `CMAKE_HIP_ARCHITECTURES`.
+
 `make test` from the repo root cascades through every leaf Makefile and runs each example binary as a smoke test. A leaf can declare its test invocation via the `TEST_ARGS` variable (e.g. `TEST_ARGS := graph4096.txt` in `HIP-Doc/Tutorials/Programming-Patterns/bfs/Makefile`); the default is no arguments. To override at runtime — for example to point a rocDecode test at custom video data — set `TEST_ARGS` on the command line or in the environment:
 
 ```sh

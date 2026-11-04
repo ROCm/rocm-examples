@@ -4,7 +4,7 @@
 
 This example shows how to manually compile and link a HIP application from device LLVM IR. Pre-generated LLVM-IR files are compiled into an _offload bundle_, a bundle of device object files, and then linked with the host object file to produce the final executable.
 
-LLVM IR is the intermediary language used by the LLVM compiler, which hipcc is built on. Building HIP executables from LLVM IR can be useful for example to experiment with specific LLVM instructions, or can help debugging miscompilations.
+LLVM IR is the intermediary language used by the LLVM compiler, which amdclang++ is built on. Building HIP executables from LLVM IR can be useful for example to experiment with specific LLVM instructions, or can help debugging miscompilations.
 
 ### Building
 
@@ -28,11 +28,11 @@ LLVM IR is the intermediary language used by the LLVM compiler, which hipcc is b
 In this example, a HIP executable is compiled from device LLVM IR code. While LLVM IR can be written completely manually, is it not advisable to do so because it is unstable between LLVM versions. Instead, in this example it is generated from `main.hip`, using the following commands:
 
 ```shell
-$ROCM_PATH/bin/hipcc --cuda-device-only -c -emit-llvm ./main.hip --offload-arch=<arch> -o main_<arch>.bc -I ../../Common -std=c++17
+$ROCM_PATH/bin/amdclang++ -x hip --cuda-device-only -c -emit-llvm ./main.hip --offload-arch=<arch> -o main_<arch>.bc -I ../../Common -std=c++17
 $ROCM_PATH/llvm/bin/llvm-dis main_<arch>.bc -o main_<arch>.ll
 ```
 
-Where `<arch>` is the architecture to generate the LLVM IR for. Note that the `--cuda-device-only` flag is required to instruct `hipcc` to only generate LLVM IR for the device part of the computation, and `-c` is required to prevent the compiler from linking the outputs into an executable. In the case of this example, the LLVM IR files where generated using architectures `gfx803`, `gfx900`, `gfx906`, `gfx908`, `gfx90a`, `gfx1030`, `gfx1100`, `gfx1101`, `gfx1102`. The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
+Where `<arch>` is the architecture to generate the LLVM IR for. Note that the `--cuda-device-only` flag is required to instruct `amdclang++` to only generate LLVM IR for the device part of the computation, and `-c` is required to prevent the compiler from linking the outputs into an executable. In the case of this example, the LLVM IR files where generated using architectures `gfx803`, `gfx900`, `gfx906`, `gfx908`, `gfx90a`, `gfx1030`, `gfx1100`, `gfx1101`, `gfx1102`. The user may modify the `--offload-arch` flag to build for other architectures and choose to either enable or disable extra device code-generation features such as `xnack` or `sram-ecc`, which can be specified as `--offload-arch=<arch>:<feature>+` to enable it or `--offload-arch=<arch>:<feature>-` to disable it. Multiple features may be present, separated by colons.
 
 The first of these two commands generates a _bitcode_ module: this is a binary encoded version of LLVM IR. The second command, using `llvm-dis` disassembles the bitcode module into textual LLVM IR.
 
@@ -40,10 +40,10 @@ The first of these two commands generates a _bitcode_ module: this is a binary e
 
 A HIP binary consists of a regular host executable, which has an offload bundle containing device code embedded inside it. This offload bundle contains object files for each of the target devices that it is compiled for, and is loaded at runtime to provide the machine code for the current device. A HIP executable can be built from device LLVM IR and host HIP code according to the following process:
 
-1. The `main.hip` file is compiled to an object file with `hipcc` that only contains host code by using the `--cuda-host-only` option. `main.hip` is a program that launches a simple kernel to compute the square of each element of a vector. The `-c` option is required to prevent the compiler from creating an executable, and make it create an object file containing the compiled host code instead.
+1. The `main.hip` file is compiled to an object file with `amdclang++` that only contains host code by using the `--cuda-host-only` option. `main.hip` is a program that launches a simple kernel to compute the square of each element of a vector. The `-c` option is required to prevent the compiler from creating an executable, and make it create an object file containing the compiled host code instead.
 
     ```shell
-    $ROCM_PATH/bin/hipcc -c --cuda-host-only main.hip
+    $ROCM_PATH/bin/amdclang++ -x hip -c --cuda-host-only main.hip
     ```
 
 2. Each LLVM IR file is assembled to a device object file using `clang`. This requires specifying the correct architecture using `-target amdgcn-amd-amdhsa`, and the target architecture that should be assembled for using `-mcpu`:
@@ -87,10 +87,10 @@ A HIP binary consists of a regular host executable, which has an offload bundle 
     $ROCM_PATH/llvm/bin/llvm-mc -triple <host target> -o main_device.o hip_obj_gen.mcin --filetype=obj
     ```
 
-5. Finally, using the system linker, `hipcc`, or `clang`, the host object and device objects are linked into an executable:
+5. Finally, using the system linker, `amdclang++`, or `clang`, the host object and device objects are linked into an executable. `--hip-link` tells amdclang++ to link against the HIP runtime:
 
     ```shell
-    <ROCM_PATH>/hip/bin/hipcc -o hip_llvm_ir_to_executable main.o main_device.o
+    $ROCM_PATH/bin/amdclang++ --hip-link -o hip_llvm_ir_to_executable main.o main_device.o
     ```
 
 ### Visual Studio 2019
