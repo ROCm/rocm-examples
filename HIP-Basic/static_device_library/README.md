@@ -18,27 +18,27 @@ This example shows how to create a static library that exports device functions.
 
 ## Build Process
 
-Compiling a HIP static library that exports device functions must be done in two steps:
+Compiling a HIP static library that exports device functions must be done in two steps. Both steps must pass `--offload-arch=<arch>` for the target GPU architecture (`--offload-arch=native` targets the GPUs present on the build machine):
 
-1. First, the source files that make up the library must be compiled to object files. This is done similarly to how an object file is created for a regular source file (using the `-c` flag), except that the additional option `-fgpu-rdc` must be passed:
+1. First, the source files that make up the library must be compiled to object files. This is done similarly to how an object file is created for a regular source file (using the `-c` flag), except that the additional option `-fgpu-rdc` must be passed. `-x hip` tells the compiler to treat the input as HIP source:
 
     ```shell
-    hipcc -c -fgpu-rdc -Ilibrary library/library.hip -o library.o
+    amdclang++ -x hip --offload-arch=<arch> -c -fgpu-rdc -Ilibrary library/library.hip -o library.o
     ```
 
-2. After compiling all library sources into object files, they must be manually bundled into an archive that can act as static library. `hipcc` cannot currently create this archive automatically, hence it must be created manually using `ar`:
+2. After compiling all library sources into object files, they must be manually bundled into an archive that can act as static library. `amdclang++` cannot currently create this archive automatically, hence it must be created manually using `ar`:
 
     ```shell
     ar rcsD liblibrary.a library.o
     ```
 
-After the static device library has been compiled, it can be linked with another HIP program or library. Linking with a static device library is done by placing it on the command line directly, and additionally requires `-fgpu-rdc`. The static library should be placed on the command line _before_ any source files. Source files that use the static library can also be compiled to object files first, in this case they also need to be compiled with `-fgpu-rdc`:
+After the static device library has been compiled, it can be linked with another HIP program or library. Linking with a static device library is done by placing it on the command line directly, and additionally requires `-fgpu-rdc`. The static library should be placed on the command line _before_ any source files, and `-x hip` must come _after_ the static library and right before the HIP source file, otherwise the compiler will try to compile the archive as HIP source. `--hip-link` tells amdclang++ to link against the HIP runtime. Source files that use the static library can also be compiled to object files first, in this case they also need to be compiled with `-fgpu-rdc`:
 
 ```shell
-hipcc -fgpu-rdc liblibrary.a main.hip -o hip_static_device_library
+amdclang++ -fgpu-rdc --offload-arch=<arch> --hip-link liblibrary.a -x hip main.hip -o hip_static_device_library
 ```
 
-**Note**: static device libraries _must_ be linked with `hipcc`. There is no support yet for linking such libraries with (ROCm-bundled) clang, using CMake, or using Visual Studio.
+**Note**: static device libraries _must_ be linked with `amdclang++`. There is no support yet for linking such libraries with (ROCm-bundled) clang, using CMake, or using Visual Studio.
 
 ## Demonstrated API Calls
 
