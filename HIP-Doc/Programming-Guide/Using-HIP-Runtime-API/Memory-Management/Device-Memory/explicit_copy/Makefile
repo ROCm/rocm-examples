@@ -42,6 +42,7 @@ ILDLIBS   :=
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   COMPILER := $(CUDACXX)
+  ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS  ?= -Wall -Wextra
   ICXXFLAGS += -D__HIP_PLATFORM_AMD__

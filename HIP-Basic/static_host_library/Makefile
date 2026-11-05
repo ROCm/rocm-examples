@@ -50,6 +50,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
   LIBFLAGS  += -lib
   HIPLIBS   += -L$(CUDA_INSTALL_DIR)/lib64 -lcudart
   COMPILER  := $(CUDACXX)
+  ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS  ?= -Wall -Wextra
   LIBFLAGS  += -c -fPIC
