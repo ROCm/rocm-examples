@@ -47,6 +47,11 @@
 
 constexpr int error_exit_code = -1;
 
+/// \brief Exit code that signals the example was skipped, e.g. because the GPU
+/// lacks a required hardware feature. Tests that may be skipped register it
+/// with CTest's SKIP_RETURN_CODE test property.
+constexpr int skip_exit_code = 77;
+
 /// \brief Checks if the provided error code is \p hipSuccess and if not,
 /// prints an error message to the standard error output and terminates the
 /// program with an error code.

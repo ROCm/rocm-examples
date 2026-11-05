@@ -85,6 +85,8 @@ if(NOT ROCWMMA_TARGET AND NOT rocwmma_FOUND)
     # Create imported target for header-only library
     add_library(rocwmma INTERFACE)
     target_include_directories(rocwmma INTERFACE ${ROCWMMA_INCLUDE_DIR})
+    # HIP supplies compiler-rt builtins for host FP16 conversions on Windows.
+    target_link_libraries(rocwmma INTERFACE hip::host)
     set(ROCWMMA_TARGET rocwmma)
 endif()
 

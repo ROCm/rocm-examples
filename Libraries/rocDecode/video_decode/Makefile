@@ -118,8 +118,9 @@ $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
 # Mirrors ctest's per-codec test entries (HEVC, AVC, AV1, VP9). Each variant
-# is skipped cleanly if its test video isn't present; runs all available
-# codecs and returns the worst exit code.
+# is skipped cleanly if its test video isn't present, or if the example exits
+# with 77 because the GPU doesn't support the codec (ctest's SKIP_RETURN_CODE);
+# runs all available codecs and returns the worst exit code.
 test: $(EXAMPLE)
 	@rc=0; \
 	for v in $(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4 \
@@ -128,7 +129,12 @@ test: $(EXAMPLE)
 	         $(ROCM_PATH)/share/rocdecode/video/AMD_driving_virtual_20-VP9.ivf; do \
 	    if [ -e "$$v" ]; then \
 	        echo "==> ./$(EXAMPLE) -i $$v"; \
-	        ./$(EXAMPLE) -i "$$v" || rc=$$?; \
+	        ./$(EXAMPLE) -i "$$v"; ec=$$?; \
+	        if [ $$ec -eq 77 ]; then \
+	            echo "==> Skipping (codec not supported on this GPU): $$v"; \
+	        elif [ $$ec -ne 0 ]; then \
+	            rc=$$ec; \
+	        fi; \
 	    else \
 	        echo "==> Skipping (not found): $$v"; \
 	    fi; \

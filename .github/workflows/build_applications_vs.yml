@@ -14,6 +14,9 @@ on:
       - '.github/workflows/**'
       - 'Scripts/VisualStudio/**'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.number || github.sha }}
   cancel-in-progress: true
@@ -34,6 +37,8 @@ jobs:
             shell: pwsh
         steps:
           - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            with:
+              persist-credentials: false
           - uses: microsoft/setup-msbuild@30375c66a4eea26614e0d39710365f22f8b0af57 # v3.0.0
           - name: Install Python dependencies
             run: |
@@ -71,9 +76,9 @@ jobs:
                   echo "PLATFORM_TOOLSET_VERSION=$version" >> $env:GITHUB_ENV
           - name: Build ${{ matrix.config }} x64
             run: |
-                  Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang .\..' | Select-Object -First 1).Matches.Value) with HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}"
+                  Write-Host "Replace toolset $((Get-ChildItem -Recurse -File | Get-Content | Select-String -Pattern 'HIP clang .\..' | Select-Object -First 1).Matches.Value) with HIP clang $env:PLATFORM_TOOLSET_VERSION"
                   Get-ChildItem -Recurse -File | Where-Object { Select-String -Pattern 'HIP clang .\..' -Path $_ } | ForEach-Object {
-                    (Get-Content -Path $_.FullName) -replace 'HIP clang .\..', "HIP clang ${{ env.PLATFORM_TOOLSET_VERSION }}" | Set-Content -Path $_.FullName
+                    (Get-Content -Path $_.FullName) -replace 'HIP clang .\..', "HIP clang $env:PLATFORM_TOOLSET_VERSION" | Set-Content -Path $_.FullName
                   }
                   msbuild Scripts\VisualStudio\build.proj -maxCpuCount -detailedSummary -property:"Category=Applications;Configuration=${{ matrix.config }};Platform=x64"
                   Write-Host "msbuild returned: $LastExitCode"
