@@ -51,27 +51,19 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::DeviceMem`
 * `ck_tile::element_wise::PassThrough`
 * `ck_tile::FillUniformDistribution`
-* `ck_tile::BaseGemmPipelineAgBgCrCompV3`
-* `ck_tile::BaseGemmPipelineAgBgCrCompV4`
-* `ck_tile::BaseGemmPipelineAgBgCrMem`
 * `ck_tile::GemmMultiDHostArgs`
 * `ck_tile::GemmKernelMultiD`
-* `ck_tile::GemmPipelineProblem`
 * `ck_tile::GemmPipelineScheduler::Interwave`
 * `ck_tile::GemmPipelineScheduler::Intrawave`
 * `ck_tile::GemmSpatiallyLocalTilePartitioner`
 * `ck_tile::half_t`
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
-* `ck_tile::integral_constant`
-* `ck_tile::memory_operation_enum`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
-* `ck_tile::TailNumber`
 * `ck_tile::tensor_layout::gemm::ColumnMajor`
 * `ck_tile::tensor_layout::gemm::RowMajor`
 * `ck_tile::TileGemmShape`
-* `ck_tile::TileGemmTraits`
 * `ck_tile::TileGemmUniversalTraits`
 * `ck_tile::UniversalGemmPipelineProblem`
 

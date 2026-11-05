@@ -4,7 +4,7 @@
 
 set -euo pipefail
 
-BIN="${BIN:-../../../build/bin/tile_example_copy}"
+BIN="${1:-${BIN:-../../../build/bin/tile_example_copy}}"
 WARMUP="${WARMUP:-20}"
 REPEAT="${REPEAT:-100}"
 VALIDATE="${VALIDATE:-1}"
@@ -50,4 +50,5 @@ if [[ $failures -eq 0 ]]; then
   echo "All runs passed"
 else
   echo "$failures runs failed"
+  exit 1
 fi

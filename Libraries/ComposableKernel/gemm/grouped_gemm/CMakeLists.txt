@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -54,7 +54,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 add_executable(${example_name} grouped_gemm.cpp)
-add_test(${example_name} COMMAND ${example_name})
+add_test(NAME ${example_name} COMMAND ${example_name})
 set_source_files_properties(grouped_gemm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
@@ -74,7 +74,18 @@ set_source_files_properties(grouped_gemm_preshuffle.cpp PROPERTIES LANGUAGE ${RO
 target_compile_features(${example_preshuffle} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
 
-add_executable(${example_quant} quant_grouped_gemm.cpp)
-set_source_files_properties(quant_grouped_gemm.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(example_quant_sources
+    quant_grouped_gemm.cpp
+    quant_grouped_gemm_bf8_aquant.cpp
+    quant_grouped_gemm_bf8_bquant.cpp
+    quant_grouped_gemm_bf8_rowcol.cpp
+    quant_grouped_gemm_bf8_tensor.cpp
+    quant_grouped_gemm_fp8_aquant.cpp
+    quant_grouped_gemm_fp8_bquant.cpp
+    quant_grouped_gemm_fp8_rowcol.cpp
+    quant_grouped_gemm_fp8_tensor.cpp
+)
+add_executable(${example_quant} ${example_quant_sources})
+set_source_files_properties(${example_quant_sources} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_quant} PRIVATE cxx_std_17 hip_std_17)
 target_link_libraries(${example_quant} PRIVATE composable_kernel::ck_tile hip::host)
