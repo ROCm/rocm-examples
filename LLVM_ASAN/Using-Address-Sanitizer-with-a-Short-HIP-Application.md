@@ -36,9 +36,9 @@ main(int argc, char **argv)
 This application will attempt to access invalid addresses for certain command line arguments. In particular, if `m < n1 * n2` some device threads will attempt to access
 unallocated device memory.
 Or, if `c < m`, the `hipMemcpy` function will copy past the end of the `malloc` allocated memory.
-**Note**: The `hipcc` compiler is used here for simplicity. Compiling without XNACK results in a warning.
-> `$ hipcc -g --offload-arch=gfx90a:xnack- -fsanitize=address
--shared-libsan mini.hip -o mini`
+**Note**: `amdclang++` is used here for simplicity. Compiling without XNACK results in a warning.
+> `$ amdclang++ -x hip -g --offload-arch=gfx90a:xnack- -fsanitize=address
+-shared-libsan --hip-link mini.hip -o mini`
 > `clang++: warning: ignoring '-fsanitize=address' option for offload arch 'gfx90a:xnack-'
 as it is not currently supported there. Use it with an offload arch containing 'xnack+' instead [-Woption-ignored]`
 The binary compiled above will run, but the GPU code will not be

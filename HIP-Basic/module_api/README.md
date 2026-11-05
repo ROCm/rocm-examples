@@ -23,8 +23,8 @@ This example shows how to load and execute a HIP module in runtime without linki
 
 The kernel module needs to be compiled as a non-linked device code object file (`*.co`), in one of the following ways:
 
-- `hipcc --genco --offload-arch=[TARGET GPU] [INPUT FILE] -o [OUTPUT FILE]`
-- `clang++ --cuda-device-only --offload-arch=[TARGET GPU] [INPUT FILE] -o [OUTPUT FILE]`
+- `amdclang++ -x hip --cuda-device-only --offload-arch=[TARGET GPU] [INPUT FILE] -o [OUTPUT FILE]`
+- `clang++ -x hip --cuda-device-only --offload-arch=[TARGET GPU] [INPUT FILE] -o [OUTPUT FILE]`
 
 where the parameters are:
 
