@@ -40,6 +40,7 @@ ILDLIBS   :=
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+  ILDLIBS += -lcuda
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be CUDA)
 endif

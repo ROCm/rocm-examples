@@ -42,7 +42,7 @@ ILDLIBS   :=
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
-  ILDLIBS   += -l nvrtc
+  ILDLIBS   += -l nvrtc -lcuda
   COMPILER := $(CUDACXX)
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra

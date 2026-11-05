@@ -50,6 +50,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
   COMPILER := $(CUDACXX)
+  ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
   include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
