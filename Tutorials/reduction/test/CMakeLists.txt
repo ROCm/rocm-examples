@@ -103,7 +103,7 @@ if(STL_DEPENDS_ON_TBB0 OR STL_DEPENDS_ON_TBB1)
     include(CheckSourceCompiles)
     unset(CMAKE_REQUIRED_FLAGS)
     check_source_compiles(
-        HIP
+        ${ROCM_EXAMPLES_GPU_LANGUAGE}
         "#include <tbb/task.h>
         int main() { return 0; }"
         REDUCTION_TBB_HEADERS_COMPILE
