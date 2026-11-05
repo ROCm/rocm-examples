@@ -36,18 +36,21 @@ HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 LIBHIPCXX_INCLUDE_SUBDIR := $(if $(wildcard $(HIP_INCLUDE_DIR)/hipccl),hipccl,libhipcxx)
 LIBHIPCXX_INCLUDE_DIR    := $(HIP_INCLUDE_DIR)/$(LIBHIPCXX_INCLUDE_SUBDIR)
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 # Common variables and flags
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
-ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICXXFLAGS := -std=$(CXX_STD) -x hip -O3 $(CXXFLAGS)
 # cuda::mr (cuda::mr::resource, cuda::mr::resource_ref, ...) is experimental
 # and is only compiled in when LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE
 # is defined.
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(LIBHIPCXX_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE $(CPPFLAGS)
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += $(OFFLOAD_ARCH_FLAGS)
+ILDFLAGS  += --hip-link
 
 $(EXAMPLE): main.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)

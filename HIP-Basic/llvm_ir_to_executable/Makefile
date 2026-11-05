@@ -32,7 +32,7 @@ endif
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX                ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX                ?= $(ROCM_PATH)/bin/amdclang++
 CLANG                 ?= $(ROCM_PATH)/llvm/bin/clang
 LLVM_MC               ?= $(ROCM_PATH)/llvm/bin/llvm-mc
 CLANG_OFFLOAD_BUNDLER ?= $(ROCM_PATH)/llvm/bin/clang-offload-bundler
@@ -40,9 +40,9 @@ LLVM_DIS              ?= $(ROCM_PATH)/llvm/bin/llvm-dis
 
 # Common variables and flags
 CXX_STD   := c++17
-ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICXXFLAGS := -std=$(CXX_STD) -O3 $(CXXFLAGS)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) $(CPPFLAGS)
-ILDFLAGS  := $(LDFLAGS)
+ILDFLAGS  := --hip-link $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
 
 # Compile for these GPU architectures
@@ -75,7 +75,7 @@ offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 	  -output=$@
 
 main.o: main.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c --cuda-host-only -fuse-cuid=none $<
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -x hip -c --cuda-host-only -fuse-cuid=none $<
 
 main_%.o: main_%.ll
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<
@@ -84,7 +84,7 @@ main_%.ll: main_%.bc
 	$(LLVM_DIS) -o $@ $<
 
 main_%.bc: main.hip
-	$(HIPCXX) --cuda-device-only -c -emit-llvm --offload-arch=$* -o $@ -I ../../Common -std=c++17 $<
+	$(HIPCXX) --cuda-device-only -c -emit-llvm -O3 -x hip --offload-arch=$* -o $@ -I ../../Common -std=c++17 $<
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)

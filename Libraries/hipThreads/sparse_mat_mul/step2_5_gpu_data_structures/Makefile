@@ -31,7 +31,7 @@ endif
 
 ROCM_PATH ?= /opt/rocm
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 # libhipcxx headers are installed under include/hipccl; fall back to the
@@ -43,16 +43,19 @@ endif
 
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
-ICXXFLAGS := -std=$(CXX_STD) -O3 -fgpu-rdc $(CXXFLAGS)
-ILDFLAGS  := -fgpu-rdc $(LDFLAGS)
+ICXXFLAGS := -std=$(CXX_STD) -x hip -O3 -fgpu-rdc $(CXXFLAGS)
+ILDFLAGS  := -fgpu-rdc --hip-link $(LDFLAGS)
 ICPPFLAGS := -isystem $(HIP_INCLUDE_DIR) \
              -I $(LIBHIPCXX_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) \
              -D_LIBCUDACXX_ALLOW_UNSUPPORTED_ARCHITECTURE -DEXAMPLE_DATA_DIR=\"$(abspath $(dir $(lastword $(MAKEFILE_LIST))))/../data\" \
              $(CPPFLAGS)
 ILDLIBS   := -lpthread $(LDLIBS)
 
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += $(OFFLOAD_ARCH_FLAGS)
+
 $(EXAMPLE): main.cpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -x hip -o $@ main.cpp $(ILDFLAGS) $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -o $@ main.cpp $(ILDFLAGS) $(ILDLIBS)
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)

@@ -32,7 +32,7 @@ endif
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 AR ?= ar
 
 # Common variables and flags
@@ -42,18 +42,22 @@ ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I library $(CPPFLAGS)
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += -O3 $(OFFLOAD_ARCH_FLAGS)
 
 EXAMPLE_LIB := hip_static_device
 LIBEXAMPLE  := lib$(EXAMPLE_LIB).a
 
+# -x hip must come right before the HIP source, never before $(LIBEXAMPLE):
+# clang would otherwise try to compile the static archive as HIP source.
 $(EXAMPLE): main.hip $(LIBEXAMPLE)
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -fgpu-rdc -o $@ $(LIBEXAMPLE) $< $(LDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -fgpu-rdc --hip-link -o $@ $(LIBEXAMPLE) -x hip $< $(LDLIBS)
 
 $(LIBEXAMPLE): library.o
 	$(AR) rcsD $@ $^
 
 library.o: library/library.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c -o $@ $< -fgpu-rdc
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -c -o $@ -x hip $< -fgpu-rdc
 
 test:
 
