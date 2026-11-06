@@ -91,17 +91,21 @@ echo "==========================================================================
 echo "PC sampling"
 echo "==============================================================================="
 # PC sampling is currently a beta feature and not supported on all devices. The supported method, unit and interval
-# range vary per agent and ROCm version, so query the capabilities and use the first reported configuration instead
-# of hardcoding one.
-PC_SAMPLING_INFO="$($EXAMPLE_QUERY info --pc-sampling)"
+# range vary per agent and ROCm version, so query the capabilities of the device the workload actually runs on
+# (HIP's default device, index 0, since the workload never calls hipSetDevice) and use its first reported
+# configuration instead of hardcoding one or picking up a config reported for a different agent.
+PC_SAMPLING_INFO="$($EXAMPLE_QUERY -d 0 info --pc-sampling)"
 if [[ -z "$PC_SAMPLING_INFO" ]]; then
     echo "PC sampling not supported on any agent"
 else
     read -r METHOD UNIT INTERVAL <<< "$(awk '
-        /^[[:space:]]*Method[[:space:]]*:/       { method = $NF; next }
-        /^[[:space:]]*Unit[[:space:]]*:/         { unit = $NF; next }
-        /^[[:space:]]*Min_Interval[[:space:]]*:/ { min = $NF; next }
-        /^[[:space:]]*Max_Interval[[:space:]]*:/ { print method, unit, min; exit }
+        # Reset on every GPU boundary so a config is never built out of fields left over from a
+        # different agent'"'"'s section.
+        /^[[:space:]]*GPU[[:space:]]*:/           { method = ""; unit = ""; min = ""; next }
+        /^[[:space:]]*Method[[:space:]]*:/        { method = $NF; next }
+        /^[[:space:]]*Unit[[:space:]]*:/          { unit = $NF; next }
+        /^[[:space:]]*Min_Interval[[:space:]]*:/  { min = $NF; next }
+        /^[[:space:]]*Max_Interval[[:space:]]*:/  { if (method != "") { print method, unit, min; exit } }
     ' <<< "$PC_SAMPLING_INFO")"
 
     # --pc-sampling-unit only accepts the plural choices (instructions/cycles/time); the capability listing above
