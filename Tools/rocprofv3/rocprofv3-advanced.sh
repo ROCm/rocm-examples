@@ -90,22 +90,36 @@ OUTDIR="${EXAMPLE_TOOL}-rocTX" \
 echo "==============================================================================="
 echo "PC sampling"
 echo "==============================================================================="
-# PC sampling is currently a beta feature and not supported on all devices.
-# Only 'time' is supported as the sampling unit; 'instructions' and 'cycles' will be added in the future.
-# Only 'host_trap' is supported as the sampling method; 'stochastic' will be added in the future.
-# The sampling interval is set to 1µs.
-if [[ $($EXAMPLE_QUERY info --pc-sampling) ]]; then
+# PC sampling is currently a beta feature and not supported on all devices. The supported method, unit and interval
+# range vary per agent and ROCm version, so query the capabilities and use the first reported configuration instead
+# of hardcoding one.
+PC_SAMPLING_INFO="$($EXAMPLE_QUERY info --pc-sampling)"
+if [[ -z "$PC_SAMPLING_INFO" ]]; then
+    echo "PC sampling not supported on any agent"
+else
+    read -r METHOD UNIT INTERVAL <<< "$(awk '
+        /^[[:space:]]*Method[[:space:]]*:/       { method = $NF; next }
+        /^[[:space:]]*Unit[[:space:]]*:/         { unit = $NF; next }
+        /^[[:space:]]*Min_Interval[[:space:]]*:/ { min = $NF; next }
+        /^[[:space:]]*Max_Interval[[:space:]]*:/ { print method, unit, min; exit }
+    ' <<< "$PC_SAMPLING_INFO")"
+
+    # --pc-sampling-unit only accepts the plural choices (instructions/cycles/time); the capability listing above
+    # reports them singular except for "time".
+    case "$UNIT" in
+        instruction*) UNIT=instructions ;;
+        cycle*)       UNIT=cycles ;;
+    esac
+
     OUTDIR="${EXAMPLE_TOOL}-pc-sampling" \
         $EXAMPLE_TOOL \
         --pc-sampling-beta-enabled \
-        --pc-sampling-unit time \
-        --pc-sampling-method host_trap \
-        --pc-sampling-interval 1 \
+        --pc-sampling-unit "$UNIT" \
+        --pc-sampling-method "$METHOD" \
+        --pc-sampling-interval "$INTERVAL" \
         --output-directory %env{OUTDIR}% \
         --output-format csv \
         -- $EXAMPLE_WORKLOAD
-else
-    echo "PC sampling not supported on any agent"
 fi
 
 exit 0
