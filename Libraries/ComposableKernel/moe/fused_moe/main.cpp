@@ -1,30 +1,13 @@
-// MIT License
-//
-// Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #include <algorithm>
 #include <cstring>
-#include <set>
 #include <unordered_set>
+
 #include <vector>
+
+#include <set>
 
 #include "ck_tile/host.hpp"
 #include "ck_tile/utility/json_dump.hpp"
@@ -301,33 +284,27 @@ bool run(const ck_tile::ArgParser &arg_parser) {
     ck_tile::FillStepRange<TopkWeightDataType>{-.5f, .5f,
                                                0.01f}(topk_weight_host);
   } else if (init == 1) {
-    ck_tile::FillUniformDistribution<ADataType>{-.5f, .5f, seed, true}(a_host);
-    ck_tile::FillUniformDistribution<GDataType>{-.5f, .5f, seed, true}(g_host);
-    ck_tile::FillUniformDistribution<DDataType>{-.5f, .5f, seed, true}(d_host);
-    ck_tile::FillUniformDistribution<AScaleDataType>{-.5f, .5f, seed,
-                                                     true}(sa_host);
-    ck_tile::FillUniformDistribution<GScaleDataType>{-.5f, .5f, seed,
-                                                     true}(sg_host);
-    ck_tile::FillUniformDistribution<DScaleDataType>{-.5f, .5f, seed,
-                                                     true}(sd_host);
-    ck_tile::FillUniformDistribution<YSmoothScaleDataType>{-.5f, .5f, seed,
-                                                           true}(sy_host);
-    ck_tile::FillUniformDistribution<TopkWeightDataType>{-.5f, .5f, seed, true}(
+    ck_tile::FillUniformDistribution<ADataType>{-.5f, .5f, seed}(a_host);
+    ck_tile::FillUniformDistribution<GDataType>{-.5f, .5f, seed}(g_host);
+    ck_tile::FillUniformDistribution<DDataType>{-.5f, .5f, seed}(d_host);
+    ck_tile::FillUniformDistribution<AScaleDataType>{-.5f, .5f, seed}(sa_host);
+    ck_tile::FillUniformDistribution<GScaleDataType>{-.5f, .5f, seed}(sg_host);
+    ck_tile::FillUniformDistribution<DScaleDataType>{-.5f, .5f, seed}(sd_host);
+    ck_tile::FillUniformDistribution<YSmoothScaleDataType>{-.5f, .5f,
+                                                           seed}(sy_host);
+    ck_tile::FillUniformDistribution<TopkWeightDataType>{-.5f, .5f, seed}(
         topk_weight_host);
   } else if (init == 2) {
-    ck_tile::FillNormalDistribution<ADataType>{0.f, 1.f, seed, true}(a_host);
-    ck_tile::FillNormalDistribution<GDataType>{0.f, 1.f, seed, true}(g_host);
-    ck_tile::FillNormalDistribution<DDataType>{0.f, 1.f, seed, true}(d_host);
-    ck_tile::FillNormalDistribution<AScaleDataType>{0.f, 1.f, seed,
-                                                    true}(sa_host);
-    ck_tile::FillNormalDistribution<GScaleDataType>{0.f, 1.f, seed,
-                                                    true}(sg_host);
-    ck_tile::FillNormalDistribution<DScaleDataType>{0.f, 1.f, seed,
-                                                    true}(sd_host);
-    ck_tile::FillNormalDistribution<YSmoothScaleDataType>{0.f, 1.f, seed,
-                                                          true}(sy_host);
-    ck_tile::FillNormalDistribution<TopkWeightDataType>{0.f, 1.f, seed,
-                                                        true}(topk_weight_host);
+    ck_tile::FillNormalDistribution<ADataType>{0.f, 1.f, seed}(a_host);
+    ck_tile::FillNormalDistribution<GDataType>{0.f, 1.f, seed}(g_host);
+    ck_tile::FillNormalDistribution<DDataType>{0.f, 1.f, seed}(d_host);
+    ck_tile::FillNormalDistribution<AScaleDataType>{0.f, 1.f, seed}(sa_host);
+    ck_tile::FillNormalDistribution<GScaleDataType>{0.f, 1.f, seed}(sg_host);
+    ck_tile::FillNormalDistribution<DScaleDataType>{0.f, 1.f, seed}(sd_host);
+    ck_tile::FillNormalDistribution<YSmoothScaleDataType>{0.f, 1.f,
+                                                          seed}(sy_host);
+    ck_tile::FillNormalDistribution<TopkWeightDataType>{0.f, 1.f,
+                                                        seed}(topk_weight_host);
   }
 
   // permute weight
@@ -352,16 +329,16 @@ bool run(const ck_tile::ArgParser &arg_parser) {
 
 // leave it here for future debug purpose
 #if 0
-    a_host.loadtxt("../../ater/input_torch.txt");
+    ck_tile::loadtxt(a_host, "../../ater/input_torch.txt");
 
-    topk_ids_host.loadtxt("../../ater/topk_ids_torch.txt", "int");
-    // topk_ids_host.savetxt("topk_ids_2.txt");
-    topk_weight_host.loadtxt("../../ater/topk_weights_torch.txt", "float");
+    ck_tile::loadtxt(topk_ids_host, "../../ater/topk_ids_torch.txt", "int");
+    // ck_tile::savetxt(topk_ids_host, "topk_ids_2.txt");
+    ck_tile::loadtxt(topk_weight_host, "../../ater/topk_weights_torch.txt", "float");
     std::cout << "------- @@@ " << __LINE__ << std::flush << std::endl;
 
-    g_host.loadtxt("../../ater/w1_torch.txt", "float");
+    ck_tile::loadtxt(g_host, "../../ater/w1_torch.txt", "float");
     std::cout << "------- @@@ " << __LINE__ << std::flush << std::endl;
-    d_host.loadtxt("../../ater/w2_torch.txt", "float");
+    ck_tile::loadtxt(d_host, "../../ater/w2_torch.txt", "float");
     std::cout << "------- @@@ " << __LINE__ << std::flush << std::endl;
 
     ck_tile::HostTensor<GDataType> g_perm_host = shuffle_moe_weight(g_host, prec_w, 1);
@@ -504,7 +481,7 @@ bool run(const ck_tile::ArgParser &arg_parser) {
       }
 
       auto o_dev = o_buf.ToHost<ODataType>();
-      // o_dev.savetxt("gpu-out.txt", "float");
+      // ck_tile::savetxt(o_dev, "gpu-out.txt", "float");
       auto [rtol, atol] = get_elimit<ADataType>();
       pass &= ck_tile::check_err(o_dev, o_host,
                                  std::string("OUT Error: Incorrect results!"),
@@ -597,7 +574,7 @@ bool run(const ck_tile::ArgParser &arg_parser) {
       }
 
       auto o_dev = o_buf.ToHost<ODataType>();
-      // o_dev.savetxt("gpu-out.txt", "float");
+      // ck_tile::savetxt(o_dev, "gpu-out.txt", "float");
       auto [rtol, atol] = get_elimit<ADataType>();
       pass &= ck_tile::check_err(o_dev, o_host,
                                  std::string("OUT Error: Incorrect results!"),

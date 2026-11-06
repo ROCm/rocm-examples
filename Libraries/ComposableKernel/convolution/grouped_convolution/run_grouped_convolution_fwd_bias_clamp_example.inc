@@ -1,27 +1,6 @@
-// MIT License
-//
-// Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 #pragma once
-
 #include "ck_tile/ops/elementwise/unary_element_wise_operation.hpp"
 
 using BiasAndClamp = ck_tile::element_wise::
@@ -204,11 +183,6 @@ int run_grouped_conv_fwd_bias_clamp_example_with_layouts(
 
     if(arg_parser.get_int("v") == 1)
     {
-        // FIXME: Address this issue
-        if(arg_parser.get_int("g") > 1 && init_method == 0)
-            std::cerr << "Adding different bias to different groups yield incorrect results"
-                      << std::endl;
-
         ck_tile::HostTensor<OutDataType> output_host_ref(out_g_n_k_wos_desc);
         output_host_ref.SetZero();
 
@@ -256,7 +230,11 @@ int run_grouped_conv_fwd_bias_clamp_example_with_layouts(
     }
     else if(arg_parser.get_int("v") == 2)
     {
-        throw std::runtime_error("Unsupported gpu verification !!!");
+        // GPU verification for fused operation (Conv + Bias + Clamp) is complex
+        // For now, we only support GPU verification for basic convolution operations
+        // The bias+clamp fused variant can use CPU verification (-v=1) or no verification (-v=0)
+        throw std::runtime_error("GPU verification not yet supported for fused operations! Use "
+                                 "-v=1 for CPU verification.");
     }
 
     return pass;
@@ -270,29 +248,27 @@ template <typename Invoker,
 int run_grouped_conv_fwd_bias_clamp_example_prec_type(
     std::string in_layout, std::string wei_layout, std::string out_layout, int argc, char* argv[])
 {
-    // using NWGC   = ck_tile::tensor_layout::convolution::NWGC;
+    using NWGC   = ck_tile::tensor_layout::convolution::NWGC;
     using NHWGC  = ck_tile::tensor_layout::convolution::NHWGC;
     using NDHWGC = ck_tile::tensor_layout::convolution::NDHWGC;
 
-    // using GKXC   = ck_tile::tensor_layout::convolution::GKXC;
+    using GKXC   = ck_tile::tensor_layout::convolution::GKXC;
     using GKYXC  = ck_tile::tensor_layout::convolution::GKYXC;
     using GKZYXC = ck_tile::tensor_layout::convolution::GKZYXC;
 
-    // using NWGK   = ck_tile::tensor_layout::convolution::NWGK;
+    using NWGK   = ck_tile::tensor_layout::convolution::NWGK;
     using NHWGK  = ck_tile::tensor_layout::convolution::NHWGK;
     using NDHWGK = ck_tile::tensor_layout::convolution::NDHWGK;
 
     if(in_layout == "NWGC" && wei_layout == "GKXC" && out_layout == "NWGK")
     {
-        // FIXME: Fix crash in 1D convolution whem using Ds tensor.
-        throw std::runtime_error("1D Convolution does not support bias.");
-        // return run_grouped_conv_fwd_bias_clamp_example_with_layouts<ck_tile::number<1>{},
-        //                                                             GemmWarpConfig,
-        //                                                             Invoker,
-        //                                                             InPrecType,
-        //                                                             WeiPrecType,
-        //                                                             OutPrecType>(
-        //     argc, argv, NWGC{}, GKXC{}, NWGK{});
+        return run_grouped_conv_fwd_bias_clamp_example_with_layouts<ck_tile::number<1>{},
+                                                                    GemmWarpConfig,
+                                                                    Invoker,
+                                                                    InPrecType,
+                                                                    WeiPrecType,
+                                                                    OutPrecType>(
+            argc, argv, NWGC{}, GKXC{}, NWGK{});
     }
     else if(in_layout == "NHWGC" && wei_layout == "GKYXC" && out_layout == "NHWGK")
     {

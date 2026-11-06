@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -70,6 +70,7 @@ add_test(${example_basic} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_basic_scr
 target_compile_features(${example_basic} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_basic} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_basic} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_basic} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 
 add_executable(${example_universal} universal_gemm.cpp)
 add_test(${example_universal}
@@ -78,6 +79,7 @@ add_test(${example_universal}
 target_compile_features(${example_universal} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_universal} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_universal} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_universal} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 
 add_executable(${example_weight_preshuffle} gemm_weight_preshuffle.cpp)
 add_test(
@@ -94,6 +96,7 @@ target_compile_options(
     "SHELL:-mllvm -greedy-reverse-local-assignment=1 -mllvm --slp-threshold=-32 -mllvm -enable-noalias-to-md-conversion=0"
 )
 target_link_libraries(${example_weight_preshuffle} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_weight_preshuffle} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 
 # Additional executables for splitk two-stage
 set(example_splitk_reduce ${example_name}_splitk_reduce)
@@ -103,10 +106,12 @@ add_executable(${example_splitk_reduce} gemm_splitk_two_stage_reduce.cpp)
 target_compile_features(${example_splitk_reduce} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_splitk_reduce} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_splitk_reduce} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_splitk_reduce} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 set_source_files_properties(gemm_splitk_two_stage_reduce.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 add_executable(${example_splitk_two_stage} gemm_splitk_two_stage.cpp)
 target_compile_features(${example_splitk_two_stage} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_splitk_two_stage} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_splitk_two_stage} PRIVATE composable_kernel::ck_tile hip::host)
+target_include_directories(${example_splitk_two_stage} PRIVATE ${CMAKE_CURRENT_LIST_DIR}/..)
 set_source_files_properties(gemm_splitk_two_stage.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})

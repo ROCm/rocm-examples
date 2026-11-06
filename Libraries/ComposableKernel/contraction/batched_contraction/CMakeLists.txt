@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -34,6 +34,12 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FilterHIPArchitectures.cmake")
+filter_hip_architectures("CK Tile batched contraction example" "gfx908;gfx90a;gfx942;gfx950" SHOULD_SKIP)
+if(SHOULD_SKIP)
+    return()
+endif()
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "Composable Kernel examples are not supported for CUDA.")
