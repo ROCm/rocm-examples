@@ -29,16 +29,17 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     message(FATAL_ERROR "The graph API example is currently not supported for Windows.")
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/ROCmPath.cmake")
 
 add_executable(${example_name} main.hip)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
+set_tests_properties(${example_name} PROPERTIES TIMEOUT 60)
 
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 

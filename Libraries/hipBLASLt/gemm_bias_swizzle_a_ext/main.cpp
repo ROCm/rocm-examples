@@ -216,6 +216,8 @@ void swizzle_gemm_epilogue_bias_vec_ext(
     return;
   }
 
+  // initialize() checks the solution's workspace needs against this size.
+  gemm.setMaxWorkspaceBytes(max_workspace_size);
   HIPBLASLT_CHECK(gemm.initialize(heuristic_results[0].algo, d_workspace));
   HIPBLASLT_CHECK(gemm.run(stream));
 

@@ -37,7 +37,7 @@ foreach(ARCH ${CMAKE_HIP_ARCHITECTURES})
     endif()
 endforeach()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "The hipSPARSELt examples are available on Linux only.")

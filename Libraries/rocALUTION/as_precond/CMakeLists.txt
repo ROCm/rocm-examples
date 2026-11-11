@@ -41,7 +41,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
 
 find_package(rocalution REQUIRED)
 
@@ -49,6 +49,7 @@ add_executable(${example_name} main.cpp)
 
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
+set_tests_properties(${example_name} PROPERTIES TIMEOUT 60)
 
 target_link_libraries(${example_name} PRIVATE roc::rocalution)
 

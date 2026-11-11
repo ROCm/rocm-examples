@@ -25,7 +25,7 @@ set(example_name rccl_send_recv)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../Common/HipPlatform.cmake")
+include("../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -40,13 +40,16 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("../../../Common/ROCmPath.cmake")
+include("../../../cmake/ROCmPath.cmake")
 
 find_package(rccl REQUIRED)
 
 add_executable(${example_name} main.cpp)
 # Make example runnable using ctest
 add_test(NAME ${example_name} COMMAND ${example_name})
+# 60s was calibrated on <=8 GPUs (~15s). 64-GPU CPX init takes about as long
+# as the other RCCL samples (~3 min); 300s is the timeout QA confirmed.
+set_tests_properties(${example_name} PROPERTIES TIMEOUT 300)
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::rccl)

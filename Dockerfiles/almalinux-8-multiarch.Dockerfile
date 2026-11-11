@@ -119,10 +119,9 @@ ENV PKG_CONFIG_PATH="${VULKAN_SDK}/share/pkgconfig:${VULKAN_SDK}/lib/pkgconfig:/
 # whose /etc/ld.so.conf lists it), so register it before ldconfig -- otherwise
 # libavcodec.so.58 stays out of the loader cache and rocDecode's Makefile test
 # fails at runtime with "error while loading shared libraries".
-WORKDIR /tmp
-RUN wget https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
-    tar -xvf ffmpeg-4.4.6.tar.xz && \
-    cd ffmpeg-4.4.6 && \
+WORKDIR /tmp/ffmpeg-4.4.6
+RUN wget -P /tmp https://ffmpeg.org/releases/ffmpeg-4.4.6.tar.xz && \
+    tar -xvf /tmp/ffmpeg-4.4.6.tar.xz --strip-components=1 && \
     ./configure --enable-pic --enable-shared && \
     make -j$(nproc) && \
     make install && \

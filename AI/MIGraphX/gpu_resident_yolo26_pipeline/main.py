@@ -304,7 +304,8 @@ class Detector:
             rgb_tensor = torch.from_numpy(rgb_tensor).cuda()
 
         # Step 2: preprocess on GPU.
-        assert rgb_tensor.is_cuda, "decoder returned a CPU tensor"
+        if not rgb_tensor.is_cuda:
+            raise RuntimeError("decoder returned a CPU tensor")
         chw = self.preprocess_color_layout(rgb_tensor)
         scale, pad_x, pad_y = self.letterbox_geometry(chw.shape[2], chw.shape[3])
         model_input = self.preprocess_spatial(chw)

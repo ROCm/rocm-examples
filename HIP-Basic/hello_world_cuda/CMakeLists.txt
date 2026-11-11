@@ -24,7 +24,7 @@ set(example_name hip_hello_world_cuda)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 project(${example_name} LANGUAGES ${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -35,7 +35,7 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD 17)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_EXTENSIONS OFF)
 set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 add_executable(${example_name} main.hip)
 
 # Make example runnable using ctest

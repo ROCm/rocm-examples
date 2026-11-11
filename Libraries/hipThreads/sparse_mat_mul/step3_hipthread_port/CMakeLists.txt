@@ -34,7 +34,7 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/ROCmPath.cmake")
 if(NOT CMAKE_PREFIX_PATH)
     set(CMAKE_PREFIX_PATH "$ENV{ROCM_PATH};/opt/rocm")
 endif()
@@ -42,11 +42,12 @@ endif()
 find_package(hipthreads REQUIRED)
 find_package(rocprim REQUIRED CONFIG)
 find_package(rocthrust REQUIRED CONFIG)
+find_package(Threads REQUIRED)
 
 add_executable(${example_name} main.hip)
 target_compile_options(${example_name} PRIVATE -fgpu-rdc)
 target_link_options(${example_name} PRIVATE -fgpu-rdc)
-target_link_libraries(${example_name} PRIVATE hipthreads::hipthreads roc::rocthrust)
+target_link_libraries(${example_name} PRIVATE hipthreads::hipthreads roc::rocthrust Threads::Threads)
 
 target_compile_definitions(${example_name} PRIVATE EXAMPLE_DATA_DIR="${CMAKE_CURRENT_SOURCE_DIR}/../data")
 

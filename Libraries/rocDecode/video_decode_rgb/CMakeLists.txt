@@ -26,7 +26,8 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../Common/HipPlatform.cmake")
+include("../../../cmake/HipPlatform.cmake")
+include("../../../cmake/RocDecodeLinkOrder.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -41,7 +42,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("../../../Common/ROCmPath.cmake")
+include("../../../cmake/ROCmPath.cmake")
 
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
@@ -69,6 +70,7 @@ add_executable(${example_name}
     ${ROCM_PATH}/share/rocdecode/utils/resize_kernels.cpp
 )
 
+link_rocdecode_first(${example_name})
 target_link_libraries(${example_name}
     PRIVATE
     hip::host
@@ -103,21 +105,12 @@ set_source_files_properties(
     PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE}
 )
 
-# disable FFmpeg tests for TheRock, see https://github.com/ROCm/rocm-systems/pull/3768
-# Check if lib/rocm_sysdeps/lib exists in the ROCm path which indicates ROCm installation via TheRock
-set(USING_THE_ROCK OFF)
-if(EXISTS "${ROCM_PATH}/lib/rocm_sysdeps/lib")
-  set(USING_THE_ROCK ON)
-endif()
-
-if (NOT USING_THE_ROCK)
-    set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
-    if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
-        add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -of rgb)
-        add_test(NAME ${example_name}-resize COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -resize 640x360 -of rgb)
-    else()
-        message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
-    endif()
+set(ROCDECODE_TEST_VIDEO_HEVC "${ROCM_PATH}/share/rocdecode/video/AMD_driving_virtual_20-H265.mp4")
+if(EXISTS "${ROCDECODE_TEST_VIDEO_HEVC}")
+    add_test(NAME ${example_name} COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -of rgb)
+    add_test(NAME ${example_name}-resize COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_HEVC}" -resize 640x360 -of rgb)
+else()
+    message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_HEVC} not found, skipping ${example_name}-HEVC test")
 endif()
 
 install(TARGETS ${example_name})

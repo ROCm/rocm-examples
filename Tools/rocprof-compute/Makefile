@@ -21,7 +21,12 @@
 # SOFTWARE.
 
 EXAMPLE := rocprof-compute-occupancy
+COMMON_INCLUDE_DIR := ../../Common
 GPU_RUNTIME := HIP
+
+# Supported GPU architectures for rocprof-compute
+SUPPORTED_HIP_ARCHITECTURES := gfx908 gfx90a gfx940 gfx941 gfx942 gfx950
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 
 # HIP variables
 ROCM_PATH ?= /opt/rocm
@@ -45,11 +50,21 @@ ILDLIBS   += $(LDLIBS)
 all: $(EXAMPLE)
 .PHONY: all
 
+ifeq ($(SKIP_BUILD),1)
+$(EXAMPLE):
+	@echo "Skipping $(EXAMPLE): no supported architectures"
+else
 $(EXAMPLE): occupancy.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(OFFLOAD_ARCH_FLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+endif
 
+ifeq ($(SKIP_BUILD),1)
+test:
+	@echo "Skipping $(EXAMPLE) test: no supported architectures"
+else
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)
+endif
 
 clean:
 	$(RM) $(EXAMPLE)

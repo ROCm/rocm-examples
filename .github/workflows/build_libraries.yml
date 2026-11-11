@@ -36,10 +36,12 @@ jobs:
           run:
             shell: bash
         container:
-            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.0
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.1
         steps:
           # see https://github.com/dorny/paths-filter/issues/212
           - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+            with:
+              persist-credentials: false
           - name: Trust git directory
             run: git config --global --add safe.directory "$GITHUB_WORKSPACE"
           - uses: dorny/paths-filter@ceb8a2b8f2d89434be7ff52d3de7ec3738c5cc9d # v4.0.3
@@ -49,9 +51,11 @@ jobs:
                 ck:
                   - 'Libraries/ComposableKernel/**'
           - name: Set CK build flag
+            env:
+              CK_CHANGED: ${{ steps.changes.outputs.ck }}
             run: |
               # Enable CK for: scheduled runs OR CK files changed
-              if [ "${{ github.event_name }}" == "schedule" ] || [ "${{ steps.changes.outputs.ck }}" == "true" ]; then
+              if [ "$GITHUB_EVENT_NAME" == "schedule" ] || [ "$CK_CHANGED" == "true" ]; then
                 ENABLE_CK=ON
               else
                 ENABLE_CK=OFF
@@ -64,7 +68,7 @@ jobs:
           - name: CMake Configure, Build, and Install
             run: |
               cd Libraries
-              cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -DROCM_EXAMPLES_ENABLE_OPENMP=ON -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/Common/SkipExamples.cmake" -S . -B build
+              cmake -DCMAKE_BUILD_TYPE=Release -DGPU_TARGETS="${GPU_TARGETS}" -DCMAKE_HIP_ARCHITECTURES="${GPU_TARGETS}" -DROCM_EXAMPLES_ENABLE_CK=${ENABLE_CK} -DROCM_EXAMPLES_ENABLE_OPENMP=ON -DCMAKE_PROJECT_INCLUDE_BEFORE="${GITHUB_WORKSPACE}/cmake/SkipExamples.cmake" -S . -B build
               cmake --build build --parallel $(nproc)
               cmake --install build --prefix install
           - name: Make

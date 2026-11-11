@@ -137,11 +137,11 @@ cmake --build build
 
 The following options are available when building with CMake.
 
-| Option                     | Relevant to | Default value    | Description                                                                                             |
-|:---------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
-| `ROCM_EXAMPLES_GPU_LANGUAGE` | HIP / CUDA  | `"HIP"`          | GPU language to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.  |
-| `CMAKE_HIP_ARCHITECTURES`  | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
-| `CMAKE_CUDA_ARCHITECTURES` | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capibility 50 and 72.                 |
+| Option                       | Relevant to | Default value    | Description                                                                                             |
+|:-----------------------------|:------------|:-----------------|:--------------------------------------------------------------------------------------------------------|
+| `ROCM_EXAMPLES_GPU_LANGUAGE` | HIP / CUDA  | `"HIP"`          | GPU language to compile for. Set to `"CUDA"` to compile for NVIDIA GPUs and to `"HIP"` for AMD GPUs.    |
+| `CMAKE_HIP_ARCHITECTURES`    | HIP         | Compiler default | HIP device architectures to target, e.g. `"gfx908;gfx1030"` to target architectures gfx908 and gfx1030. |
+| `CMAKE_CUDA_ARCHITECTURES`   | CUDA        | Compiler default | CUDA architecture to compile for e.g. `"50;72"` to target compute capability 50 and 72.                 |
 
 ## Repository Contents
 
@@ -465,6 +465,16 @@ The following options are available when building with CMake.
       - [permute](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/permute): Shows how to perform tensor dimension reordering operations.
       - [trinary](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/elementwise/trinary): Shows how to combine three tensors using nested binary operations with permutation.
     - [reduction](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/hipTensor/reduction): Program that showcases tensor reduction operations using hipTensor.
+  - [libhipcxx](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/)
+    - [atomic_counter](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/atomic_counter/): Counts with `cuda::std::atomic`, `cuda::atomic` with a narrowed thread scope, and `atomic_ref` over device memory.
+    - [bit_manipulation](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/bit_manipulation/): Packs several fields into a 32-bit key, extracts them again, and inspects the key with bit counting operations.
+    - [bounded_sequences](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/bounded_sequences/): Shows three bounded-sequence types from libhipcxx -- `cuda::std::span`, `cuda::std::inplace_vector`, and `cuda::std::array` -- that need no dynamic memory allocation.
+    - [index_math](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/index_math/): Uses the libhipcxx index-math helpers `cuda::ceil_div`, `cuda::round_up`, and `cuda::round_down` to size a kernel launch grid and align buffer offsets.
+    - [mdspan_restrict](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/mdspan_restrict/): Shows how `cuda::std::mdspan` gives a kernel a multidimensional view of data, and how `cuda::restrict_mdspan` carries a `__restrict__` no-aliasing promise in that view's type.
+    - [memory_resource](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/memory_resource/): Implements a custom memory resource that satisfies libhipcxx's `cuda::mr::resource` concept and consumes it through the type-erased `cuda::mr::resource_ref`.
+    - [stream_ref](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/stream_ref/): Shows how to use `cuda::stream_ref`, a small, non-owning wrapper around a `hipStream_t` that can drop in for existing HIP streams.
+    - [thread_scopes](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/thread_scopes/): Shows why to narrow a `cuda::atomic`'s thread scope, with a staged block- and device-scope reduction using `fetch_max`.
+    - [vocabulary_types](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/libhipcxx/vocabulary_types/): Shows how the libhipcxx vocabulary types -- `cuda::std::tuple`, `pair`, `expected`, and `optional` -- are used together to cross the host/device boundary.
   - [MIGraphX](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/)
     - [migraphx](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/): Core MIGraphX functionality examples including model parsing, custom operators, and dynamic batch processing.
       - [cpp_dynamic_batch](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/MIGraphX/migraphx/cpp_dynamic_batch/): Demonstrates running graph programs with dynamic batch sizes using the MIGraphX C++ API.
@@ -552,6 +562,7 @@ The following options are available when building with CMake.
     - [rocdec_decode](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocDecode/rocdec_decode/): Demonstrates low-level rocDecode APIs for hardware-accelerated video decoding with direct control over decoder initialization, frame decoding, and output retrieval.
     - [video_decode](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocDecode/video_decode/): Illustrates standard video decoding workflow using FFMPEG demuxer and hardware-accelerated decoder to obtain decoded frames in YUV format.
     - [video_decode_batch](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocDecode/video_decode_batch/): Demonstrates batch video decoding using multiple threads to decode multiple video files concurrently, maximizing GPU utilization and throughput.
+    - [video_decode_caps](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocDecode/video_decode_caps/): Queries and prints the GPU's hardware decode capabilities for every codec, chroma format, and bit depth, useful for checking codec support before decoding.
     - [video_decode_mem](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocDecode/video_decode_mem/): Shows memory-based video decoding with a custom stream provider, useful for scenarios where video data comes from network streams, memory buffers, or other non-file sources.
     - [video_decode_multi_files](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocDecode/video_decode_multi_files/): Showcases decoder reconfiguration capability by decoding multiple video files with different resolutions using a single decoder instance.
     - [video_decode_perf](https://github.com/ROCm/rocm-examples/tree/amd-staging/Libraries/rocDecode/video_decode_perf/): Performance testing and benchmarking by decoding the same video file multiple times in parallel to measure maximum decode throughput and GPU utilization.
@@ -687,12 +698,13 @@ The following options are available when building with CMake.
     - [api/get_version](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/api/get_version/): Queries the hipFile library version at both compile time (via header macros) and runtime (via `hipFileGetVersion`).
     - [basics/bufregister_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/bufregister_write/): Writes a registered GPU buffer to a file using `hipFileBufRegister` to enable the GPU-direct fast path.
     - [basics/no_bufregister_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/no_bufregister_write/): Writes a GPU buffer to a file without explicit buffer registration; hipFile routes the data through its internal pool buffer.
-    - [basics/no_odirect_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/no_odirect_write/): Writes a registered GPU buffer to a file opened without `O_DIRECT`, triggering hipFile's POSIX-compatible fallback path.
+    - [basics/no_odirect_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/no_odirect_write/): Writes a registered GPU buffer to a file opened without `O_DIRECT`; on `O_DIRECT`-capable filesystems hipFile transparently reopens the file and takes the fast path, falling back to the POSIX-compatible path otherwise.
     - [basics/roundtrip_verify](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/roundtrip_verify/): Performs a write-read-write round trip via hipFile and verifies data integrity with FNV-1a hashing.
     - [basics/iterative_read](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/iterative_read/): Reads a file into GPU memory in fixed-size chunks by advancing the device pointer on each `hipFileRead` call.
     - [basics/iterative_devmem_offset_read](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/iterative_devmem_offset_read/): Reads a file into a registered GPU buffer in chunks by advancing the `buf_offset` parameter rather than the base pointer.
     - [basics/various_mem_rw](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/various_mem_rw/): Round-trips a file through hipFile using device memory, managed memory, or pinned host memory, selectable at runtime.
     - [basics/subregion_write](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/basics/subregion_write/): Reads a full file into a registered GPU buffer and then writes only a trailing sub-region to an output file using a non-zero `buf_offset`.
+    - [batch/batch_roundtrip](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/batch/batch_roundtrip/): Round-trips a file through hipFile using the batch IO APIs with a registered GPU buffer and a continuously refilled batch of 4 KiB requests.
     - [async/roundtrip_async](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/async/roundtrip_async/): Async GPU-direct read and write on the HIP default stream using `hipFileReadAsync` and `hipFileWriteAsync`.
     - [async/roundtrip_async_nonblocking_stream](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/async/roundtrip_async_nonblocking_stream/): Same async round trip on an explicit `hipStreamNonBlocking` stream that does not implicitly synchronize with the default stream.
     - [async/roundtrip_async_multi_stream](https://github.com/ROCm/rocm-examples/tree/amd-staging/Systems/hipFile/async/roundtrip_async_multi_stream/): Submits concurrent async read+write pairs across multiple independent non-blocking streams, each processing a non-overlapping file slice.

@@ -25,7 +25,7 @@ set(example_name hipfft_multi_gpu)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(hipfft_multi_gpu LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 if(CMAKE_SYSTEM_NAME MATCHES "Windows")

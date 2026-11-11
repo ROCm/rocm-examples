@@ -12,10 +12,12 @@ This example demonstrates synchronous, on-demand, device-level hardware counter 
     - The `tool_init` function discovers the first available GPU agent and initializes a `counter_sampler` object for it.
 2. **Sampler Initialization**:
     - The `counter_sampler` constructor creates a rocProfiler context, a buffer, and configures the device counting service.
+    - Before starting the sampling thread, `tool_init` calls `create_profile` for the requested counters (`SQ_WAVES`) to create and cache the profile. This completes the SDK's one-time counter setup before the workload runs.
+    - It then registers an `atexit` handler, so the SDK static objects initialized during profile creation remain alive until the handler finishes.
 3. **Asynchronous Sampling**:
-    - A detached thread is launched to perform the counter sampling.
+    - A joinable thread is launched to perform the counter sampling.
     - Inside this thread, the `sample_counter_values` method is called in a loop. This method is synchronous:
-        - It creates a counter profile for the requested counters (`SQ_WAVES`) if not already cached.
+        - It calls `create_profile`, which reuses the cached profile. If any requested counter is unavailable, it clears the output vector and returns `ROCPROFILER_STATUS_ERROR_NO_HARDWARE_COUNTERS` without sampling a partial profile.
         - It starts the rocProfiler context.
         - It calls `rocprofiler_sample_device_counting_service` to collect the data, which blocks until the data is ready.
         - It stops the rocProfiler context.
@@ -25,7 +27,8 @@ This example demonstrates synchronous, on-demand, device-level hardware counter 
 5. **Data Processing**:
     - The sampling thread receives the `rocprofiler_counter_record_t` vector and prints the counter names, values, and dimensions.
 6. **Finalization**:
-    - After the workload is complete, the `tool_fini` function signals the sampling thread to exit, stops the context, flushes the buffer, and joins the thread.
+    - After the workload is complete, the `atexit` handler signals the sampling thread to exit and joins it before calling the SDK finalization function. This prevents the thread from using SDK services or counter metadata during teardown.
+    - The `tool_fini` function also stops and joins the thread if it is still joinable, then stops the context, flushes the buffer and output stream, and releases the sampler and thread object.
 
 ## Key APIs and Concepts
 
@@ -35,8 +38,9 @@ This example demonstrates synchronous, on-demand, device-level hardware counter 
 - **`counter_sampler` Class**:
   - This class provides a high-level abstraction for device profiling. It manages the rocProfiler context, buffer, and profile configurations internally.
 
-- **Dynamic Profile Management**:
-  - The `sample_counter_values` method dynamically creates and caches `rocprofiler_counter_config_id_t` profiles based on the vector of counter names requested by the user.
+- **Profile Creation and Reuse**:
+  - The `create_profile` method creates and caches `rocprofiler_counter_config_id_t` profiles by the requested counter names, returning `ROCPROFILER_STATUS_SUCCESS` for a new or cached profile. It rejects the entire request if any counter is unavailable.
+  - This example creates its profile in `tool_init`, before registering the exit handler and launching the sampling thread. `sample_counter_values` reuses that profile and propagates profile creation failures to its caller.
 
 - **Context Lifecycle per Sample**:
   - The rocProfiler context is started and stopped around each call to `rocprofiler_sample_device_counting_service`, ensuring that counters are only collected when explicitly requested.

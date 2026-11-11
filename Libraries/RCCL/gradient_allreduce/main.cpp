@@ -296,6 +296,9 @@ int main(int argc, const char **argv) {
   // 2. Destroy streams
   // 3. Finalize communicators (ncclCommFinalize)
   // 4. Destroy communicators (ncclCommDestroy)
+  // ncclCommFinalize is an intra-node collective. One thread finalizing every
+  // rank must group those calls; otherwise the first rank waits forever for
+  // the others in the host-local teardown barrier.
   for (int rank = 0; rank < num_ranks; ++rank) {
     HIP_CHECK(hipSetDevice(rank));
     HIP_CHECK(hipStreamDestroy(streams[rank]));
@@ -304,8 +307,16 @@ int main(int argc, const char **argv) {
       RCCL_CHECK(ncclMemFree(device_layer_inputs[rank][layer]));
       RCCL_CHECK(ncclMemFree(device_layer_outputs[rank][layer]));
     }
+  }
 
+  RCCL_CHECK(ncclGroupStart());
+  for (int rank = 0; rank < num_ranks; ++rank) {
+    HIP_CHECK(hipSetDevice(rank));
     RCCL_CHECK(ncclCommFinalize(comms[rank]));
+  }
+  RCCL_CHECK(ncclGroupEnd());
+
+  for (int rank = 0; rank < num_ranks; ++rank) {
     RCCL_CHECK(ncclCommDestroy(comms[rank]));
   }
 

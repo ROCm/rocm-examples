@@ -7,7 +7,7 @@ The generator (``generate_skip_tests.py``) reads this list and produces the
 per-consumer artifacts:
 
   * ``skip_tests.txt``  -> consumed by ``ctest --exclude-from-file``
-  * ``skip_build.txt``  -> consumed by ``Common/SkipExamples.cmake``
+  * ``skip_build.txt``  -> consumed by ``cmake/SkipExamples.cmake``
   * ``SKIP_FROM_TEST``  -> passed on the ``make test`` command line
   * ``SKIP_FROM_BUILD`` -> passed on the ``make`` command line
 
@@ -86,7 +86,8 @@ applies everywhere). Always include a ``reason``.
 # carry the data, so the make-test skip is scoped to that install method.
 # ctest self-guards each on `if(EXISTS ...)`, so the ctest key is None (ctest
 # auto-skips where the data is absent); only the `make test` path needs the
-# explicit, install-method-scoped skip.
+# explicit, install-method-scoped skip. video_decode_caps is not listed: it only
+# queries decoder capabilities and needs no test data.
 _ROCDECODE_DIRS = [
     "rocdec_decode",
     "video_decode",
@@ -131,17 +132,37 @@ SKIP_MANIFEST = [
         }
         for d in _ROCDECODE_DIRS
     ],
-    # --- hipThreads: nightly whl build skip (whole tree) ------------------
-    # The TheRock nightly whl ships hipthreads headers + libhipthreads.a but an
-    # empty include/libhipcxx, so the libhipcxx headers the examples include
-    # (hip/std, hip/atomic) are absent and every hipthreads-linked example fails
-    # to compile. Skip the whole Libraries/hipThreads tree until the nightly whl
-    # ships libhipcxx at include/libhipcxx (ROCm/TheRock#7530 disabled it).
+    # --- rocDecode video_decode_caps: test-only, stable channel, gfx1151 only ---
+    # The ROCm 10.1 rocDecode maps unmapped codec/bit-depth combinations (e.g. HEVC
+    # 12-bit) to VAProfileNone and calls vaCreateConfig on it. Mesa advertises
+    # VAProfileNone only on GPUs with a VPE block (gfx1151, not gfx1100), so there
+    # rocDecGetDecoderCaps returns ROCDEC_RUNTIME_ERROR instead of "unsupported".
+    # Fixed in ROCm/rocm-systems#11724, which is not in ROCm 10.1.
     {
-        "ctest": None,
-        "path": "Libraries/hipThreads",
-        "scope": ["build"],
-        "channels": ["nightly"],
-        "reason": "libhipcxx headers (hip/std, hip/atomic) absent from include/libhipcxx in the TheRock nightly whl (ROCm/TheRock#7530); hipthreads ships but is unbuildable without them",
+        "ctest": "rocdecode_video_decode_caps",
+        "path": "Libraries/rocDecode/video_decode_caps",
+        "scope": ["test"],
+        "channels": ["stable"],
+        "targets": ["gfx1151"],
+        "reason": "ROCm/rocm-systems#11724 rocDecGetDecoderCaps VAProfileNone fix not in ROCm 10.1",
+    },
+    # --- hipThreads: test-only, gfx1151 only, hipthreads_in_one_weekend_raytracer_step3_hipthread_dropin and hipthreads_in_one_weekend_raytracer_step4_simdize ---
+    # oem kernel driver does not have ROCm/amdgpu@55ff0278dd12. This fix needs to be upstreamed for APUs that don’t use dkms to work properly with hipthread.
+    # The test failure is due to the driver writing the page tables from the CPU (the default on APUs). The GPU keeps using the address translation it cached in iteration 1,
+    # and every later copy reads and writes iteration 1's buffer, which was already freed. ROCm's amdgpu-dkms driver avoids this with a TLB flush after each remap (ROCm/amdgpu@55ff0278dd12),
+    # which never reached upstream Linux, so it passes on dGPUs (either using SDMA (page tables are updated on device) or has resizable bar enabled (CPU code path) but with dkms which has the proper fix) and fails on gfx1151 and likely every other APUs without dkms.
+    {
+        "ctest": "hipthreads_in_one_weekend_raytracer_step3_hipthread_dropin",
+        "path": "Libraries/hipThreads/in_one_weekend_raytracer/step3_hipthread_dropin",
+        "scope": ["test"],
+        "targets": ["gfx1151"],
+        "reason": "https://github.com/ROCm/amdgpu/commit/55ff0278dd1239b0bb379d7e0dffa0b16aca6306 is needed for APUs but not available in upstream oem kernel",
+    },
+    {
+        "ctest": "hipthreads_in_one_weekend_raytracer_step4_simdize",
+        "path": "Libraries/hipThreads/in_one_weekend_raytracer/step4_simdize",
+        "scope": ["test"],
+        "targets": ["gfx1151"],
+        "reason": "https://github.com/ROCm/amdgpu/commit/55ff0278dd1239b0bb379d7e0dffa0b16aca6306 is needed for APUs but not available in upstream oem kernel",
     },
 ]

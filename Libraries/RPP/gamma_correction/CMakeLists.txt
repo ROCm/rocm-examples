@@ -25,7 +25,7 @@ set(example_name rpp_gamma_correction)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../Common/HipPlatform.cmake")
+include("../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -40,12 +40,12 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("../../../Common/ROCmPath.cmake")
+include("../../../cmake/ROCmPath.cmake")
 
 find_package(OpenCV REQUIRED)
 
 # Locate libomp.so with helper
-include("../../../Common/FindOpenMPHelpers.cmake")
+include("../../../cmake/FindOpenMPHelpers.cmake")
 find_omp_library(OMP_LIBRARY)
 
 add_executable(${example_name} main.cpp)

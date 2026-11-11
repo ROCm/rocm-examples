@@ -23,8 +23,8 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(HIP-Doc-Programming-Guide-Programming-for-HIP-Runtime-Compiler LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/FindFilesystem.cmake")
-include("${CMAKE_CURRENT_LIST_DIR}/../../../Common/HipPlatform.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/FindFilesystem.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})

@@ -110,6 +110,8 @@ void gemm_with_scale_a_b_ext(hipblasLtHandle_t handle,
   //     heuristic_result[i].workspaceSize);
   // HIP_CHECK(hipMalloc(&d_workspace, workspace_size));
 
+  // initialize() checks the solution's workspace needs against this size.
+  gemm.setMaxWorkspaceBytes(max_workspace_size);
   // Make sure to initialize every time when algo changes
   HIPBLASLT_CHECK(gemm.initialize(heuristic_result[0].algo, d_workspace));
   HIPBLASLT_CHECK(gemm.run(stream));

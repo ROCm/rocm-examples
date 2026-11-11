@@ -31,7 +31,7 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 find_package(hip)
 # Try to find rocWMMA as a package first
@@ -83,6 +83,8 @@ if(NOT ROCWMMA_TARGET AND NOT rocwmma_FOUND)
     # Create imported target for header-only library
     add_library(rocwmma INTERFACE)
     target_include_directories(rocwmma INTERFACE ${ROCWMMA_INCLUDE_DIR})
+    # HIP supplies compiler-rt builtins for host FP16 conversions on Windows.
+    target_link_libraries(rocwmma INTERFACE hip::host)
     set(ROCWMMA_TARGET rocwmma)
 endif()
 

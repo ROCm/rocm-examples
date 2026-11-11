@@ -25,7 +25,7 @@ set(example_name rocdecode_video_decode_raw)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("../../../Common/HipPlatform.cmake")
+include("../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -40,7 +40,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("../../../Common/ROCmPath.cmake")
+include("../../../cmake/ROCmPath.cmake")
 
 find_package(HIP REQUIRED)
 find_package(rocdecode REQUIRED)
@@ -109,6 +109,13 @@ if(EXISTS "${ROCDECODE_TEST_VIDEO_RAW_VP9}")
     add_test(NAME ${example_name}-VP9 COMMAND ${example_name} -i "${ROCDECODE_TEST_VIDEO_RAW_VP9}")
 else()
     message(WARNING "rocDecode test video ${ROCDECODE_TEST_VIDEO_RAW_VP9} not found, skipping ${example_name}-VP9 test")
+endif()
+
+# The example exits with skip_exit_code (77, Common/example_utils.hpp) when the GPU's video
+# decoder doesn't support the stream's codec, e.g. AV1 on gfx90a. Report that as a skip.
+get_directory_property(example_tests TESTS)
+if(example_tests)
+    set_tests_properties(${example_tests} PROPERTIES SKIP_RETURN_CODE 77)
 endif()
 
 install(TARGETS ${example_name})

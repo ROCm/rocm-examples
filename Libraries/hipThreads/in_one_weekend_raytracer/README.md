@@ -11,7 +11,7 @@ This series is based on the original source code from [Ray Tracing in One Weeken
 ### Steps
 
 | Step | Directory | Description |
-|------|-----------|-------------|
+| ---- | --------- | ----------- |
 | 1 | `step1_baseline/` | CPU baseline: `std::thread` parallelism across image rows. |
 | 2 | `step2_cpu_tiling/` | CPU tiling: threads pull 8×4 pixel tiles from a shared work queue for better cache locality. |
 | 3 | `step3_hipthread_dropin/` | GPU port: `std::thread` replaced with `hip::wthread` as a near drop-in; scene constructed on the GPU. |

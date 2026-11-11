@@ -32,7 +32,7 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../Common/ROCmPath.cmake")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
 find_package(rocdecode QUIET)
 if(NOT rocdecode_FOUND)
@@ -41,6 +41,7 @@ if(NOT rocdecode_FOUND)
 endif()
 
 add_subdirectory(rocdec_decode)
+add_subdirectory(video_decode_caps)
 add_subdirectory(video_decode_raw)
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../cmake")
