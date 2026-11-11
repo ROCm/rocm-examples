@@ -101,13 +101,16 @@ if(STL_DEPENDS_ON_TBB0 OR STL_DEPENDS_ON_TBB1)
     # rejects that as a non-constant expression (gcc doesn't). Detect it with the real HIP
     # compiler and fall back to the serial PSTL backend only where this fails to compile.
     include(CheckSourceCompiles)
-    unset(CMAKE_REQUIRED_FLAGS)
+    include(CMakePushCheckState)
+    cmake_push_check_state(RESET)
+    set(CMAKE_REQUIRED_LIBRARIES TBB::tbb)
     check_source_compiles(
         ${ROCM_EXAMPLES_GPU_LANGUAGE}
         "#include <tbb/task.h>
         int main() { return 0; }"
         REDUCTION_TBB_HEADERS_COMPILE
     )
+    cmake_pop_check_state()
 endif()
 
 # NOTE1: Google Test has created a mess with legacy FindGTest.cmake and newer GTestConfig.cmake
