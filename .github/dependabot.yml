@@ -9,10 +9,20 @@ updates:
   - package-ecosystem: "github-actions"
     # "/" covers .github/workflows; composite actions keep their own `uses:`
     # pins, so .github/actions has to be listed separately to get bumped.
-    directory: "/"
+    directories:
+      - "/"
+      - "/.github/actions/*"
     schedule:
       interval: "daily"
       # Wait a week before adopting newly released action versions.
+    pull-request-branch-name:
+      prefix: "users/dependabot"
+      template: "{prefix}/{name}"
+      word-separator: "-"
+      branch-name-case: "lowercase"
+    commit-message:
+      prefix: "chore"
+      include: "scope"
     cooldown:
       default-days: 7
       exclude:
