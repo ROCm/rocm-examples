@@ -95,6 +95,22 @@ else()
 endif()
 if(STL_DEPENDS_ON_TBB0 OR STL_DEPENDS_ON_TBB1)
     find_package(TBB REQUIRED)
+
+    # RHEL/Rocky 9's tbb-devel (2020.3, the last pre-oneTBB release) default-initializes
+    # tbb/task.h's kind_type one past its last enumerator (kind_type(bound+1)); HIP clang
+    # rejects that as a non-constant expression (gcc doesn't). Detect it with the real HIP
+    # compiler and fall back to the serial PSTL backend only where this fails to compile.
+    include(CheckSourceCompiles)
+    include(CMakePushCheckState)
+    cmake_push_check_state(RESET)
+    set(CMAKE_REQUIRED_LIBRARIES TBB::tbb)
+    check_source_compiles(
+        ${ROCM_EXAMPLES_GPU_LANGUAGE}
+        "#include <tbb/task.h>
+        int main() { return 0; }"
+        REDUCTION_TBB_HEADERS_COMPILE
+    )
+    cmake_pop_check_state()
 endif()
 
 # NOTE1: Google Test has created a mess with legacy FindGTest.cmake and newer GTestConfig.cmake
@@ -146,6 +162,10 @@ foreach(VER RANGE 1 10)
     add_executable(${TargetName} ${Sources})
 
     target_include_directories(${TargetName} PRIVATE ${include_dirs})
+
+    if(DEFINED REDUCTION_TBB_HEADERS_COMPILE AND NOT REDUCTION_TBB_HEADERS_COMPILE)
+        target_compile_definitions(${TargetName} PRIVATE _GLIBCXX_USE_TBB_PAR_BACKEND=0)
+    endif()
 
     set_target_properties(${TargetName} PROPERTIES LINKER_LANGUAGE CXX)
 
