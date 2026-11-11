@@ -41,7 +41,7 @@ ILDLIBS   :=
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
-  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
   # The CUDA green-context path uses the CUDA driver API, so link libcuda.
   ILDLIBS   += -lcuda
   COMPILER := $(CUDACXX)
