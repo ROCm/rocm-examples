@@ -105,9 +105,9 @@ static_assert(
 
 // Allocates through a type-erased resource reference, without mentioning the
 // concrete resource type: this is the point of type erasure.
-void *allocate_device_buffer(
-    HIP_MR_RESOURCE_REF<hip::mr::device_accessible> resource,
-    std::size_t bytes) {
+void *
+allocate_device_buffer(HIP_MR_RESOURCE_REF<hip::mr::device_accessible> resource,
+                       std::size_t bytes) {
   std::cout << "Allocating " << bytes
             << " bytes through the type-erased resource reference.\n";
   return resource.HIP_MR_ALLOCATE(bytes,
