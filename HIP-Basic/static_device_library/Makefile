@@ -38,12 +38,12 @@ AR ?= ar
 # Common variables and flags
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
-ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICXXFLAGS := -std=$(CXX_STD) -O3 $(CXXFLAGS)
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -I library $(CPPFLAGS)
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
 include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
-ICXXFLAGS += -O3 $(OFFLOAD_ARCH_FLAGS)
+ICXXFLAGS += $(OFFLOAD_ARCH_FLAGS)
 
 EXAMPLE_LIB := hip_static_device
 LIBEXAMPLE  := lib$(EXAMPLE_LIB).a

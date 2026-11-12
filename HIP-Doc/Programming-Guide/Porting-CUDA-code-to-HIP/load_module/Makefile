@@ -38,7 +38,7 @@ CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 # Common variables and flags
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
-ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
+ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := $(CPPFLAGS)
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
@@ -70,5 +70,7 @@ test: $(EXAMPLE)
 clean:
 	$(RM) $(EXAMPLE) vcpy_isa.ptx
 endif
+
+ICXXFLAGS += $(CXXFLAGS)
 
 .PHONY: clean test
