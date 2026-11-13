@@ -1,5 +1,8 @@
 # MIVisionX Canny Edge Detection
 
+> [!WARNING]
+> MIVisionX will stop being shipped with OpenCV support in future releases, this example requires MIVisionX built with OpenCV support. For more details on how to build MIVisionX, please see https://github.com/ROCm/MIVisionX and https://github.com/ROCm/MIVisionX/pull/1575
+
 ## Description
 
 This example demonstrates Canny edge detection using the OpenVX framework. The example processes images or live camera feeds to detect edges using the Canny algorithm, which involves color space conversion, channel extraction, and edge detection with configurable thresholds.

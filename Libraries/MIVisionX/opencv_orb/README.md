@@ -1,7 +1,7 @@
 # MIVisionX ORB Feature Detection
 
 > [!WARNING]
-> This example is deprecated. OpenCV support from MIVisionX will be removed in future releases, this example will only work on Ubuntu 22.04 with MIVisionX built from source with OpenCV support. For more details on how to build MIVisionX, please see https://github.com/ROCm/MIVisionX and https://github.com/ROCm/MIVisionX/pull/1575
+> MIVisionX will stop being shipped with OpenCV support in future releases, this example requires MIVisionX built with OpenCV support. For more details on how to build MIVisionX, please see https://github.com/ROCm/MIVisionX and https://github.com/ROCm/MIVisionX/pull/1575
 
 ## Description
 
