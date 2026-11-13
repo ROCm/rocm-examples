@@ -130,6 +130,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_vs2017", 
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memory_access_host_staging_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memory_access_host_staging\p2p_memory_access_host_staging_vs2017.vcxproj", "{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "p2p_memcpy_peer_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\p2p_memcpy_peer\p2p_memcpy_peer_vs2017.vcxproj", "{46FE8431-16A3-477A-AFAE-F0A9353728CF}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "constant_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\constant_memory\constant_memory_vs2017.vcxproj", "{119213EE-509A-41F2-8C87-B0872D68E41A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_shared_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Device-Memory\dynamic_shared_memory\dynamic_shared_memory_vs2017.vcxproj", "{6F4522E2-3205-45C5-A4E2-B934F56ECC7B}"
@@ -404,6 +406,10 @@ Global
 		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Debug|x64.Build.0 = Debug|x64
 		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Release|x64.ActiveCfg = Release|x64
 		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4}.Release|x64.Build.0 = Release|x64
+		{46FE8431-16A3-477A-AFAE-F0A9353728CF}.Debug|x64.ActiveCfg = Debug|x64
+		{46FE8431-16A3-477A-AFAE-F0A9353728CF}.Debug|x64.Build.0 = Debug|x64
+		{46FE8431-16A3-477A-AFAE-F0A9353728CF}.Release|x64.ActiveCfg = Release|x64
+		{46FE8431-16A3-477A-AFAE-F0A9353728CF}.Release|x64.Build.0 = Release|x64
 		{119213EE-509A-41F2-8C87-B0872D68E41A}.Debug|x64.ActiveCfg = Debug|x64
 		{119213EE-509A-41F2-8C87-B0872D68E41A}.Debug|x64.Build.0 = Debug|x64
 		{119213EE-509A-41F2-8C87-B0872D68E41A}.Release|x64.ActiveCfg = Release|x64
@@ -633,6 +639,7 @@ Global
 		{799BC522-3B34-4C4F-8B9F-CEE82D286414} = {72AABC83-55BE-401F-937E-B2E6683C8B64}
 		{05859FB6-53F2-4EDE-8E0E-4F4DCACF6C20} = {72AABC83-55BE-401F-937E-B2E6683C8B64}
 		{FAA67BCB-BA0E-4152-95C9-2DBE0F0DFBF4} = {72AABC83-55BE-401F-937E-B2E6683C8B64}
+		{46FE8431-16A3-477A-AFAE-F0A9353728CF} = {72AABC83-55BE-401F-937E-B2E6683C8B64}
 		{119213EE-509A-41F2-8C87-B0872D68E41A} = {82FA9FFB-20C9-4358-B3F4-27BB740A5571}
 		{6F4522E2-3205-45C5-A4E2-B934F56ECC7B} = {82FA9FFB-20C9-4358-B3F4-27BB740A5571}
 		{7CBD6563-38D3-4EED-A6F2-062E784E857F} = {82FA9FFB-20C9-4358-B3F4-27BB740A5571}
