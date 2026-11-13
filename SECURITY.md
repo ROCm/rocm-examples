@@ -21,15 +21,16 @@ The scanners are not implemented here: rocm-examples calls the shared
 [`ROCm/rocm-security-gh`](https://github.com/ROCm/rocm-security-gh)
 `security-baseline.yml` reusable workflow, so the scanner versions and
 behavior are maintained centrally for ROCm, and this repository supplies only
-its own configuration (the `*.yml` / `*.toml` files at the repo root).
+its own configuration (the files in
+[`.github/scan_tools_configs/`](.github/scan_tools_configs/)).
 
-| Scanner                                          | Looks for                                                | Configuration                        |
-| ------------------------------------------------ | -------------------------------------------------------- | ------------------------------------ |
-| [gitleaks](https://github.com/gitleaks/gitleaks) | Secrets and credentials in tracked files and git history | [`gitleaks.toml`](gitleaks.toml)     |
-| [bandit](https://bandit.readthedocs.io/)         | Unsafe patterns in our Python scripts                    | [`bandit.yml`](bandit.yml)           |
-| [zizmor](https://docs.zizmor.sh/)                | GitHub Actions workflow vulnerabilities                  | [`zizmor.yml`](zizmor.yml)           |
-| [trivy](https://trivy.dev/)                      | Dependency vulnerabilities and misconfigurations         | [`trivy.yml`](trivy.yml)             |
-| [CodeQL](https://codeql.github.com/)             | Semantic code analysis of our Python                     | org-wide default (no local override) |
+| Scanner                                          | Looks for                                                | Configuration                                               |
+| ------------------------------------------------ | -------------------------------------------------------- | ----------------------------------------------------------- |
+| [gitleaks](https://github.com/gitleaks/gitleaks) | Secrets and credentials in tracked files and git history | [`gitleaks.toml`](.github/scan_tools_configs/gitleaks.toml) |
+| [bandit](https://bandit.readthedocs.io/)         | Unsafe patterns in our Python scripts                    | [`bandit.yml`](.github/scan_tools_configs/bandit.yml)       |
+| [zizmor](https://docs.zizmor.sh/)                | GitHub Actions workflow vulnerabilities                  | [`zizmor.yml`](.github/scan_tools_configs/zizmor.yml)       |
+| [trivy](https://trivy.dev/)                      | Dependency vulnerabilities and misconfigurations         | [`trivy.yml`](.github/scan_tools_configs/trivy.yml)         |
+| [CodeQL](https://codeql.github.com/)             | Semantic code analysis of our Python                     | org-wide default (no local override)                        |
 
 Two workflows run them, and where a finding shows up depends on which one
 produced it:
@@ -51,7 +52,3 @@ produced it:
 > finding turns out to be an exploitable vulnerability in shipped ROCm
 > software, report it through the AMD Product Security portal above rather
 > than in a public issue or pull request.
-
-Contributors can run every scanner locally against the same configuration CI
-uses; see
-[the security scanners section in `CONTRIBUTING.md`](CONTRIBUTING.md#security-scanners).
