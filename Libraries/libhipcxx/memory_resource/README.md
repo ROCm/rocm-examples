@@ -7,7 +7,7 @@ This example shows how to implement a custom memory resource that satisfies libh
 Starting with libhipcxx 3.4 (`CCCL_VERSION >= 3004000`), the plain, non-stream-ordered resource concept, its member functions, and its type-erased view have new names:
 
 | Before 3.4 | From 3.4 on |
-|---|---|
+| --- | --- |
 | `hip::mr::resource` | `hip::mr::synchronous_resource` |
 | `hip::mr::resource_with` | `hip::mr::synchronous_resource_with` |
 | `hip::mr::resource_ref` | `hip::mr::synchronous_resource_ref` |
