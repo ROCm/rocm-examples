@@ -16,7 +16,9 @@ on:
       - 'cmake/**'
       - 'CMakeLists.txt'
       - 'Makefile'
-      - '.github/workflows/**'
+      - '.github/workflows/ci_therock.yml'
+      - '.github/workflows/build-rocm-examples-reusable.yml'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
@@ -32,7 +34,9 @@ on:
       - 'cmake/**'
       - 'CMakeLists.txt'
       - 'Makefile'
-      - '.github/workflows/**'
+      - '.github/workflows/ci_therock.yml'
+      - '.github/workflows/build-rocm-examples-reusable.yml'
+      - '.github/build_tools/**'
   workflow_dispatch:
     inputs:
       gpu_config:
