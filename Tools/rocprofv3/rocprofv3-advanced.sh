@@ -94,19 +94,26 @@ echo "==========================================================================
 # range vary per agent and ROCm version, so query the capabilities of the device the workload actually runs on
 # (HIP's default device, index 0, since the workload never calls hipSetDevice) and use its first reported
 # configuration instead of hardcoding one or picking up a config reported for a different agent.
+#
+# rocprofv3-avail's `-d` does not scope `info --pc-sampling` to a single agent: it always lists every
+# PC-sampling-capable agent. The awk parser below therefore filters the listing to the GPU:0 block itself
+# instead of relying on `-d` to do it, so a config is never picked up from a different agent.
 PC_SAMPLING_INFO="$($EXAMPLE_QUERY -d 0 info --pc-sampling)"
-if [[ -z "$PC_SAMPLING_INFO" ]]; then
-    echo "PC sampling not supported on any agent"
+PC_SAMPLING_CONFIG="$(awk '
+    # Reset on every GPU boundary, and only keep fields while inside the GPU:0 block, so a config is
+    # never built out of fields left over from, or belonging to, a different agent'"'"'s section.
+    /^[[:space:]]*GPU[[:space:]]*:/           { selected = ($NF == "0"); method = ""; unit = ""; min = ""; next }
+    !selected                                 { next }
+    /^[[:space:]]*Method[[:space:]]*:/        { method = $NF; next }
+    /^[[:space:]]*Unit[[:space:]]*:/          { unit = $NF; next }
+    /^[[:space:]]*Min_Interval[[:space:]]*:/  { min = $NF; next }
+    /^[[:space:]]*Max_Interval[[:space:]]*:/  { if (method != "") { print method, unit, min; exit } }
+' <<< "$PC_SAMPLING_INFO")"
+
+if [[ -z "$PC_SAMPLING_CONFIG" ]]; then
+    echo "PC sampling not supported on device 0"
 else
-    read -r METHOD UNIT INTERVAL <<< "$(awk '
-        # Reset on every GPU boundary so a config is never built out of fields left over from a
-        # different agent'"'"'s section.
-        /^[[:space:]]*GPU[[:space:]]*:/           { method = ""; unit = ""; min = ""; next }
-        /^[[:space:]]*Method[[:space:]]*:/        { method = $NF; next }
-        /^[[:space:]]*Unit[[:space:]]*:/          { unit = $NF; next }
-        /^[[:space:]]*Min_Interval[[:space:]]*:/  { min = $NF; next }
-        /^[[:space:]]*Max_Interval[[:space:]]*:/  { if (method != "") { print method, unit, min; exit } }
-    ' <<< "$PC_SAMPLING_INFO")"
+    read -r METHOD UNIT INTERVAL <<< "$PC_SAMPLING_CONFIG"
 
     # --pc-sampling-unit only accepts the plural choices (instructions/cycles/time); the capability listing above
     # reports them singular except for "time".
