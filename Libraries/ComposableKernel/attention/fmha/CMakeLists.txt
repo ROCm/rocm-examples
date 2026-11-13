@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -27,9 +27,6 @@ set(example_fwd_script test_ck_tile_fmha_fwd.sh)
 
 set(example_bwd ${example_name}_bwd)
 set(example_bwd_script test_ck_tile_fmha_bwd.sh)
-
-set(example_fwd_v3 ${example_name}_fwd_v3)
-set(example_fwd_v3_script test_ck_tile_fmha_fwd_v3.sh)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
@@ -105,7 +102,15 @@ add_dependencies(${example_fwd} fmha_fwd_gen_srcs)
 
 set_source_files_properties(fmha_fwd.cpp ${EXAMPLE_FWD_GEN_SRCS} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
-target_compile_definitions(${example_fwd} PRIVATE CK_TILE_FMHA_FWD_FAST_EXP2=1)
+target_compile_definitions(
+    ${example_fwd}
+    PRIVATE
+        CK_TILE_FMHA_FWD_FAST_EXP2=1
+        CK_TILE_FMHA_FWD_SPLITKV_API=0
+        CK_TILE_FMHA_FWD_APPENDKV_API=0
+        CK_TILE_FMHA_FWD_PAGEDKV_API=0
+        CK_TILE_FMHA_FWD_BATCH_PREFILL_API=0
+)
 target_compile_features(${example_fwd} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_fwd} PRIVATE -Wno-float-equal
                                               -Wno-undefined-func-template
@@ -151,7 +156,7 @@ add_custom_target(fmha_bwd_gen_srcs
 add_dependencies(${example_bwd} fmha_bwd_gen_srcs)
 target_compile_definitions(${example_bwd} PRIVATE CK_TILE_FLOAT_TO_BFLOAT16_DEFAULT=3)
 target_compile_features(${example_bwd} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_fwd} PRIVATE -Wno-float-equal
+target_compile_options(${example_bwd} PRIVATE -Wno-float-equal
                                               -Wno-undefined-func-template
                                               -fgpu-flush-denormals-to-zero
 )

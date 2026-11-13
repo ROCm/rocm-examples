@@ -1,27 +1,9 @@
-// MIT License
-//
-// Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
+#include "ck_tile/host.hpp"
 
 #include "fmha_fwd.hpp"
-#include "ck_tile/host.hpp"
 #include "fmha_fwd_runner.hpp"
 
 #include <string>
@@ -67,17 +49,17 @@ auto create_args(int argc, char *argv[]) {
       .insert("d", "128", "head dim for q, k")
       .insert("d_v", "-1", "head dim for v, -1 means equal to d")
       .insert("scale_s", "0",
-              "scale factor of S. 0 means equal to 1/sqrt(hdim).\n"
-              "note when squant=1, this value will be modified")
+              "scale factor of S. 0 means equal to 1/sqrt(hdim)")
+      .insert("qscale", "n",
+              "quant scale:\n"
+              "  n or 0, no scale\n"
+              "  pt or 1, per-tensor scale\n"
+              "  bs or 2, block scale\n"
+              "  kvbs or 3, Q per-tensor, K/V per-page block scale\n"
+              "  mx or 4, microscaling (exclusively for data types like mxfp8 "
+              "and mxfp4)\n"
+              "  ph or 5, per-head scale")
       .insert("logits_soft_cap", "0", "attention logits soft capping value.")
-      .insert("squant", "auto",
-              "if using static quantization fusion or not. auto: fp8 will "
-              "default use squant, "
-              "other will not\n"
-              "0: no static quant(not implemented) 1: apply scale_p and "
-              "scale_o with respect to "
-              "P and O.\n"
-              "calculate scale_s, scale_p, scale_o auto")
       .insert("iperm", "1",
               "permute input\n"
               "if true, will be b*h*s*d, else b*s*h*d")
@@ -87,7 +69,8 @@ auto create_args(int argc, char *argv[]) {
               "e(lementwise) or 1, elementwise bias with 1*1*s*s. e:1, "
               "1*h*s*s. e:2, b*h*s*s\n"
               "a(libi) or 2, alibi with 1*h. a:1, b*h")
-      .insert("prec", "fp16", "data type. fp32/fp16/bf16/fp8/bf8")
+      .insert("prec", "fp16",
+              "data type: fp32/fp16/bf16/fp8/fp8bf16/fp8fp32/mxfp8/mxfp4")
       .insert(
           "mask", "0",
           "0: no mask, 1: top-left(same as 't'), 2:bottom-right(same as 'b')\n"
@@ -114,7 +97,9 @@ auto create_args(int argc, char *argv[]) {
           "init method:\n  ui or 0 - uniform random int\n  ni - normalized "
           "random int"
           "\n  uf or 1 - uniform random float\n  nf - normalized random float"
-          "\n  tf or 2 - trig float\n")
+          "\n  tf or 2 - trig float"
+          "\n  tf or 3 - uniform random float, min max is the max of the "
+          "type\n")
       .insert("seed", "11939",
               "random seed used for initializing input tensors. 0 for "
               "non-deterministic seed")
@@ -146,7 +131,12 @@ auto create_args(int argc, char *argv[]) {
       .insert(
           "kv_eff_lens", "",
           "Batch-mode only: per-batch effective seqlen for KV (exclude PAD).\n"
-          "Comma-separated list of length 'b'. If empty, no override.");
+          "Comma-separated list of length 'b'. If empty, no override.")
+      .insert("init_sink", "0",
+              "value to init the output tensor sink value for validation")
+      .insert(
+          "pack_gqa", "1",
+          "1: enable Pack-GQA (fold GQA Q heads into seqlen for non-causal)");
 
   bool result = arg_parser.parse(argc, argv);
   return std::make_tuple(result, arg_parser);
@@ -178,6 +168,7 @@ auto run(const ck_tile::ArgParser &arg_parser) {
   ck_tile::index_t page_block_size = arg_parser.get_int("page_block_size");
   bool use_cache_batch_idx = arg_parser.get_bool("cache_batch_idx");
   std::string bias_str = arg_parser.get_str("bias");
+  std::string qscale_str = arg_parser.get_str("qscale");
   float p_drop = arg_parser.get_float("p_drop");
   uint64_t drop_seed = arg_parser.get_uint64("drop_seed");
   uint64_t drop_offset = arg_parser.get_uint64("drop_offset");
@@ -187,13 +178,8 @@ auto run(const ck_tile::ArgParser &arg_parser) {
   ck_tile::index_t num_splits = arg_parser.get_int("num_splits");
   std::string init_method = arg_parser.get_str("init");
   uint32_t seed = arg_parser.get_uint32("seed");
-
-  bool squant = [&]() {
-    if (arg_parser.get_str("squant") == "auto")
-      return std::is_same_v<DataTypeConfig, FmhaFwdFp8>;
-    else
-      return arg_parser.get_bool("squant");
-  }();
+  int init_sink_value = arg_parser.get_int("init_sink");
+  int pack_gqa = arg_parser.get_int("pack_gqa");
 
   ck_tile::stream_config stream_config{
       nullptr,
@@ -212,9 +198,9 @@ auto run(const ck_tile::ArgParser &arg_parser) {
       seqlen_knew, seqlen_qpads, seqlen_kpads, q_eff_lens_per_batch,
       kv_eff_lens_per_batch, rotary_dim, i_perm, o_perm, scale_s,
       logits_soft_cap, is_v_rowmajor, lse, page_block_size, use_cache_batch_idx,
-      bias_str, p_drop, drop_seed, drop_offset, drop_prefs, mask_str, squant,
-      is_rotary_interleaved, num_splits, init_method, seed, do_validation,
-      stream_config, json);
+      bias_str, p_drop, drop_seed, drop_offset, drop_prefs, mask_str,
+      qscale_str, is_rotary_interleaved, num_splits, init_method, seed,
+      do_validation, init_sink_value, pack_gqa, stream_config, json);
 }
 
 int main(int argc, char *argv[]) {
@@ -236,6 +222,10 @@ int main(int argc, char *argv[]) {
       return run<FmhaFwdFp8Bf16>(arg_parser) == fwd_result::success ? 0 : -2;
     } else if (data_type == "fp8fp32") {
       return run<FmhaFwdFp8Fp32>(arg_parser) == fwd_result::success ? 0 : -2;
+    } else if (data_type == "mxfp8") {
+      return run<FmhaFwdMxFp8>(arg_parser) == fwd_result::success ? 0 : -2;
+    } else if (data_type == "mxfp4") {
+      return run<FmhaFwdMxFp4>(arg_parser) == fwd_result::success ? 0 : -2;
     }
     std::cerr << "Unsupported precision: " << data_type << std::endl;
     return -1;

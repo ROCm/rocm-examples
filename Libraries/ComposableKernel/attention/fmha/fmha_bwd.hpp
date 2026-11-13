@@ -1,38 +1,57 @@
-// MIT License
-//
-// Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
-#include "bias.hpp"
 #include "ck_tile/core.hpp"
+
 #include "ck_tile/host/device_prop.hpp"
+
 #include "ck_tile/host/kernel_launch.hpp"
-#include "ck_tile/ops/epilogue.hpp"
+
 #include "ck_tile/ops/fmha.hpp"
+
+#include "ck_tile/ops/epilogue.hpp"
+
 #include "mask.hpp"
 
+#include "bias.hpp"
+
+#include <functional>
+#include <iostream>
+#include <memory>
 #include <type_traits>
 #include <utility>
 #include <variant>
+
+// Function pointer type for workspace packing (no captures, points to code
+// segment)
+using PrepareWorkspaceHostFunc = size_t (*)(
+    void *,                   // host_ws
+    ck_tile::index_t,         // batch
+    ck_tile::index_t,         // hdim_q
+    ck_tile::index_t,         // nhead_q
+    ck_tile::index_t,         // seqlen_q
+    ck_tile::index_t,         // seqlen_k
+    const ck_tile::index_t *, // seqstart_q
+    const ck_tile::index_t *  // seqstart_k
+);
+
+// Function pointer type for the on-device workspace-metadata kernel launch.
+// Launches a single-thread kernel that writes nsplits[]/offsets[] straight into
+// the device workspace, so no host callback, pinned staging, or metadata
+// D2H/H2D is needed (graph-capturable).
+using PrepareWorkspaceDeviceFunc =
+    void (*)(void *,                   // device_ws
+             ck_tile::index_t,         // batch
+             ck_tile::index_t,         // hdim_q
+             ck_tile::index_t,         // nhead_q
+             ck_tile::index_t,         // seqlen_q
+             ck_tile::index_t,         // seqlen_k
+             ck_tile::index_t,         // num_cus
+             const ck_tile::index_t *, // seqstart_q (device)
+             const ck_tile::index_t *, // seqstart_k (device)
+             const ck_tile::stream_config &);
 
 struct FmhaBwdFp32 {};
 
@@ -118,7 +137,11 @@ struct fmha_bwd_args {
   void *dk_ptr;
   void *dv_ptr;
   void *dbias_ptr;
-  void *dq_acc_ptr;
+  void *workspace_ptr;
+  const void *sink_ptr; // sink scores [nhead] in log-space (LSEDataType);
+                        // nullptr disables sink
+  void *d_sink_ptr;     // sink gradient output [nhead] (LSEDataType); nullptr
+                        // disables sink gradient
 
   // Usage notes for sequence length pointer parameters:
   //
@@ -128,13 +151,17 @@ struct fmha_bwd_args {
   // With padding:
   //   Group mode:
   //     - seqstart_q_ptr, seqstart_k_ptr: Record cumulative physical (including
-  //     padding) sequence lengths. [array size: batch + 1]
+  //     padding) sequence
+  //       lengths. [array size: batch + 1]
   //     - seqlen_q_ptr/seqlen_k_ptr: Records logical (excluding padding) length
-  //     for each sequence. [array size: batch]
+  //     for each
+  //       sequence. [array size: batch]
   //     - cu_seqlen_q_ptr/cu_seqlen_k_ptr: Records cumulative logical
-  //     (excluding padding) sequence lengths. [array size: batch + 1]
+  //     (excluding padding)
+  //       sequence lengths. [array size: batch + 1]
   //     - seqlen_q_ptr (per-sequence) and cu_seqlen_q_ptr (cumulative logical)
-  //     are mutually exclusive. Use one set, not both.
+  //     are mutually
+  //       exclusive. Use one set, not both.
   //
   //   Batch mode:
   //     - cu_seqlen_q_ptr/cu_seqlen_k_ptr: Records cumulative logical
@@ -190,7 +217,6 @@ struct fmha_bwd_args {
   ck_tile::index_t stride_o;
   ck_tile::index_t stride_randval;
   ck_tile::index_t stride_do;
-  ck_tile::index_t stride_dq_acc;
   ck_tile::index_t stride_dq;
   ck_tile::index_t stride_dk;
   ck_tile::index_t stride_dv;
@@ -203,7 +229,6 @@ struct fmha_bwd_args {
   ck_tile::index_t nhead_stride_randval;
   ck_tile::index_t nhead_stride_do;
   ck_tile::index_t nhead_stride_lsed;
-  ck_tile::index_t nhead_stride_dq_acc;
   ck_tile::index_t nhead_stride_dq;
   ck_tile::index_t nhead_stride_dk;
   ck_tile::index_t nhead_stride_dv;
@@ -216,12 +241,10 @@ struct fmha_bwd_args {
   ck_tile::index_t batch_stride_randval;
   ck_tile::index_t batch_stride_do;
   ck_tile::index_t batch_stride_lsed;
-  ck_tile::index_t batch_stride_dq_acc;
   ck_tile::index_t batch_stride_dq;
   ck_tile::index_t batch_stride_dk;
   ck_tile::index_t batch_stride_dv;
   ck_tile::index_t batch_stride_dbias;
-  ck_tile::index_t split_stride_dq_acc;
   ck_tile::index_t window_size_left;
   ck_tile::index_t window_size_right;
   ck_tile::index_t mask_type;
@@ -236,57 +259,50 @@ template <typename FmhaBwdDQDKDVKernel>
 auto fmha_bwd_dq_dk_dv_create_kargs_and_grids(fmha_bwd_args args) {
   assert(args.nhead_q % args.nhead_k == 0);
   auto kargs = [&] {
-    constexpr bool dq_uss_acc = FmhaBwdDQDKDVKernel::kMaxSeqLenQ == 0;
-    const auto dq_ptr = dq_uss_acc ? args.dq_acc_ptr : args.dq_ptr;
-    const auto stride_dq = dq_uss_acc ? args.stride_dq_acc : args.stride_dq;
-    const auto nhead_stride_dq =
-        dq_uss_acc ? args.nhead_stride_dq_acc : args.nhead_stride_dq;
-    const auto batch_stride_dq =
-        dq_uss_acc ? args.batch_stride_dq_acc : args.batch_stride_dq;
-
     // create group mode kernel arguments
     if constexpr (FmhaBwdDQDKDVKernel::kIsGroupMode) {
       return FmhaBwdDQDKDVKernel::MakeKargsImpl(
           args.q_ptr, args.k_ptr, args.v_ptr, args.bias_ptr, args.lse_ptr,
-          args.do_ptr, args.d_ptr, args.rand_val_ptr, args.dk_ptr, args.dv_ptr,
-          args.dbias_ptr, dq_ptr, args.seqstart_q_ptr, args.seqstart_k_ptr,
-          args.seqlen_q_ptr, args.seqlen_k_ptr, args.cu_seqlen_q_ptr,
-          args.cu_seqlen_k_ptr, args.hdim_q, args.hdim_v, args.nhead_q,
-          args.nhead_q / args.nhead_k, args.scale, args.stride_q, args.stride_k,
-          args.stride_v, args.stride_bias, args.stride_randval, args.stride_do,
-          stride_dq, args.stride_dk, args.stride_dv, args.stride_dbias,
-          args.nhead_stride_q, args.nhead_stride_k, args.nhead_stride_v,
-          args.nhead_stride_bias, args.nhead_stride_randval,
-          args.nhead_stride_do, args.nhead_stride_lsed, nhead_stride_dq,
-          args.nhead_stride_dk, args.nhead_stride_dv, args.nhead_stride_dbias,
-          args.split_stride_dq_acc, args.window_size_left,
+          args.do_ptr, args.d_ptr, args.rand_val_ptr, args.dq_ptr, args.dk_ptr,
+          args.dv_ptr, args.dbias_ptr, args.workspace_ptr, args.seqstart_q_ptr,
+          args.seqstart_k_ptr, args.seqlen_q_ptr, args.seqlen_k_ptr,
+          args.cu_seqlen_q_ptr, args.cu_seqlen_k_ptr, args.batch, args.hdim_q,
+          args.hdim_v, args.nhead_q, args.nhead_q / args.nhead_k, args.scale,
+          args.stride_q, args.stride_k, args.stride_v, args.stride_bias,
+          args.stride_randval, args.stride_do, args.stride_dq, args.stride_dk,
+          args.stride_dv, args.stride_dbias, args.nhead_stride_q,
+          args.nhead_stride_k, args.nhead_stride_v, args.nhead_stride_bias,
+          args.nhead_stride_randval, args.nhead_stride_do,
+          args.nhead_stride_lsed, args.nhead_stride_dq, args.nhead_stride_dk,
+          args.nhead_stride_dv, args.nhead_stride_dbias, args.window_size_left,
           args.window_size_right, args.mask_type, args.p_drop,
           args.drop_seed_offset);
     } else { // create batch mode kernel arguments
       return FmhaBwdDQDKDVKernel::MakeKargsImpl(
           args.q_ptr, args.k_ptr, args.v_ptr, args.bias_ptr, args.lse_ptr,
-          args.do_ptr, args.d_ptr, args.rand_val_ptr, args.dk_ptr, args.dv_ptr,
-          args.dbias_ptr, dq_ptr, args.seqlen_q, args.seqlen_k, args.hdim_q,
-          args.hdim_v, args.nhead_q, args.nhead_q / args.nhead_k, args.scale,
-          args.stride_q, args.stride_k, args.stride_v, args.stride_bias,
-          args.stride_randval, args.stride_do, stride_dq, args.stride_dk,
-          args.stride_dv, args.stride_dbias, args.nhead_stride_q,
-          args.nhead_stride_k, args.nhead_stride_v, args.nhead_stride_bias,
-          args.nhead_stride_randval, args.nhead_stride_do,
-          args.nhead_stride_lsed, nhead_stride_dq, args.nhead_stride_dk,
-          args.nhead_stride_dv, args.nhead_stride_dbias, args.batch_stride_q,
-          args.batch_stride_k, args.batch_stride_v, args.batch_stride_bias,
-          args.batch_stride_randval, args.batch_stride_do,
-          args.batch_stride_lsed, batch_stride_dq, args.batch_stride_dk,
-          args.batch_stride_dv, args.batch_stride_dbias,
-          args.split_stride_dq_acc, args.window_size_left,
-          args.window_size_right, args.mask_type, args.p_drop,
-          args.drop_seed_offset);
+          args.do_ptr, args.d_ptr, args.rand_val_ptr, args.dq_ptr, args.dk_ptr,
+          args.dv_ptr, args.dbias_ptr, args.workspace_ptr, args.seqlen_q,
+          args.seqlen_k, args.batch, args.hdim_q, args.hdim_v, args.nhead_q,
+          args.nhead_q / args.nhead_k, args.scale, args.stride_q, args.stride_k,
+          args.stride_v, args.stride_bias, args.stride_randval, args.stride_do,
+          args.stride_dq, args.stride_dk, args.stride_dv, args.stride_dbias,
+          args.nhead_stride_q, args.nhead_stride_k, args.nhead_stride_v,
+          args.nhead_stride_bias, args.nhead_stride_randval,
+          args.nhead_stride_do, args.nhead_stride_lsed, args.nhead_stride_dq,
+          args.nhead_stride_dk, args.nhead_stride_dv, args.nhead_stride_dbias,
+          args.batch_stride_q, args.batch_stride_k, args.batch_stride_v,
+          args.batch_stride_bias, args.batch_stride_randval,
+          args.batch_stride_do, args.batch_stride_lsed, args.batch_stride_dq,
+          args.batch_stride_dk, args.batch_stride_dv, args.batch_stride_dbias,
+          args.window_size_left, args.window_size_right, args.mask_type,
+          args.p_drop, args.drop_seed_offset);
     }
   }();
 
-  dim3 grids = FmhaBwdDQDKDVKernel::GridSize(args.batch, args.nhead_q,
-                                             args.max_seqlen_k);
+  const auto grid_seqlen_k =
+      FmhaBwdDQDKDVKernel::kIsGroupMode ? args.max_seqlen_k : args.seqlen_k;
+  dim3 grids =
+      FmhaBwdDQDKDVKernel::GridSize(args.batch, args.nhead_q, grid_seqlen_k);
   return ck_tile::make_tuple(kargs, grids);
 }
 
@@ -296,14 +312,16 @@ auto fmha_bwd_dot_do_o_create_kargs_and_grids(fmha_bwd_args args) {
     // create group mode kernel arguments
     if constexpr (FmhaBwdOGradDotOKernel::kIsGroupMode) {
       return FmhaBwdOGradDotOKernel::MakeKargs(
-          args.o_ptr, args.do_ptr, args.d_ptr, args.p_undrop,
-          args.seqstart_q_ptr, args.seqlen_q_ptr, args.cu_seqlen_q_ptr,
-          args.hdim_v, args.stride_do, args.stride_o, args.nhead_stride_do,
+          args.o_ptr, args.do_ptr, args.d_ptr, args.lse_ptr, args.sink_ptr,
+          args.d_sink_ptr, args.p_undrop, args.seqstart_q_ptr,
+          args.seqlen_q_ptr, args.cu_seqlen_q_ptr, args.hdim_v, args.nhead_q,
+          args.stride_do, args.stride_o, args.nhead_stride_do,
           args.nhead_stride_o, args.nhead_stride_lsed);
     } else { // create batch mode kernel arguments
       return FmhaBwdOGradDotOKernel::MakeKargs(
-          args.o_ptr, args.do_ptr, args.d_ptr, args.p_undrop, args.seqlen_q,
-          args.hdim_v, args.stride_do, args.stride_o, args.nhead_stride_do,
+          args.o_ptr, args.do_ptr, args.d_ptr, args.lse_ptr, args.sink_ptr,
+          args.d_sink_ptr, args.p_undrop, args.seqlen_q, args.hdim_v,
+          args.nhead_q, args.stride_do, args.stride_o, args.nhead_stride_do,
           args.nhead_stride_o, args.nhead_stride_lsed, args.batch_stride_do,
           args.batch_stride_o, args.batch_stride_lsed);
     }
@@ -320,17 +338,15 @@ auto fmha_bwd_convert_dq_create_kargs_and_grids(fmha_bwd_args args) {
     // create group mode kernel arguments
     if constexpr (FmhaBwdConvertQGradKernel::kIsGroupMode) {
       return FmhaBwdConvertQGradKernel::MakeKargs(
-          args.dq_acc_ptr, args.dq_ptr, args.seqstart_q_ptr,
-          args.seqstart_k_ptr, args.seqlen_q_ptr, args.seqlen_k_ptr,
-          args.cu_seqlen_q_ptr, args.cu_seqlen_k_ptr, args.hdim_q,
-          args.stride_dq, args.stride_dq_acc, args.nhead_stride_dq,
-          args.nhead_stride_dq_acc, args.split_stride_dq_acc);
+          args.workspace_ptr, args.dq_ptr, args.batch, args.nhead_q,
+          args.seqstart_q_ptr, args.seqstart_k_ptr, args.seqlen_q_ptr,
+          args.seqlen_k_ptr, args.cu_seqlen_q_ptr, args.cu_seqlen_k_ptr,
+          args.hdim_q, args.stride_dq, args.nhead_stride_dq);
     } else { // create batch mode kernel arguments
       return FmhaBwdConvertQGradKernel::MakeKargs(
-          args.dq_acc_ptr, args.dq_ptr, args.seqlen_q, args.seqlen_k,
-          args.hdim_q, args.stride_dq, args.stride_dq_acc, args.nhead_stride_dq,
-          args.nhead_stride_dq_acc, args.batch_stride_dq,
-          args.batch_stride_dq_acc, args.split_stride_dq_acc);
+          args.workspace_ptr, args.dq_ptr, args.batch, args.nhead_q,
+          args.seqlen_q, args.seqlen_k, args.hdim_q, args.stride_dq,
+          args.nhead_stride_dq, args.batch_stride_dq);
     }
   }();
 
@@ -358,6 +374,36 @@ void fmha_bwd_dq_dk_dv_oneshot_(const ck_tile::stream_config &, fmha_bwd_args);
 template <typename Traits_, typename Arch = void>
 std::string fmha_bwd_dq_dk_dv_get_name_();
 template <typename Traits_, typename Arch = void> int fmha_bwd_dq_dk_dv_maxq_();
+struct fmha_bwd_traits;
+template <typename Traits_, typename Arch = void>
+size_t fmha_bwd_dq_dk_dv_dq_ws_host_size_(int batch_size);
+// `total_seqlen_q_padded` is total q tokens across all batches (incl. per-batch
+// padding):
+//   - batch mode: max_batch * seqlen_q
+//   - group mode: seqstart_q[batch] (== varlen q tensor's first dim)
+template <typename Traits_, typename Arch = void>
+size_t fmha_bwd_dq_dk_dv_dq_ws_device_upper_bound_(
+    ck_tile::index_t max_batch, ck_tile::index_t hdim_q,
+    ck_tile::index_t nhead_q, ck_tile::index_t total_seqlen_q_padded,
+    ck_tile::index_t max_seqlen_k);
+template <typename Traits_, typename Arch = void>
+size_t fmha_bwd_dq_dk_dv_dq_prepare_ws_host_(
+    void *cpu_ws, ck_tile::index_t batch_size, ck_tile::index_t hdim_q,
+    ck_tile::index_t nhead_q, ck_tile::index_t seqlen_q,
+    ck_tile::index_t seqlen_k, const ck_tile::index_t *seqstart_qs,
+    const ck_tile::index_t *seqstart_ks);
+// On-device metadata preparation: launches a kernel that writes
+// nsplits[]/offsets[] into the device workspace on stream `s`. Replaces the
+// host-callback + H2D staging path.
+template <typename Traits_, typename Arch = void>
+void fmha_bwd_dq_dk_dv_dq_prepare_ws_device_(
+    void *device_ws, ck_tile::index_t batch_size, ck_tile::index_t hdim_q,
+    ck_tile::index_t nhead_q, ck_tile::index_t seqlen_q,
+    ck_tile::index_t seqlen_k, ck_tile::index_t num_cus,
+    const ck_tile::index_t *seqstart_qs, const ck_tile::index_t *seqstart_ks,
+    const ck_tile::stream_config &s);
+template <typename Traits_, typename Arch = void>
+bool fmha_bwd_dq_dk_dv_needs_zero_dq_acc_();
 
 template <ck_tile::index_t HDim_, typename DataType_, bool kIsGroupMode_,
           bool kPadS_, bool kPadDv_>
@@ -379,8 +425,7 @@ template <typename Traits_, typename Arch = void>
 std::string fmha_bwd_dot_do_o_get_name_();
 
 template <ck_tile::index_t HDim_, typename DataType_, bool kIsGroupMode_,
-          bool kPadS_, bool kPadD_, bool kIsDeterministic_,
-          ck_tile::index_t kN0>
+          bool kPadS_, bool kPadD_, bool kIsDeterministic_>
 struct fmha_bwd_convert_dq_traits_ {};
 
 template <typename Traits_, typename Arch = void>
@@ -393,10 +438,18 @@ void fmha_bwd_convert_dq_oneshot_(const ck_tile::stream_config &,
 template <typename Traits_, typename Arch = void>
 std::string fmha_bwd_convert_dq_get_name_();
 
-// This is the public API, will be generated by script
+// Traits that are used to dispatch different kernel implementations for fmha
+// backward
 struct fmha_bwd_traits {
+  int seqlen_q;
+  int seqlen_k;
+  int batch;
+  int max_seqlen_q;
+  int max_seqlen_k;
   int hdim_q;
   int hdim_v;
+  int nhead_q;
+  int nhead_k;
   std::string data_type;
   bool is_group_mode;
   mask_enum mask_type;
@@ -408,5 +461,170 @@ struct fmha_bwd_traits {
   bool is_deterministic;
   // TODO: padding check is inside this api
 };
+
+template <typename T0 /*dot_do_o_trait*/, typename T1 /*dq_dk_dv_trait*/,
+          typename T2 /*convert_dq_trait*/, typename Arch>
+float fmha_bwd_(const ck_tile::stream_config &s, fmha_bwd_args a) {
+  if constexpr (!std::is_same_v<T2, void>) {
+    if (s.log_level_ > 0)
+      std::cout << ", " << fmha_bwd_dot_do_o_get_name_<T0, Arch>() << "@"
+                << fmha_bwd_convert_dq_get_name_<T2, Arch>() << "@"
+                << fmha_bwd_dq_dk_dv_get_name_<T1, Arch>() << std::flush;
+    return ck_tile::launch_kernel(
+        s,
+        [=](const ck_tile::stream_config &s_) {
+          fmha_bwd_dot_do_o_oneshot_<T0, Arch>(s_, a);
+        },
+        [=](const ck_tile::stream_config &s_) {
+          fmha_bwd_dq_dk_dv_oneshot_<T1, Arch>(s_, a);
+        },
+        [=](const ck_tile::stream_config &s_) {
+          fmha_bwd_convert_dq_oneshot_<T2, Arch>(s_, a);
+        });
+  } else {
+    if (s.log_level_ > 0)
+      std::cout << ", " << fmha_bwd_dot_do_o_get_name_<T0, Arch>() << "@"
+                << fmha_bwd_dq_dk_dv_get_name_<T1, Arch>() << std::flush;
+    return ck_tile::launch_kernel(
+        s,
+        [=](const ck_tile::stream_config &s_) {
+          fmha_bwd_dot_do_o_oneshot_<T0, Arch>(s_, a);
+        },
+        [=](const ck_tile::stream_config &s_) {
+          fmha_bwd_dq_dk_dv_oneshot_<T1, Arch>(s_, a);
+        });
+  }
+}
+
 template <int Version = 2>
-float fmha_bwd(fmha_bwd_traits, fmha_bwd_args, const ck_tile::stream_config &);
+float fmha_bwd(const fmha_bwd_traits &, fmha_bwd_args,
+               const ck_tile::stream_config &);
+
+struct fmha_bwd_launcher {
+  std::function<float(fmha_bwd_args, const ck_tile::stream_config &)> run{
+      [](fmha_bwd_args, const ck_tile::stream_config &) {
+        std::cerr
+            << "fmha_bwd: no kernel found for given traits, skipping run\n";
+        return -1.0f;
+      }};
+  // Layout: [host_ws_size_ bytes (host-prepared metadata)][dq_acc region]
+  size_t workspace_size = 0;
+
+  fmha_bwd_launcher(const fmha_bwd_traits &);
+  fmha_bwd_launcher(fmha_bwd_launcher &&) = delete;
+  fmha_bwd_launcher &operator=(fmha_bwd_launcher &&) = delete;
+
+  ~fmha_bwd_launcher() = default;
+
+  ck_tile::index_t selected_max_seqlen_q() const {
+    return selected_max_seqlen_q_;
+  }
+
+  // Stream-async workspace preparation. Zeroes the dq_acc region (if the kernel
+  // accumulates) and launches a single-thread device kernel that writes the
+  // nsplits[]/offsets[] metadata straight into the device workspace. Every op
+  // is stream-ordered and capturable -- there is no host callback, no pinned
+  // host staging, and no metadata D2H/H2D. seqstart_q_dev/seqstart_k_dev are
+  // read on-device in group mode and must already be resident on the device.
+  void prepare_workspace_async( //
+      void *device_ws_ptr, const int *seqstart_q_dev, const int *seqstart_k_dev,
+      const ck_tile::stream_config &s) {
+    hipStream_t stream = s.stream_id_;
+
+    // Fast path: no metadata region; just zero dq_acc if needed.
+    if (host_ws_size_ == 0) {
+      if (needs_zero_dq_acc_ && workspace_size > 0)
+        HIP_CHECK_ERROR(
+            hipMemsetAsync(device_ws_ptr, 0, workspace_size, stream));
+      return;
+    }
+
+    if (traits_.is_group_mode && (!seqstart_q_dev || !seqstart_k_dev))
+      throw std::runtime_error(
+          "fmha_bwd_launcher::prepare_workspace_async: "
+          "seqstart_q_dev and seqstart_k_dev are required in "
+          "group mode");
+
+    // Zero only the dq_acc region that follows the metadata region; the
+    // metadata region is fully overwritten by the prepare kernel below.
+    if (needs_zero_dq_acc_ && workspace_size > host_ws_size_)
+      HIP_CHECK_ERROR(
+          hipMemsetAsync(static_cast<char *>(device_ws_ptr) + host_ws_size_, 0,
+                         workspace_size - host_ws_size_, stream));
+
+    prepare_ws_dev_func_(
+        device_ws_ptr, batch_, hdim_q_, nhead_q_, seqlen_q_, seqlen_k_,
+        num_cus_, reinterpret_cast<const ck_tile::index_t *>(seqstart_q_dev),
+        reinterpret_cast<const ck_tile::index_t *>(seqstart_k_dev), s);
+  }
+
+  // Backward-compatible overload for callers written against the previous API,
+  // which passed a pinned-host-buffer allocator for staging workspace metadata.
+  // Metadata is now produced by an on-device kernel, so the allocator is
+  // unused.
+  template <typename HostAllocFn>
+  void prepare_workspace_async( //
+      void *device_ws_ptr, const int *seqstart_q_dev, const int *seqstart_k_dev,
+      const ck_tile::stream_config &s, const HostAllocFn &) {
+    prepare_workspace_async(device_ws_ptr, seqstart_q_dev, seqstart_k_dev, s);
+  }
+
+private:
+  fmha_bwd_traits traits_{};
+  ck_tile::index_t selected_max_seqlen_q_ = 0;
+  size_t host_ws_size_ = 0;
+  bool needs_zero_dq_acc_ = false;
+
+  // Function pointer (points to code segment, survives launcher destruction)
+  PrepareWorkspaceDeviceFunc prepare_ws_dev_func_ = nullptr;
+
+  // Captured data passed to the prepare kernel at dispatch time.
+  ck_tile::index_t batch_ = 0;
+  ck_tile::index_t hdim_q_ = 0;
+  ck_tile::index_t nhead_q_ = 0;
+  ck_tile::index_t seqlen_q_ = 0;
+  ck_tile::index_t seqlen_k_ = 0;
+  // CU count queried on the host (persistent deterministic nsplits depends on
+  // it, and must match the value used when sizing the device workspace upper
+  // bound).
+  ck_tile::index_t num_cus_ = 0;
+
+  template <typename T0 /*dot_do_o_trait*/, typename T1 /*dq_dk_dv_trait*/,
+            typename T2 /*convert_dq_trait*/, typename Arch>
+  void init(const fmha_bwd_traits &t) {
+    traits_ = t;
+    selected_max_seqlen_q_ = fmha_bwd_dq_dk_dv_maxq_<T1, Arch>();
+    run = [](fmha_bwd_args a, const ck_tile::stream_config &s) {
+      return fmha_bwd_<T0, T1, T2, Arch>(s, a);
+    };
+    host_ws_size_ = fmha_bwd_dq_dk_dv_dq_ws_host_size_<T1, Arch>(t.batch);
+    size_t device_ws_size = 0;
+    if (host_ws_size_ > 0) {
+      // In group mode t.seqlen_q is already the padded total (==
+      // seqstart_q[batch]); in batch mode it's per-batch and the total is batch
+      // * seqlen_q.
+      const ck_tile::index_t total_seqlen_q_padded =
+          t.is_group_mode ? t.seqlen_q : t.batch * t.seqlen_q;
+      device_ws_size = fmha_bwd_dq_dk_dv_dq_ws_device_upper_bound_<T1, Arch>(
+          t.batch, t.hdim_q, t.nhead_q, total_seqlen_q_padded, t.max_seqlen_k);
+
+      // Store function pointer (directly assign template-instantiated function)
+      prepare_ws_dev_func_ = &fmha_bwd_dq_dk_dv_dq_prepare_ws_device_<T1, Arch>;
+
+      // Store captured data as member variables
+      batch_ = t.batch;
+      hdim_q_ = t.hdim_q;
+      nhead_q_ = t.nhead_q;
+      seqlen_q_ = t.seqlen_q;
+      seqlen_k_ = t.seqlen_k;
+      num_cus_ = ck_tile::get_num_cus();
+    }
+    workspace_size = host_ws_size_ + device_ws_size;
+    needs_zero_dq_acc_ = fmha_bwd_dq_dk_dv_needs_zero_dq_acc_<T1, Arch>();
+  }
+
+public:
+  template <typename... Args> float operator()(Args &&...args) const {
+    return run(std::forward<Args>(args)...);
+  }
+};

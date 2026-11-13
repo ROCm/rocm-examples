@@ -1,24 +1,5 @@
-// MIT License
-//
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -26,11 +7,30 @@
 
 #include "ck_tile/core.hpp"
 #include "ck_tile/host/kernel_launch.hpp"
-#include "ck_tile/ops/elementwise/unary_element_wise_operation.hpp"
 #include "ck_tile/ops/gemm/kernel/batched_gemm_kernel.hpp"
-#include "ck_tile/utility/json_dump.hpp"
 
-struct GemmConfigMemory {
+#include "ck_tile/ops/elementwise/unary_element_wise_operation.hpp"
+#include "ck_tile/utility/json_dump.hpp"
+#include "gemm_common/vector_size_fallback_dispatch.hpp"
+
+using ck_tile_example::GemmConfigVectorSizeFallback;
+
+struct GemmConfigBase {
+  static constexpr bool kPadM = false;
+  static constexpr bool kPadN = false;
+  static constexpr bool kPadK = false;
+
+  static constexpr bool FixedVectorSize = false;
+  static constexpr ck_tile::index_t VectorSizeA = 1;
+  static constexpr ck_tile::index_t VectorSizeB = 1;
+  static constexpr ck_tile::index_t VectorSizeC = 1;
+
+  static constexpr bool EnableSmallerVectorLoadFallback = false;
+
+  static constexpr bool LargeTensors = false;
+};
+
+struct GemmConfigMemory : public GemmConfigBase {
   // Memory friendly for Interwave scheduler
   static constexpr ck_tile::index_t M_Tile = 128;
   static constexpr ck_tile::index_t N_Tile = 32;
@@ -50,7 +50,11 @@ struct GemmConfigMemory {
   static constexpr auto Scheduler = ck_tile::GemmPipelineScheduler::Interwave;
 };
 
-struct GemmConfigV3 {
+struct GemmConfigV3 : public GemmConfigBase {
+  static constexpr bool kPadM = true;
+  static constexpr bool kPadN = true;
+  static constexpr bool kPadK = true;
+
   // Compute friendly for Intrawave scheduler
   static constexpr ck_tile::index_t M_Tile = 256;
   static constexpr ck_tile::index_t N_Tile = 256;
@@ -68,9 +72,12 @@ struct GemmConfigV3 {
   static constexpr ck_tile::GemmPipeline Pipeline =
       ck_tile::GemmPipeline::COMPUTE_V3;
   static constexpr auto Scheduler = ck_tile::GemmPipelineScheduler::Intrawave;
+
+  static constexpr bool EnableSmallerVectorLoadFallback = true;
+  static constexpr bool LargeTensors = true;
 };
 
-struct GemmConfigV4 {
+struct GemmConfigV4 : public GemmConfigBase {
   // Compute friendly for Intrawave scheduler
   // Using the ping pong reader in the lds level
   static constexpr ck_tile::index_t M_Tile = 256;
@@ -91,7 +98,7 @@ struct GemmConfigV4 {
   static constexpr auto Scheduler = ck_tile::GemmPipelineScheduler::Intrawave;
 };
 
-struct GemmConfigV3_Wmma {
+struct GemmConfigV3_Wmma : public GemmConfigBase {
   // Compute friendly for Intrawave scheduler
   static constexpr ck_tile::index_t M_Tile = 128;
   static constexpr ck_tile::index_t N_Tile = 128;
@@ -109,6 +116,9 @@ struct GemmConfigV3_Wmma {
   static constexpr ck_tile::GemmPipeline Pipeline =
       ck_tile::GemmPipeline::COMPUTE_V3;
   static constexpr auto Scheduler = ck_tile::GemmPipelineScheduler::Intrawave;
+
+  static constexpr bool EnableSmallerVectorLoadFallback = true;
+  static constexpr bool LargeTensors = true;
 };
 
 template <ck_tile::GemmPipeline PipelineId> struct PipelineTypeTraits;
@@ -116,25 +126,16 @@ template <ck_tile::GemmPipeline PipelineId> struct PipelineTypeTraits;
 template <> struct PipelineTypeTraits<ck_tile::GemmPipeline::MEMORY> {
   template <typename PipelineProblem>
   using GemmPipeline = ck_tile::GemmPipelineAgBgCrMem<PipelineProblem>;
-  template <typename PipelineProblem>
-  using UniversalGemmPipeline =
-      ck_tile::BaseGemmPipelineAgBgCrMem<PipelineProblem>;
 };
 
 template <> struct PipelineTypeTraits<ck_tile::GemmPipeline::COMPUTE_V3> {
   template <typename PipelineProblem>
   using GemmPipeline = ck_tile::GemmPipelineAgBgCrCompV3<PipelineProblem>;
-  template <typename PipelineProblem>
-  using UniversalGemmPipeline =
-      ck_tile::BaseGemmPipelineAgBgCrCompV3<PipelineProblem>;
 };
 
 template <> struct PipelineTypeTraits<ck_tile::GemmPipeline::COMPUTE_V4> {
   template <typename PipelineProblem>
   using GemmPipeline = ck_tile::GemmPipelineAgBgCrCompV4<PipelineProblem>;
-  template <typename PipelineProblem>
-  using UniversalGemmPipeline =
-      ck_tile::BaseGemmPipelineAgBgCrCompV4<PipelineProblem>;
 };
 
 template <typename DataType> struct BatchedGemmTypeConfig;
