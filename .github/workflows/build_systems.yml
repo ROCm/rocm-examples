@@ -5,12 +5,14 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Systems/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_systems.yml'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Systems/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_systems.yml'
+      - '.github/build_tools/**'
 
 permissions:
   contents: read

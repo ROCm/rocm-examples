@@ -5,13 +5,13 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Applications/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_applications_vs.yml'
       - 'Scripts/VisualStudio/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Applications/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_applications_vs.yml'
       - 'Scripts/VisualStudio/**'
 
 permissions:

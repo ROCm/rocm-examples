@@ -5,12 +5,14 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'HIP-Doc/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_hip_documentation.yml'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'HIP-Doc/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_hip_documentation.yml'
+      - '.github/build_tools/**'
 
 permissions:
   contents: read
