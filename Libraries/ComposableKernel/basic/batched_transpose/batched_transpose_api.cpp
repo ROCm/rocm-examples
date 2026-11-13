@@ -1,24 +1,6 @@
-// MIT License
-//
-// Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
 #include "batched_transpose_example.hpp"
 
 namespace {
@@ -111,18 +93,18 @@ float batched_transpose_dispatch(batched_transpose_kargs &a,
 
 // Param Comb: type_size, block_x & y, WarpNum_x & y
 #define FOREACH_TRANSPOSE_PARAM(F)                                             \
-  F(fp8, ck_tile::fp8_t, 64, 64, 1, 1, true, true, 0)                          \
-  F(fp8, ck_tile::fp8_t, 64, 64, 1, 1, false, false, 0)                        \
-  F(fp16, ck_tile::fp16_t, 64, 64, 1, 1, true, true, 0)                        \
-  F(fp16, ck_tile::fp16_t, 64, 64, 1, 1, false, false, 0)                      \
-  F(bf16, ck_tile::bf16_t, 64, 64, 1, 1, true, true, 0)                        \
-  F(bf16, ck_tile::bf16_t, 64, 64, 1, 1, false, false, 0)                      \
-  F(fp8, ck_tile::fp8_t, 64, 64, 1, 1, true, true, 1)                          \
-  F(fp8, ck_tile::fp8_t, 64, 64, 1, 1, false, false, 1)                        \
-  F(fp16, ck_tile::fp16_t, 64, 64, 1, 1, true, true, 1)                        \
-  F(fp16, ck_tile::fp16_t, 64, 64, 1, 1, false, false, 1)                      \
-  F(bf16, ck_tile::bf16_t, 64, 64, 1, 1, true, true, 1)                        \
-  F(bf16, ck_tile::bf16_t, 64, 64, 1, 1, false, false, 1)
+  F(fp8, ck_tile::fp8_t, 32, 32, 1, 1, true, true, 0)                          \
+  F(fp8, ck_tile::fp8_t, 32, 32, 1, 1, false, false, 0)                        \
+  F(fp16, ck_tile::fp16_t, 32, 32, 1, 1, true, true, 0)                        \
+  F(fp16, ck_tile::fp16_t, 32, 32, 1, 1, false, false, 0)                      \
+  F(bf16, ck_tile::bf16_t, 32, 32, 1, 1, true, true, 0)                        \
+  F(bf16, ck_tile::bf16_t, 32, 32, 1, 1, false, false, 0)                      \
+  F(fp8, ck_tile::fp8_t, 32, 32, 1, 1, true, true, 1)                          \
+  F(fp8, ck_tile::fp8_t, 32, 32, 1, 1, false, false, 1)                        \
+  F(fp16, ck_tile::fp16_t, 32, 32, 1, 1, true, true, 1)                        \
+  F(fp16, ck_tile::fp16_t, 32, 32, 1, 1, false, false, 1)                      \
+  F(bf16, ck_tile::bf16_t, 32, 32, 1, 1, true, true, 1)                        \
+  F(bf16, ck_tile::bf16_t, 32, 32, 1, 1, false, false, 1)
 
 // Macro that defines one static function per line
 #define GEN_TRANSPOSE_FN(SHORT_NAME, REAL_TYPE, BX, BY, WX, WY, PADM, PADN,              \
@@ -141,42 +123,42 @@ float batched_transpose(batched_transpose_trait t, batched_transpose_kargs a,
                         ck_tile::stream_config s) {
   if (t.pipeline == "0") {
     if (t.type == "fp8") {
-      if (a.height % 64 == 0 && a.width % 64 == 0) {
-        return transpose_fn_fp8_64_64_1_1_false_false_v0(a, s);
+      if (a.height % 32 == 0 && a.width % 32 == 0) {
+        return transpose_fn_fp8_32_32_1_1_false_false_v0(a, s);
       } else {
-        return transpose_fn_fp8_64_64_1_1_true_true_v0(a, s);
+        return transpose_fn_fp8_32_32_1_1_true_true_v0(a, s);
       }
     } else if (t.type == "fp16") {
-      if (a.height % 64 == 0 && a.width % 64 == 0) {
-        return transpose_fn_fp16_64_64_1_1_false_false_v0(a, s);
+      if (a.height % 32 == 0 && a.width % 32 == 0) {
+        return transpose_fn_fp16_32_32_1_1_false_false_v0(a, s);
       } else {
-        return transpose_fn_fp16_64_64_1_1_true_true_v0(a, s);
+        return transpose_fn_fp16_32_32_1_1_true_true_v0(a, s);
       }
     } else if (t.type == "bf16") {
-      if (a.height % 64 == 0 && a.width % 64 == 0) {
-        return transpose_fn_bf16_64_64_1_1_false_false_v0(a, s);
+      if (a.height % 32 == 0 && a.width % 32 == 0) {
+        return transpose_fn_bf16_32_32_1_1_false_false_v0(a, s);
       } else {
-        return transpose_fn_bf16_64_64_1_1_true_true_v0(a, s);
+        return transpose_fn_bf16_32_32_1_1_true_true_v0(a, s);
       }
     }
   } else if (t.pipeline == "1") {
     if (t.type == "fp8") {
-      if (a.height % 64 == 0 && a.width % 64 == 0) {
-        return transpose_fn_fp8_64_64_1_1_false_false_v1(a, s);
+      if (a.height % 32 == 0 && a.width % 32 == 0) {
+        return transpose_fn_fp8_32_32_1_1_false_false_v1(a, s);
       } else {
-        return transpose_fn_fp8_64_64_1_1_true_true_v1(a, s);
+        return transpose_fn_fp8_32_32_1_1_true_true_v1(a, s);
       }
     } else if (t.type == "fp16") {
-      if (a.height % 64 == 0 && a.width % 64 == 0) {
-        return transpose_fn_fp16_64_64_1_1_false_false_v1(a, s);
+      if (a.height % 32 == 0 && a.width % 32 == 0) {
+        return transpose_fn_fp16_32_32_1_1_false_false_v1(a, s);
       } else {
-        return transpose_fn_fp16_64_64_1_1_true_true_v1(a, s);
+        return transpose_fn_fp16_32_32_1_1_true_true_v1(a, s);
       }
     } else if (t.type == "bf16") {
-      if (a.height % 64 == 0 && a.width % 64 == 0) {
-        return transpose_fn_bf16_64_64_1_1_false_false_v1(a, s);
+      if (a.height % 32 == 0 && a.width % 32 == 0) {
+        return transpose_fn_bf16_32_32_1_1_false_false_v1(a, s);
       } else {
-        return transpose_fn_bf16_64_64_1_1_true_true_v1(a, s);
+        return transpose_fn_bf16_32_32_1_1_true_true_v1(a, s);
       }
     }
   }

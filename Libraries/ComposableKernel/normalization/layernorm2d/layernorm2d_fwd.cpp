@@ -1,27 +1,10 @@
-// MIT License
-//
-// Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
+
+#include "ck_tile/host.hpp"
 
 #include "layernorm2d_fwd.hpp"
-#include "ck_tile/host.hpp"
+
 #include "ck_tile/utility/json_dump.hpp"
 #include <algorithm>
 #include <cstring>
@@ -43,6 +26,18 @@ template <> auto get_elimit<ck_tile::int8_t>() {
   double rtol = 1e-2;
   double atol = 1.0;
   return ck_tile::make_tuple(rtol, atol);
+}
+
+// threshold for the output y. check_err takes the number of fp8 rounding steps
+// allowed instead of rtol for fp8, so fp8 needs its own threshold.
+template <typename DataType> auto get_y_elimit() {
+  return get_elimit<DataType>();
+}
+
+template <> auto get_y_elimit<ck_tile::fp8_t>() {
+  unsigned max_rounding_point_distance = 1;
+  double atol = 1.0;
+  return ck_tile::make_tuple(max_rounding_point_distance, atol);
 }
 
 auto create_args(int argc, char *argv[]) {
@@ -314,10 +309,8 @@ bool run(const ck_tile::ArgParser &arg_parser) {
           absmax = a > absmax ? a : absmax;
         }
         // printf("cpu:absmax:%f\n", absmax);
-        constexpr ComputeDataType kMaxY =
-            std::is_same<YDataType, ck_tile::fp8_t>::value    ? 240.0
-            : std::is_same<YDataType, ck_tile::int8_t>::value ? 127.0
-                                                              : 0.0;
+        const ComputeDataType kMaxY = ck_tile::type_convert<ComputeDataType>(
+            ck_tile::numeric<YDataType>::max());
         ComputeDataType y_scale = absmax / kMaxY;
         y_scale_host_ref(m_) = ck_tile::type_convert<YScaleDataType>(y_scale);
         for (int n_ = 0; n_ < N_; n_++) {
@@ -347,11 +340,12 @@ bool run(const ck_tile::ArgParser &arg_parser) {
     }
 
     auto [rtol, atol] = get_elimit<OutDataType>();
+    auto [y_rtol, y_atol] = get_y_elimit<YDataType>();
 
     if (x_stride == n) {
       pass = ck_tile::check_err(y_host_dev, y_host_ref,
                                 std::string("OUT Error: Incorrect results!"),
-                                rtol, atol);
+                                y_rtol, y_atol);
       if (fused_add == 1) {
         pass &= ck_tile::check_err(y_residual_host_dev, x_host,
                                    std::string("ADD Error: Incorrect results!"),
@@ -369,7 +363,7 @@ bool run(const ck_tile::ArgParser &arg_parser) {
             ck_tile::check_err(y_host_dev_row, y_host_ref_row,
                                std::string("OUT[") + std::to_string(i_r) +
                                    std::string("] Error: Incorrect results!"),
-                               rtol, atol);
+                               y_rtol, y_atol);
         if (fused_add == 1) {
           std::vector<YResidualDataType> y_residual_host_dev_row(
               y_residual_host_dev.begin() + i_r * yr_stride,

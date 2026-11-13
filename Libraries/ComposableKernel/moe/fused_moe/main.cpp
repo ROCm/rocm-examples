@@ -1,46 +1,41 @@
-// MIT License
-//
-// Copyright (c) 2018 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #include <algorithm>
 #include <cstring>
-#include <set>
 #include <unordered_set>
+
 #include <vector>
+
+#include <set>
 
 #include "ck_tile/host.hpp"
 #include "ck_tile/utility/json_dump.hpp"
 #include "fused_moe.hpp"
 
-// different threshold for different dtype
-template <typename DataType> auto get_elimit() {
-  double rtol = 1e-2;
-  double atol = 1e-2;
-  return ck_tile::make_tuple(rtol, atol);
-}
-
-template <> auto get_elimit<ck_tile::bf16_t>() {
-  double rtol = 1e-2;
-  double atol = 1e-2;
-  return ck_tile::make_tuple(rtol, atol);
+// Each token's output is the sum of topk expert results that the kernel adds
+// into the output with ODataType atomics, like a split-k gemm with
+// kbatch = topk. Unlike split-k, each expert runs the whole second gemm, so the
+// gemm error uses the full K and the full max value.
+template <typename ComputeType, typename OutDataType, typename AccDataType>
+auto calculate_rtol_atol(const ck_tile::index_t K, const ck_tile::index_t topk,
+                         const float max_accumulated_value) {
+  // Calculate thresholds
+  const auto rtol =
+      ck_tile::get_relative_threshold<ComputeType, OutDataType, AccDataType>(K);
+  const auto atol =
+      ck_tile::get_absolute_threshold<ComputeType, OutDataType, AccDataType>(
+          max_accumulated_value, K);
+  // Calculate error due to the topk accumulation
+  const auto rtol_topk =
+      ck_tile::get_relative_threshold<OutDataType, OutDataType, OutDataType>(
+          topk);
+  const auto atol_topk =
+      ck_tile::get_absolute_threshold<OutDataType, OutDataType, OutDataType>(
+          max_accumulated_value, topk);
+  // Use higher threshold
+  return ck_tile::make_tuple(std::max(rtol, rtol_topk),
+                             std::max(atol, atol_topk));
 }
 
 // mfma_type, 0:32x32, 1:16x16
@@ -301,33 +296,27 @@ bool run(const ck_tile::ArgParser &arg_parser) {
     ck_tile::FillStepRange<TopkWeightDataType>{-.5f, .5f,
                                                0.01f}(topk_weight_host);
   } else if (init == 1) {
-    ck_tile::FillUniformDistribution<ADataType>{-.5f, .5f, seed, true}(a_host);
-    ck_tile::FillUniformDistribution<GDataType>{-.5f, .5f, seed, true}(g_host);
-    ck_tile::FillUniformDistribution<DDataType>{-.5f, .5f, seed, true}(d_host);
-    ck_tile::FillUniformDistribution<AScaleDataType>{-.5f, .5f, seed,
-                                                     true}(sa_host);
-    ck_tile::FillUniformDistribution<GScaleDataType>{-.5f, .5f, seed,
-                                                     true}(sg_host);
-    ck_tile::FillUniformDistribution<DScaleDataType>{-.5f, .5f, seed,
-                                                     true}(sd_host);
-    ck_tile::FillUniformDistribution<YSmoothScaleDataType>{-.5f, .5f, seed,
-                                                           true}(sy_host);
-    ck_tile::FillUniformDistribution<TopkWeightDataType>{-.5f, .5f, seed, true}(
+    ck_tile::FillUniformDistribution<ADataType>{-.5f, .5f, seed}(a_host);
+    ck_tile::FillUniformDistribution<GDataType>{-.5f, .5f, seed}(g_host);
+    ck_tile::FillUniformDistribution<DDataType>{-.5f, .5f, seed}(d_host);
+    ck_tile::FillUniformDistribution<AScaleDataType>{-.5f, .5f, seed}(sa_host);
+    ck_tile::FillUniformDistribution<GScaleDataType>{-.5f, .5f, seed}(sg_host);
+    ck_tile::FillUniformDistribution<DScaleDataType>{-.5f, .5f, seed}(sd_host);
+    ck_tile::FillUniformDistribution<YSmoothScaleDataType>{-.5f, .5f,
+                                                           seed}(sy_host);
+    ck_tile::FillUniformDistribution<TopkWeightDataType>{-.5f, .5f, seed}(
         topk_weight_host);
   } else if (init == 2) {
-    ck_tile::FillNormalDistribution<ADataType>{0.f, 1.f, seed, true}(a_host);
-    ck_tile::FillNormalDistribution<GDataType>{0.f, 1.f, seed, true}(g_host);
-    ck_tile::FillNormalDistribution<DDataType>{0.f, 1.f, seed, true}(d_host);
-    ck_tile::FillNormalDistribution<AScaleDataType>{0.f, 1.f, seed,
-                                                    true}(sa_host);
-    ck_tile::FillNormalDistribution<GScaleDataType>{0.f, 1.f, seed,
-                                                    true}(sg_host);
-    ck_tile::FillNormalDistribution<DScaleDataType>{0.f, 1.f, seed,
-                                                    true}(sd_host);
-    ck_tile::FillNormalDistribution<YSmoothScaleDataType>{0.f, 1.f, seed,
-                                                          true}(sy_host);
-    ck_tile::FillNormalDistribution<TopkWeightDataType>{0.f, 1.f, seed,
-                                                        true}(topk_weight_host);
+    ck_tile::FillNormalDistribution<ADataType>{0.f, 1.f, seed}(a_host);
+    ck_tile::FillNormalDistribution<GDataType>{0.f, 1.f, seed}(g_host);
+    ck_tile::FillNormalDistribution<DDataType>{0.f, 1.f, seed}(d_host);
+    ck_tile::FillNormalDistribution<AScaleDataType>{0.f, 1.f, seed}(sa_host);
+    ck_tile::FillNormalDistribution<GScaleDataType>{0.f, 1.f, seed}(sg_host);
+    ck_tile::FillNormalDistribution<DScaleDataType>{0.f, 1.f, seed}(sd_host);
+    ck_tile::FillNormalDistribution<YSmoothScaleDataType>{0.f, 1.f,
+                                                          seed}(sy_host);
+    ck_tile::FillNormalDistribution<TopkWeightDataType>{0.f, 1.f,
+                                                        seed}(topk_weight_host);
   }
 
   // permute weight
@@ -352,16 +341,16 @@ bool run(const ck_tile::ArgParser &arg_parser) {
 
 // leave it here for future debug purpose
 #if 0
-    a_host.loadtxt("../../ater/input_torch.txt");
+    ck_tile::loadtxt(a_host, "../../ater/input_torch.txt");
 
-    topk_ids_host.loadtxt("../../ater/topk_ids_torch.txt", "int");
-    // topk_ids_host.savetxt("topk_ids_2.txt");
-    topk_weight_host.loadtxt("../../ater/topk_weights_torch.txt", "float");
+    ck_tile::loadtxt(topk_ids_host, "../../ater/topk_ids_torch.txt", "int");
+    // ck_tile::savetxt(topk_ids_host, "topk_ids_2.txt");
+    ck_tile::loadtxt(topk_weight_host, "../../ater/topk_weights_torch.txt", "float");
     std::cout << "------- @@@ " << __LINE__ << std::flush << std::endl;
 
-    g_host.loadtxt("../../ater/w1_torch.txt", "float");
+    ck_tile::loadtxt(g_host, "../../ater/w1_torch.txt", "float");
     std::cout << "------- @@@ " << __LINE__ << std::flush << std::endl;
-    d_host.loadtxt("../../ater/w2_torch.txt", "float");
+    ck_tile::loadtxt(d_host, "../../ater/w2_torch.txt", "float");
     std::cout << "------- @@@ " << __LINE__ << std::flush << std::endl;
 
     ck_tile::HostTensor<GDataType> g_perm_host = shuffle_moe_weight(g_host, prec_w, 1);
@@ -504,8 +493,12 @@ bool run(const ck_tile::ArgParser &arg_parser) {
       }
 
       auto o_dev = o_buf.ToHost<ODataType>();
-      // o_dev.savetxt("gpu-out.txt", "float");
-      auto [rtol, atol] = get_elimit<ADataType>();
+      // ck_tile::savetxt(o_dev, "gpu-out.txt", "float");
+      const float max_accumulated_value =
+          *std::max_element(o_host.mData.begin(), o_host.mData.end());
+      auto [rtol, atol] =
+          calculate_rtol_atol<ADataType, ODataType, AccDataType>(
+              intermediate_size / tp, topk, max_accumulated_value);
       pass &= ck_tile::check_err(o_dev, o_host,
                                  std::string("OUT Error: Incorrect results!"),
                                  rtol, atol);
@@ -597,8 +590,12 @@ bool run(const ck_tile::ArgParser &arg_parser) {
       }
 
       auto o_dev = o_buf.ToHost<ODataType>();
-      // o_dev.savetxt("gpu-out.txt", "float");
-      auto [rtol, atol] = get_elimit<ADataType>();
+      // ck_tile::savetxt(o_dev, "gpu-out.txt", "float");
+      const float max_accumulated_value =
+          *std::max_element(o_host.mData.begin(), o_host.mData.end());
+      auto [rtol, atol] =
+          calculate_rtol_atol<ADataType, ODataType, AccDataType>(
+              intermediate_size / tp, topk, max_accumulated_value);
       pass &= ck_tile::check_err(o_dev, o_host,
                                  std::string("OUT Error: Incorrect results!"),
                                  rtol, atol);

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -56,30 +56,23 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 add_executable(${example_fwd} grouped_convolution_forward.cpp)
-add_test(${example_fwd} COMMAND ${example_fwd})
+add_test(NAME ${example_fwd} COMMAND ${example_fwd})
 set_source_files_properties(grouped_convolution_forward.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_fwd} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_fwd} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_fwd} PRIVATE composable_kernel::ck_tile hip::host)
 
 add_executable(${example_bwd} grouped_convolution_backward_weight.cpp)
-add_test(${example_bwd} COMMAND ${example_bwd})
+add_test(NAME ${example_bwd} COMMAND ${example_bwd})
 set_source_files_properties(grouped_convolution_backward_weight.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_bwd} PRIVATE cxx_std_17 hip_std_17)
 target_compile_options(${example_bwd} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
 target_link_libraries(${example_bwd} PRIVATE composable_kernel::ck_tile hip::host)
 
 # Additional convolution variants
-set(example_fwd_large ${example_name}_fwd_large_tensor)
 set(example_fwd_bias_clamp ${example_name}_fwd_bias_clamp)
 set(example_bwd_two_stage ${example_name}_bwd_weight_two_stage)
 set(example_bwd_data ${example_name}_bwd_data)
-
-add_executable(${example_fwd_large} grouped_convolution_forward_large_tensor.cpp)
-set_source_files_properties(grouped_convolution_forward_large_tensor.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-target_compile_features(${example_fwd_large} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_fwd_large} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
-target_link_libraries(${example_fwd_large} PRIVATE composable_kernel::ck_tile hip::host)
 
 add_executable(${example_fwd_bias_clamp} grouped_convolution_forward_bias_clamp.cpp)
 set_source_files_properties(grouped_convolution_forward_bias_clamp.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})

@@ -5,7 +5,8 @@
 This example demonstrates parallel reduction (sum, max, etc.) using the CK Tile programming model, a core operation for
 normalization, statistics, and aggregation in deep learning.
 
-Given a tensor $\mathbf{X}$ and a reduction axis, the performed computation is $\mathbf{Y} = \sum_i \mathbf{X}_i$.
+Given a tensor $\mathbf{X}$ in NHWC layout, the example reduces along the $N$ axis, so the performed computation is
+$\mathbf{Y}_{hwc} = \sum_n \mathbf{X}_{nhwc}$.
 
 ### Supported architectures
 
@@ -14,19 +15,17 @@ This example works with
 
 ### Application flow
 
-1. Command line arguments are parsed to configure matrix dimensions and execution parameters.
+1. Command line arguments are parsed to configure tensor dimensions and execution parameters.
 2. $\mathbf{X}$ is created on the host and initialized with random floating-point values in the range $[-5, 5]$.
 3. Buffers for $\mathbf{X}$ and $\mathbf{Y}$ are created on the device.
 4. $\mathbf{X}$ is copied from the host to the device.
-5. A custom reduction kernel is instantiated and launched on the device.
-6. If validation is enabled the results are compared agains CK Tile's built-in `reference_reduce` function.
+5. CK Tile's `ReduceKernel` is instantiated from a `Reduce2dShape` and a `Reduce2dProblem`, and launched on the device.
+6. If validation is enabled the results are compared against CK Tile's built-in `reference_reduce` function.
 7. All buffers are freed automatically.
 
 ## Key APIs and concepts
 
 ### CK Tile architecture
-
-The CK Tile framework is built around four key architectural components:
 
 The CK Tile framework is built around four key architectural components:
 
@@ -51,39 +50,24 @@ shared memory and register accumulation for efficiency.
 
 * `ck_tile::ArgParser`
 * `ck_tile::bf16_t`
+* `ck_tile::DataTypeTraits`
 * `ck_tile::DeviceMem`
 * `ck_tile::FillUniformDistribution`
 * `ck_tile::half_t`
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
 * `ck_tile::number`
+* `ck_tile::Reduce2dProblem`
+* `ck_tile::Reduce2dShape`
+* `ck_tile::ReduceKernel`
 * `ck_tile::ReduceOp::Add`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
 
 #### Functions
 
-* `ck_tile::block_tile_reduce`
-* `ck_tile::block_tile_reduce_sync`
-* `ck_tile::cast_tile`
 * `ck_tile::check_err`
-* `ck_tile::get_block_id`
-* `ck_tile::integer_divide_ceil`
 * `ck_tile::launch_kernel`
-* `ck_tile::load_tile`
 * `ck_tile::make_kernel`
-* `ck_tile::make_naive_tensor_view`
-* `ck_tile::make_naive_tensor_view_packed`
-* `ck_tile::make_tile_window`
 * `ck_tile::make_tuple`
-* `ck_tile::move_tile_window`
-* `ck_tile::reduce_on_sequence`
 * `ck_tile::reference_reduce`
-* `ck_tile::set_tile`
-* `ck_tile::store_tile`
-
-### HIP Runtime
-
-#### Device symbols
-
-* `__builtin_amdgcn_readfirstlane`

@@ -1,24 +1,5 @@
-// MIT License
-//
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -28,6 +9,33 @@
 #include "ck_tile/core.hpp"
 #include "ck_tile/host/kernel_launch.hpp"
 #include "ck_tile/ops/moe_flatmm.hpp"
+
+template <typename PrecType, ck_tile::index_t M_Warp_Tile>
+constexpr ck_tile::index_t get_k_warp_tile() {
+#if CK_TILE_USE_WMMA
+#if defined(CK_USE_GFX1250)
+  constexpr bool is_8bit_float = std::is_same_v<PrecType, ck_tile::fp8_t> ||
+                                 std::is_same_v<PrecType, ck_tile::bf8_t>;
+  return is_8bit_float ? 64 : 32;
+#else
+  return 16;
+#endif
+#else
+#if defined(CK_GFX950_SUPPORT)
+  constexpr bool is_8bit_float = std::is_same_v<PrecType, ck_tile::fp8_t> ||
+                                 std::is_same_v<PrecType, ck_tile::bf8_t>;
+  if constexpr (M_Warp_Tile == 32)
+    return is_8bit_float ? 64 : 16;
+  else
+    return is_8bit_float ? 128 : 32;
+#else
+  if constexpr (M_Warp_Tile == 32)
+    return 16;
+  else
+    return 32;
+#endif
+#endif
+}
 
 template <typename DataType> struct FlatmmConfig32 {
   static constexpr ck_tile::index_t M_Tile = 64;
@@ -113,6 +121,20 @@ struct FlatmmConfig16_950 : public FlatmmConfig16<DataType> {
   static constexpr bool TiledMMAPermuteN = false; // N_Repeat % 2 == 0;
 };
 
+template <typename DataType>
+struct FlatmmConfig16_Wmma : public FlatmmConfig16<DataType> {
+  static constexpr ck_tile::index_t M_Tile = 64;
+  static constexpr ck_tile::index_t K_Tile = 64;
+  static constexpr ck_tile::index_t K_Warp_Tile =
+      get_k_warp_tile<DataType, 16>();
+  static constexpr int kBlockPerCu = 1;
+
+  static constexpr int N_Repeat = FlatmmConfig16<DataType>::N_Tile /
+                                  FlatmmConfig16<DataType>::N_Warp_Tile /
+                                  FlatmmConfig16<DataType>::N_Warp;
+  static constexpr bool TiledMMAPermuteN = false; // N_Repeat % 2 == 0;
+};
+
 template <typename ADataType> struct GemmBasicTypeConfig;
 
 template <> struct GemmBasicTypeConfig<ck_tile::half_t> {
@@ -144,27 +166,6 @@ template <> struct GemmBasicTypeConfig<ck_tile::bf8_t> {
   using CDataType = ck_tile::half_t;
 };
 
-template <typename T> struct DataTypeTraits;
-
-template <> struct DataTypeTraits<ck_tile::fp8_t> {
-  static constexpr const char *name = "fp8";
-};
-
-template <> struct DataTypeTraits<ck_tile::bf8_t> {
-  static constexpr const char *name = "bf8";
-};
-template <> struct DataTypeTraits<float> {
-  static constexpr const char *name = "fp32";
-};
-
-template <> struct DataTypeTraits<double> {
-  static constexpr const char *name = "fp64";
-};
-
-template <> struct DataTypeTraits<ck_tile::half_t> {
-  static constexpr const char *name = "fp16";
-};
-
 template <typename T>
 struct is_8bit_type : std::bool_constant<std::is_same_v<T, ck_tile::fp8_t> ||
                                          std::is_same_v<T, ck_tile::bf8_t>> {};
@@ -193,7 +194,8 @@ auto create_args(int argc, char *argv[]) {
       .insert(
           "warp_tile", "0",
           "0: 16x16, 1: 32x32, 2: 16x16x128 (950 only), 3: 32x32x64 (950 only)")
-      .insert("repeat", "10", "number of iterations to benchmark the kernel.");
+      .insert("repeat", "10", "number of iterations to benchmark the kernel.")
+      .insert("rotating_count", "50", "rotating count, defaults to 50");
 
   bool result = arg_parser.parse(argc, argv);
   return std::make_tuple(result, arg_parser);

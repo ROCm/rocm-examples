@@ -1,24 +1,5 @@
-// MIT License
-//
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #pragma once
 
@@ -29,38 +10,6 @@
 #include "ck_tile/host/kernel_launch.hpp"
 #include "ck_tile/ops/gemm.hpp"
 #include "ck_tile/utility/json_dump.hpp"
-
-template <typename PrecType, ck_tile::index_t M_Warp_Tile>
-constexpr ck_tile::index_t get_k_warp_tile() {
-#if defined(CK_GFX950_SUPPORT)
-  constexpr bool is_8bit_float = std::is_same_v<PrecType, ck_tile::fp8_t> ||
-                                 std::is_same_v<PrecType, ck_tile::bf8_t>;
-  if constexpr (M_Warp_Tile == 32)
-    return is_8bit_float ? 64 : 16;
-  else
-    return is_8bit_float ? 128 : 32;
-#else
-  if constexpr (M_Warp_Tile == 32)
-    return 16;
-  else
-    return 32;
-#endif
-}
-
-template <typename PrecType, ck_tile::index_t M_Warp_Tile>
-constexpr ck_tile::index_t get_k_warp_tile_flatmm() {
-#if defined(CK_GFX950_SUPPORT)
-  if constexpr (M_Warp_Tile == 32)
-    return sizeof(PrecType) == 2 ? 16 : 64;
-  else
-    return sizeof(PrecType) == 2 ? 32 : 128;
-#else
-  if constexpr (M_Warp_Tile == 32)
-    return sizeof(PrecType) == 2 ? 16 : 32;
-  else
-    return sizeof(PrecType) == 2 ? 32 : 64;
-#endif
-}
 
 template <typename DataType> struct GemmTypeConfig;
 
@@ -76,6 +25,13 @@ template <> struct GemmTypeConfig<ck_tile::fp8_t> {
   using BDataType = ck_tile::fp8_t;
   using AccDataType = float;
   using CDataType = ck_tile::half_t;
+};
+
+template <> struct GemmTypeConfig<ck_tile::bf16_t> {
+  using ADataType = ck_tile::bf16_t;
+  using BDataType = ck_tile::bf16_t;
+  using AccDataType = float;
+  using CDataType = ck_tile::bf16_t;
 };
 
 struct GemmConfigBase {
@@ -114,7 +70,7 @@ struct GemmConfigComputeV3_2 : public GemmConfigBase {
   static constexpr ck_tile::index_t M_Warp_Tile = 32;
   static constexpr ck_tile::index_t N_Warp_Tile = 32;
   static constexpr ck_tile::index_t K_Warp_Tile =
-      get_k_warp_tile<PrecType, M_Warp_Tile>();
+      ck_tile::get_k_warp_tile<PrecType, M_Warp_Tile>();
 
   static constexpr bool DoubleSmemBuffer = false;
   static constexpr ck_tile::GemmPipeline Pipeline =
@@ -138,7 +94,7 @@ struct GemmConfigComputeV4 : public GemmConfigBase {
   static constexpr ck_tile::index_t M_Warp_Tile = 32;
   static constexpr ck_tile::index_t N_Warp_Tile = 32;
   static constexpr ck_tile::index_t K_Warp_Tile =
-      get_k_warp_tile<PrecType, M_Warp_Tile>();
+      ck_tile::get_k_warp_tile<PrecType, M_Warp_Tile>();
 
   static constexpr bool DoubleSmemBuffer = true;
   static constexpr ck_tile::GemmPipeline Pipeline =
@@ -162,7 +118,7 @@ struct GemmConfigComputeV4_V2 : public GemmConfigBase {
   static constexpr ck_tile::index_t M_Warp_Tile = 16;
   static constexpr ck_tile::index_t N_Warp_Tile = 16;
   static constexpr ck_tile::index_t K_Warp_Tile =
-      get_k_warp_tile<PrecType, M_Warp_Tile>();
+      ck_tile::get_k_warp_tile<PrecType, M_Warp_Tile>();
 
   static constexpr bool DoubleSmemBuffer = true;
   static constexpr ck_tile::GemmPipeline Pipeline =
@@ -184,7 +140,7 @@ struct GemmConfigPreshuffleDecode : public GemmConfigBase {
   static constexpr ck_tile::index_t M_Warp_Tile = 16;
   static constexpr ck_tile::index_t N_Warp_Tile = 16;
   static constexpr ck_tile::index_t K_Warp_Tile =
-      get_k_warp_tile_flatmm<PrecType, M_Warp_Tile>();
+      ck_tile::get_k_warp_tile<PrecType, M_Warp_Tile, true>();
 
   static constexpr bool kPadK = true;
 
@@ -210,7 +166,7 @@ struct GemmConfigPreshufflePrefill : public GemmConfigBase {
   static constexpr ck_tile::index_t M_Warp_Tile = 16;
   static constexpr ck_tile::index_t N_Warp_Tile = 16;
   static constexpr ck_tile::index_t K_Warp_Tile =
-      get_k_warp_tile_flatmm<PrecType, M_Warp_Tile>();
+      ck_tile::get_k_warp_tile<PrecType, M_Warp_Tile, true>();
 
   static constexpr int kBlockPerCu = 2;
   static constexpr auto Scheduler = ck_tile::GemmPipelineScheduler::Default;
@@ -235,7 +191,8 @@ struct GemmConfigComputeV4_Wmma : public GemmConfigBase {
 
   static constexpr ck_tile::index_t M_Warp_Tile = 16;
   static constexpr ck_tile::index_t N_Warp_Tile = 16;
-  static constexpr ck_tile::index_t K_Warp_Tile = 16;
+  static constexpr ck_tile::index_t K_Warp_Tile =
+      ck_tile::get_k_warp_tile<PrecType, M_Warp_Tile>();
 
   static constexpr bool DoubleSmemBuffer = true;
   static constexpr ck_tile::GemmPipeline Pipeline =
@@ -256,7 +213,8 @@ struct GemmConfigPreshuffleDecode_Wmma : public GemmConfigBase {
 
   static constexpr ck_tile::index_t M_Warp_Tile = 16;
   static constexpr ck_tile::index_t N_Warp_Tile = 16;
-  static constexpr ck_tile::index_t K_Warp_Tile = 16;
+  static constexpr ck_tile::index_t K_Warp_Tile =
+      ck_tile::get_k_warp_tile<PrecType, M_Warp_Tile, true>();
 
   static constexpr bool kPadK = true;
 
@@ -273,34 +231,22 @@ template <ck_tile::GemmPipeline PipelineId> struct PipelineTypeTraits;
 template <> struct PipelineTypeTraits<ck_tile::GemmPipeline::MEMORY> {
   template <typename PipelineProblem>
   using GemmPipeline = ck_tile::GemmPipelineAgBgCrMem<PipelineProblem>;
-  template <typename PipelineProblem>
-  using UniversalGemmPipeline =
-      ck_tile::BaseGemmPipelineAgBgCrMem<PipelineProblem>;
 };
 
 template <> struct PipelineTypeTraits<ck_tile::GemmPipeline::COMPUTE_V3> {
   template <typename PipelineProblem>
   using GemmPipeline = ck_tile::GemmPipelineAgBgCrCompV3<PipelineProblem>;
-  template <typename PipelineProblem>
-  using UniversalGemmPipeline =
-      ck_tile::BaseGemmPipelineAgBgCrCompV3<PipelineProblem>;
 };
 
 template <> struct PipelineTypeTraits<ck_tile::GemmPipeline::COMPUTE_V4> {
   template <typename PipelineProblem>
   using GemmPipeline = ck_tile::GemmPipelineAgBgCrCompV4<PipelineProblem>;
-  template <typename PipelineProblem>
-  using UniversalGemmPipeline =
-      ck_tile::BaseGemmPipelineAgBgCrCompV4<PipelineProblem>;
 };
 
 template <> struct PipelineTypeTraits<ck_tile::GemmPipeline::PRESHUFFLE_V2> {
   template <typename PipelineProblem>
   using GemmPipeline =
       ck_tile::WeightPreshufflePipelineAGmemBGmemCRegV2<PipelineProblem>;
-  template <typename PipelineProblem>
-  using UniversalGemmPipeline =
-      ck_tile::BaseWeightPreshufflePipelineAGmemBGmemCRegV2<PipelineProblem>;
 };
 
 using grouped_gemm_kargs = ck_tile::GroupedGemmHostArgs<>;
@@ -336,39 +282,6 @@ get_workspace_size(const std::vector<grouped_gemm_kargs> &gemm_descs) {
   return gemm_descs.size() * sizeof(ck_tile::GemmTransKernelArg<>);
 }
 
-template <typename GemmConfig, typename T>
-auto shuffle_b(const ck_tile::HostTensor<T> &t) {
-  assert(t.get_lengths().size() == 2);
-  int n_ = t.get_lengths()[1];
-  int k_ = t.get_lengths()[0];
-
-  if (ck_tile::is_gfx12_supported()) {
-    constexpr int divisor = 2;
-    constexpr int kABK1PerLane = 8;
-    constexpr int kABK0PerLane =
-        GemmConfig::K_Warp_Tile / divisor / kABK1PerLane;
-    ck_tile::HostTensor<T> t_view(
-        {n_ / GemmConfig::N_Warp_Tile, GemmConfig::N_Warp_Tile,
-         k_ / GemmConfig::K_Warp_Tile, kABK0PerLane, divisor, kABK1PerLane});
-    std::copy(t.begin(), t.end(), t_view.begin());
-    return ck_tile::reference_permute(t_view, {0, 2, 4, 1, 3, 5});
-  } else {
-    int divisor = 1;
-    if (ck_tile::is_gfx11_supported()) {
-      divisor = 1;
-    } else {
-      assert(is_wave32() == false);
-      divisor = GemmConfig::N_Warp_Tile == 32 ? 2 : 4;
-    }
-    ck_tile::HostTensor<T> t_view({n_ / GemmConfig::N_Warp_Tile,
-                                   GemmConfig::N_Warp_Tile,
-                                   k_ / GemmConfig::K_Warp_Tile, divisor,
-                                   GemmConfig::K_Warp_Tile / divisor});
-    std::copy(t.begin(), t.end(), t_view.begin());
-    return ck_tile::reference_permute(t_view, {0, 2, 3, 1, 4});
-  }
-}
-
 template <typename GemmConfig, typename ADataType, typename BDataType,
           typename DsDataType, typename AccDataType, typename CDataType,
           typename ALayout, typename BLayout, typename DsLayout,
@@ -380,5 +293,4 @@ template <typename GemmConfig, typename ALayout, typename BLayout,
           typename CLayout, typename ADataType, typename BDataType,
           typename AccDataType, typename CDataType>
 float grouped_gemm_tileloop(const ck_tile::stream_config &s,
-                            const ck_tile::index_t num_groups, void *kargs_ptr,
-                            bool splitk = false);
+                            const ck_tile::index_t num_groups, void *kargs_ptr);
