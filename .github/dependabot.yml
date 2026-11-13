@@ -15,14 +15,14 @@ updates:
       - "/.github/actions/*"
     schedule:
       interval: "daily"
-      # Wait a week after a release before proposing it, so a compromised or
-      # broken release has time to be caught and yanked upstream.
+    # Wait a week after a release before proposing it, so a compromised or
+    # broken release has time to be caught and yanked upstream.
     cooldown:
       default-days: 7
       exclude:
         - "ROCm/rocm-security-gh*"
-     # Follow the repository's required users/<username>/<description>
-     # branch-naming convention
+    # Follow the repository's required users/<username>/<description>
+    # branch-naming convention
     pull-request-branch-name:
       prefix: "users/dependabot"
       template: "{prefix}/{name}"
