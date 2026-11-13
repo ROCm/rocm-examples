@@ -4,7 +4,16 @@
 
 This example shows how to implement a custom memory resource that satisfies libhipcxx's plain (non-stream-ordered) resource concept, and how to consume it through the corresponding type-erased, non-owning resource reference. `hip::mr` (the resource concept, the type-erased resource reference, the `device_accessible`/`host_accessible` property tags, and `get_property`) is an experimental part of libhipcxx and is only compiled in when `LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE` is defined; both the CMake and Makefile builds of this example define it for you.
 
-libhipcxx 3.4 (`CCCL_VERSION >= 3004000`) renamed this plain resource concept, its member functions, and its type-erased view from `hip::mr::resource`/`resource_with`/`resource_ref` with `allocate`/`deallocate`, to `hip::mr::synchronous_resource`/`synchronous_resource_with`/`synchronous_resource_ref` with `allocate_sync`/`deallocate_sync`, freeing up the unprefixed names for a new stream-ordered resource concept this example does not use. `main.hip` picks whichever spelling the installed libhipcxx provides through a small `HIP_MR_*` macro shim keyed on `CCCL_VERSION`, so the example builds against both pre-3.4 and 3.4+ libhipcxx.
+Starting with libhipcxx 3.4 (`CCCL_VERSION >= 3004000`), the plain, non-stream-ordered resource concept, its member functions, and its type-erased view have new names:
+
+| Before 3.4 | From 3.4 on |
+|---|---|
+| `hip::mr::resource` | `hip::mr::synchronous_resource` |
+| `hip::mr::resource_with` | `hip::mr::synchronous_resource_with` |
+| `hip::mr::resource_ref` | `hip::mr::synchronous_resource_ref` |
+| `allocate`, `deallocate` | `allocate_sync`, `deallocate_sync` |
+
+The rename frees the unprefixed names for a new stream-ordered resource concept, which this example does not use. `main.hip` selects whichever names the installed libhipcxx provides through a small `HIP_MR_*` macro shim keyed on `CCCL_VERSION`, so the example builds against libhipcxx both before 3.4 and from 3.4 on.
 
 The example defines `HipDeviceResource`, a minimal resource whose allocate/deallocate member functions call `hipMalloc`/`hipFree`, and which declares itself `device_accessible` through a friend `get_property` function. It is then wrapped in a type-erased resource reference over `hip::mr::device_accessible` and passed to plain (non-templated) functions that allocate and free a device buffer without ever naming `HipDeviceResource`. A kernel writes into the allocated buffer to demonstrate that the memory really is device-accessible, and the result is copied back and validated.
 
@@ -20,7 +29,11 @@ The example defines `HipDeviceResource`, a minimal resource whose allocate/deall
 
 ## Key APIs and Concepts
 
-- The plain resource concept (`hip::mr::resource` before libhipcxx 3.4, `hip::mr::synchronous_resource` from 3.4 on) verifies that a type provides `void* allocate(_sync)(size_t bytes, size_t alignment)`, `void deallocate(_sync)(void* ptr, size_t bytes, size_t alignment)`, and is equality-comparable (`operator==` and `operator!=`). The corresponding `..._with<Resource, Properties...>` concept additionally requires that `Resource` has every property in `Properties...`.
+- The plain resource concept (`hip::mr::resource` before libhipcxx 3.4, `hip::mr::synchronous_resource` from 3.4 on) is satisfied by a type that is equality-comparable (`operator==` and `operator!=`) and provides these member functions:
+  - `void* allocate(size_t bytes, size_t alignment)` (`allocate_sync` from 3.4 on)
+  - `void deallocate(void* ptr, size_t bytes, size_t alignment)` (`deallocate_sync` from 3.4 on)
+
+  The corresponding `hip::mr::resource_with<Resource, Properties...>` concept (`hip::mr::synchronous_resource_with` from 3.4 on) additionally requires that `Resource` has every property in `Properties...`.
 - A resource declares a property by providing a friend function named `get_property` that takes the resource and the property tag. `hip::mr::device_accessible` and `hip::mr::host_accessible` are stateless tags (empty structs), so their `get_property` overload returns `void`; the overload's existence, found via argument-dependent lookup, is what signals the property.
   - `device_accessible` tells a caller that memory returned by the resource's allocate member can be read and written from device code (kernels).
   - `host_accessible` tells a caller that the memory can be read and written from host code. A resource can declare either, both, or (as in this example) only one of them.
