@@ -2,9 +2,9 @@
 * @ROCm/rocm-examples-owners
 
 # HIP Examples
-HIP-Basics/* @rakesroy
+HIP-Basics/* @rakesroy @ROCm/rocm-examples-owners
 
 # Documentation files
-docs/* @ROCm/rocm-documentation
-*.md @ROCm/rocm-documentation
-*.rst @ROCm/rocm-documentation
+docs/* @ROCm/rocm-documentation @ROCm/rocm-examples-owners
+*.md @ROCm/rocm-documentation @ROCm/rocm-examples-owners
+*.rst @ROCm/rocm-documentation @ROCm/rocm-examples-owners
