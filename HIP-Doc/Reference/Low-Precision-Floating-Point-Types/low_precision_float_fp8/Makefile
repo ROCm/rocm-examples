@@ -27,7 +27,9 @@ GPU_RUNTIME ?= HIP
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX  ?= $(ROCM_PATH)/bin/amdclang++
+CUDA_INSTALL_DIR ?= /usr/local/cuda
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -39,8 +41,14 @@ ILDLIBS   :=
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+  COMPILER := $(CUDACXX)
+  ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
+  include ../../../../Common/filter_hip_architectures.mk
+  ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+  ILDFLAGS  += --hip-link
+  COMPILER := $(HIPCXX)
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
@@ -51,7 +59,7 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 $(EXAMPLE): main.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)

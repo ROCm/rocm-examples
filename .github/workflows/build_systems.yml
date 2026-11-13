@@ -48,4 +48,4 @@ jobs:
           - name: Make
             run: |
               cd Systems
-              make -j $(nproc) SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
+              make -j $(nproc) HIP_ARCHITECTURES="${GPU_TARGETS}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"

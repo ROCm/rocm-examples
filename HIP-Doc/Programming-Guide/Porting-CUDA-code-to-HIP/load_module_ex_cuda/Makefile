@@ -27,7 +27,8 @@ GPU_RUNTIME ?= CUDA
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+CUDA_INSTALL_DIR ?= /usr/local/cuda
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -39,7 +40,9 @@ ILDLIBS   :=
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
-  ILDLIBS += -lcudadevrt -lcudart_static -lrt
+  # main.cpp uses the CUDA driver API (cuInit, cuCtxCreate, cuModuleLoadDataEx, ...),
+  # which lives in libcuda, not libcudart.
+  ILDLIBS += -lcudadevrt -lcudart_static -lrt -lcuda
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be CUDA)
 endif
@@ -50,10 +53,10 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 $(EXAMPLE): main.cpp myKernel.ptx
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
+	$(CUDACXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $< $(ILDLIBS)
 
 myKernel.ptx: myKernel.cu
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --genco -o $@ $< $(ILDLIBS)
+	$(CUDACXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -ptx -o $@ $< $(ILDLIBS)
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)
