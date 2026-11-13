@@ -80,7 +80,8 @@ jobs:
         run: |
           echo "## Target: ${GPU_TARGET} on ${DISTRO_LABEL}" >> $GITHUB_STEP_SUMMARY
           pip install --no-cache-dir --upgrade pip
-          PKG="rocm[libraries,devel,device-${GPU_TARGET}]"
+          # The profiler extra provides the rocprof-sys tools needed by the rocprof-systems tests.
+          PKG="rocm[libraries,devel,profiler,device-${GPU_TARGET}]"
           # Pin to the exact nightly when a caller (e.g. the Quartz workflow) requests one;
           # otherwise install whatever is latest on the index.
           if [ -n "$ROCM_VERSION" ]; then
