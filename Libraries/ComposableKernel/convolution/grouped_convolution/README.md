@@ -6,7 +6,6 @@ This example demonstrates how to perform a grouped convolution operation with CK
 Tile. Multiple variants are provided:
 
 * **Forward pass**: Basic grouped convolution forward operation
-* **Forward pass with large tensors**: Optimized for larger tensor dimensions
 * **Forward pass with bias and clamp**: Includes bias addition and value
   clamping
 * **Backward pass (weight)**: Computes gradients with respect to weights
@@ -81,7 +80,6 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::FillMonotonicSeq`
 * `ck_tile::FillUniformDistribution`
 * `ck_tile::GemmPipelineAGmemBGmemCRegV1`
-* `ck_tile::GemmPipelineProblem`
 * `ck_tile::GemmTile1DPartitioner`
 * `ck_tile::GroupedConvFwdHostArgs`
 * `ck_tile::GroupedConvolutionForwardKernel`
@@ -89,8 +87,6 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::half_t`
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
-* `ck_tile::integral_constant`
-* `ck_tile::memory_operation_enum`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
 * `ck_tile::tensor_layout::convolution::GKXC`
