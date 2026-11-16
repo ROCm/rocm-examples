@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 #include "example_utils.hpp"
+#include "hiprtc_utils.hpp"
 #include "rocfft_utils.hpp"
 
 #include <rocfft/rocfft.h>
@@ -34,25 +35,33 @@
 #include <random>
 #include <vector>
 
-// example of using load/store callbacks with rocfft
+// example of using JIT load callbacks with rocfft
 
 struct load_callback_data {
   double2 *filter;
 };
 
-__device__ double2 load_callback(double2 *input, size_t offset,
-                                 void *callback_data, void * /*sharedMem*/) {
-  auto data = static_cast<load_callback_data *>(callback_data);
+static const char *load_callback_src = R"(
+struct load_callback_data
+{
+    double2* filter;
+};
 
-  // multiply each element by filter element
-  return hipCmul(input[offset], data->filter[offset]);
+// Give the callback C linkage so that its symbol name matches what
+// is written here.
+extern "C"
+__device__ double2 load_callback(double2* input,
+                                 size_t   offset,
+                                 void*    callback_data,
+                                 void* /*sharedMem*/)
+{
+    auto data = static_cast<load_callback_data*>(callback_data);
+
+    // multiply each element by filter element
+    return hipCmul(input[offset], data->filter[offset]);
 }
+)";
 
-// Can not give __device__ function to HIP_SYMBOL
-__device__ auto load_callback_dev = load_callback;
-
-// NOTE: Function pointer callbacks are about to be deprecated, in favor of JIT
-// callbacks.
 int main() {
   constexpr size_t N = 8;
 
@@ -69,15 +78,11 @@ int main() {
     callback_filter[i].x = distribution(gen);
   }
 
-  // Rocfft gpu compute
-  ROCFFT_CHECK(rocfft_setup());
-
-  const size_t Nbytes = N * sizeof(double2);
-
   // Create HIP device object.
   double2 *data_dev, *callback_filter_dev;
 
   // Create buffers
+  const size_t Nbytes = N * sizeof(double2);
   HIP_CHECK(hipMalloc(&data_dev, Nbytes));
   HIP_CHECK(hipMalloc(&callback_filter_dev, Nbytes));
 
@@ -86,12 +91,31 @@ int main() {
   HIP_CHECK(hipMemcpy(callback_filter_dev, callback_filter.data(), Nbytes,
                       hipMemcpyHostToDevice));
 
-  // Set up scaling
+  // Prepare callback
+  auto load_callback_code = compile_jit_callback(load_callback_src);
+  load_callback_data callback_data_host;
+  callback_data_host.filter = callback_filter_dev;
+
+  void *callback_data_dev;
+  HIP_CHECK(hipMalloc(&callback_data_dev, sizeof(load_callback_data)));
+  HIP_CHECK(hipMemcpy(callback_data_dev, &callback_data_host,
+                      sizeof(load_callback_data), hipMemcpyHostToDevice));
+
+  std::vector<void *> cbdatas(1);
+  cbdatas[0] = callback_data_dev;
+
+  // Rocfft gpu compute
+  ROCFFT_CHECK(rocfft_setup());
+
+  // Set up scaling and load callback
   rocfft_plan_description description = nullptr;
   const double scale_factor = 1.0 / static_cast<double>(N);
   ROCFFT_CHECK(rocfft_plan_description_create(&description));
   ROCFFT_CHECK(
       rocfft_plan_description_set_scale_factor(description, scale_factor));
+  ROCFFT_CHECK(rocfft_plan_description_set_load_callback(
+      description, "load_callback", load_callback_code.data(),
+      load_callback_code.size(), 0));
 
   // Create plan
   rocfft_plan plan = nullptr;
@@ -112,24 +136,9 @@ int main() {
         rocfft_execution_info_set_work_buffer(info, work_buf, work_buf_size));
   }
 
-  // Prepare callback
-  load_callback_data callback_data_host;
-  callback_data_host.filter = callback_filter_dev;
-
-  void *callback_data_dev;
-  HIP_CHECK(hipMalloc(&callback_data_dev, sizeof(load_callback_data)));
-  HIP_CHECK(hipMemcpy(callback_data_dev, &callback_data_host,
-                      sizeof(load_callback_data), hipMemcpyHostToDevice));
-
-  // Get a properly-typed host pointer to the device function, as
-  // rocfft_execution_info_set_load_callback expects void*.
-  void *callback_ptr_host = nullptr;
-  HIP_CHECK(hipMemcpyFromSymbol(&callback_ptr_host,
-                                HIP_SYMBOL(load_callback_dev), sizeof(void *)));
-
-  // Set callback
-  ROCFFT_CHECK(rocfft_execution_info_set_load_callback(info, &callback_ptr_host,
-                                                       &callback_data_dev, 0));
+  // Set callback data on execution info
+  ROCFFT_CHECK(rocfft_execution_info_set_load_callback_data(
+      info, cbdatas.data(), cbdatas.size()));
 
   // Execute plan
   ROCFFT_CHECK(rocfft_execute(plan, (void **)&data_dev, nullptr, info));
