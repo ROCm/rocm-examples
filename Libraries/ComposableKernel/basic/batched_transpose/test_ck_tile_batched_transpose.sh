@@ -1,6 +1,7 @@
+#!/bin/sh
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -20,10 +21,18 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set -e
 EXE=$1
 
+# The LDS pipeline (-pipeline=1) uses gfx950's LDS transpose loads; Composable Kernel's own test skips it on other GPUs.
+GPU_arch=${GPU_arch:-$(rocminfo | grep -E 'Name:\s+gfx' | head -n1 | awk '{print $2}')}
+case $GPU_arch in
+gfx950) pipelines="0 1" ;;
+*) pipelines="0" ;;
+esac
+
 for pr in "fp8" "fp16" "bf16"; do
-for pipeline in "0" "1"; do
+for pipeline in $pipelines; do
 $EXE -pr=$pr -pipeline=$pipeline -N=1 -C=32 -H=1 -W=32 -layout_in='NCHW' -layout_out='NHWC'
 $EXE -pr=$pr -pipeline=$pipeline -N=1 -C=64 -H=1 -W=64 -layout_in='NCHW' -layout_out='NHWC'
 $EXE -pr=$pr -pipeline=$pipeline -N=2 -C=12 -H=1 -W=32 -layout_in='NHWC' -layout_out='NCHW'

@@ -65,8 +65,6 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::half_t`
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
-* `ck_tile::integral_constant`
-* `ck_tile::memory_operation_enum`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`
 * `ck_tile::TailNumber`

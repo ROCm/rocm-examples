@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,11 @@
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(ComposableKernel_examples LANGUAGES CXX)
 
+# Set default build type to Release, as Composable Kernel's own build does
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif()
+
 if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
     message(STATUS "Composable Kernel examples are supported on Linux only.")
     return()
@@ -43,9 +48,6 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "Composable Kernel examples are not supported for CUDA.")
     return()
 endif()
-
-file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 

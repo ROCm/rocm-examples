@@ -53,8 +53,6 @@ For more information on CK Tile terminology, refer to the
 
 * `ck_tile::ArgParser`
 * `ck_tile::BaseGemmPipelineAgBgCrCompV3`
-* `ck_tile::BaseGemmPipelineAgBgCrCompV4`
-* `ck_tile::BaseGemmPipelineAgBgCrMem`
 * `ck_tile::bool_constant`
 * `ck_tile::CShuffleEpilogue`
 * `ck_tile::CShuffleEpilogueProblem`
@@ -74,8 +72,6 @@ For more information on CK Tile terminology, refer to the
 * `ck_tile::half_t`
 * `ck_tile::HostTensor`
 * `ck_tile::index_t`
-* `ck_tile::integral_constant`
-* `ck_tile::memory_operation_enum`
 * `ck_tile::PersistentTileGemmUniversalTraits`
 * `ck_tile::sequence`
 * `ck_tile::stream_config`

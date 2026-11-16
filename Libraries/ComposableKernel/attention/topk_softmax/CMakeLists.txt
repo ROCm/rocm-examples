@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -49,7 +49,7 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FindCKTile.cmake")
 find_package(hip REQUIRED)
 
 add_executable(${example_name} topk_softmax_api.cpp topk_softmax.cpp)
-add_test(${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script} $<TARGET_FILE:${example_name}>")
+add_test(NAME ${example_name} COMMAND "${CMAKE_CURRENT_LIST_DIR}/${example_script}" "$<TARGET_FILE:${example_name}>")
 
 set_source_files_properties(topk_softmax_api.cpp topk_softmax.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 

@@ -1,6 +1,6 @@
 # MIT License
 #
-# Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+# Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy
 # of this software and associated documentation files (the "Software"), to deal
@@ -53,9 +53,22 @@ include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/FindCKTile.cmake")
 
 find_package(hip REQUIRED)
 
-add_executable(${example_name} gemm_quant_basic.cpp)
-add_test(${example_name} COMMAND ${example_name})
-set_source_files_properties(gemm_quant_basic.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
+set(example_sources
+    gemm_quant.cpp
+    gemm_bquant_quantgrouped_bf8.cpp
+    gemm_bquant_quantgrouped_bf8i4.cpp
+    gemm_bquant_quantgrouped_fp8.cpp
+    gemm_bquant_quantgrouped_fp8i4.cpp
+)
+
+add_executable(${example_name} ${example_sources})
+add_test(NAME ${example_name} COMMAND ${example_name})
+set_source_files_properties(${example_sources} PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 target_compile_features(${example_name} PRIVATE cxx_std_17 hip_std_17)
-target_compile_options(${example_name} PRIVATE -mllvm -enable-noalias-to-md-conversion=0)
+target_compile_options(
+    ${example_name}
+    PRIVATE
+        "SHELL:-mllvm -enable-noalias-to-md-conversion=1"
+        "SHELL:-mllvm -greedy-reverse-local-assignment=1"
+)
 target_link_libraries(${example_name} PRIVATE composable_kernel::ck_tile hip::host)
