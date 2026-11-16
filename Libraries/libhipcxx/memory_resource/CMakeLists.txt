@@ -45,8 +45,9 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 target_link_libraries(${example_name} PRIVATE libhipcxx::libhipcxx)
 target_include_directories(${example_name} PRIVATE "../../../Common")
-# cuda::mr (cuda::mr::resource, cuda::mr::resource_ref, ...) is experimental
-# and is only compiled in when this macro is defined.
+# cuda::mr (cuda::mr::resource/synchronous_resource,
+# cuda::mr::resource_ref/synchronous_resource_ref, ...) is experimental and is
+# only compiled in when this macro is defined.
 target_compile_definitions(${example_name} PRIVATE LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE)
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 

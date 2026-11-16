@@ -3,7 +3,7 @@
 #
 # Weekly security scan: runs on a fixed cadence and pushes SARIF findings
 # to the repository's code-scanning Security tab. Complements
-# `pr-security-scan.yml`, which scans only what changed in a PR and
+# `security_scan_pr.yml`, which scans only what changed in a PR and
 # uploads reviewer-readable artifacts for in-review browsing.
 
 name: Security scan (Weekly)
@@ -27,3 +27,7 @@ jobs:
     with:
       scan_mode: all
       report_formats: sarif
+      bandit_config_path: .github/scan_tools_configs/bandit.yml
+      gitleaks_config_path: .github/scan_tools_configs/gitleaks.toml
+      trivy_config_path: .github/scan_tools_configs/trivy.yml
+      zizmor_config_path: .github/scan_tools_configs/zizmor.yml

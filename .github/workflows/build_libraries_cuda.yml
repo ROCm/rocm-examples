@@ -6,12 +6,12 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_libraries_cuda.yml'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_libraries_cuda.yml'
 
 permissions:
   contents: read
