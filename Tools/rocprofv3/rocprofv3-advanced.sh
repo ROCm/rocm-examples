@@ -92,45 +92,67 @@ echo "PC sampling"
 echo "==============================================================================="
 # PC sampling is currently a beta feature and not supported on all devices. The supported method, unit and interval
 # range vary per agent and ROCm version, so query the capabilities of the device the workload actually runs on
-# (HIP's default device, index 0, since the workload never calls hipSetDevice) and use its first reported
+# (HIP's default device, ordinal 0, since the workload never calls hipSetDevice) and use its first reported
 # configuration instead of hardcoding one or picking up a config reported for a different agent.
 #
-# rocprofv3-avail's `-d` does not scope `info --pc-sampling` to a single agent: it always lists every
-# PC-sampling-capable agent. The awk parser below therefore filters the listing to the GPU:0 block itself
-# instead of relying on `-d` to do it, so a config is never picked up from a different agent.
-PC_SAMPLING_INFO="$($EXAMPLE_QUERY -d 0 info --pc-sampling)"
-PC_SAMPLING_CONFIG="$(awk '
-    # Reset on every GPU boundary, and only keep fields while inside the GPU:0 block, so a config is
-    # never built out of fields left over from, or belonging to, a different agent'"'"'s section.
-    /^[[:space:]]*GPU[[:space:]]*:/           { selected = ($NF == "0"); method = ""; unit = ""; min = ""; next }
-    !selected                                 { next }
-    /^[[:space:]]*Method[[:space:]]*:/        { method = $NF; next }
-    /^[[:space:]]*Unit[[:space:]]*:/          { unit = $NF; next }
-    /^[[:space:]]*Min_Interval[[:space:]]*:/  { min = $NF; next }
-    /^[[:space:]]*Max_Interval[[:space:]]*:/  { if (method != "") { print method, unit, min; exit } }
-' <<< "$PC_SAMPLING_INFO")"
-
-if [[ -z "$PC_SAMPLING_CONFIG" ]]; then
-    echo "PC sampling not supported on device 0"
+# rocprofv3-avail's "GPU:<id>" is its own profiler agent index, not HIP's device ordinal. HIP_VISIBLE_DEVICES
+# (falling back to CUDA_VISIBLE_DEVICES, matching HIP's own fallback) reassigns ordinals by the literal order of
+# its comma-separated list -- e.g. "3,2" makes physical GPU 3 ordinal 0 -- a HIP-runtime-private remap that
+# rocprofv3-avail's listing never reflects, so it can't be recovered by inspecting that listing; only the literal
+# env var text gives the order. ROCR_VISIBLE_DEVICES needs no such handling: it filters the agent enumeration
+# below the HIP layer, so rocprofv3-avail already observes the same reordering HIP does. When neither
+# HIP_VISIBLE_DEVICES nor CUDA_VISIBLE_DEVICES is set, no HIP-private remap exists and GPU:<id> already matches
+# HIP's ordinals directly.
+HIP_VISIBLE_LIST="${HIP_VISIBLE_DEVICES:-$CUDA_VISIBLE_DEVICES}"
+if [[ -z "$HIP_VISIBLE_LIST" ]]; then
+    HIP_DEVICE0_GPU=0
 else
-    read -r METHOD UNIT INTERVAL <<< "$PC_SAMPLING_CONFIG"
+    HIP_DEVICE0_GPU="${HIP_VISIBLE_LIST%%,*}"
+    # A UUID (or anything else that isn't a plain index) can't be resolved against rocprofv3-avail's listing,
+    # which has no UUID field to match against.
+    [[ "$HIP_DEVICE0_GPU" =~ ^[0-9]+$ ]] || HIP_DEVICE0_GPU=""
+fi
 
-    # --pc-sampling-unit only accepts the plural choices (instructions/cycles/time); the capability listing above
-    # reports them singular except for "time".
-    case "$UNIT" in
-        instruction*) UNIT=instructions ;;
-        cycle*)       UNIT=cycles ;;
-    esac
+if [[ -z "$HIP_DEVICE0_GPU" ]]; then
+    echo "PC sampling not supported: could not resolve HIP's default device to a profiler agent"
+else
+    # rocprofv3-avail's `-d` does not scope `info --pc-sampling` to a single agent: it always lists every
+    # PC-sampling-capable agent. The awk parser below therefore filters the listing to the resolved GPU's block
+    # itself, so a config is never picked up from a different agent.
+    PC_SAMPLING_INFO="$($EXAMPLE_QUERY info --pc-sampling)"
+    PC_SAMPLING_CONFIG="$(awk -v target="$HIP_DEVICE0_GPU" '
+        # Reset on every GPU boundary, and only keep fields while inside the matching GPU block, so a config is
+        # never built out of fields left over from, or belonging to, a different agent'"'"'s section.
+        /^[[:space:]]*GPU[[:space:]]*:/           { selected = ($NF == target); method = ""; unit = ""; min = ""; next }
+        !selected                                 { next }
+        /^[[:space:]]*Method[[:space:]]*:/        { method = $NF; next }
+        /^[[:space:]]*Unit[[:space:]]*:/          { unit = $NF; next }
+        /^[[:space:]]*Min_Interval[[:space:]]*:/  { min = $NF; next }
+        /^[[:space:]]*Max_Interval[[:space:]]*:/  { if (method != "") { print method, unit, min; exit } }
+    ' <<< "$PC_SAMPLING_INFO")"
 
-    OUTDIR="${EXAMPLE_TOOL}-pc-sampling" \
-        $EXAMPLE_TOOL \
-        --pc-sampling-beta-enabled \
-        --pc-sampling-unit "$UNIT" \
-        --pc-sampling-method "$METHOD" \
-        --pc-sampling-interval "$INTERVAL" \
-        --output-directory %env{OUTDIR}% \
-        --output-format csv \
-        -- $EXAMPLE_WORKLOAD
+    if [[ -z "$PC_SAMPLING_CONFIG" ]]; then
+        echo "PC sampling not supported on device 0 (profiler agent GPU:$HIP_DEVICE0_GPU)"
+    else
+        read -r METHOD UNIT INTERVAL <<< "$PC_SAMPLING_CONFIG"
+
+        # --pc-sampling-unit only accepts the plural choices (instructions/cycles/time); the capability listing above
+        # reports them singular except for "time".
+        case "$UNIT" in
+            instruction*) UNIT=instructions ;;
+            cycle*)       UNIT=cycles ;;
+        esac
+
+        OUTDIR="${EXAMPLE_TOOL}-pc-sampling" \
+            $EXAMPLE_TOOL \
+            --pc-sampling-beta-enabled \
+            --pc-sampling-unit "$UNIT" \
+            --pc-sampling-method "$METHOD" \
+            --pc-sampling-interval "$INTERVAL" \
+            --output-directory %env{OUTDIR}% \
+            --output-format csv \
+            -- $EXAMPLE_WORKLOAD
+    fi
 fi
 
 exit 0
