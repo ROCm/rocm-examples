@@ -65,7 +65,8 @@ set_source_files_properties(
     PROPERTIES COMPILE_OPTIONS "--cuda-host-only;-fuse-cuid=none"
 )
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     set(OBJ_TYPE obj)
     set(NULDEV NUL)
     set(HOST_TARGET x86_64-pc-windows-msvc)

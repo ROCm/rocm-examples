@@ -27,17 +27,20 @@ project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-Unifie
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/HipPlatform.cmake")
+detect_system_platform()
+
 add_subdirectory(data_prefetching)
 add_subdirectory(dynamic_unified_memory)
 add_subdirectory(explicit_memory)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "The memory range attributes example is available only on Linux.")
 else()
     add_subdirectory(memory_range_attributes)
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "The standard unified memory example is available only on Linux.")
 elseif(NOT DEFINED ENV{HSA_XNACK})
     message(WARNING "Environment variable HSA_XNACK not set, not building standard unified memory example.")

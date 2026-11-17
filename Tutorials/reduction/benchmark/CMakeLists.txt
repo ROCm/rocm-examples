@@ -51,7 +51,8 @@ if("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
     list(APPEND include_dirs "${ROCM_PATH}/include")
 
     # Some CUDA versions have issues when compiling for C++20 on Windows, check if we are using those
-    if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    detect_system_platform()
+    if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
         find_package(CUDA)
         if(CUDA_FOUND)
             set(FAULTY_CUDA_VERSION "12.5")

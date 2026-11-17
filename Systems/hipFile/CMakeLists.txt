@@ -28,12 +28,13 @@ include(CTest)
 # Guard must precede any language enable: on Windows the HIP/CUDA toolchain
 # may not be installed and enable_language() would abort configuration before
 # a later return() could fire.
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "hipFile examples are only available on Linux")
     return()
 endif()
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()

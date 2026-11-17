@@ -39,7 +39,9 @@ endforeach()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "The hipSPARSELt examples are available on Linux only.")
 else()
     find_package(hipsparselt QUIET)
