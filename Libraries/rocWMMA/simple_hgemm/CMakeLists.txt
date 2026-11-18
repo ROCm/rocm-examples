@@ -25,18 +25,18 @@ set(example_name rocwmma_simple_hgemm)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/FilterHIPArchitectures.cmake")
-filter_hip_architectures("rocWMMA simple_hgemm example" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201" SHOULD_SKIP)
-if(SHOULD_SKIP)
-    return()
-endif()
-
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocWMMA examples do not support the CUDA runtime")
     return()
 endif()
 
 enable_language(HIP)
+
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/FilterHIPArchitectures.cmake")
+filter_hip_architectures("rocWMMA simple_hgemm example" "gfx908;gfx90a;gfx942;gfx950;gfx1100;gfx1101;gfx1102;gfx1103;gfx1150;gfx1151;gfx1152;gfx1153;gfx1200;gfx1201" SHOULD_SKIP)
+if(SHOULD_SKIP)
+    return()
+endif()
 
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
