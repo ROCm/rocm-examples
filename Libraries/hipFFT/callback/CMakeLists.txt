@@ -23,6 +23,7 @@
 set(example_name hipfft_callback)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX HIP)
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "hipFFT callback example does not support the CUDA runtime")
@@ -35,8 +36,6 @@ if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "hipFFT callback example does not support windows")
     return()
 endif()
-
-project(hipfft_callback LANGUAGES CXX HIP)
 
 # Set default build type to Release
 # to workaround a compiler issue when building with -O0

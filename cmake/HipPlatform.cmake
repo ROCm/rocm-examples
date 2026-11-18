@@ -112,7 +112,7 @@ endfunction()
 variable_watch(GPU_RUNTIME warn_gpu_runtime_used)
 
 function(detect_system_platform)
-    if(DEFINED ROCM_EXAMPLES_SYSTEM_PLATFORM)
+    if(DEFINED ROCM_EXAMPLES_SYSTEM_PLATFORM AND NOT "${ROCM_EXAMPLES_SYSTEM_PLATFORM}" STREQUAL "")
         return()
     endif()
 

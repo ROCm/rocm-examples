@@ -20,6 +20,10 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 
+set(example_name Reduction)
+
+project(${example_name} LANGUAGES CXX)
+
 if("${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
     if(${CMAKE_VERSION} VERSION_LESS "3.25.2")
         message(
@@ -41,8 +45,6 @@ else()
         return()
     endif()
 endif()
-
-project(Reduction LANGUAGES CXX)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
