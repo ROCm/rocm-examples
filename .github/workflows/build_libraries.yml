@@ -6,12 +6,14 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_libraries.yml'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Libraries/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_libraries.yml'
+      - '.github/build_tools/**'
   schedule:
     # Nightly at 2 AM UTC
     - cron: '0 2 * * *'
