@@ -23,7 +23,7 @@
 set(example_name hipthreads_saxpy_step2_hipthread_dropin)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(${example_name} LANGUAGES CXX HIP)
+project(${example_name} LANGUAGES CXX)
 
 set(CMAKE_HIP_STANDARD 17)
 set(CMAKE_HIP_EXTENSIONS OFF)
@@ -33,6 +33,8 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "hipThreads examples do not support the CUDA runtime")
     return()
 endif()
+
+enable_language(HIP)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/ROCmPath.cmake")
 if(NOT CMAKE_PREFIX_PATH)

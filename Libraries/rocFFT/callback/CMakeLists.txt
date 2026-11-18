@@ -23,12 +23,14 @@
 set(example_name rocfft_callback)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(${example_name} LANGUAGES CXX HIP)
+project(${example_name} LANGUAGES CXX)
 
 if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "rocFFT examples do not support the CUDA runtime")
     return()
 endif()
+
+enable_language(HIP)
 
 # Set default build type to Release
 # to workaround a compiler issue when building with -O0
