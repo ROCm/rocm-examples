@@ -9,7 +9,7 @@ on:
       - 'HIP-Doc/**'
       - 'Libraries/hip**'
       - 'Programming-Guide/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_portable_sln.yml'
       - 'Scripts/VisualStudio/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
@@ -19,7 +19,7 @@ on:
       - 'HIP-Doc/**'
       - 'Libraries/hip**'
       - 'Programming-Guide/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_portable_sln.yml'
       - 'Scripts/VisualStudio/**'
 
 permissions:

@@ -42,9 +42,10 @@ HIPCXX ?= $(ROCM_PATH)/bin/hipcc
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) $(CXXFLAGS)
-# cuda::mr (cuda::mr::resource, cuda::mr::resource_ref, ...) is experimental
-# and is only compiled in when LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE
-# is defined.
+# cuda::mr (cuda::mr::resource/synchronous_resource,
+# cuda::mr::resource_ref/synchronous_resource_ref, ...) is experimental and is
+# only compiled in when LIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE is
+# defined.
 ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(LIBHIPCXX_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ -DLIBCUDACXX_ENABLE_EXPERIMENTAL_MEMORY_RESOURCE $(CPPFLAGS)
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)

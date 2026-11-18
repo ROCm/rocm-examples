@@ -40,6 +40,8 @@ if(NOT TIFF_FOUND)
         GIT_REPOSITORY https://gitlab.com/libtiff/libtiff.git
         GIT_TAG v4.7.1)
     set(BUILD_SHARED_LIBS "ON")
+    # LibTIFF's own test suite is unrelated to this example; keep it out of our ctest run.
+    set(tiff-tests OFF CACHE BOOL "Disable LibTIFF's test suite" FORCE)
     FetchContent_MakeAvailable(libtiff)
 
     target_compile_definitions(tiff PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
