@@ -24,6 +24,7 @@
 #include <hip/hip_runtime.h>
 
 #include <cstddef>
+#include <cstdlib>
 #include <iostream>
 
 #define ROUND_UP(SIZE, GRANULARITY) ((1 + SIZE / GRANULARITY) * GRANULARITY)
@@ -34,6 +35,7 @@
     if (err != hipSuccess) {                                                   \
       std::cerr << "HIP error: " << hipGetErrorString(err) << " at "           \
                 << __LINE__ << "\n";                                           \
+      exit(EXIT_FAILURE);                                                      \
     }                                                                          \
   }
 
