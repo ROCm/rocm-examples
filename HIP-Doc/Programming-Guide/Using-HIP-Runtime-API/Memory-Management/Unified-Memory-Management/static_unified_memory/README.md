@@ -6,6 +6,10 @@ This example demonstrates how to statically allocate unified memory and use it f
 more information on this topic, please refer to the
 [HIP documentation](https://rocm.docs.amd.com/projects/HIP/en/latest/how-to/hip_runtime_api/memory_management/unified_memory.html#id1).
 
+### Prerequisites
+
+This example is only supported on native Linux; it is not available on Windows or Windows Subsystem for Linux (WSL).
+
 ### Application flow
 
 1. Three variables are globally declared in the unified memory space.

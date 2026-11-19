@@ -50,5 +50,10 @@ else()
     add_subdirectory(standard_unified_memory)
 endif()
 
-add_subdirectory(static_unified_memory)
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM MATCHES "^(Windows|WSL)$")
+    message(STATUS "The static unified memory example is available only on native Linux (not WSL).")
+else()
+    add_subdirectory(static_unified_memory)
+endif()
+
 add_subdirectory(unified_memory_advice)

@@ -412,8 +412,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_unified_memory_vs20
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\explicit_memory\explicit_memory_vs2017.vcxproj", "{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_unified_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\static_unified_memory\static_unified_memory_vs2017.vcxproj", "{73842647-DCEE-4834-B938-33F10A9427F9}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unified_memory_advice_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\unified_memory_advice\unified_memory_advice_vs2017.vcxproj", "{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "device_enumeration_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Multi-Device-Management\device_enumeration\device_enumeration_vs2017.vcxproj", "{C31535EF-37D5-4261-810C-E7F9D1950B23}"
@@ -1132,10 +1130,6 @@ Global
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Debug|x64.Build.0 = Debug|x64
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Release|x64.ActiveCfg = Release|x64
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Release|x64.Build.0 = Release|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Debug|x64.ActiveCfg = Debug|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Debug|x64.Build.0 = Debug|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Release|x64.ActiveCfg = Release|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Release|x64.Build.0 = Release|x64
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}.Debug|x64.ActiveCfg = Debug|x64
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}.Debug|x64.Build.0 = Debug|x64
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}.Release|x64.ActiveCfg = Release|x64
@@ -1454,7 +1448,6 @@ Global
 		{757426E0-0AF6-4898-A4C3-42E9F03BAEC6} = {8D25760A-A72D-42C0-9660-11DC1CD5CE6E}
 		{25C30A61-AB4A-474C-8DA1-55B7D04177B0} = {8D25760A-A72D-42C0-9660-11DC1CD5CE6E}
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F} = {8D25760A-A72D-42C0-9660-11DC1CD5CE6E}
-		{73842647-DCEE-4834-B938-33F10A9427F9} = {8D25760A-A72D-42C0-9660-11DC1CD5CE6E}
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A} = {8D25760A-A72D-42C0-9660-11DC1CD5CE6E}
 		{C31535EF-37D5-4261-810C-E7F9D1950B23} = {8169D01C-B7FD-478D-A742-AAC572042C77}
 		{16C9D204-07DE-4777-ACA3-42D17922AD9A} = {8169D01C-B7FD-478D-A742-AAC572042C77}
