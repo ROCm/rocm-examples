@@ -150,8 +150,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dynamic_unified_memory_vs20
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "explicit_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\explicit_memory\explicit_memory_vs2017.vcxproj", "{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "static_unified_memory_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\static_unified_memory\static_unified_memory_vs2017.vcxproj", "{73842647-DCEE-4834-B938-33F10A9427F9}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "unified_memory_advice_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\Unified-Memory-Management\unified_memory_advice\unified_memory_advice_vs2017.vcxproj", "{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ordinary_memory_allocation_vs2017", "HIP-Doc\Programming-Guide\Using-HIP-Runtime-API\Memory-Management\SOMA\ordinary_memory_allocation\ordinary_memory_allocation_vs2017.vcxproj", "{D42186F5-700C-485C-85E6-8168710EC240}"
@@ -444,10 +442,6 @@ Global
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Debug|x64.Build.0 = Debug|x64
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Release|x64.ActiveCfg = Release|x64
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F}.Release|x64.Build.0 = Release|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Debug|x64.ActiveCfg = Debug|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Debug|x64.Build.0 = Debug|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Release|x64.ActiveCfg = Release|x64
-		{73842647-DCEE-4834-B938-33F10A9427F9}.Release|x64.Build.0 = Release|x64
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}.Debug|x64.ActiveCfg = Debug|x64
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}.Debug|x64.Build.0 = Debug|x64
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A}.Release|x64.ActiveCfg = Release|x64
@@ -643,7 +637,6 @@ Global
 		{757426E0-0AF6-4898-A4C3-42E9F03BAEC6} = {11AB9420-D165-489A-8240-0FA4D8164E9E}
 		{25C30A61-AB4A-474C-8DA1-55B7D04177B0} = {11AB9420-D165-489A-8240-0FA4D8164E9E}
 		{0C559C6A-D675-4B99-9FA2-2CC72F2E6C7F} = {11AB9420-D165-489A-8240-0FA4D8164E9E}
-		{73842647-DCEE-4834-B938-33F10A9427F9} = {11AB9420-D165-489A-8240-0FA4D8164E9E}
 		{2911B0E7-9BE3-4B47-BE27-B5442EF1A38A} = {11AB9420-D165-489A-8240-0FA4D8164E9E}
 		{D42186F5-700C-485C-85E6-8168710EC240} = {812CCAB6-5157-48AD-9F9E-2E33510C0C84}
 		{70A51D02-8ADF-4CFD-BE3E-6647E09AF45B} = {23D01721-DB47-4545-AD6C-B0DF786308C8}

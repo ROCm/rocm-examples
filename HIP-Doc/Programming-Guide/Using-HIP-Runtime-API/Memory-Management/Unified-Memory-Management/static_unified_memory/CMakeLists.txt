@@ -26,6 +26,7 @@ cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../cmake/HipPlatform.cmake")
+reject_unsupported_platform(EXAMPLE ${example_name} EXCLUDE Windows WSL)
 
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
