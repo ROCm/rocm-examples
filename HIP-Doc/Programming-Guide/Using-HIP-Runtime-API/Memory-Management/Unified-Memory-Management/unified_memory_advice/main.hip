@@ -21,8 +21,8 @@
 // SOFTWARE.
 
 // [sphinx-start]
-#include <hip/hip_runtime.h>
 #include <cstdlib>
+#include <hip/hip_runtime.h>
 #include <iostream>
 
 #define HIP_CHECK(expression)                                                  \
