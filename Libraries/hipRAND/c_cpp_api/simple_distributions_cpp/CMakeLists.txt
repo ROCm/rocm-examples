@@ -66,7 +66,8 @@ target_include_directories(
 )
 
 ## Workaround for rocRAND since it relies on definition "WIN32".
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 
