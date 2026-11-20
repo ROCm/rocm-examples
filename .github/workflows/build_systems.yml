@@ -30,7 +30,7 @@ jobs:
         name: "Build Systems Examples"
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.1
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.2
         defaults:
             run:
                 shell: bash
