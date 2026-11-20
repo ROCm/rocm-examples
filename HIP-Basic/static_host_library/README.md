@@ -2,7 +2,7 @@
 
 ## Description
 
-This example shows how to create a static library that exports hosts functions. The library may contain both `__global__` and `__device__` code as well, but in this example only `__host__` functions are exported. The resulting library may be linked with other libraries or programs, which do not necessarily need to be HIP libraries or programs. A static host library appears as a regular library, and is compatible with either hipcc or the native system's linker. When using the system linker, the libraries or applications using the static host library do need to be linked with `libamdhip64`.
+This example shows how to create a static library that exports hosts functions. The library may contain both `__global__` and `__device__` code as well, but in this example only `__host__` functions are exported. The resulting library may be linked with other libraries or programs, which do not necessarily need to be HIP libraries or programs. A static host library appears as a regular library, and is compatible with either amdclang++ or the native system's linker. When using the system linker, the libraries or applications using the static host library do need to be linked with `libamdhip64`.
 
 ### Application flow
 
@@ -18,17 +18,17 @@ This example shows how to create a static library that exports hosts functions. 
 
 ## Build Process
 
-A HIP static host library is built the same as a regular application. Additionally, the library should be compiled with position independent code enabled:
+A HIP static host library is built the same as a regular application, passing `-x hip` to tell the compiler to treat the input as HIP source and `--offload-arch=<arch>` for the target GPU architecture (`--offload-arch=native` targets the GPUs present on the build machine). Additionally, the library should be compiled with position independent code enabled:
 
 ```shell
-hipcc library/library.hip -o liblibrary.o -c -fPIC
+amdclang++ -x hip --offload-arch=<arch> library/library.hip -o liblibrary.o -c -fPIC
 ar rcs liblibrary.a liblibrary.o
 ```
 
-Linking the static library with another library or object is done in the same way as a regular library:
+Linking the static library with another library or object is done in the same way as a regular library. `--hip-link` tells amdclang++ to link against the HIP runtime:
 
 ```shell
-hipcc -llibrary -Ilibrary main.cpp -o hip_static_host_library
+amdclang++ -x hip --offload-arch=<arch> --hip-link -llibrary -Ilibrary main.cpp -o hip_static_host_library
 ```
 
 Note that when linking the library using the host compiler or linker, such as `g++` or `clang++`, the `amdhip64` library should be linked with additionally:

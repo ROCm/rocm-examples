@@ -38,7 +38,7 @@ constexpr const char *SAMPLE_NAME = "HSOpticalFlow";
 
 // Resolve a data file path relative to this source file's directory.
 // Falls back to /proc/self/exe when __FILE__ is a bare basename (non-absolute
-// compiler invocation), which happens when hipcc is called with a relative
+// compiler invocation), which happens when amdclang++ is called with a relative
 // path.
 static std::string data_path(const char *filename) {
   std::string src = __FILE__;
