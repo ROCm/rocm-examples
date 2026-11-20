@@ -179,7 +179,7 @@ copy_sources() {
     echo "** Copying sources to $STAGING_DIR **"
 
     # Copy source files in root to package
-    cp "$SRC_DIR/LICENSE.md" "$SRC_DIR/CMakeLists.txt" "$SRC_DIR/README.md" "$STAGING_DIR"
+    cp "$SRC_DIR/LICENSE" "$SRC_DIR/CMakeLists.txt" "$SRC_DIR/README.md" "$STAGING_DIR"
 
     # Copy source directories to package
     for dir in "${SOURCE_DIRS[@]}"; do
