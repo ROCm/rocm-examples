@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 // [sphinx-start]
+#include <cstdlib>
 #include <hip/hip_runtime.h>
 #include <iostream>
 
@@ -30,6 +31,7 @@
     if (err != hipSuccess) {                                                   \
       std::cerr << "HIP error: " << hipGetErrorString(err) << " at "           \
                 << __LINE__ << "\n";                                           \
+      exit(EXIT_FAILURE);                                                      \
     }                                                                          \
   }
 
