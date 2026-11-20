@@ -28,6 +28,7 @@ EXAMPLES := \
   gebsrmm \
   gemmi \
   sddmm \
+  spmm \
   spsm
 
 SKIP_FROM_TEST :=

@@ -28,7 +28,8 @@ EXAMPLES := \
   counter_collection \
   external_correlation_id_request \
   intercept_table \
-  pc_sampling
+  pc_sampling \
+  thread_trace
 
 SKIP_FROM_TEST :=
 
