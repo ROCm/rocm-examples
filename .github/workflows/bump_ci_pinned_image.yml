@@ -1,0 +1,85 @@
+# Copyright Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: MIT
+#
+# Second half of the ROCm-version-bump stack (see bump_rocm_version.yml):
+# once build_docker.yml finishes a successful push-triggered run on
+# amd-staging (meaning the ROCm-tagged image was actually built and pushed),
+# check whether the "stable_release" entry in configure_ci.py still points
+# at an older ROCm version and, if so, open a PR pinning it to the version
+# that was just built.
+
+name: Bump CI pinned ROCm image
+
+on:
+  workflow_run:
+    workflows: ["Build Docker"]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    if: >
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.head_branch == 'amd-staging' &&
+       github.event.workflow_run.event == 'push')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout amd-staging at the built commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || 'amd-staging' }}
+          persist-credentials: false
+
+      - name: Determine built and pinned ROCm versions
+        id: versions
+        env:
+          DOCKERFILE: Dockerfiles/ubuntu-24.04-rocm.Dockerfile
+          CONFIGURE_CI: .github/build_tools/configure_ci.py
+        run: |
+          BUILT=$(grep -oP 'ARG ROCM_VERSION=\K[0-9.]+' "$DOCKERFILE")
+          PINNED=$(grep -oP 'rocm-examples-ubuntu-24\.04-rocm:\K[0-9.]+' "$CONFIGURE_CI")
+          echo "built=${BUILT}" >> "$GITHUB_OUTPUT"
+          echo "pinned=${PINNED}" >> "$GITHUB_OUTPUT"
+          echo "Built: ${BUILT}, Currently pinned: ${PINNED}"
+
+      - name: Bump pinned CI image
+        if: steps.versions.outputs.built != steps.versions.outputs.pinned
+        env:
+          CONFIGURE_CI: .github/build_tools/configure_ci.py
+          BUILT: ${{ steps.versions.outputs.built }}
+        run: |
+          sed -i -E \
+            -e "s/(rocm-examples-ubuntu-24\.04-rocm:)[0-9.]+/\1${BUILT}/" \
+            -e "s/(Ubuntu 24\.04 \(ROCm )[0-9.]+(\))/\1${BUILT}\2/" \
+            "$CONFIGURE_CI"
+
+      - name: Open pull request
+        if: steps.versions.outputs.built != steps.versions.outputs.pinned
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(ci): pin stable_release CI image to ROCm ${{ steps.versions.outputs.built }}"
+          title: "chore(ci): pin stable_release CI image to ROCm ${{ steps.versions.outputs.built }}"
+          body: |
+            `ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:${{ steps.versions.outputs.built }}`
+            was built and pushed by `build_docker.yml` after the Dockerfile
+            bump to ROCm ${{ steps.versions.outputs.built }} merged to
+            `amd-staging`.
+
+            Updates the `stable_release` entry in `configure_ci.py` from
+            `${{ steps.versions.outputs.pinned }}` to
+            `${{ steps.versions.outputs.built }}` to match.
+          branch: users/rocm-version-bot/pin-ci-image-${{ steps.versions.outputs.built }}
+          base: amd-staging
+          labels: dependencies, continuous integration
+          add-paths: .github/build_tools/configure_ci.py
