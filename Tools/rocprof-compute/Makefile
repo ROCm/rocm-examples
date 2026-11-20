@@ -32,13 +32,13 @@ include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 # Common variables and flags
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD) -O3 -g -x hip
 ICPPFLAGS :=
-ILDFLAGS  :=
+ILDFLAGS  := --hip-link
 ILDLIBS   :=
 
 CXXFLAGS ?= -Wall -Wextra

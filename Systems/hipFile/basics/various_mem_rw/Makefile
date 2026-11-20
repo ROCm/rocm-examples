@@ -27,7 +27,9 @@ GPU_RUNTIME ?= HIP
 ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX  ?= $(ROCM_PATH)/bin/amdclang++
+CUDA_INSTALL_DIR ?= /usr/local/cuda
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 
 CXX_STD   := c++17
 ICXXFLAGS := -std=$(CXX_STD)
@@ -39,8 +41,14 @@ HIPFILE_TEST_DIR ?= /tmp
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
+  COMPILER := $(CUDACXX)
+  ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
+  include ../../../../Common/filter_hip_architectures.mk
+  ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+  ILDFLAGS  += --hip-link
+  COMPILER := $(HIPCXX)
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
@@ -53,7 +61,7 @@ ILDLIBS   += $(LDLIBS)
 SRCS := various-mem-rw.cpp $(COMMON_DIR)/examples_common.cpp
 
 $(EXAMPLE): $(SRCS)
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SRCS) $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SRCS) $(ILDLIBS)
 
 # Default: test with device memory (MODE=1). Pass MODE=2 or MODE=3 via TEST_ARGS.
 test: $(EXAMPLE)

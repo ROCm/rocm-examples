@@ -37,7 +37,7 @@ ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 ROCCV_INCLUDE_DIR := $(HIP_INCLUDE_DIR)/roccv
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 # OpenCV variables
 OPENCV_CXXFLAGS := $(OPENCV_CFLAGS)
@@ -49,6 +49,9 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCCV_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -DEXAMPLE_DATA=\"$(CURDIR)/../data/mug_422.jpg\"
 ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lroccv
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+ILDFLAGS  += --hip-link
 
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
