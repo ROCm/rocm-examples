@@ -1,0 +1,90 @@
+# Copyright Advanced Micro Devices, Inc.
+# SPDX-License-Identifier: MIT
+#
+# Checks AMD's stable ROCm apt repo for a release newer than the one
+# Dockerfiles/ubuntu-24.04-rocm.Dockerfile is pinned to, and opens a PR
+# bumping ARG ROCM_VERSION if one is found. This PR touches nothing else, so
+# merging it alone triggers build_docker.yml to build and push the new
+# ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:<version> image. Once that
+# build succeeds, bump_ci_pinned_image.yml opens a follow-up PR updating the
+# CI consumer of that image.
+
+name: Bump ROCm version (Dockerfile)
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC.
+    - cron: "0 8 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  bump:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Determine current and latest ROCm versions
+        id: versions
+        env:
+          DOCKERFILE: Dockerfiles/ubuntu-24.04-rocm.Dockerfile
+        run: |
+          CURRENT=$(grep -oP 'ARG ROCM_VERSION=\K[0-9.]+' "$DOCKERFILE")
+          echo "current=${CURRENT}" >> "$GITHUB_OUTPUT"
+
+          # Query the apt repo's own index metadata for the highest published
+          # version of the "amdrocm" meta-package. This is the same repo the
+          # Dockerfile itself installs from, and is a more stable contract
+          # than scraping the pool/ directory listing.
+          LATEST=$(curl -sf https://stable.repo.amd.com/rocm/core/packages/ubuntu2404/dists/stable/main/binary-amd64/Packages \
+            | awk '/^Package: amdrocm$/{p=1} p && /^Version:/{print $2; p=0}' \
+            | sed -E 's/^([0-9]+\.[0-9]+)\.[0-9]+-[0-9]+$/\1/' \
+            | sort -V | tail -1)
+          if [ -z "$LATEST" ]; then
+            echo "::error::Could not determine latest ROCm version from apt metadata"
+            exit 1
+          fi
+          echo "latest=${LATEST}" >> "$GITHUB_OUTPUT"
+          echo "Current: ${CURRENT}, Latest: ${LATEST}"
+
+      - name: Bump ARG ROCM_VERSION
+        if: steps.versions.outputs.current != steps.versions.outputs.latest
+        env:
+          DOCKERFILE: Dockerfiles/ubuntu-24.04-rocm.Dockerfile
+          LATEST: ${{ steps.versions.outputs.latest }}
+        run: |
+          sed -i -E "s/^ARG ROCM_VERSION=.*/ARG ROCM_VERSION=${LATEST}/" "$DOCKERFILE"
+
+      - name: Open pull request
+        if: steps.versions.outputs.current != steps.versions.outputs.latest
+        uses: peter-evans/create-pull-request@3ffccacd46053766916f087ce41d627c0b8cf2d1 # v8.1.3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore(docker): bump ROCm version to ${{ steps.versions.outputs.latest }}"
+          title: "chore(docker): bump ROCm version to ${{ steps.versions.outputs.latest }}"
+          body: |
+            Bumps `ARG ROCM_VERSION` in `Dockerfiles/ubuntu-24.04-rocm.Dockerfile`
+            from `${{ steps.versions.outputs.current }}` to `${{ steps.versions.outputs.latest }}`,
+            based on the latest `amdrocm` package published at
+            https://stable.repo.amd.com/rocm/core/packages/ubuntu2404.
+
+            Merging this alone (no other files changed) will trigger
+            `build_docker.yml` to build and push
+            `ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:${{ steps.versions.outputs.latest }}`.
+            A follow-up PR updating CI consumers of the pinned image will be
+            opened automatically once that build succeeds.
+          branch: users/rocm-version-bot/bump-dockerfile-${{ steps.versions.outputs.latest }}
+          base: amd-staging
+          labels: dependencies
+          add-paths: Dockerfiles/ubuntu-24.04-rocm.Dockerfile
