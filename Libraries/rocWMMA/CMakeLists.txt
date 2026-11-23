@@ -101,3 +101,6 @@ add_subdirectory(simple_dlrm)
 add_subdirectory(simple_hgemm)
 add_subdirectory(simple_sgemm)
 add_subdirectory(simple_sgemv)
+
+enable_testing()
+add_subdirectory(type_traits)

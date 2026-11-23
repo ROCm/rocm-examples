@@ -31,7 +31,8 @@ EXAMPLES := \
   simple_dlrm \
   simple_hgemm \
   simple_sgemm \
-  simple_sgemv
+  simple_sgemv \
+  type_traits
 
 SKIP_FROM_TEST :=
 
