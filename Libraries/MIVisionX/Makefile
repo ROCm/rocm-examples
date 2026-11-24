@@ -21,10 +21,11 @@
 # SOFTWARE.
 
 EXAMPLES := \
-	canny \
-	mv_objdetect
+	canny
 
 SKIP_FROM_TEST :=
+# Disable this test until Jira ticket ROCM-1771 is resolved
+# mv_objdetect
 # opencv_orb
 
 all: $(EXAMPLES)
