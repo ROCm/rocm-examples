@@ -47,7 +47,7 @@ ILDLIBS   := -lhipsparselt
 
 ifeq ($(GPU_RUNTIME), CUDA)
   CXXFLAGS += -x cu
-  CPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
+  CPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
   COMPILER := $(CUDACXX)
   ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)

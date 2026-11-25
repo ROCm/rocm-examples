@@ -49,7 +49,7 @@ IGLSLFLAGS := -V100
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
-  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR) -D__HIP_PLATFORM_NVIDIA__
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
   COMPILER := $(CUDACXX)
   ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)

@@ -45,7 +45,6 @@ ILDLIBS   := -lhipblas -lhipsolver
 
 ifeq ($(GPU_RUNTIME), CUDA)
   CXXFLAGS += -x cu
-  CPPFLAGS += -D__HIP_PLATFORM_NVIDIA__
   COMPILER := $(CUDACXX)
   ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)

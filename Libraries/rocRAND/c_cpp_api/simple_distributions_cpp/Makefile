@@ -44,7 +44,7 @@ ILDLIBS   := -lrocrand
 
 ifeq ($(GPU_RUNTIME), CUDA)
   ICXXFLAGS += -x cu
-  ICPPFLAGS += -D__HIP_PLATFORM_NVIDIA__ -isystem $(HIP_INCLUDE_DIR)
+  ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
   ILDFLAGS  += -L $(CUDA_INSTALL_DIR)/lib64
   ILDLIBS   += -lcudart -lcuda
   COMPILER  := $(CUDACXX)
