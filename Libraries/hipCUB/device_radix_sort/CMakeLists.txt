@@ -47,7 +47,8 @@ target_include_directories(
     PRIVATE "../../../Common" "../../../External"
 )
 set_source_files_properties(main.hip PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 

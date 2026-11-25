@@ -50,7 +50,8 @@ else()
     add_subdirectory(fdtd)
 endif()
 
-if(NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"))
+detect_system_platform()
+if(NOT (ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows" AND ROCM_EXAMPLES_HIP_PLATFORM STREQUAL "nvidia"))
     add_subdirectory(monte_carlo_pi)
 endif()
 

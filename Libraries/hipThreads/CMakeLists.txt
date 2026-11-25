@@ -21,7 +21,7 @@
 # SOFTWARE.
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
-project(hipThreads_examples LANGUAGES CXX HIP)
+project(hipThreads_examples LANGUAGES CXX)
 include(CTest)
 
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
@@ -31,6 +31,8 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     message(STATUS "hipThreads examples do not support the CUDA runtime")
     return()
 endif()
+
+enable_language(HIP)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/ROCmPath.cmake")
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROCM_PATH} /opt/rocm)

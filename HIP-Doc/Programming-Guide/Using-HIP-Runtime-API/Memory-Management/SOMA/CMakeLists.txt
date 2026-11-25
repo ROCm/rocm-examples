@@ -26,7 +26,9 @@ project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-SOMA L
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "The memory pool examples are available only on Linux.")
 else()
     add_subdirectory(ipc_memory_pool_device_pointer)
@@ -39,7 +41,7 @@ endif()
 
 add_subdirectory(ordinary_memory_allocation)
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "The stream ordered memory allocation example is available only on Linux.")
 else()
     add_subdirectory(stream_ordered_memory_allocation)

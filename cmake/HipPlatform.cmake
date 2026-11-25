@@ -110,3 +110,28 @@ function(warn_gpu_runtime_used VARIABLE ACCESS VALUE CURRENT_LIST_FILE STACK)
 endfunction()
 
 variable_watch(GPU_RUNTIME warn_gpu_runtime_used)
+
+function(detect_system_platform)
+    if(DEFINED ROCM_EXAMPLES_SYSTEM_PLATFORM AND NOT "${ROCM_EXAMPLES_SYSTEM_PLATFORM}" STREQUAL "")
+        return()
+    endif()
+
+    if(DEFINED ENV{WSL_DISTRO_NAME} OR CMAKE_SYSTEM_VERSION MATCHES "[Mm]icrosoft")
+        set(_system_platform "WSL")
+    else()
+        set(_system_platform "${CMAKE_SYSTEM_NAME}")
+    endif()
+
+    set(ROCM_EXAMPLES_SYSTEM_PLATFORM "${_system_platform}" CACHE INTERNAL
+        "Detected system platform: Windows, WSL, Linux, ...")
+endfunction()
+
+function(reject_unsupported_platform)
+    cmake_parse_arguments(PARSE_ARGV 0 "PAR" "" "EXAMPLE" "EXCLUDE")
+
+    detect_system_platform()
+
+    if(ROCM_EXAMPLES_SYSTEM_PLATFORM IN_LIST PAR_EXCLUDE)
+        message(FATAL_ERROR "The ${PAR_EXAMPLE} example is not supported on ${ROCM_EXAMPLES_SYSTEM_PLATFORM}!")
+    endif()
+endfunction()

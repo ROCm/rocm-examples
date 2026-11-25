@@ -28,7 +28,8 @@ project(hipfft_multi_gpu LANGUAGES CXX)
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/HipPlatform.cmake")
 select_gpu_language()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(
         WARNING
         "hipFFT multi_gpu example is not supported on Windows. Skipping!"
@@ -67,7 +68,7 @@ if(WIN32)
 endif()
 
 install(TARGETS ${example_name})
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS hip::hipfft)
     if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
         find_package(rocfft REQUIRED)

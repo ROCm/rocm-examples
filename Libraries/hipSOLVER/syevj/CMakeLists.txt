@@ -51,7 +51,8 @@ target_include_directories(
 set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LANGUAGE})
 
 install(TARGETS ${example_name})
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::hipsolver)
     if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "HIP")
         find_package(rocsolver REQUIRED)
