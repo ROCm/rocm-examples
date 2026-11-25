@@ -31,7 +31,7 @@
     if (err != hipSuccess) {                                                   \
       std::cerr << "HIP error: " << hipGetErrorString(err) << " at "           \
                 << __LINE__ << "\n";                                           \
-      std::exit(EXIT_FAILURE);                                                      \
+      std::exit(EXIT_FAILURE);                                                 \
     }                                                                          \
   }
 
