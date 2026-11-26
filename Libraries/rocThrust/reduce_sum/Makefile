@@ -33,6 +33,9 @@ ROCM_PATH ?= /opt/rocm
 
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCTHRUST_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+# TheRock#7024 installs the libhipcxx headers under include/hipccl; fall back to include/libhipcxx.
+LIBHIPCXX_INCLUDE_SUBDIR := $(if $(wildcard $(HIP_INCLUDE_DIR)/hipccl),hipccl,libhipcxx)
+LIBHIPCXX_INCLUDE_DIR    := $(HIP_INCLUDE_DIR)/$(LIBHIPCXX_INCLUDE_SUBDIR)
 
 HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
@@ -40,7 +43,7 @@ HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 CXX_STD   := c++17
 CXXFLAGS  ?= -Wall -Wextra
 ICXXFLAGS := -std=$(CXX_STD) -x hip -O3 $(CXXFLAGS)
-ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCTHRUST_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS)
+ICPPFLAGS := -I $(COMMON_INCLUDE_DIR) -isystem $(ROCTHRUST_INCLUDE_DIR) -isystem $(LIBHIPCXX_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__ $(CPPFLAGS)
 ILDFLAGS  := $(LDFLAGS)
 ILDLIBS   := $(LDLIBS)
 include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
