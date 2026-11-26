@@ -59,12 +59,13 @@ target_include_directories(
     ${example_name}
     PRIVATE "../../../../Common" "../../../../External"
 )
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 
 install(TARGETS ${example_name})
 
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::rocrand)
 endif()

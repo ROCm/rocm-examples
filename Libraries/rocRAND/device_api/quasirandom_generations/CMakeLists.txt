@@ -55,11 +55,12 @@ set_source_files_properties(
 )
 
 # Workaround for rocRAND since it relies on definition "WIN32"
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     target_compile_definitions(${example_name} PRIVATE WIN32)
 endif()
 
 install(TARGETS ${example_name})
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::rocrand)
 endif()

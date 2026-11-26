@@ -35,8 +35,10 @@ option(ROCM_EXAMPLES_ENABLE_HIPDNN "Enable hipDNN examples (enabled by default)"
 
 # CMake configuration files for CUDA versions of HIP libraries are not yet
 # included under the HIP SDK for Windows.
+include("${CMAKE_CURRENT_LIST_DIR}/../cmake/HipPlatform.cmake")
+detect_system_platform()
 if(
-    NOT (CMAKE_SYSTEM_NAME MATCHES "Windows" AND "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
+    NOT (ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows" AND "${ROCM_EXAMPLES_GPU_LANGUAGE}" STREQUAL "CUDA")
 )
     if(ROCM_EXAMPLES_ENABLE_CK)
         add_subdirectory(ComposableKernel)

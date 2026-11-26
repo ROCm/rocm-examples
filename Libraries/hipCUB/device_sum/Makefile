@@ -30,6 +30,9 @@ CUDA_INSTALL_DIR ?= /usr/local/cuda
 
 HIP_INCLUDE_DIR    := $(ROCM_PATH)/include
 HIPCUB_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
+# TheRock#7024 installs the libhipcxx headers under include/hipccl; fall back to include/libhipcxx.
+LIBHIPCXX_INCLUDE_SUBDIR := $(if $(wildcard $(HIP_INCLUDE_DIR)/hipccl),hipccl,libhipcxx)
+LIBHIPCXX_INCLUDE_DIR    := $(HIP_INCLUDE_DIR)/$(LIBHIPCXX_INCLUDE_SUBDIR)
 
 HIPCXX  ?= $(ROCM_PATH)/bin/hipcc
 CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
@@ -47,7 +50,7 @@ ifeq ($(GPU_RUNTIME), CUDA)
   COMPILER := $(CUDACXX)
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS ?= -Wall -Wextra
-  ICPPFLAGS += -D__HIP_PLATFORM_AMD__
+  ICPPFLAGS += -isystem $(LIBHIPCXX_INCLUDE_DIR) -D__HIP_PLATFORM_AMD__
   COMPILER := $(HIPCXX)
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)

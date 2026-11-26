@@ -25,11 +25,9 @@ set(example_name hip_ipc_memory_pool_device_pointer)
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
 project(${example_name} LANGUAGES CXX)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    message(FATAL_ERROR "The IPC memory pool API is available only on Linux with the amdgpu-dkms driver.")
-endif()
-
 include("${CMAKE_CURRENT_LIST_DIR}/../../../../../../cmake/HipPlatform.cmake")
+reject_unsupported_platform(EXAMPLE ${example_name} EXCLUDE Windows)
+
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()

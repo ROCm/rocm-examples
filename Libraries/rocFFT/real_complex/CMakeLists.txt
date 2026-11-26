@@ -45,6 +45,8 @@ set_source_files_properties(main.cpp PROPERTIES LANGUAGE HIP)
 
 install(TARGETS ${example_name})
 
-if(CMAKE_SYSTEM_NAME MATCHES Windows)
+include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::rocfft)
 endif()
