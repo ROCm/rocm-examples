@@ -389,7 +389,7 @@ jobs:
         if: ${{ !cancelled() && steps.make-build.outcome == 'success' }}
         id: make-test
         run: |
-          make test HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_TEST="$SKIP_FROM_TEST" 2>&1 | tee makefile_test_output.log
+          timeout --kill-after=30s 1800s make test HIP_ARCHITECTURES="${{ matrix.gpu_config.gpu_target }}" SKIP_FROM_TEST="$SKIP_FROM_TEST" 2>&1 | tee makefile_test_output.log
 
       - name: Upload Makefile test logs
         if: ${{ !cancelled() }}
