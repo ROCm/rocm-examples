@@ -74,10 +74,10 @@ offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 	  -output=$@
 
 main.o: main.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -x hip -c --cuda-host-only -fuse-cuid=none $<
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -x hip -c --offload-host-only -fuse-cuid=none $<
 
 main_%.s: main.hip
-	$(HIPCXX) -I $(COMMON_INCLUDE_DIR) -O3 -x hip -S --cuda-device-only $(patsubst main_%.s,--offload-arch=%, $@) $< -o $@
+	$(HIPCXX) -I $(COMMON_INCLUDE_DIR) -O3 -x hip -S --offload-device-only $(patsubst main_%.s,--offload-arch=%, $@) $< -o $@
 
 main_%.o: main_%.s
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<
