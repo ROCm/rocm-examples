@@ -98,7 +98,7 @@ The above compilation steps are implemented in Visual Studio through Custom Buil
 - The host compilation from step 1 is performed by adding extra options to the source file, under `main.hip -> properties -> C/C++ -> Command Line`:
 
     ```shell
-    Additional Options: --cuda-host-only
+    Additional Options: --offload-host-only
     ```
 
 - Each device assembly .s file has a custom build tool associated to it, which performs the operation associated to step 2 from the previous section:

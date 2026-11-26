@@ -51,7 +51,7 @@ $(EXAMPLE): main.cpp vcpy_isa.hsaco
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --hip-link -o $@ $< $(ILDLIBS)
 
 vcpy_isa.hsaco: vcpy.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -c --cuda-device-only -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -c --offload-device-only -o $@ $< $(ILDLIBS)
 
 clean:
 	$(RM) $(EXAMPLE) vcpy_isa.hsaco

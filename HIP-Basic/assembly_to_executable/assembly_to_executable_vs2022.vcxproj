@@ -19,8 +19,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="main.hip">
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--cuda-host-only -fuse-cuid=none</AdditionalOptions>
-      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--cuda-host-only -fuse-cuid=none</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Release|x64'">--offload-host-only -fuse-cuid=none</AdditionalOptions>
+      <AdditionalOptions Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">--offload-host-only -fuse-cuid=none</AdditionalOptions>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -83,9 +83,9 @@
     </CustomBuild>
     <CustomBuild Include="main_gfx1151.s">
       <FileType>Document</FileType>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">if NOT EXIST "%(Identity)" "$(ClangToolPath)clang++" -o "%(Identity)" main.hip -S --cuda-device-only -I ..\..\Common --offload-arch=gfx1151
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">if NOT EXIST "%(Identity)" "$(ClangToolPath)clang++" -o "%(Identity)" main.hip -S --offload-device-only -I ..\..\Common --offload-arch=gfx1151
 "$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1151</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">if NOT EXIST "%(Identity)" "$(ClangToolPath)clang++" -o "%(Identity)" main.hip -S --cuda-device-only -I ..\..\Common --offload-arch=gfx1151
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">if NOT EXIST "%(Identity)" "$(ClangToolPath)clang++" -o "%(Identity)" main.hip -S --offload-device-only -I ..\..\Common --offload-arch=gfx1151
 "$(ClangToolPath)clang++" -o "$(IntDir)%(FileName).o" "%(Identity)" -target amdgcn-amd-amdhsa -mcpu=gfx1151</Command>
     </CustomBuild>
     <CustomBuild Include="main_gfx1201.s">
