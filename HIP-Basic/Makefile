@@ -28,6 +28,7 @@ EXAMPLES := \
   device_globals \
   dynamic_shared \
   events \
+  execution_context \
   gpu_arch \
   hello_world \
   hipify \
