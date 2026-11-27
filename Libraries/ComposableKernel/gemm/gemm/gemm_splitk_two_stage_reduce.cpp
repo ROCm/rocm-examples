@@ -1,24 +1,5 @@
-// MIT License
-//
-// Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #include <hip/hip_runtime.h>
 
@@ -29,11 +10,17 @@
 #include <tuple>
 
 #include "ck_tile/host.hpp"
-#include "ck_tile/ops/gemm/kernel/gemm_tile_partitioner.hpp"
+#include "ck_tile/ops/common/utils.hpp"
 #include "ck_tile/ops/reduce.hpp"
+
+#include "ck_tile/ops/gemm/kernel/gemm_tile_partitioner.hpp"
 #include "gemm_utils.hpp"
 #include "run_gemm_example.inc"
 
+#if __clang_major__ >= 23
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wlifetime-safety-intra-tu-suggestions"
+#endif
 /**
  * @brief Tile partitioner with output offset support.
  *
@@ -132,139 +119,107 @@ float gemm_stage1(const GemmSplitKHostArgs &args,
       GemmSplitKTilePartitioner<GemmShape, GemmConfig::TileParitionerGroupNum,
                                 GemmConfig::TileParitionerM01>;
 
-  using Traits = ck_tile::TileGemmTraits<GemmConfig::kPadM, GemmConfig::kPadN,
-                                         GemmConfig::kPadK, ALayout, BLayout,
-                                         ELayout, GemmConfig::NumWaveGroups>;
-
   using GemmUniversalTraits = ck_tile::TileGemmUniversalTraits<
       GemmConfig::kPadM, GemmConfig::kPadN, GemmConfig::kPadK,
       GemmConfig::DoubleSmemBuffer, ALayout, BLayout, ELayout,
       GemmConfig::TransposeC, GemmConfig::UseStructuredSparsity, Persistent,
       GemmConfig::NumWaveGroups, GemmConfig::Preshuffle>;
 
-  using GemmPipelineProblem =
-      ck_tile::GemmPipelineProblem<ADataType, BDataType, AccDataType, GemmShape,
-                                   Traits>;
-
-  using BaseGemmPipeline = typename PipelineTypeTraits<GemmConfig::Pipeline>::
-      template UniversalGemmPipeline<GemmPipelineProblem>;
-
-  const ck_tile::index_t k_grain = args.k_batch * GemmConfig::K_Tile;
-  const ck_tile::index_t K_split =
-      (args.K + k_grain - 1) / k_grain * GemmConfig::K_Tile;
-  const ck_tile::index_t num_loop = TilePartitioner::GetLoopNum(K_split);
-  const bool has_hot_loop = BaseGemmPipeline::BlockHasHotloop(num_loop);
-  const ck_tile::TailNumber tail_num =
-      BaseGemmPipeline::GetBlockLoopTailNum(num_loop);
-  float ave_time{0};
-
   // Create base GEMM arguments pointing to workspace instead of final output
   // The workspace will store partial results from each K-split
   ck_tile::GemmHostArgs base_args(args.a_ptr, args.b_ptr, args.e_ptr,
                                   args.k_batch, args.M, args.N, args.K,
                                   args.stride_A, args.stride_B, args.stride_E);
+  constexpr auto scheduler = GemmConfig::Scheduler;
 
-  const auto Run = [&](const auto has_hot_loop_, const auto tail_number_,
-                       const auto memory_operation_) {
-    constexpr bool has_hot_loop_v = has_hot_loop_.value;
-    constexpr auto tail_number_v = tail_number_.value;
-    constexpr auto scheduler = GemmConfig::Scheduler;
-    constexpr auto memory_operation = memory_operation_.value;
+  using AComputeDataType =
+      std::conditional_t<std::is_same_v<ADataType, ck_tile::pk_int4_t>,
+                         BDataType, ADataType>;
+  using BComputeDataType =
+      std::conditional_t<std::is_same_v<BDataType, ck_tile::pk_int4_t> ||
+                             std::is_same_v<BDataType, ck_tile::pk_fp4_raw_t>,
+                         ADataType, BDataType>;
 
-    using UniversalGemmProblem = ck_tile::UniversalGemmPipelineProblem<
-        ADataType, BDataType, AccDataType, GemmShape, GemmUniversalTraits,
-        scheduler, has_hot_loop_v, tail_number_v>;
+  using UniversalGemmProblem = ck_tile::UniversalGemmPipelineProblem<
+      ADataType, BDataType, AccDataType, GemmShape, GemmUniversalTraits,
+      scheduler, ck_tile::element_wise::PassThrough,
+      ck_tile::element_wise::PassThrough, AComputeDataType, BComputeDataType>;
 
-    using GemmPipeline = typename PipelineTypeTraits<
-        GemmConfig::Pipeline>::template GemmPipeline<UniversalGemmProblem>;
+  using GemmPipeline = typename PipelineTypeTraits<
+      GemmConfig::Pipeline>::template GemmPipeline<UniversalGemmProblem>;
 
-    using GemmEpilogue =
-        ck_tile::CShuffleEpilogue<ck_tile::CShuffleEpilogueProblem<
-            ADataType, BDataType, DsDataType, AccDataType, CDataType, DsLayout,
-            ELayout, CDEElementWise, TilePartitioner::MPerBlock,
-            TilePartitioner::NPerBlock, GemmConfig::M_Warp, GemmConfig::N_Warp,
-            GemmConfig::M_Warp_Tile, GemmConfig::N_Warp_Tile,
-            GemmConfig::K_Warp_Tile, UniversalGemmProblem::TransposeC,
-            memory_operation, GemmConfig::NumWaveGroups>>;
+  using GemmEpilogue =
+      ck_tile::CShuffleEpilogue<ck_tile::CShuffleEpilogueProblem<
+          ADataType, BDataType, DsDataType, AccDataType, CDataType, DsLayout,
+          ELayout, CDEElementWise, TilePartitioner::MPerBlock,
+          TilePartitioner::NPerBlock, GemmConfig::M_Warp, GemmConfig::N_Warp,
+          GemmConfig::M_Warp_Tile, GemmConfig::N_Warp_Tile,
+          GemmConfig::K_Warp_Tile, UniversalGemmProblem::TransposeC,
+          GemmConfig::NumWaveGroups>>;
 
-    using Kernel =
-        ck_tile::GemmKernel<TilePartitioner, GemmPipeline, GemmEpilogue>;
-    auto kargs = Kernel::MakeKernelArgs(base_args);
+  using Kernel =
+      ck_tile::GemmKernel<TilePartitioner, GemmPipeline, GemmEpilogue>;
+  auto kargs = Kernel::MakeKernelArgs(base_args);
 
-    dim3 grids;
-    if constexpr (Persistent) {
-      grids = Kernel::MaxOccupancyGridSize(s);
-    } else {
-      grids = Kernel::GridSize(args.M, args.N, args.k_batch);
-    }
-    const dim3 blocks = Kernel::BlockSize();
+  dim3 grids;
+  if constexpr (Persistent) {
+    grids = Kernel::MaxOccupancyGridSize(s);
+  } else {
+    grids = Kernel::GridSize(args.M, args.N, args.k_batch);
+  }
+  const dim3 blocks = Kernel::BlockSize();
 
-    if (!Kernel::IsSupportedArgument(kargs)) {
-      throw std::runtime_error(
-          "Wrong! Arguments not supported! Skipping gemm!\n");
-    }
+  if (!Kernel::IsSupportedArgument(kargs)) {
+    throw std::runtime_error(
+        "Wrong! Arguments not supported! Skipping gemm!\n");
+  }
 
-    if (s.log_level_ > 0) {
-      std::cout << "Stage 1 - Launching GEMM kernel: " << Kernel::GetName()
-                << '\n'
-                << "shape: " << GemmShape::GetName() << '\n'
-                << "problem: " << UniversalGemmProblem::GetName() << '\n'
-                << "pipeline: " << GemmPipeline::GetName() << '\n'
-                << "grid: {" << grids.x << ", " << grids.y << ", " << grids.z
-                << "}" << ", blocks: {" << blocks.x << ", " << blocks.y << ", "
-                << blocks.z << "}" << std::endl;
-    }
+  if (s.log_level_ > 0) {
+    std::cout << "Stage 1 - Launching GEMM kernel: " << Kernel::GetName()
+              << '\n'
+              << "shape: " << GemmShape::GetName() << '\n'
+              << "problem: " << UniversalGemmProblem::GetName() << '\n'
+              << "pipeline: " << GemmPipeline::GetName() << '\n'
+              << "grid: {" << grids.x << ", " << grids.y << ", " << grids.z
+              << "}" << ", blocks: {" << blocks.x << ", " << blocks.y << ", "
+              << blocks.z << "}" << std::endl;
+  }
 
-    if (s.flush_cache_) {
-      std::cout << "Flushing cache..." << std::endl;
+  if (s.flush_cache_) {
+    std::cout << "Flushing cache..." << std::endl;
 
-      ck_tile::HostTensor<ADataType> a_m(ck_tile::host_tensor_descriptor(
-          args.M, args.K, args.stride_A, is_row_major(ALayout{})));
-      ck_tile::HostTensor<BDataType> b_n(ck_tile::host_tensor_descriptor(
-          args.K, args.N, args.stride_B, is_row_major(BLayout{})));
+    ck_tile::HostTensor<ADataType> a_m(ck_tile::host_tensor_descriptor(
+        args.M, args.K, args.stride_A, is_row_major(ALayout{})));
+    ck_tile::HostTensor<BDataType> b_n(ck_tile::host_tensor_descriptor(
+        args.K, args.N, args.stride_B, is_row_major(BLayout{})));
 
-      auto size_a_buffer = a_m.get_element_space_size_in_bytes();
-      auto size_b_buffer = b_n.get_element_space_size_in_bytes();
+    auto size_a_buffer = a_m.get_element_space_size_in_bytes();
+    auto size_b_buffer = b_n.get_element_space_size_in_bytes();
 
-      ck_tile::RotatingMemWrapper<ADataType, BDataType> rotating_mem(
-          kargs.as_ptr[0], kargs.bs_ptr[0], s.rotating_count_, size_a_buffer,
-          size_b_buffer);
-      rotating_mem.Print();
+    ck_tile::RotatingMemWrapper<ADataType, BDataType> rotating_mem(
+        kargs.as_ptr[0], kargs.bs_ptr[0], s.rotating_count_, size_a_buffer,
+        size_b_buffer);
+    rotating_mem.Print();
 
-      auto run_flush_cache = [&]() {
-        // flush icache
-        ck_tile::flush_icache();
-        // rotating mem
-        rotating_mem.Next();
-        // clear c mem
-        if (args.k_batch > 1)
-          hipGetErrorString(hipMemsetAsync(args.e_ptr, 0,
-                                           args.M * args.N * sizeof(CDataType),
-                                           s.stream_id_));
-      };
-      return ave_time = ck_tile::launch_kernel_time_mask(
-                 s, run_flush_cache,
-                 ck_tile::make_kernel<GemmConfig::kBlockPerCu>(
-                     Kernel{}, grids, blocks, 0, kargs));
-    } else {
-      return ave_time = ck_tile::launch_kernel(
-                 s, ck_tile::make_kernel<GemmConfig::kBlockPerCu>(
-                        Kernel{}, grids, blocks, 0, kargs));
-    }
-  };
-
-  const auto RunSplitk = [&](const auto has_hot_loop_,
-                             const auto tail_number_) {
-    // For workspace mode, always use SET operation since each K-split writes to
-    // separate memory
-    return Run(
-        has_hot_loop_, tail_number_,
-        ck_tile::integral_constant<ck_tile::memory_operation_enum,
-                                   ck_tile::memory_operation_enum::set>{});
-  };
-
-  return ave_time =
-             BaseGemmPipeline::TailHandler(RunSplitk, has_hot_loop, tail_num);
+    auto run_flush_cache = [&]() {
+      // flush icache
+      ck_tile::flush_icache();
+      // rotating mem
+      rotating_mem.Next();
+      // clear c mem
+      if (args.k_batch > 1)
+        hipGetErrorString(hipMemsetAsync(
+            args.e_ptr, 0, args.M * args.N * sizeof(CDataType), s.stream_id_));
+    };
+    return ck_tile::launch_kernel_time_mask(
+        s, run_flush_cache,
+        ck_tile::make_kernel<GemmConfig::kBlockPerCu>(Kernel{}, grids, blocks,
+                                                      0, kargs));
+  } else {
+    return ck_tile::launch_kernel(
+        s, ck_tile::make_kernel<GemmConfig::kBlockPerCu>(Kernel{}, grids,
+                                                         blocks, 0, kargs));
+  }
 }
 
 /**
@@ -288,8 +243,6 @@ template <typename CDataType, typename ComputeDataType = float,
           typename ELayout = ck_tile::tensor_layout::gemm::RowMajor>
 float reduce_stage2(const GemmSplitKHostArgs &args,
                     const ck_tile::stream_config &s) {
-  const ck_tile::index_t reduce_dim_size =
-      args.k_batch; // Number of partial results to reduce
   // Calculate output size based on the final output tensor dimensions
   const ck_tile::index_t output_size = args.M * args.N;
 
@@ -308,10 +261,10 @@ float reduce_stage2(const GemmSplitKHostArgs &args,
       ck_tile::sequence<0>{}; // Reduce k_batch dimension
 
   using ReduceOp = ck_tile::ReduceOp::Add;
-  using BlockWarps = ck_tile::sequence<4, 1>;
-  using BlockTile = ck_tile::sequence<128, 128>;
-  using WarpTile = ck_tile::sequence<32, 128>;
-  using ThreadTile = ck_tile::sequence<8, 8>;
+  using BlockWarps = ck_tile::sequence<1, 1>;
+  using BlockTile = ck_tile::sequence<256, 1>;
+  using WarpTile = ck_tile::sequence<256, 1>;
+  using ThreadTile = ck_tile::sequence<1, 1>;
 
   constexpr ck_tile::index_t kBlockPerCu = 1;
 
@@ -321,14 +274,12 @@ float reduce_stage2(const GemmSplitKHostArgs &args,
 
   using Shape =
       ck_tile::Reduce2dShape<BlockWarps, BlockTile, WarpTile, ThreadTile>;
-  using Problem = ck_tile::Reduce2dProblem<CDataType, ComputeDataType,
-                                           CDataType, Shape, ReduceOp>;
-  using Kernel = ck_tile::Reduce<Problem>;
+  using Problem =
+      ck_tile::Reduce2dProblem<CDataType, ComputeDataType, CDataType, Shape,
+                               ReduceOp, decltype(kept_dim),
+                               decltype(reduce_dims), 3>;
+  using Kernel = ck_tile::ReduceKernel<Problem>;
   const ck_tile::index_t kBlockSize = Kernel::BlockSize();
-
-  if (!Kernel::IsSupportedArgument(reduce_dim_size, workspace_strides)) {
-    throw std::runtime_error("Wrong! Reduction arguments not supported!\n");
-  }
 
   if (s.log_level_ > 0) {
     std::cout << "Stage 2 - Launching Reduction kernel" << '\n'
@@ -344,7 +295,7 @@ float reduce_stage2(const GemmSplitKHostArgs &args,
              0,                                               // LDS size
              static_cast<const CDataType *>(args.e_ptr),      // workspace input
              static_cast<CDataType *>(args.final_output_ptr), // final output
-             workspace_shape, workspace_strides, kept_dim, reduce_dims));
+             workspace_shape, workspace_strides));
 
   return ave_time;
 }
@@ -505,9 +456,9 @@ float invoke_gemm_splitk_two_stage(
             << " WorkspaceSize=" << workspace_size << " bytes"
             << " A_Layout=" << ALayout::name << " B_Layout =" << BLayout::name
             << " C_Layout=" << CLayout::name
-            << " A_Type=" << DataTypeTraits<ADataType>::name
-            << " B_Type=" << DataTypeTraits<BDataType>::name
-            << " C_Type=" << DataTypeTraits<CDataType>::name
+            << " A_Type=" << ck_tile::DataTypeTraits<ADataType>::name
+            << " B_Type=" << ck_tile::DataTypeTraits<BDataType>::name
+            << " C_Type=" << ck_tile::DataTypeTraits<CDataType>::name
             << " StructuredSparsity="
             << (GemmConfig::UseStructuredSparsity ? "on" : "off")
             << " Persistent=" << (persistent ? "on" : "off") << " : "
@@ -776,7 +727,9 @@ int run_gemm_example(ck_tile::ArgParser &arg_parser) {
     return run_gemm_example_prec_type<GemmConfig<ck_tile::half_t>,
                                       ck_tile::bf16_t>(a_layout, b_layout,
                                                        arg_parser);
-  } else if (data_type == "fp8") {
+  }
+#if !CK_TILE_USE_WMMA || defined(CK_USE_WMMA_FP8)
+  else if (data_type == "fp8") {
     return run_gemm_example_prec_type<GemmConfig<ck_tile::fp8_t>,
                                       ck_tile::fp8_t, ck_tile::fp8_t,
                                       ck_tile::half_t>(a_layout, b_layout,
@@ -786,7 +739,9 @@ int run_gemm_example(ck_tile::ArgParser &arg_parser) {
                                       ck_tile::bf8_t, ck_tile::bf8_t,
                                       ck_tile::half_t>(a_layout, b_layout,
                                                        arg_parser);
-  } else if (data_type == "int8") {
+  }
+#endif
+  else if (data_type == "int8") {
     return run_gemm_example_prec_type<GemmConfig<ck_tile::int8_t>,
                                       ck_tile::int8_t, ck_tile::int8_t,
                                       ck_tile::int32_t>(a_layout, b_layout,
@@ -828,3 +783,7 @@ int main(int argc, char *argv[]) {
   }
   return EXIT_SUCCESS;
 }
+
+#if __clang_major__ >= 23
+#pragma clang diagnostic pop
+#endif

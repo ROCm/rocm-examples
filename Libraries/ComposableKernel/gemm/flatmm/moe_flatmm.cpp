@@ -1,43 +1,31 @@
-// MIT License
-//
-// Copyright (c) 2024 Advanced Micro Devices, Inc. All rights reserved.
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in
-// all copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
+// Copyright (c) Advanced Micro Devices, Inc., or its affiliates.
+// SPDX-License-Identifier: MIT
 
 #include <hip/hip_runtime.h>
 
 #include <cstring>
 #include <iostream>
-#include <memory>
 #include <ostream>
+
 #include <string>
+
 #include <tuple>
+
+#include <memory>
 
 #include "moe_flatmm.hpp"
 
 #include "ck_tile/core.hpp"
+#include "ck_tile/ops/epilogue.hpp"
+
+#include "ck_tile/ops/gemm.hpp"
+
+#include "ck_tile/ops/flatmm.hpp"
+
+#include "ck_tile/ops/moe_flatmm.hpp"
+
 #include "ck_tile/host.hpp"
 #include "ck_tile/host/reference/reference_moe_gemm.hpp"
-#include "ck_tile/ops/epilogue.hpp"
-#include "ck_tile/ops/flatmm.hpp"
-#include "ck_tile/ops/gemm.hpp"
-#include "ck_tile/ops/moe_flatmm.hpp"
 
 template <typename Layout>
 static constexpr inline auto is_row_major(Layout layout_) {
@@ -156,14 +144,11 @@ float moe_gemm(const ck_tile::MoeFlatmmHostArgs<ScaleM, ScaleN> &args,
   const bool has_hot_loop = BaseGemmPipeline::BlockHasHotloop(num_loop);
   const ck_tile::TailNumber tail_num =
       BaseGemmPipeline::GetBlockLoopTailNum(num_loop);
-  float ave_time{0};
 
-  const auto Run = [&](const auto has_hot_loop_, const auto tail_number_,
-                       const auto memory_operation_) {
+  const auto Run = [&](const auto has_hot_loop_, const auto tail_number_) {
     constexpr bool has_hot_loop_v = has_hot_loop_.value;
     constexpr auto tail_number_v = tail_number_.value;
     constexpr auto scheduler = FlatmmConfig::Scheduler;
-    constexpr auto memory_operation = memory_operation_.value;
 
     using CodegenPipelineProblem = ck_tile::FlatmmPipelineProblem<
         ADataType, BDataType, AccDataType, CodegenFlatmmShape,
@@ -174,16 +159,23 @@ float moe_gemm(const ck_tile::MoeFlatmmHostArgs<ScaleM, ScaleN> &args,
             ? 2
             : 1; // determined by scale shuffle pattern
 
-    using GemmEpilogue =
+    using GemmEpilogue = std::conditional_t<
+        FlatmmConfig::TiledMMAPermuteN,
+        ck_tile::PermuteNEpilogue<ck_tile::PermuteNEpilogueProblem<
+            ADataType, BDataType, DsDatatype, AccDataType, CDataType, DsLayout,
+            ELayout, CDEElementWise, TilePartitioner::MPerBlock,
+            TilePartitioner::NPerBlock, FlatmmConfig::M_Warp,
+            FlatmmConfig::N_Warp, FlatmmConfig::M_Warp_Tile,
+            FlatmmConfig::N_Warp_Tile, FlatmmConfig::K_Warp_Tile,
+            CodegenPipelineProblem::TransposeC, false, 1>>,
         ck_tile::CShuffleEpilogue<ck_tile::CShuffleEpilogueProblem<
             ADataType, BDataType, DsDatatype, AccDataType, CDataType, DsLayout,
             ELayout, CDEElementWise, TilePartitioner::MPerBlock,
             TilePartitioner::NPerBlock, FlatmmConfig::M_Warp,
             FlatmmConfig::N_Warp, FlatmmConfig::M_Warp_Tile,
             FlatmmConfig::N_Warp_Tile, FlatmmConfig::K_Warp_Tile,
-            CodegenPipelineProblem::TransposeC, memory_operation,
-            FlatmmConfig::NumWaveGroups, false, 1,
-            FlatmmConfig::TiledMMAPermuteN, BlockedXDLN_PerWarp>>;
+            CodegenPipelineProblem::TransposeC, FlatmmConfig::NumWaveGroups,
+            false, 1, BlockedXDLN_PerWarp>>>;
 
     using CodegenFlatmmPipeline =
         ck_tile::MoeFlatmmPipelineAGmemBGmemCRegV1<CodegenPipelineProblem>;
@@ -195,7 +187,7 @@ float moe_gemm(const ck_tile::MoeFlatmmHostArgs<ScaleM, ScaleN> &args,
     auto kargs = Kernel::MakeKernelArgs(args);
 
     const dim3 grids = Kernel::GridSize(kargs);
-    constexpr dim3 blocks = Kernel::BlockSize();
+    const dim3 blocks = Kernel::BlockSize();
 
     if (!Kernel::IsSupportedArgument(kargs)) {
       throw std::runtime_error(
@@ -257,32 +249,18 @@ float moe_gemm(const ck_tile::MoeFlatmmHostArgs<ScaleM, ScaleN> &args,
                                                outputN * sizeof(CDataType),
                                            s.stream_id_));
       };
-      ave_time = ck_tile::launch_kernel_time_mask(
+      return ck_tile::launch_kernel_time_mask(
           s, run_flush_cache,
           ck_tile::make_kernel<FlatmmConfig::kBlockPerCu>(Kernel{}, grids,
                                                           blocks, 0, kargs));
     } else {
-      ave_time = ck_tile::launch_kernel(
+      return ck_tile::launch_kernel(
           s, ck_tile::make_kernel<FlatmmConfig::kBlockPerCu>(Kernel{}, grids,
                                                              blocks, 0, kargs));
     }
-    return ave_time;
   };
 
-  const auto RunSplitk = [&](const auto has_hot_loop_,
-                             const auto tail_number_) {
-    if (args.k_batch == 1) {
-      Run(has_hot_loop_, tail_number_,
-          ck_tile::integral_constant<ck_tile::memory_operation_enum,
-                                     ck_tile::memory_operation_enum::set>{});
-    } else {
-      Run(has_hot_loop_, tail_number_,
-          ck_tile::integral_constant<
-              ck_tile::memory_operation_enum,
-              ck_tile::memory_operation_enum::atomic_add>{});
-    }
-  };
-  BaseGemmPipeline::TailHandler(RunSplitk, has_hot_loop, tail_num);
+  float ave_time = BaseGemmPipeline::TailHandler(Run, has_hot_loop, tail_num);
   return ave_time;
 }
 
@@ -398,6 +376,9 @@ int main(int argc, char *argv[]) {
     return EXIT_FAILURE;
 
   try {
+#if CK_TILE_USE_WMMA
+    return !run_moe_flatmm_example<FlatmmConfig16_Wmma>(argc, argv);
+#else
     int warp_tile = arg_parser.get_int("warp_tile");
     if (warp_tile == 0) {
       return !run_moe_flatmm_example<FlatmmConfig16>(argc, argv);
@@ -408,6 +389,7 @@ int main(int argc, char *argv[]) {
     } else {
       return !run_moe_flatmm_example<FlatmmConfig32_950>(argc, argv);
     }
+#endif
   } catch (const std::runtime_error &e) {
     std::cerr << "Runtime error: " << e.what() << '\n';
     return EXIT_FAILURE;

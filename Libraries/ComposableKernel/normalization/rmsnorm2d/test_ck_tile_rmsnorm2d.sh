@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 EXE=$1
 
 total=0
@@ -82,3 +82,7 @@ echo "Valid cases: $valid"
 accuracy=$(awk "BEGIN {printf \"%.2f\", ($valid / $total) * 100}")
 echo "Accuracy: $accuracy%"
 echo "=============================="
+
+if [ "$valid" -ne "$total" ]; then
+  exit 1
+fi
