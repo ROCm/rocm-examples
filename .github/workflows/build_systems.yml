@@ -5,12 +5,14 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Systems/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_systems.yml'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Systems/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_systems.yml'
+      - '.github/build_tools/**'
 
 permissions:
   contents: read
@@ -28,7 +30,7 @@ jobs:
         name: "Build Systems Examples"
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.1
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.2
         defaults:
             run:
                 shell: bash
@@ -48,4 +50,4 @@ jobs:
           - name: Make
             run: |
               cd Systems
-              make -j $(nproc) SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
+              make -j $(nproc) HIP_ARCHITECTURES="${GPU_TARGETS}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"

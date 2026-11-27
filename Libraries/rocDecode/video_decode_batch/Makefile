@@ -48,7 +48,7 @@ ifneq ($(SKIP_BUILD),1)
 HIP_INCLUDE_DIR       := $(ROCM_PATH)/include
 ROCDECODE_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -56,6 +56,9 @@ ICXXFLAGS := -std=$(CXX_STD)
 ICPPFLAGS := -isystem $(ROCDECODE_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_DIR) -I $(UTILS_DIR) -I $(UTILS_DIR)/rocvideodecode
 ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lrocdecode -lrocprofiler-register $(FFMPEG_LIBS) -lpthread $(CXX_FS_LIB)
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+ILDFLAGS  += --hip-link
 
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
@@ -91,11 +94,18 @@ SOURCES := main.cpp $(UTILS_DIR)/rocvideodecode/roc_video_dec.cpp
 $(EXAMPLE): $(SOURCES) $(COMMON_INCLUDE_DIR)/example_utils.hpp $(COMMON_INCLUDE_DIR)/rocdecode_utils.hpp
 	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $(SOURCES) $(ILDLIBS)
 
-# Mirrors the single ctest invocation; skips cleanly if the test video directory isn't present.
+# Mirrors the single ctest invocation; skips cleanly if the test video directory isn't present,
+# or if the example exits with 77 because the GPU supports none of the input files' codecs
+# (ctest's SKIP_RETURN_CODE).
 test: $(EXAMPLE)
 	@D=$(ROCM_PATH)/share/rocdecode/video; \
 	if [ -e "$$D" ]; then \
-	    echo "==> ./$(EXAMPLE) -i $$D -t 2"; ./$(EXAMPLE) -i "$$D" -t 2; \
+	    echo "==> ./$(EXAMPLE) -i $$D -t 2"; ./$(EXAMPLE) -i "$$D" -t 2; ec=$$?; \
+	    if [ $$ec -eq 77 ]; then \
+	        echo "==> Skipping (no codec supported on this GPU): $$D"; \
+	    elif [ $$ec -ne 0 ]; then \
+	        exit $$ec; \
+	    fi; \
 	else \
 	    echo "==> Skipping (not found): $$D"; \
 	fi

@@ -28,7 +28,9 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "Composable Kernel examples are supported on Linux only.")
     return()
 endif()
@@ -39,7 +41,6 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
 include(CTest)
 
-include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
 select_gpu_language()
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
 select_hip_platform()

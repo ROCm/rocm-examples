@@ -62,10 +62,11 @@ message(STATUS "GPU_ARCHITECTURES: ${GPU_ARCHITECTURES}")
 
 set_source_files_properties(
     main.hip
-    PROPERTIES COMPILE_OPTIONS "--cuda-host-only;-fuse-cuid=none"
+    PROPERTIES COMPILE_OPTIONS "--offload-host-only;-fuse-cuid=none"
 )
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     set(OBJ_TYPE obj)
     set(NULDEV NUL)
     set(HOST_TARGET x86_64-pc-windows-msvc)
@@ -82,7 +83,7 @@ foreach(HIP_ARCHITECTURE ${GPU_ARCHITECTURES})
     add_custom_command(
         OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/main_${HIP_ARCHITECTURE}.s
         COMMAND
-            ${CMAKE_HIP_COMPILER} -S --cuda-device-only
+            ${CMAKE_HIP_COMPILER} -S --offload-device-only
             --offload-arch=${HIP_ARCHITECTURE} -I
             ${CMAKE_CURRENT_SOURCE_DIR}/../../Common
             ${CMAKE_CURRENT_SOURCE_DIR}/main.hip -o

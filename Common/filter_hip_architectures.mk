@@ -26,18 +26,22 @@
 #   SUPPORTED_HIP_ARCHITECTURES := gfx908 gfx90a gfx942 gfx950 gfx1100 gfx1101 gfx1102 gfx1200 gfx1201
 #   include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
 #
+# SUPPORTED_HIP_ARCHITECTURES is optional; omit it if the example has no
+# architecture restrictions.
+#
 # After including this file, use:
-#   - OFFLOAD_ARCH_FLAGS: contains --offload-arch flags for hipcc
+#   - OFFLOAD_ARCH_FLAGS: --offload-arch flags for amdclang++
 #   - SKIP_BUILD: set to 1 if no supported architectures remain
 #
-# This filtering only applies if HIP_ARCHITECTURES is explicitly set by the user.
-# If HIP_ARCHITECTURES is not set, hipcc will use its default behavior.
+# If HIP_ARCHITECTURES is not set, OFFLOAD_ARCH_FLAGS targets the GPUs
+# present on the build machine (--offload-arch=native).
 
-# Only perform filtering if HIP_ARCHITECTURES is explicitly set
 ifdef HIP_ARCHITECTURES
 
 # Convert semicolon-separated list to space-separated
 _REQUESTED_ARCHS := $(subst ;, ,$(HIP_ARCHITECTURES))
+
+ifdef SUPPORTED_HIP_ARCHITECTURES
 
 # Filter: keep only architectures that are in both lists
 FILTERED_HIP_ARCHITECTURES := $(filter $(SUPPORTED_HIP_ARCHITECTURES),$(_REQUESTED_ARCHS))
@@ -50,17 +54,21 @@ ifneq ($(REMOVED_HIP_ARCHITECTURES),)
   $(warning $(EXAMPLE): Removing unsupported architectures: $(REMOVED_HIP_ARCHITECTURES))
 endif
 
+else
+  # No restriction list - use the requested architectures unfiltered
+  FILTERED_HIP_ARCHITECTURES := $(_REQUESTED_ARCHS)
+endif
+
 # Set skip flag if no supported architectures remain
 ifeq ($(FILTERED_HIP_ARCHITECTURES),)
   SKIP_BUILD := 1
   $(info $(EXAMPLE): No supported architectures found. Skipping build.)
 else
-  # Build --offload-arch flags for hipcc
   OFFLOAD_ARCH_FLAGS := $(foreach arch,$(FILTERED_HIP_ARCHITECTURES),--offload-arch=$(arch))
 endif
 
 else
-  # HIP_ARCHITECTURES not set - use hipcc defaults, no filtering needed
-  OFFLOAD_ARCH_FLAGS :=
+  # HIP_ARCHITECTURES not set - target the GPUs present on the build machine
+  OFFLOAD_ARCH_FLAGS := --offload-arch=native
   SKIP_BUILD := 0
 endif

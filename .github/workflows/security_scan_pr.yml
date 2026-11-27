@@ -19,6 +19,14 @@ concurrency:
 
 jobs:
   security:
-    uses: ROCm/rocm-security-gh/.github/workflows/security-baseline.yml@f92f9387d10fe91a0293762bdcefd3ba012a827b # v1.0.7
+    permissions:
+      actions: read
+      contents: read
+      pull-requests: write
+    uses: ROCm/rocm-security-gh/.github/workflows/security-baseline.yml@f0c86af379ef2d3af647944fd669c102bbae432e # v1.0.9
     with:
       report_formats: human
+      bandit_config_path: .github/scan_tools_configs/bandit.yml
+      gitleaks_config_path: .github/scan_tools_configs/gitleaks.toml
+      trivy_config_path: .github/scan_tools_configs/trivy.yml
+      zizmor_config_path: .github/scan_tools_configs/zizmor.yml

@@ -27,7 +27,9 @@ project(HIP-Doc-Programming-Guide-Using-HIP-Runtime-API-Memory-Management-Virtua
 file(RELATIVE_PATH folder_bin ${CMAKE_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin/${folder_bin})
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "The virtual memory example is available only on Linux.")
 else()
     add_subdirectory(virtual_memory)

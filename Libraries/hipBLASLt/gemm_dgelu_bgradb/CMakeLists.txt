@@ -45,7 +45,8 @@ add_test(NAME ${example_name} COMMAND ${example_name})
 
 # Link to example library
 target_link_libraries(${example_name} PRIVATE roc::hipblaslt)
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     target_link_libraries(${example_name} PRIVATE clang_rt.builtins-x86_64)
 endif()
 target_compile_definitions(${example_name} PRIVATE ROCM_USE_FLOAT16)
@@ -58,6 +59,6 @@ set_source_files_properties(main.cpp PROPERTIES LANGUAGE ${ROCM_EXAMPLES_GPU_LAN
 
 install(TARGETS ${example_name})
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     install(IMPORTED_RUNTIME_ARTIFACTS roc::hipblaslt)
 endif()

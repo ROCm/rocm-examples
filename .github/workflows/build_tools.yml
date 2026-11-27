@@ -5,12 +5,14 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Tools/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_tools.yml'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'Tools/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_tools.yml'
+      - '.github/build_tools/**'
 
 permissions:
   contents: read
@@ -27,7 +29,7 @@ jobs:
         name: "Build ROCm tool examples"
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.1
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.2
         defaults:
             run:
                 shell: bash
@@ -47,4 +49,4 @@ jobs:
           - name: Make
             run: |
               cd Tools
-              make -j SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
+              make -j HIP_ARCHITECTURES="${GPU_TARGETS}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"

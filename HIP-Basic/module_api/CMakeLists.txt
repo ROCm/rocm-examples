@@ -45,12 +45,12 @@ add_executable(${example_name} main.hip)
 # device code object for potentially multiple device architectures. Code objects need not and
 # _should not_ be linked using the host linker. We're creating an OBJECT library, because in
 # CMake terms, OBJECT libraries don't involve a linking step, but in reality, we'll also add
-# the `--cuda-device-only` compile option, which changes the target triplet of the compiler
+# the `--offload-device-only` compile option, which changes the target triplet of the compiler
 # from host to device code.
 add_library(${example_name}_module OBJECT module.hip)
 
 # Ideally we'd need a non-existent CheckHIPCompilerFlag module before assuming this flag works.
-target_compile_options(${example_name}_module PRIVATE --cuda-device-only)
+target_compile_options(${example_name}_module PRIVATE --offload-device-only)
 
 # Copy the code object next to the executable
 add_custom_command(

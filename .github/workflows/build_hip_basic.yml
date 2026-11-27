@@ -5,12 +5,14 @@ on:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'HIP-Basic/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_hip_basic.yml'
+      - '.github/build_tools/**'
   pull_request:
     branches: [ amd-staging, amd-mainline, release/** ]
     paths:
       - 'HIP-Basic/**'
-      - '.github/workflows/**'
+      - '.github/workflows/build_hip_basic.yml'
+      - '.github/build_tools/**'
 
 permissions:
   contents: read
@@ -28,7 +30,7 @@ jobs:
         name: "Build HIP Examples"
         runs-on: ubuntu-latest
         container:
-            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.1
+            image: ghcr.io/rocm/rocm-examples-ubuntu-24.04-rocm:10.2
         defaults:
             run:
                 shell: bash
@@ -48,4 +50,4 @@ jobs:
           - name: Make
             run: |
               cd HIP-Basic
-              make -j SKIP_FROM_BUILD="$SKIP_FROM_BUILD"
+              make -j HIP_ARCHITECTURES="${GPU_TARGETS}" SKIP_FROM_BUILD="$SKIP_FROM_BUILD"

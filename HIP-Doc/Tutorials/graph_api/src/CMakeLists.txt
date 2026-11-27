@@ -40,6 +40,8 @@ if(NOT TIFF_FOUND)
         GIT_REPOSITORY https://gitlab.com/libtiff/libtiff.git
         GIT_TAG v4.7.1)
     set(BUILD_SHARED_LIBS "ON")
+    # LibTIFF's own test suite is unrelated to this example; keep it out of our ctest run.
+    set(tiff-tests OFF CACHE BOOL "Disable LibTIFF's test suite" FORCE)
     FetchContent_MakeAvailable(libtiff)
 
     target_compile_definitions(tiff PRIVATE $<$<PLATFORM_ID:Windows>:_CRT_SECURE_NO_WARNINGS>)
@@ -108,7 +110,9 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
 endif()
 install(TARGETS ${example_streams})
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+include("${CMAKE_CURRENT_LIST_DIR}/../../../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "The graph capture tutorial is available only on Linux.")
 else()
     add_executable(${example_graph_capture} main_graph_capture.hip)
@@ -150,7 +154,7 @@ install(TARGETS ${example_graph_creation})
 
 # Make sure the TIFF library can be picked up by the tutorial application
 if(NOT TIFF_FOUND)
-    if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+    if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
         # On Windows we need to copy tiff.dll to the executables' output directory.
         foreach(target ${example_streams} ${example_graph_creation})
             add_custom_command(TARGET ${target} POST_BUILD

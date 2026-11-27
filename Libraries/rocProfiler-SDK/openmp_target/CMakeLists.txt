@@ -23,6 +23,7 @@
 set(example_name rocprofiler-sdk_openmp_target)
 
 cmake_minimum_required(VERSION 3.21 FATAL_ERROR)
+project(${example_name} LANGUAGES CXX)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/HipPlatform.cmake")
 select_gpu_language()
@@ -32,13 +33,13 @@ if(ROCM_EXAMPLES_GPU_LANGUAGE STREQUAL "CUDA")
     return()
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "rocProfiler-SDK examples are only available on Linux")
     return()
 endif()
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/ROCmPath.cmake")
-project(${example_name} LANGUAGES CXX)
 
 include("${CMAKE_CURRENT_LIST_DIR}/../../../cmake/FindFilesystem.cmake")
 

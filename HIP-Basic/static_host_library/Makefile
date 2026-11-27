@@ -30,7 +30,8 @@ CUDA_INSTALL_DIR ?= /usr/local/cuda
 HIP_INCLUDE_DIR  := $(ROCM_PATH)/include
 
 CXX    ?= g++
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
+CUDACXX ?= $(CUDA_INSTALL_DIR)/bin/nvcc
 AR     ?= ar
 
 # Common variables and flags
@@ -48,11 +49,19 @@ ifeq ($(GPU_RUNTIME), CUDA)
   ICPPFLAGS += -isystem $(HIP_INCLUDE_DIR)
   LIBFLAGS  += -lib
   HIPLIBS   += -L$(CUDA_INSTALL_DIR)/lib64 -lcudart
+  COMPILER  := $(CUDACXX)
+  ILDLIBS += -lcuda
 else ifeq ($(GPU_RUNTIME), HIP)
   CXXFLAGS  ?= -Wall -Wextra
   LIBFLAGS  += -c -fPIC
   HIPLIBS   += -L$(ROCM_PATH)/lib -lamdhip64
   HOSTFLAGS += $(CXXFLAGS)
+  include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+  ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+  # Only the HIP compiler understands --hip-link; scope it to this
+  # branch so it never reaches nvcc (CUDA) or g++ ($(EXAMPLE_CXX)).
+  HIP_LINK_FLAG := --hip-link
+  COMPILER := $(HIPCXX)
 else
   $(error GPU_RUNTIME is set to "$(GPU_RUNTIME)". GPU_RUNTIME must be either CUDA or HIP)
 endif
@@ -70,13 +79,13 @@ LIBEXAMPLE  := lib$(EXAMPLE_LIB).a
 all: $(EXAMPLE) $(EXAMPLE_CXX)
 
 $(EXAMPLE): main.cpp $(LIBEXAMPLE)
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -L. $(ILDFLAGS) -o $@ $< -l$(EXAMPLE_LIB) $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) -L. $(ILDFLAGS) $(HIP_LINK_FLAG) -o $@ $< -l$(EXAMPLE_LIB) $(ILDLIBS)
 
 $(EXAMPLE_CXX): main.cpp $(LIBEXAMPLE)
 	$(CXX) $(HOSTFLAGS) $(ICPPFLAGS) -L. $(ILDFLAGS) -o $@ $< -l$(EXAMPLE_LIB) $(HIPLIBS) $(ILDLIBS)
 
 $(LIBOBJ): library/library.hip $(COMMON_INCLUDE_DIR)/example_utils.hpp
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) $(LIBFLAGS) -o $@ $< $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) $(LIBFLAGS) -o $@ $< $(ILDLIBS)
 
 $(LIBEXAMPLE): $(LIBOBJ)
 	$(AR) rcs $@ $(LIBOBJ)

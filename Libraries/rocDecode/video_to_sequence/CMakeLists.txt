@@ -28,6 +28,7 @@ project(${example_name} LANGUAGES CXX)
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/../../../cmake")
 include("../../../cmake/FindFilesystem.cmake")
 include("../../../cmake/HipPlatform.cmake")
+include("../../../cmake/RocDecodeLinkOrder.cmake")
 select_gpu_language()
 
 enable_language(${ROCM_EXAMPLES_GPU_LANGUAGE})
@@ -37,7 +38,8 @@ set(CMAKE_${ROCM_EXAMPLES_GPU_LANGUAGE}_STANDARD_REQUIRED ON)
 select_hip_platform()
 verify_hip_platform(PLATFORMS "amd")
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     message(STATUS "rocDecode examples are only available on Linux")
     return()
 endif()
@@ -63,6 +65,7 @@ add_executable(${example_name}
     ${ROCM_PATH}/share/rocdecode/utils/rocvideodecode/roc_video_dec.cpp
 )
 
+link_rocdecode_first(${example_name})
 target_link_libraries(${example_name}
     PRIVATE
     hip::host

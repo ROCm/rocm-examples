@@ -38,7 +38,9 @@ find_package(hip)
 find_package(rocwmma QUIET)
 
 # Remove OpenMP dependency from rocwmma on Windows
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+include("${CMAKE_CURRENT_LIST_DIR}/../../cmake/HipPlatform.cmake")
+detect_system_platform()
+if(ROCM_EXAMPLES_SYSTEM_PLATFORM STREQUAL "Windows")
     if(TARGET roc::rocwmma)
         get_target_property(ROCWMMA_LINK_LIBS roc::rocwmma INTERFACE_LINK_LIBRARIES)
         if(ROCWMMA_LINK_LIBS)
