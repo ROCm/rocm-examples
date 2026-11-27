@@ -1,6 +1,6 @@
 // MIT License
 //
-// Copyright (c) 2025 Advanced Micro Devices, Inc. All rights reserved.
+// Copyright (c) 2025-2026 Advanced Micro Devices, Inc. All rights reserved.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -21,6 +21,7 @@
 // SOFTWARE.
 
 // [sphinx-start]
+#include <cstdlib>
 #include <hip/hip_runtime.h>
 #include <iostream>
 
@@ -30,6 +31,7 @@
     if (err != hipSuccess) {                                                   \
       std::cerr << "HIP error: " << hipGetErrorString(err) << " at "           \
                 << __LINE__ << "\n";                                           \
+      std::exit(EXIT_FAILURE);                                                 \
     }                                                                          \
   }
 
