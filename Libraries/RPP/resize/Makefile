@@ -37,7 +37,7 @@ ROCM_PATH ?= /opt/rocm
 HIP_INCLUDE_DIR := $(ROCM_PATH)/include
 RPP_INCLUDE_DIR := $(HIP_INCLUDE_DIR)
 
-HIPCXX ?= $(ROCM_PATH)/bin/hipcc
+HIPCXX ?= $(ROCM_PATH)/bin/amdclang++
 
 # Common variables and flags
 CXX_STD   := c++17
@@ -48,6 +48,9 @@ ICPPFLAGS := -isystem $(RPP_INCLUDE_DIR) -I $(COMMON_INCLUDE_DIR) -I $(EXTERNAL_
              -DEXAMPLE_DATA_DIR=\"$(CURDIR)/../data/images\"
 ILDFLAGS  := -L $(ROCM_PATH)/lib
 ILDLIBS   := -lrpp -lopencv_core -lopencv_imgcodecs -lopencv_imgproc -fopenmp
+include $(COMMON_INCLUDE_DIR)/filter_hip_architectures.mk
+ICXXFLAGS += -x hip -O3 $(OFFLOAD_ARCH_FLAGS)
+ILDFLAGS  += --hip-link
 
 ifeq ($(GPU_RUNTIME), HIP)
 	CXXFLAGS ?= -Wall -Wextra
