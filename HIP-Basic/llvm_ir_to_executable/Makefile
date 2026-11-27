@@ -75,7 +75,7 @@ offload_bundle.hipfb: $(GPU_ARCHS:%=main_%.o)
 	  -output=$@
 
 main.o: main.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -x hip -c --cuda-host-only -fuse-cuid=none $<
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) -x hip -c --offload-host-only -fuse-cuid=none $<
 
 main_%.o: main_%.ll
 	$(CLANG) -target amdgcn-amd-amdhsa -mcpu=$* -o $@ $<
@@ -84,7 +84,7 @@ main_%.ll: main_%.bc
 	$(LLVM_DIS) -o $@ $<
 
 main_%.bc: main.hip
-	$(HIPCXX) --cuda-device-only -c -emit-llvm -O3 -x hip --offload-arch=$* -o $@ -I ../../Common -std=c++17 $<
+	$(HIPCXX) --offload-device-only -c -emit-llvm -O3 -x hip --offload-arch=$* -o $@ -I ../../Common -std=c++17 $<
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)

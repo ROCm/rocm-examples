@@ -51,7 +51,7 @@ $(EXAMPLE): main.cpp myKernel.hsaco
 	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --hip-link -o $@ $< $(ILDLIBS)
 
 myKernel.hsaco: myKernel.hip
-	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --cuda-device-only -o $@ $< $(ILDLIBS)
+	$(HIPCXX) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) --offload-device-only -o $@ $< $(ILDLIBS)
 
 clean:
 	$(RM) $(EXAMPLE) myKernel.hsaco
