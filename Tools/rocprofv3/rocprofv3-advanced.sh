@@ -95,22 +95,28 @@ echo "==========================================================================
 # (HIP's default device, ordinal 0, since the workload never calls hipSetDevice) and use its first reported
 # configuration instead of hardcoding one or picking up a config reported for a different agent.
 #
-# rocprofv3-avail's "GPU:<id>" is its own profiler agent index, not HIP's device ordinal. HIP_VISIBLE_DEVICES
-# (falling back to CUDA_VISIBLE_DEVICES, matching HIP's own fallback) reassigns ordinals by the literal order of
-# its comma-separated list -- e.g. "3,2" makes physical GPU 3 ordinal 0 -- a HIP-runtime-private remap that
-# rocprofv3-avail's listing never reflects, so it can't be recovered by inspecting that listing; only the literal
-# env var text gives the order. ROCR_VISIBLE_DEVICES needs no such handling: it filters the agent enumeration
-# below the HIP layer, so rocprofv3-avail already observes the same reordering HIP does. When neither
-# HIP_VISIBLE_DEVICES nor CUDA_VISIBLE_DEVICES is set, no HIP-private remap exists and GPU:<id> already matches
-# HIP's ordinals directly.
-HIP_VISIBLE_LIST="${HIP_VISIBLE_DEVICES:-$CUDA_VISIBLE_DEVICES}"
-if [[ -z "$HIP_VISIBLE_LIST" ]]; then
-    HIP_DEVICE0_GPU=0
-else
-    HIP_DEVICE0_GPU="${HIP_VISIBLE_LIST%%,*}"
+# rocprofv3-avail's "GPU:<id>" is its own profiler agent's raw/native index: it is never rewritten by
+# ROCR_VISIBLE_DEVICES or HIP_VISIBLE_DEVICES (confirmed from ROCm/rocm-systems' rocprofiler-sdk agent.cpp,
+# which only flips visibility flags, leaving each agent's own id untouched), so neither remap shows up in this
+# listing and both have to be resolved here from the env vars directly. ROCR_VISIBLE_DEVICES is resolved first
+# into an ordered list of native ids; HIP_VISIBLE_DEVICES (falling back to CUDA_VISIBLE_DEVICES, then
+# GPU_DEVICE_ORDINAL, matching HIP's own fallback order) entries are then positions into that already-ROCR-
+# filtered list -- not raw native ids -- whenever ROCR_VISIBLE_DEVICES is set, so the two masks compose.
+HIP_DEVICE0_GPU=""
+if [[ -z "$ROCR_VISIBLE_DEVICES" || "$ROCR_VISIBLE_DEVICES" =~ ^[0-9]+(,[0-9]+)*$ ]]; then
+    HIP_VISIBLE_LIST="${HIP_VISIBLE_DEVICES:-${CUDA_VISIBLE_DEVICES:-$GPU_DEVICE_ORDINAL}}"
+    HIP_FIRST_ENTRY="${HIP_VISIBLE_LIST%%,*}"
+    [[ -z "$HIP_VISIBLE_LIST" ]] && HIP_FIRST_ENTRY=0
     # A UUID (or anything else that isn't a plain index) can't be resolved against rocprofv3-avail's listing,
     # which has no UUID field to match against.
-    [[ "$HIP_DEVICE0_GPU" =~ ^[0-9]+$ ]] || HIP_DEVICE0_GPU=""
+    if [[ "$HIP_FIRST_ENTRY" =~ ^[0-9]+$ ]]; then
+        if [[ -z "$ROCR_VISIBLE_DEVICES" ]]; then
+            HIP_DEVICE0_GPU="$HIP_FIRST_ENTRY"
+        else
+            IFS=',' read -r -a ROCR_IDS <<< "$ROCR_VISIBLE_DEVICES"
+            [[ "$HIP_FIRST_ENTRY" -lt "${#ROCR_IDS[@]}" ]] && HIP_DEVICE0_GPU="${ROCR_IDS[$HIP_FIRST_ENTRY]}"
+        fi
+    fi
 fi
 
 if [[ -z "$HIP_DEVICE0_GPU" ]]; then
