@@ -58,7 +58,7 @@ ILDFLAGS  += $(LDFLAGS)
 ILDLIBS   += $(LDLIBS)
 
 $(EXAMPLE): main.cpp client.cpp $(COMMON_INCLUDE_DIR)/rocprofiler_utils.hpp
-	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ $^ $(ILDLIBS)
+	$(COMPILER) $(ICXXFLAGS) $(ICPPFLAGS) $(ILDFLAGS) -o $@ main.cpp client.cpp $(ILDLIBS)
 
 test: $(EXAMPLE)
 	./$(EXAMPLE) $(TEST_ARGS)
