@@ -83,7 +83,7 @@ jobs:
         env:
           GPU_CONFIG: ${{ github.event.inputs.gpu_config }}
           INSTALL_METHOD: ${{ github.event.inputs.install_method }}
-          DISTRO: ${{ github.event.inputs.distro }}
+          DISTRO: ${{ github.event.inputs.distro || 'stable_release' }}
           ROCM_VERSION: ${{ github.event.inputs.rocm_version }}
         # The stable_release image ships its own ROCm, so it cannot install a requested version.
         run: python3 .github/build_tools/configure_ci.py ${ROCM_VERSION:+--exclude-preinstalled}
