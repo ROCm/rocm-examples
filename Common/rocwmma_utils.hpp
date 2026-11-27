@@ -98,7 +98,7 @@ __host__ static inline void fill_rand(data_t *mat, uint32_t m, uint32_t n) {
     auto rando = rand() % 5u;
     for (uint32_t j = 0; j < n; j++) {
       auto value = (rando + j) % 5u;
-      mat[i * n + j] = ((value % 3u == 0u) && std::is_signed<data_t>::value)
+      mat[i * n + j] = ((value % 3u == 0u) && rocwmma::is_signed<data_t>::value)
                            ? -static_cast<data_t>(value)
                            : static_cast<data_t>(value);
     }
